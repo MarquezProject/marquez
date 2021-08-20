@@ -23,6 +23,7 @@ requirements = [
     "requests",
     "six",
     "pyrfc3339",
+    "deprecation",
 ]
 
 extras_require = {

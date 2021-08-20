@@ -15,6 +15,7 @@ import logging
 
 import marquez_client
 
+from deprecation import deprecated
 from six.moves.urllib.parse import quote
 
 from .models import (DatasetType, JobType)
@@ -28,11 +29,15 @@ log = logging.getLogger(__name__)
 
 
 # Marquez Write Only Client
+@deprecated(deprecated_in="0.17.0",
+            details="Prefer `MarquezClient`. This class is scheduled to be removed "
+                    "in release `0.19.0`.")
 class MarquezWriteOnlyClient:
     def __init__(self, backend):
         self._backend = backend
 
     # Namespace API
+    @deprecated
     def create_namespace(self, namespace_name, owner_name, description=None):
         Utils.check_name_length(namespace_name, 'namespace_name')
         Utils.check_name_length(owner_name, 'owner_name')
@@ -51,6 +56,7 @@ class MarquezWriteOnlyClient:
         )
 
     # Source API
+    @deprecated
     def create_source(self, source_name, source_type, connection_url,
                       description=None):
         Utils.check_name_length(source_name, 'source_name')
@@ -71,6 +77,7 @@ class MarquezWriteOnlyClient:
             payload=payload)
 
     # Datasets API
+    @deprecated
     def create_dataset(self, namespace_name, dataset_name, dataset_type,
                        physical_name, source_name, run_id=None,
                        description=None, schema_location=None,
@@ -114,6 +121,7 @@ class MarquezWriteOnlyClient:
         )
 
     # Job API
+    @deprecated
     def create_job(self, namespace_name, job_name, job_type,
                    location=None, input_dataset=None,
                    output_dataset=None, description=None, context=None,
@@ -148,6 +156,7 @@ class MarquezWriteOnlyClient:
             payload=payload
         )
 
+    @deprecated
     def create_job_run(self, namespace_name, job_name, run_id,
                        nominal_start_time=None,
                        nominal_end_time=None, run_args=None,
@@ -178,15 +187,19 @@ class MarquezWriteOnlyClient:
             self.mark_job_run_as_started(
                 run_id, str(datetime.datetime.utcnow()))
 
+    @deprecated
     def mark_job_run_as_started(self, run_id, at=None):
         self.__mark_job_run_as(run_id, 'start', at)
 
+    @deprecated
     def mark_job_run_as_completed(self, run_id, at=None):
         self.__mark_job_run_as(run_id, 'complete', at)
 
+    @deprecated
     def mark_job_run_as_failed(self, run_id, at=None):
         self.__mark_job_run_as(run_id, 'fail', at)
 
+    @deprecated
     def mark_job_run_as_aborted(self, run_id, at=None):
         self.__mark_job_run_as(run_id, 'abort', at)
 
