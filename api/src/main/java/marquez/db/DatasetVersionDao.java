@@ -23,11 +23,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import marquez.common.Utils;
-import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.FieldName;
-import marquez.common.models.FieldType;
-import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
@@ -67,8 +64,7 @@ public interface DatasetVersionDao extends BaseDao {
     TagDao tagDao = createTagDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
-    final Version version =
-        datasetMeta.version(NamespaceName.of(namespaceName), DatasetName.of(datasetName));
+    Version version = Utils.newDatasetVersionFor(namespaceName, datasetName, datasetMeta);
     UUID newDatasetVersionUuid = UUID.randomUUID();
     DatasetVersionRow datasetVersionRow =
         upsert(
@@ -103,7 +99,7 @@ public interface DatasetVersionDao extends BaseDao {
               UUID.randomUUID(),
               now,
               field.getName().getValue(),
-              field.getType().name(),
+              field.getType(),
               field.getDescription().orElse(null),
               datasetUuid);
       for (TagName tagName : field.getTags()) {
@@ -148,12 +144,7 @@ public interface DatasetVersionDao extends BaseDao {
         .map(
             f ->
                 new Field(
-                    FieldName.of(f.getName()),
-                    openLineageDao.toFieldType(f.getType()) != null
-                        ? FieldType.valueOf(openLineageDao.toFieldType(f.getType()))
-                        : FieldType.VARCHAR,
-                    ImmutableSet.of(),
-                    f.getDescription()))
+                    FieldName.of(f.getName()), f.getType(), ImmutableSet.of(), f.getDescription()))
         .collect(Collectors.toList());
   }
 

@@ -38,7 +38,7 @@ public final class DatasetFieldRowMapper implements RowMapper<DatasetFieldRow> {
 
     return new DatasetFieldRow(
         uuidOrThrow(results, Columns.ROW_UUID),
-        stringOrThrow(results, Columns.TYPE),
+        stringOrNull(results, Columns.TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),

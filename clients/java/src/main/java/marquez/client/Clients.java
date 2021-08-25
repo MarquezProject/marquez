@@ -22,7 +22,10 @@ public final class Clients {
    *
    * @param backend the underlying protocol to use to transmit information
    * @return the MarquezWriteOnlyClient implementation
+   * @deprecated Prefer {@code Clients.newClient(baseUrl)}. This method is scheduled to be removed
+   *     in release {@code 0.19.0}.
    */
+  @Deprecated
   public static MarquezWriteOnlyClient newWriteOnlyClient(@NonNull final Backend backend) {
     return new MarquezWriteOnlyClientImpl(backend);
   }

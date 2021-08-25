@@ -1,6 +1,9 @@
-<p align="center">
+<div align="center">
   <img src="./docs/assets/images/marquez-logo.png" width="500px" />
-</p>
+  <a href="https://lfaidata.foundation/projects">
+    <img src="./docs/assets/images/lfaidata-project-badge-incubation-black.png" width="125px" />
+  </a>
+</div>
 
 Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata. It maintains the provenance of how datasets are consumed and produced, provides global visibility into job runtime and frequency of dataset access, centralization of dataset lifecycle management, and much more. Marquez was released and open sourced by [WeWork](https://www.wework.com).
 
@@ -8,7 +11,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
-[![status](https://img.shields.io/badge/status-WIP-yellow.svg)](#status)
+[![status](https://img.shields.io/badge/status-active-brightgreen.svg)](#status)
 [![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](http://bit.ly/MarquezSlack)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)

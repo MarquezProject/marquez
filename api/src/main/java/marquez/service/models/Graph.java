@@ -1,6 +1,6 @@
 package marquez.service.models;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
@@ -10,10 +10,12 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public final class Graph {
-  private final Set<Node> mutableNodes = Sets.newHashSet();
+  private final Set<Node> mutableNodes = Sets.newTreeSet();
+
+  private Graph() {}
 
   public void add(@NonNull final Node node) {
-    addAll(ImmutableSet.of(node));
+    mutableNodes.add(node);
   }
 
   public void addAll(@NonNull final Set<Node> nodes) {
@@ -21,7 +23,7 @@ public final class Graph {
   }
 
   public Set<Node> nodes() {
-    return ImmutableSet.copyOf(mutableNodes);
+    return ImmutableSortedSet.copyOf(mutableNodes);
   }
 
   public static Builder directed() {
@@ -30,6 +32,15 @@ public final class Graph {
 
   public static final class Builder {
     private Set<Node> nodes;
+
+    public Builder() {
+      this.nodes = Sets.newHashSet();
+    }
+
+    public Builder nodes(@NonNull Node... nodes) {
+      this.nodes = Sets.newHashSet(nodes);
+      return this;
+    }
 
     public Builder nodes(@NonNull Set<Node> nodes) {
       this.nodes = nodes;

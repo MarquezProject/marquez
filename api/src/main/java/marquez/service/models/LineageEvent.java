@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -403,7 +404,7 @@ public class LineageEvent {
   public static class SchemaField {
 
     @NotNull private String name;
-    @NotNull private String type;
+    @Nullable private String type;
     private String description;
   }
 

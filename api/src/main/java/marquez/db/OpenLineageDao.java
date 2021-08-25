@@ -1,12 +1,6 @@
 package marquez.db;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static java.util.stream.Collectors.joining;
-import static marquez.common.Utils.VERSION_DELIM;
-import static marquez.common.Utils.VERSION_JOINER;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -23,7 +17,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.FieldType;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
@@ -51,7 +44,6 @@ import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
-import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -388,12 +380,14 @@ public interface OpenLineageDao extends BaseDao {
             .orElseGet(
                 () -> {
                   UUID versionUuid =
-                      version(
-                          dsNamespace.getName(),
-                          source.getName(),
-                          dsRow.getName(),
-                          fields,
-                          runUuid);
+                      Utils.newDatasetVersionFor(
+                              dsNamespace.getName(),
+                              source.getName(),
+                              dsRow.getPhysicalName(),
+                              dsRow.getName(),
+                              fields,
+                              runUuid)
+                          .getValue();
                   DatasetVersionRow row =
                       datasetVersionDao.upsert(
                           UUID.randomUUID(),
@@ -415,7 +409,7 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(),
                 now,
                 field.getName(),
-                toFieldType(field.getType()),
+                field.getType(),
                 field.getDescription(),
                 datasetRow.getUuid());
         datasetFieldMappings.add(
@@ -437,19 +431,6 @@ public interface OpenLineageDao extends BaseDao {
     }
 
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
-  }
-
-  default String toFieldType(String type) {
-    if (type == null) {
-      return null;
-    }
-
-    try {
-      return FieldType.valueOf(type.toUpperCase()).name();
-    } catch (Exception e) {
-      LoggerFactory.getLogger(getClass()).warn("Can't handle field of type {}", type.toUpperCase());
-      return null;
-    }
   }
 
   default String formatDatasetName(String name) {
@@ -534,32 +515,6 @@ public interface OpenLineageDao extends BaseDao {
       // Allow non-UUID runId
       return UUID.nameUUIDFromBytes(runId.getBytes());
     }
-  }
-
-  default UUID version(
-      String namespace,
-      String sourceName,
-      String datasetName,
-      List<SchemaField> fields,
-      UUID runId) {
-    final byte[] bytes =
-        VERSION_JOINER
-            .join(
-                namespace,
-                sourceName,
-                datasetName,
-                fields == null
-                    ? ImmutableList.of()
-                    : fields.stream()
-                        .map(field -> versionField(field.getName(), field.getType()))
-                        .collect(joining(VERSION_DELIM)),
-                runId)
-            .getBytes(UTF_8);
-    return UUID.nameUUIDFromBytes(bytes);
-  }
-
-  default String versionField(String fieldName, String type) {
-    return VERSION_JOINER.join(fieldName, type);
   }
 
   default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
