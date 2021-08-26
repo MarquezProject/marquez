@@ -3200,9 +3200,6 @@
       "sql": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
         "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
-        "additionalPropExample": {
-          "example": true
-        },
         "query": "SELECT * FROM foo"
       },
       "additionalProp1": {
@@ -3348,5 +3345,6 @@
       }
     }
   ],
-  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+  "schemaURL": "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/RunEvent"
 }

@@ -17,6 +17,7 @@ package marquez.db;
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,6 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.JobMeta;
-import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -193,7 +193,7 @@ public interface RunDao extends BaseDao {
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
-      String externalId,
+      UUID externalId,
       Instant now,
       UUID jobVersionUuid,
       UUID runArgsUuid,
@@ -242,7 +242,7 @@ public interface RunDao extends BaseDao {
           + "RETURNING *")
   ExtendedRunRow upsert(
       UUID runUuid,
-      String externalId,
+      UUID externalId,
       Instant now,
       UUID jobVersionUuid,
       UUID runArgsUuid,
@@ -306,14 +306,14 @@ public interface RunDao extends BaseDao {
     }
   }
 
-  default List<SchemaField> toSchemaFields(List<Field> fields) {
+  default List<OpenLineage.SchemaDatasetFacetFields> toSchemaFields(List<Field> fields) {
     if (fields == null) {
       return null;
     }
     return fields.stream()
         .map(
             f ->
-                SchemaField.builder()
+                new OpenLineage.SchemaDatasetFacetFieldsBuilder()
                     .name(f.getName().getValue())
                     .type(f.getType())
                     .description(f.getDescription().orElse(null))

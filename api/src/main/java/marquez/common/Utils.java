@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
+import io.openlineage.client.OpenLineage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -58,7 +59,6 @@ import marquez.common.models.RunId;
 import marquez.common.models.Version;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTableMeta;
-import marquez.service.models.LineageEvent;
 import marquez.service.models.StreamMeta;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -207,7 +207,7 @@ public final class Utils {
       String sourceName,
       String physicalName,
       String datasetName,
-      List<LineageEvent.SchemaField> fields,
+      List<OpenLineage.SchemaDatasetFacetFields> fields,
       UUID runId) {
     DatasetVersionData data =
         DatasetVersionData.builder()
@@ -274,7 +274,8 @@ public final class Utils {
     private UUID runId;
 
     public static class DatasetVersionDataBuilder {
-      private static final Function<LineageEvent.SchemaField, Triple<String, String, String>>
+      private static final Function<
+              OpenLineage.SchemaDatasetFacetFields, Triple<String, String, String>>
           schemaFieldToTripleFunction =
               f ->
                   Triple.of(
@@ -295,7 +296,7 @@ public final class Utils {
       private UUID runId;
 
       DatasetVersionData.DatasetVersionDataBuilder schemaFields(
-          List<LineageEvent.SchemaField> schemaFields) {
+          List<OpenLineage.SchemaDatasetFacetFields> schemaFields) {
         if (schemaFields == null) return this;
         setFields(schemaFields, schemaFieldToTripleFunction);
         return this;

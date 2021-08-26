@@ -15,6 +15,7 @@ import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -22,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import io.openlineage.client.OpenLineage;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -32,6 +34,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import lombok.Getter;
 import marquez.client.MarquezClient;
 import marquez.client.Utils;
 import marquez.client.models.DatasetId;
@@ -53,6 +56,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public abstract class BaseIntegrationTest {
+  public static final OpenLineage OPEN_LINEAGE = new OpenLineage(PRODUCER_URL);
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 
@@ -251,5 +255,15 @@ public abstract class BaseIntegrationTest {
 
   protected static Field newFieldWith(final ImmutableSet<String> tags) {
     return new Field(newFieldName().getValue(), newFieldType(), tags, newDescription());
+  }
+
+  @Getter
+  public static class CustomValueFacet extends OpenLineage.CustomFacet {
+    private String value;
+
+    public CustomValueFacet(String value) {
+      super(PRODUCER_URL);
+      this.value = value;
+    }
   }
 }
