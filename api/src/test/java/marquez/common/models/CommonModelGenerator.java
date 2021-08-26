@@ -30,7 +30,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
-import marquez.service.models.LineageEvent;
 
 public final class CommonModelGenerator extends Generator {
   private CommonModelGenerator() {}
@@ -104,11 +103,6 @@ public final class CommonModelGenerator extends Generator {
 
   public static Field newField() {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
-  }
-
-  public static LineageEvent.SchemaField newSchemaField() {
-    return new LineageEvent.SchemaField(
-        newFieldName().getValue(), newFieldType(), newDescription());
   }
 
   public static List<OpenLineage.SchemaDatasetFacetFields> newSchemaFields(int amount) {
