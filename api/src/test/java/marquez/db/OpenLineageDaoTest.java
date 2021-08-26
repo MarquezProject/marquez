@@ -1,6 +1,6 @@
 package marquez.db;
 
-import static marquez.db.LineageTestUtils.ol;
+import static marquez.db.LineageTestUtils.OPEN_LINEAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.openlineage.client.OpenLineage;
@@ -24,9 +24,9 @@ class OpenLineageDaoTest {
   private static OpenLineageDao dao;
   private final OpenLineage.DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
-          ol.newSchemaDatasetFacetFields("name", "STRING", "my name"),
-          ol.newSchemaDatasetFacetFields("age", "INT", "my age"));
-  private final OpenLineage.JobFacets jobFacet = ol.newJobFacetsBuilder().build();
+          OPEN_LINEAGE.newSchemaDatasetFacetFields("name", "STRING", "my name"),
+          OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "INT", "my age"));
+  private final OpenLineage.JobFacets jobFacet = OPEN_LINEAGE.newJobFacetsBuilder().build();
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
@@ -44,7 +44,7 @@ class OpenLineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(
-                ol.newOutputDataset(
+                OPEN_LINEAGE.newOutputDataset(
                     LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)));
 
     UpdateLineageRow readJob =
@@ -54,7 +54,8 @@ class OpenLineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
+                OPEN_LINEAGE.newInputDataset(
+                    LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
             Arrays.asList());
 
     assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
@@ -76,7 +77,8 @@ class OpenLineageDaoTest {
             "RUNNING",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
+                OPEN_LINEAGE.newInputDataset(
+                    LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
             Arrays.asList());
 
     assertThat(writeJob.getInputs())
@@ -101,17 +103,18 @@ class OpenLineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(
-                ol.newOutputDataset(
+                OPEN_LINEAGE.newOutputDataset(
                     LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)));
 
     OpenLineage.DatasetFacets overrideFacet =
-        ol.newDatasetFacets(
+        OPEN_LINEAGE.newDatasetFacets(
             this.datasetFacets.getDocumentation(),
-            ol.newSchemaDatasetFacet(
+            OPEN_LINEAGE.newSchemaDatasetFacet(
                 Arrays.asList(
-                    ol.newSchemaDatasetFacetFields("name", "STRING", "my name"),
-                    ol.newSchemaDatasetFacetFields("age", "INT", "my age"),
-                    ol.newSchemaDatasetFacetFields("eyeColor", "STRING", "my eye color"))),
+                    OPEN_LINEAGE.newSchemaDatasetFacetFields("name", "STRING", "my name"),
+                    OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "INT", "my age"),
+                    OPEN_LINEAGE.newSchemaDatasetFacetFields(
+                        "eyeColor", "STRING", "my eye color"))),
             this.datasetFacets.getDataSource());
     UpdateLineageRow readJob =
         LineageTestUtils.createLineageRow(
@@ -120,7 +123,8 @@ class OpenLineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(LineageTestUtils.NAMESPACE, DATASET_NAME, overrideFacet, null)),
+                OPEN_LINEAGE.newInputDataset(
+                    LineageTestUtils.NAMESPACE, DATASET_NAME, overrideFacet, null)),
             Arrays.asList());
 
     assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
@@ -143,7 +147,7 @@ class OpenLineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(
-                ol.newOutputDataset(
+                OPEN_LINEAGE.newOutputDataset(
                     LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)));
     UpdateLineageRow readJob1 =
         LineageTestUtils.createLineageRow(
@@ -152,7 +156,8 @@ class OpenLineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
+                OPEN_LINEAGE.newInputDataset(
+                    LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
             Arrays.asList());
 
     UpdateLineageRow writeJob2 =
@@ -163,7 +168,7 @@ class OpenLineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(
-                ol.newOutputDataset(
+                OPEN_LINEAGE.newOutputDataset(
                     LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)));
     UpdateLineageRow writeJob3 =
         LineageTestUtils.createLineageRow(
@@ -173,7 +178,7 @@ class OpenLineageDaoTest {
             jobFacet,
             Arrays.asList(),
             Arrays.asList(
-                ol.newOutputDataset(
+                OPEN_LINEAGE.newOutputDataset(
                     LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)));
 
     UpdateLineageRow readJob2 =
@@ -183,7 +188,8 @@ class OpenLineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
+                OPEN_LINEAGE.newInputDataset(
+                    LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets, null)),
             Arrays.asList());
 
     // verify readJob1 read the version written by writeJob1

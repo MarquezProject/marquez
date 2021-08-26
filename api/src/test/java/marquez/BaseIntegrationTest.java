@@ -56,7 +56,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 public abstract class BaseIntegrationTest {
-  public static final OpenLineage ol = new OpenLineage(PRODUCER_URL);
+  public static final OpenLineage OPEN_LINEAGE = new OpenLineage(PRODUCER_URL);
   protected static final String CONFIG_FILE = "config.test.yml";
   protected static final String CONFIG_FILE_PATH = ResourceHelpers.resourceFilePath(CONFIG_FILE);
 

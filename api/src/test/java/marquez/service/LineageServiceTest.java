@@ -1,8 +1,8 @@
 package marquez.service;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
+import static marquez.db.LineageTestUtils.OPEN_LINEAGE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
-import static marquez.db.LineageTestUtils.ol;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,15 +47,15 @@ public class LineageServiceTest {
   private static OpenLineageDao openLineageDao;
   private final OpenLineage.DatasetFacets datasetFacets =
       newDatasetFacet(
-          ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-          ol.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
-          ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth"));
+          OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+          OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+          OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth"));
   private final OpenLineage.InputDataset inputDataset =
-      ol.newInputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
+      OPEN_LINEAGE.newInputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
   private final OpenLineage.OutputDataset outputDataset =
-      ol.newOutputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
+      OPEN_LINEAGE.newOutputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
 
-  private final OpenLineage.JobFacets jobFacet = ol.newJobFacetsBuilder().build();
+  private final OpenLineage.JobFacets jobFacet = OPEN_LINEAGE.newJobFacetsBuilder().build();
 
   static Jdbi jdbi;
 
@@ -215,12 +215,12 @@ public class LineageServiceTest {
   @Test
   public void testLineageWithWithCycle() {
     OpenLineage.OutputDataset intermediateDataset =
-        ol.newOutputDataset(
+        OPEN_LINEAGE.newOutputDataset(
             NAMESPACE,
             "intermediateDataset",
             newDatasetFacet(
-                ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-                ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
             null);
     LineageTestUtils.createLineageRow(
         openLineageDao,
@@ -231,12 +231,12 @@ public class LineageServiceTest {
         Arrays.asList(intermediateDataset));
 
     OpenLineage.OutputDataset finalDataset =
-        ol.newOutputDataset(
+        OPEN_LINEAGE.newOutputDataset(
             NAMESPACE,
             "finalDataset",
             newDatasetFacet(
-                ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-                ol.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
             null);
     UpdateLineageRow intermediateJob =
         LineageTestUtils.createLineageRow(
@@ -245,7 +245,7 @@ public class LineageServiceTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(
+                OPEN_LINEAGE.newInputDataset(
                     NAMESPACE, "intermediateDataset", intermediateDataset.getFacets(), null)),
             Arrays.asList(finalDataset));
 
@@ -255,7 +255,8 @@ public class LineageServiceTest {
         "COMPLETE",
         jobFacet,
         Arrays.asList(
-            ol.newInputDataset(NAMESPACE, "finalDataset", finalDataset.getFacets(), null)),
+            OPEN_LINEAGE.newInputDataset(
+                NAMESPACE, "finalDataset", finalDataset.getFacets(), null)),
         Arrays.asList(outputDataset));
     Lineage lineage =
         lineageService.lineage(

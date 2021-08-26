@@ -30,7 +30,7 @@ public class LineageTestUtils {
   public static final URI PRODUCER_URL = URI.create("http://test.producer/");
   public static final URI SCHEMA_URL = URI.create("http://test.schema/");
   public static final String NAMESPACE = "namespace";
-  public static final OpenLineage ol = new OpenLineage(PRODUCER_URL);
+  public static final OpenLineage OPEN_LINEAGE = new OpenLineage(PRODUCER_URL);
 
   /**
    * Create an {@link UpdateLineageRow} from the input job details and datasets.
@@ -52,15 +52,16 @@ public class LineageTestUtils {
       List<OpenLineage.OutputDataset> outputs) {
     ZonedDateTime now = Instant.now().atZone(LOCAL_ZONE).truncatedTo(ChronoUnit.HOURS);
     OpenLineage.NominalTimeRunFacet nominalTimeRunFacet =
-        ol.newNominalTimeRunFacet(now, now.plusHours(1));
+        OPEN_LINEAGE.newNominalTimeRunFacet(now, now.plusHours(1));
 
     UUID runId = UUID.randomUUID();
     OpenLineage.RunEvent event =
-        ol.newRunEventBuilder()
+        OPEN_LINEAGE
+            .newRunEventBuilder()
             .eventTime(Instant.now().atZone(LOCAL_ZONE))
             .eventType(status)
-            .job(ol.newJob(NAMESPACE, jobName, jobFacet))
-            .run(ol.newRun(runId, ol.newRunFacets(nominalTimeRunFacet, null)))
+            .job(OPEN_LINEAGE.newJob(NAMESPACE, jobName, jobFacet))
+            .run(OPEN_LINEAGE.newRun(runId, OPEN_LINEAGE.newRunFacets(nominalTimeRunFacet, null)))
             .inputs(inputs)
             .outputs(outputs)
             .build();
@@ -108,11 +109,13 @@ public class LineageTestUtils {
   public static OpenLineage.DatasetFacets newDatasetFacet(
       Map<String, OpenLineage.CustomFacet> facets, OpenLineage.SchemaDatasetFacetFields... fields) {
     OpenLineage.DatasetFacetsBuilder builder =
-        ol.newDatasetFacetsBuilder()
-            .documentation(ol.newDocumentationDatasetFacet("the dataset documentation"))
-            .schema(ol.newSchemaDatasetFacet(Arrays.asList(fields)))
+        OPEN_LINEAGE
+            .newDatasetFacetsBuilder()
+            .documentation(OPEN_LINEAGE.newDocumentationDatasetFacet("the dataset documentation"))
+            .schema(OPEN_LINEAGE.newSchemaDatasetFacet(Arrays.asList(fields)))
             .dataSource(
-                ol.newDatasourceDatasetFacet("the source", URI.create("http://thesource.com")));
+                OPEN_LINEAGE.newDatasourceDatasetFacet(
+                    "the source", URI.create("http://thesource.com")));
     facets.forEach(builder::put);
     return builder.build();
   }
@@ -144,15 +147,15 @@ public class LineageTestUtils {
                       .getOutputDatasetName()
                       .map(
                           dsName ->
-                              ol.newOutputDataset(
+                              OPEN_LINEAGE.newOutputDataset(
                                   NAMESPACE,
                                   dsName + "<-" + jobName,
                                   newDatasetFacet(
-                                      ol.newSchemaDatasetFacetFields(
+                                      OPEN_LINEAGE.newSchemaDatasetFacetFields(
                                           "afield", "string", "a string field"),
-                                      ol.newSchemaDatasetFacetFields(
+                                      OPEN_LINEAGE.newSchemaDatasetFacetFields(
                                           "anotherField", "string", "a string field"),
-                                      ol.newSchemaDatasetFacetFields(
+                                      OPEN_LINEAGE.newSchemaDatasetFacetFields(
                                           "anInteger", "int", "an integer field")),
                                   null));
               UpdateLineageRow row =
@@ -162,7 +165,7 @@ public class LineageTestUtils {
                       "COMPLETE",
                       jobFacet,
                       Collections.singletonList(
-                          ol.newInputDataset(
+                          OPEN_LINEAGE.newInputDataset(
                               dataset.getNamespace(),
                               dataset.getName(),
                               dataset.getFacets(),

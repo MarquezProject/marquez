@@ -89,34 +89,39 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
         ImmutableMap.of("inputFacetKey", new CustomValueFacet("inputFacetValue"));
 
     OpenLineage.DatasetFacetsBuilder builder =
-        ol.newDatasetFacetsBuilder()
+        OPEN_LINEAGE
+            .newDatasetFacetsBuilder()
             .documentation(
-                ol.newDocumentationDatasetFacet(
+                OPEN_LINEAGE.newDocumentationDatasetFacet(
                     DB_TABLE_META.getDescription().orElse("the dataset documentation")))
             .schema(
-                ol.newSchemaDatasetFacet(
+                OPEN_LINEAGE.newSchemaDatasetFacet(
                     Arrays.asList(
-                        ol.newSchemaDatasetFacetFieldsBuilder()
+                        OPEN_LINEAGE
+                            .newSchemaDatasetFacetFieldsBuilder()
                             .name("firstname")
                             .type("string")
                             .description("the first name")
                             .build())))
             .dataSource(
-                ol.newDatasourceDatasetFacet("the source", URI.create("http://thesource.com")));
+                OPEN_LINEAGE.newDatasourceDatasetFacet(
+                    "the source", URI.create("http://thesource.com")));
     outputFacets.forEach(builder::put);
 
     OpenLineage.DatasetFacets datasetFacets = builder.build();
 
     final OpenLineage.RunEvent lineageEvent =
-        ol.newRunEventBuilder()
+        OPEN_LINEAGE
+            .newRunEventBuilder()
             .eventType("COMPLETE")
-            .run(ol.newRun(UUID.randomUUID(), ol.newRunFacetsBuilder().build()))
-            .job(ol.newJobBuilder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
+            .run(OPEN_LINEAGE.newRun(UUID.randomUUID(), OPEN_LINEAGE.newRunFacetsBuilder().build()))
+            .job(OPEN_LINEAGE.newJobBuilder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
             .eventTime(ZonedDateTime.now())
             .inputs(Collections.emptyList())
             .outputs(
                 Collections.singletonList(
-                    ol.newOutputDatasetBuilder()
+                    OPEN_LINEAGE
+                        .newOutputDatasetBuilder()
                         .namespace(NAMESPACE_NAME)
                         .name(DB_TABLE_NAME)
                         .facets(datasetFacets)
@@ -137,14 +142,17 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     datasetFacets.getAdditionalProperties().putAll(inputFacets);
 
     final OpenLineage.RunEvent readEvent =
-        ol.newRunEventBuilder()
+        OPEN_LINEAGE
+            .newRunEventBuilder()
             .eventType("COMPLETE")
-            .run(ol.newRun(UUID.randomUUID(), ol.newRunFacetsBuilder().build()))
-            .job(ol.newJobBuilder().namespace(NAMESPACE_NAME).name("aReadOnlyJob").build())
+            .run(OPEN_LINEAGE.newRun(UUID.randomUUID(), OPEN_LINEAGE.newRunFacetsBuilder().build()))
+            .job(
+                OPEN_LINEAGE.newJobBuilder().namespace(NAMESPACE_NAME).name("aReadOnlyJob").build())
             .eventTime(ZonedDateTime.now())
             .inputs(
                 Collections.singletonList(
-                    ol.newInputDatasetBuilder()
+                    OPEN_LINEAGE
+                        .newInputDatasetBuilder()
                         .namespace(NAMESPACE_NAME)
                         .name(DB_TABLE_NAME)
                         .facets(datasetFacets)

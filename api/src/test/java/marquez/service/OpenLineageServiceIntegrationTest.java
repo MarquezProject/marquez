@@ -1,6 +1,6 @@
 package marquez.service;
 
-import static marquez.BaseIntegrationTest.ol;
+import static marquez.BaseIntegrationTest.OPEN_LINEAGE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -218,23 +218,26 @@ public class OpenLineageServiceIntegrationTest {
   public void testDatasetVersionUpdatedOnRunCompletion()
       throws ExecutionException, InterruptedException {
     OpenLineage.DatasetFacets datasetFacets =
-        ol.newDatasetFacetsBuilder()
+        OPEN_LINEAGE
+            .newDatasetFacetsBuilder()
             .dataSource(
-                ol.newDatasourceDatasetFacet("theDatasource", URI.create("http://thedatasource")))
+                OPEN_LINEAGE.newDatasourceDatasetFacet(
+                    "theDatasource", URI.create("http://thedatasource")))
             .build();
     OpenLineage.OutputDataset outputDataset =
-        ol.newOutputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
+        OPEN_LINEAGE.newOutputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
     OpenLineage.InputDataset inputDataset =
-        ol.newInputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
+        OPEN_LINEAGE.newInputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
 
     // First run creates the dataset without a currentVersionUuid
     UUID firstRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            ol.newRunEventBuilder()
+            OPEN_LINEAGE
+                .newRunEventBuilder()
                 .eventType("RUNNING")
-                .run(ol.newRun(firstRunId, ol.newRunFacetsBuilder().build()))
-                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(OPEN_LINEAGE.newRun(firstRunId, OPEN_LINEAGE.newRunFacetsBuilder().build()))
+                .job(OPEN_LINEAGE.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
                 .outputs(Collections.singletonList(outputDataset))
@@ -246,10 +249,11 @@ public class OpenLineageServiceIntegrationTest {
     // On complete, the currentVersionUuid is updated
     lineageService
         .createAsync(
-            ol.newRunEventBuilder()
+            OPEN_LINEAGE
+                .newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(ol.newRun(firstRunId, ol.newRunFacetsBuilder().build()))
-                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(OPEN_LINEAGE.newRun(firstRunId, OPEN_LINEAGE.newRunFacetsBuilder().build()))
+                .job(OPEN_LINEAGE.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
                 .outputs(Collections.singletonList(outputDataset))
@@ -268,10 +272,11 @@ public class OpenLineageServiceIntegrationTest {
     UUID secondRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            ol.newRunEventBuilder()
+            OPEN_LINEAGE
+                .newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(ol.newRun(secondRunId, ol.newRunFacetsBuilder().build()))
-                .job(ol.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
+                .run(OPEN_LINEAGE.newRun(secondRunId, OPEN_LINEAGE.newRunFacetsBuilder().build()))
+                .job(OPEN_LINEAGE.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(Collections.singletonList(inputDataset))
                 .outputs(new ArrayList<>())
@@ -285,10 +290,11 @@ public class OpenLineageServiceIntegrationTest {
     UUID failedRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            ol.newRunEventBuilder()
+            OPEN_LINEAGE
+                .newRunEventBuilder()
                 .eventType("FAILED")
-                .run(ol.newRun(failedRunId, ol.newRunFacetsBuilder().build()))
-                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(OPEN_LINEAGE.newRun(failedRunId, OPEN_LINEAGE.newRunFacetsBuilder().build()))
+                .job(OPEN_LINEAGE.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
                 .outputs(Collections.singletonList(outputDataset))
@@ -307,10 +313,11 @@ public class OpenLineageServiceIntegrationTest {
     UUID fourthRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            ol.newRunEventBuilder()
+            OPEN_LINEAGE
+                .newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(ol.newRun(fourthRunId, ol.newRunFacetsBuilder().build()))
-                .job(ol.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
+                .run(OPEN_LINEAGE.newRun(fourthRunId, OPEN_LINEAGE.newRunFacetsBuilder().build()))
+                .job(OPEN_LINEAGE.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(Collections.singletonList(inputDataset))
                 .outputs(new ArrayList<>())

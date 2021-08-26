@@ -1,8 +1,8 @@
 package marquez.db;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
+import static marquez.db.LineageTestUtils.OPEN_LINEAGE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
-import static marquez.db.LineageTestUtils.ol;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,25 +40,25 @@ public class LineageDaoTest {
   private static LineageDao lineageDao;
   private static OpenLineageDao openLineageDao;
   private final OpenLineage.InputDataset inputDataset =
-      ol.newInputDataset(
+      OPEN_LINEAGE.newInputDataset(
           NAMESPACE,
           "commonDataset",
           newDatasetFacet(
-              ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-              ol.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
-              ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
           null);
   private final OpenLineage.OutputDataset outputDataset =
-      ol.newOutputDataset(
+      OPEN_LINEAGE.newOutputDataset(
           NAMESPACE,
           "commonDataset",
           newDatasetFacet(
-              ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-              ol.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
-              ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
           null);
 
-  private final OpenLineage.JobFacets jobFacet = ol.newJobFacets(null, null, null);
+  private final OpenLineage.JobFacets jobFacet = OPEN_LINEAGE.newJobFacets(null, null, null);
 
   static Jdbi jdbi;
 
@@ -132,12 +132,14 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                ol.newInputDataset(
+                OPEN_LINEAGE.newInputDataset(
                     NAMESPACE,
                     "randomDataset",
                     newDatasetFacet(
-                        ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-                        ol.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
+                        OPEN_LINEAGE.newSchemaDatasetFacetFields(
+                            "firstname", "string", "the first name"),
+                        OPEN_LINEAGE.newSchemaDatasetFacetFields(
+                            "lastname", "string", "the last name")),
                     null)),
             Arrays.asList());
     // fetch the first "readJob" lineage.
@@ -254,13 +256,13 @@ public class LineageDaoTest {
 
     // write a new dataset with a different name
     OpenLineage.OutputDataset anotherDataset =
-        ol.newOutputDataset(
+        OPEN_LINEAGE.newOutputDataset(
             NAMESPACE,
             "anUncommonDataset",
             newDatasetFacet(
-                ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-                ol.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
-                ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
             null);
     // write a bunch of jobs that share nothing with the writeJob
     writeDownstreamLineage(
@@ -329,9 +331,11 @@ public class LineageDaoTest {
         outputDataset);
 
     OpenLineage.JobFacets newVersionFacet =
-        ol.newJobFacetsBuilder()
+        OPEN_LINEAGE
+            .newJobFacetsBuilder()
             .sourceCodeLocation(
-                ol.newSourceCodeLocationJobFacetBuilder()
+                OPEN_LINEAGE
+                    .newSourceCodeLocationJobFacetBuilder()
                     .url(URI.create("git://git@github:location"))
                     .build())
             .build();
