@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import io.dropwizard.util.Resources;
+import io.openlineage.client.OpenLineage;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +14,6 @@ import marquez.db.OpenLineageDao;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
-import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,9 +30,12 @@ public class GraphqlTest {
     GraphqlSchemaBuilder schemaBuilder = new GraphqlSchemaBuilder(jdbi);
     graphQL = GraphQL.newGraphQL(schemaBuilder.buildSchema()).build();
     OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
-    LineageEvent lineageEvent =
+
+    OpenLineage.RunEvent lineageEvent =
         Utils.newObjectMapper()
-            .readValue(Resources.getResource("open_lineage/event_simple.json"), LineageEvent.class);
+            .readValue(
+                Resources.getResource("open_lineage/event_simple.json"),
+                OpenLineage.RunEvent.class);
 
     OpenLineageService service = new OpenLineageService(openLineageDao, mock(RunService.class));
     service.createAsync(lineageEvent).get();

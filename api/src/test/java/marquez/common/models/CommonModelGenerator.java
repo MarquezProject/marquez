@@ -20,6 +20,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -110,13 +111,16 @@ public final class CommonModelGenerator extends Generator {
         newFieldName().getValue(), newFieldType(), newDescription());
   }
 
-  public static List<LineageEvent.SchemaField> newSchemaFields(int amount) {
+  public static List<OpenLineage.SchemaDatasetFacetFields> newSchemaFields(int amount) {
     return IntStream.range(0, amount)
         .boxed()
         .map(
             i ->
-                new LineageEvent.SchemaField(
-                    newFieldName().getValue(), newFieldType(), newDescription()))
+                new OpenLineage.SchemaDatasetFacetFieldsBuilder()
+                    .name(newFieldName().getValue())
+                    .type(newFieldType())
+                    .description(newDescription())
+                    .build())
         .collect(Collectors.toList());
   }
 
@@ -181,7 +185,7 @@ public final class CommonModelGenerator extends Generator {
     return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
   }
 
-  public static String newExternalId() {
-    return "test_external_id" + newId();
+  public static UUID newExternalId() {
+    return UUID.randomUUID();
   }
 }

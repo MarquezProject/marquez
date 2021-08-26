@@ -1,10 +1,12 @@
 package marquez.service;
 
+import static marquez.BaseIntegrationTest.ol;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import io.dropwizard.util.Resources;
+import io.openlineage.client.OpenLineage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,10 +35,6 @@ import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.models.Dataset;
 import marquez.service.models.Job;
-import marquez.service.models.LineageEvent;
-import marquez.service.models.LineageEvent.DatasetFacets;
-import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
-import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.Run;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Assertions;
@@ -135,11 +133,11 @@ public class OpenLineageServiceIntegrationTest {
     datasetDao = jdbi.onDemand(DatasetDao.class);
   }
 
-  private List<LineageEvent> initEvents(List<URI> uris) {
-    List<LineageEvent> events = new ArrayList<>();
+  private List<OpenLineage.RunEvent> initEvents(List<URI> uris) {
+    List<OpenLineage.RunEvent> events = new ArrayList<>();
     for (URI uri : uris) {
       try {
-        LineageEvent event = getLineageEventFromResource(uri);
+        OpenLineage.RunEvent event = getLineageEventFromResource(uri);
         lineageService.createAsync(event).get();
         events.add(event);
       } catch (Exception e) {
@@ -190,10 +188,10 @@ public class OpenLineageServiceIntegrationTest {
   @ParameterizedTest
   @MethodSource({"getData"})
   public void serviceCalls(List<URI> uris, ExpectedResults expectedResults) {
-    List<LineageEvent> events = initEvents(uris);
+    List<OpenLineage.RunEvent> events = initEvents(uris);
 
     JobService jobService = new JobService(openLineageDao, runService);
-    LineageEvent event = events.get(events.size() - 1);
+    OpenLineage.RunEvent event = events.get(events.size() - 1);
     Optional<Job> job =
         jobService.findWithRun(
             openLineageDao.formatNamespaceName(event.getJob().getNamespace()),
@@ -201,17 +199,16 @@ public class OpenLineageServiceIntegrationTest {
     Assertions.assertTrue(job.isPresent(), "Job does not exist: " + event.getJob().getName());
 
     RunService runService = new RunService(openLineageDao, new ArrayList());
-    Optional<Run> run =
-        runService.findRunByUuid(openLineageDao.runToUuid(event.getRun().getRunId()));
+    Optional<Run> run = runService.findRunByUuid(event.getRun().getRunId());
     Assertions.assertTrue(run.isPresent(), "Should have run");
 
     if (event.getInputs() != null) {
-      for (LineageEvent.Dataset ds : event.getInputs()) {
+      for (OpenLineage.Dataset ds : event.getInputs()) {
         checkExists(ds);
       }
     }
     if (event.getOutputs() != null) {
-      for (LineageEvent.Dataset ds : event.getOutputs()) {
+      for (OpenLineage.Dataset ds : event.getOutputs()) {
         checkExists(ds);
       }
     }
@@ -220,31 +217,27 @@ public class OpenLineageServiceIntegrationTest {
   @Test
   public void testDatasetVersionUpdatedOnRunCompletion()
       throws ExecutionException, InterruptedException {
-    LineageEvent.Dataset dataset =
-        LineageEvent.Dataset.builder()
-            .name(DATASET_NAME)
-            .namespace(NAMESPACE)
-            .facets(
-                DatasetFacets.builder()
-                    .dataSource(
-                        DatasourceDatasetFacet.builder()
-                            .name("theDatasource")
-                            .uri("http://thedatasource")
-                            .build())
-                    .build())
+    OpenLineage.DatasetFacets datasetFacets =
+        ol.newDatasetFacetsBuilder()
+            .dataSource(
+                ol.newDatasourceDatasetFacet("theDatasource", URI.create("http://thedatasource")))
             .build();
+    OpenLineage.OutputDataset outputDataset =
+        ol.newOutputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
+    OpenLineage.InputDataset inputDataset =
+        ol.newInputDataset(NAMESPACE, DATASET_NAME, datasetFacets, null);
 
     // First run creates the dataset without a currentVersionUuid
     UUID firstRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            LineageEvent.builder()
+            ol.newRunEventBuilder()
                 .eventType("RUNNING")
-                .run(new LineageEvent.Run(firstRunId.toString(), RunFacet.builder().build()))
-                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(ol.newRun(firstRunId, ol.newRunFacetsBuilder().build()))
+                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
-                .outputs(Collections.singletonList(dataset))
+                .outputs(Collections.singletonList(outputDataset))
                 .build())
         .get();
     Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
@@ -253,13 +246,13 @@ public class OpenLineageServiceIntegrationTest {
     // On complete, the currentVersionUuid is updated
     lineageService
         .createAsync(
-            LineageEvent.builder()
+            ol.newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(new LineageEvent.Run(firstRunId.toString(), RunFacet.builder().build()))
-                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(ol.newRun(firstRunId, ol.newRunFacetsBuilder().build()))
+                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
-                .outputs(Collections.singletonList(dataset))
+                .outputs(Collections.singletonList(outputDataset))
                 .build())
         .get();
     datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
@@ -275,12 +268,12 @@ public class OpenLineageServiceIntegrationTest {
     UUID secondRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            LineageEvent.builder()
+            ol.newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(new LineageEvent.Run(secondRunId.toString(), RunFacet.builder().build()))
-                .job(LineageEvent.Job.builder().name("AnInputJob").namespace(NAMESPACE).build())
+                .run(ol.newRun(secondRunId, ol.newRunFacetsBuilder().build()))
+                .job(ol.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
-                .inputs(Collections.singletonList(dataset))
+                .inputs(Collections.singletonList(inputDataset))
                 .outputs(new ArrayList<>())
                 .build())
         .get();
@@ -292,13 +285,13 @@ public class OpenLineageServiceIntegrationTest {
     UUID failedRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            LineageEvent.builder()
+            ol.newRunEventBuilder()
                 .eventType("FAILED")
-                .run(new LineageEvent.Run(failedRunId.toString(), RunFacet.builder().build()))
-                .job(LineageEvent.Job.builder().name(JOB_NAME).namespace(NAMESPACE).build())
+                .run(ol.newRun(failedRunId, ol.newRunFacetsBuilder().build()))
+                .job(ol.newJobBuilder().name(JOB_NAME).namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
                 .inputs(new ArrayList<>())
-                .outputs(Collections.singletonList(dataset))
+                .outputs(Collections.singletonList(outputDataset))
                 .build())
         .get();
 
@@ -314,12 +307,12 @@ public class OpenLineageServiceIntegrationTest {
     UUID fourthRunId = UUID.randomUUID();
     lineageService
         .createAsync(
-            LineageEvent.builder()
+            ol.newRunEventBuilder()
                 .eventType("COMPLETE")
-                .run(new LineageEvent.Run(fourthRunId.toString(), RunFacet.builder().build()))
-                .job(LineageEvent.Job.builder().name("AnInputJob").namespace(NAMESPACE).build())
+                .run(ol.newRun(fourthRunId, ol.newRunFacetsBuilder().build()))
+                .job(ol.newJobBuilder().name("AnInputJob").namespace(NAMESPACE).build())
                 .eventTime(Instant.now().atZone(TIMEZONE))
-                .inputs(Collections.singletonList(dataset))
+                .inputs(Collections.singletonList(inputDataset))
                 .outputs(new ArrayList<>())
                 .build())
         .get();
@@ -331,7 +324,7 @@ public class OpenLineageServiceIntegrationTest {
         .contains(dsVersion1Id);
   }
 
-  private void checkExists(LineageEvent.Dataset ds) {
+  private void checkExists(OpenLineage.Dataset ds) {
     DatasetService datasetService = new DatasetService(openLineageDao, runService);
 
     Optional<Dataset> dataset =
@@ -341,9 +334,9 @@ public class OpenLineageServiceIntegrationTest {
     Assertions.assertTrue(dataset.isPresent(), "Dataset does not exist: " + ds);
   }
 
-  private static LineageEvent getLineageEventFromResource(URI location) {
+  private static OpenLineage.RunEvent getLineageEventFromResource(URI location) {
     try {
-      return Utils.newObjectMapper().readValue(location.toURL(), LineageEvent.class);
+      return Utils.newObjectMapper().readValue(location.toURL(), OpenLineage.RunEvent.class);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

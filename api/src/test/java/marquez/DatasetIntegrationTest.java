@@ -6,8 +6,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
+import java.net.URI;
 import java.net.http.HttpResponse;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +26,6 @@ import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
 import marquez.common.Utils;
-import marquez.db.LineageTestUtils;
-import marquez.service.models.LineageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,35 +83,40 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   public void testApp_getTableVersions() {
     client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
 
-    ImmutableMap<String, Object> outputFacets =
-        ImmutableMap.of("outputFacetKey", "outputFacetValue");
-    ImmutableMap<String, Object> inputFacets = ImmutableMap.of("inputFacetKey", "inputFacetValue");
+    ImmutableMap<String, OpenLineage.CustomFacet> outputFacets =
+        ImmutableMap.of("outputFacetKey", new CustomValueFacet("outputFacetValue"));
+    ImmutableMap<String, OpenLineage.CustomFacet> inputFacets =
+        ImmutableMap.of("inputFacetKey", new CustomValueFacet("inputFacetValue"));
 
-    final LineageEvent.DatasetFacets datasetFacets =
-        LineageTestUtils.newDatasetFacet(
-            outputFacets,
-            LineageEvent.SchemaField.builder()
-                .name("firstname")
-                .type("string")
-                .description("the first name")
-                .build());
-    datasetFacets
-        .getDocumentation()
-        .setDescription(DB_TABLE_META.getDescription().orElse("the dataset documentation"));
+    OpenLineage.DatasetFacetsBuilder builder =
+        ol.newDatasetFacetsBuilder()
+            .documentation(
+                ol.newDocumentationDatasetFacet(
+                    DB_TABLE_META.getDescription().orElse("the dataset documentation")))
+            .schema(
+                ol.newSchemaDatasetFacet(
+                    Arrays.asList(
+                        ol.newSchemaDatasetFacetFieldsBuilder()
+                            .name("firstname")
+                            .type("string")
+                            .description("the first name")
+                            .build())))
+            .dataSource(
+                ol.newDatasourceDatasetFacet("the source", URI.create("http://thesource.com")));
+    outputFacets.forEach(builder::put);
 
-    final LineageEvent lineageEvent =
-        LineageEvent.builder()
-            .producer("testApp_getTableVersions")
+    OpenLineage.DatasetFacets datasetFacets = builder.build();
+
+    final OpenLineage.RunEvent lineageEvent =
+        ol.newRunEventBuilder()
             .eventType("COMPLETE")
-            .run(
-                new LineageEvent.Run(
-                    UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build()))
-            .job(LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
+            .run(ol.newRun(UUID.randomUUID(), ol.newRunFacetsBuilder().build()))
+            .job(ol.newJobBuilder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
             .eventTime(ZonedDateTime.now())
             .inputs(Collections.emptyList())
             .outputs(
                 Collections.singletonList(
-                    LineageEvent.Dataset.builder()
+                    ol.newOutputDatasetBuilder()
                         .namespace(NAMESPACE_NAME)
                         .name(DB_TABLE_NAME)
                         .facets(datasetFacets)
@@ -128,19 +134,17 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
                 });
     assertThat(resp.join()).isEqualTo(201);
 
-    datasetFacets.setAdditional(inputFacets);
-    final LineageEvent readEvent =
-        LineageEvent.builder()
-            .producer("testApp_getTableVersions")
+    datasetFacets.getAdditionalProperties().putAll(inputFacets);
+
+    final OpenLineage.RunEvent readEvent =
+        ol.newRunEventBuilder()
             .eventType("COMPLETE")
-            .run(
-                new LineageEvent.Run(
-                    UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build()))
-            .job(LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name("aReadOnlyJob").build())
+            .run(ol.newRun(UUID.randomUUID(), ol.newRunFacetsBuilder().build()))
+            .job(ol.newJobBuilder().namespace(NAMESPACE_NAME).name("aReadOnlyJob").build())
             .eventTime(ZonedDateTime.now())
             .inputs(
                 Collections.singletonList(
-                    LineageEvent.Dataset.builder()
+                    ol.newInputDatasetBuilder()
                         .namespace(NAMESPACE_NAME)
                         .name(DB_TABLE_NAME)
                         .facets(datasetFacets)
@@ -161,10 +165,15 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     // update dataset facet to include input and output facets
     // save the expected facets as a map for comparison
-    datasetFacets.setAdditional(
-        ImmutableMap.<String, Object>builder().putAll(inputFacets).putAll(outputFacets).build());
+    datasetFacets
+        .getAdditionalProperties()
+        .putAll(
+            ImmutableMap.<String, OpenLineage.CustomFacet>builder()
+                .putAll(inputFacets)
+                .putAll(outputFacets)
+                .build());
     Map<String, Object> expectedFacetsMap =
-        Utils.getMapper().convertValue(datasetFacets, new TypeReference<Map<String, Object>>() {});
+        Utils.getMapper().convertValue(datasetFacets, new TypeReference<>() {});
 
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(versions).hasSizeGreaterThanOrEqualTo(2);
@@ -194,7 +203,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
         client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
     assertThat(latestDatasetVersion.getCreatedByRun()).isPresent();
     assertThat(latestDatasetVersion.getCreatedByRun().get().getId())
-        .isEqualTo(lineageEvent.getRun().getRunId());
+        .isEqualTo(lineageEvent.getRun().getRunId().toString());
     assertThat(latestDatasetVersion.hasFacets()).isTrue();
     assertThat(latestDatasetVersion.getFacets()).isEqualTo(expectedFacetsMap);
   }

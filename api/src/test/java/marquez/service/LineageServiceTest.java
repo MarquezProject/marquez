@@ -2,9 +2,11 @@ package marquez.service;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
+import static marquez.db.LineageTestUtils.ol;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.openlineage.client.OpenLineage;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,9 +25,6 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.Edge;
 import marquez.service.models.Lineage;
-import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.JobFacet;
-import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
@@ -46,15 +45,17 @@ public class LineageServiceTest {
   private static LineageDao lineageDao;
   private static LineageService lineageService;
   private static OpenLineageDao openLineageDao;
-  private final Dataset dataset =
-      new Dataset(
-          NAMESPACE,
-          "commonDataset",
-          newDatasetFacet(
-              new SchemaField("firstname", "string", "the first name"),
-              new SchemaField("lastname", "string", "the last name"),
-              new SchemaField("birthdate", "date", "the date of birth")));
-  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+  private final OpenLineage.DatasetFacets datasetFacets =
+      newDatasetFacet(
+          ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+          ol.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+          ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth"));
+  private final OpenLineage.InputDataset inputDataset =
+      ol.newInputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
+  private final OpenLineage.OutputDataset outputDataset =
+      ol.newOutputDataset(NAMESPACE, "commonDataset", datasetFacets, null);
+
+  private final OpenLineage.JobFacets jobFacet = ol.newJobFacetsBuilder().build();
 
   static Jdbi jdbi;
 
@@ -100,7 +101,7 @@ public class LineageServiceTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     List<JobLineage> jobRows =
         writeDownstreamLineage(
             openLineageDao,
@@ -110,7 +111,7 @@ public class LineageServiceTest {
                     new DatasetConsumerJob("downstreamJob", 1, Optional.of("outputData2")),
                     new DatasetConsumerJob("finalConsumer", 1, Optional.empty()))),
             jobFacet,
-            dataset);
+            outputDataset);
 
     UpdateLineageRow secondRun =
         LineageTestUtils.createLineageRow(
@@ -119,7 +120,7 @@ public class LineageServiceTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     writeDownstreamLineage(
         openLineageDao,
         new LinkedList<>(
@@ -127,7 +128,7 @@ public class LineageServiceTest {
                 new DatasetConsumerJob("newReadJob", 5, Optional.of("outputData3")),
                 new DatasetConsumerJob("newDownstreamJob", 1, Optional.empty()))),
         jobFacet,
-        dataset);
+        outputDataset);
     String jobName = writeJob.getJob().getName();
     Lineage lineage =
         lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
@@ -213,35 +214,39 @@ public class LineageServiceTest {
 
   @Test
   public void testLineageWithWithCycle() {
-    Dataset intermediateDataset =
-        new Dataset(
+    OpenLineage.OutputDataset intermediateDataset =
+        ol.newOutputDataset(
             NAMESPACE,
             "intermediateDataset",
             newDatasetFacet(
-                new SchemaField("firstname", "string", "the first name"),
-                new SchemaField("birthdate", "date", "the date of birth")));
+                ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                ol.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+            null);
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "writeJob",
         "COMPLETE",
         jobFacet,
-        Arrays.asList(dataset),
+        Arrays.asList(inputDataset),
         Arrays.asList(intermediateDataset));
 
-    Dataset finalDataset =
-        new Dataset(
+    OpenLineage.OutputDataset finalDataset =
+        ol.newOutputDataset(
             NAMESPACE,
             "finalDataset",
             newDatasetFacet(
-                new SchemaField("firstname", "string", "the first name"),
-                new SchemaField("lastname", "string", "the last name")));
+                ol.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                ol.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
+            null);
     UpdateLineageRow intermediateJob =
         LineageTestUtils.createLineageRow(
             openLineageDao,
             "intermediateJob",
             "COMPLETE",
             jobFacet,
-            Arrays.asList(intermediateDataset),
+            Arrays.asList(
+                ol.newInputDataset(
+                    NAMESPACE, "intermediateDataset", intermediateDataset.getFacets(), null)),
             Arrays.asList(finalDataset));
 
     LineageTestUtils.createLineageRow(
@@ -249,8 +254,9 @@ public class LineageServiceTest {
         "cycleJob",
         "COMPLETE",
         jobFacet,
-        Arrays.asList(finalDataset),
-        Arrays.asList(dataset));
+        Arrays.asList(
+            ol.newInputDataset(NAMESPACE, "finalDataset", finalDataset.getFacets(), null)),
+        Arrays.asList(outputDataset));
     Lineage lineage =
         lineageService.lineage(
             NodeId.of(

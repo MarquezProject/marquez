@@ -4,7 +4,7 @@ import static marquez.tracing.SentryPropagating.withSentry;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
+import io.openlineage.client.OpenLineage;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -34,7 +34,6 @@ import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
-import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
 @Slf4j
@@ -49,7 +48,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
   }
 
-  public CompletableFuture<Void> createAsync(LineageEvent event) {
+  public CompletableFuture<Void> createAsync(OpenLineage.RunEvent event) {
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
                 withSentry(() -> updateMarquezModel(event, mapper)), ForkJoinPool.commonPool())
@@ -63,7 +62,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                   }
                 });
 
-    UUID runUuid = runUuidFromEvent(event.getRun());
+    UUID runUuid = event.getRun().getRunId();
     CompletableFuture<Void> openLineage =
         CompletableFuture.runAsync(
             withSentry(
@@ -76,27 +75,10 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                         event.getJob().getName(),
                         event.getJob().getNamespace(),
                         createJsonArray(event, mapper),
-                        event.getProducer())),
+                        event.getProducer().toString())),
             ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);
-  }
-
-  /**
-   * Try to convert the run id to a UUID. If it isn't a properly formatted UUID, generate one from
-   * the string bytes
-   *
-   * @param run
-   * @return the {@link UUID} for the run
-   */
-  private UUID runUuidFromEvent(LineageEvent.Run run) {
-    UUID runUuid;
-    try {
-      runUuid = UUID.fromString(run.getRunId());
-    } catch (Exception e) {
-      runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
-    }
-    return runUuid;
   }
 
   private Optional<JobOutputUpdate> buildJobOutputUpdate(UpdateLineageRow record) {
