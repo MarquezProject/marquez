@@ -1,6 +1,5 @@
 const postCssModulesValues = require("postcss-modules-values")
 const path = require('path')
-const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
 
 module.exports = {

@@ -12,7 +12,7 @@ import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { isDataset, isJob } from '../../../../helpers/nodes'
-import { setSelectedNode } from '../../../../actionCreators'
+import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
 
 export type Vertex = {

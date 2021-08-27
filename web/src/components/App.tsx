@@ -12,9 +12,9 @@ import Header from './header/Header'
 import Lineage from './lineage/Lineage'
 import React, { ReactElement, useState } from 'react'
 import Toast from './Toast'
-import createRootReducer from '../reducers'
+import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
-import rootSaga from '../sagas'
+import rootSaga from '../store/sagas'
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
