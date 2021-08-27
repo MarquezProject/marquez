@@ -1,4 +1,4 @@
-import { FETCH_JOB_RUNS } from '../constants/ActionTypes'
+import { FETCH_JOB_RUNS, FETCH_LINEAGE_REQUESTED } from '../constants/ActionTypes'
 import { Namespace, Namespaces } from '../types/api'
 import { all, call, put, take } from 'redux-saga/effects'
 import {
@@ -6,10 +6,13 @@ import {
   fetchDatasetsSuccess,
   fetchJobRunsSuccess,
   fetchJobsSuccess,
+  fetchLineageSuccess,
   fetchNamespacesSuccess
 } from '../actionCreators'
 import { fetchDatasets, fetchJobs, fetchLatestJobRuns, fetchNamespaces } from '../requests'
+import { fetchLineage } from '../requests/lineage'
 import _orderBy from 'lodash/orderBy'
+import myLineageSaga from './lineage'
 
 export function* fetchNamespacesDatasetsAndJobs() {
   try {
@@ -30,6 +33,18 @@ export function* fetchNamespacesDatasetsAndJobs() {
   }
 }
 
+export function* fetchLineageSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LINEAGE_REQUESTED)
+      const { lineage } = yield call(fetchLineage, payload.nodeId)
+      yield put(fetchLineageSuccess(lineage))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching lineage.'))
+    }
+  }
+}
+
 export function* fetchJobRunsSaga() {
   while (true) {
     try {
@@ -45,7 +60,7 @@ export function* fetchJobRunsSaga() {
 
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespacesDatasetsAndJobs()]
-  const sagasThatWatchForAction = [fetchJobRunsSaga()]
+  const sagasThatWatchForAction = [fetchJobRunsSaga(), myLineageSaga()]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])
 }

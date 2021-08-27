@@ -86,3 +86,17 @@ export const setBottomBarHeight = (height: number) => ({
   type: actionTypes.SET_BOTTOM_BAR_HEIGHT,
   payload: height
 })
+
+export const fetchLineageRequest = (nodeId: string) => ({
+  type: actionTypes.FETCH_LINEAGE_REQUESTED,
+  payload: {
+    nodeId
+  }
+})
+
+export const fetchLineageSuccess = (nodeId: string) => ({
+  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  payload: {
+    nodeId
+  }
+})

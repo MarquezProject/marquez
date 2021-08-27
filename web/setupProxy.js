@@ -12,6 +12,7 @@ app.use('/', express.static(path))
 app.use('/datasets/:name', express.static(path))
 app.use('/jobs/:name', express.static(path))
 app.use(proxy('/api/v1', apiOptions))
+app.use(proxy('/api/v1-beta', apiOptions))
 
 router.get('/healthcheck', function (req, res) {
   res.send('OK')

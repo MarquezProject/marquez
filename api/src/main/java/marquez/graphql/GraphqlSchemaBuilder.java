@@ -28,7 +28,6 @@ import lombok.SneakyThrows;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.FieldName;
-import marquez.common.models.FieldType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -186,11 +185,6 @@ public class GraphqlSchemaBuilder {
             GraphQLScalarType.newScalar()
                 .name("FieldName")
                 .coercing(coerce(FieldName::getValue, FieldName::of))
-                .build())
-        .scalar(
-            GraphQLScalarType.newScalar()
-                .name("FieldType")
-                .coercing(coerce(FieldType::toString, FieldType::valueOf))
                 .build())
         .scalar(
             GraphQLScalarType.newScalar()

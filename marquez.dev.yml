@@ -9,9 +9,9 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://localhost:5432/marquez_handshake
-  user: datakin
-  password: TWTgBReDzjGatVW6hHyjApkn
+  url: jdbc:postgresql://postgres:5432/marquez
+  user: marquez
+  password: marquez
 
 migrateOnStartup: true
 

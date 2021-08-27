@@ -177,7 +177,7 @@ public interface LineageDao extends SqlObject {
             field("outputs").as("output_uuids")));
     Stream<SelectedField> jobFields =
         selectionSet.getImmediateFields().stream()
-            .filter(n -> n.getObjectType().getName().equals("Job"));
+            .filter(n -> n.getName().equals("Job"));
     boolean includeContext = false;
     if (jobFields.anyMatch(n -> n.getName().equals("context"))) {
       selectedFields.add(field("jc.context"));

@@ -8,7 +8,6 @@ scalar DatasetName
 scalar DatasetType
 scalar SourceName
 scalar FieldName
-scalar FieldType
 scalar TagName
 scalar JobName
 scalar JobType
@@ -165,7 +164,7 @@ type DatasetId {
 
 type Field {
   name: FieldName
-  type: FieldType
+
   tags: [TagName]
   description: String!
 }

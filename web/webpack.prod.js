@@ -22,6 +22,7 @@ const webpackProd = {
       __DEVELOPMENT__: JSON.stringify(false),
       __NODE_ENV__: JSON.stringify('production'),
       __API_URL__: JSON.stringify('/api/v1'),
+      __API_URL_BETA__: JSON.stringify('/api/v1-beta'),
       __TEMP_ACTOR_STR__: JSON.stringify('me'),
       __ROLLBAR__: JSON.stringify(true),
       __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7'),

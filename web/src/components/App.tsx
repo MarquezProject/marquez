@@ -16,7 +16,7 @@ import createRootReducer from '../reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../sagas'
 
-const sagaMiddleware = createSagaMiddleware({
+export const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
     console.log('There was an error in the saga', error)
   }

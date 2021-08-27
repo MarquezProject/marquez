@@ -12,8 +12,8 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { fetchLineageRequest, setSelectedNode } from '../../actionCreators'
 import { localPoint } from '@visx/event'
-import { setSelectedNode } from '../../actionCreators'
 import Edge from './components/edge/Edge'
 import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -49,6 +49,7 @@ interface LineageState {
 
 interface DispatchProps {
   setSelectedNode: typeof setSelectedNode
+  fetchLineageRequest: typeof fetchLineageRequest
 }
 
 type JorD = IJob | IDataset | undefined
@@ -65,6 +66,11 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       edges: [],
       nodes: []
     }
+  }
+
+  componentDidMount() {
+    console.log('here')
+    this.props.fetchLineageRequest('dataset:food_delivery:public.categories')
   }
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
@@ -270,7 +276,8 @@ const mapStateToProps = (state: IState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setSelectedNode: setSelectedNode
+      setSelectedNode: setSelectedNode,
+      fetchLineageRequest: fetchLineageRequest
     },
     dispatch
   )
