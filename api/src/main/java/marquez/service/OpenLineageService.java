@@ -71,7 +71,6 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                         event.getEventType() == null ? "" : event.getEventType(),
                         event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
                         runUuid,
-                        runUuid,
                         event.getJob().getName(),
                         event.getJob().getNamespace(),
                         createJsonArray(event, mapper),
