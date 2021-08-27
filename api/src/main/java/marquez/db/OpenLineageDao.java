@@ -63,7 +63,7 @@ public interface OpenLineageDao extends BaseDao {
           + "job_namespace, "
           + "event, "
           + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
