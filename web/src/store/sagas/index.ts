@@ -1,4 +1,4 @@
-import { FETCH_JOB_RUNS } from '../../constants/ActionTypes'
+import { FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
 import { Namespace, Namespaces } from '../../types/api'
 import { all, call, put, take } from 'redux-saga/effects'
 import {

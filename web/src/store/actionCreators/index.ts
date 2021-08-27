@@ -1,4 +1,4 @@
-import * as actionTypes from '../../constants/ActionTypes'
+import * as actionTypes from './actionTypes'
 
 import { Dataset, Job, Namespace, Run } from '../../types/api'
 import { IFilterByKey } from '../../types'

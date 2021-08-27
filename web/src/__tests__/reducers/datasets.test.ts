@@ -1,4 +1,4 @@
-import * as actionTypes from '../../constants/ActionTypes'
+import * as actionTypes from '../../store/actionCreators/actionTypes'
 import datasetsReducer, { initialState } from '../../store/reducers/datasets'
 
 const datasets = require('../../../docker/db/data/datasets.json')

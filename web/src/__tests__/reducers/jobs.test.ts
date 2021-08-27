@@ -1,4 +1,4 @@
-import * as actionTypes from '../../constants/ActionTypes'
+import * as actionTypes from '../../store/actionCreators/actionTypes'
 import _find from 'lodash/find'
 import _sample from 'lodash/sample'
 import jobsReducer, { initialState } from '../../store/reducers/jobs'

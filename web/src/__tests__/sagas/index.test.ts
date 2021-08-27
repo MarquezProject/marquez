@@ -1,4 +1,4 @@
-import * as actionTypes from '../../constants/ActionTypes'
+import * as actionTypes from '../../store/actionCreators/actionTypes'
 import * as actions from '../../store/actionCreators'
 import * as api from '../../store/requests'
 import * as matchers from 'redux-saga-test-plan/matchers'

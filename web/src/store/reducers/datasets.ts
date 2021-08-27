@@ -2,7 +2,7 @@ import {
   FETCH_DATASETS_SUCCESS,
   FILTER_DATASETS,
   FIND_MATCHING_ENTITIES
-} from '../../constants/ActionTypes'
+} from '../actionCreators/actionTypes'
 import { IDataset } from '../../types'
 import {
   fetchDatasetsSuccess,

@@ -3,7 +3,7 @@ import {
   FETCH_JOB_RUNS_SUCCESS,
   FILTER_JOBS,
   FIND_MATCHING_ENTITIES
-} from '../../constants/ActionTypes'
+} from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
 import {
   fetchJobRunsSuccess,
