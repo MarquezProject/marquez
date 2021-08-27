@@ -58,7 +58,6 @@ public interface OpenLineageDao extends BaseDao {
       "INSERT INTO lineage_events ("
           + "event_type, "
           + "event_time, "
-          + "run_id, "
           + "run_uuid, "
           + "job_name, "
           + "job_namespace, "
@@ -68,7 +67,6 @@ public interface OpenLineageDao extends BaseDao {
   void createLineageEvent(
       String eventType,
       Instant eventTime,
-      UUID runId,
       UUID runUuid,
       String jobName,
       String jobNamespace,

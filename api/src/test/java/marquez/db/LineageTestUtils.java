@@ -78,7 +78,6 @@ public class LineageTestUtils {
         event.getEventType() == null ? "" : event.getEventType(),
         event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
         runId,
-        runId,
         event.getJob().getName(),
         event.getJob().getNamespace(),
         jsonObject,
