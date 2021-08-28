@@ -4,7 +4,7 @@
 2. Tag the release and prepare for the next version with:
 
    ```bash
-   $ ./new-version.sh --release-version X.Y.Z --next-release X.Y.Z
+   $ ./new-version.sh --release-version X.Y.Z --next-version X.Y.Z
    ```
 
    > **Tip:** Use `--help` to see script usage
