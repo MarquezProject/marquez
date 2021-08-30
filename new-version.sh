@@ -45,14 +45,14 @@ usage() {
   echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2"
   echo
   echo "  # Bump release candidate without push"
-  echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2 -p"
+  echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2 --no-push"
   echo
   title "ARGUMENTS:"
   echo "  -r, --release-version string    the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
   echo "  -n, --next-version string       the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
   echo
   title "FLAGS:"
-  echo "  -p, --no-push    local changes are not automatically pushed to the remote repository"
+  echo "  --no-push    local changes are not automatically pushed to the remote repository"
   exit 1
 }
 
@@ -81,6 +81,7 @@ if [[ $# -eq 0 ]] ; then
   usage
 fi
 
+PUSH="true"
 while [ $# -gt 0 ]; do
   case $1 in
     -r|--release-version)
@@ -91,7 +92,7 @@ while [ $# -gt 0 ]; do
        shift
        NEXT_VERSION="${1}"
        ;;
-    -p|--no-push)
+    --no-push)
        PUSH="false"
        ;;
     -h|--help)
