@@ -11,11 +11,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.TimeZone;
 import java.util.UUID;
 import marquez.common.Utils;
 import marquez.db.Columns;
 import marquez.service.models.Dataset;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.postgresql.util.PGobject;
@@ -23,9 +25,11 @@ import org.postgresql.util.PGobject;
 class DatasetMapperTest {
 
   private static ResultSet resultSet;
+  private static TimeZone defaultTZ = TimeZone.getDefault();
 
   @BeforeAll
   public static void setUp() throws SQLException, MalformedURLException {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     resultSet = mock(ResultSet.class);
     when(resultSet.getMetaData()).thenReturn(mock(ResultSetMetaData.class));
     when(resultSet.getString(Columns.NAMESPACE_NAME)).thenReturn("NAMESPACE");
@@ -73,6 +77,11 @@ class DatasetMapperTest {
             + "    \"namespace\": \"test-namespace\",\n"
             + "    \"name\": \"test-dataset\"\n"
             + "  }]");
+  }
+
+  @AfterAll
+  public static void reset() {
+    TimeZone.setDefault(defaultTZ);
   }
 
   @Test
