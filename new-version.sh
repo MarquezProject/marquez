@@ -44,15 +44,22 @@ usage() {
   echo "  # Bump release candidate"
   echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2"
   echo
+  echo "  # Bump release candidate without push"
+  echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2 --no-push"
+  echo
   title "ARGUMENTS:"
-  echo "  -r, --release-version string       the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
-  echo "  -n, --next-version string          the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
+  echo "  -r, --release-version string    the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  -n, --next-version string       the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
+  echo
+  title "FLAGS:"
+  echo "  --no-push    local changes are not automatically pushed to the remote repository"
   exit 1
 }
 
-readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}((-rc\.[0-9]+)?|(-SNAPSHOT)?)$" # X.Y.Z
-                                                                           # X.Y.Z-rc.*
-                                                                           # X.Y.Z-SNAPSHOT
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}((-rc\.[0-9]+)?(-SNAPSHOT)?)$" # X.Y.Z
+                                                                          # X.Y.Z-rc.*
+                                                                          # X.Y.Z-rc.*-SNAPSHOT
+                                                                          # X.Y.Z-SNAPSHOT
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
@@ -74,17 +81,21 @@ if [[ $# -eq 0 ]] ; then
   usage
 fi
 
+PUSH="true"
 while [ $# -gt 0 ]; do
   case $1 in
-    -r|'--release-version')
+    -r|--release-version)
        shift
        RELEASE_VERSION="${1}"
        ;;
-    -n|'--next-version')
+    -n|--next-version)
        shift
        NEXT_VERSION="${1}"
        ;;
-    -h|'--help')
+    --no-push)
+       PUSH="false"
+       ;;
+    -h|--help)
        usage
        exit 0
        ;;
@@ -107,8 +118,9 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
   exit 1;
 fi
 
-# Append '-SNAPSHOT' to 'NEXT_VERSION' if not a release candidate, or missing
-if [[ ! "${NEXT_VERSION}" == *-rc.? &&
+# Append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
+# (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
+if [[ "${NEXT_VERSION}" == *-rc.? ||
       ! "${NEXT_VERSION}" == *-SNAPSHOT ]]; then
   NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
 fi
@@ -167,6 +179,11 @@ sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 git commit -sam "Prepare next development version"
 
 # (11) Push commits and tag
-git push origin main && git push origin "${RELEASE_VERSION}"
+if [[ ${PUSH} = "true" ]]; then
+  git push origin main && \
+    git push origin "${RELEASE_VERSION}"
+else
+  echo "...skipping push to 'main'; to push manually, use 'git push origin main && git push origin "${RELEASE_VERSION}"'"
+fi
 
 echo "DONE!"
