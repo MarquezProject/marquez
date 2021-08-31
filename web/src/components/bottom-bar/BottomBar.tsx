@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Box, Container, Theme } from '@material-ui/core'
-import { IState } from '../../reducers'
+import { IState } from '../../store/reducers'
 import { Route, Switch } from 'react-router-dom'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'

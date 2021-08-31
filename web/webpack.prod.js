@@ -1,10 +1,8 @@
 const merge = require('webpack-merge')
 const webpack = require('webpack')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const webpackShared = require('./webpack.common.js')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const webpackProd = {
   mode: 'production',
@@ -27,7 +25,6 @@ const webpackProd = {
       __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7'),
       __API_DOCS_URL__: JSON.stringify('https://marquezproject.github.io/marquez/openapi.html')
     })
-    //new BundleAnalyzerPlugin(),
   ]
 }
 

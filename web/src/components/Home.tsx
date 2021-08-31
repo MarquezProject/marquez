@@ -1,9 +1,9 @@
 import * as RRD from 'react-router-dom'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
-import { IDatasetsState } from '../reducers/datasets'
-import { IJobsState } from '../reducers/jobs'
-import { IState } from '../reducers'
+import { IDatasetsState } from '../store/reducers/datasets'
+import { IJobsState } from '../store/reducers/jobs'
+import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
@@ -13,7 +13,7 @@ import {
 import { Pagination } from '@material-ui/lab'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { setSelectedNode } from '../actionCreators'
+import { setSelectedNode } from '../store/actionCreators'
 import DatasetPreviewCard from './DatasetPreviewCard'
 import JobPreviewCard from './JobPreviewCard'
 import MqText from './core/text/MqText'

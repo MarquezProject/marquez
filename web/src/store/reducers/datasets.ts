@@ -2,14 +2,14 @@ import {
   FETCH_DATASETS_SUCCESS,
   FILTER_DATASETS,
   FIND_MATCHING_ENTITIES
-} from '../constants/ActionTypes'
-import { IDataset } from '../types'
+} from '../actionCreators/actionTypes'
+import { IDataset } from '../../types'
 import {
   fetchDatasetsSuccess,
   filterDatasets,
   findMatchingEntities as findMatchingEntitiesActionCreator
 } from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './'
+import { filterEntities, findMatchingEntities } from './index'
 
 export type IDatasetsState = IDataset[]
 
