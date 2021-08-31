@@ -18,16 +18,23 @@ import static marquez.client.models.ModelGenerator.newJobWith;
 import static marquez.client.models.ModelGenerator.newRun;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.UUID;
+import marquez.client.Utils;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class JobTest {
-  private static final Job JOB = newJobWith(newRun());
-  private static final String JSON = JsonGenerator.newJsonFor(JOB);
 
   @Test
-  public void testFromJson() {
-    final Job actual = Job.fromJson(JSON);
-    assertThat(actual).isEqualTo(JOB);
+  public void testFromJson() throws JsonProcessingException {
+    final Job expected = newJobWith(newRun());
+    UUID expectedCurrentVersion = expected.getCurrentVersionUuid().get();
+
+    String jobJson = Utils.getMapper().writeValueAsString(expected);
+    Job actual = Utils.getMapper().readValue(jobJson, Job.class);
+
+    assertThat(actual.getCurrentVersionUuid().get()).isEqualTo(expectedCurrentVersion);
+    assertThat(actual).isEqualTo(expected);
   }
 }

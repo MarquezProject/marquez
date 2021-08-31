@@ -95,7 +95,8 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newDescription(),
-        newDatasetFacets(2));
+        newDatasetFacets(2),
+        UUID.fromString(newVersion()));
   }
 
   public static DbTableVersion newDbTableVersion() {
@@ -142,7 +143,8 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription(),
-        newDatasetFacets(2));
+        newDatasetFacets(2),
+        UUID.fromString(newVersion()));
   }
 
   public static StreamVersion newStreamVersion() {
@@ -212,7 +214,8 @@ public final class ModelGenerator {
         newContext(),
         newDescription(),
         latestRun,
-        null);
+        null,
+        UUID.fromString(newVersion()));
   }
 
   public static JobId newJobId() {

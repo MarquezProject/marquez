@@ -75,7 +75,7 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid,
+      @NonNull final Optional<UUID> currentVersionUuid,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;

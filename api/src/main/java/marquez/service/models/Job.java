@@ -48,7 +48,7 @@ public final class Job {
   @Nullable private final String description;
   @Nullable @Setter private Run latestRun;
   @Getter private final ImmutableMap<String, Object> facets;
-  private Optional<UUID> currentVersionUuid;
+  @Getter private Optional<UUID> currentVersionUuid;
 
   public Job(
       @NonNull final JobId id,
@@ -63,7 +63,7 @@ public final class Job {
       @Nullable final String description,
       @Nullable final Run latestRun,
       @Nullable final ImmutableMap<String, Object> facets,
-      @Nullable Optional<UUID> currentVersionUuid) {
+      @NonNull Optional<UUID> currentVersionUuid) {
     this.id = id;
     this.type = type;
     this.name = name;

@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public final class Job extends JobMeta {
   @Getter private final String namespace;
   @Nullable private final Run latestRun;
   @Getter private final Map<String, Object> facets;
+  @Getter private final Optional<UUID> currentVersionUuid;
 
   public Job(
       @NonNull final JobId id,
@@ -52,7 +54,8 @@ public final class Job extends JobMeta {
       final Map<String, String> context,
       final String description,
       @Nullable final Run latestRun,
-      @Nullable final Map<String, Object> facets) {
+      @Nullable final Map<String, Object> facets,
+      @Nullable UUID currentVersionUuid) {
     super(type, inputs, outputs, location, context, description, null);
     this.id = id;
     this.name = name;
@@ -61,6 +64,7 @@ public final class Job extends JobMeta {
     this.namespace = namespace;
     this.latestRun = latestRun;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
+    this.currentVersionUuid = Optional.ofNullable(currentVersionUuid);
   }
 
   public Optional<Run> getLatestRun() {
