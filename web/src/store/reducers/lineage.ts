@@ -1,6 +1,6 @@
-import { HEADER_HEIGHT } from '../helpers/theme'
-import { Nullable } from '../types/util/Nullable'
-import { SET_BOTTOM_BAR_HEIGHT, SET_SELECTED_NODE } from '../constants/ActionTypes'
+import { HEADER_HEIGHT } from '../../helpers/theme'
+import { Nullable } from '../../types/util/Nullable'
+import { SET_BOTTOM_BAR_HEIGHT, SET_SELECTED_NODE } from '../actionCreators/actionTypes'
 import { setBottomBarHeight, setSelectedNode } from '../actionCreators'
 
 export interface ILineageState {

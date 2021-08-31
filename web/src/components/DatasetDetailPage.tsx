@@ -13,7 +13,7 @@ import {
   Tooltip
 } from '@material-ui/core'
 import { Dataset } from '../types/api'
-import { IState } from '../reducers'
+import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,

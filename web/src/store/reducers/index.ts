@@ -1,5 +1,5 @@
 import { History } from 'history'
-import { IFilterByKey } from '../types'
+import { IFilterByKey } from '../../types'
 import { Reducer, combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 import datasets, { IDatasetsState } from './datasets'

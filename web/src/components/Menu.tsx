@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { API_DOCS_URL, FEEDBACK_FORM_URL } from '../globals'
 import IconButton from '@material-ui/core/IconButton'
 import Menu from '@material-ui/core/Menu'
 import MenuIcon from '@material-ui/icons/Menu'
@@ -19,15 +20,11 @@ export default function SimpleMenu() {
 
   const feedBackClicked = () => {
     handleClose()
-    // eslint-disable-next-line no-undef
-    const link = __FEEDBACK_FORM_URL__
-    window.open(link, '_blank')
+    window.open(FEEDBACK_FORM_URL, '_blank')
   }
   const apiDocsClicked = () => {
     handleClose()
-    // eslint-disable-next-line no-undef
-    const link = __API_DOCS_URL__
-    window.open(link, '_blank')
+    window.open(API_DOCS_URL, '_blank')
   }
 
   return (

@@ -1,9 +1,9 @@
-import * as actionTypes from '../../constants/ActionTypes'
-import * as actions from '../../actionCreators'
-import * as api from '../../requests'
+import * as actionTypes from '../../store/actionCreators/actionTypes'
+import * as actions from '../../store/actionCreators'
+import * as api from '../../store/requests'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { expectSaga, testSaga } from 'redux-saga-test-plan'
-import { fetchNamespacesDatasetsAndJobs } from '../../sagas/'
+import { fetchNamespacesDatasetsAndJobs } from '../../store/sagas/'
 
 import { INamespaceAPI } from '../../types/api'
 

@@ -1,4 +1,4 @@
-import { APPLICATION_ERROR, DIALOG_TOGGLE } from '../constants/ActionTypes'
+import { APPLICATION_ERROR, DIALOG_TOGGLE } from '../actionCreators/actionTypes'
 
 interface IToggleExpandAction {
   type: string

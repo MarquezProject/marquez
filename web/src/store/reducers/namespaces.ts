@@ -1,6 +1,6 @@
-import { Namespace } from '../types/api'
+import { Namespace } from '../../types/api'
 
-import { FETCH_NAMESPACES_SUCCESS } from '../constants/ActionTypes'
+import { FETCH_NAMESPACES_SUCCESS } from '../actionCreators/actionTypes'
 
 export type INamespacesState = Namespace[]
 const initialState: INamespacesState = []
