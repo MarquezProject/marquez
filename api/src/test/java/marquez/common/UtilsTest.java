@@ -35,6 +35,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -53,7 +54,6 @@ import marquez.common.models.SourceName;
 import marquez.common.models.Version;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.JobMeta;
-import marquez.service.models.LineageEvent;
 import marquez.service.models.StreamMeta;
 import org.junit.jupiter.api.Test;
 
@@ -271,7 +271,7 @@ public class UtilsTest {
     DatasetName datasetName = newDatasetName();
     DatasetName physicalName = newDatasetName();
     SourceName sourceName = newSourceName();
-    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    List<OpenLineage.SchemaDatasetFacetFields> schemaFields = newSchemaFields(2);
     RunId runId = newRunId();
 
     Version first =
@@ -324,7 +324,7 @@ public class UtilsTest {
 
   @Test
   public void testDatasetVersionIsNotEqualOnDifferentData() {
-    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    List<OpenLineage.SchemaDatasetFacetFields> schemaFields = newSchemaFields(2);
 
     Version first =
         Utils.newDatasetVersionFor(
@@ -367,7 +367,7 @@ public class UtilsTest {
     DatasetName datasetName = newDatasetName();
     DatasetName physicalName = newDatasetName();
     SourceName sourceName = newSourceName();
-    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+    List<OpenLineage.SchemaDatasetFacetFields> schemaFields = newSchemaFields(2);
     RunId runId = newRunId();
 
     Version first =
@@ -379,7 +379,7 @@ public class UtilsTest {
             schemaFields,
             runId.getValue());
 
-    List<LineageEvent.SchemaField> shuffleSchemaFields = new ArrayList<>(schemaFields);
+    List<OpenLineage.SchemaDatasetFacetFields> shuffleSchemaFields = new ArrayList<>(schemaFields);
     Collections.shuffle(shuffleSchemaFields);
     Version second =
         Utils.newDatasetVersionFor(

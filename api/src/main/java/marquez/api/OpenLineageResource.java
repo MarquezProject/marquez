@@ -21,6 +21,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.openlineage.client.OpenLineage;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 import javax.validation.Valid;
@@ -38,7 +39,6 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
-import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
 @Slf4j
@@ -57,7 +57,7 @@ public class OpenLineageResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public void create(
-      @Valid @NotNull LineageEvent event, @Suspended final AsyncResponse asyncResponse)
+      @Valid @NotNull OpenLineage.RunEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
     openLineageService
         .createAsync(event)

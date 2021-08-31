@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.util.Resources;
+import io.openlineage.client.OpenLineage;
 import java.io.IOException;
 import java.net.URL;
 import java.net.http.HttpResponse;
@@ -22,7 +23,6 @@ import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.Run;
 import marquez.common.Utils;
-import marquez.service.models.LineageEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -176,7 +176,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public void testSerialization(ObjectMapper mapper, String input) throws IOException {
     URL in = Resources.getResource(input);
 
-    LineageEvent lineageEvent = mapper.readValue(in, LineageEvent.class);
+    OpenLineage.RunEvent lineageEvent = mapper.readValue(in, OpenLineage.RunEvent.class);
     String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lineageEvent);
 
     Assertions.assertEquals(mapper.readTree(in), mapper.readTree(out));

@@ -15,6 +15,7 @@
 package marquez.db;
 
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,6 @@ import marquez.db.models.TagRow;
 import marquez.service.DatasetService;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DatasetVersion;
-import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
 import marquez.service.models.StreamMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -131,15 +131,14 @@ public interface DatasetVersionDao extends BaseDao {
     }
   }
 
-  default PGobject toPgObjectSchemaFields(List<SchemaField> fields) {
+  default PGobject toPgObjectSchemaFields(List<OpenLineage.SchemaDatasetFacetFields> fields) {
     return toPgObjectFields(toFields(fields));
   }
 
-  default List<Field> toFields(List<SchemaField> fields) {
+  default List<Field> toFields(List<OpenLineage.SchemaDatasetFacetFields> fields) {
     if (fields == null) {
       return null;
     }
-    OpenLineageDao openLineageDao = createOpenLineageDao();
     return fields.stream()
         .map(
             f ->
