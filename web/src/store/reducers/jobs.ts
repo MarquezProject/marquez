@@ -3,16 +3,15 @@ import {
   FETCH_JOB_RUNS_SUCCESS,
   FILTER_JOBS,
   FIND_MATCHING_ENTITIES
-} from '../constants/ActionTypes'
-import { IJob } from '../types'
+} from '../actionCreators/actionTypes'
+import { IJob } from '../../types'
 import {
   fetchJobRunsSuccess,
   fetchJobsSuccess,
   filterJobs,
   findMatchingEntities as findMatchingEntitiesActionCreator
 } from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './'
-import _find from 'lodash/find'
+import { filterEntities, findMatchingEntities } from './index'
 
 export type IJobsState = IJob[]
 

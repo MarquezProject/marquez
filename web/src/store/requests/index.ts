@@ -1,4 +1,4 @@
-import { APIError, HttpMethod } from '../types'
+import { APIError, HttpMethod } from '../../types'
 
 export const genericErrorMessageConstructor = (functionName: string, error: APIError): string => {
   const { code, message, details } = error

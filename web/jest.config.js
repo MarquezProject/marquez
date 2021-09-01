@@ -15,6 +15,8 @@ module.exports = {
       isolatedModules: 'true'
     },
     __API_URL__: '/api/v1',
+    __FEEDBACK_FORM_URL__: 'https://forms.gle/f3tTSrZ8wPj3sHTA7',
+    __API_DOCS_URL__: 'https://marquezproject.github.io/marquez/openapi.html',
     __TEMP_ACTOR_STR__: 'me'
   },
   moduleNameMapper: {

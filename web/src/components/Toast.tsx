@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as Redux from 'redux'
-import { IState } from '../reducers'
+import { IState } from '../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 const styles = require('./Toast.css')

@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react'
 
 import * as Redux from 'redux'
 import { Box, Button, Tooltip } from '@material-ui/core'
-import { IState } from '../reducers'
+import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchJobRuns } from '../actionCreators'
+import { fetchJobRuns } from '../store/actionCreators'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import _find from 'lodash/find'
