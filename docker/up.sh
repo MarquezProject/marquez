@@ -56,7 +56,7 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
 compose_files="-f docker-compose.yml"
-args="-V --force-recreate"
+args="-V --force-recreate --remove-orphans"
 
 API_PORT=5000
 API_ADMIN_PORT=5001
