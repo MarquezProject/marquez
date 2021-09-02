@@ -45,7 +45,7 @@ public final class DbTable extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final Optional<UUID> currentVersion,
       @Nullable final ImmutableMap<String, Object> facets) {
     super(
         id,
@@ -59,7 +59,7 @@ public final class DbTable extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid,
+        currentVersion,
         facets);
   }
 }

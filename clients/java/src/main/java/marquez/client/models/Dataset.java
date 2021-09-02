@@ -57,7 +57,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   @Getter private final Map<String, Object> facets;
-  @Getter private final Optional<UUID> currentVersionUuid;
+  @Getter private final Optional<UUID> currentVersion;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -73,7 +73,7 @@ public abstract class Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
       @Nullable final Map<String, Object> facets,
-      @Nullable final UUID currentVersionUuid) {
+      @Nullable final UUID currentVersion) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -87,7 +87,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
-    this.currentVersionUuid = Optional.ofNullable(currentVersionUuid);
+    this.currentVersion = Optional.ofNullable(currentVersion);
   }
 
   public Optional<Instant> getLastModifiedAt() {

@@ -11,7 +11,7 @@
   "updatedAt": 946771201,
   "sourceName": "POSTGRES",
   "lastModifiedAt": 946771201,
-  "currentVersionUuid": "b1d626a2-6d3a-475e-9ecf-943176d4a8c6",
+  "currentVersion": "b1d626a2-6d3a-475e-9ecf-943176d4a8c6",
   "fields": [{"name": "a", "type": "INTEGER","tags": []}],
   "tags": []
 }

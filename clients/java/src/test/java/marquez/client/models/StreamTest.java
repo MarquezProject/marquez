@@ -14,7 +14,7 @@
 
 package marquez.client.models;
 
-import static marquez.client.models.ModelGenerator.newStream;
+import static marquez.client.models.ModelGenerator.newStreamWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,13 +27,13 @@ public class StreamTest {
 
   @Test
   public void testFromJson() throws JsonProcessingException {
-    final Dataset expected = newStream();
-    UUID expectedCurrentVersion = expected.getCurrentVersionUuid().get();
+    UUID expectedCurrentVersion = UUID.randomUUID();
+    final Dataset expected = newStreamWith(expectedCurrentVersion);
 
     String jobJson = Utils.getMapper().writeValueAsString(expected);
-    Stream actual = Utils.getMapper().readValue(jobJson, Stream.class);
+    Dataset actual = Stream.fromJson(jobJson);
 
-    assertThat(actual.getCurrentVersionUuid().get()).isEqualTo(expectedCurrentVersion);
+    assertThat(actual.getCurrentVersion().get()).isEqualTo(expectedCurrentVersion);
     assertThat(actual).isEqualTo(expected);
   }
 }

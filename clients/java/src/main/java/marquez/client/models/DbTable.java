@@ -41,7 +41,7 @@ public final class DbTable extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
       @Nullable final Map<String, Object> facets,
-      @Nullable final UUID currentVersionUuid) {
+      @Nullable final UUID currentVersion) {
     super(
         id,
         DB_TABLE,
@@ -56,6 +56,6 @@ public final class DbTable extends Dataset {
         lastModifiedAt,
         description,
         facets,
-        currentVersionUuid);
+        currentVersion);
   }
 }

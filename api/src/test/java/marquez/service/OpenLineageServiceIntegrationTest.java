@@ -244,7 +244,7 @@ public class OpenLineageServiceIntegrationTest {
                 .build())
         .get();
     Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
-    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isNotPresent();
+    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersion).isNotPresent();
 
     // On complete, the currentVersionUuid is updated
     lineageService
@@ -260,7 +260,7 @@ public class OpenLineageServiceIntegrationTest {
                 .build())
         .get();
     datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
-    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersionUuid).isPresent();
+    assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersion).isPresent();
 
     List<ExtendedDatasetVersionRow> outputs =
         datasetVersionDao.findOutputDatasetVersionsFor(firstRunId);
@@ -304,10 +304,10 @@ public class OpenLineageServiceIntegrationTest {
     Optional<Dataset> afterFailureDataset = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
     assertThat(afterFailureDataset)
         .isPresent()
-        .flatMap(Dataset::getCurrentVersionUuid)
+        .flatMap(Dataset::getCurrentVersion)
         .isPresent()
         .get()
-        .isEqualTo(datasetRow.get().getCurrentVersionUuid().get());
+        .isEqualTo(datasetRow.get().getCurrentVersion().get());
 
     // A new consumer job run only sees the first dataset version
     UUID fourthRunId = UUID.randomUUID();

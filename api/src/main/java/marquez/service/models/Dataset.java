@@ -60,7 +60,7 @@ public abstract class Dataset {
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  @Getter private final Optional<UUID> currentVersionUuid;
+  @Getter private final Optional<UUID> currentVersion;
   @Getter ImmutableMap<String, Object> facets;
 
   public Dataset(
@@ -75,7 +75,7 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @NonNull final Optional<UUID> currentVersionUuid,
+      @NonNull final Optional<UUID> currentVersion,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
@@ -89,7 +89,7 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
-    this.currentVersionUuid = currentVersionUuid;
+    this.currentVersion = currentVersion;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 

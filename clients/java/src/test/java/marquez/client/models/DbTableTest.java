@@ -14,7 +14,7 @@
 
 package marquez.client.models;
 
-import static marquez.client.models.ModelGenerator.newDbTable;
+import static marquez.client.models.ModelGenerator.newDbTableWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,12 +27,13 @@ public class DbTableTest {
 
   @Test
   public void testFromJson() throws JsonProcessingException {
-    final Dataset expected = newDbTable();
-    UUID expectedCurrentVersion = expected.getCurrentVersionUuid().get();
-    String jobJson = Utils.getMapper().writeValueAsString(expected);
-    Dataset actual = Utils.getMapper().readValue(jobJson, Dataset.class);
+    UUID expectedCurrentVersion = UUID.randomUUID();
+    final Dataset expected = newDbTableWith(expectedCurrentVersion);
 
-    assertThat(actual.getCurrentVersionUuid().get()).isEqualTo(expectedCurrentVersion);
+    String jobJson = Utils.getMapper().writeValueAsString(expected);
+    Dataset actual = DbTable.fromJson(jobJson);
+
+    assertThat(actual.getCurrentVersion().get()).isEqualTo(expectedCurrentVersion);
     assertThat(actual).isEqualTo(expected);
   }
 }

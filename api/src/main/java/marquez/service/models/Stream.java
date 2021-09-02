@@ -51,7 +51,7 @@ public final class Stream extends Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid,
+      @NonNull final Optional<UUID> currentVersion,
       @Nullable final ImmutableMap<String, Object> facets) {
     super(
         id,
@@ -65,7 +65,7 @@ public final class Stream extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        currentVersionUuid,
+        currentVersion,
         facets);
     this.schemaLocation = schemaLocation;
   }

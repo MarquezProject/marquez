@@ -15,7 +15,6 @@
 package marquez.client.models;
 
 import static marquez.client.models.ModelGenerator.newJobWith;
-import static marquez.client.models.ModelGenerator.newRun;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,13 +27,13 @@ public class JobTest {
 
   @Test
   public void testFromJson() throws JsonProcessingException {
-    final Job expected = newJobWith(newRun());
-    UUID expectedCurrentVersion = expected.getCurrentVersionUuid().get();
+    UUID expectedCurrentVersion = UUID.randomUUID();
+    final Job expected = newJobWith(expectedCurrentVersion);
 
     String jobJson = Utils.getMapper().writeValueAsString(expected);
-    Job actual = Utils.getMapper().readValue(jobJson, Job.class);
+    Job actual = Job.fromJson(jobJson);
 
-    assertThat(actual.getCurrentVersionUuid().get()).isEqualTo(expectedCurrentVersion);
+    assertThat(actual.getCurrentVersion().get()).isEqualTo(expectedCurrentVersion);
     assertThat(actual).isEqualTo(expected);
   }
 }
