@@ -23,7 +23,7 @@ const styles = (theme: Theme) =>
       cursor: 'pointer',
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       '&:not(:last-child)': {
-        borderBottom: `1px solid ${theme.palette.primary.main}`
+        borderBottom: `1px solid ${theme.palette.common.white}`
       },
       '&:last-child': {
         borderBottomLeftRadius: '2px',
@@ -85,18 +85,18 @@ class SearchListItem extends React.Component<DkSearchListItemProps> {
             </Box>
             <Box className={classes.textOverflow}>
               {searchMatchIndex === -1 ? (
-                <MqText inline font={'mono'} bold>
+                <MqText inline font={'mono'} bold small>
                   {name}
                 </MqText>
               ) : (
                 <>
-                  <MqText inline font={'mono'} bold>
+                  <MqText inline font={'mono'} bold small>
                     {name.substring(0, searchMatchIndex)}
                   </MqText>
-                  <MqText inline font={'mono'} bold highlight>
+                  <MqText inline font={'mono'} bold highlight small>
                     {name.substring(searchMatchIndex, searchMatchIndex + this.props.search.length)}
                   </MqText>
-                  <MqText inline font={'mono'} bold>
+                  <MqText inline font={'mono'} bold small>
                     {name.substring(
                       searchMatchIndex + this.props.search.length,
                       searchResult.name.length

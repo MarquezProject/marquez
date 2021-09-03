@@ -69,9 +69,9 @@ const styles = (theme: Theme) =>
       top: 10
     },
     groupName: {
-      borderTop: `1px solid ${theme.palette.primary.main}`,
-      borderBottom: `1px solid ${theme.palette.primary.main}`,
-      padding: `${theme.spacing(0.5)}px ${theme.spacing(3)}px ${theme.spacing(
+      borderTop: `2px solid ${theme.palette.common.white}`,
+      borderBottom: `2px solid ${theme.palette.common.white}`,
+      padding: `${theme.spacing(1)}px ${theme.spacing(3)}px ${theme.spacing(
         0.5
       )}px ${theme.spacing(1)}px`,
       backgroundColor: darken(theme.palette.background.paper, 0.05)
@@ -90,7 +90,7 @@ const styles = (theme: Theme) =>
       right: 0,
       left: 0,
       zIndex: theme.zIndex.appBar + 1,
-      border: `2px dashed ${theme.palette.common.white}`,
+      border: `2px dashed ${theme.palette.secondary.main}`,
       borderRadius: theme.spacing(1),
       backgroundColor: theme.palette.background.default
     },
