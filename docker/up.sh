@@ -82,6 +82,7 @@ while [ $# -gt 0 ]; do
        ;;
     -b|'--build')
        BUILD='true'
+       TAG='latest'
        ;;
     -s|'--seed')
        SEED='true'
