@@ -5,14 +5,13 @@ import Box from '@material-ui/core/Box'
 import Menu from '../Menu'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
-import SearchBar from '../search/SearchBar'
 
 const styles = (theme: Theme) => {
   return createStyles({
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
       backgroundColor: theme.palette.background.default,
-      borderBottom: `1px solid ${theme.palette.secondary.main}`,
+      borderBottom: `2px dashed ${theme.palette.secondary.main}`,
       padding: `${theme.spacing(2)}px 0`
     },
     toolbar: {

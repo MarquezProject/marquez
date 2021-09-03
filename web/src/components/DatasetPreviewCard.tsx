@@ -11,7 +11,7 @@ const styles = (theme: Theme) => {
   return createStyles({
     link: {
       textDecoration: 'none',
-      border: `1px solid ${theme.palette.secondary.main}`,
+      border: `2px dashed ${theme.palette.secondary.main}`,
       display: 'block',
       marginBottom: theme.spacing(2),
       borderRadius: theme.shape.borderRadius,
