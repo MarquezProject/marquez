@@ -4,7 +4,8 @@ import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/s
 import Box from '@material-ui/core/Box'
 import Menu from '../Menu'
 import React, { ReactElement } from 'react'
-import SearchBar from '../search-bar/SearchBar'
+import Search from '../search/Search'
+import SearchBar from '../search/SearchBar'
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -47,7 +48,8 @@ const Header = (props: HeaderProps): ReactElement => {
             <img src={require('../../img/marquez_logo.svg')} height={48} alt='Marquez Logo' />
           </Link>
           <Box display={'flex'} alignItems={'center'}>
-            <SearchBar setShowJobs={props.setShowJobs} showJobs={props.showJobs} />
+            {/*<SearchBar setShowJobs={props.setShowJobs} showJobs={props.showJobs} />*/}
+            <Search />
             <Menu />
           </Box>
         </Box>

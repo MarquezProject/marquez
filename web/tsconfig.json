@@ -10,7 +10,8 @@
     "jsx": "react",
     "lib": ["es2016", "es2017", "dom"],
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "downlevelIteration": true
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/__tests__/*"]

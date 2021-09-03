@@ -1,4 +1,4 @@
-import { LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 
 export function isJob(node: MqNode): Undefinable<LineageJob> {
@@ -13,4 +13,10 @@ export function isDataset(node: MqNode): Undefinable<LineageDataset> {
     return node.data as LineageDataset
   }
   return undefined
+}
+
+export function encodeNode(nodeType: JobOrDataset, namespace: string, name: string) {
+  return `${encodeURIComponent(nodeType.toLowerCase())}/${encodeURIComponent(
+    namespace
+  )}/${encodeURIComponent(name)}`
 }

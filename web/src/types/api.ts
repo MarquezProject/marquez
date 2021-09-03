@@ -1,3 +1,5 @@
+import { JobOrDataset } from '../components/lineage/types'
+
 export interface Tag {
   name: string
   description: string
@@ -111,3 +113,13 @@ export interface Run {
 }
 
 export type RunState = 'NEW' | 'COMPLETED' | 'FAILED' | 'ABORTED'
+
+export interface SearchResult {
+  name: string
+  namespace: string
+  nodeId: string
+  type: JobOrDataset
+  updatedAt: string
+}
+
+export type GroupedSearch = { group: string } & SearchResult
