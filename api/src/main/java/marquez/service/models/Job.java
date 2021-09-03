@@ -48,7 +48,7 @@ public final class Job {
   @Nullable private final String description;
   @Nullable @Setter private Run latestRun;
   @Getter private final ImmutableMap<String, Object> facets;
-  @Getter private Optional<UUID> currentVersion;
+  @Nullable private UUID currentVersion;
 
   public Job(
       @NonNull final JobId id,
@@ -63,7 +63,7 @@ public final class Job {
       @Nullable final String description,
       @Nullable final Run latestRun,
       @Nullable final ImmutableMap<String, Object> facets,
-      @NonNull Optional<UUID> currentVersion) {
+      @Nullable UUID currentVersion) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -90,5 +90,9 @@ public final class Job {
 
   public Optional<Run> getLatestRun() {
     return Optional.ofNullable(latestRun);
+  }
+
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }

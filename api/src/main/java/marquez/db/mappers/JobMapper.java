@@ -28,7 +28,6 @@ import com.google.common.collect.ImmutableMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +67,7 @@ public final class JobMapper implements RowMapper<Job> {
         //  and a jsonb but custom deserializers will need to be introduced
         null,
         toFacetsOrNull(results, Columns.FACETS),
-        Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)));
+        uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
   }
 
   public static ImmutableMap<String, String> toContext(ResultSet results, String column)

@@ -39,7 +39,7 @@ public final class Job extends JobMeta {
   @Getter private final String namespace;
   @Nullable private final Run latestRun;
   @Getter private final Map<String, Object> facets;
-  @Getter private final Optional<UUID> currentVersion;
+  @Nullable private final UUID currentVersion;
 
   public Job(
       @NonNull final JobId id,
@@ -64,7 +64,7 @@ public final class Job extends JobMeta {
     this.namespace = namespace;
     this.latestRun = latestRun;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
-    this.currentVersion = Optional.ofNullable(currentVersion);
+    this.currentVersion = currentVersion;
   }
 
   public Optional<Run> getLatestRun() {
@@ -77,5 +77,9 @@ public final class Job extends JobMeta {
 
   public static Job fromJson(@NonNull final String json) {
     return Utils.fromJson(json, new TypeReference<Job>() {});
+  }
+
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }

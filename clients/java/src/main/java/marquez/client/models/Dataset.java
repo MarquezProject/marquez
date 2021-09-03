@@ -57,7 +57,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   @Getter private final Map<String, Object> facets;
-  @Getter private final Optional<UUID> currentVersion;
+  @Nullable private final UUID currentVersion;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -87,7 +87,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
-    this.currentVersion = Optional.ofNullable(currentVersion);
+    this.currentVersion = currentVersion;
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -104,5 +104,9 @@ public abstract class Dataset {
 
   public static Dataset fromJson(@NonNull final String json) {
     return Utils.fromJson(json, new TypeReference<Dataset>() {});
+  }
+
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }

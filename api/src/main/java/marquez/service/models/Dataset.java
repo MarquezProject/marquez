@@ -60,7 +60,7 @@ public abstract class Dataset {
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  @Getter private final Optional<UUID> currentVersion;
+  @Nullable private final UUID currentVersion;
   @Getter ImmutableMap<String, Object> facets;
 
   public Dataset(
@@ -75,7 +75,7 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @NonNull final Optional<UUID> currentVersion,
+      @Nullable final UUID currentVersion,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
@@ -99,5 +99,9 @@ public abstract class Dataset {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }
