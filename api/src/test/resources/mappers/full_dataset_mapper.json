@@ -1,0 +1,17 @@
+{
+  "id": {
+    "namespace": "NAMESPACE",
+    "name": "NAME"
+  },
+  "type": "DB_TABLE",
+  "description": "DESCRIPTION",
+  "name": "NAME",
+  "physicalName": "PHYSICAL_NAME",
+  "createdAt": 946684801,
+  "updatedAt": 946771201,
+  "sourceName": "POSTGRES",
+  "lastModifiedAt": 946771201,
+  "currentVersion": "b1d626a2-6d3a-475e-9ecf-943176d4a8c6",
+  "fields": [{"name": "a", "type": "INTEGER","tags": []}],
+  "tags": []
+}
