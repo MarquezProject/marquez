@@ -66,7 +66,7 @@ const styles = (theme: Theme) =>
       zIndex: theme.zIndex.appBar + 3,
       position: 'absolute',
       left: theme.spacing(12),
-      top: 10
+      top: 11
     },
     groupName: {
       borderTop: `2px solid ${theme.palette.common.white}`,
@@ -80,7 +80,7 @@ const styles = (theme: Theme) =>
       position: 'absolute',
       zIndex: theme.zIndex.appBar + 3,
       right: theme.spacing(12),
-      top: 10,
+      top: 11,
       cursor: 'pointer'
     },
     dropdown: {
@@ -319,8 +319,7 @@ class Search extends React.Component<SearchProps, SearchState> {
                               >
                                 <Box>
                                   <MqText bold font={'mono'}>
-                                    {/*{parseSearchGroup(result, 'group')}*/}
-                                    todo determine group
+                                    public
                                   </MqText>
                                 </Box>
                                 <Box>
