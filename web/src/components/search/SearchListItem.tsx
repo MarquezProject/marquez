@@ -23,7 +23,7 @@ const styles = (theme: Theme) =>
       cursor: 'pointer',
       padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       '&:not(:last-child)': {
-        borderBottom: `1px solid ${theme.palette.common.white}`
+        borderBottom: `1px solid ${theme.palette.secondary.main}`
       },
       '&:last-child': {
         borderBottomLeftRadius: '2px',
@@ -33,7 +33,7 @@ const styles = (theme: Theme) =>
         backgroundColor: darken(theme.palette.background.paper, 0.02)
       },
       '&:nth-child(even)': {
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: darken(theme.palette.background.paper, 0.2),
         '&:hover, &.selected': {
           backgroundColor: darken(theme.palette.background.paper, 0.02)
         }

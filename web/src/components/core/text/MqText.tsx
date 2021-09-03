@@ -55,7 +55,7 @@ const styles = (theme: Theme) =>
       lineHeight: 1.4
     },
     highlight: {
-      backgroundColor: fade(theme.palette.primary.main, 0.25)
+      backgroundColor: fade(theme.palette.primary.main, 0.)
     },
     bottomMargin: {
       marginBottom: theme.spacing(1)

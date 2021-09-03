@@ -8,6 +8,7 @@ import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IDataset, IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import { MqNode } from './types'
+import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
@@ -15,16 +16,24 @@ import { connect } from 'react-redux'
 import { localPoint } from '@visx/event'
 import { setSelectedNode } from '../../store/actionCreators'
 import Edge from './components/edge/Edge'
+import MqText from '../core/text/MqText'
 import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 
 const BOTTOM_OFFSET = 8
 
-const styles = () => {
+const styles = (theme: Theme) => {
   return createStyles({
     lineageContainer: {
       marginTop: HEADER_HEIGHT,
       height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
+    },
+    noSelectedNode: {
+      padding: theme.spacing(2),
+      border: `2px dashed ${theme.palette.secondary.main}`,
+      borderRadius: theme.shape.borderRadius,
+      width: '400px',
+      height: '100px'
     }
   })
 }
@@ -68,13 +77,6 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   }
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
-    if (
-      this.props.datasets.length > 0 &&
-      this.props.datasets !== prevProps.datasets &&
-      !this.props.selectedNode
-    ) {
-      this.props.setSelectedNode(this.props.datasets[0].name)
-    }
     if (this.props.selectedNode !== prevProps.selectedNode && this.props.selectedNode) {
       if (this.props.jobs.length > 0 || this.props.datasets.length > 0) {
         this.initGraph()
@@ -185,6 +187,16 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const { classes } = this.props
     return (
       <Box className={classes.lineageContainer}>
+        {this.props.selectedNode === null && (
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={4}>
+            <Box className={classes.noSelectedNode}>
+              <MqText heading>Choose a Job or Dataset</MqText>
+              <MqText subdued>
+                Use search to find a job or dataset or look through your popular datasets below.
+              </MqText>
+            </Box>
+          </Box>
+        )}
         {this.state.graph && (
           <ParentSize>
             {parent => (

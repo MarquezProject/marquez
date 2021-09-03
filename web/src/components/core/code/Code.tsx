@@ -14,7 +14,7 @@ const styles = (theme: Theme) =>
     codeContainer: {
       padding: `${theme.spacing(2)}px ${theme.spacing(4)}px`,
       backgroundColor: fade(theme.palette.common.white, 0.1),
-      borderLeft: `2px solid ${THEME_EXTRA.typography.subdued}`,
+      borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
       whiteSpace: 'break-spaces'
     }
   })

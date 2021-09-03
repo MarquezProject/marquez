@@ -1,8 +1,9 @@
-import { AppBar, Toolbar } from '@material-ui/core'
+import { AppBar, IconButton, Toolbar } from '@material-ui/core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
+import { faSync } from '@fortawesome/free-solid-svg-icons'
 import Box from '@material-ui/core/Box'
-import Menu from '../Menu'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
 
@@ -47,9 +48,10 @@ const Header = (props: HeaderProps): ReactElement => {
             <img src={require('../../img/marquez_logo.svg')} height={48} alt='Marquez Logo' />
           </Link>
           <Box display={'flex'} alignItems={'center'}>
-            {/*<SearchBar setShowJobs={props.setShowJobs} showJobs={props.showJobs} />*/}
             <Search />
-            <Menu />
+            <IconButton aria-label='refresh'>
+              <FontAwesomeIcon icon={faSync} size={'xs'} />
+            </IconButton>
           </Box>
         </Box>
       </Toolbar>
