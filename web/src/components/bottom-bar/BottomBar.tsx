@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Box, Container, Theme } from '@material-ui/core'
+import { DRAWER_WIDTH } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { Route, Switch } from 'react-router-dom'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
@@ -17,8 +18,9 @@ const styles = (theme: Theme) => {
       backgroundColor: theme.palette.background.default
     },
     bottomBar: {
+      marginLeft: DRAWER_WIDTH,
       right: 0,
-      width: '100%',
+      width: `calc(100% - ${DRAWER_WIDTH}px)`,
       bottom: 0,
       position: 'fixed'
     }

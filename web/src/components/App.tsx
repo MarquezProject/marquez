@@ -1,5 +1,5 @@
+import { Box, Container, CssBaseline } from '@material-ui/core'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
-import { Container, CssBaseline } from '@material-ui/core'
 import { Helmet } from 'react-helmet'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
@@ -11,6 +11,7 @@ import BottomBar from './bottom-bar/BottomBar'
 import Header from './header/Header'
 import Lineage from './lineage/Lineage'
 import React, { ReactElement, useState } from 'react'
+import Sidenav from './drawer/Sidenav'
 import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
@@ -43,12 +44,15 @@ const App = (): ReactElement => {
             <title>{TITLE}</title>
           </Helmet>
           <CssBaseline />
-          <Container maxWidth={'lg'} disableGutters={true}>
-            <Header setShowJobs={setShowJobs} showJobs={showJobs} />
-          </Container>
-          <Lineage />
-          <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
-          <Toast />
+          <Box ml={12}>
+            <Sidenav />
+            <Container maxWidth={'lg'} disableGutters={true}>
+              <Header setShowJobs={setShowJobs} showJobs={showJobs} />
+            </Container>
+            <Lineage />
+            <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
+            <Toast />
+          </Box>
         </MuiThemeProvider>
       </ConnectedRouter>
     </Provider>

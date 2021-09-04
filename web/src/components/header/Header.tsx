@@ -1,4 +1,5 @@
 import { AppBar, IconButton, Toolbar } from '@material-ui/core'
+import { DRAWER_WIDTH } from '../../helpers/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
@@ -13,7 +14,9 @@ const styles = (theme: Theme) => {
       zIndex: theme.zIndex.drawer + 1,
       backgroundColor: theme.palette.background.default,
       borderBottom: `2px dashed ${theme.palette.secondary.main}`,
-      padding: `${theme.spacing(2)}px 0`
+      padding: `${theme.spacing(2)}px 0`,
+      left: DRAWER_WIDTH + 1,
+      width: `calc(100% - ${DRAWER_WIDTH}px)`
     },
     toolbar: {
       display: 'flex',
