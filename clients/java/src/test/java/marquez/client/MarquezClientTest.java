@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -104,7 +105,7 @@ public class MarquezClientTest {
   private static final Instant UPDATED_AT = CREATED_AT;
   private static final Instant LAST_MODIFIED_AT = newTimestamp();
   private static final String VERSION = newVersion();
-
+  private static final UUID CURRENT_VERSION = UUID.fromString(VERSION);
   // NAMESPACE
   private static final String NAMESPACE_NAME = newNamespaceName();
   private static final String OWNER_NAME = newOwnerName();
@@ -144,7 +145,8 @@ public class MarquezClientTest {
           TAGS,
           null,
           DB_TABLE_DESCRIPTION,
-          DB_FACETS);
+          DB_FACETS,
+          CURRENT_VERSION);
   private static final DbTable DB_TABLE_MODIFIED =
       new DbTable(
           DB_TABLE_ID,
@@ -158,7 +160,8 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           DB_TABLE_DESCRIPTION,
-          DB_FACETS);
+          DB_FACETS,
+          CURRENT_VERSION);
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -181,7 +184,8 @@ public class MarquezClientTest {
           null,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          DB_FACETS);
+          DB_FACETS,
+          CURRENT_VERSION);
   private static final Stream STREAM_MODIFIED =
       new Stream(
           STREAM_ID,
@@ -196,7 +200,8 @@ public class MarquezClientTest {
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
-          DB_FACETS);
+          DB_FACETS,
+          CURRENT_VERSION);
 
   // JOB
   private static final JobId JOB_ID = newJobIdWith(NAMESPACE_NAME);
@@ -220,6 +225,7 @@ public class MarquezClientTest {
           LOCATION,
           JOB_CONTEXT,
           JOB_DESCRIPTION,
+          null,
           null,
           null);
 
@@ -322,6 +328,7 @@ public class MarquezClientTest {
               DURATION,
               RUN_ARGS,
               null),
+          null,
           null);
 
   // DATASET VERSIONS
@@ -479,7 +486,7 @@ public class MarquezClientTest {
             .build();
 
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    final String dbTableAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
     when(http.put(url, metaAsJson)).thenReturn(dbTableAsJson);
 
     final Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, meta);
@@ -491,7 +498,7 @@ public class MarquezClientTest {
   public void testGetDbTable() throws Exception {
     final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
 
-    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    final String dbTableAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
     when(http.get(url)).thenReturn(dbTableAsJson);
 
     final Dataset dataset = client.getDataset(NAMESPACE_NAME, DB_TABLE_NAME);
@@ -520,7 +527,7 @@ public class MarquezClientTest {
 
     final Instant beforeModified = Instant.now();
     final String modifiedMetaAsJson = JsonGenerator.newJsonFor(modifiedMeta);
-    final String modifiedDbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE_MODIFIED);
+    final String modifiedDbTableAsJson = Utils.getMapper().writeValueAsString(DB_TABLE_MODIFIED);
     when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedDbTableAsJson);
 
     final Dataset modifiedDataset =
@@ -559,7 +566,7 @@ public class MarquezClientTest {
             .schemaLocation(STREAM_SCHEMA_LOCATION)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
+    final String streamAsJson = Utils.getMapper().writeValueAsString(STREAM);
     when(http.put(url, metaAsJson)).thenReturn(streamAsJson);
 
     final Dataset dataset = client.createDataset(NAMESPACE_NAME, STREAM_NAME, meta);
@@ -571,7 +578,7 @@ public class MarquezClientTest {
   public void testGetStream() throws Exception {
     final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, STREAM_NAME);
 
-    final String streamAsJson = JsonGenerator.newJsonFor(STREAM);
+    final String streamAsJson = Utils.getMapper().writeValueAsString(STREAM);
     when(http.get(url)).thenReturn(streamAsJson);
 
     final Dataset dataset = client.getDataset(NAMESPACE_NAME, STREAM_NAME);
@@ -600,7 +607,7 @@ public class MarquezClientTest {
 
     final Instant beforeModified = Instant.now();
     final String modifiedMetaAsJson = JsonGenerator.newJsonFor(modifiedMeta);
-    final String modifiedStreamAsJson = JsonGenerator.newJsonFor(STREAM_MODIFIED);
+    final String modifiedStreamAsJson = Utils.getMapper().writeValueAsString(STREAM_MODIFIED);
     when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedStreamAsJson);
 
     final Dataset modifiedDataset = client.createDataset(NAMESPACE_NAME, STREAM_NAME, modifiedMeta);
@@ -804,7 +811,7 @@ public class MarquezClientTest {
         buildUrlFor(
             "/namespaces/%s/datasets/%s/tags/%s", NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
 
-    final String runAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    final String runAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
     when(http.post(url)).thenReturn(runAsJson);
 
     final Dataset dataset = client.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
@@ -818,7 +825,7 @@ public class MarquezClientTest {
             "/namespaces/%s/datasets/%s/fields/%s/tags/%s",
             NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
 
-    final String runAsJson = JsonGenerator.newJsonFor(DB_TABLE);
+    final String runAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
     when(http.post(url)).thenReturn(runAsJson);
 
     final Dataset dataset = client.tagFieldWith(NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");

@@ -32,7 +32,6 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +75,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
-          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
+          uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
           toFacetsOrNull(results, Columns.FACETS));
     } else {
       return new Stream(
@@ -93,7 +92,7 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
           stringOrNull(results, Columns.DESCRIPTION),
-          Optional.ofNullable(uuidOrNull(results, Columns.CURRENT_VERSION_UUID)),
+          uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
           toFacetsOrNull(results, Columns.FACETS));
     }
   }

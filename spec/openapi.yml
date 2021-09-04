@@ -963,6 +963,10 @@ components:
           type: string
         facets:
           $ref: '#/components/schemas/DatasetFacets'
+        currentVersion:
+          description: The current version of the dataset.
+          type: string
+          format: uuid
       example:
         id:
           namespace: my-namespace
@@ -984,6 +988,7 @@ components:
         lastModifiedAt: null
         description: "My first dataset!"
         facets: {}
+        currentVersion: "b1d626a2-6d3a-475e-9ecf-943176d4a8c6"
 
     DatasetList:
       type: object
@@ -1272,6 +1277,10 @@ components:
           $ref: '#/components/schemas/Run'
         facets:
           $ref: '#/components/schemas/JobFacets'
+        currentVersion:
+          description: The current version of the job.
+          type: string
+          format: uuid
       example:
         id:
           namespace: my-namespace
@@ -1288,6 +1297,7 @@ components:
         description: My first job!
         latestRun: null
         facets: {}
+        currentVersion: "b1d626a2-6d3a-475e-9ecf-943176d4a8c6"
 
     JobVersionList:
       type: object
