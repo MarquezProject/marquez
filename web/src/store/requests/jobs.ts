@@ -2,7 +2,7 @@ import { API_URL } from '../../globals'
 import { Job, Jobs, Namespace, Run } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const fetchJobs = async (namespace: Namespace, limit = 20, offset = 0) => {
+export const getJobs = async (namespace: Namespace, limit = 20, offset = 0) => {
   const { name } = namespace
   const url = `${API_URL}/namespaces/${encodeURIComponent(
     name
@@ -12,7 +12,7 @@ export const fetchJobs = async (namespace: Namespace, limit = 20, offset = 0) =>
   })
 }
 
-export const fetchLatestJobRuns = async (
+export const getLatestJobRuns = async (
   jobName: string,
   namespace: string,
   limit = 20,

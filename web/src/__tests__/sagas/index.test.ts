@@ -20,19 +20,19 @@ describe('Main (That\'s so Fetch) Saga', () => {
       sagaTest = expectSaga(fetchNamespacesDatasetsAndJobs)
         // provide mock implementation return value for various functions & requests
         .provide([
-          [matchers.call.fn(api.fetchNamespaces), { namespaces: mockNamespaces }],
-          [matchers.call.fn(api.fetchDatasets), { datasets: [] }],
-          [matchers.call.fn(api.fetchJobs), { jobs: [] }]
+          [matchers.call.fn(api.getNamespaces), { namespaces: mockNamespaces }],
+          [matchers.call.fn(api.getDatasets), { datasets: [] }],
+          [matchers.call.fn(api.getJobs), { jobs: [] }]
         ])
     })
 
     it('calls api.fetchNamespaces', () => {
-      return sagaTest.call(api.fetchNamespaces).run()
+      return sagaTest.call(api.getNamespaces).run()
     })
 
     it('calls api.fetchDatasets for each namespace that is returned', () => {
       mockNamespaces.forEach(n => {
-        sagaTest.call(api.fetchDatasets, n)
+        sagaTest.call(api.getDatasets, n)
       })
       return sagaTest.run()
     })
@@ -53,7 +53,7 @@ describe('Main (That\'s so Fetch) Saga', () => {
       expect(
         unitTestSaga
           .next()
-          .call(api.fetchNamespaces)
+          .call(api.getNamespaces)
           .next({ namespaces: [] })
           .throw(testError)
           .inspect(fn => {

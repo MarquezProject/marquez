@@ -8,12 +8,12 @@ import {
   fetchJobsSuccess,
   fetchNamespacesSuccess
 } from '../actionCreators'
-import { fetchDatasets, fetchJobs, fetchLatestJobRuns, fetchNamespaces } from '../requests'
+import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
 import _orderBy from 'lodash/orderBy'
 
 export function* fetchNamespacesDatasetsAndJobs() {
   try {
-    const response: Namespaces = yield call(fetchNamespaces)
+    const response: Namespaces = yield call(getNamespaces)
     const { namespaces } = response
 
     // const datasetResponses = yield all(namespaces.map((n: Namespace) => call(fetchDatasets, n)))
@@ -34,7 +34,7 @@ export function* fetchJobRunsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOB_RUNS)
-      const { runs } = yield call(fetchLatestJobRuns, payload.jobName, payload.namespace)
+      const { runs } = yield call(getLatestJobRuns, payload.jobName, payload.namespace)
       const runsOrderedByStartTime = _orderBy(runs, ['nominalStartTime'], ['asc'])
       yield put(fetchJobRunsSuccess(payload.jobName, runsOrderedByStartTime))
     } catch (e) {
@@ -46,7 +46,7 @@ export function* fetchJobRunsSaga() {
 export function* fetchJobsSaga() {
   try {
     const { payload } = yield take(FETCH_JOBS)
-    const { jobs } = yield call(fetchJobs, payload.namespace)
+    const { jobs } = yield call(getJobs, payload.namespace)
     yield put(fetchJobsSuccess(jobs))
   } catch (e) {
     yield put(applicationError('Something went wrong while fetching job runs'))
@@ -56,7 +56,7 @@ export function* fetchJobsSaga() {
 export function* fetchDatasetsSaga() {
   try {
     const { payload } = yield take(FETCH_DATASETS)
-    const datasets = yield call(fetchDatasets, payload.namespace)
+    const datasets = yield call(getDatasets, payload.namespace)
     yield put(fetchDatasetsSuccess(datasets))
   } catch (e) {
     yield put(applicationError('Something went wrong while fetching dataset runs'))
