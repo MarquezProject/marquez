@@ -2,7 +2,7 @@ import * as Redux from 'redux'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { Pagination } from '@material-ui/lab'
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableHead, TableRow, Container } from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -36,7 +36,7 @@ class Datasets extends React.Component<DatasetsProps> {
   render() {
     const { datasets } = this.props
     return (
-      <Box>
+      <Container maxWidth={'lg'} disableGutters>
         <Box p={2}>
           <MqText heading>Datasets</MqText>
         </Box>
@@ -73,7 +73,7 @@ class Datasets extends React.Component<DatasetsProps> {
         <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
           <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
         </Box>
-      </Box>
+      </Container>
     )
   }
 }

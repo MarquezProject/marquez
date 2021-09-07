@@ -2,7 +2,7 @@ import * as Redux from 'redux'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { Pagination } from '@material-ui/lab'
-import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import {Container, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -36,7 +36,7 @@ class Jobs extends React.Component<JobsProps> {
   render() {
     const { jobs } = this.props
     return (
-      <Box>
+      <Container maxWidth={'lg'} disableGutters>
         <Box p={2}>
           <MqText heading>Jobs</MqText>
         </Box>
@@ -73,7 +73,7 @@ class Jobs extends React.Component<JobsProps> {
         <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
           <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
         </Box>
-      </Box>
+      </Container>
     )
   }
 }
