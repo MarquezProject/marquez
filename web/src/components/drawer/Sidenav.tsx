@@ -33,7 +33,7 @@ const styles = (theme: Theme) =>
     }
   })
 
-type SidenavProps = WithStyles<typeof styles>
+type SidenavProps = WithStyles<typeof styles> & RouteComponentProps
 
 class Sidenav extends React.Component<SidenavProps> {
   render() {
@@ -52,17 +52,29 @@ class Sidenav extends React.Component<SidenavProps> {
         >
           <Box ml={2}>
             <RouterLink to={'/'} className={classes.link}>
-              <MqIconButton id={'homeDrawerButton'} title={'Jobs'} active={true}>
+              <MqIconButton
+                id={'homeDrawerButton'}
+                title={'Jobs'}
+                active={this.props.location.pathname === '/'}
+              >
                 <FontAwesomeIcon icon={faCog} size={'2x'} />
               </MqIconButton>
             </RouterLink>
-            <RouterLink to={'/explore'} className={classes.link}>
-              <MqIconButton id={'datasetsDrawerButton'} title={'Datasets'} active={false}>
+            <RouterLink to={'/datasets'} className={classes.link}>
+              <MqIconButton
+                id={'datasetsDrawerButton'}
+                title={'Datasets'}
+                active={this.props.location.pathname === '/datasets'}
+              >
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
               </MqIconButton>
             </RouterLink>
             <RouterLink to={'/lineage'} className={classes.link}>
-              <MqIconButton id={'lineageDrawerButton'} title={'Lineage'} active={false}>
+              <MqIconButton
+                id={'lineageDrawerButton'}
+                title={'Lineage'}
+                active={this.props.location.pathname.startsWith('/lineage')}
+              >
                 <FontAwesomeIcon icon={faArrowRight} size={'2x'} />
               </MqIconButton>
             </RouterLink>
@@ -73,4 +85,4 @@ class Sidenav extends React.Component<SidenavProps> {
   }
 }
 
-export default withStyles(styles)(Sidenav)
+export default withStyles(styles)(withRouter(Sidenav))

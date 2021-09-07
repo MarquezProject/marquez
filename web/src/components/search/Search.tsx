@@ -71,9 +71,9 @@ const styles = (theme: Theme) =>
     groupName: {
       borderTop: `2px solid ${theme.palette.common.white}`,
       borderBottom: `2px solid ${theme.palette.common.white}`,
-      padding: `${theme.spacing(1)}px ${theme.spacing(3)}px ${theme.spacing(
-        0.5
-      )}px ${theme.spacing(1)}px`,
+      padding: `${theme.spacing(1)}px ${theme.spacing(3)}px ${theme.spacing(0.5)}px ${theme.spacing(
+        1
+      )}px`,
       backgroundColor: darken(theme.palette.background.paper, 0.05)
     },
     closeIcon: {

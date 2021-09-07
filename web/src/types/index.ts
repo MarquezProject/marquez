@@ -1,4 +1,4 @@
-import { Dataset, Job, Run } from './api'
+import { Job, Run } from './api'
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 
@@ -14,7 +14,6 @@ export interface INetworkLink {
 export interface INodeNetwork {
   id: string
   tag: 'dataset' | 'job'
-  matches: boolean
 }
 
 export interface INetworkData {
@@ -22,12 +21,7 @@ export interface INetworkData {
   links: INetworkLink[]
 }
 
-export interface IDataset extends Dataset {
-  matches: boolean
-}
-
 export interface IJob extends Job {
-  matches: boolean
   latestRuns?: Run[]
 }
 

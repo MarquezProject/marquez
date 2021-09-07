@@ -3,9 +3,9 @@ import React from 'react'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
 import { DAGRE_CONFIG, INITIAL_TRANSFORM, NODE_SIZE } from './config'
+import {Dataset, Job} from '../../types/api'
 import { GraphEdge, Node as GraphNode, graphlib, layout } from 'dagre'
 import { HEADER_HEIGHT } from '../../helpers/theme'
-import { IDataset, IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import { MqNode } from './types'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
@@ -45,8 +45,8 @@ const DOUBLE_CLICK_MAGNIFICATION = 1.1
 const MAX_ITERATIONS = 1000
 
 interface StateProps {
-  jobs: IJob[]
-  datasets: IDataset[]
+  jobs: Job[]
+  datasets: Dataset[]
   selectedNode: string
 }
 
@@ -60,7 +60,7 @@ interface DispatchProps {
   setSelectedNode: typeof setSelectedNode
 }
 
-type JorD = IJob | IDataset | undefined
+type JorD = Job | Dataset | undefined
 
 type LineageProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
@@ -82,10 +82,10 @@ class Lineage extends React.Component<LineageProps, LineageState> {
         this.initGraph()
         const attachedNodes = this.findNodesFromOrigin(this.props.selectedNode)
         this.buildGraphAll(
-          attachedNodes.filter(jobOrDataset => jobOrDataset && 'outputs' in jobOrDataset) as IJob[],
+          attachedNodes.filter(jobOrDataset => jobOrDataset && 'outputs' in jobOrDataset) as Job[],
           attachedNodes.filter(
             jobOrDataset => jobOrDataset && 'sourceName' in jobOrDataset
-          ) as IDataset[]
+          ) as Dataset[]
         )
       }
     }
@@ -99,7 +99,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     })
   }
 
-  buildGraphAll = (jobs: IJob[], datasets: IDataset[]) => {
+  buildGraphAll = (jobs: Job[], datasets: Dataset[]) => {
     // jobs
     for (let i = 0; i < jobs.length; i++) {
       g.setNode(jobs[i].id.name, {

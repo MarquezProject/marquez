@@ -60,8 +60,8 @@ const Home: FunctionComponent<IAllProps> = props => {
 
   const { datasets, jobs, classes, showJobs, setSelectedNode } = props
 
-  const matchingDatasets = datasets.filter(d => d.matches)
-  const matchingJobs = jobs.filter(j => j.matches)
+  const matchingDatasets = datasets
+  const matchingJobs = jobs
 
   const chunkedDatasets = _chunk(matchingDatasets, limit)
   const chunkedJobs = _chunk(matchingJobs, limit)

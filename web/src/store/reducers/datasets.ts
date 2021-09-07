@@ -1,9 +1,9 @@
+import { Dataset } from '../../types/api'
 import {
   FETCH_DATASETS_SUCCESS,
   FILTER_DATASETS,
   FIND_MATCHING_ENTITIES
 } from '../actionCreators/actionTypes'
-import { IDataset } from '../../types'
 import {
   fetchDatasetsSuccess,
   filterDatasets,
@@ -11,7 +11,7 @@ import {
 } from '../actionCreators'
 import { filterEntities, findMatchingEntities } from './index'
 
-export type IDatasetsState = IDataset[]
+export type IDatasetsState = Dataset[]
 
 export const initialState: IDatasetsState = []
 

@@ -3,12 +3,15 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { Helmet } from 'react-helmet'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
+import { Route, Switch } from 'react-router-dom'
 import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
 import BottomBar from './bottom-bar/BottomBar'
+import Datasets from '../routes/datasets/Datasets'
 import Header from './header/Header'
+import Jobs from '../routes/jobs/Jobs'
 import Lineage from './lineage/Lineage'
 import React, { ReactElement, useState } from 'react'
 import Sidenav from './drawer/Sidenav'
@@ -49,8 +52,18 @@ const App = (): ReactElement => {
             <Container maxWidth={'lg'} disableGutters={true}>
               <Header setShowJobs={setShowJobs} showJobs={showJobs} />
             </Container>
-            <Lineage />
-            <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
+            <Switch>
+              <Route path={'/'} exact>
+                <Jobs />
+              </Route>
+              <Route path={'/datasets'} exact>
+                <Datasets />
+              </Route>
+              <Route path={'/lineage'}>
+                <Lineage />
+                <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
+              </Route>
+            </Switch>
             <Toast />
           </Box>
         </MuiThemeProvider>
