@@ -3,6 +3,13 @@ import * as actionTypes from './actionTypes'
 import { Dataset, Job, Namespace, Run } from '../../types/api'
 import { IFilterByKey } from '../../types'
 
+export const fetchDatasets = (namespace: string) => ({
+  type: actionTypes.FETCH_DATASETS,
+  payload: {
+    namespace
+  }
+})
+
 export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {
@@ -15,6 +22,13 @@ export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string
   payload: {
     filterByKey,
     filterByValue
+  }
+})
+
+export const fetchJobs = (namespace: string) => ({
+  type: actionTypes.FETCH_JOBS,
+  payload: {
+    namespace
   }
 })
 

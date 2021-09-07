@@ -1,6 +1,6 @@
-import {FETCH_JOBS, FETCH_JOB_RUNS, FETCH_DATASETS} from '../actionCreators/actionTypes'
-import { Namespace, Namespaces } from '../../types/api'
-import { all, call, put, take } from 'redux-saga/effects'
+import { FETCH_DATASETS, FETCH_JOBS, FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
+import { Namespaces } from '../../types/api'
+import { all, call, put, take, takeLatest } from 'redux-saga/effects'
 import {
   applicationError,
   fetchDatasetsSuccess,
@@ -16,13 +16,13 @@ export function* fetchNamespacesDatasetsAndJobs() {
     const response: Namespaces = yield call(fetchNamespaces)
     const { namespaces } = response
 
-    const datasetResponses = yield all(namespaces.map((n: Namespace) => call(fetchDatasets, n)))
+    // const datasetResponses = yield all(namespaces.map((n: Namespace) => call(fetchDatasets, n)))
 
     // const jobResponses = yield all(namespaces.map((n: Namespace) => call(fetchJobs, n)))
-    const datasets = datasetResponses.flat()
+    // const datasets = datasetResponses.flat()
     // const jobs = jobResponses.flat()
 
-    yield put(fetchDatasetsSuccess(datasets))
+    // yield put(fetchDatasetsSuccess(datasets))
     // yield put(fetchJobsSuccess(jobs))
     yield put(fetchNamespacesSuccess(namespaces))
   } catch (e) {
@@ -46,7 +46,7 @@ export function* fetchJobRunsSaga() {
 export function* fetchJobsSaga() {
   try {
     const { payload } = yield take(FETCH_JOBS)
-    const { jobs } = yield call(fetchJobs, payload.jobName, payload.namespace)
+    const { jobs } = yield call(fetchJobs, payload.namespace)
     yield put(fetchJobsSuccess(jobs))
   } catch (e) {
     yield put(applicationError('Something went wrong while fetching job runs'))
@@ -56,10 +56,10 @@ export function* fetchJobsSaga() {
 export function* fetchDatasetsSaga() {
   try {
     const { payload } = yield take(FETCH_DATASETS)
-    const { datasets } = yield call(fetchDatasets, payload.namespace)
+    const datasets = yield call(fetchDatasets, payload.namespace)
     yield put(fetchDatasetsSuccess(datasets))
   } catch (e) {
-    yield put(applicationError('Something went wrong while fetching job runs'))
+    yield put(applicationError('Something went wrong while fetching dataset runs'))
   }
 }
 

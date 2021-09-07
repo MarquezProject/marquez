@@ -24,7 +24,8 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
 
   switch (type) {
     case FETCH_DATASETS_SUCCESS:
-      return payload.datasets.map(d => ({ ...d, matches: true }))
+      console.log(payload)
+      return payload.datasets
     case FIND_MATCHING_ENTITIES:
       return findMatchingEntities(payload.search, state) as IDatasetsState
     case FILTER_DATASETS:
