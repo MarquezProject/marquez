@@ -1,6 +1,6 @@
 import { FETCH_DATASETS, FETCH_JOBS, FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
-import { all, call, put, take, takeLatest } from 'redux-saga/effects'
+import { all, call, put, take } from 'redux-saga/effects'
 import {
   applicationError,
   fetchDatasetsSuccess,
@@ -46,7 +46,7 @@ export function* fetchJobRunsSaga() {
 export function* fetchJobsSaga() {
   try {
     const { payload } = yield take(FETCH_JOBS)
-    const { jobs } = yield call(getJobs, payload.namespace)
+    const jobs = yield call(getJobs, payload.namespace)
     yield put(fetchJobsSuccess(jobs))
   } catch (e) {
     yield put(applicationError('Something went wrong while fetching job runs'))

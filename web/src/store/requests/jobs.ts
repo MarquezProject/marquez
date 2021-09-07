@@ -1,14 +1,13 @@
 import { API_URL } from '../../globals'
-import { Job, Jobs, Namespace, Run } from '../../types/api'
+import { Job, Jobs, Run } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const getJobs = async (namespace: Namespace, limit = 20, offset = 0) => {
-  const { name } = namespace
+export const getJobs = async (namespace: string, limit = 20, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(
-    name
+    namespace
   )}/jobs?limit=${limit}&offset=${offset}`
   return genericFetchWrapper<Job[]>(url, { method: 'GET' }, 'fetchJobs').then((r: Jobs) => {
-    return r.jobs.map(j => ({ ...j, namespace: namespace.name }))
+    return r.jobs.map(j => ({ ...j, namespace: namespace }))
   })
 }
 
