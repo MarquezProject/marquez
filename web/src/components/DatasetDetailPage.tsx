@@ -12,7 +12,6 @@ import {
   TableRow,
   Tooltip
 } from '@material-ui/core'
-import { Dataset } from '../types/api'
 import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
@@ -20,6 +19,7 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
+import { LineageDataset } from './lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { formatUpdatedAt } from '../helpers'
@@ -77,14 +77,13 @@ const styles = ({ spacing }: ITheme) => {
   })
 }
 
-type IProps = IWithStyles<typeof styles> & { datasets: Dataset[] }
+type IProps = IWithStyles<typeof styles> & { dataset: LineageDataset }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { datasets, classes } = props
+  const { dataset, classes } = props
   const { root, paper, infoIcon, tableCell, tableRow } = classes
   const { datasetName } = useParams()
   const history = useHistory()
-  const dataset = _find(datasets, d => d.name === datasetName)
   if (!dataset) {
     return (
       <Box display='flex' justifyContent='center' className={root} mt={2}>
@@ -101,7 +100,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           {tags.length > 0 && (
             <ul className={classes.tagList}>
               {tags.map(tag => (
-                <li key={tag} className={classes.tag}>
+                <li key={tag.name} className={classes.tag}>
                   <Chip size='small' label={tag} />
                 </li>
               ))}
@@ -118,37 +117,35 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
         {fields && fields.length > 0 ? (
-          <Paper className={paper}>
-            <Table size='small'>
-              <TableHead>
-                <TableRow className={tableRow}>
-                  {fields.map(field => {
-                    return (
-                      <TableCell className={tableCell} key={field.name} align='center'>
-                        <strong>{field.name}</strong>
-                        <Tooltip title={field.type} placement='top'>
-                          <div className={infoIcon}>
-                            <InfoIcon color='disabled' fontSize='small' />
-                          </div>
-                        </Tooltip>
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow className={tableRow}>
-                  {fields.map(field => {
-                    return (
-                      <TableCell className={tableCell} key={field.name} align='left'>
-                        {field.description || 'no description'}
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              </TableBody>
-            </Table>
-          </Paper>
+          <Table size='small'>
+            <TableHead>
+              <TableRow className={tableRow}>
+                {fields.map(field => {
+                  return (
+                    <TableCell className={tableCell} key={field.name} align='center'>
+                      <MqText subheading>{field.name}</MqText>
+                      <Tooltip title={field.type} placement='top'>
+                        <div className={infoIcon}>
+                          <InfoIcon color='disabled' fontSize='small' />
+                        </div>
+                      </Tooltip>
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow className={tableRow}>
+                {fields.map(field => {
+                  return (
+                    <TableCell className={tableCell} key={field.name} align='left'>
+                      {field.description || 'no description'}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            </TableBody>
+          </Table>
         ) : (
           <div>
             <MqText subdued>schema not present</MqText>

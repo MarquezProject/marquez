@@ -1,4 +1,10 @@
-import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
+import {
+  JobOrDataset,
+  LineageDataset,
+  LineageJob,
+  LineageNode,
+  MqNode
+} from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 
 export function isJob(node: MqNode): Undefinable<LineageJob> {
@@ -23,4 +29,22 @@ export function encodeNode(nodeType: JobOrDataset, namespace: string, name: stri
 
 export function generateNodeId(type: JobOrDataset, namespace: string, jobName: string) {
   return `${type.toLowerCase()}:${namespace}:${jobName}`
+}
+
+export function isLineageJob(
+  node: Undefinable<LineageJob | LineageDataset>
+): Undefinable<LineageJob> {
+  if (node && node.type === 'BATCH') {
+    return node as LineageJob
+  }
+  return undefined
+}
+
+export function isLineageDataset(
+  node: Undefinable<LineageJob | LineageDataset>
+): Undefinable<LineageDataset> {
+  if (node && node.type === 'DB_TABLE') {
+    return node as LineageDataset
+  }
+  return undefined
 }

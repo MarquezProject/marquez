@@ -69,15 +69,16 @@ class Sidenav extends React.Component<SidenavProps> {
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
               </MqIconButton>
             </RouterLink>
-            <RouterLink to={'/lineage'} className={classes.link}>
-              <MqIconButton
-                id={'lineageDrawerButton'}
-                title={'Lineage'}
-                active={this.props.location.pathname.startsWith('/lineage')}
-              >
-                <FontAwesomeIcon icon={faArrowRight} size={'2x'} />
-              </MqIconButton>
-            </RouterLink>
+            {/* todo remove this link for now until direct linking available */}
+            {/*<RouterLink to={'/lineage'} className={classes.link}>*/}
+            {/*  <MqIconButton*/}
+            {/*    id={'lineageDrawerButton'}*/}
+            {/*    title={'Lineage'}*/}
+            {/*    active={this.props.location.pathname.startsWith('/lineage')}*/}
+            {/*  >*/}
+            {/*    <FontAwesomeIcon icon={faArrowRight} size={'2x'} />*/}
+            {/*  </MqIconButton>*/}
+            {/*</RouterLink>*/}
           </Box>
         </Box>
       </Drawer>

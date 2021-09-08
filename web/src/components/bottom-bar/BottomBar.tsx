@@ -9,6 +9,9 @@ import { connect } from 'react-redux'
 import DatasetDetailPage from '../DatasetDetailPage'
 import DragBar from '../lineage/components/drag-bar/DragBar'
 import JobDetailPage from '../JobDetailPage'
+import {Undefinable} from '../../types/util/Nullable'
+import {LineageNode} from '../lineage/types'
+import {isLineageJob, isLineageDataset} from '../../helpers/nodes'
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -29,6 +32,7 @@ const styles = (theme: Theme) => {
 interface OwnProps {
   setShowJobs: (bool: boolean) => void
   showJobs: boolean
+  selectedNodeData: Undefinable<LineageNode>
 }
 
 interface StateProps {
@@ -39,16 +43,19 @@ type BottomBarProps = StateProps & OwnProps & WithStyles<typeof styles>
 
 class BottomBar extends React.Component<BottomBarProps> {
   render() {
-    const { classes, bottomBarHeight } = this.props
+    const { classes, bottomBarHeight, selectedNodeData } = this.props
+    if (!selectedNodeData) {
+      return null
+    }
+    const lineageJob = isLineageJob(selectedNodeData.data)
+    const lineageDataset = isLineageDataset(selectedNodeData.data)
     return (
       <Box className={classes.bottomBar}>
         <DragBar />
         <Box className={classes.overflow} height={bottomBarHeight}>
           <Container maxWidth={'lg'} disableGutters={true}>
-            <Switch>
-              <Route path='/datasets/:datasetName' exact component={DatasetDetailPage} />
-              <Route path='/jobs/:jobName' exact component={JobDetailPage} />
-            </Switch>
+            {/*{lineageJob ? <JobDetailPage job={lineageJob} />}*/}
+            {lineageDataset && <DatasetDetailPage dataset={lineageDataset} />}
           </Container>
         </Box>
       </Box>
@@ -57,7 +64,8 @@ class BottomBar extends React.Component<BottomBarProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  bottomBarHeight: state.lineage.bottomBarHeight
+  bottomBarHeight: state.lineage.bottomBarHeight,
+  selectedNodeData: state.lineage.lineage.graph.find(node => state.lineage.selectedNode === node.id)
 })
 
 export default connect(mapStateToProps)(withStyles(styles)(BottomBar))
