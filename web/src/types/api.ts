@@ -8,18 +8,6 @@ export interface Runs {
   runs: Run[]
 }
 
-export interface Runs {
-  runs: Run[]
-}
-
-export interface Runs {
-  runs: Run[]
-}
-
-export interface Runs {
-  runs: Run[]
-}
-
 export interface Namespaces {
   namespaces: Namespace[]
 }
