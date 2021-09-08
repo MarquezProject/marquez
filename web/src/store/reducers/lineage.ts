@@ -4,17 +4,18 @@ import {
   SET_SELECTED_NODE
 } from '../actionCreators/actionTypes'
 import { HEADER_HEIGHT } from '../../helpers/theme'
+import { Lineage } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
 import { setBottomBarHeight, setSelectedNode } from '../actionCreators'
 
 export interface ILineageState {
-  lineage: any[]
+  lineage: Lineage
   selectedNode: Nullable<string>
   bottomBarHeight: number
 }
 
 const initialState: ILineageState = {
-  lineage: [],
+  lineage: { graph: [] },
   selectedNode: null,
   bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3
 }

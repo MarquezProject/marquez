@@ -93,7 +93,6 @@ class Lineage extends React.Component<LineageProps, LineageState> {
         this.props.match.params.nodeName
       )
       this.props.setSelectedNode(nodeId)
-      console.log('fetch')
       this.props.fetchLineage(
         this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
         this.props.match.params.namespace,
