@@ -1,12 +1,12 @@
 import * as Redux from 'redux'
+import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { Pagination } from '@material-ui/lab'
-import { Table, TableBody, TableCell, TableHead, TableRow, Container } from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasets } from '../../store/actionCreators'
+import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
 import MqText from '../../components/core/text/MqText'
@@ -22,6 +22,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchDatasets: typeof fetchDatasets
+  resetDatasets: typeof resetDatasets
 }
 
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
@@ -31,6 +32,10 @@ const DATASET_COLUMNS = ['Name', 'Namespace', 'Updated At']
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {
     this.props.fetchDatasets('food_delivery')
+  }
+
+  componentWillUnmount() {
+    this.props.resetDatasets()
   }
 
   render() {
@@ -85,7 +90,8 @@ const mapStateToProps = (state: IState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchDatasets: fetchDatasets
+      fetchDatasets: fetchDatasets,
+      resetDatasets: resetDatasets
     },
     dispatch
   )

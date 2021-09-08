@@ -6,7 +6,7 @@ import {Container, Table, TableBody, TableCell, TableHead, TableRow} from '@mate
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchJobs } from '../../store/actionCreators'
+import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
 import MqText from '../../components/core/text/MqText'
@@ -22,6 +22,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchJobs: typeof fetchJobs
+  resetJobs: typeof resetJobs
 }
 
 type JobsProps = WithStyles<typeof styles> & StateProps & DispatchProps
@@ -31,6 +32,10 @@ const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At']
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {
     this.props.fetchJobs('food_delivery')
+  }
+
+  componentWillUnmount() {
+    this.props.resetJobs()
   }
 
   render() {
@@ -85,7 +90,8 @@ const mapStateToProps = (state: IState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchJobs: fetchJobs
+      fetchJobs: fetchJobs,
+      resetJobs: resetJobs
     },
     dispatch
   )

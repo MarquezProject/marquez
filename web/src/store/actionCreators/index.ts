@@ -17,6 +17,10 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   }
 })
 
+export const resetDatasets = () => ({
+  type: actionTypes.RESET_DATASETS
+})
+
 export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
   type: actionTypes.FILTER_DATASETS,
   payload: {
@@ -37,6 +41,10 @@ export const fetchJobsSuccess = (jobs: Job[]) => ({
   payload: {
     jobs
   }
+})
+
+export const resetJobs = () => ({
+  type: actionTypes.RESET_JOBS
 })
 
 export const fetchJobRuns = (jobName: string, namespace: string) => ({

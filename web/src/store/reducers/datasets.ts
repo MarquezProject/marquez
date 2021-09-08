@@ -2,7 +2,8 @@ import { Dataset } from '../../types/api'
 import {
   FETCH_DATASETS_SUCCESS,
   FILTER_DATASETS,
-  FIND_MATCHING_ENTITIES
+  FIND_MATCHING_ENTITIES,
+  RESET_DATASETS
 } from '../actionCreators/actionTypes'
 import {
   fetchDatasetsSuccess,
@@ -29,6 +30,8 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
       return findMatchingEntities(payload.search, state) as IDatasetsState
     case FILTER_DATASETS:
       return filterEntities(state, payload.filterByKey, payload.filterByValue)
+    case RESET_DATASETS:
+      return initialState
     default:
       return state
   }

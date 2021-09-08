@@ -1,10 +1,11 @@
 import { FETCH_DATASETS, FETCH_JOBS, FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
-import { all, call, put, take } from 'redux-saga/effects'
+import { all, call, put, take, takeEvery, takeLatest } from 'redux-saga/effects'
 import {
   applicationError,
   fetchDatasetsSuccess,
   fetchJobRunsSuccess,
+  fetchJobs,
   fetchJobsSuccess,
   fetchNamespacesSuccess
 } from '../actionCreators'
@@ -44,22 +45,26 @@ export function* fetchJobRunsSaga() {
 }
 
 export function* fetchJobsSaga() {
-  try {
-    const { payload } = yield take(FETCH_JOBS)
-    const jobs = yield call(getJobs, payload.namespace)
-    yield put(fetchJobsSuccess(jobs))
-  } catch (e) {
-    yield put(applicationError('Something went wrong while fetching job runs'))
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOBS)
+      const jobs = yield call(getJobs, payload.namespace)
+      yield put(fetchJobsSuccess(jobs))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching job runs'))
+    }
   }
 }
 
 export function* fetchDatasetsSaga() {
-  try {
-    const { payload } = yield take(FETCH_DATASETS)
-    const datasets = yield call(getDatasets, payload.namespace)
-    yield put(fetchDatasetsSuccess(datasets))
-  } catch (e) {
-    yield put(applicationError('Something went wrong while fetching dataset runs'))
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_DATASETS)
+      const datasets = yield call(getDatasets, payload.namespace)
+      yield put(fetchDatasetsSuccess(datasets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching dataset runs'))
+    }
   }
 }
 

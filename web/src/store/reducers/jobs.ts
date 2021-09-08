@@ -2,7 +2,7 @@ import {
   FETCH_JOBS_SUCCESS,
   FETCH_JOB_RUNS_SUCCESS,
   FILTER_JOBS,
-  FIND_MATCHING_ENTITIES
+  FIND_MATCHING_ENTITIES, RESET_JOBS
 } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
 import {
@@ -38,6 +38,8 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
         return isMatching ? { ...j, latestRuns: payload.lastTenJobRuns } : j
       })
     }
+    case RESET_JOBS:
+      return initialState
     default:
       return state
   }
