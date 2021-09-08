@@ -1,13 +1,15 @@
 import * as Redux from 'redux'
+import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { Pagination } from '@material-ui/lab'
-import {Container, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { encodeNode } from '../../helpers/nodes'
 import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { stopWatchDuration } from '../../helpers/time'
 import Box from '@material-ui/core/Box'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
@@ -27,7 +29,7 @@ interface DispatchProps {
 
 type JobsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
-const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At']
+const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At', 'Last Runtime']
 
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {
@@ -58,17 +60,26 @@ class Jobs extends React.Component<JobsProps> {
             </TableRow>
           </TableHead>
           <TableBody>
-            {jobs.map(jobs => {
+            {jobs.map(job => {
               return (
-                <TableRow key={jobs.name}>
+                <TableRow key={job.name}>
                   <TableCell align='left'>
-                    <MqText>{jobs.name}</MqText>
+                    <MqText link linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}>
+                      {job.name}
+                    </MqText>
                   </TableCell>
                   <TableCell align='left'>
-                    <MqText>{jobs.namespace}</MqText>
+                    <MqText>{job.namespace}</MqText>
                   </TableCell>
                   <TableCell align='left'>
-                    <MqText>{formatUpdatedAt(jobs.updatedAt)}</MqText>
+                    <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
+                  </TableCell>
+                  <TableCell align='left'>
+                    <MqText>
+                      {job.latestRun && job.latestRun.durationMs
+                        ? stopWatchDuration(job.latestRun.durationMs)
+                        : 'N/A'}
+                    </MqText>
                   </TableCell>
                 </TableRow>
               )

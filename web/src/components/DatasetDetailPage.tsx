@@ -163,7 +163,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets
+  datasets: state.datasets.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, dispatch)

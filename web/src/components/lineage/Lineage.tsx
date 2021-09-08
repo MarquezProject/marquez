@@ -275,7 +275,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
 const mapStateToProps = (state: IState) => ({
   jobs: state.jobs,
-  datasets: state.datasets,
+  datasets: state.datasets.result,
   selectedNode: state.lineage.selectedNode
 })
 

@@ -1,8 +1,7 @@
 import { Dataset } from '../../types/api'
 import {
+  FETCH_DATASETS,
   FETCH_DATASETS_SUCCESS,
-  FILTER_DATASETS,
-  FIND_MATCHING_ENTITIES,
   RESET_DATASETS
 } from '../actionCreators/actionTypes'
 import {
@@ -10,11 +9,10 @@ import {
   filterDatasets,
   findMatchingEntities as findMatchingEntitiesActionCreator
 } from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './index'
 
-export type IDatasetsState = Dataset[]
+export type IDatasetsState = { isLoading: boolean; result: Dataset[] }
 
-export const initialState: IDatasetsState = []
+export const initialState: IDatasetsState = { isLoading: false, result: [] }
 
 type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
   ReturnType<typeof findMatchingEntitiesActionCreator> &
@@ -24,12 +22,10 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
   const { type, payload } = action
 
   switch (type) {
+    case FETCH_DATASETS:
+      return { ...state, isLoading: true }
     case FETCH_DATASETS_SUCCESS:
-      return payload.datasets
-    case FIND_MATCHING_ENTITIES:
-      return findMatchingEntities(payload.search, state) as IDatasetsState
-    case FILTER_DATASETS:
-      return filterEntities(state, payload.filterByKey, payload.filterByValue)
+      return { ...state, isLoading: false, result: payload.datasets }
     case RESET_DATASETS:
       return initialState
     default:

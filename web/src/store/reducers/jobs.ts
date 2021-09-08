@@ -11,7 +11,6 @@ import {
   filterJobs,
   findMatchingEntities as findMatchingEntitiesActionCreator
 } from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './index'
 
 export type IJobsState = IJob[]
 
@@ -28,10 +27,6 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
   switch (type) {
     case FETCH_JOBS_SUCCESS:
       return payload.jobs.map((j: IJob) => ({ ...j, matches: true }))
-    case FIND_MATCHING_ENTITIES:
-      return findMatchingEntities(payload.search, state) as IJobsState
-    case FILTER_JOBS:
-      return filterEntities(state, payload.filterByKey, payload.filterByValue)
     case FETCH_JOB_RUNS_SUCCESS: {
       return state.map((j: IJob) => {
         const isMatching = j.name == payload.jobName

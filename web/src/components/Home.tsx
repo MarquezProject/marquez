@@ -1,7 +1,7 @@
 import * as RRD from 'react-router-dom'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
-import { IDatasetsState } from '../store/reducers/datasets'
+import { Dataset } from '../types/api'
 import { IJobsState } from '../store/reducers/jobs'
 import { IState } from '../store/reducers'
 import {
@@ -45,7 +45,7 @@ const styles = (theme: ITheme) => {
 }
 
 interface IProps {
-  datasets: IDatasetsState
+  datasets: Dataset[]
   jobs: IJobsState
   showJobs: boolean
   setSelectedNode: (payload: string) => void
@@ -53,36 +53,23 @@ interface IProps {
 type IAllProps = RRD.RouteComponentProps & IWithStyles<typeof styles> & IProps
 
 const Home: FunctionComponent<IAllProps> = props => {
-  const [datasetPageIndex, setDatasetPageIndex] = useState(0)
   const [jobPageIndex, setJobPageIndex] = useState(0)
 
   const limit = 5
 
   const { datasets, jobs, classes, showJobs, setSelectedNode } = props
 
-  const matchingDatasets = datasets
   const matchingJobs = jobs
 
-  const chunkedDatasets = _chunk(matchingDatasets, limit)
   const chunkedJobs = _chunk(matchingJobs, limit)
 
-  const displayDatasets = chunkedDatasets[datasetPageIndex] || matchingDatasets
   const displayJobs = chunkedJobs[jobPageIndex] || matchingJobs
 
   return (
     <div className={classes.lowerHalf}>
       <div className={classes.row}>
         <Box className={classes.column}>
-          {matchingDatasets.length > 0 ? (
-            <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-              <MqText heading>{!showJobs ? 'Popular Datasets' : 'Matching Datasets'}</MqText>
-            </Box>
-          ) : (
-            <Box textAlign={'center'}>
-              <MqText subdued>no datasets found!</MqText>
-            </Box>
-          )}
-          {displayDatasets.map(d => (
+          {datasets.map(d => (
             <DatasetPreviewCard
               key={d.name}
               name={d.name}
@@ -92,16 +79,6 @@ const Home: FunctionComponent<IAllProps> = props => {
               setSelectedNode={setSelectedNode}
             />
           ))}
-          {matchingDatasets.length > 0 && (
-            <Pagination
-              color={'standard'}
-              shape={'rounded'}
-              onChange={(event, page) => {
-                setDatasetPageIndex(page - 1)
-              }}
-              count={Math.ceil(matchingDatasets.length / limit)}
-            />
-          )}
         </Box>
         {showJobs && (
           <Box className={classes.column} ml={2}>
@@ -142,7 +119,7 @@ const Home: FunctionComponent<IAllProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets,
+  datasets: state.datasets.result,
   jobs: state.jobs
 })
 
