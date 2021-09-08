@@ -2,6 +2,7 @@ import * as Redux from 'redux'
 import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
+import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Pagination } from '@material-ui/lab'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
@@ -20,6 +21,7 @@ const styles = (theme: Theme) => createStyles({})
 
 interface StateProps {
   jobs: Job[]
+  isJobsLoading: boolean
 }
 
 interface DispatchProps {
@@ -41,61 +43,69 @@ class Jobs extends React.Component<JobsProps> {
   }
 
   render() {
-    const { jobs } = this.props
+    const { jobs, isJobsLoading } = this.props
     return (
       <Container maxWidth={'lg'} disableGutters>
-        <Box p={2}>
-          <MqText heading>Jobs</MqText>
-        </Box>
-        <Table size='small'>
-          <TableHead>
-            <TableRow>
-              {JOB_COLUMNS.map(field => {
-                return (
-                  <TableCell key={field} align='left'>
-                    <MqText subheading>{field}</MqText>
-                  </TableCell>
-                )
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {jobs.map(job => {
-              return (
-                <TableRow key={job.name}>
-                  <TableCell align='left'>
-                    <MqText link linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}>
-                      {job.name}
-                    </MqText>
-                  </TableCell>
-                  <TableCell align='left'>
-                    <MqText>{job.namespace}</MqText>
-                  </TableCell>
-                  <TableCell align='left'>
-                    <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
-                  </TableCell>
-                  <TableCell align='left'>
-                    <MqText>
-                      {job.latestRun && job.latestRun.durationMs
-                        ? stopWatchDuration(job.latestRun.durationMs)
-                        : 'N/A'}
-                    </MqText>
-                  </TableCell>
+        <MqScreenLoad loading={isJobsLoading}>
+          <>
+            <Box p={2}>
+              <MqText heading>Jobs</MqText>
+            </Box>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  {JOB_COLUMNS.map(field => {
+                    return (
+                      <TableCell key={field} align='left'>
+                        <MqText subheading>{field}</MqText>
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-        <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
-          <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
-        </Box>
+              </TableHead>
+              <TableBody>
+                {jobs.map(job => {
+                  return (
+                    <TableRow key={job.name}>
+                      <TableCell align='left'>
+                        <MqText
+                          link
+                          linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
+                        >
+                          {job.name}
+                        </MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText>{job.namespace}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText>
+                          {job.latestRun && job.latestRun.durationMs
+                            ? stopWatchDuration(job.latestRun.durationMs)
+                            : 'N/A'}
+                        </MqText>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+            <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
+              <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
+            </Box>
+          </>
+        </MqScreenLoad>
       </Container>
     )
   }
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs
+  jobs: state.jobs.result,
+  isJobsLoading: state.jobs.isLoading
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

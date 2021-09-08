@@ -180,7 +180,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs
+  jobs: state.jobs.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

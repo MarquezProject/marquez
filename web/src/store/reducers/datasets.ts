@@ -4,19 +4,13 @@ import {
   FETCH_DATASETS_SUCCESS,
   RESET_DATASETS
 } from '../actionCreators/actionTypes'
-import {
-  fetchDatasetsSuccess,
-  filterDatasets,
-  findMatchingEntities as findMatchingEntitiesActionCreator
-} from '../actionCreators'
+import { fetchDatasetsSuccess } from '../actionCreators'
 
 export type IDatasetsState = { isLoading: boolean; result: Dataset[] }
 
 export const initialState: IDatasetsState = { isLoading: false, result: [] }
 
-type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
-  ReturnType<typeof findMatchingEntitiesActionCreator> &
-  ReturnType<typeof filterDatasets>
+type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess>
 
 export default (state: IDatasetsState = initialState, action: IDatasetsAction): IDatasetsState => {
   const { type, payload } = action

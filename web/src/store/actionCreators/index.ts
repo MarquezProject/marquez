@@ -21,14 +21,6 @@ export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS
 })
 
-export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
-  type: actionTypes.FILTER_DATASETS,
-  payload: {
-    filterByKey,
-    filterByValue
-  }
-})
-
 export const fetchJobs = (namespace: string) => ({
   type: actionTypes.FETCH_JOBS,
   payload: {
@@ -63,25 +55,10 @@ export const fetchJobRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
   }
 })
 
-export const filterJobs = (filterByKey: IFilterByKey, filterByValue?: string) => ({
-  type: actionTypes.FILTER_JOBS,
-  payload: {
-    filterByKey,
-    filterByValue
-  }
-})
-
 export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
     namespaces
-  }
-})
-
-export const findMatchingEntities = (search: string) => ({
-  type: actionTypes.FIND_MATCHING_ENTITIES,
-  payload: {
-    search
   }
 })
 

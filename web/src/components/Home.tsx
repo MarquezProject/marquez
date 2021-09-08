@@ -2,7 +2,7 @@ import * as RRD from 'react-router-dom'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
 import { Dataset } from '../types/api'
-import { IJobsState } from '../store/reducers/jobs'
+import { IJob } from '../types'
 import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
@@ -46,7 +46,7 @@ const styles = (theme: ITheme) => {
 
 interface IProps {
   datasets: Dataset[]
-  jobs: IJobsState
+  jobs: IJob[]
   showJobs: boolean
   setSelectedNode: (payload: string) => void
 }
@@ -120,7 +120,7 @@ const Home: FunctionComponent<IAllProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
-  jobs: state.jobs
+  jobs: state.jobs.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
