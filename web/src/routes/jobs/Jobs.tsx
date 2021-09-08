@@ -65,7 +65,9 @@ class Jobs extends React.Component<JobsProps> {
             {jobs.length === 0 ? (
               <Box p={2}>
                 <MqEmpty title={'No jobs found'}>
-                  <MqText subdued>Try changing namespaces or consulting our documentation.</MqText>
+                  <MqText subdued>
+                    Try changing namespaces or consulting our documentation to add jobs.
+                  </MqText>
                 </MqEmpty>
               </Box>
             ) : (
@@ -115,9 +117,6 @@ class Jobs extends React.Component<JobsProps> {
                     })}
                   </TableBody>
                 </Table>
-                <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
-                  <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
-                </Box>
               </>
             )}
           </>

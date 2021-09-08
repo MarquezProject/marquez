@@ -12,6 +12,7 @@ import { encodeNode } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
+import MqEmpty from '../../components/core/empty/Empty'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
@@ -60,54 +61,63 @@ class Datasets extends React.Component<DatasetsProps> {
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isDatasetsLoading}>
           <>
-            <Box p={2}>
-              <MqText heading>Datasets</MqText>
-            </Box>
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  {DATASET_COLUMNS.map(field => {
-                    return (
-                      <TableCell key={field} align='left'>
-                        <MqText subheading>{field}</MqText>
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {datasets.map(dataset => {
-                  return (
-                    <TableRow key={dataset.name}>
-                      <TableCell align='left'>
-                        <MqText
-                          link
-                          linkTo={`/lineage/${encodeNode(
-                            'DATASET',
-                            dataset.namespace,
-                            dataset.name
-                          )}`}
-                        >
-                          {dataset.name}
-                        </MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>{dataset.namespace}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>{dataset.sourceName}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
-                      </TableCell>
+            {datasets.length === 0 ? (
+              <Box p={2}>
+                <MqEmpty title={'No datasets found'}>
+                  <MqText subdued>
+                    Try changing namespaces or consulting our documentation to add datasets.
+                  </MqText>
+                </MqEmpty>
+              </Box>
+            ) : (
+              <>
+                <Box p={2}>
+                  <MqText heading>Datasets</MqText>
+                </Box>
+                <Table size='small'>
+                  <TableHead>
+                    <TableRow>
+                      {DATASET_COLUMNS.map(field => {
+                        return (
+                          <TableCell key={field} align='left'>
+                            <MqText subheading>{field}</MqText>
+                          </TableCell>
+                        )
+                      })}
                     </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-            <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
-              <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
-            </Box>
+                  </TableHead>
+                  <TableBody>
+                    {datasets.map(dataset => {
+                      return (
+                        <TableRow key={dataset.name}>
+                          <TableCell align='left'>
+                            <MqText
+                              link
+                              linkTo={`/lineage/${encodeNode(
+                                'DATASET',
+                                dataset.namespace,
+                                dataset.name
+                              )}`}
+                            >
+                              {dataset.name}
+                            </MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{dataset.namespace}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{dataset.sourceName}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </>
+            )}
           </>
         </MqScreenLoad>
       </Container>
