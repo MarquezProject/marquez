@@ -1,10 +1,10 @@
-package marquez;
+package marquez.tracing;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
+/** Configuration for {@code Sentry}. */
 public class SentryConfig {
-
   public static final String DEFAULT_ENVIRONMENT = "local";
   public static final double DEFAULT_TRACE_SAMPLE_RATE = 0.01d;
   public static final String DEFAULT_DSN = "";
