@@ -1,4 +1,4 @@
-import {JobOrDataset, LineageGraph} from '../components/lineage/types'
+import { JobOrDataset, LineageNode } from '../components/lineage/types'
 
 export interface Tag {
   name: string
@@ -112,6 +112,6 @@ export interface SearchResult {
 
 export type GroupedSearch = { group: string } & SearchResult
 
-export interface Lineage {
-  graph: LineageGraph[]
+export interface LineageGraph {
+  graph: LineageNode[]
 }

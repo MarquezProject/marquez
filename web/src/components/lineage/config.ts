@@ -1,6 +1,6 @@
 export const DAGRE_CONFIG = {
   rankdir: 'LR',
-  marginx: 40,
+  marginx: 140,
   marginy: 40,
   align: 'UL',
   ranker: 'network-simplex',

@@ -4,12 +4,12 @@ import {
   SET_SELECTED_NODE
 } from '../actionCreators/actionTypes'
 import { HEADER_HEIGHT } from '../../helpers/theme'
-import { Lineage } from '../../types/api'
+import { LineageGraph } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
 import { setBottomBarHeight, setSelectedNode } from '../actionCreators'
 
 export interface ILineageState {
-  lineage: Lineage
+  lineage: LineageGraph
   selectedNode: Nullable<string>
   bottomBarHeight: number
 }

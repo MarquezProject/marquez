@@ -3,11 +3,11 @@ import React from 'react'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
 import { DAGRE_CONFIG, INITIAL_TRANSFORM, NODE_SIZE } from './config'
-import { Dataset, Job } from '../../types/api'
 import { GraphEdge, Node as GraphNode, graphlib, layout } from 'dagre'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
-import { JobOrDataset, MqNode } from './types'
+import { JobOrDataset, LineageNode, MqNode } from './types'
+import { LineageGraph } from '../../types/api'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
@@ -38,11 +38,8 @@ const MIN_ZOOM = 1 / 4
 const MAX_ZOOM = 4
 const DOUBLE_CLICK_MAGNIFICATION = 1.1
 
-const MAX_ITERATIONS = 1000
-
 interface StateProps {
-  jobs: Job[]
-  datasets: Dataset[]
+  lineage: LineageGraph
   selectedNode: string
 }
 
@@ -56,8 +53,6 @@ interface DispatchProps {
   setSelectedNode: typeof setSelectedNode
   fetchLineage: typeof fetchLineage
 }
-
-type JorD = Job | Dataset | undefined
 
 export interface JobOrDatasetMatchParams {
   nodeName: string
@@ -102,17 +97,9 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   }
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
-    if (this.props.selectedNode !== prevProps.selectedNode && this.props.selectedNode) {
-      if (this.props.jobs.length > 0 || this.props.datasets.length > 0) {
-        this.initGraph()
-        const attachedNodes = this.findNodesFromOrigin(this.props.selectedNode)
-        this.buildGraphAll(
-          attachedNodes.filter(jobOrDataset => jobOrDataset && 'outputs' in jobOrDataset) as Job[],
-          attachedNodes.filter(
-            jobOrDataset => jobOrDataset && 'sourceName' in jobOrDataset
-          ) as Dataset[]
-        )
-      }
+    if (this.props.lineage !== prevProps.lineage && this.props.selectedNode) {
+      this.initGraph()
+      this.buildGraphAll(this.props.lineage.graph)
     }
   }
 
@@ -124,32 +111,20 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     })
   }
 
-  buildGraphAll = (jobs: Job[], datasets: Dataset[]) => {
-    // jobs
-    for (let i = 0; i < jobs.length; i++) {
-      g.setNode(jobs[i].id.name, {
-        data: jobs[i],
-        width: NODE_SIZE,
-        height: NODE_SIZE
-      })
-    }
-
-    // datasets
-    for (let i = 0; i < datasets.length; i++) {
-      g.setNode(datasets[i].id.name, {
-        data: datasets[i],
+  buildGraphAll = (graph: LineageNode[]) => {
+    // nodes
+    for (let i = 0; i < graph.length; i++) {
+      g.setNode(graph[i].id, {
+        data: graph[i].data,
         width: NODE_SIZE,
         height: NODE_SIZE
       })
     }
 
     // edges
-    for (let i = 0; i < jobs.length; i++) {
-      for (let j = 0; j < jobs[i].outputs.length; j++) {
-        g.setEdge(jobs[i].id.name, jobs[i].outputs[j].name)
-      }
-      for (let j = 0; j < jobs[i].inputs.length; j++) {
-        g.setEdge(jobs[i].inputs[j].name, jobs[i].id.name)
+    for (let i = 0; i < graph.length; i++) {
+      for (let j = 0; j < graph[i].inEdges.length; j++) {
+        g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
       }
     }
     layout(g)
@@ -159,53 +134,6 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       edges: g.edges().map(e => g.edge(e)),
       nodes: g.nodes().map(v => g.node(v))
     })
-  }
-
-  /**
-   * Runs a bidirectional depth first search on an origin node
-   * It has some defensive practices which will protect against inf loops for some graphs
-   */
-  findNodesFromOrigin = (node: string): JorD[] => {
-    const stack: JorD[] = []
-    const items: JorD[] = []
-
-    const root =
-      this.props.jobs.find(job => job.name === node) ||
-      this.props.datasets.find(dataset => dataset.name === node)
-    if (root) {
-      stack.push(root)
-      items.push(root)
-    }
-    let i = 0
-    while (stack.length > 0 && i < MAX_ITERATIONS) {
-      const n = stack.pop()
-      // job node
-      if (n && 'outputs' in n) {
-        const outputDatasets = n.outputs.map(output =>
-          this.props.datasets.find(d => d.name === output.name)
-        )
-        const inputDatasets = n.inputs.map(output =>
-          this.props.datasets.find(d => d.name === output.name)
-        )
-        const merged = [...inputDatasets, ...outputDatasets]
-        const filtered = merged.filter(inputOrOutput => !items.includes(inputOrOutput))
-        items.push(...filtered)
-        stack.push(...filtered)
-      }
-      // dataset node
-      else if (n && 'sourceName' in n) {
-        const inputDatasets = this.props.jobs.filter(job => job.inputs.some(e => e.name === n.name))
-        const outputDatasets = this.props.jobs.filter(job =>
-          job.outputs.some(e => e.name === n.name)
-        )
-        const merged = [...inputDatasets, ...outputDatasets]
-        const filtered = merged.filter(inputOrOutput => !items.includes(inputOrOutput))
-        items.push(...filtered)
-        stack.push(...filtered)
-      }
-      i++
-    }
-    return items
   }
 
   render() {
@@ -298,8 +226,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs.result,
-  datasets: state.datasets.result,
+  lineage: state.lineage.lineage,
   selectedNode: state.lineage.selectedNode
 })
 
