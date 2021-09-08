@@ -16,6 +16,12 @@ package marquez.api.models;
 
 /** Filter supported for {@link SearchResult}. */
 public enum SearchFilter {
-  DATASET,
-  JOB;
+  DATASET("dataset"),
+  JOB("job");
+
+  final String value;
+
+  SearchFilter(String value) {
+    this.value = value;
+  }
 }
