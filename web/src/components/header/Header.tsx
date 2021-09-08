@@ -7,6 +7,7 @@ import { faSync } from '@fortawesome/free-solid-svg-icons'
 import Box from '@material-ui/core/Box'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
+import NamespaceSelect from '../namespace-select/NamespaceSelect'
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -52,9 +53,7 @@ const Header = (props: HeaderProps): ReactElement => {
           </Link>
           <Box display={'flex'} alignItems={'center'}>
             <Search />
-            <IconButton aria-label='refresh'>
-              <FontAwesomeIcon icon={faSync} size={'xs'} />
-            </IconButton>
+            <NamespaceSelect />
           </Box>
         </Box>
       </Toolbar>

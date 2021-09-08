@@ -3,6 +3,7 @@ import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@ma
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
+import { Nullable } from '../../types/util/Nullable'
 import { Pagination } from '@material-ui/lab'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
@@ -21,6 +22,7 @@ const styles = (theme: Theme) => createStyles({})
 interface StateProps {
   datasets: Dataset[]
   isDatasetsLoading: boolean
+  selectedNamespace: Nullable<string>
 }
 
 interface DispatchProps {
@@ -34,7 +36,18 @@ const DATASET_COLUMNS = ['Name', 'Namespace', 'Source', 'Updated At']
 
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {
-    this.props.fetchDatasets('food_delivery')
+    if (this.props.selectedNamespace) {
+      this.props.fetchDatasets(this.props.selectedNamespace)
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<DatasetsProps>) {
+    if (
+      prevProps.selectedNamespace !== this.props.selectedNamespace &&
+      this.props.selectedNamespace
+    ) {
+      this.props.fetchDatasets(this.props.selectedNamespace)
+    }
   }
 
   componentWillUnmount() {
@@ -104,7 +117,8 @@ class Datasets extends React.Component<DatasetsProps> {
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
-  isDatasetsLoading: state.datasets.isLoading
+  isDatasetsLoading: state.datasets.isLoading,
+  selectedNamespace: state.namespaces.selectedNamespace
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

@@ -1,9 +1,10 @@
 import { Namespace } from '../../types/api'
 
-import { FETCH_NAMESPACES_SUCCESS } from '../actionCreators/actionTypes'
+import { FETCH_NAMESPACES_SUCCESS, SELECT_NAMESPACE } from '../actionCreators/actionTypes'
+import { Nullable } from '../../types/util/Nullable'
 
-export type INamespacesState = Namespace[]
-const initialState: INamespacesState = []
+export type INamespacesState = { result: Namespace[]; selectedNamespace: Nullable<string> }
+const initialState: INamespacesState = { result: [], selectedNamespace: null }
 
 interface INamespacesAction {
   type: string
@@ -17,7 +18,12 @@ export default (state = initialState, action: INamespacesAction) => {
 
   switch (type) {
     case FETCH_NAMESPACES_SUCCESS:
-      return payload.namespaces
+      return {
+        result: payload.namespaces,
+        selectedNamespace: payload.namespaces[0] ? payload.namespaces[0].name : null
+      }
+    case SELECT_NAMESPACE:
+      return { ...state, selectedNamespace: action.payload }
     default:
       return state
   }

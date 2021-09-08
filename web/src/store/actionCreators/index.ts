@@ -85,3 +85,8 @@ export const setBottomBarHeight = (height: number) => ({
   type: actionTypes.SET_BOTTOM_BAR_HEIGHT,
   payload: height
 })
+
+export const selectNamespace = (namespace: string) => ({
+  type: actionTypes.SELECT_NAMESPACE,
+  payload: namespace
+})

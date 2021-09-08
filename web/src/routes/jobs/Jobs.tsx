@@ -3,6 +3,7 @@ import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@ma
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
+import { Nullable } from '../../types/util/Nullable'
 import { Pagination } from '@material-ui/lab'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
@@ -23,6 +24,7 @@ const styles = (theme: Theme) => createStyles({})
 interface StateProps {
   jobs: Job[]
   isJobsLoading: boolean
+  selectedNamespace: Nullable<string>
 }
 
 interface DispatchProps {
@@ -36,7 +38,18 @@ const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At', 'Last Runtime']
 
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {
-    this.props.fetchJobs('food_delivery')
+    if (this.props.selectedNamespace) {
+      this.props.fetchJobs(this.props.selectedNamespace)
+    }
+  }
+
+  componentDidUpdate(prevProps: Readonly<JobsProps>) {
+    if (
+      prevProps.selectedNamespace !== this.props.selectedNamespace &&
+      this.props.selectedNamespace
+    ) {
+      this.props.fetchJobs(this.props.selectedNamespace)
+    }
   }
 
   componentWillUnmount() {
@@ -116,7 +129,8 @@ class Jobs extends React.Component<JobsProps> {
 
 const mapStateToProps = (state: IState) => ({
   jobs: state.jobs.result,
-  isJobsLoading: state.jobs.isLoading
+  isJobsLoading: state.jobs.isLoading,
+  selectedNamespace: state.namespaces.selectedNamespace
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
