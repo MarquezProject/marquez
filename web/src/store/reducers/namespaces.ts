@@ -4,12 +4,10 @@ import { FETCH_NAMESPACES_SUCCESS, SELECT_NAMESPACE } from '../actionCreators/ac
 import { Nullable } from '../../types/util/Nullable'
 import { fetchNamespacesSuccess, setSelectedNode } from '../actionCreators'
 
-const selectedNamespace = window.localStorage.getItem('selectedNamespace')
-
 export type INamespacesState = { result: Namespace[]; selectedNamespace: Nullable<string> }
 const initialState: INamespacesState = {
   result: [],
-  selectedNamespace: selectedNamespace ? selectedNamespace : null
+  selectedNamespace: null
 }
 
 export default (
@@ -22,8 +20,8 @@ export default (
     case FETCH_NAMESPACES_SUCCESS:
       return {
         result: payload.namespaces,
-        selectedNamespace: state.selectedNamespace
-          ? state.selectedNamespace
+        selectedNamespace: window.localStorage.getItem('selectedNamespace')
+          ? window.localStorage.getItem('selectedNamespace')
           : payload.namespaces[0]
           ? payload.namespaces[0].name
           : null

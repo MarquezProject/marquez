@@ -59,7 +59,7 @@ const App = (): ReactElement => {
               <Route path={'/datasets'} exact>
                 <Datasets />
               </Route>
-              <Route path={'/lineage'}>
+              <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
                 <Lineage />
                 <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
               </Route>

@@ -1,11 +1,14 @@
+import * as Effects from 'redux-saga/effects'
 import { FETCH_DATASETS, FETCH_JOBS, FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
-import { Namespaces } from '../../types/api'
-import { all, call, put, take, takeEvery, takeLatest } from 'redux-saga/effects'
+import { Namespace, Namespaces } from '../../types/api'
+import { all, put, take} from 'redux-saga/effects'
+const call: any = Effects.call
+
 import {
   applicationError,
+  fetchDatasets,
   fetchDatasetsSuccess,
   fetchJobRunsSuccess,
-  fetchJobs,
   fetchJobsSuccess,
   fetchNamespacesSuccess
 } from '../actionCreators'
@@ -17,14 +20,14 @@ export function* fetchNamespacesDatasetsAndJobs() {
     const response: Namespaces = yield call(getNamespaces)
     const { namespaces } = response
 
-    // const datasetResponses = yield all(namespaces.map((n: Namespace) => call(fetchDatasets, n)))
+    const datasetResponses = yield all(namespaces.map((n: Namespace) => call(getDatasets, n.name)))
 
-    // const jobResponses = yield all(namespaces.map((n: Namespace) => call(fetchJobs, n)))
-    // const datasets = datasetResponses.flat()
-    // const jobs = jobResponses.flat()
+    const jobResponses = yield all(namespaces.map((n: Namespace) => call(getJobs, n.name)))
+    const datasets = datasetResponses.flat()
+    const jobs = jobResponses.flat()
 
-    // yield put(fetchDatasetsSuccess(datasets))
-    // yield put(fetchJobsSuccess(jobs))
+    yield put(fetchDatasetsSuccess(datasets))
+    yield put(fetchJobsSuccess(jobs))
     yield put(fetchNamespacesSuccess(namespaces))
   } catch (e) {
     yield put(applicationError('Something went wrong while fetching initial data.'))

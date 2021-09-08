@@ -35,33 +35,35 @@ type NamespaceSelectProps = WithStyles<typeof styles> & OwnProps & StateProps & 
 class NamespaceSelect extends React.Component<NamespaceSelectProps, StateProps> {
   render() {
     const { classes, namespaces, selectedNamespace } = this.props
-    return (
-      <FormControl variant='outlined' className={classes.formControl}>
-        <Box position={'relative'}>
-          <Box position={'absolute'} left={12} top={9}>
-            <MqText color={theme.palette.primary.main} font={'mono'}>
-              ns
-            </MqText>
+    if (selectedNamespace) {
+      return (
+        <FormControl variant='outlined' className={classes.formControl}>
+          <Box position={'relative'}>
+            <Box position={'absolute'} left={12} top={9}>
+              <MqText color={theme.palette.primary.main} font={'mono'}>
+                ns
+              </MqText>
+            </Box>
           </Box>
-        </Box>
-        <Select
-          labelId='namespace-label'
-          id='namespace-select'
-          value={selectedNamespace}
-          onChange={event => {
-            this.props.selectNamespace(event.target.value as string)
-          }}
-          label='Namespace'
-          input={<SearchBase />}
-        >
-          {namespaces.map(namespace => (
-            <MenuItem key={namespace.name} value={namespace.name}>
-              {namespace.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    )
+          <Select
+            labelId='namespace-label'
+            id='namespace-select'
+            value={selectedNamespace}
+            onChange={event => {
+              this.props.selectNamespace(event.target.value as string)
+            }}
+            label='Namespace'
+            input={<SearchBase/>}
+          >
+            {namespaces.map(namespace => (
+              <MenuItem key={namespace.name} value={namespace.name}>
+                {namespace.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )
+    } else return null
   }
 }
 

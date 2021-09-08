@@ -20,3 +20,7 @@ export function encodeNode(nodeType: JobOrDataset, namespace: string, name: stri
     namespace
   )}/${encodeURIComponent(name)}`
 }
+
+export function generateNodeId(type: JobOrDataset, namespace: string, jobName: string) {
+  return `${type.toLowerCase()}:${namespace}:${jobName}`
+}

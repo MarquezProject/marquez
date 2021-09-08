@@ -7,12 +7,14 @@ import { Dataset, Job } from '../../types/api'
 import { GraphEdge, Node as GraphNode, graphlib, layout } from 'dagre'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
-import { MqNode } from './types'
+import { JobOrDataset, MqNode } from './types'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
 import { setSelectedNode } from '../../store/actionCreators'
 import Edge from './components/edge/Edge'
@@ -56,7 +58,16 @@ interface DispatchProps {
 
 type JorD = Job | Dataset | undefined
 
-type LineageProps = WithStyles<typeof styles> & StateProps & DispatchProps
+export interface JobOrDatasetMatchParams {
+  nodeName: string
+  namespace: string
+  nodeType: string
+}
+
+type LineageProps = WithStyles<typeof styles> &
+  StateProps &
+  DispatchProps &
+  RouteComponentProps<JobOrDatasetMatchParams>
 
 let g: graphlib.Graph<MqNode>
 
@@ -67,6 +78,20 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       graph: g,
       edges: [],
       nodes: []
+    }
+  }
+
+  componentDidMount() {
+    const nodeName = this.props.match.params.nodeName
+    const namespace = this.props.match.params.namespace
+    const nodeType = this.props.match.params.nodeType
+    if (nodeName && namespace && nodeType) {
+      const nodeId = generateNodeId(
+        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
+        this.props.match.params.namespace,
+        this.props.match.params.nodeName
+      )
+      this.props.setSelectedNode(nodeId)
     }
   }
 
@@ -284,5 +309,5 @@ export default withStyles(styles)(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(Lineage)
+  )(withRouter(Lineage))
 )
