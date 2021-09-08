@@ -87,7 +87,7 @@ export const setBottomBarHeight = (height: number) => ({
 })
 
 export const fetchLineage = (nodeType: JobOrDataset, namespace: string, name: string) => ({
-  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  type: actionTypes.FETCH_LINEAGE,
   payload: {
     nodeType,
     namespace,

@@ -5,7 +5,7 @@ import {
   FETCH_JOB_RUNS,
   FETCH_LINEAGE
 } from '../actionCreators/actionTypes'
-import { Namespace, Namespaces } from '../../types/api'
+import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
@@ -23,14 +23,12 @@ import { getLineage } from '../requests/lineage'
 import _orderBy from 'lodash/orderBy'
 
 export function* fetchNamespaces() {
-  while (true) {
-    try {
-      const response: Namespaces = yield call(getNamespaces)
-      const { namespaces } = response
-      yield put(fetchNamespacesSuccess(namespaces))
-    } catch (e) {
-      yield put(applicationError('Something went wrong while fetching initial data.'))
-    }
+  try {
+    const response: Namespaces = yield call(getNamespaces)
+    const { namespaces } = response
+    yield put(fetchNamespacesSuccess(namespaces))
+  } catch (e) {
+    yield put(applicationError('Something went wrong while fetching initial data.'))
   }
 }
 
@@ -38,8 +36,8 @@ export function* fetchLineage() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_LINEAGE)
-      const { lineage } = yield call(getLineage, payload.nodeName, payload.namespace, payload.name)
-      yield put(fetchLineageSuccess(lineage))
+      const result = yield call(getLineage, payload.nodeType, payload.namespace, payload.name)
+      yield put(fetchLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
     }

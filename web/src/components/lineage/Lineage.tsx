@@ -14,9 +14,9 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { fetchLineage, setSelectedNode } from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
-import { setSelectedNode } from '../../store/actionCreators'
 import Edge from './components/edge/Edge'
 import MqEmpty from '../core/empty/Empty'
 import MqText from '../core/text/MqText'
@@ -54,6 +54,7 @@ interface LineageState {
 
 interface DispatchProps {
   setSelectedNode: typeof setSelectedNode
+  fetchLineage: typeof fetchLineage
 }
 
 type JorD = Job | Dataset | undefined
@@ -92,6 +93,12 @@ class Lineage extends React.Component<LineageProps, LineageState> {
         this.props.match.params.nodeName
       )
       this.props.setSelectedNode(nodeId)
+      console.log('fetch')
+      this.props.fetchLineage(
+        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
+        this.props.match.params.namespace,
+        this.props.match.params.nodeName
+      )
     }
   }
 
@@ -300,7 +307,8 @@ const mapStateToProps = (state: IState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setSelectedNode: setSelectedNode
+      setSelectedNode: setSelectedNode,
+      fetchLineage: fetchLineage
     },
     dispatch
   )
