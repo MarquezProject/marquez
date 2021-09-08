@@ -8,7 +8,6 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import DatasetDetailPage from '../DatasetDetailPage'
 import DragBar from '../lineage/components/drag-bar/DragBar'
-import Home from '../Home'
 import JobDetailPage from '../JobDetailPage'
 
 const styles = (theme: Theme) => {
@@ -40,14 +39,13 @@ type BottomBarProps = StateProps & OwnProps & WithStyles<typeof styles>
 
 class BottomBar extends React.Component<BottomBarProps> {
   render() {
-    const { classes, bottomBarHeight, showJobs } = this.props
+    const { classes, bottomBarHeight } = this.props
     return (
       <Box className={classes.bottomBar}>
         <DragBar />
         <Box className={classes.overflow} height={bottomBarHeight}>
           <Container maxWidth={'lg'} disableGutters={true}>
             <Switch>
-              <Route path='/' exact render={props => <Home {...props} showJobs={showJobs} />} />
               <Route path='/datasets/:datasetName' exact component={DatasetDetailPage} />
               <Route path='/jobs/:jobName' exact component={JobDetailPage} />
             </Switch>
