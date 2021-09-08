@@ -57,9 +57,9 @@ public class SearchResource {
   public Response search(
       @QueryParam("q") @NotNull String query,
       @QueryParam("filter") @Nullable SearchFilter filter,
-      @QueryParam("sort") @DefaultValue("NAME") SearchSort sort,
-      @QueryParam("order") @DefaultValue("DESC") SearchOrder order,
-      @QueryParam("limit") @DefaultValue("10") @Min(value = 0) int limit) {
+      @QueryParam("sort") @DefaultValue("name") SearchSort sort,
+      @QueryParam("order") @DefaultValue("desc") SearchOrder order,
+      @QueryParam("limit") @DefaultValue("10") @Min(value = 0)  int limit) {
     final List<SearchResult> results = searchService.search(query, filter, sort, order, limit);
     return Response.ok(new SearchResults(results)).build();
   }
