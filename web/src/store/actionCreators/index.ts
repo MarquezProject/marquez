@@ -1,7 +1,7 @@
 import * as actionTypes from './actionTypes'
 
 import { Dataset, Job, Namespace, Run } from '../../types/api'
-import { IFilterByKey } from '../../types'
+import { JobOrDataset } from '../../components/lineage/types'
 
 export const fetchDatasets = (namespace: string) => ({
   type: actionTypes.FETCH_DATASETS,
@@ -84,6 +84,20 @@ export const setSelectedNode = (node: string) => ({
 export const setBottomBarHeight = (height: number) => ({
   type: actionTypes.SET_BOTTOM_BAR_HEIGHT,
   payload: height
+})
+
+export const fetchLineage = (nodeType: JobOrDataset, namespace: string, name: string) => ({
+  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  payload: {
+    nodeType,
+    namespace,
+    name
+  }
+})
+
+export const fetchLineageSuccess = (lineage: any[]) => ({
+  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  payload: lineage
 })
 
 export const selectNamespace = (namespace: string) => ({

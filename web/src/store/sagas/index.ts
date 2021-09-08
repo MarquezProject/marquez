@@ -1,36 +1,48 @@
 import * as Effects from 'redux-saga/effects'
-import { FETCH_DATASETS, FETCH_JOBS, FETCH_JOB_RUNS } from '../actionCreators/actionTypes'
+import {
+  FETCH_DATASETS,
+  FETCH_JOBS,
+  FETCH_JOB_RUNS,
+  FETCH_LINEAGE
+} from '../actionCreators/actionTypes'
 import { Namespace, Namespaces } from '../../types/api'
-import { all, put, take} from 'redux-saga/effects'
+import { all, put, take } from 'redux-saga/effects'
+
 const call: any = Effects.call
 
 import {
   applicationError,
-  fetchDatasets,
   fetchDatasetsSuccess,
   fetchJobRunsSuccess,
   fetchJobsSuccess,
+  fetchLineageSuccess,
   fetchNamespacesSuccess
 } from '../actionCreators'
 import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
+import { getLineage } from '../requests/lineage'
 import _orderBy from 'lodash/orderBy'
 
-export function* fetchNamespacesDatasetsAndJobs() {
-  try {
-    const response: Namespaces = yield call(getNamespaces)
-    const { namespaces } = response
+export function* fetchNamespaces() {
+  while (true) {
+    try {
+      const response: Namespaces = yield call(getNamespaces)
+      const { namespaces } = response
+      yield put(fetchNamespacesSuccess(namespaces))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching initial data.'))
+    }
+  }
+}
 
-    const datasetResponses = yield all(namespaces.map((n: Namespace) => call(getDatasets, n.name)))
-
-    const jobResponses = yield all(namespaces.map((n: Namespace) => call(getJobs, n.name)))
-    const datasets = datasetResponses.flat()
-    const jobs = jobResponses.flat()
-
-    yield put(fetchDatasetsSuccess(datasets))
-    yield put(fetchJobsSuccess(jobs))
-    yield put(fetchNamespacesSuccess(namespaces))
-  } catch (e) {
-    yield put(applicationError('Something went wrong while fetching initial data.'))
+export function* fetchLineage() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LINEAGE)
+      const { lineage } = yield call(getLineage, payload.nodeName, payload.namespace, payload.name)
+      yield put(fetchLineageSuccess(lineage))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching lineage'))
+    }
   }
 }
 
@@ -72,8 +84,13 @@ export function* fetchDatasetsSaga() {
 }
 
 export default function* rootSaga(): Generator {
-  const sagasThatAreKickedOffImmediately = [fetchNamespacesDatasetsAndJobs()]
-  const sagasThatWatchForAction = [fetchJobRunsSaga(), fetchJobsSaga(), fetchDatasetsSaga()]
+  const sagasThatAreKickedOffImmediately = [fetchNamespaces()]
+  const sagasThatWatchForAction = [
+    fetchJobRunsSaga(),
+    fetchJobsSaga(),
+    fetchDatasetsSaga(),
+    fetchLineage()
+  ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])
 }
