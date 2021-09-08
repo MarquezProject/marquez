@@ -64,6 +64,7 @@ public class SearchResource {
     return Response.ok(new SearchResults(results)).build();
   }
 
+  /** Wrapper for {@link SearchResult}s which also contains a {@code total count}. */
   @ToString
   public static final class SearchResults {
     @Getter private final int totalCount;

@@ -20,13 +20,18 @@ import lombok.Value;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 import marquez.service.models.NodeId;
 
-/** */
+/**
+ * Represents a search result. To create a new instance of a {@link ResultType#DATASET} search
+ * result, use the {@link #newDatasetResult} factory method. Similiary, to create a new instance of
+ * a {@link ResultType#JOB} search result, use the {@link #newJobResult} factory method.
+ */
 @Value
 public class SearchResult {
-  /** */
-  public enum ResultType {
+  /** An {@code enum} used to determine the result type in {@link SearchResult}. */
+  enum ResultType {
     DATASET,
     JOB;
   }
@@ -38,9 +43,13 @@ public class SearchResult {
   @NonNull NodeId nodeId;
 
   /**
-   * @param datasetName
-   * @param namespaceName
-   * @return
+   * Returns a new {@link Version} object based on the dataset's name, updated timestamp, and
+   * namespace.
+   *
+   * @param datasetName The name of the dataset.
+   * @param updatedAt The update timestamp of the dataset.
+   * @param namespaceName The namespace of the dataset.
+   * @return A {@link SearchResult} object based on the specified dataset meta.
    */
   public static SearchResult newDatasetResult(
       @NonNull final DatasetName datasetName,
@@ -55,9 +64,13 @@ public class SearchResult {
   }
 
   /**
-   * @param jobName
-   * @param namespaceName
-   * @return
+   * Returns a new {@link SearchResult} object based on the job's name, updated timestamp, and
+   * namespace.
+   *
+   * @param jobName The name of the job.
+   * @param updatedAt The update timestamp of the job.
+   * @param namespaceName The namespace of the job.
+   * @return A {@link SearchResult} object based on the specified job meta.
    */
   public static SearchResult newJobResult(
       @NonNull final JobName jobName,

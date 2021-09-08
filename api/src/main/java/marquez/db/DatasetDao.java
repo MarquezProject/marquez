@@ -35,7 +35,6 @@ import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.mappers.DatasetSearchResultMapper;
-import marquez.db.mappers.JobSearchResultMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
