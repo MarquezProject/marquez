@@ -16,6 +16,7 @@ import { connect } from 'react-redux'
 import { localPoint } from '@visx/event'
 import { setSelectedNode } from '../../store/actionCreators'
 import Edge from './components/edge/Edge'
+import MqEmpty from '../core/empty/Empty'
 import MqText from '../core/text/MqText'
 import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -27,13 +28,6 @@ const styles = (theme: Theme) => {
     lineageContainer: {
       marginTop: HEADER_HEIGHT,
       height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
-    },
-    noSelectedNode: {
-      padding: theme.spacing(2),
-      border: `2px dashed ${theme.palette.secondary.main}`,
-      borderRadius: theme.shape.borderRadius,
-      width: '400px',
-      height: '100px'
     }
   })
 }
@@ -188,13 +182,12 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     return (
       <Box className={classes.lineageContainer}>
         {this.props.selectedNode === null && (
-          <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={4}>
-            <Box className={classes.noSelectedNode}>
-              <MqText heading>Choose a Job or Dataset</MqText>
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
+            <MqEmpty title={'No node selected'}>
               <MqText subdued>
-                Use search to find a job or dataset or look through your popular datasets below.
+                Try selecting a node through search or the jobs or datasets page.
               </MqText>
-            </Box>
+            </MqEmpty>
           </Box>
         )}
         {this.state.graph && (

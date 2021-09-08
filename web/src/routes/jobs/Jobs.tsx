@@ -12,6 +12,7 @@ import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import Box from '@material-ui/core/Box'
+import MqEmpty from '../../components/core/empty/Empty'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
@@ -48,54 +49,64 @@ class Jobs extends React.Component<JobsProps> {
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isJobsLoading}>
           <>
-            <Box p={2}>
-              <MqText heading>Jobs</MqText>
-            </Box>
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  {JOB_COLUMNS.map(field => {
-                    return (
-                      <TableCell key={field} align='left'>
-                        <MqText subheading>{field}</MqText>
-                      </TableCell>
-                    )
-                  })}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {jobs.map(job => {
-                  return (
-                    <TableRow key={job.name}>
-                      <TableCell align='left'>
-                        <MqText
-                          link
-                          linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
-                        >
-                          {job.name}
-                        </MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>{job.namespace}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText>
-                          {job.latestRun && job.latestRun.durationMs
-                            ? stopWatchDuration(job.latestRun.durationMs)
-                            : 'N/A'}
-                        </MqText>
-                      </TableCell>
+            {jobs.length === 0 ? (
+              <Box p={2}>
+                <MqEmpty title={'No jobs found'}>
+                  <MqText subdued>Try changing namespaces or consulting our documentation.</MqText>
+                </MqEmpty>
+              </Box>
+            ) : (
+              <>
+                <Box p={2}>
+                  <MqText heading>Jobs</MqText>
+                </Box>
+                <Table size='small'>
+                  <TableHead>
+                    <TableRow>
+                      {JOB_COLUMNS.map(field => {
+                        return (
+                          <TableCell key={field} align='left'>
+                            <MqText subheading>{field}</MqText>
+                          </TableCell>
+                        )
+                      })}
                     </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-            <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
-              <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
-            </Box>
+                  </TableHead>
+                  <TableBody>
+                    {jobs.map(job => {
+                      return (
+                        <TableRow key={job.name}>
+                          <TableCell align='left'>
+                            <MqText
+                              link
+                              linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
+                            >
+                              {job.name}
+                            </MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{job.namespace}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>
+                              {job.latestRun && job.latestRun.durationMs
+                                ? stopWatchDuration(job.latestRun.durationMs)
+                                : 'N/A'}
+                            </MqText>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+                <Box display={'flex'} justifyContent={'flex-end'} mt={2} mr={2}>
+                  <Pagination color={'standard'} shape={'rounded'} onChange={() => {}} count={10} />
+                </Box>
+              </>
+            )}
           </>
         </MqScreenLoad>
       </Container>
