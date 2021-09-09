@@ -9,7 +9,6 @@ import { IState } from '../../store/reducers'
 import { JobOrDataset, LineageNode, MqNode } from './types'
 import { LineageGraph } from '../../types/api'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
@@ -25,7 +24,7 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 
 const BOTTOM_OFFSET = 8
 
-const styles = (theme: Theme) => {
+const styles = () => {
   return createStyles({
     lineageContainer: {
       marginTop: HEADER_HEIGHT,

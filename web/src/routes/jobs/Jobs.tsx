@@ -4,8 +4,6 @@ import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
-import { Pagination } from '@material-ui/lab'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode } from '../../helpers/nodes'
@@ -19,10 +17,11 @@ import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
-const styles = (theme: Theme) => createStyles({})
+const styles = () => createStyles({})
 
 interface StateProps {
   jobs: Job[]
+  isJobsInit: boolean
   isJobsLoading: boolean
   selectedNamespace: Nullable<string>
 }
@@ -57,10 +56,10 @@ class Jobs extends React.Component<JobsProps> {
   }
 
   render() {
-    const { jobs, isJobsLoading } = this.props
+    const { jobs, isJobsLoading, isJobsInit } = this.props
     return (
       <Container maxWidth={'lg'} disableGutters>
-        <MqScreenLoad loading={isJobsLoading}>
+        <MqScreenLoad loading={isJobsLoading || !isJobsInit}>
           <>
             {jobs.length === 0 ? (
               <Box p={2}>
@@ -127,6 +126,7 @@ class Jobs extends React.Component<JobsProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
+  isJobsInit: state.jobs.init,
   jobs: state.jobs.result,
   isJobsLoading: state.jobs.isLoading,
   selectedNamespace: state.namespaces.selectedNamespace

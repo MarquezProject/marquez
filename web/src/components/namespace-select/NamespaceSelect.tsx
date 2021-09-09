@@ -53,7 +53,7 @@ class NamespaceSelect extends React.Component<NamespaceSelectProps, StateProps> 
               this.props.selectNamespace(event.target.value as string)
             }}
             label='Namespace'
-            input={<SearchBase/>}
+            input={<SearchBase />}
           >
             {namespaces.map(namespace => (
               <MenuItem key={namespace.name} value={namespace.name}>

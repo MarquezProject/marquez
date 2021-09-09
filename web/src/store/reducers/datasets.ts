@@ -6,9 +6,9 @@ import {
 } from '../actionCreators/actionTypes'
 import { fetchDatasetsSuccess } from '../actionCreators'
 
-export type IDatasetsState = { isLoading: boolean; result: Dataset[] }
+export type IDatasetsState = { isLoading: boolean; result: Dataset[]; init: boolean }
 
-export const initialState: IDatasetsState = { isLoading: false, result: [] }
+export const initialState: IDatasetsState = { isLoading: false, init: false, result: [] }
 
 type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess>
 
@@ -19,7 +19,7 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case FETCH_DATASETS:
       return { ...state, isLoading: true }
     case FETCH_DATASETS_SUCCESS:
-      return { ...state, isLoading: false, result: payload.datasets }
+      return { ...state, isLoading: false, init: true, result: payload.datasets }
     case RESET_DATASETS:
       return initialState
     default:

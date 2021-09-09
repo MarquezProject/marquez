@@ -4,8 +4,6 @@ import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
-import { Pagination } from '@material-ui/lab'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode } from '../../helpers/nodes'
@@ -18,11 +16,12 @@ import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
-const styles = (theme: Theme) => createStyles({})
+const styles = () => createStyles({})
 
 interface StateProps {
   datasets: Dataset[]
   isDatasetsLoading: boolean
+  isDatasetsInit: boolean
   selectedNamespace: Nullable<string>
 }
 
@@ -56,10 +55,10 @@ class Datasets extends React.Component<DatasetsProps> {
   }
 
   render() {
-    const { datasets, isDatasetsLoading } = this.props
+    const { datasets, isDatasetsLoading, isDatasetsInit } = this.props
     return (
       <Container maxWidth={'lg'} disableGutters>
-        <MqScreenLoad loading={isDatasetsLoading}>
+        <MqScreenLoad loading={isDatasetsLoading || !isDatasetsInit}>
           <>
             {datasets.length === 0 ? (
               <Box p={2}>
@@ -128,6 +127,7 @@ class Datasets extends React.Component<DatasetsProps> {
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
   isDatasetsLoading: state.datasets.isLoading,
+  isDatasetsInit: state.datasets.init,
   selectedNamespace: state.namespaces.selectedNamespace
 })
 

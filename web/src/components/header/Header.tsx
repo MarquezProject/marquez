@@ -1,13 +1,11 @@
-import { AppBar, IconButton, Toolbar } from '@material-ui/core'
+import { AppBar, Toolbar } from '@material-ui/core'
 import { DRAWER_WIDTH } from '../../helpers/theme'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
-import { faSync } from '@fortawesome/free-solid-svg-icons'
 import Box from '@material-ui/core/Box'
+import NamespaceSelect from '../namespace-select/NamespaceSelect'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
-import NamespaceSelect from '../namespace-select/NamespaceSelect'
 
 const styles = (theme: Theme) => {
   return createStyles({

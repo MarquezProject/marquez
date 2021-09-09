@@ -7,9 +7,9 @@ import {
 import { IJob } from '../../types'
 import { fetchJobRunsSuccess, fetchJobsSuccess } from '../actionCreators'
 
-export type IJobsState = { isLoading: boolean; result: IJob[] }
+export type IJobsState = { isLoading: boolean; result: IJob[]; init: boolean }
 
-export const initialState: IJobsState = { isLoading: false, result: [] }
+export const initialState: IJobsState = { isLoading: false, result: [], init: false }
 
 type IJobsAction = ReturnType<typeof fetchJobsSuccess> & ReturnType<typeof fetchJobRunsSuccess>
 
@@ -20,7 +20,7 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
     case FETCH_JOBS:
       return { ...state, isLoading: true }
     case FETCH_JOBS_SUCCESS:
-      return { ...state, isLoading: false, result: payload.jobs }
+      return { ...state, isLoading: false, init: true, result: payload.jobs }
     case FETCH_JOB_RUNS_SUCCESS: {
       return {
         ...state,

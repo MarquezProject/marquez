@@ -1,10 +1,4 @@
-import {
-  JobOrDataset,
-  LineageDataset,
-  LineageJob,
-  LineageNode,
-  MqNode
-} from '../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 
 export function isJob(node: MqNode): Undefinable<LineageJob> {

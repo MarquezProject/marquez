@@ -12,7 +12,7 @@ import MqText from '../core/text/MqText'
 import React from 'react'
 import SearchListItem from './SearchListItem'
 import SearchPlaceholder from './SearchPlaceholder'
-import debounce from '@material-ui/core/utils/debounce'
+// import debounce from '@material-ui/core/utils/debounce'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
 const INITIAL_SEARCH_FILTER = [
@@ -244,7 +244,7 @@ class Search extends React.Component<SearchProps, SearchState> {
   // }
 
   render() {
-    const { classes, isSearching, isSearchingInit, searchResults } = this.props
+    const { classes, isSearching, isSearchingInit } = this.props
     return (
       <Box width={538} position={'relative'} px={10} mr={-8} id={'searchContainer'}>
         <Box className={classes.searchIcon}>
