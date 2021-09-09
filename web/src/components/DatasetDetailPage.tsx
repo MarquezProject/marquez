@@ -52,17 +52,6 @@ const styles = ({ spacing }: ITheme) => {
       paddingLeft: '3px',
       paddingTop: '3px'
     },
-    tableCell: {
-      display: 'flex',
-      paddingTop: '12px',
-      flexFlow: 'row nowrap',
-      flexGrow: 1,
-      flexBasis: 0
-    },
-    tableRow: {
-      display: 'flex',
-      width: '100%'
-    },
     updated: {
       marginTop: '10px'
     }
@@ -73,7 +62,7 @@ type IProps = IWithStyles<typeof styles> & { dataset: LineageDataset }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { dataset, classes } = props
-  const { root, infoIcon, tableCell, tableRow } = classes
+  const { root, infoIcon } = classes
   const { datasetName } = useParams()
   const history = useHistory()
   if (!dataset) {
@@ -111,26 +100,30 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         {fields && fields.length > 0 ? (
           <Table size='small'>
             <TableHead>
-              <TableRow className={tableRow}>
+              <TableRow>
                 {fields.map(field => {
                   return (
-                    <TableCell className={tableCell} key={field.name} align='center'>
-                      <MqText subheading>{field.name}</MqText>
-                      <Tooltip title={field.type} placement='top'>
-                        <div className={infoIcon}>
-                          <InfoIcon color='disabled' fontSize='small' />
-                        </div>
-                      </Tooltip>
+                    <TableCell key={field.name} align='center'>
+                      <Box display={'flex'} alignItems={'center'}>
+                        <MqText subheading inline>
+                          {field.name}
+                        </MqText>
+                        <Tooltip title={field.type} placement='top'>
+                          <div className={infoIcon}>
+                            <InfoIcon color='disabled' fontSize='small' />
+                          </div>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   )
                 })}
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow className={tableRow}>
+              <TableRow>
                 {fields.map(field => {
                   return (
-                    <TableCell className={tableCell} key={field.name} align='left'>
+                    <TableCell key={field.name} align='left'>
                       {field.description || 'no description'}
                     </TableCell>
                   )

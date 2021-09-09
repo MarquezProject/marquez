@@ -115,6 +115,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     // nodes
     for (let i = 0; i < graph.length; i++) {
       g.setNode(graph[i].id, {
+        label: graph[i].id,
         data: graph[i].data,
         width: NODE_SIZE,
         height: NODE_SIZE

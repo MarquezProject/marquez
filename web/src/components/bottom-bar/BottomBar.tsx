@@ -3,15 +3,14 @@ import React from 'react'
 import { Box, Container, Theme } from '@material-ui/core'
 import { DRAWER_WIDTH } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
-import { Route, Switch } from 'react-router-dom'
+import { LineageNode } from '../lineage/types'
+import { Undefinable } from '../../types/util/Nullable'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
+import { isLineageDataset, isLineageJob } from '../../helpers/nodes'
 import DatasetDetailPage from '../DatasetDetailPage'
 import DragBar from '../lineage/components/drag-bar/DragBar'
 import JobDetailPage from '../JobDetailPage'
-import {Undefinable} from '../../types/util/Nullable'
-import {LineageNode} from '../lineage/types'
-import {isLineageJob, isLineageDataset} from '../../helpers/nodes'
 
 const styles = (theme: Theme) => {
   return createStyles({
