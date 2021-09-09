@@ -2,7 +2,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import { createStyles } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
-import DkSmallIcon from '../small-icon/DkSmallIcon'
+import MqSmallIcon from '../small-icon/MqSmallIcon'
 import MqText from '../text/MqText'
 import React from 'react'
 import classNames from 'classnames'
@@ -62,7 +62,7 @@ const MqChip: React.FC<MqChipProps & WithStyles<typeof styles>> = ({
     >
       {icon && foregroundColor && backgroundColor && (
         <Box display={'inherit'}>
-          <DkSmallIcon
+          <MqSmallIcon
             icon={icon}
             shape={'rect'}
             foregroundColor={foregroundColor}

@@ -17,7 +17,7 @@ import { fetchLineage, resetLineage, setSelectedNode } from '../../store/actionC
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
 import Edge from './components/edge/Edge'
-import MqEmpty from '../core/empty/Empty'
+import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'

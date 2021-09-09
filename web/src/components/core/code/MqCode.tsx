@@ -24,7 +24,7 @@ interface OwnProps {
   description?: string
 }
 
-const Code: React.FC<OwnProps & WithStyles<typeof styles>> = ({ code, description, classes }) => {
+const MqCode: React.FC<OwnProps & WithStyles<typeof styles>> = ({ code, description, classes }) => {
   return (
     <Box className={classes.codeContainer}>
       {description && (
@@ -41,4 +41,4 @@ const Code: React.FC<OwnProps & WithStyles<typeof styles>> = ({ code, descriptio
   )
 }
 
-export default withStyles(styles)(Code)
+export default withStyles(styles)(MqCode)

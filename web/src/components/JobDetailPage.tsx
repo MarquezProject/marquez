@@ -19,8 +19,8 @@ const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning }
 import { IJob } from '../types'
 import { LineageJob } from './lineage/types'
 import { formatUpdatedAt } from '../helpers'
-import Code from './core/code/Code'
 import IconButton from '@material-ui/core/IconButton'
+import MqCode from './core/code/MqCode'
 import MqText from './core/text/MqText'
 
 const colorMap = {
@@ -156,7 +156,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      <Code code={context.sql} />
+      <MqCode code={context.sql} />
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
         {/*<div className={classes.latestRunContainer}>*/}
         {/*  {latestRuns.map(r => {*/}

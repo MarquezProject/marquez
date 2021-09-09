@@ -21,7 +21,7 @@ interface OwnProps {
   shape: 'circle' | 'rect'
 }
 
-const DkSmallIcon: React.FC<OwnProps & WithStyles<typeof styles>> = ({
+const MqSmallIcon: React.FC<OwnProps & WithStyles<typeof styles>> = ({
   icon,
   backgroundColor,
   foregroundColor,
@@ -43,4 +43,4 @@ const DkSmallIcon: React.FC<OwnProps & WithStyles<typeof styles>> = ({
   )
 }
 
-export default withStyles(styles)(DkSmallIcon)
+export default withStyles(styles)(MqSmallIcon)
