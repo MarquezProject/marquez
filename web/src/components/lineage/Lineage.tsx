@@ -97,7 +97,10 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   }
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
-    if (this.props.lineage !== prevProps.lineage && this.props.selectedNode) {
+    if (
+      JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) &&
+      this.props.selectedNode
+    ) {
       this.initGraph()
       this.buildGraphAll(this.props.lineage.graph)
     }
