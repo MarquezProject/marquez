@@ -23,7 +23,9 @@ import lombok.NoArgsConstructor;
 import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
 import marquez.service.models.Tag;
+import marquez.tracing.SentryConfig;
 
+/** Configuration for {@code Marquez}. */
 @NoArgsConstructor
 public class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;

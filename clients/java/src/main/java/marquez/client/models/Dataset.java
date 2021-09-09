@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -56,6 +57,7 @@ public abstract class Dataset {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   @Getter private final Map<String, Object> facets;
+  @Nullable private final UUID currentVersion;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -70,7 +72,8 @@ public abstract class Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Map<String, Object> facets) {
+      @Nullable final Map<String, Object> facets,
+      @Nullable final UUID currentVersion) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -84,6 +87,7 @@ public abstract class Dataset {
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
+    this.currentVersion = currentVersion;
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -100,5 +104,9 @@ public abstract class Dataset {
 
   public static Dataset fromJson(@NonNull final String json) {
     return Utils.fromJson(json, new TypeReference<Dataset>() {});
+  }
+
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }
