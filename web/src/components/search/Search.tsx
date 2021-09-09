@@ -2,6 +2,7 @@ import * as Redux from 'redux'
 import { Box, Theme, createStyles, darken } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GroupedSearch } from '../../types/api'
+import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
@@ -9,7 +10,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog, faDatabase, faSearch, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { fetchSearch, setSelectedNode } from '../../store/actionCreators'
-import { groupBy } from '../../types/util/groupBy'
+import { parseSearchGroup } from '../../helpers/nodes'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import MqChipGroup from '../core/chip/MqChipGroup'
 import MqText from '../core/text/MqText'
@@ -29,14 +30,14 @@ const INITIAL_SEARCH_FILTER = [
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: 'Jobs',
-    value: 'Jobs'
+    value: 'JOB'
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: 'Datasets',
-    value: 'Datasets'
+    value: 'DATASET'
   }
 ]
 
@@ -49,12 +50,12 @@ const INITIAL_SEARCH_SORT_FILTER = [
     selectable: false
   },
   {
-    text: 'Recent',
-    value: 'Recent'
+    text: 'Updated',
+    value: 'UPDATE_AT'
   },
   {
-    text: 'Relevance',
-    value: 'Name'
+    text: 'Name',
+    value: 'NAME'
   }
 ]
 
@@ -128,9 +129,8 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  fetchSearch: (q: string, filter: string, sort: string) => void
-  purgeSearch: () => void
-  nodeSearch: (search: string) => void
+  setSelectedNode: typeof setSelectedNode
+  fetchSearch: typeof fetchSearch
 }
 
 interface SearchState {
@@ -155,7 +155,7 @@ class Search extends React.Component<SearchProps, SearchState> {
       search: '',
       selected: '',
       filter: 'All',
-      sort: 'Recent'
+      sort: 'UPDATE_AT'
     }
     this.fetchSearch = debounce(this.fetchSearch, 300)
   }
@@ -173,38 +173,8 @@ class Search extends React.Component<SearchProps, SearchState> {
     this.unlisten()
   }
 
-  // determineSelected = (offset: 1 | -1) => {
-  //   const currentIndex = this.props.searchResults.rawResults.findIndex(
-  //     result => result.name === this.state.selected
-  //   )
-  //   const newIndex = currentIndex + offset
-  //   if (newIndex >= 0 && newIndex < this.props.searchResults.rawResults.length) {
-  //     return this.props.searchResults.rawResults[currentIndex + offset].name
-  //   } else {
-  //     return this.state.selected
-  //   }
-  // }
-
-  handleKeyboard = (event: React.KeyboardEvent<HTMLElement>) => {
-    switch (event.key) {
-      case 'ArrowDown':
-        break
-      case 'ArrowUp':
-        break
-      case 'Escape':
-        break
-      case 'Enter':
-        break
-      default:
-        this.setState({
-          open: true,
-          selected: ''
-        })
-    }
-  }
-
   onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ search: event.target.value }, () => {
+    this.setState({ search: event.target.value, open: true }, () => {
       this.fetchSearch(
         this.state.search,
         this.state.filter.toUpperCase(),
@@ -243,7 +213,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     )
   }
 
-  fetchSearch(q: string, filter = 'ALL', sort = 'RECENT') {
+  fetchSearch(q: string, filter = 'ALL', sort = 'NAME') {
     this.props.fetchSearch(q, filter, sort)
   }
 
@@ -263,13 +233,13 @@ class Search extends React.Component<SearchProps, SearchState> {
               color={THEME_EXTRA.typography.disabled}
               onClick={() => {
                 this.setState({ open: false, search: '', selected: '' })
-                // this.props.purgeSearch()
               }}
             />
           </Box>
         )}
         <Box>
           <MqInputBase
+            spellCheck={false}
             className={classes.search}
             fullWidth={true}
             onFocus={() => this.setState({ open: true })}
@@ -277,7 +247,6 @@ class Search extends React.Component<SearchProps, SearchState> {
             value={this.state.search}
             autoComplete={'off'}
             autoFocus={true}
-            onKeyDown={event => this.handleKeyboard(event)}
             id={'searchBar'}
           />
           <ClickAwayListener
@@ -323,12 +292,12 @@ class Search extends React.Component<SearchProps, SearchState> {
                               >
                                 <Box>
                                   <MqText bold font={'mono'}>
-                                    public
+                                    {parseSearchGroup(result, 'group')}
                                   </MqText>
                                 </Box>
                                 <Box>
                                   <MqText bold font={'mono'} small>
-                                    {result}
+                                    {parseSearchGroup(result, 'namespace')}
                                   </MqText>
                                 </Box>
                               </Box>
@@ -346,12 +315,11 @@ class Search extends React.Component<SearchProps, SearchState> {
                                     search={this.state.search}
                                     selected={listItem.name === this.state.selected}
                                     onClick={nodeName => {
-                                      // this.props.setSelectedNode(listItem.nodeId, listItem.type)
-                                      // this.props.nodeSearch(nodeName)
                                       this.setState({
                                         open: false,
                                         search: nodeName
                                       })
+                                      this.props.setSelectedNode(listItem.nodeId)
                                     }}
                                   />
                                 )
@@ -374,125 +342,12 @@ class Search extends React.Component<SearchProps, SearchState> {
   }
 }
 
-const mapStateToProps = () => {
+const mapStateToProps = (state: IState) => {
   return {
-    searchResults: groupBy(
-      [
-        {
-          nodeId: 'dataset:food_delivery:public.top_delivery_times',
-          updatedAt: '2021-09-03T05:19:19.468809Z',
-          name: 'public.top_delivery_times',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.customers',
-          updatedAt: '2021-09-03T05:19:19.468809Z',
-          name: 'public.customers',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:analytics.orders_popular_day_of_week',
-          updatedAt: '2021-09-03T05:19:19.468809Z',
-          name: 'analytics.orders_popular_day_of_week',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:emails.email_discounts',
-          updatedAt: '2021-09-03T05:18:54.468809Z',
-          name: 'emails.email_discounts',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.delivery_7_days',
-          updatedAt: '2021-09-03T05:15:14.468809Z',
-          name: 'public.delivery_7_days',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:analytics.delivery_times_7_days',
-          updatedAt: '2021-09-03T05:15:14.468809Z',
-          name: 'analytics.delivery_times_7_days',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.restaurants',
-          updatedAt: '2021-09-03T05:11:26.468809Z',
-          name: 'public.restaurants',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.drivers',
-          updatedAt: '2021-09-03T05:11:26.468809Z',
-          name: 'public.drivers',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.order_status',
-          updatedAt: '2021-09-03T05:11:26.468809Z',
-          name: 'public.order_status',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.orders_7_days',
-          updatedAt: '2021-09-03T05:11:26.468809Z',
-          name: 'public.orders_7_days',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:etl.etl_delivery_7_days',
-          updatedAt: '2021-09-03T05:11:26.468809Z',
-          name: 'etl.etl_delivery_7_days',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:etl.etl_customers',
-          updatedAt: '2021-09-03T05:08:10.468809Z',
-          name: 'etl.etl_customers',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:etl.etl_restaurants',
-          updatedAt: '2021-09-03T05:08:04.468809Z',
-          name: 'etl.etl_restaurants',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'job:food_delivery:etl.etl_order_status',
-          updatedAt: '2021-09-03T05:07:08.468809Z',
-          name: 'etl.etl_order_status',
-          type: 'JOB',
-          namespace: 'food_delivery'
-        },
-        {
-          nodeId: 'dataset:food_delivery:public.categories',
-          updatedAt: '2021-09-03T05:07:03.468809Z',
-          name: 'public.categories',
-          type: 'DATASET',
-          namespace: 'food_delivery'
-        }
-      ].map(result => {
-        return {
-          ...result,
-          group: `${result.namespace}:${result.name.substring(0, result.name.lastIndexOf('.'))}`
-        }
-      }),
-      'namespace'
-    ),
-    isSearching: false,
-    isSearchingInit: true
+    searchResults: state.search.data.results,
+    rawResults: state.search.data.rawResults,
+    isSearching: state.search.isLoading,
+    isSearchingInit: state.search.init
   }
 }
 

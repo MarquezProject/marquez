@@ -1,17 +1,14 @@
 import { FETCH_SEARCH, FETCH_SEARCH_SUCCESS } from '../actionCreators/actionTypes'
 
 import { GroupedSearch, GroupedSearchResult } from '../../types/api'
-import {
-  fetchSearch,
-  fetchSearchSuccess
-} from '../actionCreators'
+import { fetchSearch, fetchSearchSuccess } from '../actionCreators'
 import { groupBy } from '../../types/util/groupBy'
 
-export type ISearchState = { isLoading: boolean; result: GroupedSearchResult; init: boolean }
+export type ISearchState = { isLoading: boolean; data: GroupedSearchResult; init: boolean }
 
 export const initialState: ISearchState = {
   isLoading: false,
-  result: { results: new Map<string, GroupedSearch[]>(), rawResults: [] },
+  data: { results: new Map<string, GroupedSearch[]>(), rawResults: [] },
   init: false
 }
 
@@ -34,7 +31,7 @@ export default (state = initialState, action: IJobsAction): ISearchState => {
         ...state,
         isLoading: false,
         init: true,
-        result: {
+        data: {
           results: groupBy(groupedResult, 'group'),
           rawResults: groupedResult
         }

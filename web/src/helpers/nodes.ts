@@ -42,3 +42,14 @@ export function isLineageDataset(
   }
   return undefined
 }
+
+const searchDelimiterMap = {
+  namespace: 0,
+  group: 1
+}
+
+type SearchDelimiterMap = typeof searchDelimiterMap
+
+export function parseSearchGroup(nodeId: string, field: keyof SearchDelimiterMap) {
+  return nodeId.split(':')[searchDelimiterMap[field]] || ''
+}

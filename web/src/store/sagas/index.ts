@@ -102,7 +102,8 @@ export default function* rootSaga(): Generator {
     fetchJobRunsSaga(),
     fetchJobsSaga(),
     fetchDatasetsSaga(),
-    fetchLineage()
+    fetchLineage(),
+    fetchSearch()
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

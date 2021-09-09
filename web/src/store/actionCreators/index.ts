@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes'
 
-import {Dataset, Job, LineageGraph, Namespace, Run, Search, SearchResult} from '../../types/api'
+import { Dataset, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
 export const fetchDatasets = (namespace: string) => ({
@@ -119,6 +119,6 @@ export const fetchSearch = (q: string, filter: string, sort: string) => ({
 })
 
 export const fetchSearchSuccess = (search: Search) => ({
-  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  type: actionTypes.FETCH_SEARCH_SUCCESS,
   payload: search
 })
