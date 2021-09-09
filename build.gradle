@@ -69,14 +69,14 @@ subprojects {
     }
 
     dependencies {
-        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        implementation "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-        testCompile "org.assertj:assertj-core:${assertjVersion}"
-        testCompile "org.junit.jupiter:junit-jupiter:${junit5Version}"
-        testCompile "org.mockito:mockito-core:${mockitoVersion}"
-        testCompile "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testImplementation "org.assertj:assertj-core:${assertjVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+        testImplementation "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     }
 

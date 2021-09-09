@@ -24,9 +24,10 @@ import marquez.common.models.Version;
 import marquez.service.models.NodeId;
 
 /**
- * Represents a search result. To create a new instance of a {@link ResultType#DATASET} search
- * result, use the {@link #newDatasetResult} factory method. Similiary, to create a new instance of
- * a {@link ResultType#JOB} search result, use the {@link #newJobResult} factory method.
+ * Represents a search result. A search result can be of type {@link ResultType#DATASET} or {@link
+ * ResultType#JOB}. To create a new instance of a {@code dataset} search result, use the {@link
+ * #newDatasetResult} static factory method. Similiary, to create a new instance of a {@code job}
+ * search result, use the {@link #newJobResult} static factory method.
  */
 @Value
 public class SearchResult {
