@@ -13,7 +13,7 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchLineage, setSelectedNode } from '../../store/actionCreators'
+import { fetchLineage, resetLineage, setSelectedNode } from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
 import Edge from './components/edge/Edge'
@@ -51,6 +51,7 @@ interface LineageState {
 interface DispatchProps {
   setSelectedNode: typeof setSelectedNode
   fetchLineage: typeof fetchLineage
+  resetLineage: typeof resetLineage
 }
 
 export interface JobOrDatasetMatchParams {
@@ -107,6 +108,10 @@ class Lineage extends React.Component<LineageProps, LineageState> {
         this.props.match.params.nodeName
       )
     }
+  }
+
+  componentWillUnmount() {
+    this.props.resetLineage()
   }
 
   initGraph = () => {
@@ -241,7 +246,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       setSelectedNode: setSelectedNode,
-      fetchLineage: fetchLineage
+      fetchLineage: fetchLineage,
+      resetLineage: resetLineage
     },
     dispatch
   )

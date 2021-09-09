@@ -108,15 +108,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
               {fields.map(field => {
                 return (
                   <TableRow key={field.name}>
-                    <TableCell key={field.name} align='left'>
-                      {field.name}
-                    </TableCell>
-                    <TableCell key={field.name} align='left'>
-                      {field.type}
-                    </TableCell>
-                    <TableCell key={field.name} align='left'>
-                      {field.description || 'no description'}
-                    </TableCell>
+                    <TableCell align='left'>{field.name}</TableCell>
+                    <TableCell align='left'>{field.type}</TableCell>
+                    <TableCell align='left'>{field.description || 'no description'}</TableCell>
                   </TableRow>
                 )
               })}

@@ -100,6 +100,10 @@ export const fetchLineageSuccess = (lineage: any[]) => ({
   payload: lineage
 })
 
+export const resetLineage = () => ({
+  type: actionTypes.RESET_LINEAGE
+})
+
 export const selectNamespace = (namespace: string) => ({
   type: actionTypes.SELECT_NAMESPACE,
   payload: namespace

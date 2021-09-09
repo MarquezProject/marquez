@@ -1,5 +1,6 @@
 import {
   FETCH_LINEAGE_SUCCESS,
+  RESET_LINEAGE,
   SET_BOTTOM_BAR_HEIGHT,
   SET_SELECTED_NODE
 } from '../actionCreators/actionTypes'
@@ -38,6 +39,9 @@ export default (state = initialState, action: ILineageActions) => {
           Math.max(2, action.payload)
         )
       }
+    case RESET_LINEAGE: {
+      return { ...state, lineage: { graph: [] } }
+    }
     default:
       return state
   }
