@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -39,7 +40,8 @@ public final class DbTable extends Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Map<String, Object> facets) {
+      @Nullable final Map<String, Object> facets,
+      @Nullable final UUID currentVersion) {
     super(
         id,
         DB_TABLE,
@@ -53,6 +55,7 @@ public final class DbTable extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        facets);
+        facets,
+        currentVersion);
   }
 }

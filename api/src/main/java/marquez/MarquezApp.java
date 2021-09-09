@@ -37,6 +37,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.cli.SeedCommand;
 import marquez.db.DbMigration;
+import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
@@ -84,6 +85,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+    // Add graphql playground
     bootstrap.addBundle(
         new AssetsBundle(
             "/assets",

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URL;
+import java.util.UUID;
 import marquez.client.Utils;
 
 public final class JsonGenerator {
@@ -158,6 +159,7 @@ public final class JsonGenerator {
     obj.put("lastModifiedAt", dbTable.getLastModifiedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("description", dbTable.getDescription().orElse(null));
     obj.set("facets", facets);
+    obj.put("currentVersion", dbTable.getCurrentVersion().map(UUID::toString).orElse(null));
 
     return obj.toString();
   }
@@ -214,6 +216,7 @@ public final class JsonGenerator {
     obj.put("schemaLocation", stream.getSchemaLocation().map(URL::toString).orElse(null));
     obj.put("description", stream.getDescription().orElse(null));
     obj.set("facets", facets);
+    obj.put("currentVersion", stream.getCurrentVersion().map(UUID::toString).orElse(null));
 
     return obj.toString();
   }
@@ -288,6 +291,7 @@ public final class JsonGenerator {
     obj.set("context", context);
     obj.put("description", job.getDescription().orElse(null));
     obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
+    obj.put("currentVersion", job.getCurrentVersion().map(UUID::toString).orElse(null));
 
     return obj.toString();
   }
