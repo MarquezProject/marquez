@@ -3,7 +3,7 @@ import { Box, FormControl, MenuItem, Select, WithStyles, createStyles } from '@m
 import { IState } from '../../store/reducers'
 import { Namespace } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
-import { SearchBase } from '../search/SearchBase'
+import { MqInputBase } from '../core/input-base/MqInputBase'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { selectNamespace } from '../../store/actionCreators'
@@ -53,7 +53,7 @@ class NamespaceSelect extends React.Component<NamespaceSelectProps, StateProps> 
               this.props.selectNamespace(event.target.value as string)
             }}
             label='Namespace'
-            input={<SearchBase />}
+            input={<MqInputBase />}
           >
             {namespaces.map(namespace => (
               <MenuItem key={namespace.name} value={namespace.name}>

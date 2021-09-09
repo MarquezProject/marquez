@@ -6,6 +6,7 @@ import display, { IDisplayState } from './display'
 import jobs, { IJobsState } from './jobs'
 import lineage, { ILineageState } from './lineage'
 import namespaces, { INamespacesState } from './namespaces'
+import search, { ISearchState } from './search'
 
 export interface IState {
   datasets: IDatasetsState
@@ -14,6 +15,7 @@ export interface IState {
   display: IDisplayState
   router: any
   lineage: ILineageState
+  search: ISearchState
 }
 
 export default (history: History): Reducer =>
@@ -23,5 +25,6 @@ export default (history: History): Reducer =>
     jobs,
     namespaces,
     display,
-    lineage
+    lineage,
+    search
   })

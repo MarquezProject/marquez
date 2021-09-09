@@ -3,7 +3,8 @@ import {
   FETCH_DATASETS,
   FETCH_JOBS,
   FETCH_JOB_RUNS,
-  FETCH_LINEAGE
+  FETCH_LINEAGE,
+  FETCH_SEARCH
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
@@ -20,6 +21,7 @@ import {
 } from '../actionCreators'
 import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
 import { getLineage } from '../requests/lineage'
+import { getSearch } from '../requests/search'
 import _orderBy from 'lodash/orderBy'
 
 export function* fetchNamespaces() {
@@ -37,6 +39,18 @@ export function* fetchLineage() {
     try {
       const { payload } = yield take(FETCH_LINEAGE)
       const result = yield call(getLineage, payload.nodeType, payload.namespace, payload.name)
+      yield put(fetchLineageSuccess(result))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching lineage'))
+    }
+  }
+}
+
+export function* fetchSearch() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_SEARCH)
+      const result = yield call(getSearch, payload.q, payload.filter, payload.sort)
       yield put(fetchLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))

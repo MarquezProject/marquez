@@ -1,7 +1,7 @@
 import { Theme, createStyles, fade, withStyles } from '@material-ui/core'
 import InputBase from '@material-ui/core/InputBase'
 
-export const SearchBase = withStyles((theme: Theme) =>
+export const MqInputBase = withStyles((theme: Theme) =>
   createStyles({
     input: {
       borderRadius: theme.spacing(4),

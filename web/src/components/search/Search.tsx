@@ -1,10 +1,14 @@
+import * as Redux from 'redux'
 import { Box, Theme, createStyles, darken } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GroupedSearch } from '../../types/api'
-import { SearchBase } from './SearchBase'
+import { MqInputBase } from '../core/input-base/MqInputBase'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog, faDatabase, faSearch, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { fetchSearch, setSelectedNode } from '../../store/actionCreators'
 import { groupBy } from '../../types/util/groupBy'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import MqChipGroup from '../core/chip/MqChipGroup'
@@ -12,7 +16,7 @@ import MqText from '../core/text/MqText'
 import React from 'react'
 import SearchListItem from './SearchListItem'
 import SearchPlaceholder from './SearchPlaceholder'
-// import debounce from '@material-ui/core/utils/debounce'
+import debounce from '@material-ui/core/utils/debounce'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
 const INITIAL_SEARCH_FILTER = [
@@ -124,9 +128,9 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  // fetchSearch: (q: string, filter: string, sort: string) => void
-  // purgeSearch: () => void
-  // nodeSearch: (search: string) => void
+  fetchSearch: (q: string, filter: string, sort: string) => void
+  purgeSearch: () => void
+  nodeSearch: (search: string) => void
 }
 
 interface SearchState {
@@ -139,7 +143,7 @@ interface SearchState {
 
 type UnregisterCallback = () => void
 
-type SearchProps = StateProps & DispatchProps & WithStyles<typeof styles>
+type SearchProps = StateProps & DispatchProps & WithStyles<typeof styles> & RouteComponentProps
 
 class Search extends React.Component<SearchProps, SearchState> {
   private unlisten!: UnregisterCallback
@@ -153,20 +157,20 @@ class Search extends React.Component<SearchProps, SearchState> {
       filter: 'All',
       sort: 'Recent'
     }
-    // this.fetchSearch = debounce(this.fetchSearch, 300)
+    this.fetchSearch = debounce(this.fetchSearch, 300)
   }
 
   componentDidMount() {
     // close search on a route change
-    // this.unlisten = this.props.history.listen(() => {
-    //   this.setState({
-    //     open: false
-    //   })
-    // })
+    this.unlisten = this.props.history.listen(() => {
+      this.setState({
+        open: false
+      })
+    })
   }
 
   componentWillUnmount() {
-    // this.unlisten()
+    this.unlisten()
   }
 
   // determineSelected = (offset: 1 | -1) => {
@@ -201,11 +205,11 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     this.setState({ search: event.target.value }, () => {
-      // this.fetchSearch(
-      //   this.state.search,
-      //   this.state.filter.toUpperCase(),
-      //   this.state.sort.toUpperCase()
-      // )
+      this.fetchSearch(
+        this.state.search,
+        this.state.filter.toUpperCase(),
+        this.state.sort.toUpperCase()
+      )
     })
   }
 
@@ -215,11 +219,11 @@ class Search extends React.Component<SearchProps, SearchState> {
         filter: label
       },
       () => {
-        // this.fetchSearch(
-        //   this.state.search,
-        //   this.state.filter.toUpperCase(),
-        //   this.state.sort.toUpperCase()
-        // )
+        this.fetchSearch(
+          this.state.search,
+          this.state.filter.toUpperCase(),
+          this.state.sort.toUpperCase()
+        )
       }
     )
   }
@@ -230,18 +234,18 @@ class Search extends React.Component<SearchProps, SearchState> {
         sort: label
       },
       () => {
-        // this.fetchSearch(
-        //   this.state.search,
-        //   this.state.filter.toUpperCase(),
-        //   this.state.sort.toUpperCase()
-        // )
+        this.fetchSearch(
+          this.state.search,
+          this.state.filter.toUpperCase(),
+          this.state.sort.toUpperCase()
+        )
       }
     )
   }
 
-  // fetchSearch(q: string, filter = 'ALL', sort = 'RECENT') {
-  //   // this.props.fetchSearch(q, filter, sort)
-  // }
+  fetchSearch(q: string, filter = 'ALL', sort = 'RECENT') {
+    this.props.fetchSearch(q, filter, sort)
+  }
 
   render() {
     const { classes, isSearching, isSearchingInit } = this.props
@@ -265,7 +269,7 @@ class Search extends React.Component<SearchProps, SearchState> {
           </Box>
         )}
         <Box>
-          <SearchBase
+          <MqInputBase
             className={classes.search}
             fullWidth={true}
             onFocus={() => this.setState({ open: true })}
@@ -492,4 +496,18 @@ const mapStateToProps = () => {
   }
 }
 
-export default withStyles(styles)(connect(mapStateToProps)(Search))
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      setSelectedNode: setSelectedNode,
+      fetchSearch: fetchSearch
+    },
+    dispatch
+  )
+
+export default withStyles(styles)(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withRouter(Search))
+)
