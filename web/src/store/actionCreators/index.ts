@@ -118,7 +118,7 @@ export const fetchSearch = (q: string, filter: string, sort: string) => ({
   }
 })
 
-export const fetchSearchSuccess = (lineage: Search) => ({
+export const fetchSearchSuccess = (search: Search) => ({
   type: actionTypes.FETCH_LINEAGE_SUCCESS,
-  payload: lineage
+  payload: search
 })

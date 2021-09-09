@@ -17,7 +17,8 @@ import {
   fetchJobRunsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
-  fetchNamespacesSuccess
+  fetchNamespacesSuccess,
+  fetchSearchSuccess
 } from '../actionCreators'
 import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
 import { getLineage } from '../requests/lineage'
@@ -51,9 +52,9 @@ export function* fetchSearch() {
     try {
       const { payload } = yield take(FETCH_SEARCH)
       const result = yield call(getSearch, payload.q, payload.filter, payload.sort)
-      yield put(fetchLineageSuccess(result))
+      yield put(fetchSearchSuccess(result))
     } catch (e) {
-      yield put(applicationError('Something went wrong while fetching lineage'))
+      yield put(applicationError('Something went wrong while fetching search'))
     }
   }
 }

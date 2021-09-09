@@ -24,7 +24,8 @@ const styles = (theme: ITheme) => {
       minWidth: '40%',
       textAlign: 'center',
       border: `2px dashed ${theme.palette.secondary.main}`,
-      borderBottom: 'none'
+      borderBottom: 'none',
+      backgroundColor: theme.palette.background.default
     },
     error: {
       color: theme.palette.error.main
