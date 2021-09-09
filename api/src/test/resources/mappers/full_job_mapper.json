@@ -1,0 +1,21 @@
+{
+  "id": {
+    "namespace": "NAMESPACE",
+    "name": "NAME"
+  },
+  "type": "BATCH",
+  "description": "DESCRIPTION",
+  "name": "NAME",
+  "createdAt": 946684801,
+  "updatedAt": 946771201,
+  "currentVersion": "b1d626a2-6d3a-475e-9ecf-943176d4a8c6",
+  "location": "https://github.com/",
+  "context": { "test" : "value"},
+  "outputs": [],
+  "inputs": [
+    {
+      "namespace": "test-namespace",
+      "name": "test-dataset"
+    }
+  ]
+}

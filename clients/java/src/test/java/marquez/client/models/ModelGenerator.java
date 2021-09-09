@@ -80,7 +80,7 @@ public final class ModelGenerator {
         .build();
   }
 
-  public static DbTable newDbTable() {
+  public static DbTable newDbTableWith(UUID currentVersion) {
     final Instant now = newTimestamp();
     final DatasetId dbTableId = newDatasetId();
     return new DbTable(
@@ -95,7 +95,8 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newDescription(),
-        newDatasetFacets(2));
+        newDatasetFacets(2),
+        currentVersion);
   }
 
   public static DbTableVersion newDbTableVersion() {
@@ -126,7 +127,7 @@ public final class ModelGenerator {
         .build();
   }
 
-  public static Stream newStream() {
+  public static Stream newStreamWith(UUID currentVersion) {
     final Instant now = newTimestamp();
     final DatasetId streamId = newDatasetId();
     return new Stream(
@@ -142,7 +143,8 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription(),
-        newDatasetFacets(2));
+        newDatasetFacets(2),
+        currentVersion);
   }
 
   public static StreamVersion newStreamVersion() {
@@ -193,10 +195,10 @@ public final class ModelGenerator {
   }
 
   public static Job newJob() {
-    return newJobWith(null);
+    return newJobWith(null, null);
   }
 
-  public static Job newJobWith(final Run latestRun) {
+  public static Job newJobWith(final Run latestRun, UUID currentVersion) {
     final Instant now = newTimestamp();
     final JobId jobId = newJobId();
     return new Job(
@@ -212,7 +214,12 @@ public final class ModelGenerator {
         newContext(),
         newDescription(),
         latestRun,
-        null);
+        null,
+        currentVersion);
+  }
+
+  public static Job newJobWith(final UUID currentVersion) {
+    return newJobWith(null, currentVersion);
   }
 
   public static JobId newJobId() {

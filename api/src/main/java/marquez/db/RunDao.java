@@ -331,8 +331,8 @@ public interface RunDao extends BaseDao {
       Optional<Dataset> dataset =
           datasetDao.findDatasetByName(
               datasetId.getNamespace().getValue(), datasetId.getName().getValue());
-      if (dataset.isPresent() && dataset.get().getCurrentVersionUuid().isPresent()) {
-        updateInputMapping(runUuid, dataset.get().getCurrentVersionUuid().get());
+      if (dataset.isPresent() && dataset.get().getCurrentVersion().isPresent()) {
+        updateInputMapping(runUuid, dataset.get().getCurrentVersion().get());
       }
     }
   }
