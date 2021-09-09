@@ -31,7 +31,7 @@ import marquez.service.models.NodeId;
 @Value
 public class SearchResult {
   /** An {@code enum} used to determine the result type in {@link SearchResult}. */
-  enum ResultType {
+  public enum ResultType {
     DATASET,
     JOB;
   }
@@ -47,7 +47,7 @@ public class SearchResult {
    * namespace.
    *
    * @param datasetName The name of the dataset.
-   * @param updatedAt The update timestamp of the dataset.
+   * @param updatedAt The updated timestamp of the dataset.
    * @param namespaceName The namespace of the dataset.
    * @return A {@link SearchResult} object based on the specified dataset meta.
    */
@@ -68,7 +68,7 @@ public class SearchResult {
    * namespace.
    *
    * @param jobName The name of the job.
-   * @param updatedAt The update timestamp of the job.
+   * @param updatedAt The updated timestamp of the job.
    * @param namespaceName The namespace of the job.
    * @return A {@link SearchResult} object based on the specified job meta.
    */

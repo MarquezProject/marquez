@@ -25,16 +25,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Value;
-import marquez.api.models.SearchOrder;
-import marquez.api.models.SearchResult;
-import marquez.api.models.SearchSort;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
-import marquez.db.mappers.DatasetSearchResultMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -46,7 +42,6 @@ import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
-import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -287,22 +282,6 @@ public interface DatasetDao extends BaseDao {
       String sourceName,
       String name,
       String physicalName);
-
-  /**
-   * @param datasetName
-   * @param sort
-   * @param order
-   * @param limit
-   * @return
-   */
-  @SqlQuery(
-      "SELECT name, updated_at, namespace_name FROM datasets "
-          + "WHERE name ilike '%' || :datasetName || '%' "
-          + "ORDER BY :sort <order> "
-          + "LIMIT :limit")
-  @RegisterRowMapper(DatasetSearchResultMapper.class)
-  List<SearchResult> like(
-      String datasetName, SearchSort sort, @Define SearchOrder order, int limit);
 
   @Transaction
   default Dataset upsertDatasetMeta(

@@ -35,18 +35,21 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SearchFilter;
-import marquez.api.models.SearchOrder;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
-import marquez.service.SearchService;
+import marquez.db.SearchDao;
 
 @Slf4j
 @Path("/api/v1/search")
 public class SearchResource {
-  private final SearchService searchService;
+  private static final String DEFAULT_SORT = "name";
+  private static final String DEFAULT_LIMIT = "10";
+  private static final int MIN_LIMIT = 0;
 
-  public SearchResource(@NonNull final SearchService searchService) {
-    this.searchService = searchService;
+  private final SearchDao searchDao;
+
+  public SearchResource(@NonNull final SearchDao searchDao) {
+    this.searchDao = searchDao;
   }
 
   @Timed
@@ -57,10 +60,9 @@ public class SearchResource {
   public Response search(
       @QueryParam("q") @NotNull String query,
       @QueryParam("filter") @Nullable SearchFilter filter,
-      @QueryParam("sort") @DefaultValue("name") SearchSort sort,
-      @QueryParam("order") @DefaultValue("desc") SearchOrder order,
-      @QueryParam("limit") @DefaultValue("10") @Min(value = 0) int limit) {
-    final List<SearchResult> results = searchService.search(query, filter, sort, order, limit);
+      @QueryParam("sort") @DefaultValue(DEFAULT_SORT) SearchSort sort,
+      @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Min(MIN_LIMIT) int limit) {
+    final List<SearchResult> results = searchDao.search(query, filter, sort, limit);
     return Response.ok(new SearchResults(results)).build();
   }
 

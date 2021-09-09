@@ -30,6 +30,7 @@ import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
+import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
@@ -43,7 +44,6 @@ import marquez.service.NamespaceService;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
-import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
 import marquez.service.TagService;
@@ -66,6 +66,7 @@ public final class MarquezContext {
   @Getter private final TagDao tagDao;
   @Getter private final OpenLineageDao openLineageDao;
   @Getter private final LineageDao lineageDao;
+  @Getter private final SearchDao searchDao;
 
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
@@ -77,7 +78,6 @@ public final class MarquezContext {
   @Getter private final RunService runService;
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
-  @Getter private final SearchService searchService;
 
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
@@ -115,13 +115,13 @@ public final class MarquezContext {
     this.tagDao = jdbi.onDemand(TagDao.class);
     this.openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     this.lineageDao = jdbi.onDemand(LineageDao.class);
+    this.searchDao = jdbi.onDemand(SearchDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
     this.namespaceService = new NamespaceService(baseDao);
     this.sourceService = new SourceService(baseDao);
     this.runService = new RunService(baseDao, runTransitionListeners);
     this.datasetService = new DatasetService(datasetDao, runService);
-    this.searchService = new SearchService(datasetDao, jobDao);
 
     this.jobService = new JobService(baseDao, runService);
     this.tagService = new TagService(baseDao);
@@ -149,7 +149,7 @@ public final class MarquezContext {
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
     this.lineageResource = new LineageResource(serviceFactory);
-    this.searchResource = new SearchResource(searchService);
+    this.searchResource = new SearchResource(searchDao);
 
     this.resources =
         ImmutableList.of(

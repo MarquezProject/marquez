@@ -24,9 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import marquez.api.models.SearchOrder;
-import marquez.api.models.SearchResult;
-import marquez.api.models.SearchSort;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -35,7 +32,6 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
-import marquez.db.mappers.JobSearchResultMapper;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -43,7 +39,6 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
@@ -247,19 +242,4 @@ public interface JobDao extends BaseDao {
       UUID jobContextUuid,
       String location,
       PGobject inputs);
-
-  /**
-   * @param jobName
-   * @param order
-   * @param sort
-   * @param limit
-   * @return
-   */
-  @SqlQuery(
-      "SELECT name, updated_at, namespace_name FROM jobs\n"
-          + "WHERE name ilike '%' || :jobName || '%'\n"
-          + "ORDER BY :sort <order>\n"
-          + "LIMIT :limit")
-  @RegisterRowMapper(JobSearchResultMapper.class)
-  List<SearchResult> like(String jobName, SearchSort sort, @Define SearchOrder order, int limit);
 }
