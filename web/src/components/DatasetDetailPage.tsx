@@ -1,16 +1,7 @@
 import React, { FunctionComponent } from 'react'
 
 import * as Redux from 'redux'
-import {
-  Box,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip
-} from '@material-ui/core'
+import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
@@ -25,7 +16,6 @@ import { formatUpdatedAt } from '../helpers'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
-import InfoIcon from '@material-ui/icons/Info'
 import MqText from './core/text/MqText'
 
 const styles = ({ spacing }: ITheme) => {
@@ -58,11 +48,13 @@ const styles = ({ spacing }: ITheme) => {
   })
 }
 
+const DATASET_COLUMNS = ['Attribute', 'Type', 'Description']
+
 type IProps = IWithStyles<typeof styles> & { dataset: LineageDataset }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { dataset, classes } = props
-  const { root, infoIcon } = classes
+  const { root } = classes
   const { datasetName } = useParams()
   const history = useHistory()
   if (!dataset) {
@@ -101,34 +93,33 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <Table size='small'>
             <TableHead>
               <TableRow>
-                {fields.map(field => {
+                {DATASET_COLUMNS.map(column => {
                   return (
-                    <TableCell key={field.name} align='center'>
-                      <Box display={'flex'} alignItems={'center'}>
-                        <MqText subheading inline>
-                          {field.name}
-                        </MqText>
-                        <Tooltip title={field.type} placement='top'>
-                          <div className={infoIcon}>
-                            <InfoIcon color='disabled' fontSize='small' />
-                          </div>
-                        </Tooltip>
-                      </Box>
+                    <TableCell key={column} align='left'>
+                      <MqText subheading inline>
+                        {column}
+                      </MqText>
                     </TableCell>
                   )
                 })}
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                {fields.map(field => {
-                  return (
+              {fields.map(field => {
+                return (
+                  <TableRow key={field.name}>
+                    <TableCell key={field.name} align='left'>
+                      {field.name}
+                    </TableCell>
+                    <TableCell key={field.name} align='left'>
+                      {field.type}
+                    </TableCell>
                     <TableCell key={field.name} align='left'>
                       {field.description || 'no description'}
                     </TableCell>
-                  )
-                })}
-              </TableRow>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         ) : (
