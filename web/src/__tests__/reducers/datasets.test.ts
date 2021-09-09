@@ -4,10 +4,6 @@ import datasetsReducer, { initialState } from '../../store/reducers/datasets'
 const datasets = require('../../../docker/db/data/datasets.json')
 
 describe('datasets reducer', () => {
-  it('should return the initial state', () => {
-    expect(datasetsReducer(undefined, {})).toEqual(initialState)
-  })
-
   it('should handle FETCH_DATASETS_SUCCESS', () => {
     const action = {
       type: actionTypes.FETCH_DATASETS_SUCCESS,
@@ -15,7 +11,7 @@ describe('datasets reducer', () => {
         datasets: datasets
       }
     }
-    expect(datasetsReducer([], action)).toHaveLength(datasets.length)
+    expect(datasetsReducer(initialState, action)).toStrictEqual({init: true, isLoading: false, result: datasets})
   })
 
 })

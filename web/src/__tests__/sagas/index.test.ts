@@ -3,12 +3,10 @@ import * as actions from '../../store/actionCreators'
 import * as api from '../../store/requests'
 import * as matchers from 'redux-saga-test-plan/matchers'
 import { expectSaga, testSaga } from 'redux-saga-test-plan'
-import { fetchNamespacesDatasetsAndJobs } from '../../store/sagas/'
-
-import { INamespaceAPI } from '../../types/api'
+import { fetchNamespaces } from '../../store/sagas/'
 
 describe('Main (That\'s so Fetch) Saga', () => {
-  const mockNamespaces: INamespaceAPI[] = [
+  const mockNamespaces = [
     { name: 'Mock Namespace 1', description: '', createdAt: '', owner: 'CDA' },
     { name: 'Mock Namespace 2', description: '', createdAt: '', owner: 'CDA' }
   ]
@@ -17,24 +15,15 @@ describe('Main (That\'s so Fetch) Saga', () => {
 
   describe('integration test', () => {
     beforeEach(() => {
-      sagaTest = expectSaga(fetchNamespacesDatasetsAndJobs)
+      sagaTest = expectSaga(fetchNamespaces)
         // provide mock implementation return value for various functions & requests
         .provide([
-          [matchers.call.fn(api.getNamespaces), { namespaces: mockNamespaces }],
-          [matchers.call.fn(api.getDatasets), { datasets: [] }],
-          [matchers.call.fn(api.getJobs), { jobs: [] }]
+          [matchers.call.fn(api.getNamespaces), { namespaces: mockNamespaces }]
         ])
     })
 
     it('calls api.fetchNamespaces', () => {
       return sagaTest.call(api.getNamespaces).run()
-    })
-
-    it('calls api.fetchDatasets for each namespace that is returned', () => {
-      mockNamespaces.forEach(n => {
-        sagaTest.call(api.getDatasets, n)
-      })
-      return sagaTest.run()
     })
   })
 
@@ -42,14 +31,12 @@ describe('Main (That\'s so Fetch) Saga', () => {
     it('when it works, yields a PUT to fetchDatasetsSuccess', () => {
       return sagaTest.put
         .like({ action: { type: actionTypes.FETCH_NAMESPACES_SUCCESS } })
-        .put.like({ action: { type: actionTypes.FETCH_DATASETS_SUCCESS } })
-        .put.like({ action: { type: actionTypes.FETCH_JOBS_SUCCESS } })
         .run()
     })
 
     it('if an error is thrown, yields a PUT to applicationError', () => {
       const testError = new Error('Something went wrong')
-      const unitTestSaga = testSaga(fetchNamespacesDatasetsAndJobs)
+      const unitTestSaga = testSaga(fetchNamespaces)
       expect(
         unitTestSaga
           .next()

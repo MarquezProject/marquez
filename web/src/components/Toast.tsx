@@ -36,7 +36,7 @@ const styles = (theme: ITheme) => {
   })
 }
 
-export const Toast = ({ error, success, classes }: IProps & WithStyles<typeof styles>) =>
+const Toast = ({ error, success, classes }: IProps & WithStyles<typeof styles>) =>
   error || success ? (
     <Box
       className={`${classes.container} ${

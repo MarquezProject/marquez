@@ -24,7 +24,9 @@ export default (state = initialState, action: IJobsAction): ISearchState => {
       const groupedResult = payload.results.map(result => {
         return {
           ...result,
-          group: `${result.namespace}:${result.name.substring(0, result.name.lastIndexOf('.'))}`
+          group: `${encodeURIComponent(result.namespace)}:${encodeURIComponent(
+            result.name.substring(0, result.name.lastIndexOf('.'))
+          )}`
         }
       })
       return {
