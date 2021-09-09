@@ -53,7 +53,7 @@ class Node extends React.Component<NodeProps> {
     return (
       <Link
         to={this.determineLink(node)}
-        onClick={() => this.props.setSelectedNode(node.data.name)}
+        onClick={() => node.label && this.props.setSelectedNode(node.label)}
       >
         {job ? (
           <g>
@@ -64,7 +64,7 @@ class Node extends React.Component<NodeProps> {
               stroke={
                 selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
               strokeWidth={BORDER}
               cx={node.x}
@@ -89,7 +89,7 @@ class Node extends React.Component<NodeProps> {
               color={
                 selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
             />
           </g>
@@ -103,7 +103,7 @@ class Node extends React.Component<NodeProps> {
               stroke={
                 selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
               strokeWidth={BORDER}
               width={RADIUS * 2}
@@ -130,7 +130,7 @@ class Node extends React.Component<NodeProps> {
               color={
                 selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
             />
           </g>

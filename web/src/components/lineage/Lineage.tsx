@@ -101,6 +101,13 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       this.initGraph()
       this.buildGraphAll(this.props.lineage.graph)
     }
+    if (this.props.selectedNode !== prevProps.selectedNode) {
+      this.props.fetchLineage(
+        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
+        this.props.match.params.namespace,
+        this.props.match.params.nodeName
+      )
+    }
   }
 
   initGraph = () => {

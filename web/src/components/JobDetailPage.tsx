@@ -116,7 +116,6 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     context = { sql: '' }
   } = job as IJob
 
-  console.log(job);
   return (
     <Box
       p={4}
