@@ -14,7 +14,6 @@
 
 package marquez.service.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableList;
@@ -61,7 +60,7 @@ public abstract class Dataset {
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
-  private final Optional<UUID> currentVersionUuid;
+  @Nullable private final UUID currentVersion;
   @Getter ImmutableMap<String, Object> facets;
 
   public Dataset(
@@ -76,7 +75,7 @@ public abstract class Dataset {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
-      @Nullable final Optional<UUID> currentVersionUuid,
+      @Nullable final UUID currentVersion,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.type = type;
@@ -90,7 +89,7 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
-    this.currentVersionUuid = currentVersionUuid;
+    this.currentVersion = currentVersion;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
@@ -102,8 +101,7 @@ public abstract class Dataset {
     return Optional.ofNullable(description);
   }
 
-  @JsonIgnore
-  public Optional<UUID> getCurrentVersionUuid() {
-    return currentVersionUuid;
+  public Optional<UUID> getCurrentVersion() {
+    return Optional.ofNullable(currentVersion);
   }
 }

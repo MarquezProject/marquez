@@ -132,7 +132,7 @@ public interface DatasetDao extends BaseDao {
   default void setFields(Dataset ds) {
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
-    ds.getCurrentVersionUuid()
+    ds.getCurrentVersion()
         .ifPresent(
             dsv -> {
               ds.setFields(datasetFieldDao.find(dsv));

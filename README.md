@@ -18,6 +18,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez-api.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
 [![docker](https://img.shields.io/badge/docker-hub-blue.svg?style=flat)](https://hub.docker.com/r/marquezproject/marquez)
 [![Known Vulnerabilities](https://snyk.io/test/github/MarquezProject/marquez/badge.svg)](https://snyk.io/test/github/MarquezProject/marquez)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5160/badge)](https://bestpractices.coreinfrastructure.org/projects/5160)
 
 ## Status
 

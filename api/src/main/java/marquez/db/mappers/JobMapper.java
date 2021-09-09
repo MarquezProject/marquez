@@ -18,6 +18,7 @@ import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
+import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,7 +66,8 @@ public final class JobMapper implements RowMapper<Job> {
         // Latest Run is resolved in the JobDao. This can be brought in via a join and
         //  and a jsonb but custom deserializers will need to be introduced
         null,
-        toFacetsOrNull(results, Columns.FACETS));
+        toFacetsOrNull(results, Columns.FACETS),
+        uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
   }
 
   public static ImmutableMap<String, String> toContext(ResultSet results, String column)
@@ -73,8 +75,7 @@ public final class JobMapper implements RowMapper<Job> {
     if (results.getString(column) == null) {
       return null;
     }
-    return Utils.fromJson(
-        results.getString(column), new TypeReference<ImmutableMap<String, String>>() {});
+    return Utils.fromJson(results.getString(column), new TypeReference<>() {});
   }
 
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)
@@ -84,8 +85,7 @@ public final class JobMapper implements RowMapper<Job> {
     }
     PGobject pgObject = (PGobject) results.getObject(column);
     try {
-      Set<DatasetId> datasets =
-          MAPPER.readValue(pgObject.getValue(), new TypeReference<Set<DatasetId>>() {});
+      Set<DatasetId> datasets = MAPPER.readValue(pgObject.getValue(), new TypeReference<>() {});
       if (datasets == null) {
         return new HashSet<>();
       }
