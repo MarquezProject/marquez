@@ -174,11 +174,12 @@ git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (9) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
+sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
-# (10) Prepare next development version commit
+# (11) Prepare next development version commit
 git commit -sam "Prepare next development version"
 
-# (11) Push commits and tag
+# (12) Push commits and tag
 if [[ ${PUSH} = "true" ]]; then
   git push origin main && \
     git push origin "${RELEASE_VERSION}"
