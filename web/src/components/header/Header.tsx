@@ -1,8 +1,10 @@
+import { API_DOCS_URL } from '../../globals'
 import { AppBar, Toolbar } from '@material-ui/core'
 import { DRAWER_WIDTH } from '../../helpers/theme'
 import { Link } from 'react-router-dom'
 import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
+import MqText from '../core/text/MqText'
 import NamespaceSelect from '../namespace-select/NamespaceSelect'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
@@ -52,6 +54,11 @@ const Header = (props: HeaderProps): ReactElement => {
           <Box display={'flex'} alignItems={'center'}>
             <Search />
             <NamespaceSelect />
+            <Box ml={2}>
+              <MqText link href={API_DOCS_URL}>
+                API Docs
+              </MqText>
+            </Box>
           </Box>
         </Box>
       </Toolbar>
