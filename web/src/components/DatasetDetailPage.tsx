@@ -4,7 +4,6 @@ import * as Redux from 'redux'
 import {
   Box,
   Chip,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -28,7 +27,6 @@ import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
 import InfoIcon from '@material-ui/icons/Info'
 import MqText from './core/text/MqText'
-import _find from 'lodash/find'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -65,12 +63,6 @@ const styles = ({ spacing }: ITheme) => {
       display: 'flex',
       width: '100%'
     },
-    paper: {
-      overflowX: 'auto',
-      marginTop: '10px',
-      display: 'flex',
-      flexFlow: 'column nowrap'
-    },
     updated: {
       marginTop: '10px'
     }
@@ -81,7 +73,7 @@ type IProps = IWithStyles<typeof styles> & { dataset: LineageDataset }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { dataset, classes } = props
-  const { root, paper, infoIcon, tableCell, tableRow } = classes
+  const { root, infoIcon, tableCell, tableRow } = classes
   const { datasetName } = useParams()
   const history = useHistory()
   if (!dataset) {

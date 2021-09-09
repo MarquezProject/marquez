@@ -54,7 +54,7 @@ class BottomBar extends React.Component<BottomBarProps> {
         <DragBar />
         <Box className={classes.overflow} height={bottomBarHeight}>
           <Container maxWidth={'lg'} disableGutters={true}>
-            {/*{lineageJob ? <JobDetailPage job={lineageJob} />}*/}
+            {lineageJob && <JobDetailPage job={lineageJob} />}
             {lineageDataset && <DatasetDetailPage dataset={lineageDataset} />}
           </Container>
         </Box>
