@@ -10,7 +10,7 @@ import Box from '@material-ui/core/Box'
 import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme'
 import { Drawer } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faDatabase } from '@fortawesome/free-solid-svg-icons'
+import { faDatabase, faListAlt } from '@fortawesome/free-solid-svg-icons'
 import MqIconButton from '../core/icon-button/MqIconButton'
 
 const styles = (theme: Theme) =>
@@ -57,7 +57,7 @@ class Sidenav extends React.Component<SidenavProps> {
                 title={'Jobs'}
                 active={this.props.location.pathname === '/'}
               >
-                <FontAwesomeIcon icon={faCog} size={'2x'} />
+                <FontAwesomeIcon icon={faListAlt} size={'2x'} />
               </MqIconButton>
             </RouterLink>
             <RouterLink to={'/datasets'} className={classes.link}>
