@@ -28,7 +28,7 @@ import marquez.db.Columns;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-/** */
+/** Convert a search results to a {@link SearchResult}. */
 public final class SearchResultMapper implements RowMapper<SearchResult> {
   @Override
   public SearchResult map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -47,7 +47,7 @@ public final class SearchResultMapper implements RowMapper<SearchResult> {
             timestampOrThrow(results, Columns.UPDATED_AT),
             NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)));
       default:
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(String.format("search type '%s' not supported", type));
     }
   }
 }
