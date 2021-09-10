@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 /** The test suite for {@link SearchDao}. */
-@Tag("IntegrationTests")
+@Tag("DataAccessTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class SearchDaoTest {
   static final int LIMIT = 25;
