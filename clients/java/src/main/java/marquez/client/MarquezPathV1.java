@@ -164,4 +164,8 @@ class MarquezPathV1 {
   static String createTagPath(String name) {
     return path("/tags/%s", name);
   }
+
+  static String searchPath() {
+    return path("/search");
+  }
 }

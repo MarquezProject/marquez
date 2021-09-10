@@ -529,6 +529,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/TagList'
 
+  /search:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/q'
+        - $ref: '#/components/parameters/filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/limit'
+      summary: Query all datasets and jobs
+      description: Returns one or more datasets and jobs of your query.
+      tags:
+        - Search
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResultList'
+
 components:
   parameters:
     at:
@@ -646,14 +665,33 @@ components:
       description: The ID of the node.
       required: true
 
-    depth:
-      name: depth
+    q:
+      name: q
       in: query
       schema:
-        type: integer
-        example: 50
-        default: 20
-        description: The maximum number of edges from node.
+        type: string
+        example: my-dataset
+        description: Query containing pattern to match; datasets and jobs pattern matching is string based
+          and case-insensitive. Use percent sign (`%`) to match any string of zero or more characters (`my-job%`),
+          or an underscore (`_`) to match a single character (`_job_`).
+      required: true
+
+    filter:
+      name: filter
+      in: query
+      schema:
+        type: string
+        example: dataset
+        description: Filters the results of your query by `dataset` or `job`.
+      required: false
+
+    sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: name
+        description: Sorts the results of your query by `name` or `updated_at`.
       required: false
 
   schemas:
@@ -1620,10 +1658,10 @@ components:
           namespace: my-namespace,
           name: my-output,
           facets: {
-            schema": {
-              _producer: https://github:.com/OpenLineage/OpenLineage/blob/v1-0-0/client,
-              _schemaURL: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet,
-              fields": [
+            schema: {
+              _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+              _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+              fields: [
                 {name: a, type: INTEGER},
                 {name: b, type: TIMESTAMP},
                 {name: c, type: INTEGER},
@@ -1631,5 +1669,45 @@ components:
               ]
             }
           }
-        }]     
-        producer: https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client
+        }]
+        producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+
+    SearchResultList:
+      type: object
+      properties:
+        totalCount:
+          description: Total number of search results.
+          type: integer
+          example: 1
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+
+    SearchResult:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SearchResultType'
+        name:
+          type:
+          description: The name of the dataset or job.
+          example: public.delivery_7_days
+        updatedAt:
+          type:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset or job was updated.
+          example: 2019-05-09T19:49:24.201361Z
+        namespace:
+          type: string
+          description: The namespace of the dataset or job.
+          example: food_delivery
+        nodeId:
+          type: string
+          description: The ID of the dataset or job node.
+          example: dataset:food_delivery:public.delivery_7_days
+
+    SearchResultType:
+      type: enum
+      enum: [DATASET, JOB]
+      description: The type of search result.
+      example: DATASET

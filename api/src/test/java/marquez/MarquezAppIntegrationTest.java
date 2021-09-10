@@ -31,6 +31,8 @@ import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
+import marquez.client.models.SearchResult;
+import marquez.client.models.SearchResults;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
@@ -589,5 +591,33 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(runs.get(0).getId()).isEqualTo(run2.getId());
     assertThat(runs.get(1).getId()).isEqualTo(run1.getId());
     assertThat(runs.get(2).getId()).isEqualTo(run0.getId());
+  }
+
+  @Test
+  public void testApp_search() {
+    createNamespace(NAMESPACE_NAME);
+    createSource("my-source");
+
+    final String datasetName = "public.mytable";
+    final List<Field> fields =
+        ImmutableList.of(
+            Field.builder().name("a").type("INTEGER").build(),
+            Field.builder().name("b").type("TIMESTAMP").build());
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName)
+            .sourceName("my-source")
+            .fields(fields)
+            .build();
+
+    client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
+
+    final String query = "mytable";
+    final SearchResults searchResults = client.search(query);
+    assertThat(searchResults.getTotalCount()).isEqualTo(1);
+
+    final SearchResult result = searchResults.getResults().get(0);
+    assertThat(result.getType()).isEqualTo(SearchResult.ResultType.DATASET);
+    assertThat(result.getName()).isEqualTo(datasetName);
   }
 }
