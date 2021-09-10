@@ -174,6 +174,7 @@ git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
 # (9) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
+sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
 # (10) Prepare next development version commit
 git commit -sam "Prepare next development version"
