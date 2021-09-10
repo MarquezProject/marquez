@@ -67,6 +67,11 @@ public final class ServiceModelGenerator extends Generator {
     return newDbTableMetaWith(newDatasetName());
   }
 
+  /** Returns a new {@link DbTableMeta} object with a specified {@code dataset name}. */
+  public static DbTableMeta newDbTableMetaWith(final String datasetName) {
+    return newDbTableMetaWith(DatasetName.of(datasetName));
+  }
+
   /** Returns a new {@link DbTableMeta} object with a specified {@link DatasetName}. */
   public static DbTableMeta newDbTableMetaWith(final DatasetName datasetName) {
     return new DbTableMeta(
