@@ -16,6 +16,7 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
-import org.glassfish.jersey.internal.guava.Lists;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -70,14 +70,17 @@ public class SearchDaoTest {
     assertThat(results).hasSize(NUM_OF_DATASETS + NUM_OF_JOBS);
 
     // Group search results by result type.
-    final List<List<SearchResult>> resultsGroupedByType = groupResultsByType(results);
+    final Map<SearchResult.ResultType, List<SearchResult>> resultsGroupedByType =
+        groupResultsByType(results);
 
     // Ensure search results contain exactly N datasets.
-    final List<SearchResult> resultsWithOnlyDatasets = resultsGroupedByType.get(0);
+    final List<SearchResult> resultsWithOnlyDatasets =
+        resultsGroupedByType.get(SearchResult.ResultType.DATASET);
     assertThat(resultsWithOnlyDatasets).hasSize(NUM_OF_DATASETS);
 
     // Ensure search results contain exactly M jobs.
-    final List<SearchResult> resultsWithOnlyJobs = resultsGroupedByType.get(1);
+    final List<SearchResult> resultsWithOnlyJobs =
+        resultsGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithOnlyJobs).hasSize(NUM_OF_JOBS);
   }
 
@@ -98,15 +101,17 @@ public class SearchDaoTest {
     assertThat(resultsWithFilter).hasSize(NUM_OF_DATASETS);
 
     // Group search results with filter by result type.
-    final List<List<SearchResult>> resultsWithFilterGroupedByType =
+    final Map<SearchResult.ResultType, List<SearchResult>> resultsWithFilterGroupedByType =
         groupResultsByType(resultsWithFilter);
 
     // Ensure filtered search results contain exactly N datasets.
-    final List<SearchResult> resultsWithFilterOnlyDatasets = resultsWithFilterGroupedByType.get(0);
+    final List<SearchResult> resultsWithFilterOnlyDatasets =
+        resultsWithFilterGroupedByType.get(SearchResult.ResultType.DATASET);
     assertThat(resultsWithFilterOnlyDatasets).hasSize(NUM_OF_DATASETS);
 
     // Ensure filtered search results contain no jobs.
-    final List<SearchResult> resultsWithFilterOnlyJobs = resultsWithFilterGroupedByType.get(1);
+    final List<SearchResult> resultsWithFilterOnlyJobs =
+        resultsWithFilterGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithFilterOnlyJobs).isEmpty();
 
     final String queryOnlyDatasets = "test_dataset";
@@ -117,16 +122,17 @@ public class SearchDaoTest {
     assertThat(resultsWithNoFilter).hasSize(NUM_OF_DATASETS);
 
     // Group filtered search results by result type.
-    final List<List<SearchResult>> resultsWithNoFilterGroupedByType =
+    final Map<SearchResult.ResultType, List<SearchResult>> resultsWithNoFilterGroupedByType =
         groupResultsByType(resultsWithNoFilter);
 
     // Ensure filtered search results contain exactly N datasets.
     final List<SearchResult> resultsWithNoFilterOnlyDatasets =
-        resultsWithNoFilterGroupedByType.get(0);
+        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.DATASET);
     assertThat(resultsWithNoFilterOnlyDatasets).hasSize(NUM_OF_DATASETS);
 
     // Ensure filtered search results contain no jobs.
-    final List<SearchResult> resultsWithNoFilterOnlyJobs = resultsWithNoFilterGroupedByType.get(1);
+    final List<SearchResult> resultsWithNoFilterOnlyJobs =
+        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithNoFilterOnlyJobs).isEmpty();
   }
 
@@ -140,15 +146,17 @@ public class SearchDaoTest {
     assertThat(resultsWithFilter).hasSize(NUM_OF_JOBS);
 
     // Group filtered search results by result type.
-    final List<List<SearchResult>> resultsWithFilterGroupedByType =
+    final Map<SearchResult.ResultType, List<SearchResult>> resultsWithFilterGroupedByType =
         groupResultsByType(resultsWithFilter);
 
     // Ensure filtered search results contain no datasets.
-    final List<SearchResult> resultsWithFilterOnlyDatasets = resultsWithFilterGroupedByType.get(0);
+    final List<SearchResult> resultsWithFilterOnlyDatasets =
+        resultsWithFilterGroupedByType.get(SearchResult.ResultType.DATASET);
     assertThat(resultsWithFilterOnlyDatasets).isEmpty();
 
     // Ensure filtered search results contain exactly N jobs.
-    final List<SearchResult> resultsWithFilterOnlyJobs = resultsWithFilterGroupedByType.get(1);
+    final List<SearchResult> resultsWithFilterOnlyJobs =
+        resultsWithFilterGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithFilterOnlyJobs).hasSize(NUM_OF_JOBS);
 
     final String queryOnlyJobs = "test_job";
@@ -159,16 +167,17 @@ public class SearchDaoTest {
     assertThat(resultsWithNoFilter).hasSize(NUM_OF_JOBS);
 
     // Group filtered search results with filter by result type.
-    final List<List<SearchResult>> resultsWithNoFilterGroupedByType =
+    final Map<SearchResult.ResultType, List<SearchResult>> resultsWithNoFilterGroupedByType =
         groupResultsByType(resultsWithNoFilter);
 
     // Ensure filtered search results contain no datasets.
     final List<SearchResult> resultsWithNoFilterOnlyDatasets =
-        resultsWithNoFilterGroupedByType.get(0);
+        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.DATASET);
     assertThat(resultsWithNoFilterOnlyDatasets).isEmpty();
 
     // Ensure filtered search results contain exactly N jobs.
-    final List<SearchResult> resultsWithNoFilterOnlyJobs = resultsWithNoFilterGroupedByType.get(1);
+    final List<SearchResult> resultsWithNoFilterOnlyJobs =
+        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithNoFilterOnlyJobs).hasSize(NUM_OF_JOBS);
   }
 
@@ -205,12 +214,16 @@ public class SearchDaoTest {
   }
 
   /** Returns search results grouped by {@link SearchResult.ResultType}. */
-  private List<List<SearchResult>> groupResultsByType(@NonNull List<SearchResult> results) {
+  private Map<SearchResult.ResultType, List<SearchResult>> groupResultsByType(
+      @NonNull List<SearchResult> results) {
     final Map<Boolean, List<SearchResult>> resultsByType =
         results.stream()
             .collect(
                 Collectors.partitioningBy(
                     result -> result.getType() == SearchResult.ResultType.JOB));
-    return Lists.newArrayList(resultsByType.values());
+    return new ImmutableMap.Builder<SearchResult.ResultType, List<SearchResult>>()
+        .put(SearchResult.ResultType.DATASET, resultsByType.get(false))
+        .put(SearchResult.ResultType.JOB, resultsByType.get(true))
+        .build();
   }
 }
