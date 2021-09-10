@@ -1,6 +1,5 @@
 import { THEME_EXTRA } from '../../../helpers/theme'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { fade } from '@material-ui/core/styles'
+import { Theme, fade } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
 import MqText from '../text/MqText'
 import React from 'react'

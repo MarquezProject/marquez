@@ -14,10 +14,6 @@ import Box from '@material-ui/core/Box'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
-import createStyles from '@material-ui/core/styles/createStyles'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-const styles = () => createStyles({})
 
 interface StateProps {
   jobs: Job[]
@@ -31,7 +27,7 @@ interface DispatchProps {
   resetJobs: typeof resetJobs
 }
 
-type JobsProps = WithStyles<typeof styles> & StateProps & DispatchProps
+type JobsProps = StateProps & DispatchProps
 
 const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At', 'Last Runtime']
 
@@ -144,4 +140,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Jobs))
+)(Jobs)

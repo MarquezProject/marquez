@@ -1,9 +1,8 @@
 import React from 'react'
 
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
+import { Theme, WithStyles, createStyles } from '@material-ui/core'
 import { Undefinable } from '../../../types/util/Nullable'
-import { WithStyles, createStyles } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import MqChip from './MqChip'
 import withStyles from '@material-ui/core/styles/withStyles'

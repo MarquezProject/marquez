@@ -2,8 +2,8 @@ import React, { ReactElement } from 'react'
 
 import { Box, Theme } from '@material-ui/core'
 import { Dataset } from '../types/api'
-import { WithStyles as IWithStyles, createStyles, fade, withStyles } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
+import { WithStyles, alpha, createStyles, withStyles } from '@material-ui/core/styles'
 import { formatUpdatedAt } from '../helpers'
 import MqText from './core/text/MqText'
 
@@ -17,13 +17,13 @@ const styles = (theme: Theme) => {
       borderRadius: theme.shape.borderRadius,
       transition: theme.transitions.create(['background-color']),
       '&:hover': {
-        backgroundColor: fade(theme.palette.common.white, 0.1)
+        backgroundColor: alpha(theme.palette.common.white, 0.1)
       }
     }
   })
 }
 
-type IProps = IWithStyles<typeof styles> &
+type IProps = WithStyles<typeof styles> &
   Pick<Dataset, 'name' | 'description' | 'updatedAt' | 'tags'> & {
     setSelectedNode: (payload: string) => void
   }

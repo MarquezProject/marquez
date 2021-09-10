@@ -35,12 +35,7 @@ const styles = (theme: Theme) => {
   })
 }
 
-interface OwnProps {
-  setShowJobs: (bool: boolean) => void
-  showJobs: boolean
-}
-
-type HeaderProps = OwnProps & WithStyles<typeof styles>
+type HeaderProps = WithStyles<typeof styles>
 
 const Header = (props: HeaderProps): ReactElement => {
   const { classes } = props

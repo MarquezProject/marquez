@@ -1,6 +1,6 @@
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme } from '@material-ui/core'
 
-export const theme = createMuiTheme({
+export const theme = createTheme({
   overrides: {
     MuiCssBaseline: {
       '@global': {

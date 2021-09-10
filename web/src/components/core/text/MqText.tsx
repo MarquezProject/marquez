@@ -2,8 +2,7 @@ import React, { ReactElement } from 'react'
 
 import { Link } from 'react-router-dom'
 import { THEME_EXTRA } from '../../../helpers/theme'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { WithStyles, createStyles, fade } from '@material-ui/core'
+import { Theme, WithStyles, createStyles, fade } from '@material-ui/core'
 import classNames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 

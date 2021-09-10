@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
@@ -8,7 +7,7 @@ import { RouteComponentProps, Link as RouterLink, withRouter } from 'react-route
 import Box from '@material-ui/core/Box'
 
 import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme'
-import { Drawer } from '@material-ui/core'
+import { Drawer, Theme } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs, faDatabase } from '@fortawesome/free-solid-svg-icons'
 import MqIconButton from '../core/icon-button/MqIconButton'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { IState } from '../store/reducers'
-import { Theme as ITheme } from '@material-ui/core/styles/createMuiTheme'
+import { Theme } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { createStyles } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'
@@ -11,7 +11,7 @@ interface IProps {
   success?: string
 }
 
-const styles = (theme: ITheme) => {
+const styles = (theme: Theme) => {
   return createStyles({
     container: {
       position: 'fixed',

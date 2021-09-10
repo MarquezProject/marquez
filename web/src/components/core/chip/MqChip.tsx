@@ -1,6 +1,5 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { createStyles } from '@material-ui/core'
+import { Theme, createStyles } from '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import MqSmallIcon from '../small-icon/MqSmallIcon'
 import MqText from '../text/MqText'

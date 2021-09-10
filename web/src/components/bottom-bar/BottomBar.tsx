@@ -29,8 +29,6 @@ const styles = (theme: Theme) => {
 }
 
 interface OwnProps {
-  setShowJobs: (bool: boolean) => void
-  showJobs: boolean
   selectedNodeData: Undefinable<LineageNode>
 }
 

@@ -13,7 +13,7 @@ import Datasets from '../routes/datasets/Datasets'
 import Header from './header/Header'
 import Jobs from '../routes/jobs/Jobs'
 import Lineage from './lineage/Lineage'
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement } from 'react'
 import Sidenav from './sidenav/Sidenav'
 import Toast from './Toast'
 import createRootReducer from '../store/reducers'
@@ -38,7 +38,6 @@ sagaMiddleware.run(rootSaga)
 const TITLE = 'Marquez'
 
 const App = (): ReactElement => {
-  const [showJobs, setShowJobs] = useState(false)
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
@@ -50,7 +49,7 @@ const App = (): ReactElement => {
           <Box ml={12}>
             <Sidenav />
             <Container maxWidth={'lg'} disableGutters={true}>
-              <Header setShowJobs={setShowJobs} showJobs={showJobs} />
+              <Header />
             </Container>
             <Switch>
               <Route path={'/'} exact>
@@ -61,7 +60,7 @@ const App = (): ReactElement => {
               </Route>
               <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
                 <Lineage />
-                <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
+                <BottomBar />
               </Route>
             </Switch>
             <Toast />

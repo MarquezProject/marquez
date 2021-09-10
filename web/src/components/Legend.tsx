@@ -1,15 +1,10 @@
 import React, { ReactElement } from 'react'
 
-import { Box } from '@material-ui/core'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
+import { Box, Theme, createStyles } from '@material-ui/core'
+import { WithStyles, withStyles } from '@material-ui/styles'
 import MqText from './core/text/MqText'
 
-const styles = ({ spacing, palette }: ITheme) => {
+const styles = ({ spacing, palette }: Theme) => {
   return createStyles({
     datasetShape: {
       backgroundColor: palette.common.white
@@ -31,7 +26,7 @@ interface IProps {
   customClassName: string
 }
 
-type AllProps = IWithStyles<typeof styles> & IProps
+type AllProps = WithStyles<typeof styles> & IProps
 interface IState {}
 
 class Legend extends React.Component<AllProps, IState> {
