@@ -537,7 +537,7 @@ paths:
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/limit'
       summary: Query all datasets and jobs
-      description: Returns one or more datasets and jobs of your query; matching of datasets and jobs is string based and case-insensitive.
+      description: Returns one or more datasets and jobs of your query.
       tags:
         - Search
       responses:
@@ -671,7 +671,9 @@ components:
       schema:
         type: string
         example: my-dataset
-        description: Query containing one or more search keywords.
+        description: Query containing pattern to match; datasets and jobs pattern matching is string based
+          and case-insensitive. Use percent sign (`%`) to match any string of zero or more characters (`my-job%`),
+          or an underscore (`_`) to match a single character (`_job_`).
       required: true
 
     filter:
