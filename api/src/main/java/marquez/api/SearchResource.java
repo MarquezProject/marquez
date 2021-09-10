@@ -62,8 +62,21 @@ public class SearchResource {
       @QueryParam("filter") @Nullable SearchFilter filter,
       @QueryParam("sort") @DefaultValue(DEFAULT_SORT) SearchSort sort,
       @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Min(MIN_LIMIT) int limit) {
+    return Response.ok(
+            isQueryBlank(query)
+                ? SearchResults.EMPTY
+                : searchWithNonBlankQuery(query, filter, sort, limit))
+        .build();
+  }
+
+  private static boolean isQueryBlank(@NonNull String query) {
+    return query.trim().isEmpty();
+  }
+
+  private SearchResults searchWithNonBlankQuery(
+      String query, SearchFilter filter, SearchSort sort, int limit) {
     final List<SearchResult> results = searchDao.search(query, filter, sort, limit);
-    return Response.ok(new SearchResults(results)).build();
+    return new SearchResults(results);
   }
 
   /** Wrapper for {@link SearchResult}s which also contains a {@code total count}. */
@@ -77,5 +90,7 @@ public class SearchResource {
       this.totalCount = results.size();
       this.results = results;
     }
+
+    static final SearchResults EMPTY = new SearchResults(List.of());
   }
 }
