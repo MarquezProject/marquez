@@ -32,6 +32,7 @@ import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchResult;
+import marquez.client.models.SearchResults;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Stream;
@@ -612,10 +613,10 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     client.createDataset(NAMESPACE_NAME, datasetName, dbTableMeta);
 
     final String query = "mytable";
-    final List<SearchResult> results = client.search("mytable");
-    assertThat(results).hasSize(1);
+    final SearchResults searchResults = client.search(query);
+    assertThat(searchResults.getTotalCount()).isEqualTo(1);
 
-    final SearchResult result = results.get(0);
+    final SearchResult result = searchResults.getResults().get(0);
     assertThat(result.getType()).isEqualTo(SearchResult.ResultType.DATASET);
     assertThat(result.getName()).isEqualTo(datasetName);
   }

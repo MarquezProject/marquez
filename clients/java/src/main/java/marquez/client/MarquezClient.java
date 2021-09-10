@@ -50,7 +50,7 @@ import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
-import marquez.client.models.SearchResult;
+import marquez.client.models.SearchResults;
 import marquez.client.models.SearchSort;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
@@ -317,26 +317,26 @@ public class MarquezClient {
     return createTag(tag, null);
   }
 
-  public List<SearchResult> search(String query) {
+  public SearchResults search(String query) {
     return search(query, null, null, DEFAULT_LIMIT);
   }
 
-  public List<SearchResult> search(@NonNull String query, @NonNull SearchFilter filter) {
+  public SearchResults search(@NonNull String query, @NonNull SearchFilter filter) {
     return search(query, filter, null, DEFAULT_LIMIT);
   }
 
-  public List<SearchResult> search(@NonNull String query, @NonNull SearchSort sort) {
+  public SearchResults search(@NonNull String query, @NonNull SearchSort sort) {
     return search(query, null, sort, DEFAULT_LIMIT);
   }
 
-  public List<SearchResult> search(@NonNull String query, int limit) {
+  public SearchResults search(@NonNull String query, int limit) {
     return search(query, null, null, limit);
   }
 
-  public List<SearchResult> search(
+  public SearchResults search(
       String query, @Nullable SearchFilter filter, @Nullable SearchSort sort, int limit) {
     final String bodyAsJson = http.get(url.toSearchUrl(query, filter, sort, limit));
-    return SearchResults.fromJson(bodyAsJson).getValue();
+    return SearchResults.fromJson(bodyAsJson);
   }
 
   public static final class Builder {
@@ -526,24 +526,6 @@ public class MarquezClient {
 
     String toJson() {
       return Utils.toJson(this);
-    }
-  }
-
-  @Value
-  static class SearchResults {
-    @Getter int totalCount;
-    @Getter List<SearchResult> value;
-
-    @JsonCreator
-    SearchResults(
-        @JsonProperty("totalCount") int totalCount,
-        @JsonProperty("results") final List<SearchResult> value) {
-      this.totalCount = totalCount;
-      this.value = ImmutableList.copyOf(value);
-    }
-
-    static SearchResults fromJson(final String json) {
-      return Utils.fromJson(json, new TypeReference<SearchResults>() {});
     }
   }
 }
