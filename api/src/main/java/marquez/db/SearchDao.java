@@ -26,7 +26,8 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(SearchResultMapper.class)
 public interface SearchDao {
   /**
-   * Returns all datasets and jobs that match the provided query.
+   * Returns all datasets and jobs that match the provided query; matching of datasets and jobs is
+   * string based and case-insensitive.
    *
    * @param query Query containing one or more search keywords.
    * @param filter The filter to apply to the query result.
