@@ -537,7 +537,7 @@ paths:
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/limit'
       summary: Query all datasets and jobs
-      description: Returns one or more datasets and jobs of your query.
+      description: Returns one or more datasets and jobs of your query; matching of datasets and jobs is string based and case-insensitive.
       tags:
         - Search
       responses:

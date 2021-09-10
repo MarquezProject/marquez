@@ -29,7 +29,7 @@ public interface SearchDao {
    * Returns all datasets and jobs that match the provided query; matching of datasets and jobs is
    * string based and case-insensitive.
    *
-   * @param query Query containing one or more search keywords.
+   * @param query Query containing pattern to match.
    * @param filter The filter to apply to the query result.
    * @param sort The sort to apply to the query result.
    * @param limit The limit to apply to the query result.
