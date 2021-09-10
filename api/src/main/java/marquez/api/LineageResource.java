@@ -25,7 +25,7 @@ import marquez.service.models.NodeId;
  */
 @Path("/api/v1-beta")
 @Slf4j
-@Deprecated(since = "0.16")
+@Deprecated(since = "0.16.0")
 public class LineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
 

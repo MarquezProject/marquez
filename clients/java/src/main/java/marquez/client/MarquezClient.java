@@ -49,6 +49,9 @@ import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
+import marquez.client.models.SearchFilter;
+import marquez.client.models.SearchResults;
+import marquez.client.models.SearchSort;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
@@ -312,6 +315,28 @@ public class MarquezClient {
 
   public Tag createTag(String tag) {
     return createTag(tag, null);
+  }
+
+  public SearchResults search(String query) {
+    return search(query, null, null, DEFAULT_LIMIT);
+  }
+
+  public SearchResults search(@NonNull String query, @NonNull SearchFilter filter) {
+    return search(query, filter, null, DEFAULT_LIMIT);
+  }
+
+  public SearchResults search(@NonNull String query, @NonNull SearchSort sort) {
+    return search(query, null, sort, DEFAULT_LIMIT);
+  }
+
+  public SearchResults search(@NonNull String query, int limit) {
+    return search(query, null, null, limit);
+  }
+
+  public SearchResults search(
+      String query, @Nullable SearchFilter filter, @Nullable SearchSort sort, int limit) {
+    final String bodyAsJson = http.get(url.toSearchUrl(query, filter, sort, limit));
+    return SearchResults.fromJson(bodyAsJson);
   }
 
   public static final class Builder {
