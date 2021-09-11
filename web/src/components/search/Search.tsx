@@ -246,7 +246,6 @@ class Search extends React.Component<SearchProps, SearchState> {
             onChange={event => this.onSearch(event)}
             value={this.state.search}
             autoComplete={'off'}
-            autoFocus={true}
             id={'searchBar'}
           />
           <ClickAwayListener
