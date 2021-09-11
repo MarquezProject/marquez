@@ -1,4 +1,5 @@
-import { Theme, createStyles, fade, withStyles } from '@material-ui/core'
+import { Theme, createStyles, withStyles } from '@material-ui/core'
+import { alpha } from '@material-ui/core/styles'
 import InputBase from '@material-ui/core/InputBase'
 
 export const MqInputBase = withStyles((theme: Theme) =>
@@ -13,7 +14,7 @@ export const MqInputBase = withStyles((theme: Theme) =>
       transition: theme.transitions.create(['border-color', 'box-shadow']),
       '&:focus': {
         borderColor: theme.palette.primary.main,
-        boxShadow: `${fade(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
+        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
         borderRadius: theme.spacing(4)
       }
     }
