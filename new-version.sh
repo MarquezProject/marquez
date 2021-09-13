@@ -24,12 +24,17 @@
 
 set -e
 
+title() {
+  echo -e "\033[1m${1}\033[0m"
+}
+
 usage() {
-  echo "Usage: ./$(basename -- "${0}") --release-version RELEASE_VERSION --next-version NEXT_VERSION"
-  echo
   echo "A script used to release Marquez"
   echo
-  echo "Examples:"
+  title "USAGE:"
+  echo "  ./$(basename -- "${0}") --release-version RELEASE_VERSION --next-version NEXT_VERSION"
+  echo
+  title "EXAMPLES:"
   echo "  # Bump version ('-SNAPSHOT' will automatically be appended to '0.0.2')"
   echo "  $ ./new-version.sh -r 0.0.1 -n 0.0.2"
   echo
@@ -39,19 +44,26 @@ usage() {
   echo "  # Bump release candidate"
   echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2"
   echo
-  echo "Arguments:"
-  echo "  -r, --release-version string       the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
-  echo "  -n, --next-version string          the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
+  echo "  # Bump release candidate without push"
+  echo "  $ ./new-version.sh -r 0.0.1-rc.1 -n 0.0.2-rc.2 --no-push"
+  echo
+  title "ARGUMENTS:"
+  echo "  -r, --release-version string    the release version (ex: X.Y.Z, X.Y.Z-rc.*)"
+  echo "  -n, --next-version string       the next version (ex: X.Y.Z, X.Y.Z-SNAPSHOT)"
+  echo
+  title "FLAGS:"
+  echo "  --no-push    local changes are not automatically pushed to the remote repository"
   exit 1
 }
 
-readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}((-rc\.[0-9]+)?|(-SNAPSHOT)?)$" # X.Y.Z
-                                                                           # X.Y.Z-rc.*
-                                                                           # X.Y.Z-SNAPSHOT
+readonly SEMVER_REGEX="^[0-9]+(\.[0-9]+){2}((-rc\.[0-9]+)?(-SNAPSHOT)?)$" # X.Y.Z
+                                                                          # X.Y.Z-rc.*
+                                                                          # X.Y.Z-rc.*-SNAPSHOT
+                                                                          # X.Y.Z-SNAPSHOT
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
-cd "${project_root}"
+cd "${project_root}/"
 
 # Verify bump2version is installed
 if [[ ! $(type -P bump2version) ]]; then
@@ -65,14 +77,39 @@ if [[ ! $(type -P redoc-cli) ]]; then
   exit 1;
 fi
 
+if [[ $# -eq 0 ]] ; then
+  usage
+fi
+
+PUSH="true"
+while [ $# -gt 0 ]; do
+  case $1 in
+    -r|--release-version)
+       shift
+       RELEASE_VERSION="${1}"
+       ;;
+    -n|--next-version)
+       shift
+       NEXT_VERSION="${1}"
+       ;;
+    --no-push)
+       PUSH="false"
+       ;;
+    -h|--help)
+       usage
+       exit 0
+       ;;
+    *) usage
+       exit 1
+       ;;
+  esac
+  shift
+done
+
 branch=$(git symbolic-ref --short HEAD)
 if [[ "${branch}" != "main" ]]; then
   echo "error: you may only release on 'main'!"
   exit 1;
-fi
-
-if [[ $# -eq 0 ]] ; then
-  usage
 fi
 
 # Ensure no unstaged changes are present in working directory
@@ -81,27 +118,9 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
   exit 1;
 fi
 
-while [ $# -gt 0 ]; do
-  case $1 in
-    '--release-version'|-r)
-       shift
-       RELEASE_VERSION="${1}"
-       ;;
-    '--next-version'|-n)
-       shift
-       NEXT_VERSION="${1}"
-       ;;
-    '--help'|-h)
-       usage
-       ;;
-    *) exit 1
-       ;;
-  esac
-  shift
-done
-
-# Append '-SNAPSHOT' to 'NEXT_VERSION' if not a release candidate, or missing
-if [[ ! "${NEXT_VERSION}" == *-rc.? &&
+# Append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
+# (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
+if [[ "${NEXT_VERSION}" == *-rc.? ||
       ! "${NEXT_VERSION}" == *-SNAPSHOT ]]; then
   NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
 fi
@@ -123,7 +142,7 @@ if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
 fi
 
 # (1) Bump python module versions
-PYTHON_MODULES=(clients/python/ integrations/airflow/ integrations/common/ integrations/dbt/bigquery/ integrations/dbt/snowflake/)
+PYTHON_MODULES=(clients/python/ integrations/airflow/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
   (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${PYTHON_RELEASE_VERSION}" --allow-dirty)
 done
@@ -135,30 +154,37 @@ sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
 sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
 
-# (4) Bump version in docs
+# (4) Bump version in scripts
+sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
+
+# (5) Bump version in docs
 sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
 sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./clients/java/README.md
 sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/README.md
-sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./integrations/spark/README.md
-sed -i "" "s/marquez-spark:.*/marquez-spark:${RELEASE_VERSION}/g" ./integrations/spark/README.md
 
-# (5) Bundle openAPI docs
-redoc-cli bundle spec/openapi.yml -o docs/openapi.html  --title "Marquez API Reference"
+# (6) Bundle openAPI docs
+redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
 
-# (6) Prepare release commit
+# (7) Prepare release commit
 git commit -sam "Prepare for release ${RELEASE_VERSION}"
 
-# (7) Pull latest tags, then prepare release tag
+# (8) Pull latest tags, then prepare release tag
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
-# (8) Prepare next development version
+# (9) Prepare next development version
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
+sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
-# (9) Prepare next development version commit
+# (10) Prepare next development version commit
 git commit -sam "Prepare next development version"
 
-# (10) Push commits and tag
-git push origin main && git push origin "${RELEASE_VERSION}"
+# (11) Push commits and tag
+if [[ ${PUSH} = "true" ]]; then
+  git push origin main && \
+    git push origin "${RELEASE_VERSION}"
+else
+  echo "...skipping push to 'main'; to push manually, use 'git push origin main && git push origin "${RELEASE_VERSION}"'"
+fi
 
 echo "DONE!"

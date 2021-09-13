@@ -24,6 +24,11 @@ import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.SourceMeta;
 
+/**
+ * @deprecated Prefer {@link MarquezClient}. This class is scheduled to be removed in release {@code
+ *     0.19.0}.
+ */
+@Deprecated
 @Slf4j
 class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
 
@@ -33,6 +38,7 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
     this.backend = backend;
   }
 
+  @Deprecated
   private static String pathWithQueryParams(String path, Map<String, Object> queryParams) {
     StringBuilder pathBuilder = new StringBuilder(path);
     if (queryParams != null && !queryParams.isEmpty()) {
@@ -59,31 +65,37 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
     return pathBuilder.toString();
   }
 
+  @Deprecated
   @Override
   public void createNamespace(String namespaceName, NamespaceMeta namespaceMeta) {
     backend.put(namespacePath(namespaceName), namespaceMeta.toJson());
   }
 
+  @Deprecated
   @Override
   public void createSource(String sourceName, SourceMeta sourceMeta) {
     backend.put(sourcePath(sourceName), sourceMeta.toJson());
   }
 
+  @Deprecated
   @Override
   public void createDataset(String namespaceName, String datasetName, DatasetMeta datasetMeta) {
     backend.put(datasetPath(namespaceName, datasetName), datasetMeta.toJson());
   }
 
+  @Deprecated
   @Override
   public void createJob(String namespaceName, String jobName, JobMeta jobMeta) {
     backend.put(jobPath(namespaceName, jobName), jobMeta.toJson());
   }
 
+  @Deprecated
   @Override
   public void createRun(String namespaceName, String jobName, RunMeta runMeta) {
     backend.post(createRunPath(namespaceName, jobName), runMeta.toJson());
   }
 
+  @Deprecated
   @Override
   public void markRunAs(String runId, RunState runState, Instant at) {
     Map<String, Object> queryParams =
@@ -91,6 +103,7 @@ class MarquezWriteOnlyClientImpl implements MarquezWriteOnlyClient {
     backend.post(pathWithQueryParams(runTransitionPath(runId, runState), queryParams));
   }
 
+  @Deprecated
   @Override
   public void close() throws IOException {
     backend.close();

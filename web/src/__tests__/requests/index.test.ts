@@ -1,6 +1,6 @@
 
-import * as requestUtils from '../../requests'
-import { parseResponse } from '../../requests'
+import * as requestUtils from '../../store/requests'
+import { parseResponse } from '../../store/requests'
 
 export const mockFetch = (requestBody: any = []) => {
   return jest.fn().mockImplementation(() => Promise.resolve({

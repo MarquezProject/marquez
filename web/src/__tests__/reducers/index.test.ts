@@ -1,4 +1,4 @@
-import { filterEntities, findMatchingEntities } from '../../reducers'
+import { filterEntities, findMatchingEntities } from '../../store/reducers'
 
 describe('findMatchingEntities test', () => {
   const datasets = require('../../../docker/db/data/datasets.json')

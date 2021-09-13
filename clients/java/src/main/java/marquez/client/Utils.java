@@ -34,6 +34,10 @@ public final class Utils {
 
   private static final ObjectMapper MAPPER = newObjectMapper();
 
+  public static ObjectMapper getMapper() {
+    return MAPPER;
+  }
+
   public static ObjectMapper newObjectMapper() {
     final ObjectMapper mapper = Jackson.newObjectMapper();
     mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

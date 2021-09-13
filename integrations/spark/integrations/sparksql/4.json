@@ -2,7 +2,7 @@
   "eventType": "COMPLETE",
   "eventTime": "2021-01-01T00:00:00Z",
   "run": {
-    "runId": "fake_run_id",
+    "runId": "ddca29f1-0800-4340-84f6-f8a1ea4e7e47",
     "facets": {
       "parent": {
         "_producer": "https://github.com/MarquezProject/marquez/tree/$VERSION/integrations/spark",

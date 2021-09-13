@@ -12,6 +12,8 @@ import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.CommonModelGenerator.newRunId;
+import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
 import static marquez.common.models.CommonModelGenerator.newTagName;
 import static marquez.common.models.CommonModelGenerator.newTagNames;
@@ -65,10 +67,28 @@ public final class ServiceModelGenerator extends Generator {
     return newDbTableMetaWith(newDatasetName());
   }
 
+  /** Returns a new {@link DbTableMeta} object with a specified {@code dataset name}. */
+  public static DbTableMeta newDbTableMetaWith(final String datasetName) {
+    return newDbTableMetaWith(DatasetName.of(datasetName));
+  }
+
   /** Returns a new {@link DbTableMeta} object with a specified {@link DatasetName}. */
   public static DbTableMeta newDbTableMetaWith(final DatasetName datasetName) {
     return new DbTableMeta(
         datasetName, newSourceName(), newFields(4), newTagNames(2), newDescription(), null);
+  }
+
+  /** Returns a new {@link StreamMeta} object */
+  public static StreamMeta newStreamMeta() {
+    final DatasetName physicalName = newDatasetName();
+    return new StreamMeta(
+        physicalName,
+        newSourceName(),
+        newSchemaLocation(),
+        newFields(4),
+        newTagNames(2),
+        newDescription(),
+        newRunId());
   }
 
   /** Returns a new {@link JobMeta} object with a default number of inputs and outputs. */

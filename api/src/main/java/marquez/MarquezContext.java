@@ -13,6 +13,7 @@ import marquez.api.JobResource;
 import marquez.api.LineageResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
+import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
@@ -29,6 +30,7 @@ import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.RunStateDao;
+import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
@@ -64,6 +66,7 @@ public final class MarquezContext {
   @Getter private final TagDao tagDao;
   @Getter private final OpenLineageDao openLineageDao;
   @Getter private final LineageDao lineageDao;
+  @Getter private final SearchDao searchDao;
 
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
@@ -83,6 +86,7 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final LineageResource lineageResource;
+  @Getter private final SearchResource searchResource;
 
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
@@ -111,6 +115,7 @@ public final class MarquezContext {
     this.tagDao = jdbi.onDemand(TagDao.class);
     this.openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     this.lineageDao = jdbi.onDemand(LineageDao.class);
+    this.searchDao = jdbi.onDemand(SearchDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
     this.namespaceService = new NamespaceService(baseDao);
@@ -144,6 +149,7 @@ public final class MarquezContext {
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
     this.lineageResource = new LineageResource(serviceFactory);
+    this.searchResource = new SearchResource(searchDao);
 
     this.resources =
         ImmutableList.of(
@@ -154,7 +160,8 @@ public final class MarquezContext {
             tagResource,
             jdbiException,
             openLineageResource,
-            lineageResource);
+            lineageResource,
+            searchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));

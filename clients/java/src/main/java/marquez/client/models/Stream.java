@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -44,7 +45,8 @@ public final class Stream extends Dataset {
       @Nullable final Instant lastModifiedAt,
       @Nullable final URL schemaLocation,
       @Nullable final String description,
-      @Nullable final Map<String, Object> facets) {
+      @Nullable final Map<String, Object> facets,
+      @Nullable final UUID currentVersion) {
     super(
         id,
         STREAM,
@@ -58,7 +60,8 @@ public final class Stream extends Dataset {
         tags,
         lastModifiedAt,
         description,
-        facets);
+        facets,
+        currentVersion);
     this.schemaLocation = schemaLocation;
   }
 

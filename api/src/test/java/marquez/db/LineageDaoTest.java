@@ -1,11 +1,14 @@
 package marquez.db;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
+import static marquez.db.LineageTestUtils.OPEN_LINEAGE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Functions;
+import io.openlineage.client.OpenLineage;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,10 +26,6 @@ import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
-import marquez.service.models.LineageEvent.Dataset;
-import marquez.service.models.LineageEvent.JobFacet;
-import marquez.service.models.LineageEvent.SchemaField;
-import marquez.service.models.LineageEvent.SourceCodeLocationJobFacet;
 import marquez.service.models.Run;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.ObjectAssert;
@@ -38,18 +37,28 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageDaoTest {
-
   private static LineageDao lineageDao;
   private static OpenLineageDao openLineageDao;
-  private final Dataset dataset =
-      new Dataset(
+  private final OpenLineage.InputDataset inputDataset =
+      OPEN_LINEAGE.newInputDataset(
           NAMESPACE,
           "commonDataset",
           newDatasetFacet(
-              new SchemaField("firstname", "string", "the first name"),
-              new SchemaField("lastname", "string", "the last name"),
-              new SchemaField("birthdate", "date", "the date of birth")));
-  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+          null);
+  private final OpenLineage.OutputDataset outputDataset =
+      OPEN_LINEAGE.newOutputDataset(
+          NAMESPACE,
+          "commonDataset",
+          newDatasetFacet(
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+              OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+          null);
+
+  private final OpenLineage.JobFacets jobFacet = OPEN_LINEAGE.newJobFacets(null, null, null);
 
   static Jdbi jdbi;
 
@@ -94,7 +103,7 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     List<JobLineage> jobRows =
         writeDownstreamLineage(
             openLineageDao,
@@ -103,7 +112,7 @@ public class LineageDaoTest {
                     new DatasetConsumerJob("readJob", 20, Optional.of("outputData")),
                     new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
             jobFacet,
-            dataset);
+            outputDataset);
 
     // don't expect a failed job in the returned lineage
     UpdateLineageRow failedJobRow =
@@ -112,7 +121,7 @@ public class LineageDaoTest {
             "readJobFailed",
             "FAILED",
             jobFacet,
-            Arrays.asList(dataset),
+            Arrays.asList(inputDataset),
             Arrays.asList());
 
     // don't expect a disjoint job in the returned lineage
@@ -123,12 +132,15 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(
-                new Dataset(
+                OPEN_LINEAGE.newInputDataset(
                     NAMESPACE,
                     "randomDataset",
                     newDatasetFacet(
-                        new SchemaField("firstname", "string", "the first name"),
-                        new SchemaField("lastname", "string", "the last name")))),
+                        OPEN_LINEAGE.newSchemaDatasetFacetFields(
+                            "firstname", "string", "the first name"),
+                        OPEN_LINEAGE.newSchemaDatasetFacetFields(
+                            "lastname", "string", "the last name")),
+                    null)),
             Arrays.asList());
     // fetch the first "readJob" lineage.
     Set<JobData> connectedJobs =
@@ -178,7 +190,7 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     Set<UUID> lineage =
         lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
             .map(JobData::getUuid)
@@ -210,7 +222,7 @@ public class LineageDaoTest {
             "RUNNING",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     Set<JobData> lineage =
         lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
 
@@ -239,18 +251,19 @@ public class LineageDaoTest {
             "writeJob",
             "COMPLETE",
             jobFacet,
-            Arrays.asList(dataset),
+            Arrays.asList(inputDataset),
             Arrays.asList());
 
     // write a new dataset with a different name
-    Dataset anotherDataset =
-        new Dataset(
+    OpenLineage.OutputDataset anotherDataset =
+        OPEN_LINEAGE.newOutputDataset(
             NAMESPACE,
             "anUncommonDataset",
             newDatasetFacet(
-                new SchemaField("firstname", "string", "the first name"),
-                new SchemaField("lastname", "string", "the last name"),
-                new SchemaField("birthdate", "date", "the date of birth")));
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name"),
+                OPEN_LINEAGE.newSchemaDatasetFacetFields("birthdate", "date", "the date of birth")),
+            null);
     // write a bunch of jobs that share nothing with the writeJob
     writeDownstreamLineage(
         openLineageDao,
@@ -267,7 +280,6 @@ public class LineageDaoTest {
   /** A failed consumer job doesn't show up in the datasets out edges */
   @Test
   public void testGetLineageWithFailedConsumer() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -276,13 +288,13 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "failedConsumer",
         "FAILED",
         jobFacet,
-        Arrays.asList(dataset),
+        Arrays.asList(inputDataset),
         Arrays.asList());
     Set<JobData> lineage =
         lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
@@ -307,7 +319,7 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
 
     writeDownstreamLineage(
         openLineageDao,
@@ -316,13 +328,16 @@ public class LineageDaoTest {
                 new DatasetConsumerJob("readJob", 3, Optional.of("outputData")),
                 new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
         jobFacet,
-        dataset);
+        outputDataset);
 
-    JobFacet newVersionFacet =
-        JobFacet.builder()
+    OpenLineage.JobFacets newVersionFacet =
+        OPEN_LINEAGE
+            .newJobFacetsBuilder()
             .sourceCodeLocation(
-                SourceCodeLocationJobFacet.builder().url("git@github:location").build())
-            .additional(LineageTestUtils.EMPTY_MAP)
+                OPEN_LINEAGE
+                    .newSourceCodeLocationJobFacetBuilder()
+                    .url(URI.create("git://git@github:location"))
+                    .build())
             .build();
 
     // readJobV2 produces outputData2 and not outputData
@@ -334,7 +349,7 @@ public class LineageDaoTest {
                     new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
                     new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
             newVersionFacet,
-            dataset);
+            outputDataset);
 
     Set<JobData> lineage =
         lineageDao.getLineage(
@@ -387,7 +402,6 @@ public class LineageDaoTest {
   /** A failed producer job doesn't show up in the lineage */
   @Test
   public void testGetLineageWithFailedProducer() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -396,14 +410,14 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "failedProducer",
         "FAILED",
         jobFacet,
         Arrays.asList(),
-        Arrays.asList(dataset));
+        Arrays.asList(outputDataset));
     Set<JobData> inputDatasets =
         lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2);
     assertThat(inputDatasets)
@@ -416,8 +430,6 @@ public class LineageDaoTest {
   /** A failed producer job doesn't show up in the lineage */
   @Test
   public void testGetLineageChangedJobVersion() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             openLineageDao,
@@ -425,7 +437,7 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     LineageTestUtils.createLineageRow(
         openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
 
@@ -442,8 +454,6 @@ public class LineageDaoTest {
 
   @Test
   public void testGetJobFromInputOrOutput() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             openLineageDao,
@@ -451,23 +461,21 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "consumerJob",
         "COMPLETE",
         jobFacet,
-        Arrays.asList(dataset),
+        Arrays.asList(inputDataset),
         Arrays.asList());
     Optional<UUID> jobNode =
-        lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
+        lineageDao.getJobFromInputOrOutput(inputDataset.getName(), inputDataset.getNamespace());
     assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
   }
 
   @Test
   public void testGetJobFromInputOrOutputPrefersRecentOutputJob() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
     // add some consumer jobs prior to the write so we know that the sort isn't simply picking
     // the first job created
     for (int i = 0; i < 5; i++) {
@@ -476,7 +484,7 @@ public class LineageDaoTest {
           "consumerJob" + i,
           "COMPLETE",
           jobFacet,
-          Arrays.asList(dataset),
+          Arrays.asList(inputDataset),
           Arrays.asList());
     }
     // older write job- should be ignored.
@@ -486,7 +494,7 @@ public class LineageDaoTest {
         "COMPLETE",
         jobFacet,
         Arrays.asList(),
-        Arrays.asList(dataset));
+        Arrays.asList(outputDataset));
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -495,23 +503,28 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "consumerJob",
         "COMPLETE",
         jobFacet,
-        Arrays.asList(dataset),
+        Arrays.asList(inputDataset),
         Arrays.asList());
     Optional<UUID> jobNode =
-        lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
+        lineageDao.getJobFromInputOrOutput(inputDataset.getName(), inputDataset.getNamespace());
     assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
   }
 
   @Test
   public void testGetDatasetData() {
     LineageTestUtils.createLineageRow(
-        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(),
+        Arrays.asList(outputDataset));
     List<JobLineage> newRows =
         writeDownstreamLineage(
             openLineageDao,
@@ -520,7 +533,7 @@ public class LineageDaoTest {
                     new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
                     new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
             jobFacet,
-            dataset);
+            outputDataset);
     Set<DatasetData> datasetData =
         lineageDao.getDatasetData(
             newRows.stream()
@@ -542,7 +555,7 @@ public class LineageDaoTest {
             "COMPLETE",
             jobFacet,
             Arrays.asList(),
-            Arrays.asList(dataset));
+            Arrays.asList(outputDataset));
     List<JobLineage> newRows =
         writeDownstreamLineage(
             openLineageDao,
@@ -551,7 +564,7 @@ public class LineageDaoTest {
                     new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
                     new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
             jobFacet,
-            dataset);
+            outputDataset);
 
     Set<UUID> expectedRunIds =
         Stream.concat(
@@ -575,7 +588,12 @@ public class LineageDaoTest {
   public void testGetCurrentRunsWithFailedJob() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            openLineageDao,
+            "writeJob",
+            "FAIL",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(outputDataset));
 
     Set<UUID> jobids = Collections.singleton(writeJob.getJob().getUuid());
 
@@ -597,7 +615,7 @@ public class LineageDaoTest {
           "COMPLETE",
           jobFacet,
           Arrays.asList(),
-          Arrays.asList(dataset));
+          Arrays.asList(outputDataset));
     }
 
     List<JobLineage> newRows =
@@ -608,10 +626,15 @@ public class LineageDaoTest {
                     new DatasetConsumerJob("readJob", 3, Optional.of("outputData2")),
                     new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
             jobFacet,
-            dataset);
+            outputDataset);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            openLineageDao,
+            "writeJob",
+            "FAIL",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(outputDataset));
 
     Set<UUID> expectedRunIds =
         Stream.concat(

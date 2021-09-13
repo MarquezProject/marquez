@@ -21,6 +21,7 @@ import static marquez.client.MarquezPathV1.listTagsPath;
 import static marquez.client.MarquezPathV1.namespacePath;
 import static marquez.client.MarquezPathV1.runPath;
 import static marquez.client.MarquezPathV1.runTransitionPath;
+import static marquez.client.MarquezPathV1.searchPath;
 import static marquez.client.MarquezPathV1.sourcePath;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -34,6 +35,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
+import marquez.client.models.SearchFilter;
+import marquez.client.models.SearchSort;
 import org.apache.http.client.utils.URIBuilder;
 
 class MarquezUrl {
@@ -156,5 +159,19 @@ class MarquezUrl {
 
   URL toCreateTagsUrl(String name) {
     return from(createTagPath(name));
+  }
+
+  URL toSearchUrl(
+      @NonNull String query, @Nullable SearchFilter filter, @Nullable SearchSort sort, int limit) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("q", query);
+    if (filter != null) {
+      queryParams.put("filter", filter);
+    }
+    if (filter != null) {
+      queryParams.put("sort", sort);
+    }
+    queryParams.put("limit", limit);
+    return from(searchPath(), queryParams.build());
   }
 }

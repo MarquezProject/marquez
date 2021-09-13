@@ -6,11 +6,11 @@ import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newExternalId;
+import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
-import static marquez.service.models.ServiceModelGenerator.newDbTableMeta;
 import static marquez.service.models.ServiceModelGenerator.newDbTableMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static marquez.service.models.ServiceModelGenerator.newRunMeta;
@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
@@ -69,9 +70,26 @@ final class DbTestUtils {
 
   /** Adds a new {@link DatasetRow} object to the {@code datasets} table. */
   static Dataset newDataset(final Jdbi jdbi) {
+    return newDataset(jdbi, newNamespaceName().getValue(), newDatasetName().getValue());
+  }
+
+  /**
+   * Adds a new {@link DatasetRow} object to the {@code datasets} table with a specified {@code
+   * dataset name}.
+   */
+  static Dataset newDataset(final Jdbi jdbi, final String datasetName) {
+    return newDataset(jdbi, newNamespaceName().getValue(), datasetName);
+  }
+
+  /**
+   * Adds a new {@link DatasetRow} object to the {@code datasets} table with the specified {@code
+   * namespace} and {@code dataset name}.
+   */
+  static Dataset newDataset(final Jdbi jdbi, final String namespace, final String datasetName) {
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
-    final DbTableMeta dbTableMeta = newDbTableMeta();
-    return datasetDao.upsertDatasetMeta(newNamespaceName(), newDatasetName(), dbTableMeta);
+    final DbTableMeta dbTableMeta = newDbTableMetaWith(datasetName);
+    return datasetDao.upsertDatasetMeta(
+        NamespaceName.of(namespace), DatasetName.of(datasetName), dbTableMeta);
   }
 
   /**
@@ -83,9 +101,29 @@ final class DbTestUtils {
   }
 
   /** Adds a new {@link JobRow} object to the {@code jobs} table. */
+  static JobRow newJob(final Jdbi jdbi) {
+    return newJob(jdbi, newNamespaceName().getValue(), newJobName().getValue());
+  }
+
+  /**
+   * Adds a new {@link JobRow} object to the {@code jobs} table with a specified {@code job name}.
+   */
+  static JobRow newJob(final Jdbi jdbi, final String jobName) {
+    return newJob(jdbi, newNamespaceName().getValue(), jobName);
+  }
+
+  /**
+   * Adds a new {@link JobRow} object to the {@code jobs} table with the specified {@code namespace}
+   * and {@code job name}.
+   */
   static JobRow newJob(final Jdbi jdbi, final String namespaceName, final String jobName) {
     return newJobWith(
         jdbi, namespaceName, jobName, newJobMetaWith(NamespaceName.of(namespaceName)));
+  }
+
+  /** Adds new {@link JobRow} objects to the {@code jobs} table with a specified {@code limit}. */
+  static ImmutableSet<JobRow> newJobs(final Jdbi jdbi, final int limit) {
+    return Stream.generate(() -> newJob(jdbi)).limit(limit).collect(toImmutableSet());
   }
 
   /**

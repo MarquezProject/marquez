@@ -20,9 +20,13 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
@@ -101,6 +105,19 @@ public final class CommonModelGenerator extends Generator {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
   }
 
+  public static List<OpenLineage.SchemaDatasetFacetFields> newSchemaFields(int amount) {
+    return IntStream.range(0, amount)
+        .boxed()
+        .map(
+            i ->
+                new OpenLineage.SchemaDatasetFacetFieldsBuilder()
+                    .name(newFieldName().getValue())
+                    .type(newFieldType())
+                    .description(newDescription())
+                    .build())
+        .collect(Collectors.toList());
+  }
+
   public static FieldName newFieldName() {
     return FieldName.of("test_field" + newId());
   }
@@ -162,7 +179,7 @@ public final class CommonModelGenerator extends Generator {
     return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
   }
 
-  public static String newExternalId() {
-    return "test_external_id" + newId();
+  public static UUID newExternalId() {
+    return UUID.randomUUID();
   }
 }
