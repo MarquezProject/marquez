@@ -186,7 +186,7 @@ if [[ ${PUSH} = "true" ]]; then
     git push origin "${RELEASE_VERSION}"
 else
   echo "...skipping push to 'main'; to push commits manually, run:"
-  echo "    $ git push origin main && git push origin "${RELEASE_VERSION}"""
+  echo "    $ git push origin main && git push origin "${RELEASE_VERSION}""
 fi
 
 echo "DONE!"
