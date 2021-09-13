@@ -16,7 +16,6 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +109,7 @@ public class SearchDaoTest {
     assertThat(resultsWithFilterOnlyDatasets).hasSize(NUM_OF_DATASETS);
 
     // Ensure filtered search results contain no jobs.
-    final List<SearchResult> resultsWithFilterOnlyJobs =
-        resultsWithFilterGroupedByType.get(SearchResult.ResultType.JOB);
-    assertThat(resultsWithFilterOnlyJobs).isEmpty();
+    assertThat(resultsWithFilterGroupedByType).doesNotContainKey(SearchResult.ResultType.JOB);
 
     final String queryOnlyDatasets = "test_dataset";
     final List<SearchResult> resultsWithNoFilter =
@@ -131,9 +128,7 @@ public class SearchDaoTest {
     assertThat(resultsWithNoFilterOnlyDatasets).hasSize(NUM_OF_DATASETS);
 
     // Ensure filtered search results contain no jobs.
-    final List<SearchResult> resultsWithNoFilterOnlyJobs =
-        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.JOB);
-    assertThat(resultsWithNoFilterOnlyJobs).isEmpty();
+    assertThat(resultsWithNoFilterGroupedByType).doesNotContainKey(SearchResult.ResultType.JOB);
   }
 
   @Test
@@ -150,9 +145,7 @@ public class SearchDaoTest {
         groupResultsByType(resultsWithFilter);
 
     // Ensure filtered search results contain no datasets.
-    final List<SearchResult> resultsWithFilterOnlyDatasets =
-        resultsWithFilterGroupedByType.get(SearchResult.ResultType.DATASET);
-    assertThat(resultsWithFilterOnlyDatasets).isEmpty();
+    assertThat(resultsWithFilterGroupedByType).doesNotContainKey(SearchResult.ResultType.DATASET);
 
     // Ensure filtered search results contain exactly N jobs.
     final List<SearchResult> resultsWithFilterOnlyJobs =
@@ -171,9 +164,7 @@ public class SearchDaoTest {
         groupResultsByType(resultsWithNoFilter);
 
     // Ensure filtered search results contain no datasets.
-    final List<SearchResult> resultsWithNoFilterOnlyDatasets =
-        resultsWithNoFilterGroupedByType.get(SearchResult.ResultType.DATASET);
-    assertThat(resultsWithNoFilterOnlyDatasets).isEmpty();
+    assertThat(resultsWithNoFilterGroupedByType).doesNotContainKey(SearchResult.ResultType.DATASET);
 
     // Ensure filtered search results contain exactly N jobs.
     final List<SearchResult> resultsWithNoFilterOnlyJobs =
@@ -216,14 +207,6 @@ public class SearchDaoTest {
   /** Returns search results grouped by {@link SearchResult.ResultType}. */
   private Map<SearchResult.ResultType, List<SearchResult>> groupResultsByType(
       @NonNull List<SearchResult> results) {
-    final Map<Boolean, List<SearchResult>> resultsByType =
-        results.stream()
-            .collect(
-                Collectors.partitioningBy(
-                    result -> result.getType() == SearchResult.ResultType.JOB));
-    return new ImmutableMap.Builder<SearchResult.ResultType, List<SearchResult>>()
-        .put(SearchResult.ResultType.DATASET, resultsByType.get(false))
-        .put(SearchResult.ResultType.JOB, resultsByType.get(true))
-        .build();
+    return results.stream().collect(Collectors.groupingBy(SearchResult::getType));
   }
 }
