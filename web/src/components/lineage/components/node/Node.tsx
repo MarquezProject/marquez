@@ -8,10 +8,10 @@ import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
-import { isDataset, isJob } from '../../../../helpers/nodes'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
 
@@ -40,9 +40,9 @@ type NodeProps = DispatchProps & OwnProps
 class Node extends React.Component<NodeProps> {
   determineLink = (node: GraphNode<MqNode>) => {
     if (isJob(node)) {
-      return `/jobs/${node.data.name}`
+      return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
     } else if (isDataset(node)) {
-      return `/datasets/${node.data.name}`
+      return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
     }
     return '/'
   }
@@ -53,7 +53,7 @@ class Node extends React.Component<NodeProps> {
     return (
       <Link
         to={this.determineLink(node)}
-        onClick={() => this.props.setSelectedNode(node.data.name)}
+        onClick={() => node.label && this.props.setSelectedNode(node.label)}
       >
         {job ? (
           <g>
@@ -62,9 +62,9 @@ class Node extends React.Component<NodeProps> {
               r={RADIUS}
               fill={theme.palette.common.white}
               stroke={
-                selectedNode === node.data.name
+                selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
               strokeWidth={BORDER}
               cx={node.x}
@@ -87,9 +87,9 @@ class Node extends React.Component<NodeProps> {
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
               color={
-                selectedNode === node.data.name
+                selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
             />
           </g>
@@ -101,9 +101,9 @@ class Node extends React.Component<NodeProps> {
               y={node.y - RADIUS}
               fill={theme.palette.common.white}
               stroke={
-                selectedNode === node.data.name
+                selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
               strokeWidth={BORDER}
               width={RADIUS * 2}
@@ -128,9 +128,9 @@ class Node extends React.Component<NodeProps> {
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
               color={
-                selectedNode === node.data.name
+                selectedNode === node.label
                   ? theme.palette.primary.main
-                  : theme.palette.secondary.dark
+                  : theme.palette.secondary.main
               }
             />
           </g>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import * as Redux from 'redux'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
+import { Theme } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setBottomBarHeight } from '../../../../store/actionCreators'

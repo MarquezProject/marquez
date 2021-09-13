@@ -2,8 +2,8 @@ import React, { ReactElement } from 'react'
 
 import { Link } from 'react-router-dom'
 import { THEME_EXTRA } from '../../../helpers/theme'
-import { Theme } from '@material-ui/core/styles/createMuiTheme'
-import { WithStyles, createStyles, fade } from '@material-ui/core'
+import { Theme, WithStyles, createStyles } from '@material-ui/core'
+import { alpha } from '@material-ui/core/styles'
 import classNames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 
@@ -55,7 +55,7 @@ const styles = (theme: Theme) =>
       lineHeight: 1.4
     },
     highlight: {
-      backgroundColor: fade(theme.palette.primary.main, 0.25)
+      backgroundColor: alpha(theme.palette.primary.main, 0.5)
     },
     bottomMargin: {
       marginBottom: theme.spacing(1)

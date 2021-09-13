@@ -1,6 +1,6 @@
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme } from '@material-ui/core'
 
-export const theme = createMuiTheme({
+export const theme = createTheme({
   overrides: {
     MuiCssBaseline: {
       '@global': {
@@ -25,7 +25,10 @@ export const theme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: {
-      main: '#3587e8'
+      main: '#71ddbf'
+    },
+    error: {
+      main: '#ee7b7b'
     },
     background: {
       default: '#191f26'
@@ -45,3 +48,4 @@ export const THEME_EXTRA = {
 
 // 1px for bottom border
 export const HEADER_HEIGHT = 96 + 1
+export const DRAWER_WIDTH = 96

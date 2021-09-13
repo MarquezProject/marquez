@@ -6,9 +6,6 @@ import jobsReducer, { initialState } from '../../store/reducers/jobs'
 const jobs = require('../../../docker/db/data/jobs.json')
 
 describe('jobs reducer', () => {
-  it('should return the initial state', () => {
-    expect(jobsReducer(undefined, {})).toEqual(initialState)
-  })
 
   it('should handle FETCH_JOBS_SUCCESS', () => {
     const action = {
@@ -17,7 +14,7 @@ describe('jobs reducer', () => {
         jobs: jobs
       }
     }
-    expect(jobsReducer([], action)).toHaveLength(jobs.length)
+    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true })
   })
 
   it('should handle FETCH_JOB_RUNS_SUCCESS', () => {
@@ -46,8 +43,8 @@ describe('jobs reducer', () => {
       }
     }
 
-    const newState = jobsReducer(jobs, action)
-    const changedJob = _find(newState, j => j.name === randomJob.name)
+    const newState = jobsReducer({isLoading: false, init: true, result: jobs}, action)
+    const changedJob = _find(newState.result, j => j.name === randomJob.name)
     expect(changedJob).toHaveProperty('latestRuns')
   })
 })

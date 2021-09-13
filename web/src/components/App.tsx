@@ -1,16 +1,20 @@
+import { Box, Container, CssBaseline } from '@material-ui/core'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
-import { Container, CssBaseline } from '@material-ui/core'
 import { Helmet } from 'react-helmet'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
+import { Route, Switch } from 'react-router-dom'
 import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
 import BottomBar from './bottom-bar/BottomBar'
+import Datasets from '../routes/datasets/Datasets'
 import Header from './header/Header'
+import Jobs from '../routes/jobs/Jobs'
 import Lineage from './lineage/Lineage'
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement } from 'react'
+import Sidenav from './sidenav/Sidenav'
 import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
@@ -34,7 +38,6 @@ sagaMiddleware.run(rootSaga)
 const TITLE = 'Marquez'
 
 const App = (): ReactElement => {
-  const [showJobs, setShowJobs] = useState(false)
   return (
     <Provider store={store}>
       <ConnectedRouter history={history}>
@@ -43,12 +46,25 @@ const App = (): ReactElement => {
             <title>{TITLE}</title>
           </Helmet>
           <CssBaseline />
-          <Container maxWidth={'lg'} disableGutters={true}>
-            <Header setShowJobs={setShowJobs} showJobs={showJobs} />
-          </Container>
-          <Lineage />
-          <BottomBar setShowJobs={setShowJobs} showJobs={showJobs} />
-          <Toast />
+          <Box ml={12}>
+            <Sidenav />
+            <Container maxWidth={'lg'} disableGutters={true}>
+              <Header />
+            </Container>
+            <Switch>
+              <Route path={'/'} exact>
+                <Jobs />
+              </Route>
+              <Route path={'/datasets'} exact>
+                <Datasets />
+              </Route>
+              <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
+                <Lineage />
+                <BottomBar />
+              </Route>
+            </Switch>
+            <Toast />
+          </Box>
         </MuiThemeProvider>
       </ConnectedRouter>
     </Provider>
