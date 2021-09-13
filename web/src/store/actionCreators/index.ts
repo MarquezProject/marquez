@@ -1,7 +1,14 @@
 import * as actionTypes from './actionTypes'
 
-import { Dataset, Job, Namespace, Run } from '../../types/api'
-import { IFilterByKey } from '../../types'
+import { Dataset, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
+import { JobOrDataset } from '../../components/lineage/types'
+
+export const fetchDatasets = (namespace: string) => ({
+  type: actionTypes.FETCH_DATASETS,
+  payload: {
+    namespace
+  }
+})
 
 export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
@@ -10,11 +17,14 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   }
 })
 
-export const filterDatasets = (filterByKey: IFilterByKey, filterByValue?: string) => ({
-  type: actionTypes.FILTER_DATASETS,
+export const resetDatasets = () => ({
+  type: actionTypes.RESET_DATASETS
+})
+
+export const fetchJobs = (namespace: string) => ({
+  type: actionTypes.FETCH_JOBS,
   payload: {
-    filterByKey,
-    filterByValue
+    namespace
   }
 })
 
@@ -23,6 +33,10 @@ export const fetchJobsSuccess = (jobs: Job[]) => ({
   payload: {
     jobs
   }
+})
+
+export const resetJobs = () => ({
+  type: actionTypes.RESET_JOBS
 })
 
 export const fetchJobRuns = (jobName: string, namespace: string) => ({
@@ -41,25 +55,10 @@ export const fetchJobRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
   }
 })
 
-export const filterJobs = (filterByKey: IFilterByKey, filterByValue?: string) => ({
-  type: actionTypes.FILTER_JOBS,
-  payload: {
-    filterByKey,
-    filterByValue
-  }
-})
-
 export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
     namespaces
-  }
-})
-
-export const findMatchingEntities = (search: string) => ({
-  type: actionTypes.FIND_MATCHING_ENTITIES,
-  payload: {
-    search
   }
 })
 
@@ -85,4 +84,41 @@ export const setSelectedNode = (node: string) => ({
 export const setBottomBarHeight = (height: number) => ({
   type: actionTypes.SET_BOTTOM_BAR_HEIGHT,
   payload: height
+})
+
+export const fetchLineage = (nodeType: JobOrDataset, namespace: string, name: string) => ({
+  type: actionTypes.FETCH_LINEAGE,
+  payload: {
+    nodeType,
+    namespace,
+    name
+  }
+})
+
+export const fetchLineageSuccess = (lineage: LineageGraph) => ({
+  type: actionTypes.FETCH_LINEAGE_SUCCESS,
+  payload: lineage
+})
+
+export const resetLineage = () => ({
+  type: actionTypes.RESET_LINEAGE
+})
+
+export const selectNamespace = (namespace: string) => ({
+  type: actionTypes.SELECT_NAMESPACE,
+  payload: namespace
+})
+
+export const fetchSearch = (q: string, filter: string, sort: string) => ({
+  type: actionTypes.FETCH_SEARCH,
+  payload: {
+    q,
+    filter,
+    sort
+  }
+})
+
+export const fetchSearchSuccess = (search: Search) => ({
+  type: actionTypes.FETCH_SEARCH_SUCCESS,
+  payload: search
 })

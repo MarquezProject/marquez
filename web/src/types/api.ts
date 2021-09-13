@@ -1,19 +1,9 @@
+import { JobOrDataset, LineageNode } from '../components/lineage/types'
+
 export interface Tag {
   name: string
   description: string
 }
-export interface Runs {
-  runs: Run[]
-}
-
-export interface Runs {
-  runs: Run[]
-}
-
-export interface Runs {
-  runs: Run[]
-}
-
 export interface Runs {
   runs: Run[]
 }
@@ -111,3 +101,27 @@ export interface Run {
 }
 
 export type RunState = 'NEW' | 'COMPLETED' | 'FAILED' | 'ABORTED'
+
+export interface SearchResult {
+  name: string
+  namespace: string
+  nodeId: string
+  type: JobOrDataset
+  updatedAt: string
+}
+
+export type GroupedSearch = { group: string } & SearchResult
+
+export interface LineageGraph {
+  graph: LineageNode[]
+}
+
+export interface Search {
+  totalCount: number
+  results: SearchResult[]
+}
+
+export interface GroupedSearchResult {
+  results: Map<string, GroupedSearch[]>
+  rawResults: GroupedSearch[]
+}
