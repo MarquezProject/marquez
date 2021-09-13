@@ -1,43 +1,37 @@
 import {
+  FETCH_JOBS,
   FETCH_JOBS_SUCCESS,
   FETCH_JOB_RUNS_SUCCESS,
-  FILTER_JOBS,
-  FIND_MATCHING_ENTITIES
+  RESET_JOBS
 } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
-import {
-  fetchJobRunsSuccess,
-  fetchJobsSuccess,
-  filterJobs,
-  findMatchingEntities as findMatchingEntitiesActionCreator
-} from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './index'
+import { fetchJobRunsSuccess, fetchJobsSuccess } from '../actionCreators'
 
-export type IJobsState = IJob[]
+export type IJobsState = { isLoading: boolean; result: IJob[]; init: boolean }
 
-export const initialState: IJobsState = []
+export const initialState: IJobsState = { isLoading: false, result: [], init: false }
 
-type IJobsAction = ReturnType<typeof fetchJobsSuccess> &
-  ReturnType<typeof findMatchingEntitiesActionCreator> &
-  ReturnType<typeof filterJobs> &
-  ReturnType<typeof fetchJobRunsSuccess>
+type IJobsAction = ReturnType<typeof fetchJobsSuccess> & ReturnType<typeof fetchJobRunsSuccess>
 
 export default (state = initialState, action: IJobsAction): IJobsState => {
   const { type, payload } = action
 
   switch (type) {
+    case FETCH_JOBS:
+      return { ...state, isLoading: true }
     case FETCH_JOBS_SUCCESS:
-      return payload.jobs.map((j: IJob) => ({ ...j, matches: true }))
-    case FIND_MATCHING_ENTITIES:
-      return findMatchingEntities(payload.search, state) as IJobsState
-    case FILTER_JOBS:
-      return filterEntities(state, payload.filterByKey, payload.filterByValue)
+      return { ...state, isLoading: false, init: true, result: payload.jobs }
     case FETCH_JOB_RUNS_SUCCESS: {
-      return state.map((j: IJob) => {
-        const isMatching = j.name == payload.jobName
-        return isMatching ? { ...j, latestRuns: payload.lastTenJobRuns } : j
-      })
+      return {
+        ...state,
+        result: state.result.map((j: IJob) => {
+          const isMatching = j.name == payload.jobName
+          return isMatching ? { ...j, latestRuns: payload.lastTenJobRuns } : j
+        })
+      }
     }
+    case RESET_JOBS:
+      return initialState
     default:
       return state
   }

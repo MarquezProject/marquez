@@ -3,8 +3,8 @@ import React, { ReactElement } from 'react'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
+  alpha,
   createStyles,
-  fade,
   withStyles
 } from '@material-ui/core/styles'
 import { Link } from 'react-router-dom'
@@ -50,7 +50,7 @@ const styles = ({ palette, spacing, shape }: ITheme) => {
       borderRadius: shape.borderRadius,
       transition: transitions.create(['background-color']),
       '&:hover': {
-        backgroundColor: fade(palette.common.white, 0.1)
+        backgroundColor: alpha(palette.common.white, 0.1)
       }
     }
   })
