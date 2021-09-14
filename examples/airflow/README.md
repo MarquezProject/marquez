@@ -5,7 +5,7 @@ In this example, we'll walk you through how to enable Airflow DAGs to send linea
 ### What you’ll learn:
 
 * Enable OpenLineage in Airflow
-* Write your very first Marquez enabled DAG using OpenLineage
+* Write your very first OpenLineage enabled DAG
 * Troubleshoot a failing DAG using Marquez
 
 # Prerequisites
@@ -188,7 +188,7 @@ At this point, you should have the following under your `examples/airflow/` dire
 ├── docker/
 ├── docker-compose.yml
 ├── docs/
-├── marquez.env
+├── openlineage.env
 └── requirements.txt
 ```
 
@@ -212,7 +212,7 @@ To view the Airflow UI and verify it's running, open [http://localhost:8080](htt
 
 # Step 4: View Collected Metadata
 
-To ensure that Airflow is executing `counter` and `sum`, navigate to the DAGs tab in Airflow and verify that they are both enabled and have a timestamp in the Last Run column.
+To ensure that Airflow is executing `counter` and `sum`, navigate to the DAGs tab in Airflow and verify that they are both enabled and are in a _running_ state:
 
 ![](./docs/airflow-view-dag.png)
 
