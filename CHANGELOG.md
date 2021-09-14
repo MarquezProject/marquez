@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.17.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
+
+## [0.18.0](https://github.com/MarquezProject/marquez/compare/0.17.0...0.18.0) - 2021-09-14
 
 ### Added
 
@@ -12,7 +14,7 @@
 * Add [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) as dependency [@OleksandrDvornik](https://github.com/OleksandrDvornik)
 * Move **class** SentryConfig from `marquez` to `marquez.tracing` pkg
 * Major UI [improvements](https://github.com/MarquezProject/marquez/blob/main/web/docs/demo.gif); the UI now uses the Search and Lineage APIs  :tada: [@phixMe](https://github.com/phixMe)
-* Set default API port to `8080` when running the Marquez shadow `jar` [@wslulciuc](https://github.com/wslulciuc)   
+* Set default API port to `8080` when running the Marquez shadow `jar` [@wslulciuc](https://github.com/wslulciuc)
 
 ### Fixed
 
@@ -52,7 +54,7 @@
 * (De)serialization issue for `Run` and `JobData` models [@collado-mike](https://github.com/collado-mike)
 * Prefix spark `openlineage.*` configuration parameters with `spark.*` [@collado-mike](https://github.com/collado-mike)
 * Parse multi-statement sql in **class** `SqlParser` used in Airflow integration [@wslulciuc](https://github.com/wslulciuc)
-* URL-encode namespace on calls to API backend [@phixMe](https://github.com/phixMe) 
+* URL-encode namespace on calls to API backend [@phixMe](https://github.com/phixMe)
 
 ## [0.16.0](https://github.com/MarquezProject/marquez/compare/0.15.2...0.16.0) - 2021-07-01
 
