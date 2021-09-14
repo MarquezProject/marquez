@@ -20,11 +20,11 @@ bin/
 build/
 clients/java/out/
 dist/
-examples/airflow/marquez.env
-examples/airflow/requirements.txt
-examples/airflow/whl
 integrations/airflow/tests/integration/integration-requirements.txt
 integrations/airflow/tests/integration/requirements.txt
+examples/airflow/whl
+examples/airflow/requirements.txt
+examples/airflow/openlineage.env
 out/*
 venv
 
@@ -36,7 +36,3 @@ marquez.yml
 
 # Dependent Helm charts
 chart/charts/
-
-integrations/spark/src/test/resources/test_data/test_output
-integrations/spark/src/test/resources/test_data/rdd_to_csv_output
-integrations/spark/src/test/resources/test_data/rdd_to_table
