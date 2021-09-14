@@ -112,12 +112,6 @@ if [[ "${branch}" != "main" ]]; then
   exit 1;
 fi
 
-# Ensure no unstaged changes are present in working directory
-if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
-  echo "error: you have unstaged changes in your working directory!"
-  exit 1;
-fi
-
 # Append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
 # (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
 if [[ "${NEXT_VERSION}" == *-rc.? ||
@@ -167,7 +161,7 @@ sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/R
 redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
 
 # (7) Prepare release commit
-git commit -sam "Prepare for release ${RELEASE_VERSION}"
+git commit -sam "Prepare for release ${RELEASE_VERSION}" --no-verify
 
 # (8) Pull latest tags, then prepare release tag
 git fetch --all --tags
@@ -178,7 +172,7 @@ sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
 # (10) Prepare next development version commit
-git commit -sam "Prepare next development version"
+git commit -sam "Prepare next development version" --no-verify
 
 # (11) Push commits and tag
 if [[ ${PUSH} = "true" ]]; then
