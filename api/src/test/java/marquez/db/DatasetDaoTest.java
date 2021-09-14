@@ -206,7 +206,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"))
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -215,7 +215,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
   }
 
   @Test
@@ -285,7 +285,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"))
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -294,7 +294,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
 
     assertThat(datasets.get(1))
         .matches(ds -> ds.getName().getValue().equals(secondDatasetName))
@@ -312,7 +312,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"))
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -321,7 +321,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
   }
 
   @Test
@@ -401,7 +401,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"))
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -410,7 +410,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
 
     assertThat(datasets.get(1))
         .matches(ds -> ds.getName().getValue().equals(secondDatasetName))
@@ -428,7 +428,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
 
     // write a third version of the writeJob
     // since there is no read of this version, all input facets will be missing from the response
@@ -461,7 +461,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/CustomFacet"));
+                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
   }
 
   @Getter
