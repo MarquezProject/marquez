@@ -2,11 +2,31 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.17.0...HEAD)
 
+### Added
+
+* **New** Add Search API :tada: [@wslulciuc](https://github.com/wslulciuc)
+* Add `.env.example` to override variables defined in docker-compose files [@wslulciuc](https://github.com/wslulciuc)
+
+### Changed
+
+* Add [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) as dependency [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* Move **class** SentryConfig from `marquez` to `marquez.tracing` pkg
+* Major UI [improvements](https://github.com/MarquezProject/marquez/blob/main/web/docs/demo.gif); the UI now uses the Search and Lineage APIs  :tada: [@phixMe](https://github.com/phixMe)
+* Set default API port to `8080` when running the Marquez shadow `jar` [@wslulciuc](https://github.com/wslulciuc)   
+
+### Fixed
+
+* Update [`examples/airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) to use `openlineage-airflow` and fix the SQL in DAG troubleshooting step [@wslulciuc](https://github.com/wslulciuc)
+
+### Removed
+
+* Drop `job_versions_io_mapping_inputs` and `job_versions_io_mapping_outputs` tables [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+
 ## [0.17.0](https://github.com/MarquezProject/marquez/compare/0.16.1...0.17.0) - 2021-08-20
 
 ### Changed
 
-* Updated Lineage runs query to improve performance, added tests [@collado-mike](https://github.com/collado-mike)
+* Update Lineage runs query to improve performance, added tests [@collado-mike](https://github.com/collado-mike)
 * Add **POST** `/api/v1/lineage` endpoint to docs and **deprecate** run endpoints [@wslulciuc](https://github.com/wslulciuc)
 * Drop `FieldType` enum [@wslulciuc](https://github.com/wslulciuc)
 

@@ -1,3 +1,4 @@
+**/*.python-version
 *.egg-info
 *.iml
 *.swp
@@ -6,14 +7,14 @@
 .DS_Store
 .classpath
 .editorconfig
+.env
 .gradle/
 .idea/
 .project
+.pytest_cache
 .settings
 .vscode/
 __pycache__
-.pytest_cache
-venv
 api/out/
 bin/
 build/
@@ -25,7 +26,7 @@ examples/airflow/whl
 examples/airflow/requirements.txt
 examples/airflow/openlineage.env
 out/*
-**/*.python-version
+venv
 
 # Marquez configuration
 marquez.yml
