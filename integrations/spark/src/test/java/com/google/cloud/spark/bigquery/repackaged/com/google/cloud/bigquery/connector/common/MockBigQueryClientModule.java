@@ -21,7 +21,12 @@ public class MockBigQueryClientModule implements Module {
   @Singleton
   public BigQueryCredentialsSupplier provideBigQueryCredentialsSupplier(BigQueryConfig config) {
     return new BigQueryCredentialsSupplier(
-        Optional.of("not a real access token"), Optional.empty(), Optional.empty());
+        Optional.of("not a real access token"),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty());
   }
 
   @Provides

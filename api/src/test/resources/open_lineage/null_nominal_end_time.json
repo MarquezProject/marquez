@@ -28,5 +28,5 @@
     }
   ],
   "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
-  "schemaURL": "https://openlineage.io/spec/1-0-0/OpenLineage.json#/definitions/RunEvent"
+  "schemaURL": "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent"
 }
