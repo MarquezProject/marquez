@@ -63,7 +63,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling Marquez to observe the DAG and automatically collect task-level metadata.  Notice that the only change required to begin collecting DAG metadata is to use `openlineage.airflow` instead of `airflow`:
+When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata.  Notice that the only change required to begin collecting DAG metadata is to use `openlineage.airflow` instead of `airflow`:
 
 ```diff
 - from airflow import DAG
@@ -123,7 +123,6 @@ t2 = PostgresOperator(
 )
 
 t1 >> t2
-
 ```
 
 # Step 2.2: Create DAG `sum`
@@ -174,7 +173,6 @@ t2 = PostgresOperator(
 )
 
 t1 >> t2
-
 ```
 
 At this point, you should have the following under your `examples/airflow/` directory:

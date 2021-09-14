@@ -5,7 +5,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - marquez.env
+      - openlineage.env
     environment:
       - AIRFLOW_USERNAME=airflow
       - AIRFLOW_PASSWORD=airflow
@@ -28,7 +28,7 @@ services:
   airflow_scheduler:
     image: bitnami/airflow-scheduler:1.10.13
     env_file:
-      - marquez.env
+      - openlineage.env
     environment:
       - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
       - AIRFLOW_DATABASE_HOST=postgres
@@ -48,7 +48,7 @@ services:
   airflow_worker:
     image: bitnami/airflow-worker:1.10.13
     env_file:
-      - marquez.env
+      - openlineage.env
     environment:
       - AIRFLOW_FERNET_KEY=Z2uDm0ZL60fXNkEXG8LW99Ki2zf8wkmIltaTz1iQPDU=
       - AIRFLOW_DATABASE_HOST=postgres
