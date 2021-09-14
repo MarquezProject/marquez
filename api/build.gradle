@@ -41,7 +41,7 @@ dependencies {
     implementation "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
     implementation "io.dropwizard:dropwizard-assets:${dropwizardVersion}"
     implementation "io.prometheus:simpleclient:${prometheusVersion}"
-    implementation "io.openlineage:openlineage-spark:${openlineageVersion}"
+    implementation "io.openlineage:openlineage-java:${openlineageVersion}"
     implementation "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
     implementation "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
     implementation "io.prometheus:simpleclient_servlet:${prometheusVersion}"
