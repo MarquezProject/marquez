@@ -8,7 +8,7 @@ In this example, we'll walk you through how to enable Airflow DAGs to send linea
 * Write your very first Marquez enabled DAG using OpenLineage
 * Troubleshoot a failing DAG using Marquez
 
-## Prerequisites
+# Prerequisites
 
 Before you begin, make sure you have installed:
 
@@ -70,7 +70,7 @@ When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/projec
 + from openlineage.airflow import DAG
 ```
 
-## Step 2.1: Create DAG `counter`
+# Step 2.1: Create DAG `counter`
 
 Under `dags/`, create a file named `counter.py` and add the following code:
 
@@ -126,7 +126,7 @@ t1 >> t2
 
 ```
 
-## Step 2.2: Create DAG `sum`
+# Step 2.2: Create DAG `sum`
 
 Under `dags/`, create a file named `sum.py` and add the following code:
 
@@ -226,7 +226,7 @@ If you take a quick look at the lineage graph for `counter.inc`, you should see 
 
 ![](./docs/lineage-view-job.png)
 
-## Step 5: Troubleshoot a Failing DAG with Marquez
+# Step 5: Troubleshoot a Failing DAG with Marquez
 
 In this step, let's quickly walk through a simple troubleshooting scenario where DAG `sum` begins to fail as the result of an upstream schema change for table `counts`. So, let's get to it!
 
@@ -279,11 +279,11 @@ With the code change, the DAG `sum` begins to run successfully:
 
 _Congrats_! You successfully step through a troubleshooting scenario of a failing DAG using metadata collected with Marquez! You can now add your own DAGs to `dags/` to build more complex data lineage graphs.
 
-## Next Steps
+# Next Steps
 
 * Review the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) used to collect Airflow DAG metadata and learn how to build your own integrations using OpenLineage
 * Take a look at [`openlineage-spark`](https://openlineage.io/integration/apache-spark) integration that can be used with Airflow
 
-## Feedback
+# Feedback
 
 What did you think of this example? You can reach out to us on [slack](http://bit.ly/MarquezSlack) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
