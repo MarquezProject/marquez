@@ -72,7 +72,7 @@ logging:
 # Enables tracing with sentry (see: https://docs.sentry.io/product/sentry-basics/tracing/distributed-tracing)
 # sentry:
 #  environment: ${SENTRY_ENVIRONMENT}
-#  tracesSampleRate: ${SENTRY_SAMPLE_RATE}
+#  tracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE}
 #  dsn: ${SENTRY_DSN}
 #  debug: ${SENTRY_DEBUG}
 
