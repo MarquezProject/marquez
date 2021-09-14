@@ -9,14 +9,14 @@
 
 ### Changed
 
-* Added [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) as dependency [@OleksandrDvornik](https://github.com/OleksandrDvornik)
-* Moved **class** SentryConfig from `marquez` to `marquez.tracing` pkg
-* Major UI [improvements](https://github.com/MarquezProject/marquez/blob/main/web/docs/demo.gif) :tada: [@phixMe](https://github.com/phixMe)
+* Add [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) as dependency [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* Move **class** SentryConfig from `marquez` to `marquez.tracing` pkg
+* Major UI [improvements](https://github.com/MarquezProject/marquez/blob/main/web/docs/demo.gif); the UI now uses the Search and Lineage APIs  :tada: [@phixMe](https://github.com/phixMe)
 * Set default API port to `8080` when running the Marquez shadow `jar` [@wslulciuc](https://github.com/wslulciuc)   
 
 ### Fixed
 
-* Updated [`examples/airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) to use `openlineage-airflow` and fixed the SQL in DAG troubleshooting step [@wslulciuc](https://github.com/wslulciuc) 
+* Update [`examples/airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) to use `openlineage-airflow` and fix the SQL in DAG troubleshooting step [@wslulciuc](https://github.com/wslulciuc)
 
 ### Removed
 
@@ -26,7 +26,7 @@
 
 ### Changed
 
-* Updated Lineage runs query to improve performance, added tests [@collado-mike](https://github.com/collado-mike)
+* Update Lineage runs query to improve performance, added tests [@collado-mike](https://github.com/collado-mike)
 * Add **POST** `/api/v1/lineage` endpoint to docs and **deprecate** run endpoints [@wslulciuc](https://github.com/wslulciuc)
 * Drop `FieldType` enum [@wslulciuc](https://github.com/wslulciuc)
 
