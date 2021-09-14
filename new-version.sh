@@ -112,6 +112,12 @@ if [[ "${branch}" != "main" ]]; then
   exit 1;
 fi
 
+# Ensure no unstaged changes are present in working directory
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
+  echo "error: you have unstaged changes in your working directory!"
+  exit 1;
+fi
+
 # Append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
 # (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
 if [[ "${NEXT_VERSION}" == *-rc.? ||
