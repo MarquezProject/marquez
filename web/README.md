@@ -17,6 +17,8 @@ To develop on this project, you need to have Node version 12.21.0 installed. In 
    ```
    $ npm run dev
    ```
+   
+   > **Note:** Marquez listens on port `8080` for all API calls; use the `MARQUEZ_PORT` environment variable to  override the API port.
 
 ### Testing
 
