@@ -64,7 +64,7 @@ import marquez.client.models.SourceMeta;
 @Slf4j
 public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   static final String DEFAULT_MARQUEZ_HOST = "localhost";
-  static final int DEFAULT_MARQUEZ_PORT = 5000;
+  static final int DEFAULT_MARQUEZ_PORT = 8080;
 
   public static final String NAMESPACE_NAME = "food_delivery";
   static final String SOURCE_NAME = "analytics_db";
