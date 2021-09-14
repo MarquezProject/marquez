@@ -239,13 +239,36 @@ t1 = PostgresOperator(
 -   task_id='if_not_exists',
 +   task_id='alter_name_of_column',
     postgres_conn_id='example_db',
--   sql='''
+    sql='''
 -   CREATE TABLE IF NOT EXISTS counts (
 -     value INTEGER
 -   );''',
-+   sql='''
-+   ALTER TABLE counts RENAME COLUMN value TO value_1_to_10;
-+   ''',
++    DO $$
++    BEGIN
++      IF EXISTS(SELECT *
++        FROM information_schema.columns
++        WHERE table_name='counts' and column_name='value')
++      THEN
++          ALTER TABLE "counts" RENAME COLUMN "value" TO "value_1_to_10";
++      END IF;
++    END $$;
+    ''',
+    dag=dag
+)
+```
+
+```diff
+t2 = PostgresOperator(
+    task_id='inc',
+    postgres_conn_id='example_db',
+    sql='''
+-    INSERT INTO counts (value)
++    INSERT INTO counts (value_1_to_10)
+         VALUES (%(value)s)
+    ''',
+    parameters={
+      'value': random.randint(1, 10)
+    },
     dag=dag
 )
 ```
