@@ -1,18 +1,24 @@
 import { API_URL } from '../../globals'
-import { Job, Jobs, Namespace, Run } from '../../types/api'
+import { Job, Jobs, Run } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const fetchJobs = async (namespace: Namespace) => {
-  const { name } = namespace
-  const url = `${API_URL}/namespaces/${encodeURIComponent(name)}/jobs?limit=700`
+export const getJobs = async (namespace: string, limit = 2000, offset = 0) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/jobs?limit=${limit}&offset=${offset}`
   return genericFetchWrapper<Job[]>(url, { method: 'GET' }, 'fetchJobs').then((r: Jobs) => {
-    return r.jobs.map(j => ({ ...j, namespace: namespace.name }))
+    return r.jobs.map(j => ({ ...j, namespace: namespace }))
   })
 }
 
-export const fetchLatestJobRuns = async (jobName: string, namespace: string) => {
+export const getLatestJobRuns = async (
+  jobName: string,
+  namespace: string,
+  limit = 20,
+  offset = 0
+) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${encodeURIComponent(
     jobName
-  )}/runs?limit=10`
+  )}/runs?limit=${limit}&offset=${offset}`
   return genericFetchWrapper<Run[]>(url, { method: 'GET' }, 'fetchLatestJobRuns')
 }

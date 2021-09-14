@@ -67,9 +67,18 @@ logging:
     #   environment: ${SENTRY_ENVIRONMENT}
     #   stacktraceAppPackages: ['marquez']
 
+### TRACING ###
+
+# Enables tracing with sentry (see: https://docs.sentry.io/product/sentry-basics/tracing/distributed-tracing)
+# sentry:
+#  environment: ${SENTRY_ENVIRONMENT}
+#  tracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE}
+#  dsn: ${SENTRY_DSN}
+#  debug: ${SENTRY_DEBUG}
+
 ### METRICS CONFIG ###
 
-# Enables metric reportering to the console (see: https://www.dropwizard.io/en/stable/manual/configuration.html#metrics)
+# Enables metric reporting to the console (see: https://www.dropwizard.io/en/stable/manual/configuration.html#metrics)
 # metrics:
 #  frequency: ${METRICS_FREQUENCY:-1 minute}
 #  reporters:

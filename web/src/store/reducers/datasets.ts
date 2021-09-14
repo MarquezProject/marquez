@@ -1,34 +1,27 @@
+import { Dataset } from '../../types/api'
 import {
+  FETCH_DATASETS,
   FETCH_DATASETS_SUCCESS,
-  FILTER_DATASETS,
-  FIND_MATCHING_ENTITIES
+  RESET_DATASETS
 } from '../actionCreators/actionTypes'
-import { IDataset } from '../../types'
-import {
-  fetchDatasetsSuccess,
-  filterDatasets,
-  findMatchingEntities as findMatchingEntitiesActionCreator
-} from '../actionCreators'
-import { filterEntities, findMatchingEntities } from './index'
+import { fetchDatasetsSuccess } from '../actionCreators'
 
-export type IDatasetsState = IDataset[]
+export type IDatasetsState = { isLoading: boolean; result: Dataset[]; init: boolean }
 
-export const initialState: IDatasetsState = []
+export const initialState: IDatasetsState = { isLoading: false, init: false, result: [] }
 
-type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
-  ReturnType<typeof findMatchingEntitiesActionCreator> &
-  ReturnType<typeof filterDatasets>
+type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess>
 
 export default (state: IDatasetsState = initialState, action: IDatasetsAction): IDatasetsState => {
   const { type, payload } = action
 
   switch (type) {
+    case FETCH_DATASETS:
+      return { ...state, isLoading: true }
     case FETCH_DATASETS_SUCCESS:
-      return payload.datasets.map(d => ({ ...d, matches: true }))
-    case FIND_MATCHING_ENTITIES:
-      return findMatchingEntities(payload.search, state) as IDatasetsState
-    case FILTER_DATASETS:
-      return filterEntities(state, payload.filterByKey, payload.filterByValue)
+      return { ...state, isLoading: false, init: true, result: payload.datasets }
+    case RESET_DATASETS:
+      return initialState
     default:
       return state
   }
