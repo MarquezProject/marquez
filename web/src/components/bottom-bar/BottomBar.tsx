@@ -1,13 +1,15 @@
 import React from 'react'
 
 import { Box, Container, Theme } from '@material-ui/core'
+import { DRAWER_WIDTH } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
-import { Route, Switch } from 'react-router-dom'
+import { LineageNode } from '../lineage/types'
+import { Undefinable } from '../../types/util/Nullable'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
+import { isLineageDataset, isLineageJob } from '../../helpers/nodes'
 import DatasetDetailPage from '../DatasetDetailPage'
 import DragBar from '../lineage/components/drag-bar/DragBar'
-import Home from '../Home'
 import JobDetailPage from '../JobDetailPage'
 
 const styles = (theme: Theme) => {
@@ -17,8 +19,9 @@ const styles = (theme: Theme) => {
       backgroundColor: theme.palette.background.default
     },
     bottomBar: {
+      marginLeft: DRAWER_WIDTH,
       right: 0,
-      width: '100%',
+      width: `calc(100% - ${DRAWER_WIDTH}px)`,
       bottom: 0,
       position: 'fixed'
     }
@@ -26,8 +29,7 @@ const styles = (theme: Theme) => {
 }
 
 interface OwnProps {
-  setShowJobs: (bool: boolean) => void
-  showJobs: boolean
+  selectedNodeData: Undefinable<LineageNode>
 }
 
 interface StateProps {
@@ -38,17 +40,19 @@ type BottomBarProps = StateProps & OwnProps & WithStyles<typeof styles>
 
 class BottomBar extends React.Component<BottomBarProps> {
   render() {
-    const { classes, bottomBarHeight, showJobs } = this.props
+    const { classes, bottomBarHeight, selectedNodeData } = this.props
+    if (!selectedNodeData) {
+      return null
+    }
+    const lineageJob = isLineageJob(selectedNodeData.data)
+    const lineageDataset = isLineageDataset(selectedNodeData.data)
     return (
       <Box className={classes.bottomBar}>
         <DragBar />
         <Box className={classes.overflow} height={bottomBarHeight}>
           <Container maxWidth={'lg'} disableGutters={true}>
-            <Switch>
-              <Route path='/' exact render={props => <Home {...props} showJobs={showJobs} />} />
-              <Route path='/datasets/:datasetName' exact component={DatasetDetailPage} />
-              <Route path='/jobs/:jobName' exact component={JobDetailPage} />
-            </Switch>
+            {lineageJob && <JobDetailPage job={lineageJob} />}
+            {lineageDataset && <DatasetDetailPage dataset={lineageDataset} />}
           </Container>
         </Box>
       </Box>
@@ -57,7 +61,8 @@ class BottomBar extends React.Component<BottomBarProps> {
 }
 
 const mapStateToProps = (state: IState) => ({
-  bottomBarHeight: state.lineage.bottomBarHeight
+  bottomBarHeight: state.lineage.bottomBarHeight,
+  selectedNodeData: state.lineage.lineage.graph.find(node => state.lineage.selectedNode === node.id)
 })
 
 export default connect(mapStateToProps)(withStyles(styles)(BottomBar))

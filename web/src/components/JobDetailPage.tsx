@@ -14,13 +14,13 @@ import { connect } from 'react-redux'
 import { fetchJobRuns } from '../store/actionCreators'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
-import _find from 'lodash/find'
 const globalStyles = require('../global_styles.css')
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 import { IJob } from '../types'
+import { LineageJob } from './lineage/types'
 import { formatUpdatedAt } from '../helpers'
-import Code from './core/code/Code'
 import IconButton from '@material-ui/core/IconButton'
+import MqCode from './core/code/MqCode'
 import MqText from './core/text/MqText'
 
 const colorMap = {
@@ -71,22 +71,24 @@ const styles = ({ palette, spacing }: ITheme) => {
   })
 }
 
-type IProps = IWithStyles<typeof styles> & { jobs: IJob[] } & { fetchJobRuns: any }
+interface DispatchProps {
+  fetchJobRuns: typeof fetchJobRuns
+}
+
+type IProps = IWithStyles<typeof styles> & { job: LineageJob } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { jobs, classes, fetchJobRuns } = props
+  const { job, classes } = props
 
   const { jobName } = useParams()
   const history = useHistory()
 
-  const job = _find(jobs, j => j.name === jobName)
-
   // useEffect hook to run on any change to jobName
   useEffect(() => {
     job ? fetchJobRuns(job.name, job.namespace) : null
-  }, [jobs.length])
+  }, [job])
 
-  if (!job || jobs.length == 0) {
+  if (!job) {
     return (
       <Box
         p={2}
@@ -113,8 +115,6 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     namespace,
     context = { sql: '' }
   } = job as IJob
-
-  const latestRuns = job ? job.latestRuns || [] : []
 
   return (
     <Box
@@ -156,21 +156,21 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      <Code code={context.sql} />
+      <MqCode code={context.sql} />
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-        <div className={classes.latestRunContainer}>
-          {latestRuns.map(r => {
-            return (
-              <Tooltip key={r.id} title={r.state} placement='top'>
-                <div
-                  key={r.id}
-                  className={classes.squareShape}
-                  style={{ backgroundColor: colorMap[r.state] }}
-                />
-              </Tooltip>
-            )
-          })}
-        </div>
+        {/*<div className={classes.latestRunContainer}>*/}
+        {/*  {latestRuns.map(r => {*/}
+        {/*    return (*/}
+        {/*      <Tooltip key={r.id} title={r.state} placement='top'>*/}
+        {/*        <div*/}
+        {/*          key={r.id}*/}
+        {/*          className={classes.squareShape}*/}
+        {/*          style={{ backgroundColor: colorMap[r.state] }}*/}
+        {/*        />*/}
+        {/*      </Tooltip>*/}
+        {/*    )*/}
+        {/*  })}*/}
+        {/*</div>*/}
         <Box ml={1}>
           <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
         </Box>
@@ -180,7 +180,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs
+  jobs: state.jobs.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

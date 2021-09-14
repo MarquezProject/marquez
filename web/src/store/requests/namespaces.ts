@@ -2,7 +2,7 @@ import { API_URL } from '../../globals'
 import { Namespaces } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const fetchNamespaces = async () => {
+export const getNamespaces = async () => {
   const url = `${API_URL}/namespaces`
   return genericFetchWrapper<Namespaces>(url, { method: 'GET' }, 'fetchNamespaces')
 }

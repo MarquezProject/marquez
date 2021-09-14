@@ -9,8 +9,8 @@ const app = express()
 const path = __dirname + '/dist'
 
 app.use('/', express.static(path))
-app.use('/datasets/:name', express.static(path))
-app.use('/jobs/:name', express.static(path))
+app.use('/datasets', express.static(path))
+app.use('/lineage/:type/:namespace/:name', express.static(path))
 app.use(proxy('/api/v1', apiOptions))
 
 router.get('/healthcheck', function (req, res) {
