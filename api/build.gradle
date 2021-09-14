@@ -41,6 +41,7 @@ dependencies {
     implementation "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
     implementation "io.dropwizard:dropwizard-assets:${dropwizardVersion}"
     implementation "io.prometheus:simpleclient:${prometheusVersion}"
+    implementation "io.openlineage:openlineage-java:${openlineageVersion}"
     implementation "io.prometheus:simpleclient_dropwizard:${prometheusVersion}"
     implementation "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
     implementation "io.prometheus:simpleclient_servlet:${prometheusVersion}"
@@ -54,7 +55,6 @@ dependencies {
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation 'com.graphql-java:graphql-java:17.2'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:11.1.1'
-    implementation 'io.openlineage:openlineage-java:0.2.1'
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"

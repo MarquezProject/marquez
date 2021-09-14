@@ -33,7 +33,7 @@ ext {
 }
 
 dependencies {
-    implementation 'io.openlineage:openlineage-spark:0.2.2'
+    implementation "io.openlineage:openlineage-spark:${openlineageVersion}"
     compileOnly "org.apache.spark:spark-core_2.11:${sparkVersion}"
 
     testImplementation 'com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.21.1'
@@ -42,7 +42,6 @@ dependencies {
     testImplementation('org.xerial:sqlite-jdbc:3.36.0.3')
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.16"
 }
 
 test {
