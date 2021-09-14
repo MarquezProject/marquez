@@ -156,6 +156,7 @@ sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
 
 # (4) Bump version in scripts
 sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
+sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" .env.example
 
 # (5) Bump version in docs
 sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
@@ -184,7 +185,8 @@ if [[ ${PUSH} = "true" ]]; then
   git push origin main && \
     git push origin "${RELEASE_VERSION}"
 else
-  echo "...skipping push to 'main'; to push manually, use 'git push origin main && git push origin "${RELEASE_VERSION}"'"
+  echo "...skipping push to 'main'; to push commits manually, run:"
+  echo "    $ git push origin main && git push origin "${RELEASE_VERSION}""
 fi
 
 echo "DONE!"
