@@ -167,7 +167,7 @@ sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/R
 redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
 
 # (7) Prepare release commit
-git commit -sam "Prepare for release ${RELEASE_VERSION}"
+git commit -sam "Prepare for release ${RELEASE_VERSION}" --no-verify
 
 # (8) Pull latest tags, then prepare release tag
 git fetch --all --tags
@@ -178,7 +178,7 @@ sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
 # (10) Prepare next development version commit
-git commit -sam "Prepare next development version"
+git commit -sam "Prepare next development version" --no-verify
 
 # (11) Push commits and tag
 if [[ ${PUSH} = "true" ]]; then
