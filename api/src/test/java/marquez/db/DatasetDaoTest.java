@@ -1,21 +1,20 @@
 package marquez.db;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
-import static marquez.db.LineageTestUtils.OPEN_LINEAGE;
-import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.createLineageRow;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableMap;
-import io.openlineage.client.OpenLineage;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.Getter;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.JobFacet;
+import marquez.service.models.LineageEvent.SchemaField;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +29,7 @@ class DatasetDaoTest {
   private static DatasetDao datasetDao;
   private static OpenLineageDao openLineageDao;
 
-  private final OpenLineage.JobFacets jobFacet = OPEN_LINEAGE.newJobFacets(null, null, null);
+  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
   static Jdbi jdbi;
 
@@ -41,28 +40,14 @@ class DatasetDaoTest {
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
 
-  private OpenLineage.OutputDataset newCommonOutputDataset(
-      Map<String, OpenLineage.CustomFacet> facets) {
-    return OPEN_LINEAGE.newOutputDataset(
+  private Dataset newCommonDataset(Map<String, Object> facets) {
+    return new Dataset(
         NAMESPACE,
         DATASET,
         newDatasetFacet(
             facets,
-            OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-            OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
-        null);
-  }
-
-  private OpenLineage.InputDataset newCommonInputDataset(
-      Map<String, OpenLineage.CustomFacet> facets) {
-    return OPEN_LINEAGE.newInputDataset(
-        NAMESPACE,
-        DATASET,
-        newDatasetFacet(
-            facets,
-            OPEN_LINEAGE.newSchemaDatasetFacetFields("firstname", "string", "the first name"),
-            OPEN_LINEAGE.newSchemaDatasetFacetFields("lastname", "string", "the last name")),
-        null);
+            new SchemaField("firstname", "string", "the first name"),
+            new SchemaField("lastname", "string", "the last name")));
   }
 
   @AfterEach
@@ -97,17 +82,13 @@ class DatasetDaoTest {
         "COMPLETE",
         jobFacet,
         Collections.emptyList(),
-        Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("aFacetValue")))));
+        Collections.singletonList(newCommonDataset(ImmutableMap.of("writeFacet", "aFacetValue"))));
     createLineageRow(
         openLineageDao,
         "aReadJob",
         "COMPLETE",
         jobFacet,
-        Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("aFacetValue")))),
+        Collections.singletonList(newCommonDataset(ImmutableMap.of("inputFacet", "aFacetValue"))),
         Collections.emptyList());
     createLineageRow(
         openLineageDao,
@@ -115,8 +96,7 @@ class DatasetDaoTest {
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("anotherInputFacet", new CustomValueFacet("aFacetValue")))),
+            newCommonDataset(ImmutableMap.of("anotherInputFacet", "aFacetValue"))),
         Collections.emptyList());
 
     Optional<marquez.service.models.Dataset> datasetByName =
@@ -128,11 +108,12 @@ class DatasetDaoTest {
             marquez.service.models.Dataset::getFacets,
             InstanceOfAssertFactories.map(String.class, Object.class))
         .isNotEmpty()
-        .hasSize(6)
+        .hasSize(7)
         .containsKeys(
             "documentation",
             "schema",
             "dataSource",
+            "description",
             "writeFacet",
             "inputFacet",
             "anotherInputFacet");
@@ -147,16 +128,14 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "firstWriteValue"))));
     createLineageRow(
         openLineageDao,
         "aReadJob",
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("firstReadValue")))),
+            newCommonDataset(ImmutableMap.of("inputFacet", "firstReadValue"))),
         Collections.emptyList());
 
     createLineageRow(
@@ -166,16 +145,14 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "secondWriteValue"))));
     createLineageRow(
         openLineageDao,
         "aReadJob",
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")))),
+            newCommonDataset(ImmutableMap.of("inputFacet", "secondReadValue"))),
         Collections.emptyList());
     createLineageRow(
         openLineageDao,
@@ -183,8 +160,7 @@ class DatasetDaoTest {
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("thirdReadValue")))),
+            newCommonDataset(ImmutableMap.of("inputFacet", "thirdReadValue"))),
         Collections.emptyList());
 
     Optional<marquez.service.models.Dataset> datasetByName =
@@ -227,8 +203,7 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "firstWriteValue"))));
 
     String secondDatasetName = "secondDataset";
     createLineageRow(
@@ -238,14 +213,13 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            OPEN_LINEAGE.newOutputDataset(
+            new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "int", "the age"),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("address", "string", "the address")),
-                null)));
+                    ImmutableMap.of("writeFacet", "secondWriteValue"),
+                    new SchemaField("age", "int", "the age"),
+                    new SchemaField("address", "string", "the address")))));
 
     createLineageRow(
         openLineageDao,
@@ -253,16 +227,14 @@ class DatasetDaoTest {
         "COMPLETE",
         jobFacet,
         Arrays.asList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("firstReadValue"))),
-            OPEN_LINEAGE.newInputDataset(
+            newCommonDataset(ImmutableMap.of("inputFacet", "firstReadValue")),
+            new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "int", "the age"),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("address", "string", "the address")),
-                null)),
+                    ImmutableMap.of("inputFacet", "secondReadValue"),
+                    new SchemaField("age", "int", "the age"),
+                    new SchemaField("address", "string", "the address")))),
         Collections.emptyList());
 
     List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
@@ -334,25 +306,23 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "firstWriteValue"))));
     createLineageRow(
         openLineageDao,
         "aReadJob",
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("firstReadValue")))),
+            newCommonDataset(ImmutableMap.of("inputFacet", "firstReadValue"))),
         Collections.singletonList(
-            OPEN_LINEAGE.newOutputDataset(
+            new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("writeFacet", new CustomValueFacet("readJobFirstWriteValue")),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "int", "the age"),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("address", "string", "the address")),
-                null)));
+                    ImmutableMap.of("writeFacet", "readJobFirstWriteValue"),
+                    new SchemaField("age", "int", "the age"),
+                    new SchemaField("address", "string", "the address")))));
+
     createLineageRow(
         openLineageDao,
         "aWriteJob",
@@ -360,8 +330,7 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "secondWriteValue"))));
 
     createLineageRow(
         openLineageDao,
@@ -369,17 +338,15 @@ class DatasetDaoTest {
         "COMPLETE",
         jobFacet,
         Collections.singletonList(
-            newCommonInputDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")))),
+            newCommonDataset(ImmutableMap.of("inputFacet", "secondReadValue"))),
         Collections.singletonList(
-            OPEN_LINEAGE.newOutputDataset(
+            new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("writeFacet", new CustomValueFacet("readJobSecondWriteValue")),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("age", "int", "the age"),
-                    OPEN_LINEAGE.newSchemaDatasetFacetFields("address", "string", "the address")),
-                null)));
+                    ImmutableMap.of("writeFacet", "readJobSecondWriteValue"),
+                    new SchemaField("age", "int", "the age"),
+                    new SchemaField("address", "string", "the address")))));
 
     List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(2);
@@ -439,8 +406,7 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(
-            newCommonOutputDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("thirdWriteValue")))));
+            newCommonDataset(ImmutableMap.of("writeFacet", "thirdWriteValue"))));
 
     datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(2);
