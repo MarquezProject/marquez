@@ -303,7 +303,7 @@ class MarquezClient:
             payload=payload)
 
         if mark_as_running:
-            response = self.mark_job_run_as_started(run_id)
+            response = self.mark_job_run_as_started(response['id'])
 
         return response
 
