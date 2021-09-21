@@ -45,7 +45,7 @@ marquez_client.create_source(
 marquez_client.create_dataset(
     namespace_name="my-namespace",
     dataset_type=DatasetType.DB_TABLE,
-    dataset_name="my-dataset", # You can also use the physical name as the dataset name.
+    dataset_name="my-dataset",  # You can also use the physical name as the dataset name.
     dataset_physical_name="public.mytable",
     source_name="my-source",
     fields=[
@@ -61,7 +61,7 @@ marquez_client.create_job(
     namespace_name="my-namespace",
     job_type=JobType.BATCH,
     job_name="my-job",
-    inputs= [
+    inputs=[
       DatasetId("my-namespace", "my-dataset")
     ],
     outputs=[],
