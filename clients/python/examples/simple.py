@@ -68,7 +68,7 @@ marquez_client.create_job(
     description="My first job!"
 )
 
-# Now, let's create a run for 'my-job' and capture any runtime arguments:
+# Now, let's create a run for 'my-job' and mark the run as 'RUNNING'.
 active_run = marquez_client.create_job_run(
     namespace_name="my-namespace",
     job_name="my-job",
