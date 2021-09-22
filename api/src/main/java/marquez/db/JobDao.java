@@ -119,6 +119,9 @@ public interface JobDao extends BaseDao {
           + "LIMIT :limit OFFSET :offset")
   List<Job> findAll(String namespaceName, int limit, int offset);
 
+  @SqlQuery("SELECT count(*) FROM jobs AS j WHERE j.namespace_name = :namespaceName")
+  int countFindAll(String namespaceName);
+
   default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
     RunDao runDao = createRunDao();
     return findAll(namespaceName, limit, offset).stream()
