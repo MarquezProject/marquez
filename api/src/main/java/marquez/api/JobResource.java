@@ -160,8 +160,8 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
 
     final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
-    final int total = jobService.countFindAll(namespaceName.getValue());
-    return Response.ok(new ListResult<>("jobs", jobs, total)).build();
+    final int totalCount = jobService.countFindAll(namespaceName.getValue());
+    return Response.ok(new ListResult<>("jobs", jobs, totalCount)).build();
   }
 
   @Timed

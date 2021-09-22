@@ -9,13 +9,13 @@ import lombok.NonNull;
 
 public class ListResult<T> {
 
-  @NonNull private final Map<String, T> values;
+  @NonNull private final Map<String, T> value;
 
   @JsonProperty("totalCount")
   final int totalCount;
 
-  public ListResult(String propertyName, T data, int totalCount) {
-    this.values = setValue(propertyName, data);
+  public ListResult(String propertyName, T value, int totalCount) {
+    this.value = setValue(propertyName, value);
     this.totalCount = totalCount;
   }
 
@@ -25,7 +25,7 @@ public class ListResult<T> {
   }
 
   @JsonAnyGetter
-  public Map<String, T> getValues() {
-    return values;
+  public Map<String, T> getValue() {
+    return value;
   }
 }
