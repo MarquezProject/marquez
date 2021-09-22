@@ -1034,6 +1034,9 @@ components:
         datasets:
           items:
             $ref: '#/components/schemas/Dataset'
+        totalCount:
+          type: number
+          description: The total number of datasets for the given namespace
       required:
         - datasets
 
@@ -1424,6 +1427,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Job'
+        totalCount:
+          type: number
+          description: The total number of jobs for the given namespace
 
     CreatedRun:
       type: object
