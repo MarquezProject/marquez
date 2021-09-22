@@ -215,6 +215,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
                           }}
                         />
                         <g transform={zoom.toString()}>
+                          <Edge edgePoints={this.state.edges} />
                           {this.state.nodes.map(node => (
                             <Node
                               key={node.data.name}
@@ -225,7 +226,6 @@ class Lineage extends React.Component<LineageProps, LineageState> {
                               selectedNode={this.props.selectedNode}
                             />
                           ))}
-                          <Edge edgePoints={this.state.edges} />
                         </g>
                       </svg>
                     </Box>
