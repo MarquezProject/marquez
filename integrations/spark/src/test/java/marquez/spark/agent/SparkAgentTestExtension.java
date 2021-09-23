@@ -2,10 +2,10 @@ package marquez.spark.agent;
 
 import static org.mockito.Mockito.mock;
 
+import io.openlineage.spark.agent.OpenLineageContext;
+import io.openlineage.spark.agent.SparkAgent;
 import marquez.spark.agent.lifecycle.StaticExecutionContextFactory;
 import net.bytebuddy.agent.ByteBuddyAgent;
-import openlineage.spark.agent.OpenLineageContext;
-import openlineage.spark.agent.SparkAgent;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
