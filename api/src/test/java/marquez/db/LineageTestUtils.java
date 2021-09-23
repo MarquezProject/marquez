@@ -75,6 +75,12 @@ public class LineageTestUtils {
             inputs,
             outputs,
             PRODUCER_URL.toString());
+    // emulate an OpenLineage RunEvent
+    event
+        .getProperties()
+        .put(
+            "_schemaURL",
+            "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent");
     UpdateLineageRow updateLineageRow = dao.updateMarquezModel(event, Utils.getMapper());
     PGobject jsonObject = new PGobject();
     jsonObject.setType("json");

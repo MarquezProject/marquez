@@ -3,7 +3,6 @@ package marquez.service.models;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -33,8 +32,7 @@ import lombok.ToString;
 @Getter
 @Valid
 @ToString
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class LineageEvent {
+public class LineageEvent extends BaseJsonModel {
 
   private String eventType;
   @NotNull private ZonedDateTime eventTime;
@@ -51,8 +49,7 @@ public class LineageEvent {
   @Valid
   @ToString
   @NotNull
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Run {
+  public static class Run extends BaseJsonModel {
 
     @NotNull private String runId;
     private RunFacet facets;
@@ -64,7 +61,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonPropertyOrder({"nominalTime", "parent"})
   public static class RunFacet {
 
@@ -122,7 +118,6 @@ public class LineageEvent {
   @Valid
   @ToString
   @NoArgsConstructor
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class NominalTimeRunFacet extends BaseFacet {
 
     @NotNull private ZonedDateTime nominalStartTime;
@@ -145,7 +140,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class ParentRunFacet extends BaseFacet {
 
     @NotNull private RunLink run;
@@ -170,7 +164,6 @@ public class LineageEvent {
   @Getter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class RunLink {
 
     @NotNull private String runId;
@@ -183,7 +176,6 @@ public class LineageEvent {
   @Getter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class JobLink {
 
     @NotNull private String namespace;
@@ -197,8 +189,7 @@ public class LineageEvent {
   @Getter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Job {
+  public static class Job extends BaseJsonModel {
 
     @NotNull private String namespace;
     @NotNull private String name;
@@ -211,7 +202,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description"})
   public static class JobFacet {
 
@@ -248,7 +238,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DocumentationJobFacet extends BaseFacet {
 
     @NotNull private String description;
@@ -266,7 +255,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class SourceCodeLocationJobFacet extends BaseFacet {
 
     private String type;
@@ -286,7 +274,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class SQLJobFacet extends BaseFacet {
 
     @NotNull private String query;
@@ -306,8 +293,7 @@ public class LineageEvent {
   @Valid
   @ToString
   @NotNull
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class Dataset {
+  public static class Dataset extends BaseJsonModel {
 
     @NotNull private String namespace;
     @NotNull private String name;
@@ -320,7 +306,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonPropertyOrder({"documentation", "schema", "dataSource", "description"})
   public static class DatasetFacets {
 
@@ -362,7 +347,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DocumentationDatasetFacet extends BaseFacet {
 
     @NotNull private String description;
@@ -380,7 +364,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class SchemaDatasetFacet extends BaseFacet {
 
     private List<SchemaField> fields;
@@ -400,8 +383,7 @@ public class LineageEvent {
   @Getter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class SchemaField {
+  public static class SchemaField extends BaseJsonModel {
 
     @NotNull private String name;
     @Nullable private String type;
@@ -413,7 +395,6 @@ public class LineageEvent {
   @Setter
   @Valid
   @ToString
-  @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DatasourceDatasetFacet extends BaseFacet {
 
     private String name;
