@@ -23,6 +23,8 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.Job;
 
 @EqualsAndHashCode
 @ToString
@@ -108,10 +110,15 @@ public final class NodeId implements Comparable<NodeId> {
   }
 
   public static NodeId of(Dataset dataset) {
-    return NodeId.of(new DatasetId(dataset.getNamespace(), dataset.getName()));
+    return NodeId.of(
+        new DatasetId(NamespaceName.of(dataset.getNamespace()), DatasetName.of(dataset.getName())));
   }
 
   public static NodeId of(Job job) {
+    return NodeId.of(new JobId(NamespaceName.of(job.getNamespace()), JobName.of(job.getName())));
+  }
+
+  public static NodeId of(marquez.service.models.Job job) {
     return NodeId.of(new JobId(job.getNamespace(), job.getName()));
   }
 

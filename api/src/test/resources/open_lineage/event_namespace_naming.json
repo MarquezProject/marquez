@@ -56,6 +56,9 @@
       "sql": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
         "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+        "additionalPropExample": {
+          "example": true
+        },
         "query": "SELECT * FROM foo"
       },
       "additionalProp1": {
