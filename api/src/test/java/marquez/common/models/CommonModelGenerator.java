@@ -20,7 +20,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import io.openlineage.client.OpenLineage;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -30,6 +29,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import marquez.Generator;
 import marquez.common.Utils;
+import marquez.service.models.LineageEvent;
 
 public final class CommonModelGenerator extends Generator {
   private CommonModelGenerator() {}
@@ -105,16 +105,18 @@ public final class CommonModelGenerator extends Generator {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
   }
 
-  public static List<OpenLineage.SchemaDatasetFacetFields> newSchemaFields(int amount) {
+  public static LineageEvent.SchemaField newSchemaField() {
+    return new LineageEvent.SchemaField(
+        newFieldName().getValue(), newFieldType(), newDescription());
+  }
+
+  public static List<LineageEvent.SchemaField> newSchemaFields(int amount) {
     return IntStream.range(0, amount)
         .boxed()
         .map(
             i ->
-                new OpenLineage.SchemaDatasetFacetFieldsBuilder()
-                    .name(newFieldName().getValue())
-                    .type(newFieldType())
-                    .description(newDescription())
-                    .build())
+                new LineageEvent.SchemaField(
+                    newFieldName().getValue(), newFieldType(), newDescription()))
         .collect(Collectors.toList());
   }
 
@@ -179,7 +181,7 @@ public final class CommonModelGenerator extends Generator {
     return Utils.toUrl("http://localhost:8081/schemas/ids/" + newId());
   }
 
-  public static UUID newExternalId() {
-    return UUID.randomUUID();
+  public static String newExternalId() {
+    return "test_external_id" + newId();
   }
 }
