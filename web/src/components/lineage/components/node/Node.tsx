@@ -8,7 +8,7 @@ import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
+import { encodeNodeForUrl, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
@@ -40,9 +40,9 @@ type NodeProps = DispatchProps & OwnProps
 class Node extends React.Component<NodeProps> {
   determineLink = (node: GraphNode<MqNode>) => {
     if (isJob(node)) {
-      return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
+      return `/lineage${encodeNodeForUrl('JOB', node.data.namespace, node.data.name)}`
     } else if (isDataset(node)) {
-      return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
+      return `/lineage${encodeNodeForUrl('DATASET', node.data.namespace, node.data.name)}`
     }
     return '/'
   }

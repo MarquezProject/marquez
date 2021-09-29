@@ -6,7 +6,7 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode } from '../../helpers/nodes'
+import { encodeNodeForUrl } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
@@ -92,7 +92,7 @@ class Datasets extends React.Component<DatasetsProps> {
                           <TableCell align='left'>
                             <MqText
                               link
-                              linkTo={`/lineage/${encodeNode(
+                              linkTo={`/lineage${encodeNodeForUrl(
                                 'DATASET',
                                 dataset.namespace,
                                 dataset.name

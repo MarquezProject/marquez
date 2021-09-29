@@ -5,6 +5,10 @@ import { generateNodeId } from '../../helpers/nodes'
 import { genericFetchWrapper } from './index'
 
 export const getLineage = async (nodeType: JobOrDataset, namespace: string, name: string) => {
-  const url = `${API_URL}/lineage/?nodeId=${generateNodeId(nodeType, namespace, name)}`
+  const url = `${API_URL}/lineage/?nodeId=${generateNodeId(
+    nodeType,
+    encodeURIComponent(namespace),
+    encodeURIComponent(name)
+  )}`
   return genericFetchWrapper<LineageGraph>(url, { method: 'GET' }, 'fetchLineage')
 }

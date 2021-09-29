@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { JobOrDataset } from '../lineage/types'
 import { Link as RouterLink } from 'react-router-dom'
 import { SearchResult } from '../../types/api'
-import { encodeNode } from '../../helpers/nodes'
+import { encodeNodeForUrl } from '../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { theme } from '../../helpers/theme'
@@ -76,7 +76,11 @@ class SearchListItem extends React.Component<DkSearchListItemProps> {
         key={this.props.key}
         className={classNames(classes.listItem, selected && 'selected')}
         onClick={() => this.props.onClick(searchResult.name)}
-        to={`/lineage/${encodeNode(searchResult.type, searchResult.namespace, searchResult.name)}`}
+        to={`/lineage${encodeNodeForUrl(
+          searchResult.type,
+          searchResult.namespace,
+          searchResult.name
+        )}`}
       >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           <Box display={'flex'} alignItems={'center'}>

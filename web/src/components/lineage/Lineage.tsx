@@ -78,21 +78,13 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   }
 
   componentDidMount() {
-    const nodeName = this.props.match.params.nodeName
-    const namespace = this.props.match.params.namespace
-    const nodeType = this.props.match.params.nodeType
-    if (nodeName && namespace && nodeType) {
-      const nodeId = generateNodeId(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
+    const type = new URLSearchParams(this.props.location.search).get('type')
+    const namespace = new URLSearchParams(this.props.location.search).get('namespace')
+    const name = new URLSearchParams(this.props.location.search).get('name')
+    if (name && namespace && type) {
+      const nodeId = generateNodeId(type.toUpperCase() as JobOrDataset, namespace, name)
       this.props.setSelectedNode(nodeId)
-      this.props.fetchLineage(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
+      this.props.fetchLineage(type.toUpperCase() as JobOrDataset, namespace, name)
     }
   }
 
@@ -105,11 +97,12 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       this.buildGraphAll(this.props.lineage.graph)
     }
     if (this.props.selectedNode !== prevProps.selectedNode) {
-      this.props.fetchLineage(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
+      const type = new URLSearchParams(this.props.location.search).get('type')
+      const namespace = new URLSearchParams(this.props.location.search).get('namespace')
+      const name = new URLSearchParams(this.props.location.search).get('name')
+      if (name && namespace && type) {
+        this.props.fetchLineage(type.toUpperCase() as JobOrDataset, namespace, name)
+      }
     }
   }
 

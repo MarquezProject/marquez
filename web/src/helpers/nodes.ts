@@ -15,10 +15,8 @@ export function isDataset(node: MqNode): Undefinable<LineageDataset> {
   return undefined
 }
 
-export function encodeNode(nodeType: JobOrDataset, namespace: string, name: string) {
-  return `${encodeURIComponent(nodeType.toLowerCase())}/${encodeURIComponent(
-    namespace
-  )}/${encodeURIComponent(name)}`
+export function encodeNodeForUrl(nodeType: JobOrDataset, namespace: string, name: string) {
+  return `?type=${nodeType.toLowerCase()}&namespace=${namespace}&name=${name}`
 }
 
 export function generateNodeId(type: JobOrDataset, namespace: string, jobName: string) {

@@ -6,7 +6,7 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode } from '../../helpers/nodes'
+import { encodeNodeForUrl } from '../../helpers/nodes'
 import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
@@ -89,7 +89,7 @@ class Jobs extends React.Component<JobsProps> {
                           <TableCell align='left'>
                             <MqText
                               link
-                              linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
+                              linkTo={`/lineage${encodeNodeForUrl('JOB', job.namespace, job.name)}`}
                             >
                               {job.name}
                             </MqText>
