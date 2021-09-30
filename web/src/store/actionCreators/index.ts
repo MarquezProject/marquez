@@ -32,6 +32,10 @@ export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
   }
 })
 
+export const resetDatasetVersions = () => ({
+  type: actionTypes.RESET_DATASET_VERSIONS
+})
+
 export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS
 })

@@ -13,8 +13,9 @@ import {
 import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasetVersions } from '../../store/actionCreators'
+import { fetchDatasetVersions, resetDatasetVersions } from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
@@ -54,10 +55,12 @@ const styles = ({ spacing }: ITheme) => {
 interface StateProps {
   dataset: LineageDataset
   versions: DatasetVersion[]
+  versionsLoading: boolean
 }
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
+  resetDatasetVersions: typeof resetDatasetVersions
 }
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
@@ -70,7 +73,7 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions } = props
+  const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
   const { root } = classes
   const history = useHistory()
 
@@ -78,16 +81,31 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
   }, [props.dataset.name])
 
-  const [value, setValue] = React.useState(0)
+  // unmounting
+  useEffect(() => {
+    return () => {
+      resetDatasetVersions()
+    }
+  }, [])
+
+  const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
-    setValue(newValue)
+    setTab(newValue)
   }
 
-  if (props.versions.length === 0) {
+  if (versionsLoading) {
+    return (
+      <Box display={'flex'} justifyContent={'center'}>
+        <CircularProgress color='primary' />
+      </Box>
+    )
+  }
+
+  if (versions.length === 0) {
     return null
   }
 
-  const dataset = props.versions[0]
+  const dataset = versions[0]
   const { name, tags, description } = dataset
 
   return (
@@ -104,12 +122,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         )}
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={value}
-              onChange={handleChange}
-              textColor='primary'
-              indicatorColor='primary'
-            >
+            <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
               <Tab label='Current' {...a11yProps(0)} disableRipple={true} />
               <Tab label='Versions' {...a11yProps(1)} disableRipple={true} />
             </Tabs>
@@ -125,21 +138,23 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      {value === 0 && <DatasetInfo datasetFields={dataset.fields} facets={dataset.facets} />}
-      {value === 1 && <DatasetVersions versions={props.versions} />}
+      {tab === 0 && <DatasetInfo datasetFields={dataset.fields} facets={dataset.facets} />}
+      {tab === 1 && <DatasetVersions versions={props.versions} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
-  versions: state.datasetVersions.result.versions
+  versions: state.datasetVersions.result.versions,
+  versionsLoading: state.datasetVersions.isLoading
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchDatasetVersions: fetchDatasetVersions
+      fetchDatasetVersions: fetchDatasetVersions,
+      resetDatasetVersions: resetDatasetVersions
     },
     dispatch
   )
