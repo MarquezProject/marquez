@@ -1,5 +1,5 @@
+import { Field, Run, Tag } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
-import {Field, Run, Tag} from '../../types/api'
 
 export type JobOrDataset = 'JOB' | 'DATASET'
 export type BatchOrStream = 'BATCH' | 'STREAM' | 'SERVICE'

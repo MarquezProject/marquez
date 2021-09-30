@@ -64,16 +64,20 @@ type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
 
 function a11yProps(index: number) {
   return {
-    id: `simple-tab-${index}`,
+    id: `tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`
   }
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { dataset, classes, fetchDatasetVersions } = props
+  const { classes, fetchDatasetVersions } = props
   const { root } = classes
   const { datasetName } = useParams()
   const history = useHistory()
+
+  if (props.versions.length === 0) {
+    return null
+  }
 
   useEffect(() => {
     fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
@@ -84,6 +88,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     setValue(newValue)
   }
 
+  const dataset = props.versions[0]
+  const { name, tags, description } = dataset
+
   if (!dataset) {
     return (
       <Box display='flex' justifyContent='center' className={root} mt={2}>
@@ -93,14 +100,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
     )
   } else {
-    const { name, description, tags } = dataset
     return (
       <Box my={2} className={root}>
         <Box>
           {tags.length > 0 && (
             <ul className={classes.tagList}>
               {tags.map(tag => (
-                <li key={tag.name} className={classes.tag}>
+                <li key={tag} className={classes.tag}>
                   <Chip size='small' label={tag} />
                 </li>
               ))}
