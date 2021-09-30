@@ -21,7 +21,7 @@ jobs:
       - image: circleci/node:12.21.0
     steps:
       - checkout
-      - run: npm i -g redoc-cli
+      - run: npm install --prefix=$HOME/.local --global redoc-cli
       - run: redoc-cli bundle spec/openapi.yml
 
   build-api:
