@@ -15,6 +15,14 @@ only-on-release: &only-on-release
       ignore: /.*/
 
 jobs:
+  build-docs:
+    working_directory: ~/marquez
+    docker:
+      - image: redocly/redoc
+    steps:
+      - checkout
+      - run: redoc-cli bundle spec/openapi.yml
+
   build-api:
     working_directory: ~/marquez
     machine: true
@@ -240,6 +248,7 @@ jobs:
 workflows:
   marquez:
     jobs:
+      - build-docs
       - build-api
       - image-api
       - build-integration-spark
