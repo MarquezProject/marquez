@@ -114,7 +114,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
               <Tab label='Versions' {...a11yProps(1)} disableRipple={true} />
             </Tabs>
           </Box>
-          <IconButton onClick={() => history.push('/')}>
+          <IconButton onClick={() => history.push('/datasets')}>
             <CloseIcon />
           </IconButton>
         </Box>
