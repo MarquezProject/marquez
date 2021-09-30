@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -38,6 +39,7 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +54,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import marquez.common.models.DatasetId;
 import marquez.common.models.Field;
+import marquez.common.models.FlexibleDateTimeDeserializer;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
@@ -80,8 +83,12 @@ public final class Utils {
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
+    mapper.addMixIn(ZonedDateTime.class, ZonedDateTimeMixin.class);
     return mapper;
   }
+
+  @JsonDeserialize(using = FlexibleDateTimeDeserializer.class)
+  static final class ZonedDateTimeMixin {}
 
   public static String toJson(@NonNull final Object value) {
     try {
