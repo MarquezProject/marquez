@@ -1,7 +1,17 @@
-import React, { FunctionComponent } from 'react'
+import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 import * as Redux from 'redux'
-import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import {
+  Box,
+  Chip,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tabs
+} from '@material-ui/core'
 import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
@@ -12,6 +22,7 @@ import {
 import { LineageDataset } from './lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { fetchDatasetVersions } from '../store/actionCreators'
 import { formatUpdatedAt } from '../helpers'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
@@ -50,13 +61,31 @@ const styles = ({ spacing }: ITheme) => {
 
 const DATASET_COLUMNS = ['Attribute', 'Type', 'Description']
 
-type IProps = IWithStyles<typeof styles> & { dataset: LineageDataset }
+interface StateProps {
+  dataset: LineageDataset
+}
+
+interface DispatchProps {
+  fetchDatasetVersions: typeof fetchDatasetVersions
+}
+
+type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { dataset, classes } = props
+  const { dataset, classes, fetchDatasetVersions } = props
   const { root } = classes
   const { datasetName } = useParams()
   const history = useHistory()
+
+  useEffect(() => {
+    fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
+  }, [props.dataset.name])
+
+  const [value, setValue] = React.useState(0)
+  const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
+    setValue(newValue)
+  }
+
   if (!dataset) {
     return (
       <Box display='flex' justifyContent='center' className={root} mt={2}>
@@ -79,14 +108,20 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
               ))}
             </ul>
           )}
-          <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-            <MqText heading font={'mono'}>
-              {name}
-            </MqText>
+          <Box display={'flex'} justifyContent={'space-between'} mb={2}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={value} onChange={handleChange}>
+                <Tab label='Current' disableRipple={true} />
+                <Tab label='Versions' disableRipple={true} />
+              </Tabs>
+            </Box>
             <IconButton onClick={() => history.push('/')}>
               <CloseIcon />
             </IconButton>
           </Box>
+          <MqText heading font={'mono'}>
+            {name}
+          </MqText>
           <MqText subdued>{description}</MqText>
         </Box>
         {fields && fields.length > 0 ? (
@@ -133,7 +168,13 @@ const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result
 })
 
-const mapDispatchToProps = (dispatch: Redux.Dispatch) => bindActionCreators({}, dispatch)
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchDatasetVersions: fetchDatasetVersions
+    },
+    dispatch
+  )
 
 export default connect(
   mapStateToProps,

@@ -40,6 +40,10 @@ export interface Dataset {
   facets: object
 }
 
+export interface DatasetVersions {
+  versions: DatasetVersion[]
+}
+
 export interface DatasetVersion {
   id: DatasetVersionId
   type: DatasetType

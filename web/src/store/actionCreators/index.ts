@@ -17,6 +17,14 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   }
 })
 
+export const fetchDatasetVersions = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS,
+  payload: {
+    namespace,
+    name
+  }
+})
+
 export const fetchDatasetVersionsSuccess = (datasetVersions: DatasetVersion[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {

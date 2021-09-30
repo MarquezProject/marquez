@@ -20,7 +20,7 @@ import {
   fetchNamespacesSuccess,
   fetchSearchSuccess
 } from '../actionCreators'
-import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
+import {getDatasets, getDatasetVersions, getJobs, getLatestJobRuns, getNamespaces} from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 import _orderBy from 'lodash/orderBy'
@@ -100,7 +100,7 @@ export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET_VERSIONS)
-      const datasets = yield call(getDatasets, payload.namespace)
+      const datasets = yield call(getDatasetVersions, payload.namespace, payload.name)
       yield put(fetchDatasetVersionsSuccess(datasets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
