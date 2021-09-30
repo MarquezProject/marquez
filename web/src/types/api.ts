@@ -37,11 +37,35 @@ export interface Dataset {
   tags: string[]
   lastModifiedAt: string
   description: string
+  facets: object
+}
+
+export interface DatasetVersion {
+  id: DatasetVersionId
+  type: DatasetType
+  name: string
+  physicalName: string
+  createdAt: string
+  version: string
+  updatedAt: string
+  namespace: string
+  sourceName: string
+  fields: Field[]
+  tags: string[]
+  lastModifiedAt: string
+  description: string
+  facets: object
 }
 
 export interface DatasetId {
   namespace: string
   name: string
+}
+
+export interface DatasetVersionId {
+  namespace: string
+  name: string
+  version: string
 }
 
 export type DatasetType = 'DB_TABLE' | 'STREAM'

@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes'
 
-import { Dataset, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
+import { Dataset, DatasetVersion, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
 export const fetchDatasets = (namespace: string) => ({
@@ -14,6 +14,13 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {
     datasets
+  }
+})
+
+export const fetchDatasetVersionsSuccess = (datasetVersions: DatasetVersion[]) => ({
+  type: actionTypes.FETCH_DATASETS_SUCCESS,
+  payload: {
+    datasetVersions
   }
 })
 

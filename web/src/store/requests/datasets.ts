@@ -10,3 +10,10 @@ export const getDatasets = async (namespace: string, limit = 2000, offset = 0) =
     return r.datasets.map(d => ({ ...d, namespace: namespace }))
   })
 }
+
+export const getDatasetVersions = async (namespace: string, dataset: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/datasets/${dataset}/versions`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchDatasetVersions').then((r: Datasets) => {
+    return r.datasets.map(d => ({ ...d, namespace: namespace }))
+  })
+}
