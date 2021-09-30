@@ -12,6 +12,7 @@ import {
   TableRow,
   Tabs
 } from '@material-ui/core'
+import { DatasetVersion } from '../types/api'
 import { IState } from '../store/reducers'
 import {
   Theme as ITheme,
@@ -24,6 +25,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDatasetVersions } from '../store/actionCreators'
 import { formatUpdatedAt } from '../helpers'
+import { stopWatchDuration } from '../helpers/time'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
@@ -60,9 +62,11 @@ const styles = ({ spacing }: ITheme) => {
 }
 
 const DATASET_COLUMNS = ['Attribute', 'Type', 'Description']
+const DATASET_VERSIONS_COLUMNS = ['Last Updated', 'Creator Duration', 'Field Count']
 
 interface StateProps {
   dataset: LineageDataset
+  versions: DatasetVersion[]
 }
 
 interface DispatchProps {
@@ -117,7 +121,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           )}
           <Box display={'flex'} justifyContent={'space-between'} mb={2}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={value} onChange={handleChange}>
+              <Tabs
+                value={value}
+                onChange={handleChange}
+                textColor='primary'
+                indicatorColor='primary'
+              >
                 <Tab label='Current' {...a11yProps(0)} disableRipple={true} />
                 <Tab label='Versions' {...a11yProps(1)} disableRipple={true} />
               </Tabs>
@@ -173,14 +182,46 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             </Box>
           </>
         )}
-        {value === 1 && <MqText>versions</MqText>}
+        {value === 1 && (
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                {DATASET_VERSIONS_COLUMNS.map(column => {
+                  return (
+                    <TableCell key={column} align='left'>
+                      <MqText subheading inline>
+                        {column}
+                      </MqText>
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {props.versions.map(version => {
+                return (
+                  <TableRow key={version.createdAt}>
+                    <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
+                    <TableCell align='left'>
+                      {version.createdByRun
+                        ? stopWatchDuration(version.createdByRun.durationMs)
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell align='left'>{version.fields.length}</TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        )}
       </Box>
     )
   }
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets.result
+  datasets: state.datasets.result,
+  versions: state.datasetVersions.result.versions
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

@@ -47,11 +47,11 @@ export interface DatasetVersions {
 export interface DatasetVersion {
   id: DatasetVersionId
   type: DatasetType
+  createdByRun: Run
   name: string
   physicalName: string
   createdAt: string
   version: string
-  updatedAt: string
   namespace: string
   sourceName: string
   fields: Field[]

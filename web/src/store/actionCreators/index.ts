@@ -25,10 +25,10 @@ export const fetchDatasetVersions = (namespace: string, name: string) => ({
   }
 })
 
-export const fetchDatasetVersionsSuccess = (datasetVersions: DatasetVersion[]) => ({
-  type: actionTypes.FETCH_DATASETS_SUCCESS,
+export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
   payload: {
-    datasetVersions
+    versions
   }
 })
 
