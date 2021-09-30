@@ -71,6 +71,13 @@ interface DispatchProps {
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
 
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`
+  }
+}
+
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { dataset, classes, fetchDatasetVersions } = props
   const { root } = classes
@@ -111,8 +118,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <Box display={'flex'} justifyContent={'space-between'} mb={2}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
               <Tabs value={value} onChange={handleChange}>
-                <Tab label='Current' disableRipple={true} />
-                <Tab label='Versions' disableRipple={true} />
+                <Tab label='Current' {...a11yProps(0)} disableRipple={true} />
+                <Tab label='Versions' {...a11yProps(1)} disableRipple={true} />
               </Tabs>
             </Box>
             <IconButton onClick={() => history.push('/')}>
@@ -122,43 +129,51 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <MqText heading font={'mono'}>
             {name}
           </MqText>
-          <MqText subdued>{description}</MqText>
+          <Box mb={2}>
+            <MqText subdued>{description}</MqText>
+          </Box>
         </Box>
-        {fields && fields.length > 0 ? (
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                {DATASET_COLUMNS.map(column => {
-                  return (
-                    <TableCell key={column} align='left'>
-                      <MqText subheading inline>
-                        {column}
-                      </MqText>
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {fields.map(field => {
-                return (
-                  <TableRow key={field.name}>
-                    <TableCell align='left'>{field.name}</TableCell>
-                    <TableCell align='left'>{field.type}</TableCell>
-                    <TableCell align='left'>{field.description || 'no description'}</TableCell>
+
+        {value === 0 && (
+          <>
+            {fields && fields.length > 0 ? (
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    {DATASET_COLUMNS.map(column => {
+                      return (
+                        <TableCell key={column} align='left'>
+                          <MqText subheading inline>
+                            {column}
+                          </MqText>
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        ) : (
-          <div>
-            <MqText subdued>schema not present</MqText>
-          </div>
+                </TableHead>
+                <TableBody>
+                  {fields.map(field => {
+                    return (
+                      <TableRow key={field.name}>
+                        <TableCell align='left'>{field.name}</TableCell>
+                        <TableCell align='left'>{field.type}</TableCell>
+                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            ) : (
+              <div>
+                <MqText subdued>schema not present</MqText>
+              </div>
+            )}
+            <Box display={'flex'} justifyContent={'flex-end'} mt={1}>
+              <MqText subdued>last updated: {formatUpdatedAt(updatedAt)}</MqText>
+            </Box>
+          </>
         )}
-        <Box display={'flex'} justifyContent={'flex-end'} mt={1}>
-          <MqText subdued>last updated: {formatUpdatedAt(updatedAt)}</MqText>
-        </Box>
+        {value === 1 && <MqText>versions</MqText>}
       </Box>
     )
   }
