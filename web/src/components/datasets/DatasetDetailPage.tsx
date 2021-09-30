@@ -1,17 +1,7 @@
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 import * as Redux from 'redux'
-import {
-  Box,
-  Chip,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tabs
-} from '@material-ui/core'
+import { Box, Chip, Tab, Tabs } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import {
@@ -24,7 +14,6 @@ import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDatasetVersions } from '../../store/actionCreators'
-import { formatUpdatedAt } from '../../helpers'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import DatasetInfo from './DatasetInfo'
@@ -106,7 +95,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   } else {
     const { name, description, tags } = dataset
     return (
-      <Box mt={2} className={root}>
+      <Box my={2} className={root}>
         <Box>
           {tags.length > 0 && (
             <ul className={classes.tagList}>
@@ -140,8 +129,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             <MqText subdued>{description}</MqText>
           </Box>
         </Box>
-
-        {value === 0 && <DatasetInfo dataset={dataset} />}
+        {value === 0 && <DatasetInfo datasetFields={dataset.fields} facets={dataset.facets} />}
         {value === 1 && <DatasetVersions versions={props.versions} />}
       </Box>
     )

@@ -1,9 +1,30 @@
-import React, {FunctionComponent} from 'react'
-import {DatasetVersion} from '../../types/api'
-import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core'
+import { ArrowBackIosRounded } from '@material-ui/icons'
+import {Box, Chip, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core'
+import { DatasetVersion } from '../../types/api'
+import { Theme as ITheme } from '@material-ui/core/styles/createTheme'
+import { WithStyles as IWithStyles } from '@material-ui/core/styles/withStyles'
+import { alpha, createStyles, withStyles } from '@material-ui/core/styles'
+import { formatUpdatedAt } from '../../helpers'
+import { stopWatchDuration } from '../../helpers/time'
+import CloseIcon from '@material-ui/icons/Close'
+import DatasetInfo from './DatasetInfo'
+import IconButton from '@material-ui/core/IconButton'
+import MqChip from '../core/chip/MqChip'
 import MqText from '../core/text/MqText'
-import {formatUpdatedAt} from '../../helpers'
-import {stopWatchDuration} from '../../helpers/time'
+import React, { FunctionComponent, SetStateAction } from 'react'
+import transitions from '@material-ui/core/styles/transitions'
+
+const styles = (theme: ITheme) => {
+  return createStyles({
+    tableRow: {
+      cursor: 'pointer',
+      transition: transitions.create(['background-color']),
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.1)
+      }
+    }
+  })
+}
 
 const DATASET_VERSIONS_COLUMNS = ['Last Updated', 'Creator Duration', 'Field Count']
 
@@ -11,42 +32,66 @@ interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
 
-const DatasetVersions: FunctionComponent<DatasetVersionsProps> = props => {
-  const {versions} = props
+const DatasetVersions: FunctionComponent<
+  DatasetVersionsProps & IWithStyles<typeof styles>
+> = props => {
+  const { versions, classes } = props
+
+  const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)
+  const handleClick = (newValue: SetStateAction<DatasetVersion | null>) => {
+    setInfoView(newValue)
+  }
+
   if (versions.length === 0) {
     return null
   }
-
-  return           <Table size='small'>
-    <TableHead>
-      <TableRow>
-        {DATASET_VERSIONS_COLUMNS.map(column => {
+  if (infoView) {
+    return (
+      <>
+        <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+          <Chip label={infoView.version} />
+          <IconButton onClick={() => handleClick(null)}>
+            <ArrowBackIosRounded fontSize={'small'} />
+          </IconButton>
+        </Box>
+        <DatasetInfo datasetFields={infoView.fields} facets={infoView.facets} />
+      </>
+    )
+  }
+  return (
+    <Table size='small'>
+      <TableHead>
+        <TableRow>
+          {DATASET_VERSIONS_COLUMNS.map(column => {
+            return (
+              <TableCell key={column} align='left'>
+                <MqText subheading inline>
+                  {column}
+                </MqText>
+              </TableCell>
+            )
+          })}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {versions.map(version => {
           return (
-            <TableCell key={column} align='left'>
-              <MqText subheading inline>
-                {column}
-              </MqText>
-            </TableCell>
+            <TableRow
+              className={classes.tableRow}
+              key={version.createdAt}
+              onClick={() => handleClick(version)}
+            >
+              <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
+              <TableCell align='left'>
+                {version.createdByRun ? stopWatchDuration(version.createdByRun.durationMs) : 'N/A'}
+              </TableCell>
+              <TableCell align='left'>{version.fields.length}</TableCell>
+            </TableRow>
           )
         })}
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {versions.map(version => {
-        return (
-          <TableRow key={version.createdAt}>
-            <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
-            <TableCell align='left'>
-              {version.createdByRun
-                ? stopWatchDuration(version.createdByRun.durationMs)
-                : 'N/A'}
-            </TableCell>
-            <TableCell align='left'>{version.fields.length}</TableCell>
-          </TableRow>
-        )
-      })}
-    </TableBody>
-  </Table>
+      </TableBody>
+    </Table>
+  )
 }
 
-export default DatasetVersions
+export default withStyles(styles)(DatasetVersions)
