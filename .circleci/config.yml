@@ -18,9 +18,10 @@ jobs:
   build-docs:
     working_directory: ~/marquez
     docker:
-      - image: redocly/redoc
+      - image: circleci/node:12.21.0
     steps:
       - checkout
+      - run: npm install redoc-cli
       - run: redoc-cli bundle spec/openapi.yml
 
   build-api:
