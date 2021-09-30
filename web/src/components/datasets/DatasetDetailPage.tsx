@@ -12,24 +12,25 @@ import {
   TableRow,
   Tabs
 } from '@material-ui/core'
-import { DatasetVersion } from '../types/api'
-import { IState } from '../store/reducers'
+import { DatasetVersion } from '../../types/api'
+import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-import { LineageDataset } from './lineage/types'
+import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasetVersions } from '../store/actionCreators'
-import { formatUpdatedAt } from '../helpers'
-import { stopWatchDuration } from '../helpers/time'
+import { fetchDatasetVersions } from '../../store/actionCreators'
+import { formatUpdatedAt } from '../../helpers'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
+import DatasetInfo from './DatasetInfo'
+import DatasetVersions from './DatasetVersions'
 import IconButton from '@material-ui/core/IconButton'
-import MqText from './core/text/MqText'
+import MqText from '../core/text/MqText'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -60,9 +61,6 @@ const styles = ({ spacing }: ITheme) => {
     }
   })
 }
-
-const DATASET_COLUMNS = ['Attribute', 'Type', 'Description']
-const DATASET_VERSIONS_COLUMNS = ['Last Updated', 'Creator Duration', 'Field Count']
 
 interface StateProps {
   dataset: LineageDataset
@@ -106,7 +104,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
     )
   } else {
-    const { name, description, updatedAt, fields, tags } = dataset
+    const { name, description, tags } = dataset
     return (
       <Box mt={2} className={root}>
         <Box>
@@ -143,77 +141,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           </Box>
         </Box>
 
-        {value === 0 && (
-          <>
-            {fields && fields.length > 0 ? (
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    {DATASET_COLUMNS.map(column => {
-                      return (
-                        <TableCell key={column} align='left'>
-                          <MqText subheading inline>
-                            {column}
-                          </MqText>
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {fields.map(field => {
-                    return (
-                      <TableRow key={field.name}>
-                        <TableCell align='left'>{field.name}</TableCell>
-                        <TableCell align='left'>{field.type}</TableCell>
-                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            ) : (
-              <div>
-                <MqText subdued>schema not present</MqText>
-              </div>
-            )}
-            <Box display={'flex'} justifyContent={'flex-end'} mt={1}>
-              <MqText subdued>last updated: {formatUpdatedAt(updatedAt)}</MqText>
-            </Box>
-          </>
-        )}
-        {value === 1 && (
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                {DATASET_VERSIONS_COLUMNS.map(column => {
-                  return (
-                    <TableCell key={column} align='left'>
-                      <MqText subheading inline>
-                        {column}
-                      </MqText>
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {props.versions.map(version => {
-                return (
-                  <TableRow key={version.createdAt}>
-                    <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
-                    <TableCell align='left'>
-                      {version.createdByRun
-                        ? stopWatchDuration(version.createdByRun.durationMs)
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell align='left'>{version.fields.length}</TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        )}
+        {value === 0 && <DatasetInfo dataset={dataset} />}
+        {value === 1 && <DatasetVersions versions={props.versions} />}
       </Box>
     )
   }
