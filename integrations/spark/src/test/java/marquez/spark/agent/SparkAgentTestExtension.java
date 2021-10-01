@@ -14,8 +14,8 @@ import org.mockito.Mockito;
 /**
  * JUnit extension that invokes the {@link SparkAgent} by installing the {@link ByteBuddyAgent} to
  * instrument classes. This will allow the {@link java.lang.instrument.ClassFileTransformer}s in the
- * {@link io.openlineage.spark.agent.transformers} package to transform the byte code of target
- * classes as they're loaded.
+ * {@link openlineage.spark.agent.transformers} package to transform the byte code of target classes
+ * as they're loaded.
  *
  * <p>Note that this extension has to be annotated on any class that interacts with any of the
  * transformed classes (i.e., {@link org.apache.spark.SparkContext}, {@link

@@ -56,6 +56,9 @@
       "sql": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
         "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+        "additionalPropExample": {
+          "example": true
+        },
         "query": "SELECT * FROM foo"
       },
       "additionalProp1": {
@@ -79,6 +82,29 @@
     {
       "namespace": "my-datasource-namespace",
       "name": "instance.schema.table",
+      "inputFacets": {
+        "dataQualityMetrics": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/DataQualityMetricsInputDatasetFacet",
+          "rowCount": 1000,
+          "bytes": 1048576
+        },
+        "dataQualityAssertions": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/DataQualityAssertionsDatasetFacet",
+          "assertions": [
+            {
+              "assertion": "row_count_equal_to",
+              "success": true
+            },
+            {
+              "assertion": "no_null_values",
+              "success": true,
+              "column": "id"
+            }
+          ]
+        }
+      },
       "facets": {
         "documentation": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
@@ -124,6 +150,14 @@
     {
       "namespace": "my-datasource-namespace",
       "name": "instance.schema.table",
+      "outputFacets": {
+        "outputStatistics": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/OutputStatisticsOutputDatasetFacet",
+          "rowCount": 2000,
+          "size": 2097152
+        }
+      },
       "facets": {
         "documentation": {
           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",

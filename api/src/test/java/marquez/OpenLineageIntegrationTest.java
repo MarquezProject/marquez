@@ -2,17 +2,10 @@ package marquez;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.util.Resources;
-import io.openlineage.client.OpenLineage;
 import java.io.IOException;
-import java.net.URL;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -148,37 +141,5 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     } else {
       assertThat(latestDatasetVersion.getFacets()).isEmpty();
     }
-  }
-
-  @ParameterizedTest
-  @MethodSource("data")
-  public void testSerialization(String input) throws IOException {
-    testSerialization(Utils.newObjectMapper(), input);
-  }
-
-  // Test object mapper with listed jackson requirements
-  @ParameterizedTest
-  @MethodSource("data")
-  public void testRequiredObjectMapper(String input) throws IOException {
-    testSerialization(getMapper(), input);
-  }
-
-  public ObjectMapper getMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-
-    return mapper;
-  }
-
-  public void testSerialization(ObjectMapper mapper, String input) throws IOException {
-    URL in = Resources.getResource(input);
-
-    OpenLineage.RunEvent lineageEvent = mapper.readValue(in, OpenLineage.RunEvent.class);
-    String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lineageEvent);
-
-    Assertions.assertEquals(mapper.readTree(in), mapper.readTree(out));
   }
 }
