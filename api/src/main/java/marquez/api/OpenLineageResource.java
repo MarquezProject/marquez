@@ -15,6 +15,7 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
@@ -22,6 +23,7 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.SQLException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -65,11 +67,20 @@ public class OpenLineageResource extends BaseResource {
             (result, err) -> {
               if (err != null) {
                 log.error("Unexpected error while processing request", err);
-                asyncResponse.resume(Response.status(INTERNAL_SERVER_ERROR).build());
+                asyncResponse.resume(Response.status(determineStatusCode(err)).build());
               } else {
                 asyncResponse.resume(Response.status(201).build());
               }
             });
+  }
+
+  private int determineStatusCode(Throwable e) {
+    if (e instanceof CompletionException) {
+      return determineStatusCode(e.getCause());
+    } else if (e instanceof IllegalArgumentException) {
+      return BAD_REQUEST.getStatusCode();
+    }
+    return INTERNAL_SERVER_ERROR.getStatusCode();
   }
 
   @Timed

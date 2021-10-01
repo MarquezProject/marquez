@@ -8,15 +8,21 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.Run;
 import marquez.common.Utils;
+import marquez.service.models.LineageEvent;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -40,6 +46,49 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         // EVENT_LARGE,
         NULL_NOMINAL_END_TIME,
         EVENT_NAMESPACE_NAMING);
+  }
+
+  @Test
+  public void testSendOpenLineageBadArgument() throws IOException {
+    // Namespaces can't have semi-colons, so this will get rejected
+    String badNamespace =
+        "sqlserver://myhost:3342;user=auser;password=XXXXXXXXXX;database=TheDatabase";
+    LineageEvent event =
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job("namespace", "job_name", null),
+            List.of(new LineageEvent.Dataset(badNamespace, "the_table", null)),
+            Collections.emptyList(),
+            "the_producer");
+
+    final CompletableFuture<Integer> resp =
+        this.sendLineage(Utils.toJson(event))
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+
+    // Ensure the event was correctly rejected and a proper response code returned.
+    assertThat(resp.join()).isEqualTo(400);
+  }
+
+  @Test
+  public void testGetLineageForNonExistantDataset() {
+    CompletableFuture<Integer> response =
+        this.fetchLineage("dataset:Imadethisup:andthistoo")
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+    assertThat(response.join()).isEqualTo(404);
   }
 
   @ParameterizedTest
