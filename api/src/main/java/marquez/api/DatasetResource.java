@@ -40,7 +40,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.DatasetVersionNotFoundException;
-import marquez.api.models.ListResult;
+import marquez.api.models.ResultsPage;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
@@ -150,8 +150,8 @@ public class DatasetResource extends BaseResource {
 
     final List<Dataset> datasets =
         datasetService.findAllWithTags(namespaceName.getValue(), limit, offset);
-    final int totalCount = datasetService.countFindAll(namespaceName.getValue());
-    return Response.ok(new ListResult<>("datasets", datasets, totalCount)).build();
+    final int totalCount = datasetService.countFor(namespaceName.getValue());
+    return Response.ok(new ResultsPage<>("datasets", datasets, totalCount)).build();
   }
 
   @Timed

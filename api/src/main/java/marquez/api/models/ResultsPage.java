@@ -7,14 +7,14 @@ import java.util.Collections;
 import java.util.Map;
 import lombok.NonNull;
 
-public class ListResult<T> {
+public class ResultsPage<T> {
 
   @NonNull private final Map<String, T> value;
 
   @JsonProperty("totalCount")
   final int totalCount;
 
-  public ListResult(String propertyName, T value, int totalCount) {
+  public ResultsPage(String propertyName, T value, int totalCount) {
     this.value = setValue(propertyName, value);
     this.totalCount = totalCount;
   }
