@@ -83,8 +83,19 @@ public final class Utils {
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
-    mapper.addMixIn(ZonedDateTime.class, ZonedDateTimeMixin.class);
+    addZonedDateTimeMixin(mapper);
     return mapper;
+  }
+
+  /**
+   * Add a mixin to the object mapper to support a {@link FlexibleDateTimeDeserializer}. This allows
+   * us to support ISO timestamps that are missing timezones and defaults to the server timezone in
+   * such cases.
+   *
+   * @param mapper
+   */
+  public static void addZonedDateTimeMixin(ObjectMapper mapper) {
+    mapper.addMixIn(ZonedDateTime.class, ZonedDateTimeMixin.class);
   }
 
   @JsonDeserialize(using = FlexibleDateTimeDeserializer.class)
