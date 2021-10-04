@@ -35,6 +35,7 @@ import lombok.ToString;
 public class LineageEvent extends BaseJsonModel {
 
   private String eventType;
+
   @NotNull private ZonedDateTime eventTime;
   @NotNull private LineageEvent.Run run;
   @NotNull private LineageEvent.Job job;
