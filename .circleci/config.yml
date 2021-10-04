@@ -15,6 +15,15 @@ only-on-release: &only-on-release
       ignore: /.*/
 
 jobs:
+  build-docs:
+    working_directory: ~/marquez
+    docker:
+      - image: cimg/node:12.21
+    steps:
+      - checkout
+      - run: npm install --prefix=${HOME}/.local --global redoc-cli
+      - run: redoc-cli bundle spec/openapi.yml
+
   build-api:
     working_directory: ~/marquez
     machine: true
@@ -206,6 +215,7 @@ jobs:
 workflows:
   marquez:
     jobs:
+      - build-docs
       - build-api
       - image-api
       - build-integration-spark
