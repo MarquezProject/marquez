@@ -62,7 +62,6 @@ export function* fetchRunsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_RUNS)
-      console.log(payload)
       const { runs } = yield call(getRuns, payload.jobName, payload.namespace)
       yield put(fetchRunsSuccess(payload.jobName, runs))
     } catch (e) {

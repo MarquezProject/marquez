@@ -12,7 +12,6 @@ export const getJobs = async (namespace: string, limit = 2000, offset = 0) => {
 }
 
 export const getRuns = async (jobName: string, namespace: string, limit = 100, offset = 0) => {
-  console.log('getruns')
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${encodeURIComponent(
     jobName
   )}/runs?limit=${limit}&offset=${offset}`

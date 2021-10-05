@@ -1,8 +1,4 @@
-import {
-  FETCH_JOBS,
-  FETCH_JOBS_SUCCESS,
-  RESET_JOBS
-} from '../actionCreators/actionTypes'
+import { FETCH_JOBS, FETCH_JOBS_SUCCESS, RESET_JOBS } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
 import { fetchJobsSuccess } from '../actionCreators'
 

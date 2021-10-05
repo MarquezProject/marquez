@@ -79,15 +79,12 @@ interface DispatchProps {
 type IProps = IWithStyles<typeof styles> & { job: LineageJob; runs: Run[] } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes } = props
+  const { job, classes, fetchRuns } = props
 
   const { jobName } = useParams()
   const history = useHistory()
-  fetchRuns(job.name, job.namespace)
-  console.log(props)
 
   useEffect(() => {
-    console.log('fetch runs')
     fetchRuns(job.name, job.namespace)
   }, [job.name])
 

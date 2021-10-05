@@ -1,6 +1,7 @@
 export const APPLICATION_ERROR = 'APPLICATION_ERROR'
 export const DIALOG_TOGGLE = 'DIALOG_TOGGLE'
 
+// runs
 export const FETCH_RUNS = 'FETCH_RUNS'
 export const FETCH_RUNS_SUCCESS = 'FETCH_RUNS_SUCCESS'
 export const RESET_RUNS = 'RESET_RUNS'
