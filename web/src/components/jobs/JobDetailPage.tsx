@@ -2,7 +2,6 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
-import { IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
@@ -15,11 +14,12 @@ import { Run } from '../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchRuns, resetRuns } from '../../store/actionCreators'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
+import RunStatus from './RunStatus'
 import Runs from './Runs'
 
 const styles = ({ palette, spacing }: ITheme) => {
@@ -113,9 +113,17 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           </IconButton>
         </Box>
       </Box>
-      <MqText font={'mono'} heading>
-        {job.name}
-      </MqText>
+      <Box display={'flex'} alignItems={'center'}>
+        {job.latestRun && (
+          <Box mr={1}>
+            <RunStatus run={job.latestRun} />
+          </Box>
+        )}
+        <MqText font={'mono'} heading>
+          {job.name}
+        </MqText>
+      </Box>
+
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>

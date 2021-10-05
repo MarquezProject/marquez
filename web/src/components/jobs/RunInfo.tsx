@@ -1,6 +1,6 @@
 import { Box } from '@material-ui/core'
-import {Run} from '../../types/api'
-import {formatUpdatedAt} from '../../helpers'
+import { Run } from '../../types/api'
+import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'

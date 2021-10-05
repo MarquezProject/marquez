@@ -16,14 +16,14 @@ import {
 import { Run } from '../../types/api'
 import { alpha } from '@material-ui/core/styles'
 import { formatUpdatedAt } from '../../helpers'
-import { runColorMap } from '../../helpers/runs'
 import { stopWatchDuration } from '../../helpers/time'
 import MqCode from '../core/code/MqCode'
+import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
+import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
-import MqEmpty from '../core/empty/MqEmpty'
 
 const RUN_COLUMNS = ['Status', 'Created At', 'Start Time', 'End Time', 'Duration']
 
@@ -97,11 +97,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
               <TableRow key={run.id} className={classes.tableRow} onClick={() => handleClick(run)}>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
-                    <Box
-                      mr={1}
-                      className={classes.status}
-                      style={{ backgroundColor: runColorMap[run.state] }}
-                    />
+                    <RunStatus run={run} />
                     <MqText>{run.state}</MqText>
                   </Box>
                 </TableCell>
