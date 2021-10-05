@@ -65,7 +65,6 @@ import java.util.UUID;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-
 import lombok.NonNull;
 import lombok.Value;
 import marquez.client.MarquezClient.DatasetVersions;
@@ -665,7 +664,9 @@ public class MarquezClientTest {
   public void testListDatasets() throws Exception {
     Datasets datasets = new Datasets(ImmutableList.of(DB_TABLE, STREAM));
     when(http.get(buildUrlFor("/namespaces/%s/datasets?limit=10&offset=0", NAMESPACE_NAME)))
-        .thenReturn(Utils.toJson(new ResultsPage<>("datasets", datasets.getValue(), datasets.getValue().size())));
+        .thenReturn(
+            Utils.toJson(
+                new ResultsPage<>("datasets", datasets.getValue(), datasets.getValue().size())));
     final List<Dataset> listDatasets = client.listDatasets(NAMESPACE_NAME, 10, 0);
     assertThat(listDatasets).asList().containsExactly(DB_TABLE, STREAM);
   }
