@@ -216,6 +216,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .filter(other -> other.getName().equals(DB_TABLE_NAME))
                 .count())
         .isEqualTo(1);
+    // test the total count, in this case it is the same as the response.
+    assertThat(client.countDatasets(NAMESPACE_NAME)).isEqualTo(1);
 
     assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
 

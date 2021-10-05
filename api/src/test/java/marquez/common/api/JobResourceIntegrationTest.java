@@ -39,6 +39,13 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void testApp_countJobs() {
+    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    int countJobs = client.countJobs(NAMESPACE_NAME);
+    assertThat(countJobs).isEqualTo(1);
+  }
+
+  @Test
   public void testApp_listRuns() {
     client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
     List<Run> runs = client.listRuns(NAMESPACE_NAME, JOB_NAME);
