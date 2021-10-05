@@ -19,9 +19,13 @@ import static marquez.client.models.RunState.COMPLETED;
 import static marquez.client.models.RunState.FAILED;
 import static marquez.client.models.RunState.RUNNING;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -29,13 +33,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.client.models.Dataset;
@@ -174,6 +186,11 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
+  public int countDatasets(@NonNull String namespaceName) {
+    final String bodyAsJson = http.get(url.toListDatasetsUrl(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET));
+    return Datasets.fromJson(bodyAsJson).getTotalCount();
+  }
+
   public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
     final String bodyAsJson = http.post(url.toDatasetTagUrl(namespaceName, datasetName, tagName));
@@ -214,6 +231,11 @@ public class MarquezClient {
   public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, limit, offset));
     return Jobs.fromJson(bodyAsJson).getValue();
+  }
+
+  public int countJobs(@NonNull String namespaceName) {
+    final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET));
+    return Jobs.fromJson(bodyAsJson).getTotalCount();
   }
 
   public List<JobVersion> listJobVersions(
@@ -434,9 +456,15 @@ public class MarquezClient {
     }
   }
 
+  @NoArgsConstructor
+  static class ResultsPage {
+    @JsonProperty @Setter @Getter int totalCount;
+  }
+
   @Value
-  static class Datasets {
-    @Getter List<Dataset> value;
+  @EqualsAndHashCode(callSuper=false)
+  public static class Datasets extends ResultsPage {
+    private final @Getter List<Dataset> value;
 
     @JsonCreator
     Datasets(@JsonProperty("datasets") final List<Dataset> value) {
@@ -463,7 +491,8 @@ public class MarquezClient {
   }
 
   @Value
-  static class Jobs {
+  @EqualsAndHashCode(callSuper=false)
+  static class Jobs extends ResultsPage {
     @Getter List<Job> value;
 
     @JsonCreator
