@@ -4,7 +4,7 @@ import MqCode from '../core/code/MqCode'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 
-const DATASET_COLUMNS = ['Attribute', 'Type', 'Description']
+const DATASET_COLUMNS = ['Field', 'Type', 'Description']
 
 interface DatasetInfoProps {
   datasetFields: Field[]

@@ -5,7 +5,6 @@ import { Theme as ITheme } from '@material-ui/core/styles/createTheme'
 import { WithStyles as IWithStyles } from '@material-ui/core/styles/withStyles'
 import { alpha, createStyles, withStyles } from '@material-ui/core/styles'
 import { formatUpdatedAt } from '../../helpers'
-import { stopWatchDuration } from '../../helpers/time'
 import DatasetInfo from './DatasetInfo'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
@@ -24,7 +23,7 @@ const styles = (theme: ITheme) => {
   })
 }
 
-const DATASET_VERSIONS_COLUMNS = ['Last Updated', 'Creator Duration', 'Field Count']
+const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count']
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -79,10 +78,8 @@ const DatasetVersions: FunctionComponent<
               key={version.createdAt}
               onClick={() => handleClick(version)}
             >
+              <TableCell align='left'>{version.version}</TableCell>
               <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
-              <TableCell align='left'>
-                {version.createdByRun ? stopWatchDuration(version.createdByRun.durationMs) : 'N/A'}
-              </TableCell>
               <TableCell align='left'>{version.fields.length}</TableCell>
             </TableRow>
           )
