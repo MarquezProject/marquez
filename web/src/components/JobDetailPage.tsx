@@ -11,13 +11,14 @@ import {
 } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchJobRuns } from '../store/actionCreators'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 const globalStyles = require('../global_styles.css')
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
 import { IJob } from '../types'
 import { LineageJob } from './lineage/types'
+import { Run } from '../types/api'
+import { fetchRuns } from '../store/actionCreators'
 import { formatUpdatedAt } from '../helpers'
 import IconButton from '@material-ui/core/IconButton'
 import MqCode from './core/code/MqCode'
@@ -72,21 +73,23 @@ const styles = ({ palette, spacing }: ITheme) => {
 }
 
 interface DispatchProps {
-  fetchJobRuns: typeof fetchJobRuns
+  fetchRuns: typeof fetchRuns
 }
 
-type IProps = IWithStyles<typeof styles> & { job: LineageJob } & DispatchProps
+type IProps = IWithStyles<typeof styles> & { job: LineageJob; runs: Run[] } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
   const { job, classes } = props
 
   const { jobName } = useParams()
   const history = useHistory()
+  fetchRuns(job.name, job.namespace)
+  console.log(props)
 
-  // useEffect hook to run on any change to jobName
   useEffect(() => {
-    job ? fetchJobRuns(job.name, job.namespace) : null
-  }, [job])
+    console.log('fetch runs')
+    fetchRuns(job.name, job.namespace)
+  }, [job.name])
 
   if (!job) {
     return (
@@ -158,19 +161,6 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       </Box>
       <MqCode code={context.sql} />
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-        {/*<div className={classes.latestRunContainer}>*/}
-        {/*  {latestRuns.map(r => {*/}
-        {/*    return (*/}
-        {/*      <Tooltip key={r.id} title={r.state} placement='top'>*/}
-        {/*        <div*/}
-        {/*          key={r.id}*/}
-        {/*          className={classes.squareShape}*/}
-        {/*          style={{ backgroundColor: colorMap[r.state] }}*/}
-        {/*        />*/}
-        {/*      </Tooltip>*/}
-        {/*    )*/}
-        {/*  })}*/}
-        {/*</div>*/}
         <Box ml={1}>
           <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
         </Box>
@@ -180,13 +170,13 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobs: state.jobs.result
+  runs: state.runs.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchJobRuns: fetchJobRuns
+      fetchRuns: fetchRuns
     },
     dispatch
   )
