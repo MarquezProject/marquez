@@ -98,6 +98,7 @@ export interface Run {
   args: {
     [key: string]: string
   }
+  facets: object
 }
 
 export type RunState = 'NEW' | 'COMPLETED' | 'FAILED' | 'ABORTED'

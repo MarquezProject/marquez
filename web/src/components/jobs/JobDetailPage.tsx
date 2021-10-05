@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 import * as Redux from 'redux'
-import { Box, Button, Tooltip } from '@material-ui/core'
+import { Box, Button, Tab, Tabs } from '@material-ui/core'
 import { IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import {
@@ -14,9 +14,8 @@ import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchRuns } from '../../store/actionCreators'
+import { fetchRuns, resetRuns } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
-import { runColorMap } from '../../helpers/runs'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
@@ -28,12 +27,6 @@ const styles = ({ palette, spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: spacing(2)
-    },
-    status: {
-      gridArea: 'status',
-      width: spacing(2),
-      height: spacing(2),
-      borderRadius: '50%'
     },
     squareShape: {
       width: spacing(2),
@@ -60,19 +53,32 @@ const styles = ({ palette, spacing }: ITheme) => {
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
+  resetRuns: typeof resetRuns
 }
 
 type IProps = IWithStyles<typeof styles> & { job: LineageJob; runs: Run[] } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes, fetchRuns, runs } = props
+  const { job, classes, fetchRuns, resetRuns, runs } = props
 
   const { jobName } = useParams()
   const history = useHistory()
 
+  const [tab, setTab] = React.useState(0)
+  const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
+    setTab(newValue)
+  }
+
   useEffect(() => {
     fetchRuns(job.name, job.namespace)
   }, [job.name])
+
+  // unmounting
+  useEffect(() => {
+    return () => {
+      resetRuns()
+    }
+  }, [])
 
   if (!job) {
     return (
@@ -90,17 +96,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     )
   }
 
-  const { root, status } = classes
+  const { root } = classes
 
-  const {
-    name,
-    description,
-    updatedAt = '',
-    latestRun,
-    location,
-    namespace,
-    context = { sql: '' }
-  } = job as IJob
+  const { name, description, updatedAt = '', location, context = { sql: '' } } = job as IJob
 
   return (
     <Box
@@ -110,54 +108,53 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       justifyContent='space-between'
       className={root}
     >
-      <Box>
-        <Box mb={1}>
-          {latestRun && (
-            <Tooltip title={latestRun.state} placement='top'>
-              {latestRun && (
-                <div className={status} style={{ backgroundColor: runColorMap[latestRun.state] }} />
-              )}
-            </Tooltip>
-          )}
-        </Box>
-        <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-          <MqText font={'mono'} heading>
-            {namespace} / {name}
-          </MqText>
-          <Box display={'flex'} alignItems={'center'}>
-            <Box mr={1}>
-              <Button variant='outlined' color='primary' target={'_blank'} href={location}>
-                Location
-              </Button>
-            </Box>
-            <IconButton onClick={() => history.push('/')}>
-              <CloseIcon />
-            </IconButton>
+      <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
+          <Tab label='Current Run' disableRipple={true} />
+          <Tab label='Previous Runs' disableRipple={true} />
+        </Tabs>
+        <Box display={'flex'} alignItems={'center'}>
+          <Box mr={1}>
+            <Button variant='outlined' color='primary' target={'_blank'} href={location}>
+              Location
+            </Button>
           </Box>
-        </Box>
-        <Box mb={2}>
-          <MqText subdued>{description}</MqText>
-        </Box>
-      </Box>
-      <MqCode code={context.sql} />
-      <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-        <Box ml={1}>
-          <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
+          <IconButton onClick={() => history.push('/')}>
+            <CloseIcon />
+          </IconButton>
         </Box>
       </Box>
-      <Runs runs={runs} />
+      <MqText font={'mono'} heading>
+        {name}
+      </MqText>
+      <Box mt={1} mb={2}>
+        <MqText subdued>{description}</MqText>
+      </Box>
+      {tab === 0 && (
+        <>
+          <MqCode code={context.sql} />
+          <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
+            <Box ml={1}>
+              <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
+            </Box>
+          </Box>
+        </>
+      )}
+      {tab === 1 && <Runs runs={runs} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  runs: state.runs.result
+  runs: state.runs.result,
+  runsLoading: state.runs.isLoading
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchRuns: fetchRuns
+      fetchRuns: fetchRuns,
+      resetRuns: resetRuns
     },
     dispatch
   )

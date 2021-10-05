@@ -55,6 +55,10 @@ export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
   }
 })
 
+export const resetRuns = () => ({
+  type: actionTypes.RESET_RUNS
+})
+
 export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
