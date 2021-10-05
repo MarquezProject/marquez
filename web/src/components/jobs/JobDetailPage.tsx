@@ -116,7 +116,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       <MqText font={'mono'} heading>
         {job.name}
       </MqText>
-      <Box mt={1} mb={2}>
+      <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
       {tab === 0 && job.latestRun && <RunInfo run={job.latestRun} />}

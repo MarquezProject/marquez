@@ -1,5 +1,8 @@
+import { ArrowBackIosRounded } from '@material-ui/icons'
 import {
   Box,
+  Chip,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -11,12 +14,16 @@ import {
   withStyles
 } from '@material-ui/core'
 import { Run } from '../../types/api'
+import { alpha } from '@material-ui/core/styles'
 import { formatUpdatedAt } from '../../helpers'
 import { runColorMap } from '../../helpers/runs'
 import { stopWatchDuration } from '../../helpers/time'
 import MqCode from '../core/code/MqCode'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, SetStateAction } from 'react'
+import RunInfo from './RunInfo'
+import transitions from '@material-ui/core/styles/transitions'
+import MqEmpty from '../core/empty/MqEmpty'
 
 const RUN_COLUMNS = ['Status', 'Created At', 'Start Time', 'End Time', 'Duration']
 
@@ -27,6 +34,13 @@ const styles = (theme: Theme) => {
       width: theme.spacing(2),
       height: theme.spacing(2),
       borderRadius: '50%'
+    },
+    tableRow: {
+      cursor: 'pointer',
+      transition: transitions.create(['background-color']),
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.1)
+      }
     }
   })
 }
@@ -39,7 +53,26 @@ interface RunsProps {
 const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => {
   const { runs, facets, classes } = props
   if (runs.length === 0) {
-    return null
+    return <MqEmpty title={'No Runs Found'} />
+  }
+
+  const [infoView, setInfoView] = React.useState<Run | null>(null)
+  const handleClick = (newValue: SetStateAction<Run | null>) => {
+    setInfoView(newValue)
+  }
+
+  if (infoView) {
+    return (
+      <>
+        <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+          <Chip label={infoView.id} />
+          <IconButton onClick={() => handleClick(null)}>
+            <ArrowBackIosRounded fontSize={'small'} />
+          </IconButton>
+        </Box>
+        <RunInfo run={infoView} />
+      </>
+    )
   }
 
   return (
@@ -61,7 +94,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
         <TableBody>
           {runs.map(run => {
             return (
-              <TableRow key={run.id}>
+              <TableRow key={run.id} className={classes.tableRow} onClick={() => handleClick(run)}>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
                     <Box
