@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 import * as Redux from 'redux'
-import { Box, Button, Tab, Tabs } from '@material-ui/core'
+import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
 import { IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import {
@@ -15,12 +15,11 @@ import { Run } from '../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchRuns, resetRuns } from '../../store/actionCreators'
-import { formatUpdatedAt } from '../../helpers'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
-import MqCode from '../core/code/MqCode'
 import MqText from '../core/text/MqText'
+import RunInfo from './RunInfo'
 import Runs from './Runs'
 
 const styles = ({ palette, spacing }: ITheme) => {
@@ -56,12 +55,14 @@ interface DispatchProps {
   resetRuns: typeof resetRuns
 }
 
-type IProps = IWithStyles<typeof styles> & { job: LineageJob; runs: Run[] } & DispatchProps
+type IProps = IWithStyles<typeof styles> & {
+  job: LineageJob
+  runs: Run[]
+  runsLoading: boolean
+} & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes, fetchRuns, resetRuns, runs } = props
-
-  const { jobName } = useParams()
+  const { job, classes, fetchRuns, resetRuns, runs, runsLoading } = props
   const history = useHistory()
 
   const [tab, setTab] = React.useState(0)
@@ -80,25 +81,13 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     }
   }, [])
 
-  if (!job) {
+  if (runsLoading) {
     return (
-      <Box
-        p={2}
-        display='flex'
-        flexDirection='column'
-        justifyContent='space-between'
-        className={classes.root}
-      >
-        <MqText>
-          No job by the name of <MqText bold>{`"${jobName}"`}</MqText> found
-        </MqText>
+      <Box display={'flex'} justifyContent={'center'}>
+        <CircularProgress color='primary' />
       </Box>
     )
   }
-
-  const { root } = classes
-
-  const { name, description, updatedAt = '', location, context = { sql: '' } } = job as IJob
 
   return (
     <Box
@@ -106,7 +95,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       display='flex'
       flexDirection='column'
       justifyContent='space-between'
-      className={root}
+      className={classes.root}
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
@@ -115,7 +104,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
-            <Button variant='outlined' color='primary' target={'_blank'} href={location}>
+            <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
               Location
             </Button>
           </Box>
@@ -125,21 +114,12 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         </Box>
       </Box>
       <MqText font={'mono'} heading>
-        {name}
+        {job.name}
       </MqText>
       <Box mt={1} mb={2}>
-        <MqText subdued>{description}</MqText>
+        <MqText subdued>{job.description}</MqText>
       </Box>
-      {tab === 0 && (
-        <>
-          <MqCode code={context.sql} />
-          <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-            <Box ml={1}>
-              <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
-            </Box>
-          </Box>
-        </>
-      )}
+      {tab === 0 && job.latestRun && <RunInfo run={job.latestRun} />}
       {tab === 1 && <Runs runs={runs} />}
     </Box>
   )

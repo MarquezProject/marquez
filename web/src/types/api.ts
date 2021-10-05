@@ -87,6 +87,9 @@ export interface Runs {
 
 export interface Run {
   id: string
+  context: {
+    sql?: string
+  }
   createdAt: string
   updatedAt: string
   nominalStartTime: string
