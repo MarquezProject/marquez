@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react'
 
 import * as Redux from 'redux'
 import { Box, Button, Tooltip } from '@material-ui/core'
+import { IJob } from '../../types'
 import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
@@ -9,36 +10,26 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { useHistory, useParams } from 'react-router-dom'
-import CloseIcon from '@material-ui/icons/Close'
-const globalStyles = require('../../global_styles.css')
-const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
-import { IJob } from '../../types'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { fetchRuns } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { runColorMap } from '../../helpers/runs'
+import { useHistory, useParams } from 'react-router-dom'
+import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
 import MqCode from '../core/code/MqCode'
 import MqText from '../core/text/MqText'
 import Runs from './Runs'
-
-const colorMap = {
-  NEW: jobRunNew,
-  FAILED: jobRunFailed,
-  COMPLETED: jobRunCompleted,
-  ABORTED: jobRunAborted,
-  RUNNING: jobRunRunning
-}
 
 const styles = ({ palette, spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: spacing(2)
     },
-    _status: {
+    status: {
       gridArea: 'status',
       width: spacing(2),
       height: spacing(2),
@@ -57,12 +48,6 @@ const styles = ({ palette, spacing }: ITheme) => {
     latestRunContainer: {
       float: 'right',
       display: 'flex'
-    },
-    failed: {
-      backgroundColor: jobRunFailed
-    },
-    passed: {
-      backgroundColor: jobRunCompleted
     },
     copyToClipboard: {
       position: 'absolute',
@@ -105,7 +90,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     )
   }
 
-  const { root, _status } = classes
+  const { root, status } = classes
 
   const {
     name,
@@ -130,10 +115,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           {latestRun && (
             <Tooltip title={latestRun.state} placement='top'>
               {latestRun && (
-                <div
-                  className={`${_status}`}
-                  style={{ backgroundColor: colorMap[latestRun.state] }}
-                />
+                <div className={status} style={{ backgroundColor: runColorMap[latestRun.state] }} />
               )}
             </Tooltip>
           )}
