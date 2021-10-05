@@ -5,7 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 
 import { formatUpdatedAt } from '../../helpers'
-import JobDetailPage from '../../components/JobDetailPage'
+import JobDetailPage from '../../components/jobs/JobDetailPage'
 
 const jobs = require('../../../docker/db/data/jobs.json')
 

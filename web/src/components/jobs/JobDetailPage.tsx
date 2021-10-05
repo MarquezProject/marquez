@@ -2,7 +2,7 @@ import React, { FunctionComponent, useEffect } from 'react'
 
 import * as Redux from 'redux'
 import { Box, Button, Tooltip } from '@material-ui/core'
-import { IState } from '../store/reducers'
+import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
   WithStyles as IWithStyles,
@@ -13,16 +13,17 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
-const globalStyles = require('../global_styles.css')
+const globalStyles = require('../../global_styles.css')
 const { jobRunNew, jobRunFailed, jobRunCompleted, jobRunAborted, jobRunRunning } = globalStyles
-import { IJob } from '../types'
-import { LineageJob } from './lineage/types'
-import { Run } from '../types/api'
-import { fetchRuns } from '../store/actionCreators'
-import { formatUpdatedAt } from '../helpers'
+import { IJob } from '../../types'
+import { LineageJob } from '../lineage/types'
+import { Run } from '../../types/api'
+import { fetchRuns } from '../../store/actionCreators'
+import { formatUpdatedAt } from '../../helpers'
 import IconButton from '@material-ui/core/IconButton'
-import MqCode from './core/code/MqCode'
-import MqText from './core/text/MqText'
+import MqCode from '../core/code/MqCode'
+import MqText from '../core/text/MqText'
+import Runs from './Runs'
 
 const colorMap = {
   NEW: jobRunNew,
@@ -79,7 +80,7 @@ interface DispatchProps {
 type IProps = IWithStyles<typeof styles> & { job: LineageJob; runs: Run[] } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes, fetchRuns } = props
+  const { job, classes, fetchRuns, runs } = props
 
   const { jobName } = useParams()
   const history = useHistory()
@@ -162,6 +163,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{formatUpdatedAt(updatedAt)}</MqText>
         </Box>
       </Box>
+      <Runs runs={runs} />
     </Box>
   )
 }
