@@ -2,6 +2,7 @@ import { Box } from '@material-ui/core'
 import { Run } from '../../types/api'
 import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
+import MqJson from '../core/code/MqJson'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 
@@ -25,7 +26,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>Facets</MqText>
           </Box>
-          <MqCode code={JSON.stringify(run.facets, null, '\t')} />
+          <MqJson code={run.facets} />
         </Box>
       )}
     </Box>

@@ -1,6 +1,7 @@
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { Field } from '../../types/api'
-import MqCode from '../core/code/MqCode'
+import MqEmpty from '../core/empty/MqEmpty'
+import MqJson from '../core/code/MqJson'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 
@@ -13,6 +14,10 @@ interface DatasetInfoProps {
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
   const { datasetFields, facets } = props
+
+  if (datasetFields.length === 0) {
+    return <MqEmpty title={'No Fields'} body={'Try adding dataset fields.'} />
+  }
 
   return (
     <Box>
@@ -47,7 +52,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>Facets</MqText>
           </Box>
-          <MqCode code={JSON.stringify(facets, null, '\t')} />
+          <MqJson code={facets} />
         </Box>
       )}
     </Box>
