@@ -53,7 +53,7 @@ interface RunsProps {
 const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => {
   const { runs, facets, classes } = props
   if (runs.length === 0) {
-    return <MqEmpty title={'No Runs Found'} />
+    return <MqEmpty title={'No Runs Found'} body={'Try adding some runs for this job.'} />
   }
 
   const [infoView, setInfoView] = React.useState<Run | null>(null)

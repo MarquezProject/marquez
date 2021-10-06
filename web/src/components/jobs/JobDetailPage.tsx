@@ -17,6 +17,7 @@ import { fetchRuns, resetRuns } from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import IconButton from '@material-ui/core/IconButton'
+import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
@@ -107,7 +108,16 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
-      {tab === 0 && job.latestRun && <RunInfo run={job.latestRun} />}
+      {tab === 0 && job.latestRun ? (
+        <RunInfo run={job.latestRun} />
+      ) : (
+        !job.latestRun && (
+          <MqEmpty
+            title={'No Run Information Available'}
+            body={'Try adding some runs for this job.'}
+          />
+        )
+      )}
       {tab === 1 && <Runs runs={runs} />}
     </Box>
   )
