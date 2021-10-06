@@ -58,20 +58,24 @@ export const resetJobs = () => ({
   type: actionTypes.RESET_JOBS
 })
 
-export const fetchJobRuns = (jobName: string, namespace: string) => ({
-  type: actionTypes.FETCH_JOB_RUNS,
+export const fetchRuns = (jobName: string, namespace: string) => ({
+  type: actionTypes.FETCH_RUNS,
   payload: {
     jobName,
     namespace
   }
 })
 
-export const fetchJobRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
-  type: actionTypes.FETCH_JOB_RUNS_SUCCESS,
+export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
+  type: actionTypes.FETCH_RUNS_SUCCESS,
   payload: {
     jobName,
-    lastTenJobRuns: jobRuns
+    runs: jobRuns
   }
+})
+
+export const resetRuns = () => ({
+  type: actionTypes.RESET_RUNS
 })
 
 export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
