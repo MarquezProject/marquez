@@ -22,8 +22,7 @@ import {
   fetchRunsSuccess,
   fetchSearchSuccess
 } from '../actionCreators'
-import {
-  getDatasetVersions, getDatasets, getJobs, getNamespaces, getRuns } from '../requests'
+import { getDatasetVersions, getDatasets, getJobs, getNamespaces, getRuns } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 

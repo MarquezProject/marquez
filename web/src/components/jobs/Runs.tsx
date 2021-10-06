@@ -25,7 +25,7 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
-const RUN_COLUMNS = ['Status', 'Created At', 'Start Time', 'End Time', 'Duration']
+const RUN_COLUMNS = ['ID', 'State', 'Created At', 'Started At', 'Ended At', 'Duration']
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -95,6 +95,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
           {runs.map(run => {
             return (
               <TableRow key={run.id} className={classes.tableRow} onClick={() => handleClick(run)}>
+                <TableCell align='left'>{run.id}</TableCell>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
                     <RunStatus run={run} />

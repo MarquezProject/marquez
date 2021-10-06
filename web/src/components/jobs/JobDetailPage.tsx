@@ -22,30 +22,10 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import Runs from './Runs'
 
-const styles = ({ palette, spacing }: ITheme) => {
+const styles = ({ spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: spacing(2)
-    },
-    squareShape: {
-      width: spacing(2),
-      height: spacing(2),
-      marginLeft: '5px',
-      borderRadius: '50%'
-    },
-    lastUpdated: {
-      color: palette.grey[600],
-      padding: '0px 0px 5px 5px'
-    },
-    latestRunContainer: {
-      float: 'right',
-      display: 'flex'
-    },
-    copyToClipboard: {
-      position: 'absolute',
-      bottom: '1rem',
-      right: '1rem',
-      cursor: 'pointer'
     }
   })
 }
