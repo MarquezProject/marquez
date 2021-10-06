@@ -19,7 +19,7 @@ title() {
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--daemon]"
+  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--detach]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -47,7 +47,7 @@ usage() {
   title "FLAGS:"
   echo "  -b, --build           build images from source"
   echo "  -s, --seed            seed HTTP API server with metadata"
-  echo "  -d, --daemon          run in the background"
+  echo "  -d, --detach          run in the background"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -88,8 +88,8 @@ while [ $# -gt 0 ]; do
     -s|'--seed')
        SEED='true'
        ;;
-    -d|'--daemon')
-       DAEMON='true'
+    -d|'--detach')
+       DETACH='true'
        ;;
     -h|'--help')
        usage
@@ -102,7 +102,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-if [[ "${DAEMON}" = "true" ]]; then
+if [[ "${DETACH}" = "true" ]]; then
   args+=" -d"
 fi
 
