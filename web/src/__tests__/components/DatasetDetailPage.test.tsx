@@ -3,7 +3,7 @@ import { mount } from 'enzyme'
 import Typography from '@material-ui/core/Typography'
 
 import { formatUpdatedAt } from '../../helpers'
-import DatasetDetailPage from '../../components/DatasetDetailPage'
+import DatasetDetailPage from '../../components/datasets/DatasetDetailPage'
 
 const datasets = require('../../../docker/db/data/datasets.json')
 const dataset = datasets[0]

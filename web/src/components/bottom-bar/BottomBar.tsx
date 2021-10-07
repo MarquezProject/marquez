@@ -8,9 +8,9 @@ import { Undefinable } from '../../types/util/Nullable'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { isLineageDataset, isLineageJob } from '../../helpers/nodes'
-import DatasetDetailPage from '../DatasetDetailPage'
+import DatasetDetailPage from '../datasets/DatasetDetailPage'
 import DragBar from '../lineage/components/drag-bar/DragBar'
-import JobDetailPage from '../JobDetailPage'
+import JobDetailPage from '../jobs/JobDetailPage'
 
 const styles = (theme: Theme) => {
   return createStyles({

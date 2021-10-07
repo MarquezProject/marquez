@@ -1,5 +1,5 @@
+import { Field, Run, Tag } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
-import { Run, Tag } from '../../types/api'
 
 export type JobOrDataset = 'JOB' | 'DATASET'
 export type BatchOrStream = 'BATCH' | 'STREAM' | 'SERVICE'
@@ -14,12 +14,8 @@ export interface LineageDataset {
   updatedAt: string
   namespace: string
   sourceName: string
-  fields: {
-    name: string
-    type: string
-    tags: Tag[]
-    description: string
-  }[]
+  fields: Field[]
+  facets: object
   tags: Tag[]
   lastModifiedAt: string
   description: string
