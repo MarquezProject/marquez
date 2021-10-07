@@ -39,11 +39,14 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.DatasetName;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
+@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
   @ParameterizedTest
@@ -216,10 +219,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .filter(other -> other.getName().equals(DB_TABLE_NAME))
                 .count())
         .isEqualTo(1);
-    // test the total count, in this case it is the same as the response.
-    assertThat(client.countDatasets(NAMESPACE_NAME)).isEqualTo(1);
-
-    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
 
     // (4) Add field to db table
     final List<Field> original = dbTable.getFields();
