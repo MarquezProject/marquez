@@ -19,7 +19,7 @@ title() {
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed]"
+  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--detach]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -47,6 +47,7 @@ usage() {
   title "FLAGS:"
   echo "  -b, --build           build images from source"
   echo "  -s, --seed            seed HTTP API server with metadata"
+  echo "  -d, --detach          run in the background"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -87,6 +88,9 @@ while [ $# -gt 0 ]; do
     -s|'--seed')
        SEED='true'
        ;;
+    -d|'--detach')
+       DETACH='true'
+       ;;
     -h|'--help')
        usage
        exit 0
@@ -97,6 +101,10 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+if [[ "${DETACH}" = "true" ]]; then
+  args+=" -d"
+fi
 
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
