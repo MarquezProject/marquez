@@ -11,14 +11,9 @@ export const getJobs = async (namespace: string, limit = 2000, offset = 0) => {
   })
 }
 
-export const getLatestJobRuns = async (
-  jobName: string,
-  namespace: string,
-  limit = 20,
-  offset = 0
-) => {
+export const getRuns = async (jobName: string, namespace: string, limit = 100, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${encodeURIComponent(
     jobName
   )}/runs?limit=${limit}&offset=${offset}`
-  return genericFetchWrapper<Run[]>(url, { method: 'GET' }, 'fetchLatestJobRuns')
+  return genericFetchWrapper<Run[]>(url, { method: 'GET' }, 'fetchRuns')
 }

@@ -8,8 +8,7 @@
 @value datasetNodeWhite: #fff;
 @value linkGrey: #f3f3f3;
 @value jobRunNew: #3199FF;
-@value jobRunFailed: #CC101D;
-@value jobRunCompleted: #01965C;
+@value jobRunFailed: #ee7b7b;
+@value jobRunCompleted: #71ddbf;
 @value jobRunAborted: #7D7D7D;
 @value jobRunRunning: #FECC00;
-
