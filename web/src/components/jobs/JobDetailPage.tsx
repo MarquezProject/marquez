@@ -108,16 +108,18 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
-      {tab === 0 && job.latestRun ? (
-        <RunInfo run={job.latestRun} />
-      ) : (
-        !job.latestRun && (
-          <MqEmpty
-            title={'No Run Information Available'}
-            body={'Try adding some runs for this job.'}
-          />
+      {tab === 0 ? (
+        job.latestRun ? (
+          <RunInfo run={job.latestRun} />
+        ) : (
+          !job.latestRun && (
+            <MqEmpty
+              title={'No Run Information Available'}
+              body={'Try adding some runs for this job.'}
+            />
+          )
         )
-      )}
+      ) : null}
       {tab === 1 && <Runs runs={runs} />}
     </Box>
   )
