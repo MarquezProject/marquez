@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes'
 
-import { Dataset, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
+import { Dataset, DatasetVersion, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
 export const fetchDatasets = (namespace: string) => ({
@@ -15,6 +15,25 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   payload: {
     datasets
   }
+})
+
+export const fetchDatasetVersions = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS,
+  payload: {
+    namespace,
+    name
+  }
+})
+
+export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
+  payload: {
+    versions
+  }
+})
+
+export const resetDatasetVersions = () => ({
+  type: actionTypes.RESET_DATASET_VERSIONS
 })
 
 export const resetDatasets = () => ({
@@ -39,20 +58,24 @@ export const resetJobs = () => ({
   type: actionTypes.RESET_JOBS
 })
 
-export const fetchJobRuns = (jobName: string, namespace: string) => ({
-  type: actionTypes.FETCH_JOB_RUNS,
+export const fetchRuns = (jobName: string, namespace: string) => ({
+  type: actionTypes.FETCH_RUNS,
   payload: {
     jobName,
     namespace
   }
 })
 
-export const fetchJobRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
-  type: actionTypes.FETCH_JOB_RUNS_SUCCESS,
+export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
+  type: actionTypes.FETCH_RUNS_SUCCESS,
   payload: {
     jobName,
-    lastTenJobRuns: jobRuns
+    runs: jobRuns
   }
+})
+
+export const resetRuns = () => ({
+  type: actionTypes.RESET_RUNS
 })
 
 export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
