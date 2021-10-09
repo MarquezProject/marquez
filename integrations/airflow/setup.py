@@ -20,7 +20,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "openlineage-airflow==0.2.2",
+    "openlineage-airflow==0.2.3",
 ]
 
 setup(
