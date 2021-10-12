@@ -20,11 +20,15 @@ export default (
     case FETCH_NAMESPACES_SUCCESS:
       return {
         result: payload.namespaces,
-        selectedNamespace: window.localStorage.getItem('selectedNamespace')
-          ? window.localStorage.getItem('selectedNamespace')
-          : payload.namespaces[0]
-          ? payload.namespaces[0].name
-          : null
+        selectedNamespace:
+          window.localStorage.getItem('selectedNamespace') &&
+          action.payload.namespaces.find(
+            ns => ns.name === window.localStorage.getItem('selectedNamespace')
+          )
+            ? window.localStorage.getItem('selectedNamespace')
+            : payload.namespaces.length > 0
+            ? payload.namespaces[0].name
+            : null
       }
     case SELECT_NAMESPACE:
       window.localStorage.setItem('selectedNamespace', action.payload)
