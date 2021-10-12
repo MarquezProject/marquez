@@ -80,8 +80,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-          <Tab label='Current Run' disableRipple={true} />
-          <Tab label='Previous Runs' disableRipple={true} />
+          <Tab label='LATEST RUN' disableRipple={true} />
+          <Tab label='RUN HISTORY' disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
@@ -108,16 +108,18 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
-      {tab === 0 && job.latestRun ? (
-        <RunInfo run={job.latestRun} />
-      ) : (
-        !job.latestRun && (
-          <MqEmpty
-            title={'No Run Information Available'}
-            body={'Try adding some runs for this job.'}
-          />
+      {tab === 0 ? (
+        job.latestRun ? (
+          <RunInfo run={job.latestRun} />
+        ) : (
+          !job.latestRun && (
+            <MqEmpty
+              title={'No Run Information Available'}
+              body={'Try adding some runs for this job.'}
+            />
+          )
         )
-      )}
+      ) : null}
       {tab === 1 && <Runs runs={runs} />}
     </Box>
   )
