@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
 
+### Fixed
+
+* location/connectionUrl should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+
 ## [0.18.0](https://github.com/MarquezProject/marquez/compare/0.17.0...0.18.0) - 2021-09-14
 
 ### Added

@@ -56,6 +56,7 @@ class OpenLineageDaoTest {
             Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)),
             Arrays.asList());
 
+    assertThat(writeJob.getJob().getLocation()).isNull();
     assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(readJob.getInputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(readJob.getInputs().get().get(0).getDatasetVersionRow())
