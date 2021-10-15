@@ -220,6 +220,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
                 .count())
         .isEqualTo(1);
 
+    assertThat(client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME)).hasSize(1);
+
     // (4) Add field to db table
     final List<Field> original = dbTable.getFields();
     final List<Field> added = ImmutableList.of(newFieldWith(PII.getName()), newField(), newField());
