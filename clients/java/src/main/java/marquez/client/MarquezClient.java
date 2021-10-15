@@ -177,11 +177,6 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
-  public int countDatasets(@NonNull String namespaceName) {
-    final String bodyAsJson = http.get(url.toListDatasetsUrl(namespaceName, 0, DEFAULT_OFFSET));
-    return Datasets.fromJson(bodyAsJson).getTotalCount();
-  }
-
   public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
     final String bodyAsJson = http.post(url.toDatasetTagUrl(namespaceName, datasetName, tagName));
@@ -222,11 +217,6 @@ public class MarquezClient {
   public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, limit, offset));
     return Jobs.fromJson(bodyAsJson).getValue();
-  }
-
-  public int countJobs(@NonNull String namespaceName) {
-    final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, 0, DEFAULT_OFFSET));
-    return Jobs.fromJson(bodyAsJson).getTotalCount();
   }
 
   public List<JobVersion> listJobVersions(

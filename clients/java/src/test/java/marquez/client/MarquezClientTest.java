@@ -672,17 +672,6 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testCountDatasets() throws Exception {
-    Datasets datasets = new Datasets(ImmutableList.of(DB_TABLE, STREAM));
-    when(http.get(buildUrlFor("/namespaces/%s/datasets?limit=0&offset=0", NAMESPACE_NAME)))
-        .thenReturn(
-            Utils.toJson(
-                new ResultsPage<>("datasets", datasets.getValue(), datasets.getValue().size())));
-    final int countDatasets = client.countDatasets(NAMESPACE_NAME);
-    assertThat(countDatasets).isEqualTo(2);
-  }
-
-  @Test
   public void testListDatasetVersions() throws Exception {
     when(http.get(
             buildUrlFor(
@@ -756,17 +745,6 @@ public class MarquezClientTest {
         .thenReturn(Utils.toJson(new Jobs(ImmutableList.of(JOB))));
     final List<Job> jobs = client.listJobs(NAMESPACE_NAME, 10, 0);
     assertThat(jobs).asList().containsExactly(JOB);
-  }
-
-  @Test
-  public void testCountJobs() throws Exception {
-    Jobs jobs = new Jobs(ImmutableList.of(JOB));
-    when(http.get(buildUrlFor("/namespaces/%s/jobs?limit=0&offset=0", NAMESPACE_NAME)))
-        .thenReturn(
-            Utils.toJson(new ResultsPage<>("jobs", jobs.getValue(), jobs.getValue().size())));
-
-    final int countJobs = client.countJobs(NAMESPACE_NAME);
-    assertThat(countJobs).isEqualTo(1);
   }
 
   @Test
