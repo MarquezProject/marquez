@@ -18,17 +18,42 @@ import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.common.models.CommonModelGenerator;
+import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import org.jdbi.v3.core.Jdbi;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
+@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   public void setup() {
     createNamespace(NAMESPACE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);
+  }
+
+  @AfterEach
+  public void tearDown(Jdbi jdbi) {
+    jdbi.inTransaction(
+        handle -> {
+          handle.execute("DELETE FROM lineage_events");
+          handle.execute("DELETE FROM runs_input_mapping");
+          handle.execute("DELETE FROM dataset_versions_field_mapping");
+          handle.execute("DELETE FROM stream_versions");
+          handle.execute("DELETE FROM dataset_versions");
+          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
+          handle.execute("DELETE FROM run_states");
+          handle.execute("DELETE FROM runs");
+          handle.execute("DELETE FROM run_args");
+          handle.execute("DELETE FROM job_versions_io_mapping");
+          handle.execute("DELETE FROM job_versions");
+          handle.execute("DELETE FROM jobs");
+          return null;
+        });
   }
 
   @Test
@@ -40,6 +65,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testApp_listRuns() {
+    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build());
     List<Run> runs = client.listRuns(NAMESPACE_NAME, JOB_NAME);
     assertThat(runs).hasSizeGreaterThan(0);
@@ -137,6 +163,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_listJobVersions() {
     String runId = UUID.randomUUID().toString();
+    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
     client.markRunAs(runId, RunState.COMPLETED);
 
@@ -185,6 +212,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_getJobVersion() {
     String runId = UUID.randomUUID().toString();
+    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().id(runId).build());
     client.markRunAs(runId, RunState.COMPLETED);
 

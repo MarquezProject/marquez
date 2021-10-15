@@ -34,8 +34,11 @@ import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.client.models.Dataset;
@@ -434,9 +437,15 @@ public class MarquezClient {
     }
   }
 
+  @NoArgsConstructor
+  static class ResultsPage {
+    @JsonProperty @Setter @Getter int totalCount;
+  }
+
   @Value
-  static class Datasets {
-    @Getter List<Dataset> value;
+  @EqualsAndHashCode(callSuper = false)
+  public static class Datasets extends ResultsPage {
+    private final @Getter List<Dataset> value;
 
     @JsonCreator
     Datasets(@JsonProperty("datasets") final List<Dataset> value) {
@@ -463,7 +472,8 @@ public class MarquezClient {
   }
 
   @Value
-  static class Jobs {
+  @EqualsAndHashCode(callSuper = false)
+  static class Jobs extends ResultsPage {
     @Getter List<Job> value;
 
     @JsonCreator

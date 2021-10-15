@@ -45,6 +45,7 @@ import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.JobVersionNotFoundException;
 import marquez.api.models.JobVersion;
+import marquez.api.models.ResultsPage;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
@@ -159,7 +160,8 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
 
     final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
-    return Response.ok(new Jobs(jobs)).build();
+    final int totalCount = jobService.countFor(namespaceName.getValue());
+    return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
 
   @Timed
@@ -206,15 +208,6 @@ public class JobResource extends BaseResource {
   public RunResource runResourceRoot(@PathParam("id") RunId runId) {
     throwIfNotExists(runId);
     return new RunResource(runId, runService);
-  }
-
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Getter
-  public static class Jobs {
-    @NonNull
-    @JsonProperty("jobs")
-    public List<Job> value;
   }
 
   @Value
