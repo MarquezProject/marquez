@@ -116,7 +116,7 @@ public interface OpenLineageDao extends BaseDao {
     String location = null;
     if (event.getJob().getFacets() != null
         && event.getJob().getFacets().getSourceCodeLocation() != null) {
-      location = getUrlOrPlaceholder(event.getJob().getFacets().getSourceCodeLocation().getUrl());
+      location = getUrlOrNull(event.getJob().getFacets().getSourceCodeLocation().getUrl());
     }
 
     JobRow job =
@@ -285,7 +285,7 @@ public interface OpenLineageDao extends BaseDao {
     updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
   }
 
-  default String getUrlOrPlaceholder(String uri) {
+  default String getUrlOrNull(String uri) {
     try {
       return new URI(uri).toASCIIString();
     } catch (URISyntaxException e) {
@@ -293,7 +293,7 @@ public interface OpenLineageDao extends BaseDao {
         // assume host as string
         return new URI("http://" + uri).toASCIIString();
       } catch (Exception ex) {
-        return ""; // empty string for placeholder
+        return null;
       }
     }
   }
@@ -329,7 +329,7 @@ public interface OpenLineageDao extends BaseDao {
               getSourceType(ds),
               now,
               ds.getFacets().getDataSource().getName(),
-              getUrlOrPlaceholder(ds.getFacets().getDataSource().getUri()));
+              getUrlOrNull(ds.getFacets().getDataSource().getUri()));
     } else {
       source =
           sourceDao.upsertOrDefault(
