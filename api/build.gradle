@@ -54,7 +54,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:6.5.7'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation 'com.graphql-java:graphql-java:17.3'
-    implementation 'com.graphql-java-kickstart:graphql-java-servlet:11.1.1'
+    implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"
