@@ -16,5 +16,4 @@ __author__ = """Marquez Project"""
 __version__ = "0.18.0"
 
 from marquez_client.client import MarquezClient              # noqa: F401
-from marquez_client.client_wo import MarquezWriteOnlyClient  # noqa: F401
 from marquez_client.clients import Clients                   # noqa: F401

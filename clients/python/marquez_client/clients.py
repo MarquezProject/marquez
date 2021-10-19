@@ -14,15 +14,10 @@ import os
 
 from deprecation import deprecated
 
-from marquez_client import MarquezClient, MarquezWriteOnlyClient
-from marquez_client.http_backend import HttpBackend
-from marquez_client.file_backend import FileBackend
-from marquez_client.log_backend import LogBackend
+from marquez_client import MarquezClient
 from marquez_client.utils import Utils
 from marquez_client.constants import (
-    DEFAULT_MARQUEZ_BACKEND,
     DEFAULT_MARQUEZ_URL,
-    DEFAULT_MARQUEZ_FILE,
     DEFAULT_TIMEOUT_MS
 )
 
@@ -44,20 +39,3 @@ class Clients(object):
         return MarquezWriteOnlyClient(
             backend=Clients._backend_from_env(),
         )
-
-    @staticmethod
-    def _backend_from_env():
-        backend = \
-            os.environ.get('MARQUEZ_BACKEND', DEFAULT_MARQUEZ_BACKEND).upper()
-
-        if backend == 'HTTP':
-            url = os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL)
-            api_key = os.environ.get('MARQUEZ_API_KEY')
-            timeout = Utils.to_seconds(
-                os.environ.get('MARQUEZ_TIMEOUT_MS', DEFAULT_TIMEOUT_MS))
-            return HttpBackend(url, timeout, api_key)
-        elif backend == 'FILE':
-            file = os.environ.get('MARQUEZ_FILE', DEFAULT_MARQUEZ_FILE)
-            return FileBackend(file)
-        elif backend == 'LOG':
-            return LogBackend()
