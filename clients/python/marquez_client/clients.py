@@ -15,10 +15,8 @@ import os
 from deprecation import deprecated
 
 from marquez_client import MarquezClient
-from marquez_client.utils import Utils
 from marquez_client.constants import (
-    DEFAULT_MARQUEZ_URL,
-    DEFAULT_TIMEOUT_MS
+    DEFAULT_MARQUEZ_URL
 )
 
 
@@ -29,13 +27,4 @@ class Clients(object):
         return MarquezClient(
             url=os.environ.get('MARQUEZ_URL', DEFAULT_MARQUEZ_URL),
             api_key=os.environ.get('MARQUEZ_API_KEY')
-        )
-
-    @staticmethod
-    @deprecated(deprecated_in="0.17.0",
-                details="Prefer `Clients.new_client()`. This method is scheduled to be removed "
-                        "in release `0.19.0`.")
-    def new_write_only_client():
-        return MarquezWriteOnlyClient(
-            backend=Clients._backend_from_env(),
         )
