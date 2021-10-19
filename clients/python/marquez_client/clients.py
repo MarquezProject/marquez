@@ -12,8 +12,6 @@
 
 import os
 
-from deprecation import deprecated
-
 from marquez_client import MarquezClient
 from marquez_client.constants import (
     DEFAULT_MARQUEZ_URL

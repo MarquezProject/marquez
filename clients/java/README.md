@@ -37,17 +37,21 @@ NamespaceMeta meta = NamespaceMeta().builder()
 Namespace namespace = client.createNamespace("my-namespace", meta);
 ```
 
-### Supply an SSLContext to enable TLS
+## HTTPS
+
 ```java
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import marquez.client.MarquezClient;
-...
+.
+.
 KeyManager[] keyManager = setUpKeyManagers();
 TrustManager[] trustManager = setUpTrustManagers();
+
 SSLContext sslContext = SSLContext.getInstance("TLS");
 sslContext.init(keyManager, trustManager, null);
+
 MarquezClient client = MarquezClient.builder()
         .sslContext(sslContext)
         .baseUrl("https://localhost:5000")
