@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
 
+### Deprecated
+
+* Write only clients for `java` and `python` [@wslulciuc](https://github.com/wslulciuc)
+
 ### Fixed
 
 * location/connectionUrl should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
