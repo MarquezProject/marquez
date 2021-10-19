@@ -15,18 +15,4 @@ public final class Clients {
   public static MarquezClient newClient(@NonNull final URL baseUrl) {
     return MarquezClient.builder().baseUrl(baseUrl).build();
   }
-
-  /**
-   * Allows updating job run status and related lineage Interaction can be synchronous or
-   * asynchronous depending on the backend
-   *
-   * @param backend the underlying protocol to use to transmit information
-   * @return the MarquezWriteOnlyClient implementation
-   * @deprecated Prefer {@code Clients.newClient(baseUrl)}. This method is scheduled to be removed
-   *     in release {@code 0.19.0}.
-   */
-  @Deprecated
-  public static MarquezWriteOnlyClient newWriteOnlyClient(@NonNull final Backend backend) {
-    return new MarquezWriteOnlyClientImpl(backend);
-  }
 }
