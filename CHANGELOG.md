@@ -25,7 +25,7 @@
 
 ### Removed
 
-* Write only clients for `java` and `python`, please use OpenLineage [clients](https://github.com/OpenLineage/OpenLineage/tree/main/client) instead [@wslulciuc](https://github.com/wslulciuc)
+* `WriteOnly` clients for `java` and `python`. Before [OpenLineage](https://openlineage.io), we added a `WriteOnly` implementation to our clients to emit calls to a backend. A `backend` enabled collecting raw HTTP requests to an HTTP endpoint, console, or file. This was our way of capturing lineage _events_ that could then be used to automatically create resources on the Marquez backend. We soon worked on a standard that eventually became OpenLineage. That is, OpenLineage removed the need to make individual calls to create a namespace, a source, a datasets, etc, but rather accept an event with metadata that the backend could process. [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.18.0](https://github.com/MarquezProject/marquez/compare/0.17.0...0.18.0) - 2021-09-14
 
