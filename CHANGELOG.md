@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
 
-### Deprecated
+### Removed
 
 * Write only clients for `java` and `python`, please use OpenLineage [clients](https://github.com/OpenLineage/OpenLineage/tree/main/client) instead [@wslulciuc](https://github.com/wslulciuc)
 
