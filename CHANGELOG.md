@@ -9,7 +9,7 @@
 * Display runs and run facets in web UI :tada: [@phixMe](https://github.com/phixMe)
 * Facet formatting and highlighting as Json in web UI [@phixMe](https://github.com/phixMe)
 * Add option for `docker/up.sh` to run in the background [@rossturk](https://github.com/rossturk)
-* Retun `totalCount` in lists of jobs and datatsets [@phixMe](https://github.com/phixMe)
+* Return `totalCount` in lists of jobs and datatsets [@phixMe](https://github.com/phixMe)
 
 ### Changed
 
