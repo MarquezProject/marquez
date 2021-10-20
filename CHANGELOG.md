@@ -4,7 +4,7 @@
 
 ### Deprecated
 
-* Write only clients for `java` and `python` [@wslulciuc](https://github.com/wslulciuc)
+* Write only clients for `java` and `python`, please use OpenLineage [clients](https://github.com/OpenLineage/OpenLineage/tree/main/client) instead [@wslulciuc](https://github.com/wslulciuc)
 
 ### Fixed
 
