@@ -2,9 +2,26 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
 
+### Added
+
+* Add simple python client example [@wslulciuc](https://github.com/wslulciuc)
+* Navigate Dataset Versions in web UI [@phixMe](https://github.com/phixMe)
+* Runs and run facets for web UI [@phixMe](https://github.com/phixMe)
+* Facet formatting and highlighting in web UI [@phixMe](https://github.com/phixMe)
+* Add option for `docker/up.sh` to run in the background [@rossturk](https://github.com/rossturk)
+* Retun `totalCount` in lists of jobs and datatsets [@phixMe](https://github.com/phixMe)
+
+### Changed
+
+* Change type column in `dataset_fields` table to `TEXT` [@wslulciuc](https://github.com/wslulciuc)
+* Set `ZonedDateTime` parsing to support optional offsets and default to server timezone [@collado-mike](https://github.com/collado-mike)
+
 ### Fixed
 
-* location/connectionUrl should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* `Job.location` and `Source.connectionUrl` should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* Z-Index fix for nodes and edges in lineage graph [@phixMe](https://github.com/phixMe)
+* Format of the index files for web UI [@phixMe](https://github.com/phixMe)
+* Fix OpenLineage API to return correct response codes for exceptions propagated from async calls [@collado-mike](https://github.com/collado-mike)
 
 ## [0.18.0](https://github.com/MarquezProject/marquez/compare/0.17.0...0.18.0) - 2021-09-14
 
