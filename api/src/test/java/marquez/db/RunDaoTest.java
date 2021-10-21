@@ -141,4 +141,36 @@ class RunDaoTest {
         .map(RunId::getValue)
         .containsAll(expectedRuns.stream().map(RunRow::getUuid).collect(Collectors.toSet()));
   }
+
+  @Test
+  public void updateRowWithNullNominalTimeDoesNotUpdateNominalTime() {
+    final RunDao runDao = jdbi.onDemand(RunDao.class);
+
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        DbTestUtils.newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+
+    RunRow row = DbTestUtils.newRun(jdbi, namespaceRow.getName(), jobRow.getName());
+
+    RunRow updatedRow =
+        runDao.upsert(
+            row.getUuid(),
+            row.getUuid().toString(),
+            row.getUpdatedAt(),
+            null,
+            row.getRunArgsUuid(),
+            null,
+            null,
+            namespaceRow.getUuid(),
+            namespaceRow.getName(),
+            row.getJobName(),
+            null,
+            null);
+
+    assertThat(row.getUuid()).isEqualTo(updatedRow.getUuid());
+    assertThat(row.getNominalStartTime()).isNotNull();
+    assertThat(row.getNominalEndTime()).isNotNull();
+    assertThat(updatedRow.getNominalStartTime()).isEqualTo(row.getNominalStartTime());
+    assertThat(updatedRow.getNominalEndTime()).isEqualTo(row.getNominalEndTime());
+  }
 }

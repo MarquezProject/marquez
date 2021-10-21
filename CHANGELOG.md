@@ -22,6 +22,7 @@
 * Z-Index fix for nodes and edges in lineage graph [@phixMe](https://github.com/phixMe)
 * Format of the index files for web UI [@phixMe](https://github.com/phixMe)
 * Fix OpenLineage API to return correct response codes for exceptions propagated from async calls [@collado-mike](https://github.com/collado-mike)
+* Stopped overwriting nominal time information with nulls [@mobuchowski](https://github.com/mobuchowski)
 
 ### Removed
 
