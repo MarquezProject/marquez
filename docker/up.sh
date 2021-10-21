@@ -79,11 +79,10 @@ while [ $# -gt 0 ]; do
        ;;
     -t|'--tag')
        shift
-       TAG=0.19.0
+       TAG="${1}"
        ;;
     -b|'--build')
        BUILD='true'
-       TAG=0.19.0
        ;;
     -s|'--seed')
        SEED='true'
@@ -115,4 +114,4 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=0.19.0
+API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args
