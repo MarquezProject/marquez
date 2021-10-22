@@ -194,6 +194,12 @@ public interface DatasetDao extends BaseDao {
           + "ORDER BY d.name")
   List<Dataset> findAll(String namespaceName, int limit, int offset);
 
+  @SqlQuery("SELECT count(*) FROM datasets")
+  int count();
+
+  @SqlQuery("SELECT count(*) FROM datasets AS j WHERE j.namespace_name = :namespaceName")
+  int countFor(String namespaceName);
+
   default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
     List<Dataset> datasets = findAll(namespaceName, limit, offset);
     return datasets.stream().peek(this::setFields).collect(Collectors.toList());

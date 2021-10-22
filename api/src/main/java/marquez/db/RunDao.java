@@ -187,8 +187,8 @@ public interface RunDao extends BaseDao {
           + "updated_at = EXCLUDED.updated_at, "
           + "current_run_state = EXCLUDED.current_run_state, "
           + "transitioned_at = EXCLUDED.transitioned_at, "
-          + "nominal_start_time = EXCLUDED.nominal_start_time, "
-          + "nominal_end_time = EXCLUDED.nominal_end_time, "
+          + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
+          + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
           + "RETURNING *")
   ExtendedRunRow upsert(
@@ -236,8 +236,8 @@ public interface RunDao extends BaseDao {
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "updated_at = EXCLUDED.updated_at, "
-          + "nominal_start_time = EXCLUDED.nominal_start_time, "
-          + "nominal_end_time = EXCLUDED.nominal_end_time, "
+          + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
+          + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
           + "RETURNING *")
   ExtendedRunRow upsert(

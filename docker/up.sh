@@ -19,7 +19,7 @@ title() {
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed]"
+  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--detach]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -47,6 +47,7 @@ usage() {
   title "FLAGS:"
   echo "  -b, --build           build images from source"
   echo "  -s, --seed            seed HTTP API server with metadata"
+  echo "  -d, --detach          run in the background"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -61,7 +62,7 @@ args="-V --force-recreate --remove-orphans"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=0.18.0
+TAG=0.19.0
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -78,14 +79,16 @@ while [ $# -gt 0 ]; do
        ;;
     -t|'--tag')
        shift
-       TAG=0.18.0
+       TAG="${1}"
        ;;
     -b|'--build')
        BUILD='true'
-       TAG=0.18.0
        ;;
     -s|'--seed')
        SEED='true'
+       ;;
+    -d|'--detach')
+       DETACH='true'
        ;;
     -h|'--help')
        usage
@@ -98,6 +101,10 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+if [[ "${DETACH}" = "true" ]]; then
+  args+=" -d"
+fi
+
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
@@ -107,4 +114,4 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=0.18.0 docker-compose $compose_files up $args
+API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args

@@ -46,6 +46,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
@@ -54,6 +57,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +65,8 @@ import java.util.UUID;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import lombok.NonNull;
+import lombok.Value;
 import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
 import marquez.client.MarquezClient.Jobs;
@@ -365,6 +371,29 @@ public class MarquezClientTest {
   @Mock private MarquezHttp http;
   private MarquezClient client;
 
+  @Value
+  static class ResultsPage<T> {
+    @NonNull Map<String, T> value;
+
+    @JsonProperty("totalCount")
+    int totalCount;
+
+    public ResultsPage(String propertyName, T value, int totalCount) {
+      this.value = setValue(propertyName, value);
+      this.totalCount = totalCount;
+    }
+
+    @JsonAnySetter
+    public Map<String, T> setValue(String key, T value) {
+      return Collections.singletonMap(key, value);
+    }
+
+    @JsonAnyGetter
+    public @NonNull Map<String, T> getValue() {
+      return value;
+    }
+  }
+
   @BeforeEach
   public void setUp() {
     client = new MarquezClient(marquezUrl, http);
@@ -633,10 +662,13 @@ public class MarquezClientTest {
 
   @Test
   public void testListDatasets() throws Exception {
+    Datasets datasets = new Datasets(ImmutableList.of(DB_TABLE, STREAM));
     when(http.get(buildUrlFor("/namespaces/%s/datasets?limit=10&offset=0", NAMESPACE_NAME)))
-        .thenReturn(Utils.toJson(new Datasets(ImmutableList.of(DB_TABLE, STREAM))));
-    final List<Dataset> datasets = client.listDatasets(NAMESPACE_NAME, 10, 0);
-    assertThat(datasets).asList().containsExactly(DB_TABLE, STREAM);
+        .thenReturn(
+            Utils.toJson(
+                new ResultsPage<>("datasets", datasets.getValue(), datasets.getValue().size())));
+    final List<Dataset> listDatasets = client.listDatasets(NAMESPACE_NAME, 10, 0);
+    assertThat(listDatasets).asList().containsExactly(DB_TABLE, STREAM);
   }
 
   @Test

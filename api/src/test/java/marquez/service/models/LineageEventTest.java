@@ -2,18 +2,23 @@ package marquez.service.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import io.dropwizard.util.Resources;
 import io.openlineage.client.OpenLineage.RunEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Arrays;
 import java.util.List;
 import marquez.common.Utils;
+import marquez.common.models.FlexibleDateTimeDeserializer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -25,6 +30,8 @@ public class LineageEventTest {
   public static String EVENT_LARGE = "open_lineage/event_large.json";
   public static String NULL_NOMINAL_END_TIME = "open_lineage/null_nominal_end_time.json";
   public static String EVENT_NAMESPACE_NAMING = "open_lineage/event_namespace_naming.json";
+  public static String EVENT_NANOSECOND_TIME = "open_lineage/event_required_nanoseconds.json";
+  public static String EVENT_TIME_WITH_NO_TIMEZONE = "open_lineage/event_required_no_timezone.json";
 
   public static List<String> data() {
     return Arrays.asList(
@@ -34,7 +41,9 @@ public class LineageEventTest {
         EVENT_UNICODE,
         EVENT_LARGE,
         NULL_NOMINAL_END_TIME,
-        EVENT_NAMESPACE_NAMING);
+        EVENT_NAMESPACE_NAMING,
+        EVENT_NANOSECOND_TIME,
+        EVENT_TIME_WITH_NO_TIMEZONE);
   }
 
   @ParameterizedTest
@@ -46,7 +55,11 @@ public class LineageEventTest {
     LineageEvent lineageEvent = objectMapper.readValue(expectedResource, LineageEvent.class);
     RunEvent converted =
         objectMapper.readValue(objectMapper.writeValueAsString(lineageEvent), RunEvent.class);
-    assertThat(converted).usingRecursiveComparison().isEqualTo(expectedEvent);
+    assertThat(converted)
+        .usingRecursiveComparison()
+        .withEqualsForFields(
+            (ZonedDateTime a, ZonedDateTime b) -> a.toInstant().equals(b.toInstant()), "eventTime")
+        .isEqualTo(expectedEvent);
   }
 
   @ParameterizedTest
@@ -55,28 +68,25 @@ public class LineageEventTest {
     testSerialization(Utils.newObjectMapper(), input);
   }
 
-  // Test object mapper with listed jackson requirements
-  @ParameterizedTest
-  @MethodSource("data")
-  public void testRequiredObjectMapper(String input) throws IOException {
-    testSerialization(getMapper(), input);
-  }
-
-  public ObjectMapper getMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(Include.NON_NULL);
-    mapper.registerModule(new JavaTimeModule());
-    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-
-    return mapper;
-  }
-
   public void testSerialization(ObjectMapper mapper, String expectedFile) throws IOException {
     URL expectedResource = Resources.getResource(expectedFile);
-    LineageEvent expected = mapper.readValue(expectedResource, LineageEvent.class);
-    String serialized = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(expected);
+    LineageEvent deserialized = mapper.readValue(expectedResource, LineageEvent.class);
+    String serialized = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(deserialized);
 
-    assertThat(mapper.readTree(serialized)).isEqualTo(mapper.readTree(expectedResource));
+    JsonNode expectedNode = mapper.readTree(expectedResource);
+    TemporalAccessor parsedEventTime =
+        FlexibleDateTimeDeserializer.DATE_TIME_OPTIONAL_OFFSET.parse(
+            expectedNode.get("eventTime").textValue());
+    ZonedDateTime zonedDateTime =
+        parsedEventTime.query(TemporalQueries.zone()) != null
+            ? ZonedDateTime.from(parsedEventTime)
+            : LocalDateTime.from(parsedEventTime).atZone(ZoneId.systemDefault());
+    ((ObjectNode) expectedNode)
+        .set(
+            "eventTime",
+            new TextNode(
+                FlexibleDateTimeDeserializer.DATE_TIME_OPTIONAL_OFFSET.format(zonedDateTime)));
+    JsonNode actualNode = mapper.readTree(serialized);
+    assertThat(actualNode).isEqualTo(expectedNode);
   }
 }

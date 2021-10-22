@@ -1,5 +1,5 @@
 import { API_URL } from '../../globals'
-import { Datasets } from '../../types/api'
+import { DatasetVersions, Datasets } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
 export const getDatasets = async (namespace: string, limit = 2000, offset = 0) => {
@@ -9,4 +9,18 @@ export const getDatasets = async (namespace: string, limit = 2000, offset = 0) =
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchDatasets').then((r: Datasets) => {
     return r.datasets.map(d => ({ ...d, namespace: namespace }))
   })
+}
+
+export const getDatasetVersions = async (
+  namespace: string,
+  dataset: string,
+  limit = 100,
+  offset = 0
+) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/datasets/${dataset}/versions?limit=${limit}&offset=${offset}`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchDatasetVersions').then(
+    (versions: DatasetVersions) => versions.versions
+  )
 }

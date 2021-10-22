@@ -1,6 +1,38 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.18.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.0...HEAD)
+
+### Fixed
+
+* URI and URL DB mappper should handle empty string as null [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+
+## [0.19.0](https://github.com/MarquezProject/marquez/compare/0.18.0...0.19.0) - 2021-10-21
+
+### Added
+
+* Add simple python client example [@wslulciuc](https://github.com/wslulciuc)
+* Display dataset versions in web UI :tada: [@phixMe](https://github.com/phixMe)
+* Display runs and run facets in web UI :tada: [@phixMe](https://github.com/phixMe)
+* Facet formatting and highlighting as Json in web UI [@phixMe](https://github.com/phixMe)
+* Add option for `docker/up.sh` to run in the background [@rossturk](https://github.com/rossturk)
+* Return `totalCount` in lists of jobs and datatsets [@phixMe](https://github.com/phixMe)
+
+### Changed
+
+* Change type column in `dataset_fields` table to `TEXT` [@wslulciuc](https://github.com/wslulciuc)
+* Set `ZonedDateTime` parsing to support optional offsets and default to server timezone [@collado-mike](https://github.com/collado-mike)
+
+### Fixed
+
+* `Job.location` and `Source.connectionUrl` should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* Z-Index fix for nodes and edges in lineage graph [@phixMe](https://github.com/phixMe)
+* Format of the index files for web UI [@phixMe](https://github.com/phixMe)
+* Fix OpenLineage API to return correct response codes for exceptions propagated from async calls [@collado-mike](https://github.com/collado-mike)
+* Stopped overwriting nominal time information with nulls [@mobuchowski](https://github.com/mobuchowski)
+
+### Removed
+
+* `WriteOnly` clients for `java` and `python`. Before [OpenLineage](https://openlineage.io), we added a `WriteOnly` implementation to our clients to emit calls to a backend. A `backend` enabled collecting raw HTTP requests to an HTTP endpoint, console, or file. This was our way of capturing lineage _events_ that could then be used to automatically create resources on the Marquez backend. We soon worked on a standard that eventually became OpenLineage. That is, OpenLineage removed the need to make individual calls to create a namespace, a source, a datasets, etc, but rather accept an event with metadata that the backend could process. [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.18.0](https://github.com/MarquezProject/marquez/compare/0.17.0...0.18.0) - 2021-09-14
 

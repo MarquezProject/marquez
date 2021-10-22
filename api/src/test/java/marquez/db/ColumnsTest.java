@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URL;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -238,5 +240,61 @@ public class ColumnsTest {
 
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> Columns.stringArrayOrThrow(results, column));
+  }
+
+  @Test
+  public void testEmptyUrl() throws SQLException {
+    final String column = "url";
+    final String expected = "";
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getString(column)).thenReturn(expected);
+
+    final URL actual = Columns.urlOrNull(results, column);
+    assertThat(actual).isNull();
+  }
+
+  @Test
+  public void testEmptyUri() throws SQLException {
+    final String column = "uri";
+    final String expected = "";
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getString(column)).thenReturn(expected);
+
+    final URI actual = Columns.uriOrNull(results, column);
+    assertThat(actual).isNull();
+  }
+
+  @Test
+  public void testNullUrl() throws SQLException {
+    final URL actual = Columns.urlOrNull(results, "url");
+    assertThat(actual).isNull();
+  }
+
+  @Test
+  public void testNullUri() throws SQLException {
+    final URI actual = Columns.uriOrNull(results, "uri");
+    assertThat(actual).isNull();
+  }
+
+  @Test
+  public void testBlankUrl() throws SQLException {
+    final String column = "url";
+    final String expected = "   ";
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getString(column)).thenReturn(expected);
+
+    final URL actual = Columns.urlOrNull(results, column);
+    assertThat(actual).isNull();
+  }
+
+  @Test
+  public void testBlankUri() throws SQLException {
+    final String column = "uri";
+    final String expected = "   ";
+    when(results.getObject(column)).thenReturn(expected);
+    when(results.getString(column)).thenReturn(expected);
+
+    final URI actual = Columns.uriOrNull(results, column);
+    assertThat(actual).isNull();
   }
 }

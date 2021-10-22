@@ -1,0 +1,1 @@
+ALTER TABLE dataset_fields ALTER COLUMN type TYPE TEXT;

@@ -13,9 +13,6 @@
 import os
 
 from marquez_client import Clients
-from marquez_client.http_backend import HttpBackend
-from marquez_client.file_backend import FileBackend
-from marquez_client.log_backend import LogBackend
 from marquez_client.utils import Utils
 from marquez_client.constants import DEFAULT_MARQUEZ_URL, API_PATH_V1
 
@@ -37,34 +34,3 @@ def test_new_client():
     assert _HEADERS == headers_with_auth
 
     del os.environ['MARQUEZ_API_KEY']
-
-
-def test_new_wo_client_http():
-    os.environ['MARQUEZ_BACKEND'] = 'http'
-    os.environ['MARQUEZ_API_KEY'] = API_KEY
-
-    client = Clients.new_write_only_client()
-    assert isinstance(client._backend, HttpBackend)
-    assert client._backend._api_base == API_BASE
-    assert client._backend._api_key == API_KEY
-
-    del os.environ['MARQUEZ_BACKEND']
-    del os.environ['MARQUEZ_API_KEY']
-
-
-def test_new_wo_client_file():
-    os.environ['MARQUEZ_BACKEND'] = 'file'
-
-    client = Clients.new_write_only_client()
-    assert isinstance(client._backend, FileBackend)
-
-    del os.environ['MARQUEZ_BACKEND']
-
-
-def test_new_wo_client_log():
-    os.environ['MARQUEZ_BACKEND'] = 'log'
-
-    client = Clients.new_write_only_client()
-    assert isinstance(client._backend, LogBackend)
-
-    del os.environ['MARQUEZ_BACKEND']

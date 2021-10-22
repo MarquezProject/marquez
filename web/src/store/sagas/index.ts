@@ -1,9 +1,10 @@
 import * as Effects from 'redux-saga/effects'
 import {
   FETCH_DATASETS,
+  FETCH_DATASET_VERSIONS,
   FETCH_JOBS,
-  FETCH_JOB_RUNS,
   FETCH_LINEAGE,
+  FETCH_RUNS,
   FETCH_SEARCH
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
@@ -13,17 +14,17 @@ const call: any = Effects.call
 
 import {
   applicationError,
+  fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
-  fetchJobRunsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
+  fetchRunsSuccess,
   fetchSearchSuccess
 } from '../actionCreators'
-import { getDatasets, getJobs, getLatestJobRuns, getNamespaces } from '../requests'
+import { getDatasetVersions, getDatasets, getJobs, getNamespaces, getRuns } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
-import _orderBy from 'lodash/orderBy'
 
 export function* fetchNamespaces() {
   try {
@@ -59,13 +60,12 @@ export function* fetchSearch() {
   }
 }
 
-export function* fetchJobRunsSaga() {
+export function* fetchRunsSaga() {
   while (true) {
     try {
-      const { payload } = yield take(FETCH_JOB_RUNS)
-      const { runs } = yield call(getLatestJobRuns, payload.jobName, payload.namespace)
-      const runsOrderedByStartTime = _orderBy(runs, ['nominalStartTime'], ['asc'])
-      yield put(fetchJobRunsSuccess(payload.jobName, runsOrderedByStartTime))
+      const { payload } = yield take(FETCH_RUNS)
+      const { runs } = yield call(getRuns, payload.jobName, payload.namespace)
+      yield put(fetchRunsSuccess(payload.jobName, runs))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
@@ -96,12 +96,25 @@ export function* fetchDatasetsSaga() {
   }
 }
 
+export function* fetchDatasetVersionsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_DATASET_VERSIONS)
+      const datasets = yield call(getDatasetVersions, payload.namespace, payload.name)
+      yield put(fetchDatasetVersionsSuccess(datasets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching dataset runs'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces()]
   const sagasThatWatchForAction = [
-    fetchJobRunsSaga(),
     fetchJobsSaga(),
+    fetchRunsSaga(),
     fetchDatasetsSaga(),
+    fetchDatasetVersionsSaga(),
     fetchLineage(),
     fetchSearch()
   ]
