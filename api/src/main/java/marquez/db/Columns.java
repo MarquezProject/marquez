@@ -222,12 +222,12 @@ public final class Columns {
   public static URI uriOrNull(ResultSet results, String column) {
     try {
       final String result = stringOrNull(results, column);
-      if (result == null) {
+      if (result == null || result.isBlank()) {
         return null;
       }
       return new URI(result);
     } catch (URISyntaxException | SQLException e) {
-      log.error("Could not read source URI", e);
+      log.warn("Could not read source URI for column '{}' null would be returned", column, e);
       return null;
     }
   }
@@ -235,12 +235,12 @@ public final class Columns {
   public static URL urlOrNull(ResultSet results, String column) {
     try {
       final String result = stringOrNull(results, column);
-      if (result == null) {
+      if (result == null || result.isBlank()) {
         return null;
       }
       return new URL(result);
     } catch (SQLException | MalformedURLException e) {
-      log.error("Could not read source URI", e);
+      log.warn("Could not read source URI for column '{}' null would be returned", column, e);
       return null;
     }
   }
