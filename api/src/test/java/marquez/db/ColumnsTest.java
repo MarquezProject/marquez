@@ -297,5 +297,4 @@ public class ColumnsTest {
     final URI actual = Columns.uriOrNull(results, column);
     assertThat(actual).isNull();
   }
-
 }
