@@ -340,24 +340,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
-    post:
-      summary: Create a run
-      description: Creates a new run object for a job.
-      deprecated: true
-      tags:
-        - Jobs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatedRun'
-      responses:
-        '201':
-          description: CREATED
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Run'
     get:
       parameters:
         - $ref: '#/components/parameters/limit'
@@ -380,78 +362,6 @@ paths:
     get:
       summary: Retrieve a run
       description: Retrieve a run.
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
-  /jobs/runs/{id}/start:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Start a run
-      description: Marks the run as `RUNNING`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
-  /jobs/runs/{id}/complete:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Complete a run
-      description: Marks the run as `COMPLETED`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Run'
-
-  /jobs/runs/{id}/fail:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Fail a run
-      description: Marks the run as `FAILED`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
-  /jobs/runs/{id}/abort:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Abort a run
-      description: Marks the run as `ABORTED`.
-      deprecated: true
       tags:
         - Jobs
       responses:
@@ -550,15 +460,6 @@ paths:
 
 components:
   parameters:
-    at:
-      name: at
-      in: query
-      description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the time when the run transitioned.
-      required: false
-      schema:
-        type: string
-        format: date-time
-
     namespace:
       name: namespace
       in: path
@@ -1430,28 +1331,6 @@ components:
         totalCount:
           type: number
           description: The total number of jobs for the given namespace
-
-    CreatedRun:
-      type: object
-      properties:
-        id:
-          description: An _optional_ user-provided unique ID of the run. A run ID **must** be an [UUID](https://tools.ietf.org/html/rfc4122).
-                       If an ID for the run is not provided, a random UUID will be generated for the given run.
-          type: string
-          format: uuid
-        nominalStartTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal start time of the run.
-          type: string
-          format: date-time
-        nominalEndTime:
-          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the nominal end time of the run.
-          type: string
-          format: date-time
-        args:
-          description: The arguments of the run.
-          type: object
-      example:
-        args: {'email': 'me@example.com', 'emailOnFailure': false, 'emailOnRetry': true, 'retries': 1}
 
     IncompleteRun:
       type: object
