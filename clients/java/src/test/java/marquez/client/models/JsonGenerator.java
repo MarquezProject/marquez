@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URL;
+import java.util.Map;
 import java.util.UUID;
 import marquez.client.Utils;
 
@@ -296,18 +297,6 @@ public final class JsonGenerator {
     return obj.toString();
   }
 
-  public static String newJsonFor(final RunMeta meta) {
-    final ObjectNode obj = MAPPER.createObjectNode();
-    obj.put("nominalStartTime", meta.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
-    obj.put("nominalEndTime", meta.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
-
-    final ObjectNode runArgs = MAPPER.createObjectNode();
-    meta.getArgs().forEach(runArgs::put);
-    obj.set("args", runArgs);
-
-    return obj.toString();
-  }
-
   public static String newJsonFor(final Run run) {
     return toObj(run).toString();
   }
@@ -331,8 +320,31 @@ public final class JsonGenerator {
     obj.put("durationMs", run.getDurationMs().orElse(null));
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
+    for (final Map.Entry<String, String> runArg : run.getArgs().entrySet()) {
+      runArgs.put(runArg.getKey(), runArg.getKey());
+    }
     run.getArgs().forEach(runArgs::put);
     obj.set("args", runArgs);
+
+    final ObjectNode facets = MAPPER.createObjectNode();
+    for (final Map.Entry<String, Object> facet : run.getFacets().entrySet()) {
+      facets.put(facet.getKey(), facet.getKey());
+    }
+    obj.set("facets", facets);
+
+    final ObjectNode jobVersionId =
+        MAPPER
+            .createObjectNode()
+            .put("namespace", run.getJobVersionId().getNamespace())
+            .put("name", run.getJobVersionId().getName())
+            .put("version", run.getJobVersionId().getVersion().toString());
+    obj.set("jobVersionId", jobVersionId);
+
+    final ArrayNode inputVersions = MAPPER.valueToTree(run.getInputVersions());
+    obj.putArray("inputVersions").addAll(inputVersions);
+
+    final ArrayNode outputVersions = MAPPER.valueToTree(run.getOutputVersions());
+    obj.putArray("outputVersions").addAll(outputVersions);
 
     return obj;
   }

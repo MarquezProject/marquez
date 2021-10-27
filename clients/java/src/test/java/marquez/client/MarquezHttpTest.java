@@ -17,7 +17,6 @@ package marquez.client;
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.MarquezPathV1.path;
 import static marquez.client.models.ModelGenerator.newDescription;
-import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newNamespace;
 import static marquez.client.models.ModelGenerator.newNamespaceMeta;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
@@ -42,7 +41,6 @@ import javax.net.ssl.SSLContext;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import marquez.client.models.RunMeta;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -150,8 +148,13 @@ public class MarquezHttpTest {
 
   @Test
   public void testPost() throws Exception {
-    final RunMeta meta = RunMeta.builder().build();
-    final String json = JsonGenerator.newJsonFor(newRun());
+    final Namespace namespace = newNamespace();
+    final NamespaceMeta meta =
+        NamespaceMeta.builder()
+            .ownerName(namespace.getOwnerName())
+            .description(namespace.getDescription().orElse(null))
+            .build();
+    final String json = JsonGenerator.newJsonFor(namespace);
     final ByteArrayInputStream stream = new ByteArrayInputStream(json.getBytes(UTF_8));
     when(httpEntity.getContent()).thenReturn(stream);
     when(httpResponse.getEntity()).thenReturn(httpEntity);
@@ -160,8 +163,7 @@ public class MarquezHttpTest {
 
     when(httpClient.execute(any(HttpPost.class))).thenReturn(httpResponse);
 
-    final URL url =
-        marquezUrl.from(path("/namespace/%s/jobs/%s/runs", newNamespaceName(), newJobName()));
+    final URL url = marquezUrl.from(path("/namespaces/%s", namespace.getName()));
     final String actual = marquezHttp.post(url, meta.toJson());
     assertThat(actual).isEqualTo(json);
   }

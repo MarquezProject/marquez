@@ -16,9 +16,11 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,16 +28,23 @@ import lombok.NonNull;
 import lombok.ToString;
 import marquez.client.Utils;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public final class Run extends RunMeta {
+@EqualsAndHashCode
+@ToString
+public final class Run {
+  @Getter private final String id;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
+  @Nullable private final Instant nominalStartTime;
+  @Nullable private final Instant nominalEndTime;
   @Getter private final RunState state;
   @Nullable private final Instant startedAt;
-  @Nullable private final Long durationMs;
   @Nullable private final Instant endedAt;
+  @Nullable private final Long durationMs;
+  @Getter private final Map<String, String> args;
   @Getter private final Map<String, Object> facets;
+  @Getter private final JobVersionId jobVersionId;
+  @Getter private final Set<DatasetVersionId> inputVersions;
+  @Getter private final Set<DatasetVersionId> outputVersions;
 
   public Run(
       @NonNull final String id,
@@ -48,15 +57,34 @@ public final class Run extends RunMeta {
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
       @Nullable final Map<String, String> args,
-      @Nullable final Map<String, Object> facets) {
-    super(id, nominalStartTime, nominalEndTime, args);
+      @Nullable final Map<String, Object> facets,
+      @NonNull final JobVersionId jobVersionId,
+      @Nullable final Set<DatasetVersionId> inputVersions,
+      @Nullable final Set<DatasetVersionId> outputVersions) {
+    this.id = id;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.nominalStartTime = nominalStartTime;
+    this.nominalEndTime = nominalEndTime;
     this.state = state;
     this.startedAt = startedAt;
-    this.durationMs = durationMs;
     this.endedAt = endedAt;
+    this.durationMs = durationMs;
+    this.args = (args == null) ? ImmutableMap.of() : ImmutableMap.copyOf(args);
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
+    this.jobVersionId = jobVersionId;
+    this.inputVersions =
+        (inputVersions == null) ? ImmutableSet.of() : ImmutableSet.copyOf(inputVersions);
+    this.outputVersions =
+        (outputVersions == null) ? ImmutableSet.of() : ImmutableSet.copyOf(outputVersions);
+  }
+
+  public Optional<Instant> getNominalStartTime() {
+    return Optional.ofNullable(nominalStartTime);
+  }
+
+  public Optional<Instant> getNominalEndTime() {
+    return Optional.ofNullable(nominalEndTime);
   }
 
   public Optional<Instant> getStartedAt() {

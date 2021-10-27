@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import lombok.NonNull;
-import marquez.client.models.RunState;
 import org.apache.maven.shared.utils.StringUtils;
 
 class MarquezPathV1 {
@@ -121,28 +120,6 @@ class MarquezPathV1 {
 
   static String listRunsPath(@NonNull String namespaceName, @NonNull String jobName) {
     return path("/namespaces/%s/jobs/%s/runs", namespaceName, jobName);
-  }
-
-  static String runTransitionPath(String runId, RunState runState) {
-    final String transition;
-    switch (runState) {
-      case RUNNING:
-        transition = "start";
-        break;
-      case COMPLETED:
-        transition = "complete";
-        break;
-      case ABORTED:
-        transition = "abort";
-        break;
-      case FAILED:
-        transition = "fail";
-        break;
-      default:
-        throw new IllegalArgumentException(
-            String.format("Unexpected run state: %s", runState.name()));
-    }
-    return path("/jobs/runs/%s/%s", runId, transition);
   }
 
   static String datasetTagPath(

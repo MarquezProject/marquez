@@ -14,11 +14,6 @@
 
 package marquez.client;
 
-import static marquez.client.models.RunState.ABORTED;
-import static marquez.client.models.RunState.COMPLETED;
-import static marquez.client.models.RunState.FAILED;
-import static marquez.client.models.RunState.RUNNING;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,7 +23,6 @@ import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -50,8 +44,6 @@ import marquez.client.models.JobVersion;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
-import marquez.client.models.RunMeta;
-import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
 import marquez.client.models.SearchResults;
 import marquez.client.models.SearchSort;
@@ -226,25 +218,6 @@ public class MarquezClient {
     return JobVersions.fromJson(bodyAsJson).getValue();
   }
 
-  public Run createRun(String namespaceName, String jobName, RunMeta runMeta) {
-    return createRun(namespaceName, jobName, runMeta, false);
-  }
-
-  private Run createRun(
-      @NonNull String namespaceName,
-      @NonNull String jobName,
-      @NonNull RunMeta runMeta,
-      boolean markRunAsRunning) {
-    final String bodyAsJson =
-        http.post(url.toCreateRunUrl(namespaceName, jobName), runMeta.toJson());
-    final Run run = Run.fromJson(bodyAsJson);
-    return (markRunAsRunning) ? markRunAsRunning(run.getId()) : run;
-  }
-
-  public Run createRunAndStart(String namespaceName, String jobName, RunMeta runMeta) {
-    return createRun(namespaceName, jobName, runMeta, true);
-  }
-
   public Run getRun(@NonNull String runId) {
     final String bodyAsJson = http.get(url.toRunUrl(runId));
     return Run.fromJson(bodyAsJson);
@@ -258,47 +231,6 @@ public class MarquezClient {
       @NonNull String namespaceName, @NonNull String jobName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toListRunsUrl(namespaceName, jobName, limit, offset));
     return Runs.fromJson(bodyAsJson).getValue();
-  }
-
-  public Run markRunAs(String runId, RunState runState) {
-    return markRunAs(runId, runState, null);
-  }
-
-  public Run markRunAs(String runId, @NonNull RunState runState, @Nullable Instant at) {
-    final String bodyAsJson = http.post(url.toRunTransitionUrl(runId, runState, at));
-    return Run.fromJson(bodyAsJson);
-  }
-
-  public Run markRunAsRunning(String runId) {
-    return markRunAsRunning(runId, null);
-  }
-
-  public Run markRunAsRunning(String runId, @Nullable Instant at) {
-    return markRunAs(runId, RUNNING, at);
-  }
-
-  public Run markRunAsCompleted(String runId) {
-    return markRunAsCompleted(runId, null);
-  }
-
-  public Run markRunAsCompleted(String runId, @Nullable Instant at) {
-    return markRunAs(runId, COMPLETED, at);
-  }
-
-  public Run markRunAsAborted(String runId) {
-    return markRunAsAborted(runId, null);
-  }
-
-  public Run markRunAsAborted(String runId, @Nullable Instant at) {
-    return markRunAs(runId, ABORTED, at);
-  }
-
-  public Run markRunAsFailed(String runId) {
-    return markRunAsFailed(runId, null);
-  }
-
-  public Run markRunAsFailed(String runId, @Nullable Instant at) {
-    return markRunAs(runId, FAILED, at);
   }
 
   public Set<Tag> listTags() {

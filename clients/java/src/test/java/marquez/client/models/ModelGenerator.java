@@ -230,14 +230,6 @@ public final class ModelGenerator {
     return new JobId(namespaceName, newJobName());
   }
 
-  public static RunMeta newRunMeta() {
-    return RunMeta.builder()
-        .nominalStartTime(newTimestamp())
-        .nominalEndTime(newTimestamp())
-        .args(newRunArgs())
-        .build();
-  }
-
   public static List<Run> newRuns(final int limit) {
     return java.util.stream.Stream.generate(ModelGenerator::newRun).limit(limit).collect(toList());
   }
@@ -245,7 +237,20 @@ public final class ModelGenerator {
   public static Run newRun() {
     final Instant now = newTimestamp();
     return new Run(
-        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
+        newRunId(),
+        now,
+        now,
+        now,
+        now,
+        RunState.NEW,
+        null,
+        null,
+        null,
+        newRunArgs(),
+        null,
+        newJobVersionId(),
+        newDatasetVersionIds(2),
+        newDatasetVersionIds(4));
   }
 
   public static String newOwnerName() {
@@ -405,5 +410,27 @@ public final class ModelGenerator {
 
   public static Map.Entry<String, String> newFacetSchemaURL() {
     return new AbstractMap.SimpleImmutableEntry<>("_schemaURL", "test_schemaURL" + newId());
+  }
+
+  public static DatasetVersionId newDatasetVersionId() {
+    return DatasetVersionId.builder()
+        .namespace(newNamespaceName())
+        .name(newJobName())
+        .version(UUID.randomUUID())
+        .build();
+  }
+
+  public static Set<DatasetVersionId> newDatasetVersionIds(final int limit) {
+    return java.util.stream.Stream.generate(ModelGenerator::newDatasetVersionId)
+        .limit(limit)
+        .collect(toSet());
+  }
+
+  public static JobVersionId newJobVersionId() {
+    return JobVersionId.builder()
+        .namespace(newNamespaceName())
+        .name(newJobName())
+        .version(UUID.randomUUID())
+        .build();
   }
 }

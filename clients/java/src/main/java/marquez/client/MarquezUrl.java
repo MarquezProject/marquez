@@ -1,8 +1,6 @@
 package marquez.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static marquez.client.MarquezPathV1.createRunPath;
 import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
@@ -20,7 +18,6 @@ import static marquez.client.MarquezPathV1.listSourcesPath;
 import static marquez.client.MarquezPathV1.listTagsPath;
 import static marquez.client.MarquezPathV1.namespacePath;
 import static marquez.client.MarquezPathV1.runPath;
-import static marquez.client.MarquezPathV1.runTransitionPath;
 import static marquez.client.MarquezPathV1.searchPath;
 import static marquez.client.MarquezPathV1.sourcePath;
 
@@ -30,11 +27,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
-import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
 import marquez.client.models.SearchSort;
 import org.apache.http.client.utils.URIBuilder;
@@ -108,22 +103,12 @@ class MarquezUrl {
     return from(jobVersionPath(namespaceName, jobName, version));
   }
 
-  URL toCreateRunUrl(String namespaceName, String jobName) {
-    return from(createRunPath(namespaceName, jobName));
-  }
-
   URL toRunUrl(@NonNull String runId) {
     return from(runPath(runId));
   }
 
   URL toListRunsUrl(@NonNull String namespaceName, @NonNull String jobName, int limit, int offset) {
     return from(listRunsPath(namespaceName, jobName), newQueryParamsWith(limit, offset));
-  }
-
-  URL toRunTransitionUrl(String runId, RunState runState, Instant at) {
-    return from(
-        runTransitionPath(runId, runState),
-        at == null ? ImmutableMap.of() : ImmutableMap.of("at", ISO_INSTANT.format(at)));
   }
 
   URL toListSourcesUrl(int limit, int offset) {

@@ -22,11 +22,13 @@ import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetFacets;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
+import static marquez.client.models.ModelGenerator.newDatasetVersionIds;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newFields;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobIdWith;
 import static marquez.client.models.ModelGenerator.newJobType;
+import static marquez.client.models.ModelGenerator.newJobVersionId;
 import static marquez.client.models.ModelGenerator.newLocation;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
 import static marquez.client.models.ModelGenerator.newOutputs;
@@ -77,6 +79,7 @@ import marquez.client.MarquezClient.Tags;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
+import marquez.client.models.DatasetVersionId;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.DbTableVersion;
@@ -85,11 +88,11 @@ import marquez.client.models.Job;
 import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
+import marquez.client.models.JobVersionId;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
-import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
@@ -242,32 +245,9 @@ public class MarquezClientTest {
   private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
   private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
-  private static final Run NEW =
-      new Run(
-          newRunId(),
-          CREATED_AT,
-          UPDATED_AT,
-          NOMINAL_START_TIME,
-          NOMINAL_END_TIME,
-          RunState.NEW,
-          START_AT,
-          ENDED_AT,
-          DURATION,
-          RUN_ARGS,
-          null);
-  private static final Run RUNNING =
-      new Run(
-          newRunId(),
-          CREATED_AT,
-          UPDATED_AT,
-          NOMINAL_START_TIME,
-          NOMINAL_END_TIME,
-          RunState.RUNNING,
-          START_AT,
-          ENDED_AT,
-          DURATION,
-          RUN_ARGS,
-          null);
+  private static final JobVersionId JOB_VERSION_ID = newJobVersionId();
+  private static final Set<DatasetVersionId> INPUT_VERSIONS = newDatasetVersionIds(2);
+  private static final Set<DatasetVersionId> OUTPUT_VERSIONS = newDatasetVersionIds(4);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -280,33 +260,10 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
-  private static final Run ABORTED =
-      new Run(
-          newRunId(),
-          CREATED_AT,
-          UPDATED_AT,
-          NOMINAL_START_TIME,
-          NOMINAL_END_TIME,
-          RunState.ABORTED,
-          START_AT,
-          ENDED_AT,
-          DURATION,
-          RUN_ARGS,
-          null);
-  private static final Run FAILED =
-      new Run(
-          newRunId(),
-          CREATED_AT,
-          UPDATED_AT,
-          NOMINAL_START_TIME,
-          NOMINAL_END_TIME,
-          RunState.FAILED,
-          START_AT,
-          ENDED_AT,
-          DURATION,
-          RUN_ARGS,
-          null);
+          null,
+          JOB_VERSION_ID,
+          INPUT_VERSIONS,
+          OUTPUT_VERSIONS);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -333,7 +290,10 @@ public class MarquezClientTest {
               ENDED_AT,
               DURATION,
               RUN_ARGS,
-              null),
+              null,
+              JOB_VERSION_ID,
+              INPUT_VERSIONS,
+              OUTPUT_VERSIONS),
           null,
           null);
 
@@ -551,7 +511,7 @@ public class MarquezClientTest {
             .fields(FIELDS)
             .tags(TAGS)
             .description(dataset.getDescription().get())
-            .runId(NEW.getId())
+            .runId(COMPLETED.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -631,7 +591,7 @@ public class MarquezClientTest {
             .tags(TAGS)
             .description(dataset.getDescription().get())
             .schemaLocation(dataset.getSchemaLocation().get())
-            .runId(NEW.getId())
+            .runId(COMPLETED.getId())
             .build();
 
     final Instant beforeModified = Instant.now();
@@ -748,93 +708,23 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testCreateRun() throws Exception {
-    final URL url = buildUrlFor("/namespaces/%s/jobs/%s/runs", NAMESPACE_NAME, JOB_NAME);
-
-    final RunMeta meta =
-        RunMeta.builder()
-            .nominalStartTime(NOMINAL_START_TIME)
-            .nominalEndTime(NOMINAL_END_TIME)
-            .args(RUN_ARGS)
-            .build();
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String runAsJson = JsonGenerator.newJsonFor(NEW);
-    when(http.post(url, metaAsJson)).thenReturn(runAsJson);
-
-    final Run run = client.createRun(NAMESPACE_NAME, JOB_NAME, meta);
-    assertThat(run).isEqualTo(NEW);
-  }
-
-  @Test
   public void testGetRun() throws Exception {
-    final URL url = buildUrlFor("/jobs/runs/%s", NEW.getId());
+    final URL url = buildUrlFor("/jobs/runs/%s", COMPLETED.getId());
 
-    final String runAsJson = JsonGenerator.newJsonFor(NEW);
+    final String runAsJson = JsonGenerator.newJsonFor(COMPLETED);
     when(http.get(url)).thenReturn(runAsJson);
 
-    final Run run = client.getRun(NEW.getId());
-    assertThat(run).isEqualTo(NEW);
+    final Run run = client.getRun(COMPLETED.getId());
+    assertThat(run).isEqualTo(COMPLETED);
   }
 
   @Test
   public void testListRuns() throws Exception {
     when(http.get(
             buildUrlFor("/namespaces/%s/jobs/%s/runs?limit=10&offset=0", NAMESPACE_NAME, JOB_NAME)))
-        .thenReturn(Utils.toJson(new Runs(ImmutableList.of(NEW))));
+        .thenReturn(Utils.toJson(new Runs(ImmutableList.of(COMPLETED))));
     final List<Run> runs = client.listRuns(NAMESPACE_NAME, JOB_NAME, 10, 0);
-    assertThat(runs).asList().containsExactly(NEW);
-  }
-
-  @Test
-  public void testMarkRunAsRunning() throws Exception {
-    final URL url = buildUrlFor("/jobs/runs/%s/start", RUNNING.getId());
-
-    final String runAsJson = JsonGenerator.newJsonFor(RUNNING);
-    when(http.post(url)).thenReturn(runAsJson);
-
-    final Run run = client.markRunAsRunning(RUNNING.getId());
-    assertThat(run).isEqualTo(RUNNING);
-
-    verify(http, times(1)).post(url);
-  }
-
-  @Test
-  public void testMarkRunAsCompleted() throws Exception {
-    final URL url = buildUrlFor("/jobs/runs/%s/complete", COMPLETED.getId());
-
-    final String runAsJson = JsonGenerator.newJsonFor(COMPLETED);
-    when(http.post(url)).thenReturn(runAsJson);
-
-    final Run run = client.markRunAsCompleted(COMPLETED.getId());
-    assertThat(run).isEqualTo(COMPLETED);
-
-    verify(http, times(1)).post(url);
-  }
-
-  @Test
-  public void testMarkRunAsAborted() throws Exception {
-    final URL url = buildUrlFor("/jobs/runs/%s/abort", ABORTED.getId());
-
-    final String runAsJson = JsonGenerator.newJsonFor(ABORTED);
-    when(http.post(url)).thenReturn(runAsJson);
-
-    final Run run = client.markRunAsAborted(ABORTED.getId());
-    assertThat(run).isEqualTo(ABORTED);
-
-    verify(http, times(1)).post(url);
-  }
-
-  @Test
-  public void testMarkRunAsFailed() throws Exception {
-    final URL url = buildUrlFor("/jobs/runs/%s/fail", FAILED.getId());
-
-    final String runAsJson = JsonGenerator.newJsonFor(FAILED);
-    when(http.post(url)).thenReturn(runAsJson);
-
-    final Run run = client.markRunAsFailed(FAILED.getId());
-    assertThat(run).isEqualTo(FAILED);
-
-    verify(http, times(1)).post(url);
+    assertThat(runs).asList().containsExactly(COMPLETED);
   }
 
   @Test
