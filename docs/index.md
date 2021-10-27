@@ -8,6 +8,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 #### FEATURES
 
+* A reference implementation of the [OpenLineage](https://openlineage.io) standard
 * Centralized [metadata management](https://en.wikipedia.org/wiki/Metadata_management) powering:
   * Data lineage
   * [Data governance](https://en.wikipedia.org/wiki/Data_governance)
@@ -15,7 +16,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
   * Data discovery **+** exploration
 * Precise and highly dimensional [data model](#data-model)
   * Jobs
-  * Datasets 
+  * Datasets
 * Easily collect metadata via an opinionated [Metadata API](./openapi.html)
 * **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
@@ -92,6 +93,8 @@ If you’re interested in using or learning more about Marquez, reach out to us 
 
 ## Marquez Talks
 
+* [Data Lineage with Apache Airflow using OpenLineage](https://www.youtube.com/watch?v=qQAdpbNhxl8) by Julien Le Dem, Willy Lulciuc at Airflow Summit '21
+* [Data Lineage with Apache Airflow](https://www.datacouncil.ai/talks/data-lineage-with-apache-airflow) by Willy Lulciuc at Data Council SF '20
 * [Solving Data Lineage Tracking And Data Discovery At WeWork](https://www.dataengineeringpodcast.com/marquez-data-lineage-episode-111) on [The Data Engineering Podcast](https://www.dataengineeringpodcast.com/)
 * [Data Lineage with Apache Airflow using Marquez](https://www.youtube.com/watch?v=BIVUXruv5io) by Willy Lulciuc at CRUNCH '19
 * [Marquez: An Open Source Metadata Service for ML Platforms](https://www.slideshare.net/WillyLulciuc/marquez-an-open-source-metadata-service-for-ml-platforms) by Willy Lulciuc, Shawn Shah at AI NEXTCon SF '19
