@@ -179,7 +179,7 @@ public final class NodeId implements Comparable<NodeId> {
       return parts;
     } else {
       // try to avoid matching colons in URIs- e.g., scheme://authority and host:port patterns
-      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+))|" + VERSION_DELIM);
+      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+))");
       Matcher matcher = p.matcher(value);
       String[] returnParts = new String[expectedParts];
 
@@ -217,16 +217,22 @@ public final class NodeId implements Comparable<NodeId> {
 
   @JsonIgnore
   public JobVersionId asJobVersionId() {
-    String[] parts = parts(4, ID_PREFX_JOB);
+    String[] parts = parts(3, ID_PREFX_JOB);
+    String[] nameAndVersion = parts[2].split(VERSION_DELIM);
     return new JobVersionId(
-        NamespaceName.of(parts[1]), JobName.of(parts[2]), UUID.fromString(parts[3]));
+        NamespaceName.of(parts[1]),
+        JobName.of(nameAndVersion[0]),
+        UUID.fromString(nameAndVersion[1]));
   }
 
   @JsonIgnore
   public DatasetVersionId asDatasetVersionId() {
-    String[] parts = parts(4, ID_PREFX_DATASET);
+    String[] parts = parts(3, ID_PREFX_DATASET);
+    String[] nameAndVersion = parts[2].split(VERSION_DELIM);
     return new DatasetVersionId(
-        NamespaceName.of(parts[1]), DatasetName.of(parts[2]), UUID.fromString(parts[3]));
+        NamespaceName.of(parts[1]),
+        DatasetName.of(nameAndVersion[0]),
+        UUID.fromString(nameAndVersion[1]));
   }
 
   @Override
