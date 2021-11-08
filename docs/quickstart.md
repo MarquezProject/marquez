@@ -27,7 +27,7 @@ Before you begin, make sure you have installed:
 To checkout the Marquez source code, run:
 
 ```
-$ git clone git@github.com:MarquezProject/marquez.git && cd marquez
+$ git clone https://github.com/MarquezProject/marquez && cd marquez
 ```
 
 ## Marquez Data Model
