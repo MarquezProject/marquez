@@ -1,10 +1,14 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.1...HEAD)
+
+## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1)
 
 ### Fixed
 
 * URI and URL DB mappper should handle empty string as null [@OleksandrDvornik](https://github.com/OleksandrDvornik)
+* Fix NodeId parsing when dataset name contains struct<> [@fm100](https://github.com/fm100)
+* Add encoding for dataset names in URL construction [@collado-mike](https://github.com/collado-mike)
 
 ## [0.19.0](https://github.com/MarquezProject/marquez/compare/0.18.0...0.19.0) - 2021-10-21
 
