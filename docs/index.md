@@ -16,11 +16,11 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 * Precise and highly dimensional [data model](#data-model)
   * Jobs
   * Datasets 
-* Easily collect metadata via an opinionated [Metadata API](./openapi.html)
+* Easily collect metadata via an [OpenLineage API](https://openlineage.io/)
 * **Datasets** as first-class values
 * **Enforcement** of _job_ and _dataset_ ownership
 * Simple operation and design with minimal dependencies
-* RESTful API enabling sophisticated integrations with other systems:
+* [RESTful API](./openapi.html) enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
   * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
   * [Dagster](https://github.com/dagster-io/dagster)
@@ -45,16 +45,16 @@ Marquez enables highly flexible [data lineage](https://en.wikipedia.org/wiki/Dat
 Marquez is a modular system and has been designed as a highly scalable, highly extensible platform-agnostic solution for metadata management. It consists of the following system components:
 
 * **Metadata Repository**: Stores all job and dataset metadata, including a complete history of job runs and job-level statistics (i.e. total runs, average runtimes, success/failures, etc).
-* **Metadata API**: RESTful API enabling a diverse set of clients to begin collecting metadata around dataset production and consumption.
+* **Metadata API**: RESTful API enabling a diverse set of clients to begin interacting with metadata around dataset production and consumption.
 * **Metadata UI**: Used for dataset discovery, connecting multiple datasets and exploring their dependency graph.
 
 <br/>
 
 <figure align="center">
-  <img src="./assets/images/design.png">
+  <img src="./assets/images/ol-stack.svg">
 </figure>
 
-To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific clients that implement the [Metadata API](./openapi.html). As part of our initial release, we have provided support for [Java](https://github.com/MarquezProject/marquez-java) and [Python](https://github.com/MarquezProject/marquez-python).
+To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez implements [OpenLineage specification](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.yml). OpenLineage provides Java and Python client as well as many [integrations](https://openlineage.io/integration).
 
 The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the [Metadata Repository](https://www.lucidchart.com/documents/view/f918ce01-9eb4-4900-b266-49935da271b8/0).
 
