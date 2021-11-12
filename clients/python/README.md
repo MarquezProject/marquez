@@ -24,10 +24,7 @@ $ python3 setup.py install
 
 ## Usage
 
-### Metadata Collection
-Marquez implements OpenLineage specification. Use [OpenLineage client](https://github.com/OpenLineage/OpenLineage/tree/main/client/python) to collect metadata.
-
-### Metadata Navigation
+### Reading Metadata
 ```python
 from marquez_client import MarquezClient
 
@@ -42,6 +39,9 @@ To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, 
 ```
 $ export MARQUEZ_LOG_LEVEL='INFO'
 ```
+
+### Writing Metadata
+To collect OpenLineage events using Marquez, please use the [openlineage-python](https://pypi.org/project/openlineage-python/) library. OpenLineage is an Open Standard for lineage metadata collection designed to collect metadata for a job in execution.
 
 ## Development
 
