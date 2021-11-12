@@ -22,19 +22,17 @@ implementation 'io.github.marquezproject:marquez-java:0.19.1
 
 ## Usage
 
+### Metadata Collection
+Marquez implements OpenLineage specification. Use [OpenLineage client](https://github.com/OpenLineage/OpenLineage/tree/main/client/java) to collect metadata.
+
+### Metadata Navigation
 ```java
 MarquezClient client = MarquezClient().builder()
     .baseUrl("http://localhost:5000")
     .build()
 
-// Metadata
-NamespaceMeta meta = NamespaceMeta().builder()
-    .ownerName("me")
-    .description("My first namespace!")
-    .build()
-
-// Create namespace
-Namespace namespace = client.createNamespace("my-namespace", meta);
+// List namespaces
+List<Namespace> namespaces = client.listNamespaces();
 ```
 
 ## HTTPS

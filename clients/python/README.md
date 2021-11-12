@@ -24,13 +24,17 @@ $ python3 setup.py install
 
 ## Usage
 
+### Metadata Collection
+Marquez implements OpenLineage specification. Use [OpenLineage client](https://github.com/OpenLineage/OpenLineage/tree/main/client/python) to collect metadata.
+
+### Metadata Navigation
 ```python
 from marquez_client import MarquezClient
 
 client = MarquezClient(url='http://localhost:5000')
 
-# create namespace
-client.create_namespace('my-namespace', 'me', 'My first namespace!')
+# list namespaces
+client.list_namespaces()
 ```
 
 To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
