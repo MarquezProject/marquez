@@ -22,20 +22,17 @@ implementation 'io.github.marquezproject:marquez-java:0.19.1
 
 ## Usage
 
+### Reading Metadata
 ```java
 MarquezClient client = MarquezClient().builder()
     .baseUrl("http://localhost:5000")
     .build()
 
-// Metadata
-NamespaceMeta meta = NamespaceMeta().builder()
-    .ownerName("me")
-    .description("My first namespace!")
-    .build()
-
-// Create namespace
-Namespace namespace = client.createNamespace("my-namespace", meta);
+// List namespaces
+List<Namespace> namespaces = client.listNamespaces();
 ```
+### Writing Metadata
+To collect OpenLineage events using Marquez, please use the [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) library. OpenLineage is an Open Standard for lineage metadata collection designed to collect metadata for a job in execution.
 
 ## HTTPS
 
