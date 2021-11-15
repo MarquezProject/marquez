@@ -23,8 +23,9 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 * Simple operation and design with minimal dependencies
 * RESTful API enabling sophisticated integrations with other systems:
   * [Airflow](https://airflow.apache.org)
-  * [Amundsen](https://github.com/lyft/amundsenfrontendlibrary)
-  * [Dagster](https://github.com/dagster-io/dagster)
+  * [Amundsen](https://www.amundsen.io)
+  * [dbt](https://www.getdbt.com)
+  * [Spark](https://spark.apache.org/docs/latest/index.html)
 * Designed to promote a **healthy** data ecosystem where teams within an organization can seamlessly _share_ and _safely_ depend on one another's datasets with confidence
 
 ## Why Marquez?
@@ -55,11 +56,11 @@ Marquez is a modular system and has been designed as a highly scalable, highly e
   <img src="./assets/images/design.png">
 </figure>
 
-To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific clients that implement the [Metadata API](./openapi.html). As part of our initial release, we have provided support for [Java](https://github.com/MarquezProject/marquez-java) and [Python](https://github.com/MarquezProject/marquez-python).
+To ease adoption and enable a diverse set of data processing applications to build metadata collection as a core requirement into their design, Marquez provides language-specific clients that implement the [Metadata API](./openapi.html). As part of our initial release, we have provided support for [Java](https://github.com/MarquezProject/marquez/tree/main/clients/java) and [Python](https://github.com/MarquezProject/marquez/tree/main/clients/python).
 
 The Metadata API is an abstraction for recording information around the production and consumption of datasets. It's a low-latency, highly-available stateless layer responsible for encapsulating both metadata persistence and aggregation of lineage information. The API allows clients to collect and/or obtain dataset information to/from the [Metadata Repository](https://www.lucidchart.com/documents/view/f918ce01-9eb4-4900-b266-49935da271b8/0).
 
-Metadata needs to be collected, organized, and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez-web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
+Metadata needs to be collected, organized, and stored in a way to allow for rich exploratory queries via the [Metadata UI](https://github.com/MarquezProject/marquez/tree/main/web). The Metadata Repository serves as a catalog of dataset information encapsulated and cleanly abstracted away by the Metadata API.
 
 ## Data Model
 
@@ -79,6 +80,10 @@ The diagram below shows the metadata collected and cataloged for a given job ove
 
 **Dataset Version:** A read-only _immutable_ `version` of a dataset. Each version can be read independently and has a unique ID mapped to a dataset change preserving its state at some given point in time. The _latest_ version ID is updated only when a change to the dataset has been recorded. To compute a distinct version ID, Marquez applies a versioning function to a set of properties corresponding to the datasets underlying datasource.
 
+## Deployment
+
+To deploy and manage Marquez in a cloud environment, please follow our [deployment](deployment-overview.html) guide.
+
 ## Contributing
 
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
@@ -89,7 +94,7 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez/blob/main/CODE_OF_CONDUCT.md) in all interactions with the community.
 
-If you’re interested in using or learning more about Marquez, reach out to us on [gitter](https://gitter.im/marquez-project/community) and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates.
+If you’re interested in using or learning more about Marquez, reach out to us on our [slack](http://bit.ly/MarquezSlack) channel and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates.
 
 ## Marquez Talks
 
