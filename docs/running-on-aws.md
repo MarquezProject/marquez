@@ -25,7 +25,7 @@ To create an EKS cluster, please follow the steps outlined in the AWS EKS [docum
    export AWS_SECRET_ACCESS_KEY=<AWS-SECRET-ACCESS-KEY>
    export AWS_SESSION_TOKEN=<AWS-SESSION-TOKEN>
    ```
-   
+
 2. Switch to your EKS cluster context:
 
    ```bash
@@ -45,7 +45,7 @@ To create an EKS cluster, please follow the steps outlined in the AWS EKS [docum
    $ kubectl get pods
    No resources found in default namespace.
    ```
-   
+
 ## AWS RDS
 
 Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset and job metadata collected via the Marquez HTTP API.
@@ -64,7 +64,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
 ##### CONNECT TO RDS DATABASE
 
 1. Create a `marquez` namespace:
-   
+
    ```bash
    $ kubectl create namespace marquez
    ```
@@ -88,23 +88,23 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    $ git clone git@github.com:MarquezProject/marquez.git && cd chart
    ```
 2. Install Marquez:
-   
+
    ```bash
    helm install --namespace marquez --create-namespace marquez .
    ```
-   
+
 3. Verify all the pods have come up correctly:
 
    ```bash
    $ kubectl get pods -n marquez
    ```
- 
+
 ##### UPGRADING MARQUEZ
 
 ```bash
 helm upgrade --namespace marquez .
 ```
-  
+
 ##### UNINSTALLING MARQUEZ
 
 ```bash
