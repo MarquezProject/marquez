@@ -19,9 +19,9 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.adarshr:gradle-test-logger-plugin:3.0.0'
+        classpath 'com.adarshr:gradle-test-logger-plugin:3.1.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.17.0'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.0.0'
     }
 }
 
@@ -65,7 +65,7 @@ subprojects {
         mockitoVersion = '4.0.0'
         openlineageVersion = '0.2.3'
         slf4jVersion = '1.7.32'
-        postgresqlVersion = '42.3.0'
+        postgresqlVersion = '42.3.1'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 

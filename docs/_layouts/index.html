@@ -26,10 +26,13 @@
         document.getElementById("tag_url").href = "{{ site.github.repository_url }}/releases/tag/" + data.tag_name;
       });
     </script>
-    
+
     <header class="page-header" role="banner">
       <div class='marquez-logo'>
         <img src="./assets/images/marquez-logo.png" width="500px" />
+        <a href="https://lfaidata.foundation/projects">
+          <img src="./assets/images/lfaidata-project-badge-incubation-black.png" width="125px" />
+        </a>
       </div>
       <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
       <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
