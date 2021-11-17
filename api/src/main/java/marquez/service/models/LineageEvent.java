@@ -37,11 +37,11 @@ public class LineageEvent extends BaseJsonModel {
   private String eventType;
 
   @NotNull private ZonedDateTime eventTime;
-  @NotNull private LineageEvent.Run run;
-  @NotNull private LineageEvent.Job job;
-  private List<Dataset> inputs;
-  private List<Dataset> outputs;
-  @NotNull private String producer;
+  @Valid @NotNull private LineageEvent.Run run;
+  @Valid @NotNull private LineageEvent.Job job;
+  @Valid private List<Dataset> inputs;
+  @Valid private List<Dataset> outputs;
+  @Valid @NotNull private String producer;
 
   @AllArgsConstructor
   @NoArgsConstructor
@@ -53,7 +53,7 @@ public class LineageEvent extends BaseJsonModel {
   public static class Run extends BaseJsonModel {
 
     @NotNull private String runId;
-    private RunFacet facets;
+    @Valid private RunFacet facets;
   }
 
   @Builder
@@ -65,8 +65,8 @@ public class LineageEvent extends BaseJsonModel {
   @JsonPropertyOrder({"nominalTime", "parent"})
   public static class RunFacet {
 
-    private NominalTimeRunFacet nominalTime;
-    private ParentRunFacet parent;
+    @Valid private NominalTimeRunFacet nominalTime;
+    @Valid private ParentRunFacet parent;
 
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
@@ -194,7 +194,7 @@ public class LineageEvent extends BaseJsonModel {
 
     @NotNull private String namespace;
     @NotNull private String name;
-    private JobFacet facets;
+    @Valid private JobFacet facets;
   }
 
   @Builder
@@ -206,9 +206,9 @@ public class LineageEvent extends BaseJsonModel {
   @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description"})
   public static class JobFacet {
 
-    private DocumentationJobFacet documentation;
-    private SourceCodeLocationJobFacet sourceCodeLocation;
-    private SQLJobFacet sql;
+    @Valid private DocumentationJobFacet documentation;
+    @Valid private SourceCodeLocationJobFacet sourceCodeLocation;
+    @Valid private SQLJobFacet sql;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
@@ -298,7 +298,7 @@ public class LineageEvent extends BaseJsonModel {
 
     @NotNull private String namespace;
     @NotNull private String name;
-    private DatasetFacets facets;
+    @Valid private DatasetFacets facets;
   }
 
   @Builder
@@ -310,9 +310,9 @@ public class LineageEvent extends BaseJsonModel {
   @JsonPropertyOrder({"documentation", "schema", "dataSource", "description"})
   public static class DatasetFacets {
 
-    private DocumentationDatasetFacet documentation;
-    private SchemaDatasetFacet schema;
-    private DatasourceDatasetFacet dataSource;
+    @Valid private DocumentationDatasetFacet documentation;
+    @Valid private SchemaDatasetFacet schema;
+    @Valid private DatasourceDatasetFacet dataSource;
     private String description;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
@@ -367,7 +367,7 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class SchemaDatasetFacet extends BaseFacet {
 
-    private List<SchemaField> fields;
+    @Valid private List<SchemaField> fields;
 
     @Builder
     public SchemaDatasetFacet(
