@@ -4,64 +4,60 @@ layout: running-on-aws
 
 # Running Marquez on AWS
 
-This guide helps you set up Marquez from scratch, on AWS, without using an automated approach. It details step-by-step how to go from a bare AWS account, to a fully functioning Marquez deployment that members of your company can use.
+This guide helps you install and deploy Marquez on AWS [EKS](https://aws.amazon.com/eks).
 
 #### PREREQUISITES
 
-* AWS CLI
-* Helm
-* kubectl
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
+* [helm](https://helm.sh/docs/helm/helm_install/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ## AWS EKS Cluster
 
-To create an EKS cluster, please follow the steps outlined in the AWS EKS [documentation](https://docs.aws.amazon.com/eks/latest/userguide/create-cluster.html).
+To create an AWS EKS cluster, please follow the steps outlined in the AWS EKS [documentation](https://docs.aws.amazon.com/eks/latest/userguide/create-cluster.html).
 
-##### CONNECT TO EKS CLUSTER
+##### CONNECT TO AWS EKS CLUSTER
 
-1. Use your AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context:
-
-   ```bash
-   export AWS_ACCESS_KEY_ID=<AWS-ACCESS-KEY-ID>
-   export AWS_SECRET_ACCESS_KEY=<AWS-SECRET-ACCESS-KEY>
-   export AWS_SESSION_TOKEN=<AWS-SESSION-TOKEN>
-   ```
-
-2. Switch to your EKS cluster context:
+1. [Make sure you have configured your AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html), then create or update the **kubeconfig** file for your cluster:
 
    ```bash
-   $ aws eks update-kubeconfig --name <AWS-EKS-CLUSTER> --region <AWS-REGION>
+   $ aws eks --region <AWS-REGION> update-kubeconfig --name <AWS-EKS-CLUSTER>
    ```
 
-3. Verify the context is switched:
+3. Verify the context has been switched:
 
    ```bash
    $ kubectl config current-context
    arn:aws:eks:<AWS-REGION>:<AWS_ACCOUNT_ID>:cluster/<AWS-EKS-CLUSTER>
    ```
 
-4. Using kubectl, let's verify we can connect to your EKS cluster:
+4. Using `kubectl`, verify you can connect to your cluster:
 
    ```bash
-   $ kubectl get pods
-   No resources found in default namespace.
+   $ kubectl get svc
+   NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+   svc/kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   1m
    ```
+   
+   > **Note**: If you're having issues connecting to your cluster, please see [Why can't I connect to my AWS EKS cluster?](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection)
 
 ## AWS RDS
 
-Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset and job metadata collected via the Marquez HTTP API.
+Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset, job, and run metadata collected via the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html).
 
-##### CREATE RDS DATABASE
+##### CREATE AWS RDS DATABASE
 
-1. Navigate to [RDS](https://console.aws.amazon.com/rds/home) and create a PostgreSQL compatible database, leaving the database `Template` as `Production`
-3. Use `marquez` as the cluster identifier, and set the master username to `marquez`
-5. Choose a master password which you’ll later use in your Helm template (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`)
-6. Leave public access to the database off
-7. Choose the same VPC that your EKS cluster is in
-8. In a separate tab, navigate to the EKS cluster page and make note of the security group attached to your cluster
-9. Go back to the RDS page and in the security group section, add the EKS cluster’s security group (feel free to leave the default as well). This will ensure you don’t have to play around with security group rules in order for pods running in the cluster to access the RDS instance
-10. Under the top level Additional configuration (there’s a sub menu by the same name) under “Initial database name” enter `marquez` as well
+1. Navigate to the AWS [RDS](https://console.aws.amazon.com/rds/home) page and create a PostgreSQL database, leaving the database template as **Production**
+3. Use `marquez` as the database identifier, and set the master username to `marquez`
+5. Choose a master password which you’ll later use in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`)
+6. Leave public access to the database **off**
+7. Choose the same VPC that your AWS EKS cluster is in
+8. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster
+9. Go back to the AWS RDS page and in the security group section, add the AWS EKS cluster’s security group from **step 8**
+10. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name
+11. Finally, select **Create Database**
 
-##### CONNECT TO RDS DATABASE
+##### CONNECT TO AWS RDS DATABASE
 
 1. Create a `marquez` namespace:
 
@@ -78,7 +74,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
      --command -- psql marquez --host <AWS-RDS-HOST> -U <AWS-RDS-USERNAME> -d marquez -p 5432
    ```
 
-## Deploy Marquez on EKS
+## Deploy Marquez on AWS EKS
 
 ##### INSTALLING MARQUEZ
 
@@ -87,6 +83,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    ```bash
    $ git clone git@github.com:MarquezProject/marquez.git && cd chart
    ```
+
 2. Install Marquez:
 
    ```bash
@@ -109,4 +106,4 @@ helm upgrade --namespace marquez .
 
 ```bash
 helm uninstall --namespace marquez marquez
-```------------
+```
