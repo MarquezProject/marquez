@@ -24,14 +24,14 @@ To create an AWS EKS cluster, please follow the steps outlined in the AWS EKS [d
    $ aws eks --region <AWS-REGION> update-kubeconfig --name <AWS-EKS-CLUSTER>
    ```
 
-3. Verify the context has been switched:
+2. Verify the context has been switched:
 
    ```bash
    $ kubectl config current-context
-   arn:aws:eks:<AWS-REGION>:<AWS_ACCOUNT_ID>:cluster/<AWS-EKS-CLUSTER>
+   arn:aws:eks:<AWS-REGION>:<AWS-ACCOUNT-ID>:cluster/<AWS-EKS-CLUSTER>
    ```
 
-4. Using `kubectl`, verify you can connect to your cluster:
+3. Using `kubectl`, verify you can connect to your cluster:
 
    ```bash
    $ kubectl get svc
@@ -64,12 +64,13 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    ```bash
    $ kubectl create namespace marquez
    ```
+
 2. Next, run the following command with the username and password you used, and the host returned by AWS:
 
    ```bash
    kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' \
      --namespace marquez \
-     --image docker.io/bitnami/postgresql:11.7.0-debian-10-r9 \
+     --image docker.io/bitnami/postgresql:12-debian-10 \
      --env="PGPASSWORD=<AWS-RDS-PASSWORD>" \
      --command -- psql marquez --host <AWS-RDS-HOST> -U <AWS-RDS-USERNAME> -d marquez -p 5432
    ```
@@ -87,23 +88,25 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
 2. Install Marquez:
 
    ```bash
-   helm install --namespace marquez --create-namespace marquez .
+   helm upgrade --install marquez .
+     --set marquez.db.host <AWS-RDS-HOST>
+     --set marquez.db.user <AWS-RDS-USERNAME>
+     --set marquez.db.password <AWS-RDS-PASSWORD>
+     --namespace marquez
+     --atomic
+     --wait
    ```
+
+   > **Note:** To avoid overriding deployment settings via the command line, update the `marquez.db` section of the Marquez chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
 
 3. Verify all the pods have come up correctly:
 
    ```bash
-   $ kubectl get pods -n marquez
+   $ kubectl get pods --namespace marquez
    ```
-
-##### UPGRADING MARQUEZ
-
-```bash
-helm upgrade --namespace marquez .
-```
 
 ##### UNINSTALLING MARQUEZ
 
 ```bash
-helm uninstall --namespace marquez marquez
+helm uninstall marquez --namespace marquez
 ```
