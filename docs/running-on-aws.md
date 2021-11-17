@@ -18,20 +18,20 @@ To create an AWS EKS cluster, please follow the steps outlined in the AWS EKS [d
 
 ##### CONNECT TO AWS EKS CLUSTER
 
-1. [Make sure you have configured your AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html), then create or update the **kubeconfig** file for your cluster:
+1. Make sure you have configured your [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html), then create or update the **kubeconfig** file for your cluster:
 
    ```bash
    $ aws eks --region <AWS-REGION> update-kubeconfig --name <AWS-EKS-CLUSTER>
    ```
 
-2. Verify the context has been switched:
+2. Verify that the context has been switched:
 
    ```bash
    $ kubectl config current-context
    arn:aws:eks:<AWS-REGION>:<AWS-ACCOUNT-ID>:cluster/<AWS-EKS-CLUSTER>
    ```
 
-3. Using `kubectl`, verify you can connect to your cluster:
+3. Using `kubectl`, verify that you can connect to your cluster:
 
    ```bash
    $ kubectl get svc
@@ -43,19 +43,19 @@ To create an AWS EKS cluster, please follow the steps outlined in the AWS EKS [d
 
 ## AWS RDS
 
-Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset, job, and run metadata collected as [OpenLineage](https://openlineage.io) events via the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html).
+Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset, job, and run metadata collected as [OpenLineage](https://openlineage.io) events via the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html).
 
 ##### CREATE AWS RDS DATABASE
 
-1. Navigate to the AWS [RDS](https://console.aws.amazon.com/rds/home) page and create a PostgreSQL database, leaving the database template as **Production**
-2. Use `marquez` as the database identifier, and set the master username to `marquez`
-3. Choose a master password which you’ll later use in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`)
-4. Leave public access to the database **off**
-5. Choose the same VPC that your AWS EKS cluster is in
-6. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster
-7. Navigate back to the AWS RDS page and, in the security group section, add the AWS EKS cluster’s security group from **step 6**
-8. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name
-9. Finally, select **Create Database**
+1. Navigate to the AWS [RDS](https://console.aws.amazon.com/rds/home) page and create a PostgreSQL database, leaving the database template as **Production**.
+2. Use `marquez` as the database identifier and set the master username to `marquez`.
+3. Choose a master password to use later in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`).
+4. Leave public access to the database **off**.
+5. Choose the same VPC where your AWS EKS cluster resides.
+6. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster.
+7. Navigate back to the AWS RDS page and, in the security group section, add the AWS EKS cluster’s security group from **step 6**.
+8. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name.
+9. Finally, select **Create Database**.
 
 ##### CONNECT TO AWS RDS DATABASE
 
@@ -65,7 +65,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    $ kubectl create namespace marquez
    ```
 
-2. Next, run the following command with the your AWS RDS `host`, `username`, and `password`:
+2. Next, run the following command with your AWS RDS `host`, `username`, and `password`:
 
    ```bash
    kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' \
