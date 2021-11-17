@@ -8,13 +8,11 @@ import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
 const styles = (theme: Theme) =>
   createStyles({
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
     codeContainer: {
       padding: `${theme.spacing(2)}px ${theme.spacing(4)}px`,
       backgroundColor: alpha(theme.palette.common.white, 0.1),
       borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
-      whiteSpace: 'break-spaces'
+      whiteSpace: 'pre-wrap'
     }
   })
 
