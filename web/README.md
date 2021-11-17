@@ -2,7 +2,7 @@
 
 ### Requirements
 
-To develop on this project, you need to have Node version 12.21.0 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
+To develop on this project, you need to have Node version 12.22.7 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
 
 ### Development
 

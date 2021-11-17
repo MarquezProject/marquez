@@ -14,7 +14,7 @@
     "eslint-fix": "eslint . --ext .ts,.tsx --ignore-pattern \"src/__tests__/*\" --fix"
   },
   "engines": {
-    "node": "12.21.0"
+    "node": "12.22.7"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
