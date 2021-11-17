@@ -48,14 +48,14 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
 ##### CREATE AWS RDS DATABASE
 
 1. Navigate to the AWS [RDS](https://console.aws.amazon.com/rds/home) page and create a PostgreSQL database, leaving the database template as **Production**
-3. Use `marquez` as the database identifier, and set the master username to `marquez`
-5. Choose a master password which you’ll later use in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`)
-6. Leave public access to the database **off**
-7. Choose the same VPC that your AWS EKS cluster is in
-8. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster
-9. Navigate back to the AWS RDS page and, in the security group section, add the AWS EKS cluster’s security group from **step 8**
-10. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name
-11. Finally, select **Create Database**
+2. Use `marquez` as the database identifier, and set the master username to `marquez`
+3. Choose a master password which you’ll later use in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`)
+4. Leave public access to the database **off**
+5. Choose the same VPC that your AWS EKS cluster is in
+6. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster
+7. Navigate back to the AWS RDS page and, in the security group section, add the AWS EKS cluster’s security group from **step 6**
+8. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name
+9. Finally, select **Create Database**
 
 ##### CONNECT TO AWS RDS DATABASE
 
