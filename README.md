@@ -98,11 +98,7 @@ To build the entire project, set `JAVA_HOME` to your local JDK 11 installation a
 $ ./gradlew build
 ```
 
-Note, the [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local JDK 8 installation and running:
-
-```
-$ ./gradlew :integrations:spark:build`
-```
+> **Note:** The [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local JDK 8 installation and running `./gradlew :integrations:spark:build`.
 
 ## Configuration
 
