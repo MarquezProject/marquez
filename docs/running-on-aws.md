@@ -4,7 +4,7 @@ layout: running-on-aws
 
 # Running Marquez on AWS
 
-This guide helps you install and deploy Marquez on AWS [EKS](https://aws.amazon.com/eks).
+This guide helps you deploy and manage Marquez on AWS [EKS](https://aws.amazon.com/eks).
 
 #### PREREQUISITES
 
@@ -53,7 +53,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
 6. Leave public access to the database **off**
 7. Choose the same VPC that your AWS EKS cluster is in
 8. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster
-9. Go back to the AWS RDS page and in the security group section, add the AWS EKS cluster’s security group from **step 8**
+9. Navigate back to the AWS RDS page and, in the security group section, add the AWS EKS cluster’s security group from **step 8**
 10. Next, under the **Additional Configuration** tab, enter `marquez` as the initial database name
 11. Finally, select **Create Database**
 
@@ -65,7 +65,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    $ kubectl create namespace marquez
    ```
 
-2. Next, run the following command with the your AWS RDS `host`, `user`, and `password`:
+2. Next, run the following command with the your AWS RDS `host`, `username`, and `password`:
 
    ```bash
    kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' \
@@ -97,7 +97,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
      --wait
    ```
 
-   > **Note:** To avoid overriding deployment settings via the command line, update the [marquez.db](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez Helm chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
+   > **Note:** To avoid overriding deployment settings via the command line, update the [marquez.db](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez Helm chart's `values.yaml` to include the AWS RDS `host`, `username`, and `password` in your deployment.
 
 3. Verify all the pods have come up correctly:
 
