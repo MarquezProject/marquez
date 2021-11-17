@@ -97,7 +97,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
      --wait
    ```
 
-   > **Note:** To avoid overriding deployment settings via the command line, update the `marquez.db` section of the Marquez chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
+   > **Note:** To avoid overriding deployment settings via the command line, update the [`marquez.db`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
 
 3. Verify all the pods have come up correctly:
 
