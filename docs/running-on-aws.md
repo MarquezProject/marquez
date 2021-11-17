@@ -38,12 +38,12 @@ To create an AWS EKS cluster, please follow the steps outlined in the AWS EKS [d
    NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
    svc/kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   1m
    ```
-   
+
    > **Note**: If you're having issues connecting to your cluster, please see [Why can't I connect to my AWS EKS cluster?](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection)
 
 ## AWS RDS
 
-Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset, job, and run metadata collected via the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html).
+Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html). This database will be used to store dataset, job, and run metadata collected as [OpenLineage](https://openlineage.io) events via the Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html).
 
 ##### CREATE AWS RDS DATABASE
 
@@ -65,7 +65,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
    $ kubectl create namespace marquez
    ```
 
-2. Next, run the following command with the username and password you used, and the host returned by AWS:
+2. Next, run the following command with the your AWS RDS `host`, `user`, and `password`:
 
    ```bash
    kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' \
@@ -79,7 +79,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
 
 ##### INSTALLING MARQUEZ
 
-1. Clone the Marquez repo:
+1. Get Marquez:
 
    ```bash
    $ git clone git@github.com:MarquezProject/marquez.git && cd chart
@@ -97,7 +97,7 @@ Next, we'll create an AWS RDS instance as outlined in the AWS RDS [documentation
      --wait
    ```
 
-   > **Note:** To avoid overriding deployment settings via the command line, update the [`marquez.db`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
+   > **Note:** To avoid overriding deployment settings via the command line, update the [marquez.db](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez Helm chart's `values.yaml` to include the AWS RDS `host`, `user`, and `password` in your deployment.
 
 3. Verify all the pods have come up correctly:
 
