@@ -10,6 +10,21 @@ Marquez uses [Helm](https://helm.sh) to manage deployments onto [Kubernetes](htt
 
 > **Note:** The Marquez HTTP API server and Web UI images are publshed to [DockerHub](https://hub.docker.com/r/marquezproject/marquez).
 
+## Architecture
+
+<figure align="center">
+  <img src="./assets/images/marquez-deployment-architecture.png">
+</figure>
+
+#### COMPONENTS
+
+| Component        | Image                                                                             | Description                                                                                                            |
+|------------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| Marquez Web UI   | [marquezproject/marquez-web](https://hub.docker.com/r/marquezproject/marquez-web) | The web UI used to view metadata.                                                                                      |
+| Marquez HTTP API | [marquezproject/marquez](https://hub.docker.com/r/marquezproject/marquez)         | The core API used to collect metadata.                                                                                 |
+| Marquez Database | [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql)                 | A PostgreSQL instance used to `read` / `write` metadata.                                                               |
+| Workflow         | User-provided                                                                     | A workflow using an OpenLineage [integration](https://openlineage.io/integration) to send lineage metadata to Marquez. |
+
 ## Database
 
 The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) server relies only on PostgreSQL to store dataset, job, and run metadata allowing for minimal operational overhead. We recommend a cloud provided databases, such as AWS [RDS](https://aws.amazon.com/rds/postgresql), when deploying Marquez onto Kubernetes.
