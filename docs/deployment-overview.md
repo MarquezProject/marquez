@@ -14,6 +14,33 @@ Marquez uses [Helm](https://helm.sh) to manage deployments onto [Kubernetes](htt
 
 The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) server relies only on PostgreSQL to store dataset, job, and run metadata allowing for minimal operational overhead. We recommend a cloud provided databases, such as AWS [RDS](https://aws.amazon.com/rds/postgresql), when deploying Marquez onto Kubernetes.
 
+## Architecture
+
+#### DOCKER
+
+<figure align="center">
+  <img src="./assets/images/marquez-deployment-architecture-docker.png">
+</figure>
+
+> **Figure 1:** Minimal Marquez deployment via Docker
+
+#### KUBERNETES
+
+<figure align="center">
+  <img src="./assets/images/marquez-deployment-architecture-k8s.png">
+</figure>
+
+> **Figure 2:** Marquez deployment via Kubernetes
+
+#### COMPONENTS
+
+| Component        | Image                                                                               | Description                                                                                                            |
+|------------------|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| Marquez Web UI   | [marquezproject/marquez-web](https://hub.docker.com/r/marquezproject/marquez-web)   | The web UI used to view metadata.                                                                                      |
+| Marquez HTTP API | [marquezproject/marquez](https://hub.docker.com/r/marquezproject/marquez)           | The core API used to collect metadata using [OpenLineage](https://openlineage.io).                                                                                 |
+| Database         | [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) or cloud provided | A PostgreSQL instance used to metadata.                                                               |
+| Workflow         | User-provided                                                                       | A workflow using an OpenLineage [integration](https://openlineage.io/integration) to send lineage metadata to Marquez. |
+
 ## Authentication
 
 Our [clients](https://github.com/MarquezProject/marquez/tree/main/clients) support authentication by automatically sending an API key on each request via [_Bearer Auth_](https://datatracker.ietf.org/doc/html/rfc6750) when configured on client instantiation. By default, the Marquez HTTP API does not require any form of authentication or authorization.
