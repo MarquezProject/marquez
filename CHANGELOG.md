@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.1...HEAD)
+### Fixed
+* Fixed validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
 
 ## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1)
 
