@@ -46,14 +46,14 @@ You can open [http://localhost:3000](http://localhost:3000) to begin exploring t
 
 The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
 
-* To _read_ metadata, use the read-only APIs of Marquez
-* To _write_ metadata, use the write-only APIs of Marquez, or an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events
+* To **read** metadata, use the _read-only_ APIs of Marquez
+* To **write** metadata, use the _write-only_ APIs of Marquez, or an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
 **`GRAPHQL`**
 
-To explore metadata via graphql, browse to http://localhost:5000/graphql-playground. The graphql endpoint is currently in _beta_ and is located at http://localhost:5000/api/v1-beta/graphql.
+To explore metadata via graphql, browse to [http://localhost:5000/graphql-playground](http://localhost:5000/graphql-playground). The graphql endpoint is currently in _beta_ and is located at [http://localhost:5000/api/v1-beta/graphql](http://localhost:5000/api/v1-beta/graphql).
 
 ## Documentation
 
