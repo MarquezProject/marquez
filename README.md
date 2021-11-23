@@ -40,11 +40,14 @@ $ ./docker/up.sh
 
 **`WEB UI`**
 
-You can open http://localhost:3000 to begin exploring the web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
+You can open [http://localhost:3000](http://localhost:3000) to begin exploring the Marquez Web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
 
 **`HTTP API`**
 
-The [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to http://localhost:5001.
+The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+
+* To _read_ metadata, use the read-only APIs of Marquez
+* To _write_ metadata, use the write-only APIs of Marquez, or an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
