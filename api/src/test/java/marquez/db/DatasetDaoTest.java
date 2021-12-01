@@ -456,12 +456,29 @@ class DatasetDaoTest {
   }
 
   @Getter
-  public static class CustomValueFacet extends OpenLineage.CustomFacet {
+  public static class CustomValueFacet implements OpenLineage.BaseFacet {
+    private static final URI CUSTOM_FACET_SCHEMA_URL =
+        URI.create("https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet");
+
     private String value;
 
     public CustomValueFacet(String value) {
-      super(PRODUCER_URL);
       this.value = value;
+    }
+
+    @Override
+    public URI get_producer() {
+      return PRODUCER_URL;
+    }
+
+    @Override
+    public URI get_schemaURL() {
+      return CUSTOM_FACET_SCHEMA_URL;
+    }
+
+    @Override
+    public Map<String, Object> getAdditionalProperties() {
+      return null;
     }
   }
 }
