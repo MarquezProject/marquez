@@ -117,8 +117,9 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Source createSource(@NonNull String sourceName, @NonNull SourceMeta sourceMeta) {
     final String bodyAsJson = http.put(url.toSourceUrl(sourceName), sourceMeta.toJson());
@@ -140,8 +141,9 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Dataset createDataset(
       @NonNull String namespaceName,
@@ -202,8 +204,9 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Job createJob(
       @NonNull String namespaceName, @NonNull String jobName, @NonNull JobMeta jobMeta) {
@@ -239,16 +242,18 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run createRun(String namespaceName, String jobName, RunMeta runMeta) {
     return createRun(namespaceName, jobName, runMeta, false);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   private Run createRun(
       @NonNull String namespaceName,
@@ -262,8 +267,9 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run createRunAndStart(String namespaceName, String jobName, RunMeta runMeta) {
     return createRun(namespaceName, jobName, runMeta, true);
@@ -285,16 +291,18 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAs(String runId, RunState runState) {
     return markRunAs(runId, runState, null);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAs(String runId, @NonNull RunState runState, @Nullable Instant at) {
     final String bodyAsJson = http.post(url.toRunTransitionUrl(runId, runState, at));
@@ -302,64 +310,72 @@ public class MarquezClient {
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsRunning(String runId) {
     return markRunAsRunning(runId, null);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsRunning(String runId, @Nullable Instant at) {
     return markRunAs(runId, RUNNING, at);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsCompleted(String runId) {
     return markRunAsCompleted(runId, null);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsCompleted(String runId, @Nullable Instant at) {
     return markRunAs(runId, COMPLETED, at);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsAborted(String runId) {
     return markRunAsAborted(runId, null);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsAborted(String runId, @Nullable Instant at) {
     return markRunAs(runId, ABORTED, at);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsFailed(String runId) {
     return markRunAsFailed(runId, null);
   }
 
   /**
-   * @deprecated Prefer OpenLineage, see <a href="https://openlineage.io</a>. This method is
-   *     scheduled to be removed in release {@code 0.25.0}.
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
    */
   public Run markRunAsFailed(String runId, @Nullable Instant at) {
     return markRunAs(runId, FAILED, at);
