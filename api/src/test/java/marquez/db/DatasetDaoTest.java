@@ -478,7 +478,8 @@ class DatasetDaoTest {
 
     @Override
     public Map<String, Object> getAdditionalProperties() {
-      return null;
+      // Not used
+      throw new UnsupportedOperationException();
     }
   }
 }
