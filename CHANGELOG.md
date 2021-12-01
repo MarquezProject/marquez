@@ -10,7 +10,7 @@
 
 ### Deprecated
 
-* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting dataset, source, and job run metadata [@wslulciuc](https://github.com/wslulciuc):
+* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting dataset, source, and job metadata [@wslulciuc](https://github.com/wslulciuc):
   * `/datasets` endpoint to collect dataset metadata
   * `/sources` endpoint to collect source metadata
   * `/jobs` endpoint to collect job metadata
