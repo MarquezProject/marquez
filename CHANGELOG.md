@@ -8,6 +8,12 @@
 * Upgrade to gradle `7.x` [@wslulciuc](https://github.com/wslulciuc)
 * Use `eclipse-temurin` as base image for Marquez API [@fm100](https://github.com/fm100)
 
+### Deprecated
+
+* `/datasets` endpoint to collect dataset metadata (**scheduled to be removed in** `0.25.0`)
+* `/sources` endpoint to collect source metadata (**scheduled to be removed in** `0.25.0`)
+* `/jobs` endpoint to collect job metadata (**scheduled to be removed in** `0.25.0`)
+
 ### Fixed
 
 * Validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
