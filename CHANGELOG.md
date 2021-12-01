@@ -1,8 +1,17 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.1...HEAD)
+
+### Changed
+
+* Clarify the doc on using OpenLineage for metadata collection [@fm100](https://github.com/fm100)
+* Upgrade to gradle `7.x` [@wslulciuc](https://github.com/wslulciuc)
+* Use `eclipse-temurin` as base image for Marquez API [@fm100](https://github.com/fm100)
+
 ### Fixed
-* Fixed validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
+
+* Validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
+* Increase `name` column size for tables `namespaces` and `sources` [@mmeasic](https://github.com/mmeasic)
 
 ## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1)
 
