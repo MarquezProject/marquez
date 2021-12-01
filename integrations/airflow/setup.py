@@ -20,12 +20,12 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "openlineage-airflow==0.2.3",
+    "openlineage-airflow==0.3.1",
 ]
 
 setup(
     name="marquez-airflow",
-    version="0.19.0",
+    version="0.19.2",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",

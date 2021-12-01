@@ -18,7 +18,7 @@ jobs:
   build-docs:
     working_directory: ~/marquez
     docker:
-      - image: cimg/node:12.21
+      - image: cimg/node:12.22.7
     steps:
       - checkout
       - run: npm install --prefix=${HOME}/.local --global redoc-cli
@@ -53,7 +53,7 @@ jobs:
   test-web:
     working_directory: ~/marquez/web
     docker:
-      - image: circleci/node:12.21.0
+      - image: circleci/node:12.22.7
     environment:
       TZ: 'America/New_York'
     steps:

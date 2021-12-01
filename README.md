@@ -30,7 +30,7 @@ Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/mar
   <img src="./web/docs/demo.gif">
 </p>
 
-Marquez provides a simple way to collect and view _dataset_, _job_, and _run_ metadata. The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
+Marquez provides a simple way to collect and view _dataset_, _job_, and _run_ metadata using [OpenLineage](https://openlineage.io). The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
 $ ./docker/up.sh
@@ -40,17 +40,20 @@ $ ./docker/up.sh
 
 **`WEB UI`**
 
-You can open http://localhost:3000 to begin exploring the web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
+You can open [http://localhost:3000](http://localhost:3000) to begin exploring the Marquez Web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
 
 **`HTTP API`**
 
-The [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to http://localhost:5001.
+The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
+
+* To **read** metadata, use the _read-only_ APIs of Marquez
+* To **write** metadata, use the _write-only_ APIs of Marquez, or an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
 **`GRAPHQL`**
 
-To explore metadata via graphql, browse to http://localhost:5000/graphql-playground. The graphql endpoint is currently in _beta_ and is located at http://localhost:5000/api/v1-beta/graphql.
+To explore metadata via graphql, browse to [http://localhost:5000/graphql-playground](http://localhost:5000/graphql-playground). The graphql endpoint is currently in _beta_ and is located at [http://localhost:5000/api/v1-beta/graphql](http://localhost:5000/api/v1-beta/graphql).
 
 ## Documentation
 
@@ -78,9 +81,15 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Building
 
-You can build most of the project modules using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and invoking `./gradlew :<module>:build` with the specific module you'd like to build. For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
+You can build most of the project [modules](#modules) using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and running the following gradle command with the specific module you'd like to build:
 
+```bash
+$ ./gradlew :<module>:build
 ```
+
+For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
+
+```bash
 $ ./gradlew :api:build
 ```
 
@@ -88,11 +97,11 @@ The executable can be found under `api/build/libs/`
 
 To build the entire project, set `JAVA_HOME` to your local JDK 11 installation and `JDK8_HOME` to your local JDK 8 installation. Then, build all modules with:
 
-```
+```bash
 $ ./gradlew build
 ```
 
-**The** [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) **integration requires Java 8 to build. The module can be built separately by setting** `JAVA_HOME` **to your local JDK 8 installation and invoking** `./gradlew :integrations:spark:build`.
+> **Note:** The [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local JDK 8 installation and running `./gradlew :integrations:spark:build`.
 
 ## Configuration
 

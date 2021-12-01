@@ -118,13 +118,6 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]] ; then
   exit 1;
 fi
 
-# Append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
-# (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
-if [[ "${NEXT_VERSION}" == *-rc.? ||
-      ! "${NEXT_VERSION}" == *-SNAPSHOT ]]; then
-  NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
-fi
-
 # Ensure valid versions
 VERSIONS=($RELEASE_VERSION $NEXT_VERSION)
 for VERSION in "${VERSIONS[@]}"; do
@@ -155,8 +148,8 @@ sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
 sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
 
 # (4) Bump version in scripts
-sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
-sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" .env.example
+sed -i "" "s/TAG=\d.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
+sed -i "" "s/TAG=\d.*/TAG=${RELEASE_VERSION}/g" .env.example
 
 # (5) Bump version in docs
 sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
@@ -173,7 +166,16 @@ git commit -sam "Prepare for release ${RELEASE_VERSION}" --no-verify
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
-# (9) Prepare next development version
+# (9) Prepare next development version for python and java modules
+for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
+  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${NEXT_VERSION}" --allow-dirty)
+done
+# For Java modules, append '-SNAPSHOT' to 'NEXT_VERSION' if a release candidate, or missing
+# (ex: '-SNAPSHOT' will be appended to X.Y.Z or X.Y.Z-rc.N)
+if [[ "${NEXT_VERSION}" == *-rc.? ||
+      ! "${NEXT_VERSION}" == *-SNAPSHOT ]]; then
+  NEXT_VERSION="${NEXT_VERSION}-SNAPSHOT"
+fi
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
