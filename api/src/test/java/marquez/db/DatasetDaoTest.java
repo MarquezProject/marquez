@@ -2,6 +2,7 @@ package marquez.db;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.createLineageRow;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class DatasetDaoTest {
 
   public static final String DATASET = "commonDataset";
-  public static final URI CUSTOM_FACET_PRODUCER = URI.create("http://test.producer/");
   private static DatasetDao datasetDao;
   private static OpenLineageDao openLineageDao;
 
@@ -198,7 +198,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
+                "http://test.schema/"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -207,7 +207,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
   }
 
   @Test
@@ -275,7 +275,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
+                "http://test.schema/"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -284,7 +284,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
 
     assertThat(datasets.get(1))
         .matches(ds -> ds.getName().getValue().equals(secondDatasetName))
@@ -303,7 +303,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
+                "http://test.schema/"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -312,7 +312,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
   }
 
   @Test
@@ -392,7 +392,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"))
+                "http://test.schema/"))
         .containsEntry(
             "inputFacet",
             ImmutableMap.of(
@@ -401,7 +401,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
 
     assertThat(datasets.get(1))
         .matches(ds -> ds.getName().getValue().equals(secondDatasetName))
@@ -419,7 +419,7 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
 
     // write a third version of the writeJob
     // since there is no read of this version, all input facets will be missing from the response
@@ -452,16 +452,30 @@ class DatasetDaoTest {
                 "_producer",
                 "http://test.producer/",
                 "_schemaURL",
-                "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/CustomFacet"));
+                "http://test.schema/"));
   }
 
   @Getter
-  public static class CustomValueFacet extends OpenLineage.CustomFacet {
+  public static class CustomValueFacet implements OpenLineage.BaseFacet {
     private String value;
 
     public CustomValueFacet(String value) {
-      super(PRODUCER_URL);
       this.value = value;
+    }
+
+    @Override
+    public URI get_producer() {
+      return PRODUCER_URL;
+    }
+
+    @Override
+    public URI get_schemaURL() {
+      return SCHEMA_URL;
+    }
+
+    @Override
+    public Map<String, Object> getAdditionalProperties() {
+      return null;
     }
   }
 }
