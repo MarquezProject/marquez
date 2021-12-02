@@ -51,6 +51,11 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     this.runTransitionListeners = runTransitionListeners;
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   public Run createRun(
       @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
     log.info("Creating run for job '{}'...", jobName.getValue());
@@ -60,6 +65,11 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     return findRunByUuid(runRow.getUuid()).get();
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   public void markRunAs(
       @NonNull RunId runId, @NonNull RunState runState, @Nullable Instant transitionedAt) {
     log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
