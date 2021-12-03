@@ -95,7 +95,7 @@ We're excited you're interested in contributing to Marquez! We'd love your help,
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez/blob/main/CODE_OF_CONDUCT.md) in all interactions with the community.
 
-If you’re interested in using or learning more about Marquez, reach out to us on our [slack](http://bit.ly/MarquezSlack) channel and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates.
+If you’re interested in using or learning more about Marquez, reach out to us on our [slack](http://bit.ly/MarquezSlack) channel and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates. We also encourage new comers to [join](https://lists.lfaidata.foundation/g/marquez-technical-discuss/ics/invite.ics?repeatid=32038) our monthly community meeting!
 
 ## Marquez Talks
 
