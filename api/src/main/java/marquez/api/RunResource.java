@@ -48,6 +48,11 @@ public class RunResource {
     return Response.ok(run).build();
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -58,6 +63,11 @@ public class RunResource {
     return markRunAs(RUNNING, atAsIso);
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -68,6 +78,11 @@ public class RunResource {
     return markRunAs(COMPLETED, atAsIso);
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -78,6 +93,11 @@ public class RunResource {
     return markRunAs(FAILED, atAsIso);
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
