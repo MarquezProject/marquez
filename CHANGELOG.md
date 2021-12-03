@@ -4,9 +4,16 @@
 
 ### Changed
 
-* Clarify the doc on using OpenLineage for metadata collection [@fm100](https://github.com/fm100)
+* Clarify docs on using OpenLineage for metadata collection [@fm100](https://github.com/fm100)
 * Upgrade to gradle `7.x` [@wslulciuc](https://github.com/wslulciuc)
-* Use `eclipse-temurin` as base image for Marquez API [@fm100](https://github.com/fm100)
+* Use `eclipse-temurin` for Marquez API base docker image [@fm100](https://github.com/fm100)
+
+### Deprecated
+
+* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting source, dataset, and job metadata [@wslulciuc](https://github.com/wslulciuc):
+  * [`/sources`](https://marquezproject.github.io/marquez/openapi.html#tag/Sources/paths/~1sources~1{source}/put) endpoint to collect source metadata
+  * [`/datasets`](https://marquezproject.github.io/marquez/openapi.html#tag/Datasets/paths/~1namespaces~1{namespace}~1datasets~1{dataset}/put) endpoint to collect dataset metadata
+  * [`/jobs`](https://marquezproject.github.io/marquez/openapi.html#tag/Jobs/paths/~1namespaces~1{namespace}~1jobs~1{job}/put) endpoint to collect job metadata
 
 ### Fixed
 

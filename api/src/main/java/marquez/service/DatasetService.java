@@ -60,6 +60,11 @@ public class DatasetService extends DelegatingDaos.DelegatingDatasetDao {
     this.runService = runService;
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   public Dataset createOrUpdate(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
