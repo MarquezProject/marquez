@@ -22,4 +22,4 @@ if [[ -z "${MARQUEZ_CONFIG}" ]]; then
 fi
 
 # Start http server with configuration
-java -Duser.timezone=UTC -jar marquez-*.jar server "${MARQUEZ_CONFIG}"
+java -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true -jar marquez-*.jar server "${MARQUEZ_CONFIG}"
