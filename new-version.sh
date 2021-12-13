@@ -73,7 +73,7 @@ fi
 
 # Verify redoc-cli is installed
 if [[ ! $(type -P redoc-cli) ]]; then
-  echo "redoc-cli not installed! Please see https://www.npmjs.com/package/redoc-cli"
+  echo "redoc-cli not installed! Please see https://redoc.ly/docs/redoc/quickstart/cli"
   exit 1;
 fi
 
