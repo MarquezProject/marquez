@@ -1,6 +1,12 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.20.0...HEAD)
+
+## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0)
+
+### Added
+
+* Add [deploy](https://marquezproject.github.io/marquez/deployment-overview.html) docs for running Marquez on AWS [@wslulciuc](https://github.com/wslulciuc) [@merobi-hub](https://github.com/merobi-hub)
 
 ### Changed
 
@@ -20,12 +26,16 @@
 * Validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
 * Increase `name` column size for tables `namespaces` and `sources` [@mmeasic](https://github.com/mmeasic)
 
-## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1)
+### Security
+
+* Fix log4j [exploit](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) [@fm100](https://github.com/fm100)
+
+## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1) 2021-11-05
 
 ### Fixed
 
 * URI and URL DB mappper should handle empty string as null [@OleksandrDvornik](https://github.com/OleksandrDvornik)
-* Fix NodeId parsing when dataset name contains struct<> [@fm100](https://github.com/fm100)
+* Fix NodeId parsing when dataset name contains `struct<>` [@fm100](https://github.com/fm100)
 * Add encoding for dataset names in URL construction [@collado-mike](https://github.com/collado-mike)
 
 ## [0.19.0](https://github.com/MarquezProject/marquez/compare/0.18.0...0.19.0) - 2021-10-21
