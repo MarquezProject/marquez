@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.20.0...HEAD)
 
-## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) 2021-12-13
+## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 
 ### Added
 
@@ -30,7 +30,7 @@
 
 * Fix log4j [exploit](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) [@fm100](https://github.com/fm100)
 
-## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1) 2021-11-05
+## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1) - 2021-11-05
 
 ### Fixed
 
