@@ -25,7 +25,7 @@ requirements = [
 
 setup(
     name="marquez-airflow",
-    version="0.20.0",
+    version="0.20.1",
     description="Marquez integration with Airflow",
     long_description=readme,
     long_description_content_type="text/markdown",
