@@ -21,7 +21,6 @@ paths:
         underscores (`_`), dashes (`-`), colons (`:`), slashes (`/`), or dots (`.`).
         A namespace is case-insensitive with a maximum length of `1024` characters.
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
-      deprecated: true
       tags:
         - Namespaces
       requestBody:
