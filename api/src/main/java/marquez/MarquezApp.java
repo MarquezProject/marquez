@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
 import marquez.db.DbMigration;
+import marquez.logging.LoggingMdcFilter;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -116,6 +117,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     registerResources(config, env, source);
     registerServlets(env);
+    registerFilters(env);
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
@@ -157,5 +159,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     // Expose metrics for monitoring.
     env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
+  }
+
+  private void registerFilters(@NonNull Environment env) {
+    env.jersey().getResourceConfig().register(new LoggingMdcFilter());
   }
 }
