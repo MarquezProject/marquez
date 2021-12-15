@@ -4,7 +4,7 @@
 
 ### Added
 
-* Add MDC to the `LoggingJerseyFilter` to include API method, path, and request ID.
+* Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID.
 
 ## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 
