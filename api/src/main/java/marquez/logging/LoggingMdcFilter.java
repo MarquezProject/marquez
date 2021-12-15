@@ -12,11 +12,11 @@ import org.slf4j.MDC;
  * logs throughout the request context. Request ID is randomly generated UUID, which can be used to
  * group by to see the logs for a particular request.
  */
-public class LoggingJerseyFilter implements ContainerRequestFilter, CompletionCallback {
+public class LoggingMdcFilter implements ContainerRequestFilter, CompletionCallback {
 
-  private static final String REQUEST_ID = "RequestID";
-  private static final String METHOD = "Method";
-  private static final String PATH = "Path";
+  private static final String REQUEST_ID = "requestID";
+  private static final String METHOD = "method";
+  private static final String PATH = "path";
 
   @Override
   public void onComplete(Throwable throwable) {

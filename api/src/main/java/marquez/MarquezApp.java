@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
 import marquez.db.DbMigration;
-import marquez.logging.LoggingJerseyFilter;
+import marquez.logging.LoggingMdcFilter;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -174,6 +174,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   private void registerFilters(@NonNull Environment env) {
-    env.jersey().getResourceConfig().register(new LoggingJerseyFilter());
+    env.jersey().getResourceConfig().register(new LoggingMdcFilter());
   }
 }
