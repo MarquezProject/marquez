@@ -161,7 +161,3 @@ networking issues, credentials, etc.
 ```bash
 kubectl logs -p <podName>
 ```
-
-## Contributing
-
-See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-chart/blob/master/CONTRIBUTING.md) for more details about how to contribute.
