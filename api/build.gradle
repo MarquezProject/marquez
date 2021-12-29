@@ -49,7 +49,7 @@ dependencies {
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     implementation 'com.google.guava:guava:31.0.1-jre'
-    implementation 'org.dhatim:dropwizard-sentry:2.0.26-3'
+    implementation 'org.dhatim:dropwizard-sentry:2.0.28-1'
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation 'org.flywaydb:flyway-core:6.5.7'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
