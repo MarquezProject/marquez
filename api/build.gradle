@@ -30,7 +30,7 @@ ext {
     jdbi3Version = '3.26.0'
     prometheusVersion = '0.14.1'
     testcontainersVersion = '1.16.2'
-    sentryVersion = '5.5.1'
+    sentryVersion = '5.5.2'
 }
 
 dependencies {
