@@ -37,8 +37,9 @@ The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) se
 | Component        | Image                                                                               | Description                                                                                                            |
 |------------------|-------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | Marquez Web UI   | [marquezproject/marquez-web](https://hub.docker.com/r/marquezproject/marquez-web)   | The web UI used to view metadata.                                                                                      |
-| Marquez HTTP API | [marquezproject/marquez](https://hub.docker.com/r/marquezproject/marquez)           | The core API used to collect metadata using [OpenLineage](https://openlineage.io).                                                                                 |
-| Database         | [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) or cloud provided | A PostgreSQL instance used to store metadata.                                                               |
+| Marquez HTTP API | [marquezproject/marquez](https://hub.docker.com/r/marquezproject/marquez)           | The core API used to collect metadata using [OpenLineage](https://openlineage.io).                                     |
+| Database         | [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) or cloud provided | A PostgreSQL instance used to store metadata.                                                                          |
+| Scheduler        | User-provided                                                                       | A scheduler used to run a workflow on a particular schedule (ex: [Airflow](https://airflow.apache.org))                |
 | Workflow         | User-provided                                                                       | A workflow using an OpenLineage [integration](https://openlineage.io/integration) to send lineage metadata to Marquez. |
 
 ## Authentication
