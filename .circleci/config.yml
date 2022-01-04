@@ -49,22 +49,18 @@ jobs:
       - run: ./.circleci/get-jdk11.sh
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
       - run: docker save -o marquez.tar "marquezproject/marquez:${CIRCLE_SHA1}"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - marquez.tar
+      - store_artifacts:
+          path: marquez.tar
 
   build-image-web:
     working_directory: ~/marquez/web
     machine: true
     steps:
       - *checkout_project_root
-      - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
+      - run: docker build --no-cache --tag "marquezproject/marquez-web:${CIRCLE_SHA1}" .
       - run: docker save -o marquez-web.tar "marquezproject/marquez-web:${CIRCLE_SHA1}"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - marquez-web.tar
+      - store_artifacts:
+          path: marquez-web.tar
 
   unit-test-web:
     working_directory: ~/marquez/web
