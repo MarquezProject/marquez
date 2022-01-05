@@ -174,8 +174,8 @@ jobs:
       - image: cimg/node:12.22.7
     steps:
       - checkout
-      - run: npm install --prefix=${HOME}/.local --global @redocly/openapi-cli@latest
-      - run: openapi lint spec/openapi.yml
+      - run: npm install --prefix=${HOME}/.local --global redoc-cli
+      - run: redoc-cli bundle spec/openapi.yml
 
   release-java:
     working_directory: ~/marquez
