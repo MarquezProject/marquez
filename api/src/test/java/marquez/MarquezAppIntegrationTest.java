@@ -404,7 +404,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(run.getArgs()).isEmpty();
 
     // (7) Start a run
-    final Instant startedAt = newTimestamp();
+    final Instant startedAt = newTimestamp().truncatedTo(ChronoUnit.MICROS);
     final Run runStarted = client.markRunAsRunning(run.getId(), startedAt);
     assertThat(runStarted.getId()).isEqualTo(run.getId());
     assertThat(runStarted.getCreatedAt()).isAfter(EPOCH);
