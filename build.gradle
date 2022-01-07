@@ -20,7 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.1.0'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.0'
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.1.0'
     }
 }
@@ -145,7 +145,7 @@ subprojects {
     def coverageDir = "${reportsDir}/coverage";
 
     jacoco {
-        toolVersion = '0.8.5'
+        toolVersion = '0.8.7'
         reportsDir = file(coverageDir)
     }
 

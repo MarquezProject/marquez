@@ -6,6 +6,15 @@
 
 * Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID.
 
+### Changed
+
+* Upgraded from JDK 11 to JDK 17 [@ucg8j](https://github.com/ucg8j)
+* Switched JDK image from Alpine to regular image to enable Marquez to run on multiple CPU architectures [@ucg8j](https://github.com/ucg8j)
+
+### Fixed
+
+* Error when running marquez-api on Apple M1 [@ucg8j](https://github.com/ucg8j)
+
 ## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 
 ### Added
