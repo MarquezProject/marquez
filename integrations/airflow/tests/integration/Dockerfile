@@ -23,6 +23,11 @@ RUN apt-get update && \
 USER 1001
 
 FROM marquez-airflow-base:latest AS integration
+RUN apt-get update && \
+    apt-get install -y \
+        python3-dev \
+        gcc \
+        libc-dev
 COPY integration-requirements.txt integration-requirements.txt
 COPY integration.py integration.py
 RUN pip install --use-deprecated=legacy-resolver --user -r integration-requirements.txt

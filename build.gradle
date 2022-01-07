@@ -145,7 +145,7 @@ subprojects {
     def coverageDir = "${reportsDir}/coverage";
 
     jacoco {
-        toolVersion = '0.8.5'
+        toolVersion = '0.8.7'
         reportsDir = file(coverageDir)
     }
 
