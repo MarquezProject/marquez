@@ -19,11 +19,6 @@ plugins {
     id 'signing'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 dependencies {
     implementation "io.dropwizard:dropwizard-jackson:${dropwizardVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"

@@ -60,6 +60,7 @@ subprojects {
     ext {
         assertjVersion = '3.21.0'
         dropwizardVersion = '2.0.28'
+        jacocoVersion = '0.8.7'
         junit5Version = '5.8.2'
         lombokVersion = '1.18.22'
         mockitoVersion = '4.2.0'
@@ -145,7 +146,7 @@ subprojects {
     def coverageDir = "${reportsDir}/coverage";
 
     jacoco {
-        toolVersion = '0.8.7'
+        toolVersion = "${jacocoVersion}"
         reportsDir = file(coverageDir)
     }
 
