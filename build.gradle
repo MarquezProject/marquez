@@ -57,6 +57,16 @@ subprojects {
         archivesBaseName = 'marquez-spark'
     }
 
+    ext.useJdk8OrJdk17 = { ->
+        if (project.hasProperty("jdk8.build")) {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        } else {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+        }
+    }
+
     ext {
         assertjVersion = '3.21.0'
         dropwizardVersion = '2.0.28'
@@ -86,11 +96,8 @@ subprojects {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
-        if (project.hasProperty("jdk8.build")) {
-            options.fork = true
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-        }
+        options.fork = true
+        useJdk8OrJdk17()
     }
 
     compileTestJava.doFirst {
@@ -103,11 +110,8 @@ subprojects {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
-        if (project.hasProperty("jdk8.build")) {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-            options.fork = true
-        }
+        options.fork = true
+        useJdk8OrJdk17()
     }
 
     tasks.withType(Test) {
