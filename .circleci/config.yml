@@ -35,9 +35,15 @@ jobs:
           keys:
             - v1-api-{{ .Branch }}-{{ .Revision }}
             - v1-api-{{ .Branch }}
-      - run: ./.circleci/get-jdk11.sh
+      - run: ./.circleci/get-jdk17.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
-      - run: ./gradlew --no-daemon --stacktrace api:build
+      - run: |
+          ./gradlew --no-daemon --stacktrace api:build -Dorg.gradle.jvmargs="\
+          --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
@@ -148,7 +154,7 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: ./.circleci/get-jdk11.sh
+      - run: ./.circleci/get-jdk17.sh
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
       - run: mkdir ./build && docker save -o ./build/marquezproject-api-image.tar "marquezproject/marquez:${CIRCLE_SHA1}"
       - persist_to_workspace:
@@ -186,7 +192,7 @@ jobs:
       JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
     steps:
       - checkout
-      - run: ./.circleci/get-jdk11.sh
+      - run: ./.circleci/get-jdk17.sh
       - run: |
           # Get, then decode the GPG private key used to sign *.jar
           export ORG_GRADLE_PROJECT_signingKey=$(echo $GPG_SIGNING_KEY | base64 -d)
