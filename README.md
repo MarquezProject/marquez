@@ -73,7 +73,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 ## Requirements
 
-* [Java 11](https://openjdk.java.net/install)
+* [Java 17](https://adoptium.net)
 * [Java 8](https://openjdk.java.net/install) (_required_ for **Spark** integration)
 * [PostgreSQL 12.1](https://www.postgresql.org/download)
 
