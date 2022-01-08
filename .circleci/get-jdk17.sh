@@ -16,7 +16,7 @@
 
 set -e
 
-sudo apt-get update && sudo apt-get apt-get install temurin-17-jdk
+sudo apt-get update && sudo apt-get install temurin-17-jdk
 sudo update-alternatives --set java /usr/lib/jvm/temurin-17-jdk-amd64/bin/java
 sudo update-alternatives --set javac /usr/lib/jvm/temurin-17-jdk-amd64/bin/javac
 java -version
