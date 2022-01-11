@@ -1,6 +1,6 @@
 version: 2.1
 
-# Define pipeline parameters
+# Define CI workflow parameters
 parameters:
   # Define gradle options needed for java17 build
   gradle-opts:
@@ -25,10 +25,10 @@ jobs:
   build-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202010-01gradle-opts
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
-      GRADLE_OPTS: << parameters.gradle-opts >>
+      GRADLE_OPTS: << pipeline.parameters.gradle-opts >>
     steps:
       - checkout
       - restore_cache:
@@ -54,7 +54,7 @@ jobs:
     working_directory: ~/marquez
     machine: true
     environment:
-      GRADLE_OPTS: << parameters.gradle-opts >>
+      GRADLE_OPTS: << pipeline.parameters.gradle-opts >>
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
@@ -98,7 +98,7 @@ jobs:
     machine:
       image: ubuntu-2004:202010-01
     environment:
-      GRADLE_OPTS: << parameters.gradle-opts >>
+      GRADLE_OPTS: << pipeline.parameters.gradle-opts >>
     steps:
       - checkout
       - restore_cache:
@@ -206,7 +206,7 @@ jobs:
     machine: true
     environment:
       JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
-      GRADLE_OPTS: << parameters.gradle-opts >>
+      GRADLE_OPTS: << pipeline.parameters.gradle-opts >>
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
