@@ -47,7 +47,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: ./.circleci/get-jdk17.sh
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
       - run: docker save -o marquez.tar "marquezproject/marquez:${CIRCLE_SHA1}"
       - store_artifacts:
