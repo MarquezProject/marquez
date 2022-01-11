@@ -239,7 +239,7 @@ workflows:
       - build-client-java
       - build-integration-airflow
       - build-integration-spark
-      - integration-test-integration-airflow
+      - integration-test-integration-airflow:
           requires:
             - build-integration-airflow
       - unit-test-web
