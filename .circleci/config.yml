@@ -15,15 +15,6 @@ only-on-release: &only-on-release
       ignore: /.*/
 
 jobs:
-  build-docs:
-    working_directory: ~/marquez
-    docker:
-      - image: cimg/node:12.22.7
-    steps:
-      - checkout
-      - run: npm install --prefix=${HOME}/.local --global redoc-cli
-      - run: redoc-cli bundle spec/openapi.yml
-
   build-api:
     working_directory: ~/marquez
     machine: true
@@ -56,7 +47,28 @@ jobs:
           paths:
             - ~/.gradle
 
-  test-web:
+  build-image-api:
+    working_directory: ~/marquez
+    machine: true
+    steps:
+      - checkout
+      - run: ./.circleci/get-jdk17.sh
+      - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
+      - run: docker save -o marquez.tar "marquezproject/marquez:${CIRCLE_SHA1}"
+      - store_artifacts:
+          path: marquez.tar
+
+  build-image-web:
+    working_directory: ~/marquez/web
+    machine: true
+    steps:
+      - *checkout_project_root
+      - run: docker build --no-cache --tag "marquezproject/marquez-web:${CIRCLE_SHA1}" .
+      - run: docker save -o marquez-web.tar "marquezproject/marquez-web:${CIRCLE_SHA1}"
+      - store_artifacts:
+          path: marquez-web.tar
+
+  unit-test-web:
     working_directory: ~/marquez/web
     docker:
       - image: circleci/node:12.22.7
@@ -99,7 +111,7 @@ jobs:
           paths:
             - ~/.gradle
 
-  test-client-python:
+  unit-test-client-python:
     working_directory: ~/marquez/clients/python
     docker:
       - image: circleci/python:3.6
@@ -149,19 +161,6 @@ jobs:
           paths:
             - ~/.gradle
 
-  image-api:
-    working_directory: ~/marquez
-    machine: true
-    steps:
-      - checkout
-      - run: ./.circleci/get-jdk17.sh
-      - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
-      - run: mkdir ./build && docker save -o ./build/marquezproject-api-image.tar "marquezproject/marquez:${CIRCLE_SHA1}"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./build/marquezproject-api-image.tar
-
   build-integration-airflow:
     working_directory: ~/marquez/integrations/airflow
     docker:
@@ -175,7 +174,7 @@ jobs:
             - ./dist/*.whl
             - ./dist/*.tar.gz
 
-  integration-test-airflow:
+  integration-test-integration-airflow:
     working_directory: ~/marquez/integrations/
     machine: true
     steps:
@@ -184,6 +183,15 @@ jobs:
       - run: bash -c '(cd ~/marquez && docker build -t marquezproject/marquez . )'
       - run: docker build -f airflow/Dockerfile.tests -t marquez-airflow-base .
       - run: ./airflow/tests/integration/docker/up.sh
+
+  lint-docs-api:
+    working_directory: ~/marquez
+    docker:
+      - image: cimg/node:12.22.7
+    steps:
+      - checkout
+      - run: npm install --prefix=${HOME}/.local --global redoc-cli
+      - run: redoc-cli bundle spec/openapi.yml
 
   release-java:
     working_directory: ~/marquez
@@ -199,14 +207,6 @@ jobs:
           # Publish *.jar
           ./gradlew publish
 
-  release-docker:
-    working_directory: ~/marquez
-    machine: true
-    steps:
-      - checkout
-      - run: ./docker/login.sh
-      - run: ./docker/build-and-push.sh $CIRCLE_TAG
-
   release-python:
     working_directory: ~/marquez
     docker:
@@ -218,17 +218,33 @@ jobs:
       - run: pip install wheel twine
       - run: python -m twine upload --non-interactive --verbose --repository pypi dist/*
 
+  release-docker:
+    working_directory: ~/marquez
+    machine: true
+    steps:
+      - checkout
+      - run: ./docker/login.sh
+      - run: ./docker/build-and-push.sh $CIRCLE_TAG
+
 workflows:
   marquez:
     jobs:
-      - build-docs
       - build-api
-      - image-api
-      - build-integration-spark
-      - test-web
+      - build-image-api:
+          requires:
+            - build-api
+      - build-image-web:
+          requires:
+            - unit-test-web
       - build-client-java
-      - test-client-python
-      - integration-test-airflow
+      - build-integration-airflow
+      - build-integration-spark
+      - integration-test-integration-airflow:
+          requires:
+            - build-integration-airflow
+      - unit-test-web
+      - unit-test-client-python
+      - lint-docs-api
   release:
     jobs:
       - build-client-python:
