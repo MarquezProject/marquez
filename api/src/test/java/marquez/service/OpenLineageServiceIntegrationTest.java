@@ -8,9 +8,6 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -70,11 +67,6 @@ public class OpenLineageServiceIntegrationTest {
   public static String EVENT_LARGE = "open_lineage/event_large.json";
 
   public static List<Object[]> getData() throws IOException, URISyntaxException {
-    String prefix = "../integrations/spark/integrations";
-    List<URI> rdd =
-        Files.list(Paths.get(prefix + "/sparkrdd")).map(Path::toUri).collect(Collectors.toList());
-    List<URI> sql =
-        Files.list(Paths.get(prefix + "/sparksql")).map(Path::toUri).collect(Collectors.toList());
     return Stream.of(
             new Object[] {
               Arrays.asList(Resources.getResource(EVENT_REQUIRED_ONLY).toURI()),
@@ -98,8 +90,6 @@ public class OpenLineageServiceIntegrationTest {
                   Resources.getResource("open_lineage/listener/2.json").toURI()),
               new ExpectedResults(3, 2, 2, 1)
             },
-            new Object[] {rdd, new ExpectedResults(1, 0, 2, 2)},
-            new Object[] {sql, new ExpectedResults(1, 0, 4, 4)},
             new Object[] {
               Arrays.asList(Resources.getResource(EVENT_LARGE).toURI()),
               new ExpectedResults(1, 1, 1, 1)
