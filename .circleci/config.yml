@@ -17,7 +17,8 @@ only-on-release: &only-on-release
 jobs:
   build-api:
     working_directory: ~/marquez
-    machine: true
+    machine:
+      image: ubuntu-2004:202010-01
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
@@ -84,8 +85,8 @@ jobs:
 
   build-client-java:
     working_directory: ~/marquez
-    docker:
-      - image: circleci/openjdk:8-jdk
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - checkout
       - restore_cache:
@@ -140,9 +141,8 @@ jobs:
 
   release-java:
     working_directory: ~/marquez
-    machine: true
-    environment:
-      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
