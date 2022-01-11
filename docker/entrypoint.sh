@@ -21,5 +21,8 @@ if [[ -z "${MARQUEZ_CONFIG}" ]]; then
   echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
 fi
 
+# Adjust java options for the http server
+JAVA_OPTS="${JAVA_OPTS} -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true"
+
 # Start http server with configuration
-java -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true -jar marquez-*.jar server "${MARQUEZ_CONFIG}"
+java ${JAVA_OPTS} -jar marquez-*.jar server "${MARQUEZ_CONFIG}"
