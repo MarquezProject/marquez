@@ -1,5 +1,12 @@
 version: 2.1
 
+# Define pipeline parameters
+parameters:
+  # Define gradle options needed for java17 build
+  gradle-opts:
+    type: string
+    default: "-Dorg.gradle.jvmargs= --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
+
 # Define reusable config (see: https://yaml.org/spec/1.2/spec.html#id2765878)
 checkout_project_root: &checkout_project_root
   # Override checkout path to project root (see: https://circleci.com/docs/2.0/configuration-reference/#checkout)
@@ -21,7 +28,7 @@ jobs:
       image: ubuntu-2004:202010-01
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
-      GRADLE_OPTS: $GRADLE_OPTS
+      GRADLE_OPTS: << parameters.gradle-opts >>
     steps:
       - checkout
       - restore_cache:
@@ -47,7 +54,7 @@ jobs:
     working_directory: ~/marquez
     machine: true
     environment:
-      GRADLE_OPTS: $GRADLE_OPTS
+      GRADLE_OPTS: << parameters.gradle-opts >>
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
@@ -91,7 +98,7 @@ jobs:
     machine:
       image: ubuntu-2004:202010-01
     environment:
-      GRADLE_OPTS: $GRADLE_OPTS
+      GRADLE_OPTS: << parameters.gradle-opts >>
     steps:
       - checkout
       - restore_cache:
@@ -199,7 +206,7 @@ jobs:
     machine: true
     environment:
       JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
-      GRADLE_OPTS: $GRADLE_OPTS
+      GRADLE_OPTS: << parameters.gradle-opts >>
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
