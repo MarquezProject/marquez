@@ -25,7 +25,7 @@ jobs:
   build-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:202010-01gradle-opts
+      image: ubuntu-2004:202010-01
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
       GRADLE_OPTS: << pipeline.parameters.gradle-opts >>
