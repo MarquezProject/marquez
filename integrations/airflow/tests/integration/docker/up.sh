@@ -32,7 +32,9 @@ MARQUEZ_AIRFLOW_WHL_ALL=$(docker run marquez-airflow-base:latest sh -c "ls /whl/
 # Add revision to requirements.txt
 echo "${MARQUEZ_AIRFLOW_WHL_ALL}" > requirements.txt
 
-# Add lib revision to integration-requirements.txt
-cat "${MARQUEZ_AIRFLOW_WHL}" > integration-requirements.txt
+# Add revision to integration-requirements.txt
+cat > integration-requirements.txt <<EOL
+${MARQUEZ_AIRFLOW_WHL}
+EOL
 
 docker-compose up --build --force-recreate --exit-code-from integration
