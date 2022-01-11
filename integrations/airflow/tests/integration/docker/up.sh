@@ -34,6 +34,8 @@ echo "${MARQUEZ_AIRFLOW_WHL_ALL}" > requirements.txt
 
 # Add revision to integration-requirements.txt
 cat > integration-requirements.txt <<EOL
+psycopg2-binary==2.8.6
+retrying==1.3.3
 ${MARQUEZ_AIRFLOW_WHL}
 EOL
 
