@@ -28,7 +28,7 @@ dependencies {
     implementation "io.dropwizard:dropwizard-jackson:${dropwizardVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    implementation 'org.apache.maven:maven-archiver:3.5.1'
+    implementation 'org.apache.maven:maven-archiver:3.5.2'
 
     testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
 }
