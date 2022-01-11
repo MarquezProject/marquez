@@ -30,6 +30,7 @@ jobs:
       image: ubuntu-2004:202010-01
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
+      GRADLE_OPTS: $GRADLE_OPTS
     steps:
       - checkout
       - restore_cache:
@@ -38,13 +39,7 @@ jobs:
             - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk17.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
-      - run: |
-          ./gradlew --no-daemon --stacktrace api:build -Dorg.gradle.jvmargs="\
-          --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
+      - run: ./gradlew --no-daemon --stacktrace api:build
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
@@ -81,6 +76,8 @@ jobs:
     working_directory: ~/marquez
     machine:
       image: ubuntu-2004:202010-01
+    environment:
+      GRADLE_OPTS: $GRADLE_OPTS
     steps:
       - checkout
       - restore_cache:
@@ -155,6 +152,8 @@ jobs:
     working_directory: ~/marquez
     machine:
       image: ubuntu-2004:202010-01
+    environment:
+      GRADLE_OPTS: $GRADLE_OPTS
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
@@ -193,6 +192,7 @@ jobs:
     machine: true
     environment:
       JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      GRADLE_OPTS: $GRADLE_OPTS
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
