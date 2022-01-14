@@ -4,7 +4,7 @@
 
 ### Added
 
-* Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID.
+* Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID [@fm100](https://github.com/fm100)
 
 ### Changed
 
@@ -14,6 +14,11 @@
 ### Fixed
 
 * Error when running marquez-api on Apple M1 [@ucg8j](https://github.com/ucg8j)
+
+### Removed
+
+* The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+* The `marquez-spark` lib. has been removed. **Please use the** [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) **library instead** [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 

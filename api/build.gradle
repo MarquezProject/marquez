@@ -12,18 +12,12 @@
  * limitations under the License.
  */
 
-
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'maven-publish'
     id 'signing'
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 ext {
