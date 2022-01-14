@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.apache.tools.ant.filters.ReplaceTokens
 
