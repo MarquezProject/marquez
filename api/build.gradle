@@ -8,11 +8,6 @@ plugins {
     id 'signing'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
 ext {
     jdbi3Version = '3.27.0'
     prometheusVersion = '0.14.1'

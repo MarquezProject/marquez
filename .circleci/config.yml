@@ -17,7 +17,8 @@ only-on-release: &only-on-release
 jobs:
   build-api:
     working_directory: ~/marquez
-    machine: true
+    machine:
+      image: ubuntu-2004:202010-01
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
@@ -28,13 +29,7 @@ jobs:
             - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk17.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
-      - run: |
-          ./gradlew --no-daemon --stacktrace api:build -Dorg.gradle.jvmargs="\
-          --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"
+      - run: ./gradlew --no-daemon --stacktrace api:build
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
@@ -52,7 +47,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: ./.circleci/get-jdk17.sh
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
       - run: docker save -o marquez.tar "marquezproject/marquez:${CIRCLE_SHA1}"
       - store_artifacts:
@@ -90,14 +84,15 @@ jobs:
 
   build-client-java:
     working_directory: ~/marquez
-    docker:
-      - image: circleci/openjdk:8-jdk
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
+      - run: ./.circleci/get-jdk17.sh
       - run: ./gradlew --no-daemon --stacktrace clients:java:build
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
@@ -135,55 +130,6 @@ jobs:
             - ./dist/*.whl
             - ./dist/*.tar.gz
 
-  build-integration-spark:
-    working_directory: ~/marquez/integrations/spark
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-            - v1-integration-spark-{{ .Branch }}
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:build
-      - run:
-          when: on_fail
-          command: cat integrations/spark/build/test-results/test/TEST-*.xml
-      - run: ./gradlew --no-daemon :integrations:spark:jacocoTestReport
-      - run: ./gradlew --no-daemon --stacktrace :integrations:spark:shadowJar # generate the fat jar
-      - store_test_results:
-          path: integrations/spark/build/test-results/test
-      - store_artifacts:
-          path: build/reports/tests/test
-          destination: test-report
-      - save_cache:
-          key: v1-integration-spark-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - ~/.gradle
-
-  build-integration-airflow:
-    working_directory: ~/marquez/integrations/airflow
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - *checkout_project_root
-      - run: python setup.py sdist bdist_wheel
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./dist/*.whl
-            - ./dist/*.tar.gz
-
-  integration-test-integration-airflow:
-    working_directory: ~/marquez/integrations/
-    machine: true
-    steps:
-      - *checkout_project_root
-      - run: ./../.circleci/get-docker-compose.sh
-      - run: bash -c '(cd ~/marquez && docker build -t marquezproject/marquez . )'
-      - run: docker build -f airflow/Dockerfile.tests -t marquez-airflow-base .
-      - run: ./airflow/tests/integration/docker/up.sh
-
   lint-docs-api:
     working_directory: ~/marquez
     docker:
@@ -195,9 +141,8 @@ jobs:
 
   release-java:
     working_directory: ~/marquez
-    machine: true
-    environment:
-      JDK8_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
@@ -237,19 +182,12 @@ workflows:
           requires:
             - unit-test-web
       - build-client-java
-      - build-integration-airflow
-      - build-integration-spark
-      - integration-test-integration-airflow:
-          requires:
-            - build-integration-airflow
       - unit-test-web
       - unit-test-client-python
       - lint-docs-api
   release:
     jobs:
       - build-client-python:
-          <<: *only-on-release
-      - build-integration-airflow:
           <<: *only-on-release
       - release-java:
           <<: *only-on-release
@@ -259,7 +197,6 @@ workflows:
           context: release
           requires:
             - build-client-python
-            - build-integration-airflow
       - release-docker:
           <<: *only-on-release
           context: release

@@ -52,14 +52,10 @@ subprojects {
         archivesBaseName = 'marquez-java'
     }
 
-    project(':integrations:spark') {
-        apply plugin: 'java-library'
-        archivesBaseName = 'marquez-spark'
-    }
-
     ext {
         assertjVersion = '3.22.0'
         dropwizardVersion = '2.0.28'
+        jacocoVersion = '0.8.7'
         junit5Version = '5.8.2'
         lombokVersion = '1.18.22'
         mockitoVersion = '4.2.0'
@@ -85,34 +81,16 @@ subprojects {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
-        if (project.hasProperty("jdk8.build")) {
-            options.fork = true
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-        }
-    }
-
-    compileTestJava.doFirst {
-        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
-            println "Switching build to JDK8 installation at ${System.getenv('JDK8_HOME')}"
-        }
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     compileTestJava {
         options.incremental = true
         options.compilerArgs << '-parameters'
         options.encoding = "UTF-8"
-        if (project.hasProperty("jdk8.build")) {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
-            options.fork = true
-        }
-    }
-
-    tasks.withType(Test) {
-        if (project.hasProperty("jdk8.build") && System.getenv("JDK8_HOME")) {
-            test.executable = "${System.getenv('JDK8_HOME')}/bin/java"
-        }
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     task sourceJar(type: Jar) {
@@ -145,7 +123,7 @@ subprojects {
     def coverageDir = "${reportsDir}/coverage";
 
     jacoco {
-        toolVersion = '0.8.7'
+        toolVersion = "${jacocoVersion}"
         reportsDir = file(coverageDir)
     }
 

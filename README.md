@@ -68,40 +68,25 @@ Marquez uses a _multi_-project structure and contains the following modules:
 * [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
-* [`integrations`](https://github.com/MarquezProject/marquez/tree/main/integrations): integrations with other systems (ex: [`Airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow))
+* `integrations`: **removed**, please see new location: [`OpenLineage/integration `](https://github.com/OpenLineage/OpenLineage/tree/main/integration)
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 ## Requirements
 
-* [Java 11](https://openjdk.java.net/install)
-* [Java 8](https://openjdk.java.net/install) (_required_ for **Spark** integration)
+* [Java 17](https://adoptium.net)
 * [PostgreSQL 12.1](https://www.postgresql.org/download)
 
 > **Note:** To connect to your running PostgreSQL instance, you will need the standard [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html) tool.
 
 ## Building
 
-You can build most of the project [modules](#modules) using Java 11. We recommend setting `JAVA_HOME` to your local JDK 11 installation and running the following gradle command with the specific module you'd like to build:
+To build the entire project run:
 
 ```bash
-$ ./gradlew :<module>:build
-```
-
-For example, to build the [`api`](https://github.com/MarquezProject/marquez/tree/main/api) module run:
-
-```bash
-$ ./gradlew :api:build
+./gradlew build
 ```
 
 The executable can be found under `api/build/libs/`
-
-To build the entire project, set `JAVA_HOME` to your local JDK 11 installation and `JDK8_HOME` to your local JDK 8 installation. Then, build all modules with:
-
-```bash
-$ ./gradlew build
-```
-
-> **Note:** The [`spark`](https://github.com/MarquezProject/marquez/tree/main/integrations/spark) integration requires Java 8 to build. The module can be built separately by setting `JAVA_HOME` to your local JDK 8 installation and running `./gradlew :integrations:spark:build`.
 
 ## Configuration
 
