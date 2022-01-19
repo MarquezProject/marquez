@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { APIError, HttpMethod } from '../../types'
 
 export const genericErrorMessageConstructor = (functionName: string, error: APIError): string => {

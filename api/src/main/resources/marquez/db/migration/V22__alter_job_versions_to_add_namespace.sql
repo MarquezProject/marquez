@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE job_versions ADD namespace_uuid UUID;
 ALTER TABLE job_versions ADD namespace_name VARCHAR(255);
 ALTER TABLE job_versions ADD job_name VARCHAR(255);

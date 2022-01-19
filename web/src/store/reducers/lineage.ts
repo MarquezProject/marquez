@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import {
   FETCH_LINEAGE_SUCCESS,
   RESET_LINEAGE,

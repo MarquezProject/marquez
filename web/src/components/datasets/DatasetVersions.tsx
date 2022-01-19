@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { ArrowBackIosRounded } from '@material-ui/icons'
 import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'

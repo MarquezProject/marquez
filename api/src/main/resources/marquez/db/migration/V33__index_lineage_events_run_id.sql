@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE lineage_events
     ADD run_uuid uuid;
 

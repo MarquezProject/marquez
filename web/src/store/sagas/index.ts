@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import * as Effects from 'redux-saga/effects'
 import {
   FETCH_DATASETS,

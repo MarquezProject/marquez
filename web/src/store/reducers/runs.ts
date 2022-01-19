@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { FETCH_RUNS, FETCH_RUNS_SUCCESS, RESET_RUNS } from '../actionCreators/actionTypes'
 import { Run } from '../../types/api'
 import { fetchRunsSuccess } from '../actionCreators'

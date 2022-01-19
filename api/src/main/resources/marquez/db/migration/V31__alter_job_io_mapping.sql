@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 create table job_versions_io_mapping_inputs as select * from job_versions_io_mapping where io_type = 'INPUT';
 create table job_versions_io_mapping_outputs as select * from job_versions_io_mapping where io_type = 'OUTPUT';
 alter table job_versions_io_mapping_inputs add column job_uuid uuid;

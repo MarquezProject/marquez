@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import * as React from 'react'
 import { dialogToggle } from '../store/actionCreators'
 import Button from '@material-ui/core/Button'

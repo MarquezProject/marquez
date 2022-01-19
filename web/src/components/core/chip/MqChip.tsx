@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { Theme, createStyles } from '@material-ui/core'
 import Box from '@material-ui/core/Box'

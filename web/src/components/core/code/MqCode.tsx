@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { THEME_EXTRA } from '../../../helpers/theme'
 import { Theme, alpha } from '@material-ui/core/styles'
 import Box from '@material-ui/core/Box'

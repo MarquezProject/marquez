@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 describe('AppBar Test', () => {
   // TODO: There's an issue with rendering this component in jest
 

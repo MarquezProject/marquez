@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Dataset } from '../../types/api'
 import {
   FETCH_DATASETS,

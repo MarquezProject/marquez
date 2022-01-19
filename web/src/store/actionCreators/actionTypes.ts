@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 export const APPLICATION_ERROR = 'APPLICATION_ERROR'
 export const DIALOG_TOGGLE = 'DIALOG_TOGGLE'
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Usage: $ ./prune.sh
 
 set -e

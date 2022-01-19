@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { FETCH_JOBS, FETCH_JOBS_SUCCESS, RESET_JOBS } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
 import { fetchJobsSuccess } from '../actionCreators'

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 FROM marquez-airflow-base:latest AS build
 
 FROM bitnami/airflow-scheduler:1.10.12 AS scheduler

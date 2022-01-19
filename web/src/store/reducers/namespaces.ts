@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Namespace } from '../../types/api'
 
 import { FETCH_NAMESPACES_SUCCESS, SELECT_NAMESPACE } from '../actionCreators/actionTypes'

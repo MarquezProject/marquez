@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 package marquez.spark.agent;
 
 import io.openlineage.spark.agent.OpenLineageSparkListener;

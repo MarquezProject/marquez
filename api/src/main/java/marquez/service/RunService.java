@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.service;
 
 import static marquez.common.models.RunState.COMPLETED;

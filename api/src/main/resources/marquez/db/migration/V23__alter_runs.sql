@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE runs ADD namespace_name varchar;
 ALTER TABLE runs ADD job_name varchar;
 ALTER TABLE runs ADD location varchar;

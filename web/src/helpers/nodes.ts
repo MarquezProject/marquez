@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 
