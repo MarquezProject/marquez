@@ -1,5 +1,6 @@
 package marquez.service;
 
+import static marquez.logging.MdcPropagating.withMdc;
 import static marquez.tracing.SentryPropagating.withSentry;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -52,7 +53,8 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
-                withSentry(() -> updateMarquezModel(event, mapper)), ForkJoinPool.commonPool())
+                withSentry(withMdc(() -> updateMarquezModel(event, mapper))),
+                ForkJoinPool.commonPool())
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
@@ -67,15 +69,16 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     CompletableFuture<Void> openLineage =
         CompletableFuture.runAsync(
             withSentry(
-                () ->
-                    createLineageEvent(
-                        event.getEventType() == null ? "" : event.getEventType(),
-                        event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
-                        runUuid,
-                        event.getJob().getName(),
-                        event.getJob().getNamespace(),
-                        createJsonArray(event, mapper),
-                        event.getProducer())),
+                withMdc(
+                    () ->
+                        createLineageEvent(
+                            event.getEventType() == null ? "" : event.getEventType(),
+                            event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                            runUuid,
+                            event.getJob().getName(),
+                            event.getJob().getNamespace(),
+                            createJsonArray(event, mapper),
+                            event.getProducer()))),
             ForkJoinPool.commonPool());
 
     return CompletableFuture.allOf(marquez, openLineage);

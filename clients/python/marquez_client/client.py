@@ -17,6 +17,7 @@ import requests
 
 import marquez_client
 
+from deprecation import deprecated
 from six.moves.urllib.parse import quote
 
 from marquez_client import errors
@@ -79,6 +80,8 @@ class MarquezClient:
             }
         )
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def create_source(self, source_name, source_type, connection_url,
                       description=None):
         Utils.check_name_length(source_name, 'source_name')
@@ -110,6 +113,8 @@ class MarquezClient:
             }
         )
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def create_dataset(self, namespace_name, dataset_name, dataset_type,
                        dataset_physical_name, source_name,
                        description=None, run_id=None,
@@ -223,6 +228,8 @@ class MarquezClient:
                       tag_name)
         )
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def create_job(self, namespace_name, job_name, job_type, location=None,
                    inputs: [DatasetId] = None, outputs: [DatasetId] = None,
                    description=None, context=None, run_id=None):
@@ -276,6 +283,8 @@ class MarquezClient:
             }
         )
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def create_job_run(self, namespace_name, job_name, run_id=None,
                        nominal_start_time=None,
                        nominal_end_time=None, run_args=None,
@@ -327,15 +336,23 @@ class MarquezClient:
         Utils.is_valid_uuid(run_id, 'run_id')
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def mark_job_run_as_started(self, run_id, at=None):
         return self.__mark_job_run_as(run_id, 'start', at)
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def mark_job_run_as_completed(self, run_id, at=None):
         return self.__mark_job_run_as(run_id, 'complete', at)
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def mark_job_run_as_failed(self, run_id, at=None):
         return self.__mark_job_run_as(run_id, 'fail', at)
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def mark_job_run_as_aborted(self, run_id, at=None):
         return self.__mark_job_run_as(run_id, 'abort', at)
 
@@ -358,6 +375,8 @@ class MarquezClient:
             payload=payload
         )
 
+    @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
+                details='Use OpenLineage instead, see `https://openlineage.io`')
     def __mark_job_run_as(self, run_id, action, at=None):
         Utils.is_valid_uuid(run_id, 'run_id')
 

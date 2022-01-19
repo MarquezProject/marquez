@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.19.2-SNAPSHOT
+  version: 0.20.1-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -73,6 +73,7 @@ paths:
       description: Creates a new source object. A source is the physical location of a dataset such as
         a table in PostgreSQL, or topic in Kafka. A source enables the grouping of physical datasets
         to their physical source.
+      deprecated: true
       tags:
         - Sources
       requestBody:
@@ -124,6 +125,7 @@ paths:
     put:
       summary: Create a dataset
       description: Creates a new dataset.
+      deprecated: true
       tags:
         - Datasets
       requestBody:
@@ -255,6 +257,7 @@ paths:
         Marquez will create a version of a job each time the contents of the object is modified. For example, the `location`
         of a job may change over time resulting in new versions. The accumulated versions can be listed, used to rerun a
         specific job version or possibly help debug a failed job run.
+      deprecated: true
       tags:
         - Jobs
       requestBody:

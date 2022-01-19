@@ -35,6 +35,11 @@ public class SourceService extends DelegatingDaos.DelegatingSourceDao {
     super(dao.createSourceDao());
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   public Source createOrUpdate(@NonNull SourceName name, @NonNull SourceMeta meta) {
     log.info("Create/upsert source '{}' with meta: {}", name.getValue(), meta);
     sources.inc();

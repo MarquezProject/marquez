@@ -1,15 +1,59 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.19.1...HEAD)
-### Fixed
-* Fixed validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.20.0...HEAD)
 
-## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1)
+### Added
+
+* Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID [@fm100](https://github.com/fm100)
+
+### Changed
+
+* Upgraded from JDK 11 to JDK 17 [@ucg8j](https://github.com/ucg8j)
+* Switched JDK image from Alpine to regular image to enable Marquez to run on multiple CPU architectures [@ucg8j](https://github.com/ucg8j)
+
+### Fixed
+
+* Error when running marquez-api on Apple M1 [@ucg8j](https://github.com/ucg8j)
+
+### Removed
+
+* The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+* The `marquez-spark` lib. has been removed. **Please use the** [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
+
+### Added
+
+* Add [deploy](https://marquezproject.github.io/marquez/deployment-overview.html) docs for running Marquez on AWS [@wslulciuc](https://github.com/wslulciuc) [@merobi-hub](https://github.com/merobi-hub)
+
+### Changed
+
+* Clarify docs on using OpenLineage for metadata collection [@fm100](https://github.com/fm100)
+* Upgrade to gradle `7.x` [@wslulciuc](https://github.com/wslulciuc)
+* Use `eclipse-temurin` for Marquez API base docker image [@fm100](https://github.com/fm100)
+
+### Deprecated
+
+* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting source, dataset, and job metadata [@wslulciuc](https://github.com/wslulciuc):
+  * [`/sources`](https://marquezproject.github.io/marquez/openapi.html#tag/Sources/paths/~1sources~1{source}/put) endpoint to collect source metadata
+  * [`/datasets`](https://marquezproject.github.io/marquez/openapi.html#tag/Datasets/paths/~1namespaces~1{namespace}~1datasets~1{dataset}/put) endpoint to collect dataset metadata
+  * [`/jobs`](https://marquezproject.github.io/marquez/openapi.html#tag/Jobs/paths/~1namespaces~1{namespace}~1jobs~1{job}/put) endpoint to collect job metadata
+
+### Fixed
+
+* Validation of OpenLineage events on write [@collado-mike](https://github.com/collado-mike)
+* Increase `name` column size for tables `namespaces` and `sources` [@mmeasic](https://github.com/mmeasic)
+
+### Security
+
+* Fix log4j [exploit](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) [@fm100](https://github.com/fm100)
+
+## [0.19.1](https://github.com/MarquezProject/marquez/compare/0.19.0...0.19.1) - 2021-11-05
 
 ### Fixed
 
 * URI and URL DB mappper should handle empty string as null [@OleksandrDvornik](https://github.com/OleksandrDvornik)
-* Fix NodeId parsing when dataset name contains struct<> [@fm100](https://github.com/fm100)
+* Fix NodeId parsing when dataset name contains `struct<>` [@fm100](https://github.com/fm100)
 * Add encoding for dataset names in URL construction [@collado-mike](https://github.com/collado-mike)
 
 ## [0.19.0](https://github.com/MarquezProject/marquez/compare/0.18.0...0.19.0) - 2021-10-21

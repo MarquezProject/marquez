@@ -67,6 +67,11 @@ public class JobResource extends BaseResource {
     this.jobVersionDao = jobVersionDao;
   }
 
+  /**
+   * @deprecated Prefer OpenLineage, see <a
+   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
+   *     removed in release {@code 0.25.0}.
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered

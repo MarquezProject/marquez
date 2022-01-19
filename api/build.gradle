@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -21,16 +20,11 @@ plugins {
     id 'signing'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 ext {
-    jdbi3Version = '3.24.0'
-    prometheusVersion = '0.12.0'
+    jdbi3Version = '3.27.0'
+    prometheusVersion = '0.14.1'
     testcontainersVersion = '1.16.2'
-    sentryVersion = '5.4.0'
+    sentryVersion = '5.5.2'
 }
 
 dependencies {
@@ -49,7 +43,7 @@ dependencies {
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     implementation 'com.google.guava:guava:31.0.1-jre'
-    implementation 'org.dhatim:dropwizard-sentry:2.0.25-1'
+    implementation 'org.dhatim:dropwizard-sentry:2.0.28-3'
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation 'org.flywaydb:flyway-core:6.5.7'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"

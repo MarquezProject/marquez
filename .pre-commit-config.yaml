@@ -1,6 +1,6 @@
 repos:
   -   repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v4.0.1
+      rev: v4.1.0
       hooks:
         -   id: trailing-whitespace
         -   id: end-of-file-fixer
@@ -10,4 +10,5 @@ repos:
   -   repo: https://github.com/jguttman94/pre-commit-gradle
       rev: v0.3.0
       hooks:
-        -   id: gradle-spotless
+        -  id: gradle-spotless
+           args: ['-w', --wrapper]

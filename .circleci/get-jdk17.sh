@@ -1,3 +1,5 @@
+#!/bin/bash
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,10 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# -*- coding: utf-8 -*-
+# Usage: $ ./get-jdk17.sh
 
-__author__ = """Marquez Project"""
-__version__ = "0.19.2"
-__all__ = ["DAG"]
+set -e
 
-from openlineage.airflow import DAG
+wget -qO - https://adoptium.jfrog.io/adoptium/api/gpg/key/public | sudo apt-key add -
+sudo add-apt-repository --yes https://adoptium.jfrog.io/adoptium/deb
+sudo apt-get update && sudo apt-get install temurin-17-jdk
+sudo update-alternatives --set java /usr/lib/jvm/temurin-17-jdk-amd64/bin/java
+sudo update-alternatives --set javac /usr/lib/jvm/temurin-17-jdk-amd64/bin/javac
+java -version
+
+echo "DONE!"

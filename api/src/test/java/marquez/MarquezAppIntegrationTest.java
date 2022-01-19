@@ -16,6 +16,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.net.URL;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -403,7 +404,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(run.getArgs()).isEmpty();
 
     // (7) Start a run
-    final Instant startedAt = newTimestamp();
+    final Instant startedAt = newTimestamp().truncatedTo(ChronoUnit.MICROS);
     final Run runStarted = client.markRunAsRunning(run.getId(), startedAt);
     assertThat(runStarted.getId()).isEqualTo(run.getId());
     assertThat(runStarted.getCreatedAt()).isAfter(EPOCH);
@@ -447,7 +448,7 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(jobWithNewVersion.getLatestRun().get().getId()).isEqualTo(runStarted.getId());
 
     // (9) Complete a run
-    final Instant endedAt = newTimestamp();
+    final Instant endedAt = newTimestamp().truncatedTo(ChronoUnit.MICROS);
     final Run runCompleted = client.markRunAsCompleted(run.getId(), endedAt);
     assertThat(runCompleted.getId()).isEqualTo(run.getId());
     assertThat(runCompleted.getCreatedAt()).isAfter(EPOCH);
