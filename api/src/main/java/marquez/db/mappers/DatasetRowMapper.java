@@ -2,6 +2,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.booleanOrDefault;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
@@ -32,6 +33,7 @@ public final class DatasetRowMapper implements RowMapper<DatasetRow> {
         stringOrThrow(results, Columns.PHYSICAL_NAME),
         timestampOrNull(results, Columns.LAST_MODIFIED_AT),
         stringOrNull(results, Columns.DESCRIPTION),
-        uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
+        uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
+        booleanOrDefault(results, Columns.IS_DELETED, false));
   }
 }

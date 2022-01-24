@@ -69,9 +69,11 @@ public final class Columns {
   public static final String TAG_UUIDS = "tag_uuids";
   public static final String TAGGED_AT = "tagged_at";
   public static final String LAST_MODIFIED_AT = "last_modified_at";
+  public static final String IS_DELETED = "is_deleted";
 
   /* DATASET VERSION ROW COLUMNS */
   public static final String FIELD_UUIDS = "field_uuids";
+  public static final String LIFECYCLE_STATE = "lifecycle_state";
 
   /* STREAM VERSION ROW COLUMNS */
   public static final String SCHEMA_LOCATION = "schema_location";
@@ -158,6 +160,15 @@ public final class Columns {
       throw new IllegalArgumentException();
     }
     return results.getString(column);
+  }
+
+  public static boolean booleanOrDefault(
+      final ResultSet results, final String column, final boolean defaultValue)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      return defaultValue;
+    }
+    return results.getBoolean(column);
   }
 
   public static int intOrThrow(final ResultSet results, final String column) throws SQLException {

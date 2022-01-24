@@ -54,6 +54,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
+              stringOrNull(results, Columns.LIFECYCLE_STATE),
               null,
               toFacetsOrNull(results, Columns.FACETS));
     } else {
@@ -71,6 +72,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
+              stringOrNull(results, Columns.LIFECYCLE_STATE),
               null,
               toFacetsOrNull(results, Columns.FACETS));
     }

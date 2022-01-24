@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -129,6 +130,64 @@ class DatasetDaoTest {
             "writeFacet",
             "inputFacet",
             "anotherInputFacet");
+  }
+
+  @Test
+  public void testGetDatasetWithlifecycleStatePresent() {
+    Dataset dataset =
+        new Dataset(
+            NAMESPACE,
+            DATASET,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    createLineageRow(
+        openLineageDao,
+        "aWriteJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(dataset));
+
+    Optional<marquez.service.models.Dataset> datasetByName =
+        datasetDao.findDatasetByName(NAMESPACE, DATASET);
+    assertThat(datasetByName.get().getLastLifecycleState().get()).isEqualTo("CREATE");
+  }
+
+  @Test
+  public void testGetDatasetWithDatasetMarkedDeleted() {
+    // create dataset
+    createLineageRow(
+        openLineageDao,
+        "aWriteJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            new Dataset(NAMESPACE, DATASET, LineageEvent.DatasetFacets.builder().build())));
+
+    // mark it deleted
+    createLineageRow(
+        openLineageDao,
+        "aWriteJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            new Dataset(
+                NAMESPACE,
+                DATASET,
+                LineageEvent.DatasetFacets.builder()
+                    .lifecycleStateChange(
+                        new LineageEvent.LifecycleStateChangeFacet(
+                            PRODUCER_URL, SCHEMA_URL, "DROP"))
+                    .build())));
+
+    // make sure it's returned by DAO and marked as deleted
+    assertThat(datasetDao.findDatasetByName(NAMESPACE, DATASET).get().isDeleted()).isTrue();
+    assertThat(datasetDao.findWithTags(NAMESPACE, DATASET).get().isDeleted()).isTrue();
   }
 
   @Test

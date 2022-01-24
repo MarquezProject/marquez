@@ -47,6 +47,7 @@ public abstract class DatasetVersion {
   @Getter private final SourceName sourceName;
   @Getter @Setter private ImmutableList<Field> fields;
   @Getter @Setter private ImmutableSet<TagName> tags;
+  @Nullable private final String lifecycleState;
   @Nullable private final String description;
   @Nullable @Setter private Run createdByRun;
   @Nullable @Setter private UUID createdByRunUuid;
@@ -62,6 +63,7 @@ public abstract class DatasetVersion {
       @NonNull final SourceName sourceName,
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
+      @Nullable final String lifecycleState,
       @Nullable final String description,
       @Nullable final Run createdByRun,
       @Nullable final ImmutableMap<String, Object> facets) {
@@ -75,6 +77,7 @@ public abstract class DatasetVersion {
     this.sourceName = sourceName;
     this.fields = (fields == null) ? ImmutableList.of() : fields;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
+    this.lifecycleState = lifecycleState;
     this.description = description;
     this.createdByRun = createdByRun;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
@@ -86,6 +89,10 @@ public abstract class DatasetVersion {
 
   public Optional<Run> getCreatedByRun() {
     return Optional.ofNullable(createdByRun);
+  }
+
+  public Optional<String> getLifecycleState() {
+    return Optional.ofNullable(lifecycleState);
   }
 
   @JsonIgnore

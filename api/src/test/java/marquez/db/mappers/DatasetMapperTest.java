@@ -42,6 +42,8 @@ class DatasetMapperTest {
     when(resultSet.getObject(Columns.PHYSICAL_NAME)).thenReturn("PHYSICAL_NAME");
     when(resultSet.getString(Columns.TYPE)).thenReturn("DB_TABLE");
     when(resultSet.getObject(Columns.TYPE)).thenReturn("DB_TABLE");
+    when(resultSet.getString(Columns.LIFECYCLE_STATE)).thenReturn("TRUNCATE");
+    when(resultSet.getObject(Columns.LIFECYCLE_STATE)).thenReturn("TRUNCATE");
     when(resultSet.getString(Columns.DESCRIPTION)).thenReturn("DESCRIPTION");
     when(resultSet.getObject(Columns.DESCRIPTION)).thenReturn("DESCRIPTION");
     when(resultSet.getString(Columns.SOURCE_NAME)).thenReturn("POSTGRES");

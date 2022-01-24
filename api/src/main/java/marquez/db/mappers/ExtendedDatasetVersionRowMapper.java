@@ -24,6 +24,7 @@ public final class ExtendedDatasetVersionRowMapper implements RowMapper<Extended
         timestampOrThrow(results, Columns.CREATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         uuidOrThrow(results, Columns.VERSION),
+        stringOrNull(results, Columns.LIFECYCLE_STATE),
         uuidOrNull(results, Columns.RUN_UUID),
         stringOrNull(results, Columns.NAMESPACE_NAME),
         stringOrNull(results, Columns.DATASET_NAME));

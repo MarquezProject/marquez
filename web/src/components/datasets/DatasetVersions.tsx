@@ -25,7 +25,7 @@ const styles = (theme: ITheme) => {
   })
 }
 
-const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count']
+const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count', 'Lifecycle State']
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -83,6 +83,7 @@ const DatasetVersions: FunctionComponent<
               <TableCell align='left'>{version.version}</TableCell>
               <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
               <TableCell align='left'>{version.fields.length}</TableCell>
+              <TableCell align='left'>{version.lifecycleState}</TableCell>
             </TableRow>
           )
         })}

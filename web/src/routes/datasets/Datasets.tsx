@@ -88,7 +88,7 @@ class Datasets extends React.Component<DatasetsProps> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {datasets.map(dataset => {
+                    {datasets.filter(dataset => !dataset.deleted).map(dataset => {
                       return (
                         <TableRow key={dataset.name}>
                           <TableCell align='left'>

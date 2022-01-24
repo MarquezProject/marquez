@@ -277,6 +277,7 @@ public interface RunDao extends BaseDao {
                           d.getSourceName().getValue(),
                           d.getPhysicalName().getValue(),
                           d.getName().getValue(),
+                          null,
                           toSchemaFields(d.getFields()),
                           runUuid)
                       .getValue();
@@ -288,7 +289,8 @@ public interface RunDao extends BaseDao {
                   runUuid,
                   datasetVersionDao.toPgObjectFields(d.getFields()),
                   d.getNamespace().getValue(),
-                  d.getName().getValue());
+                  d.getName().getValue(),
+                  null);
             });
       }
     }

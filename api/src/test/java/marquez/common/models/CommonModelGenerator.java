@@ -157,6 +157,10 @@ public final class CommonModelGenerator extends Generator {
     return RunId.of(UUID.randomUUID());
   }
 
+  public static String newLifecycleState() {
+    return "TRUNCATE";
+  }
+
   public static Version newVersion() {
     return Version.of(UUID.randomUUID());
   }

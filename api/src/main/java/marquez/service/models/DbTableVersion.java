@@ -31,6 +31,7 @@ public final class DbTableVersion extends DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
+      @Nullable final String lifecycleState,
       @Nullable final Run createdByRun,
       @Nullable final ImmutableMap<String, Object> facets) {
     super(
@@ -43,6 +44,7 @@ public final class DbTableVersion extends DatasetVersion {
         sourceName,
         fields,
         tags,
+        lifecycleState,
         description,
         createdByRun,
         facets);
