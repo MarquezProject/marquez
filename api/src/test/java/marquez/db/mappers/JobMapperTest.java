@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.db.mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;

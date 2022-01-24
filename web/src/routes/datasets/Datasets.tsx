@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import * as Redux from 'redux'
 import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { Dataset } from '../../types/api'

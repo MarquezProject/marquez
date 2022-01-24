@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;

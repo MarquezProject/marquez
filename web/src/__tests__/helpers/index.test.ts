@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { createNetworkData, formatUpdatedAt } from '../../helpers'
 const datasets = require('../../../docker/db/data/datasets.json')
 const jobs = require('../../../docker/db/data/jobs.json')

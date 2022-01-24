@@ -1,4 +1,5 @@
 #!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../../../ &> /dev/null && pwd )"
 cd $REPO_DIR/integrations/common && pip wheel --wheel-dir=$REPO_DIR/examples/airflow/tmp/whl .

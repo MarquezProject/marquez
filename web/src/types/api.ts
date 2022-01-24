@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { JobOrDataset, LineageNode } from '../components/lineage/types'
 
 export interface Tag {

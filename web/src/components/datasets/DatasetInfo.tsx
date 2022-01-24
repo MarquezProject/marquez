@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { Field } from '../../types/api'
 import MqEmpty from '../core/empty/MqEmpty'

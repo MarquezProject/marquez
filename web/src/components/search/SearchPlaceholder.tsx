@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box, Theme, createStyles } from '@material-ui/core'
 import { theme } from '../../helpers/theme'
 import MqText from '../core/text/MqText'

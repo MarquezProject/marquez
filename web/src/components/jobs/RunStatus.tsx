@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box, Theme, Tooltip, WithStyles, createStyles, withStyles } from '@material-ui/core'
 import { Run } from '../../types/api'
 

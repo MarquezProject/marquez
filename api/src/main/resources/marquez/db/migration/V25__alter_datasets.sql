@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE datasets ADD namespace_name varchar;
 
 UPDATE datasets SET

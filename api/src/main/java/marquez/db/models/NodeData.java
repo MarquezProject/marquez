@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.db.models;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;

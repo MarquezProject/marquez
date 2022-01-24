@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import * as actionTypes from '../../store/actionCreators/actionTypes'
 import * as actions from '../../store/actionCreators'
 import * as api from '../../store/requests'

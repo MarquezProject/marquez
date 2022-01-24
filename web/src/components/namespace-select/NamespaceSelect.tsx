@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import * as Redux from 'redux'
 import { Box, FormControl, MenuItem, Select, WithStyles, createStyles } from '@material-ui/core'
 import { IState } from '../../store/reducers'

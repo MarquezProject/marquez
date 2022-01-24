@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.service.models;
 
 import com.google.common.collect.ImmutableSortedSet;

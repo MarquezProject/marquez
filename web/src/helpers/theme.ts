@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { createTheme } from '@material-ui/core'
 
 export const theme = createTheme({

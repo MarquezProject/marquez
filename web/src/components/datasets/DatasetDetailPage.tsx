@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 import * as Redux from 'redux'

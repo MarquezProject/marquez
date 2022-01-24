@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Theme, createStyles, withStyles } from '@material-ui/core'
 import { alpha } from '@material-ui/core/styles'
 import InputBase from '@material-ui/core/InputBase'

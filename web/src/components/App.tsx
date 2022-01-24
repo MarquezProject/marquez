@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box, Container, CssBaseline } from '@material-ui/core'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { Helmet } from 'react-helmet'

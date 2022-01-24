@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { History } from 'history'
 import { Reducer, combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'

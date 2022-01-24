@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 -- Denormalize fields to dataset versions
 alter table dataset_versions add column fields jsonb;
 UPDATE dataset_versions SET (fields) = (select jsonb_agg((select x from (select distinct f.name, f.type, f.description,

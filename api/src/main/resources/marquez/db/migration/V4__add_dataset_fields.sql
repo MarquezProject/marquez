@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 CREATE TABLE dataset_fields (
   uuid         UUID PRIMARY KEY,
   type         VARCHAR(64) NOT NULL,
