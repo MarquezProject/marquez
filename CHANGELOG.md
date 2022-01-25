@@ -18,7 +18,34 @@
 ### Removed
 
 * The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+  * To use the `openlineage-airflow` lib., make the following changes:
+
+    ```diff
+    # Update the import in your DAG definitions
+    -from marquez_airflow import DAG
+    +from openlineage.airflow import DAG
+    ```
+    ```diff
+    # Update the following environment variables in your Airflow instance
+    -MARQUEZ_URL
+    +OPENLINEAGE_URL
+    -MARQUEZ_NAMESPACE
+    +OPENLINEAGE_NAMESPACE
+    ```
 * The `marquez-spark` lib. has been removed. **Please use the** [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+  * To use the `openlineage-spark ` lib., make the following change:
+
+    ```diff
+    SparkSession.builder()
+    - .config("spark.jars.packages", "io.github.marquezproject:marquez-spark:0.20.+")
+    + .config("spark.jars.packages", "io.openlineage:openlineage-spark:0.2.+")
+    - .config("spark.extraListeners", "marquez.spark.agent.SparkListener")
+    + .config("spark.extraListeners", "io.openlineage.spark.agent.OpenLineageSparkListener")
+      .config("spark.openlineage.host", "https://api.demo.datakin.com")
+      .config("spark.openlineage.apiKey", "your datakin api key")
+      .config("spark.openlineage.namespace", "<NAMESPACE_NAME>")
+    .getOrCreate()
+    ```
 
 ## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 
