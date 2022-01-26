@@ -9,8 +9,11 @@ RUN ./gradlew --version
 FROM base AS build
 WORKDIR /usr/src/app
 COPY build.gradle build.gradle
+RUN true
 COPY api ./api
+RUN true
 COPY api/build.gradle ./api/build.gradle
+RUN true
 COPY clients/java ./clients/java
 RUN ./gradlew --no-daemon :api:shadowJar
 
