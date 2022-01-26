@@ -1,4 +1,8 @@
 tasks:
+  - env:
+      API_PORT: 5000
+      API_ADMIN_PORT: 5001
+      WEB_PORT: 3000
   - init: |
       docker-compose pull
   - command: |
@@ -12,6 +16,10 @@ ports:
     onOpen: ignore
   - port: 5432
     onOpen: ignore
+github:
+  prebuilds:
+    master: true
+    addCheck: prevent-merge-on-error
 vscode:
   extensions:
     - ms-azuretools.vscode-docker
