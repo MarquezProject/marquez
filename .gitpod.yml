@@ -4,12 +4,15 @@ tasks:
   - command: |
       ./docker/up.sh --build --seed
 ports:
+  - port: 3000
+    onOpen: open-browser
   - port: 5000
     onOpen: ignore
   - port: 5001
     onOpen: ignore
-  - port: 3000
-    onOpen: open-browser
+  - port: 5432
+    onOpen: ignore
+  onOpen: ignore
 vscode:
   extensions:
     - ms-azuretools.vscode-docker
