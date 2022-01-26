@@ -8,17 +8,42 @@
 
 ### Changed
 
-* Upgraded from JDK 11 to JDK 17 [@ucg8j](https://github.com/ucg8j)
-* Switched JDK image from Alpine to regular image to enable Marquez to run on multiple CPU architectures [@ucg8j](https://github.com/ucg8j)
+* Upgrade from `Java11` to `Java17` [@ucg8j](https://github.com/ucg8j)
+* Switch JDK image from `alpine` to [`temurin`](https://adoptium.net) enabling Marquez to run on multiple CPU architectures [@ucg8j](https://github.com/ucg8j)
 
 ### Fixed
 
-* Error when running marquez-api on Apple M1 [@ucg8j](https://github.com/ucg8j)
+* Error when running Marquez on Apple M1 [@ucg8j](https://github.com/ucg8j)
 
 ### Removed
 
-* The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead** [@wslulciuc](https://github.com/wslulciuc)
-* The `marquez-spark` lib. has been removed. **Please use the** [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) **library instead** [@wslulciuc](https://github.com/wslulciuc)
+* The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead**. To migrate to using `openlineage-airflow`, make the following changes [@wslulciuc](https://github.com/wslulciuc):
+
+    ```diff
+    # Update the import in your DAG definitions
+    -from marquez_airflow import DAG
+    +from openlineage.airflow import DAG
+    ```
+    ```diff
+    # Update the following environment variables in your Airflow instance
+    -MARQUEZ_URL
+    +OPENLINEAGE_URL
+    -MARQUEZ_NAMESPACE
+    +OPENLINEAGE_NAMESPACE
+    ```
+* The `marquez-spark` lib. has been removed. **Please use the** [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) **library instead**. To migrate to using `openlineage-spark`, make the following changes [@wslulciuc](https://github.com/wslulciuc):
+
+    ```diff
+    SparkSession.builder()
+    - .config("spark.jars.packages", "io.github.marquezproject:marquez-spark:0.20.+")
+    + .config("spark.jars.packages", "io.openlineage:openlineage-spark:0.2.+")
+    - .config("spark.extraListeners", "marquez.spark.agent.SparkListener")
+    + .config("spark.extraListeners", "io.openlineage.spark.agent.OpenLineageSparkListener")
+      .config("spark.openlineage.host", "https://api.demo.datakin.com")
+      .config("spark.openlineage.apiKey", "your datakin api key")
+      .config("spark.openlineage.namespace", "<NAMESPACE_NAME>")
+    .getOrCreate()
+    ```
 
 ## [0.20.0](https://github.com/MarquezProject/marquez/compare/0.19.1...0.20.0) - 2021-12-13
 
