@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { GraphEdge } from 'dagre'
 import { LinePath } from '@visx/shape'
 import { curveMonotoneX } from '@visx/curve'

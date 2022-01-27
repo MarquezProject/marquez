@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

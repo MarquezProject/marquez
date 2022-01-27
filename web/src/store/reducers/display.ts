@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { APPLICATION_ERROR, DIALOG_TOGGLE } from '../actionCreators/actionTypes'
 
 interface IToggleExpandAction {

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Node as GraphNode } from 'dagre'
 import { MqNode } from '../../types'
 import { theme } from '../../../../helpers/theme'

@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.db;
 
 import org.jdbi.v3.sqlobject.CreateSqlObject;

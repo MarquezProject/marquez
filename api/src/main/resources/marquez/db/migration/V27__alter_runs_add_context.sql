@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE runs ADD job_context_uuid uuid;
 
 UPDATE runs SET

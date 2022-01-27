@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { API_DOCS_URL } from '../../globals'
 import { AppBar, Toolbar } from '@material-ui/core'
 import { DRAWER_WIDTH } from '../../helpers/theme'

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { THEME_EXTRA, theme } from '../../../helpers/theme'
 import { alpha } from '@material-ui/core/styles'
 import { ocean } from 'react-syntax-highlighter/dist/cjs/styles/hljs'

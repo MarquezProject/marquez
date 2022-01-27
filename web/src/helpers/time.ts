@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import moment from 'moment'
 
 function addLeadingZero(number: number) {

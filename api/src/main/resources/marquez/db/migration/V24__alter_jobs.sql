@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 ALTER TABLE jobs ADD current_job_context_uuid UUID;
 ALTER TABLE jobs ADD current_location varchar;
 ALTER TABLE jobs ADD current_inputs JSONB;

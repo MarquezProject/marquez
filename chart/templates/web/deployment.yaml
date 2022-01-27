@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
 {{- if .Values.web.enabled }}
 apiVersion: apps/v1
 kind: Deployment

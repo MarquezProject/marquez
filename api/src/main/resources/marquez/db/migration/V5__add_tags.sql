@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 CREATE TABLE tags (
   uuid        UUID PRIMARY KEY,
   created_at  TIMESTAMP NOT NULL,

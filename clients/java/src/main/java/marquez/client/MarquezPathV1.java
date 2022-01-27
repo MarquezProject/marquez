@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;

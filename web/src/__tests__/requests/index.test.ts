@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 
 import * as requestUtils from '../../store/requests'
 import { parseResponse } from '../../store/requests'

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { Box } from '@material-ui/core'
 import { Run } from '../../types/api'
 import { formatUpdatedAt } from '../../helpers'

@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Run State Transitions
 Run states change based on the success or failure of a job run. The datasets consumed and/or produced

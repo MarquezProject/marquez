@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # [Airflow](https://airflow.apache.org) Example
 
 In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to Marquez using [OpenLineage](https://openlineage.io/). The example will help demonstrate some of the features of Marquez.

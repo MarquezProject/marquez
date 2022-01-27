@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import React from 'react'
 
 import createStyles from '@material-ui/core/styles/createStyles'

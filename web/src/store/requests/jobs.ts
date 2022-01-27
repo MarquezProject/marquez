@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { API_URL } from '../../globals'
 import { Job, Jobs, Run } from '../../types/api'
 import { genericFetchWrapper } from './index'

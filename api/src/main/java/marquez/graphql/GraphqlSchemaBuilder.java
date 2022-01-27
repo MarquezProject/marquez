@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.graphql;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 import { ArrowBackIosRounded } from '@material-ui/icons'
 import {
   Box,

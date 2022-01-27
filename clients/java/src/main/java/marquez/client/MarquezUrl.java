@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
 package marquez.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
