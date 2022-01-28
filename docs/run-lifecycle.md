@@ -1,5 +1,3 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 # Lifecycle
 
 Marquez captures the runs of a job, and changes as they happen.

@@ -1,5 +1,3 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
-
 ## Migrating `marquez` database manually via [`flyway`](https://flywaydb.org)
 
 Before you can manually apply migrations to the `marquez` database, make sure you've installed `flyway`:
