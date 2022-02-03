@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-
 ## This can be used to override the image registry at a global level, which
 ## can be useful when pulling from private hosts.
 ##
-#global:
+# global:
 #  imageRegistry: myRegistryName
 
 ## Properties related to core Marquez backend functionality and API usage
@@ -89,6 +88,33 @@ web:
     requests: {}
     #    memory: 256Mi
     #    cpu: 250m
+
+## PostgreSQL chart configuration
+## ref: https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
+##
+postgresql:
+  ## @param postgresql.enabled Deploy PostgreSQL container(s)
+  ##
+  enabled: false
+  ## @param postgresql.postgresqlUsername PostgreSQL username
+  ## ref: https://hub.docker.com/_/postgres/
+  ##
+  postgresqlUsername: buendia
+  ## @param postgresql.postgresqlPassword PostgreSQL password
+  ## ref: https://hub.docker.com/_/postgres/
+  ##
+  postgresqlPassword: macondo
+  ## @param postgresql.postgresqlDatabase PostgreSQL database
+  ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
+  ##
+  postgresqlDatabase: marquez
+  ## @param postgresql.existingSecret Name of existing secret object
+  ## The secret should contain the following keys:
+  ## postgresql-postgres-password (for root user)
+  ## postgresql-password (for the unprivileged user)
+  ##
+  # existingSecret: my-secret
+  existingSecret: ""
 
 ## Additional labels to all the deployed resources; note that
 ## the following standard labels will automatically be applied.

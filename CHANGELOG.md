@@ -5,6 +5,7 @@
 ### Added
 
 * Add MDC to the `LoggingMdcFilter` to include API method, path, and request ID [@fm100](https://github.com/fm100)
+* Add Postgres sub-chart to Helm deployment for easier installation option [@KevinMellott91](https://github.com/KevinMellott91)
 
 ### Changed
 
