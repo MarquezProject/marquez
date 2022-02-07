@@ -55,3 +55,79 @@ Get the secret name
   {{- printf "%s" (include "common.names.fullname" .) -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create a default fully qualified postgresql name.
+*/}}
+{{- define "marquez.postgresql.fullname" -}}
+{{- $name := default "postgresql" .Values.postgresql.nameOverride -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Flexible Postgres database host, using an existing or newly created instance.
+*/}}
+{{- define "marquez.database.host" -}}
+  {{- if eq .Values.postgresql.enabled true -}}
+    {{- template "marquez.postgresql.fullname" . -}}
+  {{- else -}}
+    {{- .Values.marquez.db.host -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Flexible Postgres database port, using an existing or newly created instance.
+*/}}
+{{- define "marquez.database.port" -}}
+  {{- if eq .Values.postgresql.enabled true -}}
+    {{- printf "%s" "5432" -}}
+  {{- else -}}
+    {{- .Values.marquez.db.port -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Flexible Postgres database name, using an existing or newly created instance.
+*/}}
+{{- define "marquez.database.name" -}}
+  {{- if eq .Values.postgresql.enabled true -}}
+    {{- .Values.postgresql.postgresqlDatabase -}}
+  {{- else -}}
+    {{- .Values.marquez.db.name -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Flexible Postgres database user, using an existing or newly created instance.
+*/}}
+{{- define "marquez.database.user" -}}
+  {{- if eq .Values.postgresql.enabled true -}}
+    {{- .Values.postgresql.postgresqlUsername -}}
+  {{- else -}}
+    {{- .Values.marquez.db.user -}}
+  {{- end -}}
+{{- end -}}
+
+{{/*
+Postgres helm chart expects a specific secret name, when an override is not provided.
+*/}}
+{{- define "marquez.postgresql.secretName" -}}
+{{- if and (.Values.postgresql.enabled) (not .Values.postgresql.existingSecret) -}}
+    {{- printf "%s" (include "marquez.postgresql.fullname" .) -}}
+{{- else if and (.Values.postgresql.enabled) (.Values.postgresql.existingSecret) -}}
+    {{- printf "%s" .Values.postgresql.existingSecret -}}
+{{- else -}}
+    {{- include "marquez.secretName" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Postgres helm chart expects the password to exist within a specific key.
+*/}}
+{{- define "marquez.database.existingsecret.key" -}}
+{{- if .Values.postgresql.enabled -}}
+    {{- printf "%s" "postgresql-password" -}}
+{{- else -}}
+    {{- printf "%s" "marquez-db-password" -}}
+{{- end -}}
+{{- end -}}
