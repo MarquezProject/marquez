@@ -22,7 +22,7 @@ plugins {
 
 ext {
     jdbi3Version = '3.27.1'
-    prometheusVersion = '0.14.1'
+    prometheusVersion = '0.15.0'
     testcontainersVersion = '1.16.3'
     sentryVersion = '5.6.1'
 }
