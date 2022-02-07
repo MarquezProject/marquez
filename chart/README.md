@@ -3,7 +3,7 @@
 Helm Chart for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## TL;DR;
-Run all commands within the "chart" folder.
+Run all commands within the "chart" folder, with default configurations.
 
 ```bash
 helm install marquez . --dependency-update
@@ -16,13 +16,22 @@ helm install marquez . --dependency-update
 
 ## Installing the Chart
 
-To install the chart with the release name `marquez`:
+To install the chart with the release name `marquez` using a fresh Postgres instance.
 
 ```bash
-helm install marquez . --dependency-update
+helm install marquez . --dependency-update --set postgresql.enabled=true
 ```
 
 > **Note:** For a list of parameters that can be overridden during installation, see the [configuration](#configuration) section.
+
+## Testing the Chart
+
+To confirm connectivity and availability of the installed components (API and optional website). Note
+that you may need to wait a minute or so for services to fully deploy.
+
+```bash
+helm test marquez
+```
 
 ## Uninstalling the Chart
 
@@ -70,6 +79,16 @@ helm delete marquez
 | `web.resources.limits`   | K8s resource limit overrides    | `nil`          |
 | `web.resources.requests` | K8s resource requests overrides | `nil`          |
 
+### [Postgres](https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml) (sub-chart) **parameters**
+
+| Parameter                       | Description                     | Default   |
+|---------------------------------|---------------------------------|-----------|
+| `postgresql.enabled`            | Deploy PostgreSQL container(s)  | `false`   |
+| `postgresql.postgresqlUsername` | PostgreSQL username             | `buendia` |
+| `postgresql.postgresqlPassword` | PostgreSQL password             | `macondo` |
+| `postgresql.postgresqlDatabase` | PostgreSQL database             | `marquez` |
+| `postgresql.existingSecret`     | Name of existing secret object  | `nil`     |
+
 ### Common **parameters**
 
 | Parameter              | Description                         | Default |
@@ -99,9 +118,21 @@ helm delete marquez
 | `ingress.tls`         | TLS settings for hostname          | `nil`   |
 
 ## Local Installation Guide
-If you do not have an existing Postgres database, you can run the following command to create
-one using Docker. Contents of the ```./../docker-compose-postgres..yml``` file can be customized
-to better represent your target environment.
+
+### Helm Managed Postgres
+
+The quickest way to install Marquez via Kubernetes is to create a local Postgres instance.
+
+```bash
+helm install marquez . --dependency-update --set postgresql.enabled=true
+```
+
+### Docker Postgres
+
+A Postgres database is configured within the Marquez project that use Docker to launch, which provides the added
+benefit of test data seeding. You can run the following command to create this instance of Postgres via Docker.
+Contents of the ```./../docker-compose-postgres..yml``` file can be customized
+to better represent your desired setup.
 
 ```bash
 docker-compose -f ./../docker-compose.postgres.yml -p marquez-postgres up
@@ -121,6 +152,8 @@ pesky markdown escape character before running this command.
 ```bash
 helm install marquez . --dependency-update --set marquez.db.host=$marquez_db_ip
 ```
+
+### Validation
 
 Once the Kubernetes pods and services have been installed (usually within 5-10 seconds), connectivity
 tests can be executed by running the following Helm command. You should see a status message
