@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -44,17 +45,23 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   private final DatasetVersionDao datasetVersionDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
 
+  private final Executor executor;
+
   public OpenLineageService(BaseDao baseDao, RunService runService) {
+    this(baseDao, runService, ForkJoinPool.commonPool());
+  }
+
+  public OpenLineageService(BaseDao baseDao, RunService runService, Executor executor) {
     super(baseDao.createOpenLineageDao());
     this.runService = runService;
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
+    this.executor = executor;
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
-                withSentry(withMdc(() -> updateMarquezModel(event, mapper))),
-                ForkJoinPool.commonPool())
+                withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
@@ -79,7 +86,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                             event.getJob().getNamespace(),
                             createJsonArray(event, mapper),
                             event.getProducer()))),
-            ForkJoinPool.commonPool());
+            executor);
 
     return CompletableFuture.allOf(marquez, openLineage);
   }
