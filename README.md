@@ -30,10 +30,6 @@ Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/mar
 
 ## Quickstart
 
-<p align="center">
-  <img src="./web/docs/demo.gif">
-</p>
-
 Marquez provides a simple way to collect and view _dataset_, _job_, and _run_ metadata using [OpenLineage](https://openlineage.io). The easiest way to get up and running is with Docker. From the base of the Marquez repository run:
 
 ```
@@ -46,12 +42,13 @@ $ ./docker/up.sh
 
 You can open [http://localhost:3000](http://localhost:3000) to begin exploring the Marquez Web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
 
+<p align="center">
+  <img src="./web/docs/demo.gif">
+</p>
+
 **`HTTP API`**
 
-The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001).
-
-* To **read** metadata, use the _read-only_ APIs of Marquez
-* To **write** metadata, use the _write-only_ APIs of Marquez, or an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events
+The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost` browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post), or an OpenLineage [integration](https://openlineage.io/integration).
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -72,8 +69,9 @@ Marquez uses a _multi_-project structure and contains the following modules:
 * [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
-* `integrations`: **removed**, please see new location: [`OpenLineage/integration `](https://github.com/OpenLineage/OpenLineage/tree/main/integration)
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
+
+> **Note:** The `integrations` module was removed in [`0.21.0`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#removed), please use an OpenLineage [integration](https://openlineage.io/integration) to easily collect lineage events.
 
 ## Requirements
 
