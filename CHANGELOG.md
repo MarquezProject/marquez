@@ -18,6 +18,7 @@
 
 ### Removed
 
+* The `/api/v1-beta/lineage` endpoint [@wslulciuc](https://github.com/wslulciuc)
 * The `marquez-airflow` lib. has been removed, **Please use the** [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) **library instead**. To migrate to using `openlineage-airflow`, make the following changes [@wslulciuc](https://github.com/wslulciuc):
 
     ```diff
