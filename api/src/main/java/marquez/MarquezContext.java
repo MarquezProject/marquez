@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
-import marquez.api.LineageResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
 import marquez.api.SearchResource;
@@ -87,7 +86,6 @@ public final class MarquezContext {
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
-  @Getter private final LineageResource lineageResource;
   @Getter private final SearchResource searchResource;
 
   @Getter private final ImmutableList<Object> resources;
@@ -150,7 +148,6 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory, jobVersionDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
-    this.lineageResource = new LineageResource(serviceFactory);
     this.searchResource = new SearchResource(searchDao);
 
     this.resources =
@@ -162,7 +159,6 @@ public final class MarquezContext {
             tagResource,
             jdbiException,
             openLineageResource,
-            lineageResource,
             searchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();

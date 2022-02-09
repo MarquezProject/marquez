@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(DropwizardExtensionsSupport.class)
 class OpenLineageResourceTest {
   private static ResourceExtension UNDER_TEST;
+  private static Lineage LINEAGE;
 
   static {
     LineageService lineageService = mock(LineageService.class);
@@ -33,30 +34,19 @@ class OpenLineageResourceTest {
         Utils.fromJson(
             OpenLineageResourceTest.class.getResourceAsStream("/lineage/node.json"),
             new TypeReference<>() {});
-
-    when(lineageService.lineage(any(NodeId.class), anyInt()))
-        .thenReturn(new Lineage(ImmutableSortedSet.of(testNode)));
+    LINEAGE = new Lineage(ImmutableSortedSet.of(testNode));
+    when(lineageService.lineage(any(NodeId.class), anyInt())).thenReturn(LINEAGE);
 
     ServiceFactory serviceFactory =
         ApiTestUtils.mockServiceFactory(Map.of(LineageService.class, lineageService));
 
     UNDER_TEST =
-        ResourceExtension.builder()
-            .addResource(new OpenLineageResource(serviceFactory))
-            .addResource(new LineageResource(serviceFactory))
-            .build();
+        ResourceExtension.builder().addResource(new OpenLineageResource(serviceFactory)).build();
   }
 
   @Test
-  void testEqualResponseFromV1AndV1Beta() {
-    Lineage responseBeta =
-        UNDER_TEST
-            .target("/api/v1-beta/lineage")
-            .queryParam("nodeId", "job:test")
-            .request()
-            .get()
-            .readEntity(Lineage.class);
-    Lineage response =
+  public void testGetLineage() {
+    final Lineage lineage =
         UNDER_TEST
             .target("/api/v1/lineage")
             .queryParam("nodeId", "job:test")
@@ -64,6 +54,6 @@ class OpenLineageResourceTest {
             .get()
             .readEntity(Lineage.class);
 
-    assertEquals(response, responseBeta);
+    assertEquals(lineage, LINEAGE);
   }
 }
