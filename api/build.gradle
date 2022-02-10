@@ -141,11 +141,17 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-mainClassName = 'marquez.MarquezApp'
+application {
+    mainClass = 'marquez.MarquezApp'
+}
 
 shadowJar {
     classifier = ''
     transform(ServiceFileTransformer)
+    // Add LICENSE to Jar
+    from(projectDir) {
+        include 'LICENSE'
+    }
     manifest {
         attributes(
                 'Created-By': "Gradle ${gradle.gradleVersion}",
@@ -153,10 +159,15 @@ shadowJar {
                 'Build-Jdk': System.getProperty('java.version'),
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
-                'Main-Class': mainClassName)
+                'Main-Class': application.mainClass)
     }
 }
 
 runShadow {
     args = ['server', '../marquez.yml']
 }
+
+tasks.distZip.dependsOn tasks.shadowJar
+tasks.distTar.dependsOn tasks.shadowJar
+tasks.startScripts.dependsOn tasks.shadowJar
+tasks.shadowJar.dependsOn tasks.jar
