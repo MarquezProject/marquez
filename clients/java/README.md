@@ -24,9 +24,10 @@ implementation 'io.github.marquezproject:marquez-java:0.20.0
 
 ### Reading Metadata
 ```java
+// Connect to http://localhost:5000
 MarquezClient client = MarquezClient().builder()
-    .baseUrl("http://localhost:5000")
-    .build()
+  .baseUrl("http://localhost:5000")
+  .build()
 
 // List namespaces
 List<Namespace> namespaces = client.listNamespaces();
@@ -49,8 +50,9 @@ TrustManager[] trustManager = setUpTrustManagers();
 SSLContext sslContext = SSLContext.getInstance("TLS");
 sslContext.init(keyManager, trustManager, null);
 
+// Connect to https://localhost:5000
 MarquezClient client = MarquezClient.builder()
-        .sslContext(sslContext)
-        .baseUrl("https://localhost:5000")
-        .build();
+  .sslContext(sslContext)
+  .baseUrl("https://localhost:5000")
+  .build();
 ```
