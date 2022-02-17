@@ -670,6 +670,15 @@ components:
       description: The ID of the node.
       required: true
 
+    depth:
+      name: depth
+      in: query
+      schema:
+        type: integer
+        default: 20
+      description: Depth of lineage graph to create.
+      required: false
+
     q:
       name: q
       in: query
