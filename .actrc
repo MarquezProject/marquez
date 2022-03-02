@@ -1,2 +1,0 @@
-# These default configurations will be applied when running act locally for GitHub Action testing
--P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest

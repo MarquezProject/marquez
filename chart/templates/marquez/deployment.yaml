@@ -24,48 +24,18 @@ spec:
       # This init container is for avoiding CrashLoopback errors in the Marquez container because the PostgreSQL container is not ready
       initContainers:
         - name: wait-for-db
-          image: {{ include "common.images.image" (dict "imageRoot" .Values.postgresql.image "global" .Values.global) }}
-          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy  }}
+          image: postgres:12.1
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
           args:
             - -ec
-            - |
-              #!/bin/bash
-
-              set -o errexit
-              set -o nounset
-              set -o pipefail
-
-              . /opt/bitnami/scripts/libos.sh
-              . /opt/bitnami/scripts/liblog.sh
-              . /opt/bitnami/scripts/libpostgresql.sh
-
-              check_postgresql_connection() {
-                  echo "SELECT 1" | postgresql_remote_execute "$POSTGRES_HOST" "$POSTGRES_PORT" "$POSTGRES_DB" "$POSTGRES_USER" "$POSTGRES_PASSWORD"
-              }
-
-              info "Connecting to the PostgreSQL instance $POSTGRES_HOST:$POSTGRES_PORT"
-              if ! retry_while "check_postgresql_connection"; then
-                  error "Could not connect to the database server"
-                  return 1
-              else
-                  info "Connected to the PostgreSQL instance"
-              fi
+            - until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}; do echo waiting for database; sleep 2; done;
           env:
             - name: POSTGRES_HOST
               value: {{ include "marquez.database.host" . | quote }}
             - name: POSTGRES_PORT
               value: {{ include "marquez.database.port" . | quote }}
-            - name: POSTGRES_DB
-              value: {{ include "marquez.database.name" . | quote }}
-            - name: POSTGRES_USER
-              value: {{ include "marquez.database.user" . | quote }}
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "marquez.postgresql.secretName" . }}
-                  key: {{ include "marquez.database.existingsecret.key" . }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}

@@ -62,13 +62,23 @@ To setup the git hook scripts run:
 $ pre-commit install
 ```
 
-# GitHub Actions
+# `.github/workflows`
 
 Each Pull Request executes a series of quality checks, mostly relying upon CircleCI for validation. However, there are
 certain validation checks that execute via GitHub Actions and can be run locally using the steps below.
 
 Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions 
-checks that apply to each Pull Request.
+checks that apply to each Pull Request. The first time you run _act_ you will be asked to choose a
+[runner](https://github.com/nektos/act#runners).
+
+Alternatively, you can store your preferred runner within a local user profile named _.actrc_.
+
+```bash
+# .actrc file example (https://github.com/nektos/act#configuration)
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+```
+
+Once you have configured a runner, use _act_ to invoke GitHub Actions and evaluate the workflow.
 
 ```bash
 act pull_request
