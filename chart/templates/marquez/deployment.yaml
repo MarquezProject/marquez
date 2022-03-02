@@ -20,6 +20,23 @@ spec:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: marquez
     spec:
+      {{- if .Values.postgresql.enabled }}
+      # This init container is for avoiding CrashLoopback errors in the Marquez container because the PostgreSQL container is not ready
+      initContainers:
+        - name: wait-for-db
+          image: postgres:12.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}; do echo waiting for database; sleep 2; done;
+          env:
+            - name: POSTGRES_HOST
+              value: {{ include "marquez.database.host" . | quote }}
+            - name: POSTGRES_PORT
+              value: {{ include "marquez.database.port" . | quote }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "marquez.image" . }}

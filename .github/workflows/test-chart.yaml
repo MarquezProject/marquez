@@ -1,0 +1,44 @@
+name: test-chart
+
+on:
+  pull_request:
+    paths:
+      - 'chart/**'
+      - '!chart/**.md'
+
+jobs:
+  lint-test-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v2.0
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Setup chart-testing
+        uses: helm/chart-testing-action@v2.2.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          fi
+
+      - name: Run chart-testing (lint)
+        run: ct lint --config ct.yaml
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.2.0
+
+      - name: Run chart-testing (install)
+        run: ct install --config ct.yaml

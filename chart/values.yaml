@@ -96,6 +96,16 @@ postgresql:
   ## @param postgresql.enabled Deploy PostgreSQL container(s)
   ##
   enabled: false
+  ## Bitnami PostgreSQL image version
+  ## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
+  ## @param image.registry PostgreSQL image registry
+  ## @param image.repository PostgreSQL image repository
+  ## @param image.tag PostgreSQL image tag (immutable tags are recommended)
+  ##
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 12.1.0
   ## @param postgresql.postgresqlUsername PostgreSQL username
   ## ref: https://hub.docker.com/_/postgres/
   ##
