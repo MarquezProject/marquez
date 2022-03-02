@@ -6,5 +6,5 @@ import { genericFetchWrapper } from './index'
 
 export const getNamespaces = async () => {
   const url = `${API_URL}/namespaces`
-  return genericFetchWrapper<Namespaces>(url, { method: 'GET' }, 'fetchNamespaces')
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchNamespaces')
 }

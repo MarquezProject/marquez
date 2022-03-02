@@ -5,9 +5,17 @@ const webpackShared = require('./webpack.common.js')
 const webpackDev = {
   mode: 'development',
   devServer: {
-    contentBase: __dirname + '/src',
+    static: {
+      directory: __dirname + '/src',
+      staticOptions: {},
+      publicPath: "/",
+      serveIndex: true,
+      watch: true,
+    },
     port: 1337,
-    publicPath: '/',
+    devMiddleware: {
+      publicPath: '/'
+    },
     historyApiFallback: {
       index: './index.html',
       disableDotRule: true
