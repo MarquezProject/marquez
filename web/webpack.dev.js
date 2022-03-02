@@ -32,7 +32,7 @@ const webpackDev = {
     }
   },
   // Enable sourcemaps for debugging webpack"s output.
-  devtool: 'cheap-eval-source-map',
+  devtool: 'eval-cheap-module-source-map',
   plugins: [
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(true),
