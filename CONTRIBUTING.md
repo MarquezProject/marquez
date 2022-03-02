@@ -62,6 +62,53 @@ To setup the git hook scripts run:
 $ pre-commit install
 ```
 
+# `.github/workflows`
+
+Each Pull Request executes a series of quality checks, mostly relying upon CircleCI for validation. However, there are
+certain validation checks that execute via GitHub Actions and can be run locally using the steps below.
+
+Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions 
+checks that apply to each Pull Request. The first time you run _act_ you will be asked to choose a
+[runner](https://github.com/nektos/act#runners).
+
+Alternatively, you can store your preferred runner within a local user profile named _.actrc_.
+
+```bash
+# .actrc file example (https://github.com/nektos/act#configuration)
+-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest
+```
+
+Once you have configured a runner, use _act_ to invoke GitHub Actions and evaluate the workflow.
+
+```bash
+act pull_request
+```
+
+You can also enable verbose logging and image caching via [act flags](https://github.com/nektos/act#flags).
+
+```bash
+act pull_request --reuse --verbose
+```
+
+> **Note:** Docker must be running in order to utilize _act_.
+
+## Troubleshooting
+
+There is an issue within the _act_ tool that prevents the _kind_ cluster from being deleted after execution the action.
+When this condition exists, you will experience the error below.
+
+```bash
+| Creating kind cluster...
+| ERROR: failed to create cluster: node(s) already exist for a cluster with the name "chart-testing"
+[Lint and Test Chart/lint-test]   ❌  Failure - Create kind cluster
+```
+
+Execute the command below to manually clean up the _kind_ cluster and resolve the problem.
+
+```bash
+kind delete clusters chart-testing
+```
+
 # Publish to Local Maven Repository
 
 Use [`publishToMavenLocal`](https://docs.gradle.org/current/userguide/publishing_maven.html#publishing_maven:tasks) to publish artifacts to your local maven repository:

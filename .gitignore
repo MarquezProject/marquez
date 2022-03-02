@@ -4,6 +4,7 @@
 *.swp
 ./**/*.class
 ./out/*
+.actrc
 .DS_Store
 .classpath
 .editorconfig
