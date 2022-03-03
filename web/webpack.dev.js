@@ -5,9 +5,17 @@ const webpackShared = require('./webpack.common.js')
 const webpackDev = {
   mode: 'development',
   devServer: {
-    contentBase: __dirname + '/src',
+    static: {
+      directory: __dirname + '/src',
+      staticOptions: {},
+      publicPath: "/",
+      serveIndex: true,
+      watch: true,
+    },
     port: 1337,
-    publicPath: '/',
+    devMiddleware: {
+      publicPath: '/'
+    },
     historyApiFallback: {
       index: './index.html',
       disableDotRule: true
@@ -24,7 +32,7 @@ const webpackDev = {
     }
   },
   // Enable sourcemaps for debugging webpack"s output.
-  devtool: 'cheap-eval-source-map',
+  devtool: 'eval-cheap-module-source-map',
   plugins: [
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(true),

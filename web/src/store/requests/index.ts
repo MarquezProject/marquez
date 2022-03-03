@@ -34,11 +34,7 @@ export const parseResponse = async (response: Response, functionName: string) =>
   }
 }
 
-export const genericFetchWrapper = async <R>(
-  url: string,
-  params: IParams,
-  functionName: string
-) => {
+export const genericFetchWrapper = async (url: string, params: IParams, functionName: string) => {
   const response = await fetch(url, params)
   return parseResponse(response, functionName)
 }
