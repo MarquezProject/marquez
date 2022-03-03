@@ -9,5 +9,5 @@ export const getSearch = async (q: string, filter = 'ALL', sort = 'NAME', limit 
   if (filter === 'JOB' || filter === 'DATASET') {
     url += `&filter=${filter}`
   }
-  return genericFetchWrapper<Search>(url, { method: 'GET' }, 'fetchSearch')
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchSearch')
 }
