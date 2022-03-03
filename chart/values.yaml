@@ -17,7 +17,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-    tag: 0.20.0
+    tag: 0.21.0
     pullPolicy: IfNotPresent
   ## Name of the existing secret containing credentials for the Marquez installation.
   ## When this is specified, it will take precedence over the values configured in the 'db' section.
@@ -71,7 +71,7 @@ web:
   image:
     registry: docker.io
     repository: marquezproject/marquez-web
-    tag: 0.20.0
+    tag: 0.21.0
     pullPolicy: IfNotPresent
   ## Marquez website will run on this port
   ##
@@ -105,7 +105,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnami/postgresql
-    tag: 12.1.0
+    tag: 0.21.0
   ## @param postgresql.postgresqlUsername PostgreSQL username
   ## ref: https://hub.docker.com/_/postgres/
   ##
