@@ -103,28 +103,32 @@ postgresql:
   ## @param image.tag PostgreSQL image tag (immutable tags are recommended)
   ##
   image:
-    registry: docker.io
-    repository: bitnami/postgresql
-    tag: 0.21.0
-  ## @param postgresql.postgresqlUsername PostgreSQL username
-  ## ref: https://hub.docker.com/_/postgres/
-  ##
-  postgresqlUsername: buendia
-  ## @param postgresql.postgresqlPassword PostgreSQL password
-  ## ref: https://hub.docker.com/_/postgres/
-  ##
-  postgresqlPassword: macondo
-  ## @param postgresql.postgresqlDatabase PostgreSQL database
+    tag: 12.1.0
+  ## Authentication parameters
+  ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
   ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run
+  ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-user-on-first-run
   ##
-  postgresqlDatabase: marquez
-  ## @param postgresql.existingSecret Name of existing secret object
-  ## The secret should contain the following keys:
-  ## postgresql-postgres-password (for root user)
-  ## postgresql-password (for the unprivileged user)
-  ##
-  # existingSecret: my-secret
-  existingSecret: ""
+  auth:
+    ## @param auth.username Name for a custom user to create
+    ##
+    username: buendia
+    ## @param auth.password Password for the custom user to create
+    ##
+    password: macondo
+    ## @param auth.database Name for a custom database to create
+    ##
+    database: marquez
+    ## @param auth.existingSecret Name of existing secret to use for PostgreSQL credentials
+    ## `auth.postgresPassword`, `auth.password`, and `auth.replicationPassword` will be ignored and picked up from this secret
+    ## The secret must contain the keys `postgres-password` (which is the password for "postgres" admin user),
+    ## `password` (which is the password for the custom user to create when `auth.username` is set),
+    ## and `replication-password` (which is the password for replication user).
+    ## The secret might also contains the key `ldap-password` if LDAP is enabled. `ldap.bind_password` will be ignored and
+    ## picked from this secret in this case.
+    ## The value is evaluated as a template.
+    ##
+    existingSecret: ""
 
 ## Additional labels to all the deployed resources; note that
 ## the following standard labels will automatically be applied.

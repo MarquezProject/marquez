@@ -81,13 +81,14 @@ helm delete marquez
 
 ### [Postgres](https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml) (sub-chart) **parameters**
 
-| Parameter                       | Description                     | Default   |
-|---------------------------------|---------------------------------|-----------|
-| `postgresql.enabled`            | Deploy PostgreSQL container(s)  | `false`   |
-| `postgresql.postgresqlUsername` | PostgreSQL username             | `buendia` |
-| `postgresql.postgresqlPassword` | PostgreSQL password             | `macondo` |
-| `postgresql.postgresqlDatabase` | PostgreSQL database             | `marquez` |
-| `postgresql.existingSecret`     | Name of existing secret object  | `nil`     |
+| Parameter                        | Description                     | Default   |
+|----------------------------------|---------------------------------|-----------|
+| `postgresql.enabled`             | Deploy PostgreSQL container(s)  | `false`   |
+| `postgresql.image.tag`           | PostgreSQL image version        | `12.1.0`  |
+| `postgresql.auth.username`       | PostgreSQL username             | `buendia` |
+| `postgresql.auth.password`       | PostgreSQL password             | `macondo` |
+| `postgresql.auth.database`       | PostgreSQL database             | `marquez` |
+| `postgresql.auth.existingSecret` | Name of existing secret object  | `nil`     |
 
 ### Common **parameters**
 
