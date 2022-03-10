@@ -167,10 +167,22 @@ sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
 # (10) Prepare next development version commit
-git commit -sam "Prepare next development version" --no-verify
+git commit -sam "Prepare next development version ${NEXT_VERSION}" --no-verify
 
-# (11) Push commits and tag
-if [[ ${PUSH} = "true" ]]; then
+# (11) Check for commits in log
+COMMITS=false
+MESSAGE_1=$(git log -1 --grep="Prepare for release ${RELEASE_VERSION}" --pretty=format:%s)
+MESSAGE_2=$(git log -1 --grep="Prepare next development version ${NEXT_VERSION}" --pretty=format:%s)
+
+if [[ $MESSAGE_1 ]] && [[ $MESSAGE_2 ]]; then
+  COMMITS=true
+else
+  echo "one or both commits failed; exiting..."
+  exit 0
+fi
+
+# (12) Push commits and tag
+if [[ $COMMITS = "true" ]] && [[ ${PUSH} = "true" ]]; then
   git push origin main && \
     git push origin "${RELEASE_VERSION}"
 else
