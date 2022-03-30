@@ -125,6 +125,11 @@ export interface Run {
   nominalStartTime: string
   nominalEndTime: string
   state: RunState
+  jobVersion: {
+    name: string
+    namespace: string
+    version: string
+  }
   startedAt: string
   endedAt: string
   durationMs: number
