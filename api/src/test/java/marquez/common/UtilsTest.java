@@ -5,6 +5,7 @@ package marquez.common;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLifecycleState;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newRunId;
 import static marquez.common.models.CommonModelGenerator.newSchemaFields;
@@ -259,6 +260,7 @@ public class UtilsTest {
     DatasetName datasetName = newDatasetName();
     DatasetName physicalName = newDatasetName();
     SourceName sourceName = newSourceName();
+    String lifecycleState = newLifecycleState();
     List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
     RunId runId = newRunId();
 
@@ -268,6 +270,7 @@ public class UtilsTest {
             sourceName.getValue(),
             physicalName.getValue(),
             datasetName.getValue(),
+            lifecycleState,
             schemaFields,
             runId.getValue());
     Version second =
@@ -276,6 +279,7 @@ public class UtilsTest {
             sourceName.getValue(),
             physicalName.getValue(),
             datasetName.getValue(),
+            lifecycleState,
             schemaFields,
             runId.getValue());
 
@@ -320,6 +324,7 @@ public class UtilsTest {
             newSourceName().getValue(),
             newDatasetName().getValue(),
             newDatasetName().getValue(),
+            newLifecycleState(),
             schemaFields,
             newRunId().getValue());
 
@@ -329,6 +334,7 @@ public class UtilsTest {
             newSourceName().getValue(),
             newDatasetName().getValue(),
             newDatasetName().getValue(),
+            newLifecycleState(),
             schemaFields,
             newRunId().getValue());
 
@@ -337,7 +343,7 @@ public class UtilsTest {
 
   @Test
   public void testDatasetVersionWithNullFields() {
-    Version version = Utils.newDatasetVersionFor(null, null, null, null, null, null);
+    Version version = Utils.newDatasetVersionFor(null, null, null, null, null, null, null);
 
     assertThat(version.getValue()).isNotNull();
   }
@@ -355,6 +361,7 @@ public class UtilsTest {
     DatasetName datasetName = newDatasetName();
     DatasetName physicalName = newDatasetName();
     SourceName sourceName = newSourceName();
+    String lifecycleState = newLifecycleState();
     List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
     RunId runId = newRunId();
 
@@ -364,6 +371,7 @@ public class UtilsTest {
             sourceName.getValue(),
             physicalName.getValue(),
             datasetName.getValue(),
+            lifecycleState,
             schemaFields,
             runId.getValue());
 
@@ -375,6 +383,7 @@ public class UtilsTest {
             sourceName.getValue(),
             physicalName.getValue(),
             datasetName.getValue(),
+            lifecycleState,
             shuffleSchemaFields,
             runId.getValue());
 

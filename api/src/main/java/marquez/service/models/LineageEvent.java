@@ -309,11 +309,18 @@ public class LineageEvent extends BaseJsonModel {
   @Setter
   @Valid
   @ToString
-  @JsonPropertyOrder({"documentation", "schema", "dataSource", "description"})
+  @JsonPropertyOrder({
+    "documentation",
+    "schema",
+    "dataSource",
+    "description",
+    "lifecycleStateChange"
+  })
   public static class DatasetFacets {
 
     @Valid private DocumentationDatasetFacet documentation;
     @Valid private SchemaDatasetFacet schema;
+    @Valid private LifecycleStateChangeFacet lifecycleStateChange;
     @Valid private DatasourceDatasetFacet dataSource;
     private String description;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
@@ -334,6 +341,10 @@ public class LineageEvent extends BaseJsonModel {
 
     public SchemaDatasetFacet getSchema() {
       return schema;
+    }
+
+    public LifecycleStateChangeFacet getLifecycleStateChange() {
+      return lifecycleStateChange;
     }
 
     public DatasourceDatasetFacet getDataSource() {
@@ -409,6 +420,23 @@ public class LineageEvent extends BaseJsonModel {
       super(_producer, _schemaURL);
       this.name = name;
       this.uri = uri;
+    }
+  }
+
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  public static class LifecycleStateChangeFacet extends BaseFacet {
+
+    private String lifecycleStateChange;
+
+    @Builder
+    public LifecycleStateChangeFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, String lifecycleStateChange) {
+      super(_producer, _schemaURL);
+      this.lifecycleStateChange = lifecycleStateChange;
     }
   }
 }

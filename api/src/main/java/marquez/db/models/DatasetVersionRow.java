@@ -20,6 +20,7 @@ public class DatasetVersionRow {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final UUID datasetUuid;
   @Getter @NonNull private final UUID version;
+  @Getter @Nullable private final String lifecycleState;
   @Nullable private final UUID runUuid;
 
   public Optional<UUID> getRunUuid() {

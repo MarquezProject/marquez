@@ -31,9 +31,11 @@ public final class DbTable extends Dataset {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
+      @Nullable final String lastLifecycleState,
       @Nullable final String description,
       @Nullable final UUID currentVersion,
-      @Nullable final ImmutableMap<String, Object> facets) {
+      @Nullable final ImmutableMap<String, Object> facets,
+      final boolean isDeleted) {
     super(
         id,
         DB_TABLE,
@@ -45,8 +47,10 @@ public final class DbTable extends Dataset {
         fields,
         tags,
         lastModifiedAt,
+        lastLifecycleState,
         description,
         currentVersion,
-        facets);
+        facets,
+        isDeleted);
   }
 }

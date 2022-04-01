@@ -41,6 +41,7 @@ import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.LifecycleStateChangeFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -350,6 +351,12 @@ public interface OpenLineageDao extends BaseDao {
             formatNamespaceName(ds.getNamespace()),
             DEFAULT_NAMESPACE_OWNER);
 
+    String dslifecycleState =
+        Optional.ofNullable(ds.getFacets())
+            .map(DatasetFacets::getLifecycleStateChange)
+            .map(LifecycleStateChangeFacet::getLifecycleStateChange)
+            .orElse("");
+
     DatasetRow datasetRow =
         datasetDao.upsert(
             UUID.randomUUID(),
@@ -361,7 +368,8 @@ public interface OpenLineageDao extends BaseDao {
             source.getName(),
             formatDatasetName(ds.getName()),
             ds.getName(),
-            dsDescription);
+            dsDescription,
+            dslifecycleState.equalsIgnoreCase("DROP"));
 
     List<SchemaField> fields =
         Optional.ofNullable(ds.getFacets())
@@ -385,6 +393,7 @@ public interface OpenLineageDao extends BaseDao {
                               source.getName(),
                               dsRow.getPhysicalName(),
                               dsRow.getName(),
+                              dslifecycleState,
                               fields,
                               runUuid)
                           .getValue();
@@ -397,8 +406,8 @@ public interface OpenLineageDao extends BaseDao {
                           isInput ? null : runUuid,
                           datasetVersionDao.toPgObjectSchemaFields(fields),
                           dsNamespace.getName(),
-                          ds.getName());
-
+                          ds.getName(),
+                          dslifecycleState);
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();

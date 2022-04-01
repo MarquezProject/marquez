@@ -47,9 +47,11 @@ public abstract class Dataset {
   @Getter @Setter private List<Field> fields;
   @Getter private final ImmutableSet<TagName> tags;
   @Nullable private final Instant lastModifiedAt;
+  @Nullable private final String lastLifecycleState;
   @Nullable private final String description;
   @Nullable private final UUID currentVersion;
   @Getter ImmutableMap<String, Object> facets;
+  @Getter private final boolean isDeleted;
 
   public Dataset(
       @NonNull final DatasetId id,
@@ -62,9 +64,11 @@ public abstract class Dataset {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final Instant lastModifiedAt,
+      @Nullable final String lastLifecycleState,
       @Nullable final String description,
       @Nullable final UUID currentVersion,
-      @Nullable final ImmutableMap<String, Object> facets) {
+      @Nullable final ImmutableMap<String, Object> facets,
+      boolean isDeleted) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -76,9 +80,11 @@ public abstract class Dataset {
     this.fields = (fields == null) ? ImmutableList.of() : fields;
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lastModifiedAt = lastModifiedAt;
+    this.lastLifecycleState = lastLifecycleState;
     this.description = description;
     this.currentVersion = currentVersion;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
+    this.isDeleted = isDeleted;
   }
 
   public Optional<Instant> getLastModifiedAt() {
@@ -87,6 +93,10 @@ public abstract class Dataset {
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<String> getLastLifecycleState() {
+    return Optional.ofNullable(lastLifecycleState);
   }
 
   public Optional<UUID> getCurrentVersion() {

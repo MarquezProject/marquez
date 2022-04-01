@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.21.0...HEAD)
 
+### Added
+
+* Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets. 
+
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
 
 ### Added

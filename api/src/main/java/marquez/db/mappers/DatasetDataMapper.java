@@ -52,7 +52,8 @@ public class DatasetDataMapper implements RowMapper<DatasetData> {
         toFields(results, "fields"),
         ImmutableSet.of(),
         timestampOrNull(results, Columns.LAST_MODIFIED_AT),
-        stringOrNull(results, Columns.DESCRIPTION));
+        stringOrNull(results, Columns.DESCRIPTION),
+        stringOrNull(results, Columns.LIFECYCLE_STATE));
   }
 
   public static ImmutableList<Field> toFields(ResultSet results, String column)

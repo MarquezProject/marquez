@@ -28,6 +28,7 @@ public class DatasetRow {
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
   @With @Nullable private final UUID currentVersionUuid;
+  @Getter private final boolean isDeleted;
 
   public Optional<Instant> getLastModifiedAt() {
     return Optional.ofNullable(lastModifiedAt);

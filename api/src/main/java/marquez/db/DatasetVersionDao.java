@@ -48,6 +48,7 @@ public interface DatasetVersionDao extends BaseDao {
       Instant now,
       String namespaceName,
       String datasetName,
+      String lifecycleState,
       DatasetMeta datasetMeta) {
     TagDao tagDao = createTagDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
@@ -63,7 +64,8 @@ public interface DatasetVersionDao extends BaseDao {
             datasetMeta.getRunId().map(RunId::getValue).orElse(null),
             toPgObjectFields(datasetMeta.getFields()),
             namespaceName,
-            datasetName);
+            datasetName,
+            lifecycleState);
     updateDatasetVersionMetric(
         namespaceName,
         datasetMeta.getType().toString(),
@@ -167,7 +169,7 @@ public interface DatasetVersionDao extends BaseDao {
           + "    FROM selected_dataset_version_runs dv\n"
           + "    LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid\n"
           + ")\n"
-          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description,\n"
+          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state, \n"
           + "    dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
           + "    t.tags, f.facets\n"
           + "FROM selected_dataset_versions dv\n"
@@ -209,7 +211,7 @@ public interface DatasetVersionDao extends BaseDao {
           + "    FROM selected_dataset_version_runs dv\n"
           + "    LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid\n"
           + ")\n"
-          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description,\n"
+          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state, \n"
           + "    dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
           + "    t.tags, f.facets\n"
           + "FROM selected_dataset_versions dv\n"
@@ -280,7 +282,7 @@ public interface DatasetVersionDao extends BaseDao {
           + "    FROM selected_dataset_version_runs dv\n"
           + "    LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid\n"
           + ")\n"
-          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description,\n"
+          + "SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\n"
           + "    dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,\n"
           + "    t.tags, f.facets\n"
           + "FROM selected_dataset_versions dv\n"
@@ -324,9 +326,9 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(
       "INSERT INTO dataset_versions "
-          + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name) "
+          + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
           + "VALUES "
-          + "(:uuid, :now, :datasetUuid, :version, :runUuid, :fields, :namespaceName, :datasetName) "
+          + "(:uuid, :now, :datasetUuid, :version, :runUuid, :fields, :namespaceName, :datasetName, :lifecycleState) "
           + "ON CONFLICT(version) "
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
@@ -339,7 +341,8 @@ public interface DatasetVersionDao extends BaseDao {
       UUID runUuid,
       PGobject fields,
       String namespaceName,
-      String datasetName);
+      String datasetName,
+      String lifecycleState);
 
   @SqlUpdate("UPDATE dataset_versions SET fields = :fields WHERE uuid = :uuid")
   void updateFields(UUID uuid, PGobject fields);

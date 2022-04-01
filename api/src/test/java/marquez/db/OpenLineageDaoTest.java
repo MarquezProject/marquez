@@ -2,12 +2,15 @@
 
 package marquez.db;
 
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.JobFacet;
@@ -65,6 +68,28 @@ class OpenLineageDaoTest {
         .isEqualTo(writeJob.getOutputs().get().get(0).getDatasetVersionRow());
   }
 
+  @Test
+  void testUpdateMarquezModelLifecycleStateChangeFacet() {
+    Dataset dataset =
+        new Dataset(
+            LineageTestUtils.NAMESPACE,
+            DATASET_NAME,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(
+                        PRODUCER_URL, SCHEMA_URL, "TRUNCATE"))
+                .build());
+
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+    assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
+    assertThat(writeJob.getOutputs().get().get(0).getDatasetVersionRow().getLifecycleState())
+        .isEqualTo("TRUNCATE");
+  }
+
   /**
    * When reading a new dataset, a version is created and the dataset's current version is updated
    * immediately.
@@ -115,6 +140,7 @@ class OpenLineageDaoTest {
                     new SchemaField("name", "STRING", "my name"),
                     new SchemaField("age", "INT", "my age"),
                     new SchemaField("eyeColor", "STRING", "my eye color"))),
+            this.datasetFacets.getLifecycleStateChange(),
             this.datasetFacets.getDataSource(),
             this.datasetFacets.getDescription(),
             this.datasetFacets.getAdditionalFacets());
