@@ -15,7 +15,6 @@ import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.Field;
-import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
@@ -69,9 +68,9 @@ public interface RunDao extends BaseDao {
 
   String BASE_FIND_RUN_SQL =
       "SELECT r.*, ra.args, ctx.context, f.facets,\n"
-          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
+          + "jv.version AS job_version,\n"
           + "ri.input_versions, ro.output_versions\n"
-          + "FROM runs AS r\n"
+          + "FROM runs_view AS r\n"
           + "LEFT OUTER JOIN\n"
           + "(\n"
           + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
@@ -156,6 +155,7 @@ public interface RunDao extends BaseDao {
           + "external_id, "
           + "created_at, "
           + "updated_at, "
+          + "job_uuid, "
           + "job_version_uuid, "
           + "run_args_uuid, "
           + "nominal_start_time, "
@@ -171,6 +171,7 @@ public interface RunDao extends BaseDao {
           + ":externalId, "
           + ":now, "
           + ":now, "
+          + ":jobUuid,"
           + ":jobVersionUuid, "
           + ":runArgsUuid, "
           + ":nominalStartTime, "
@@ -194,6 +195,7 @@ public interface RunDao extends BaseDao {
       UUID runUuid,
       String externalId,
       Instant now,
+      UUID jobUuid,
       UUID jobVersionUuid,
       UUID runArgsUuid,
       Instant nominalStartTime,
@@ -211,6 +213,7 @@ public interface RunDao extends BaseDao {
           + "external_id, "
           + "created_at, "
           + "updated_at, "
+          + "job_uuid, "
           + "job_version_uuid, "
           + "run_args_uuid, "
           + "nominal_start_time, "
@@ -224,6 +227,7 @@ public interface RunDao extends BaseDao {
           + ":externalId, "
           + ":now, "
           + ":now, "
+          + ":jobUuid, "
           + ":jobVersionUuid, "
           + ":runArgsUuid, "
           + ":nominalStartTime, "
@@ -243,6 +247,7 @@ public interface RunDao extends BaseDao {
       UUID runUuid,
       String externalId,
       Instant now,
+      UUID jobUuid,
       UUID jobVersionUuid,
       UUID runArgsUuid,
       Instant nominalStartTime,
@@ -347,7 +352,7 @@ public interface RunDao extends BaseDao {
   /** Insert from run creates a run but does not associate any datasets. */
   @Transaction
   default RunRow upsertRunMeta(
-      NamespaceName namespaceName, JobName jobName, RunMeta runMeta, RunState currentState) {
+      NamespaceName namespaceName, JobRow jobRow, RunMeta runMeta, RunState currentState) {
     Instant now = Instant.now();
 
     NamespaceRow namespaceRow =
@@ -363,9 +368,6 @@ public interface RunDao extends BaseDao {
                 Utils.toJson(runMeta.getArgs()),
                 Utils.checksumFor(runMeta.getArgs()));
 
-    JobRow jobRow =
-        createJobDao().findJobByNameAsRow(namespaceName.getValue(), jobName.getValue()).get();
-
     UUID uuid = runMeta.getId().map(RunId::getValue).orElse(UUID.randomUUID());
 
     RunRow runRow =
@@ -373,6 +375,7 @@ public interface RunDao extends BaseDao {
             uuid,
             null,
             now,
+            jobRow.getUuid(),
             null,
             runArgsRow.getUuid(),
             runMeta.getNominalStartTime().orElse(null),
@@ -380,7 +383,7 @@ public interface RunDao extends BaseDao {
             currentState,
             now,
             namespaceRow.getName(),
-            jobName.getValue(),
+            jobRow.getName(),
             jobRow.getLocation(),
             jobRow.getJobContextUuid().orElse(null));
 

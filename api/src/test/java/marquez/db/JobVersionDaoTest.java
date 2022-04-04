@@ -128,6 +128,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     final ExtendedRunRow runRow =
         DbTestUtils.newRun(
             jdbiForTesting,
+            jobVersionRow.getJobUuid(),
             jobVersionRow.getUuid(),
             runArgsRow.getUuid(),
             namespaceRow.getUuid(),
@@ -206,8 +207,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
         DbTestUtils.newJobWith(
             jdbiForTesting, namespaceRow.getName(), newJobName().getValue(), jobMeta);
 
-    final RunRow runRow =
-        DbTestUtils.newRun(jdbiForTesting, jobRow.getNamespaceName(), jobRow.getName());
+    final RunRow runRow = DbTestUtils.newRun(jdbiForTesting, jobRow);
     final Run runCompleted =
         DbTestUtils.transitionRunWithOutputs(
             jdbiForTesting, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
@@ -247,8 +247,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             jdbiForTesting, namespaceRow.getName(), newJobName().getValue(), jobMeta);
 
     // (2) Add a new run; the input dataset versions will also be associated with the run.
-    final RunRow runRow =
-        DbTestUtils.newRun(jdbiForTesting, jobRow.getNamespaceName(), jobRow.getName());
+    final RunRow runRow = DbTestUtils.newRun(jdbiForTesting, jobRow);
 
     // Ensure the input dataset versions have been associated with the run.
     final List<ExtendedDatasetVersionRow> inputDatasetVersions =

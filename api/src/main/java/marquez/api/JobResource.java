@@ -38,6 +38,7 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.Version;
 import marquez.db.JobVersionDao;
+import marquez.db.models.JobRow;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
@@ -171,8 +172,21 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
     throwIfExists(namespaceName, jobName, runMeta.getId().orElse(null));
+    JobRow job =
+        jobService
+            .findJobByNameAsRow(namespaceName.getValue(), jobName.getValue())
+            .or(
+                () ->
+                    jobService.findJobBySimpleNameAsRow(
+                        namespaceName.getValue(), jobName.getValue()))
+            .orElseThrow(
+                () ->
+                    new IllegalArgumentException(
+                        String.format(
+                            "No such job with namespace %s and name %s",
+                            namespaceName.getValue(), jobName.getValue())));
 
-    final Run run = runService.createRun(namespaceName, jobName, runMeta);
+    final Run run = runService.createRun(namespaceName, job, runMeta);
     final URI runLocation = locationFor(uriInfo, run);
     return Response.created(runLocation).entity(run).build();
   }

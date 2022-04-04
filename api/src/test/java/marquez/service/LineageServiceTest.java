@@ -15,6 +15,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.db.JobDao;
 import marquez.db.LineageDao;
 import marquez.db.LineageTestUtils;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
@@ -64,7 +65,7 @@ public class LineageServiceTest {
   public static void setUpOnce(Jdbi jdbi) {
     LineageServiceTest.jdbi = jdbi;
     lineageDao = jdbi.onDemand(LineageDao.class);
-    lineageService = new LineageService(lineageDao);
+    lineageService = new LineageService(lineageDao, jdbi.onDemand(JobDao.class));
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
 
