@@ -53,9 +53,9 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testSendOpenLineageBadArgument() throws IOException {
-    // Namespaces can't have semi-colons, so this will get rejected
+    // Namespaces can't have emojis, so this will get rejected
     String badNamespace =
-        "sqlserver://myhost:3342;user=auser;password=XXXXXXXXXX;database=TheDatabase";
+        "sqlserver://myhost:3342;user=auser;password=\uD83D\uDE02\uD83D\uDE02\uD83D\uDE02;database=TheDatabase";
     LineageEvent event =
         new LineageEvent(
             "COMPLETE",
