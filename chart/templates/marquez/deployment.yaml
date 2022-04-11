@@ -7,9 +7,13 @@ metadata:
     {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
     {{- end }}
     app.kubernetes.io/component: marquez
-  {{- if .Values.commonAnnotations }}
-  annotations: {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
-  {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- range $key, $value := .Values.marquez.podAnnotations }}
+    {{ $key }}: {{ include "common.tplvalues.render" (dict "value" $value "context" $) | quote }}
+    {{- end }}
 spec:
   selector:
     matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
