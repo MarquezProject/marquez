@@ -55,6 +55,10 @@ marquez:
     requests: {}
     #    memory: 256Mi
     #    cpu: 250m
+  podAnnotations: {}
+  ## - name:
+  ##   value:
+  ##
 
 ## Properties related to Marquez frontend functionality
 ##
