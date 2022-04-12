@@ -6,6 +6,7 @@
 
 * Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 * Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [@wslulciuc](https://github.com/wslulciuc)
+* Add support for job renaming/redirection via symlink [@collado-mike](https://github.com/collado-mike)
 
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
 
