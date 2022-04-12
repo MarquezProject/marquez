@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import marquez.Generator;
+import marquez.common.models.JobId;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
+import org.jetbrains.annotations.NotNull;
 
 /** Generates new instances for {@code marquez.db.models} with random values used for testing. */
 public final class DbModelGenerator extends Generator {
@@ -37,5 +41,10 @@ public final class DbModelGenerator extends Generator {
   /** Returns a new {@code row} uuid. */
   public static UUID newRowUuid() {
     return UUID.randomUUID();
+  }
+
+  @NotNull
+  public static JobId jobIdFor(String namespaceName, String jobName) {
+    return new JobId(new NamespaceName(namespaceName), new JobName(jobName));
   }
 }
