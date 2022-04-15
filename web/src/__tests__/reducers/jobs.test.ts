@@ -20,7 +20,8 @@ describe('jobs reducer', () => {
 })
 
 describe('stopWatchDuration', () => {
-  const oneHour = 60 * 60 * 1000;
+  const oneMinute = 60 * 1000;
+  const oneHour = 60 * oneMinute;
   const oneDay = 24 * oneHour;
 
   it('more than one week', () => {
@@ -44,8 +45,8 @@ describe('stopWatchDuration', () => {
   })
 
   it('less than one minute', () => {
-    const value = stopWatchDuration(oneHour - 1000);
-    expect("59m 59s").toBe(value);
+    const value = stopWatchDuration(oneMinute - 1000);
+    expect("0m 59s").toBe(value);
   })
 
   it('less than one second', () => {
