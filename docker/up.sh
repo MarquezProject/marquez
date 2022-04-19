@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
+set -x
+
+SCRIPTDIR=$(dirname $0)
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -103,5 +106,7 @@ fi
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
+
+$SCRIPTDIR/volumes.sh marquez
 
 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args
