@@ -33,6 +33,7 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
+import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.db.models.DatasetRow;
@@ -128,11 +129,56 @@ final class DbTestUtils {
     return Stream.generate(() -> newJob(jdbi)).limit(limit).collect(toImmutableSet());
   }
 
+  public static JobRow createJobWithoutSymlinkTarget(
+      Jdbi jdbi, NamespaceRow namespace, String jobName, String description) {
+    return newJobWith(
+        jdbi,
+        namespace.getName(),
+        jobName,
+        new JobMeta(
+            JobType.BATCH,
+            ImmutableSet.of(),
+            ImmutableSet.of(),
+            null,
+            ImmutableMap.of(),
+            description,
+            null));
+  }
+
+  public static JobRow createJobWithSymlinkTarget(
+      Jdbi jdbi, NamespaceRow namespace, String jobName, UUID jobSymlinkId, String description) {
+    return newJobWith(
+        jdbi,
+        namespace.getName(),
+        jobName,
+        jobSymlinkId,
+        new JobMeta(
+            JobType.BATCH,
+            ImmutableSet.of(),
+            ImmutableSet.of(),
+            null,
+            ImmutableMap.of(),
+            description,
+            null));
+  }
+
   /**
    * Adds a new {@link JobRow} object to the {@code jobs} table with the provided {@link JobMeta}.
    */
   static JobRow newJobWith(
       final Jdbi jdbi, final String namespaceName, final String jobName, final JobMeta jobMeta) {
+    return newJobWith(jdbi, namespaceName, jobName, null, jobMeta);
+  }
+
+  /**
+   * Adds a new {@link JobRow} object to the {@code jobs} table with the provided {@link JobMeta}.
+   */
+  static JobRow newJobWith(
+      final Jdbi jdbi,
+      final String namespaceName,
+      final String jobName,
+      UUID symlinkTargetUuid,
+      final JobMeta jobMeta) {
     final DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
     final JobDao jobDao = jdbi.onDemand(JobDao.class);
 
@@ -151,7 +197,11 @@ final class DbTestUtils {
     }
 
     return jobDao.upsertJobMeta(
-        namespaceForDatasetAndJob, JobName.of(jobName), jobMeta, Utils.getMapper());
+        namespaceForDatasetAndJob,
+        JobName.of(jobName),
+        symlinkTargetUuid,
+        jobMeta,
+        Utils.getMapper());
   }
 
   /** Adds a new {@link JobContextRow} object to the {@code job_contexts} table. */
@@ -268,35 +318,36 @@ final class DbTestUtils {
                 .scanResultSet(
                     (rs, ctx) -> {
                       ResultSet resultSet = rs.get();
-                      return Stream.generate(
-                              () -> {
-                                try {
-                                  if (resultSet.next()) {
-                                    ResultSetMetaData metaData = resultSet.getMetaData();
-                                    int keys = metaData.getColumnCount();
-                                    return IntStream.range(1, keys + 1)
-                                        .mapToObj(
-                                            i -> {
-                                              try {
-                                                return Map.entry(
-                                                    metaData.getColumnName(i),
-                                                    Optional.ofNullable(resultSet.getObject(i))
-                                                        .orElse("NULL"));
-                                              } catch (SQLException e) {
-                                                throw new RuntimeException(e);
-                                              }
-                                            })
-                                        .collect(
-                                            Collectors.toMap(
-                                                Map.Entry::getKey, Map.Entry::getValue));
-                                  } else {
-                                    return null;
-                                  }
-                                } catch (SQLException e) {
-                                  throw new RuntimeException(e);
-                                }
-                              })
-                          .takeWhile(Predicates.notNull());
+                      return streamResults(resultSet);
                     }));
+  }
+
+  public static Stream<Map<String, Object>> streamResults(ResultSet resultSet) {
+    return Stream.generate(
+            () -> {
+              try {
+                if (resultSet.next()) {
+                  ResultSetMetaData metaData = resultSet.getMetaData();
+                  int keys = metaData.getColumnCount();
+                  return IntStream.range(1, keys + 1)
+                      .mapToObj(
+                          i -> {
+                            try {
+                              return Map.entry(
+                                  metaData.getColumnName(i),
+                                  Optional.ofNullable(resultSet.getObject(i)).orElse("NULL"));
+                            } catch (SQLException e) {
+                              throw new RuntimeException(e);
+                            }
+                          })
+                      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                } else {
+                  return null;
+                }
+              } catch (SQLException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .takeWhile(Predicates.notNull());
   }
 }

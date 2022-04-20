@@ -48,23 +48,34 @@ public interface JobDao extends BaseDao {
   void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
-      "SELECT j.*, jc.context, f.facets\n"
-          + "  FROM jobs AS j\n"
-          + "  LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid\n"
-          + "  LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid\n"
-          + "  LEFT OUTER JOIN (\n"
-          + "      SELECT run_uuid, JSON_AGG(e.facets) AS facets\n"
-          + "      FROM (\n"
-          + "       SELECT run_uuid, event->'job'->'facets' AS facets\n"
-          + "       FROM lineage_events AS le\n"
-          + "       INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid\n"
-          + "       INNER JOIN jobs j2 ON j2.current_version_uuid=jv2.uuid\n"
-          + "       WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName\n"
-          + "       ORDER BY event_time ASC\n"
-          + "   ) e\n"
-          + "    GROUP BY e.run_uuid\n"
-          + "  ) f ON f.run_uuid=jv.latest_run_uuid\n"
-          + "WHERE j.namespace_name = :namespaceName AND j.name = :jobName")
+      """
+          WITH RECURSIVE job_ids AS (
+            SELECT uuid, symlink_target_uuid
+            FROM jobs j
+            WHERE j.namespace_name=:namespaceName AND j.name=:jobName
+            UNION
+            SELECT j.uuid, j.symlink_target_uuid
+            FROM jobs j
+            INNER JOIN job_ids jn ON j.uuid=jn.symlink_target_uuid
+          )
+          SELECT j.*, jc.context, f.facets
+          FROM jobs j
+          INNER JOIN job_ids jn ON jn.uuid=j.uuid AND jn.symlink_target_uuid IS NULL
+          LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
+          LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid
+          LEFT OUTER JOIN (
+            SELECT run_uuid, JSON_AGG(e.facets) AS facets
+            FROM (
+              SELECT run_uuid, event->'job'->'facets' AS facets
+              FROM lineage_events AS le
+              INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid
+              INNER JOIN jobs j2 ON j2.current_version_uuid=jv2.uuid
+              WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName
+              ORDER BY event_time ASC
+            ) e
+            GROUP BY e.run_uuid
+          ) f ON f.run_uuid=jv.latest_run_uuid
+          """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
@@ -78,11 +89,21 @@ public interface JobDao extends BaseDao {
   }
 
   @SqlQuery(
-      "SELECT j.*, n.name AS namespace_name FROM jobs AS j "
-          + "INNER JOIN namespaces AS n "
-          + "  ON (n.name = :namespaceName AND "
-          + "      j.namespace_uuid = n.uuid AND "
-          + "      j.name = :jobName)")
+      """
+      WITH RECURSIVE job_ids AS (
+        SELECT uuid, symlink_target_uuid
+        FROM jobs j
+        WHERE j.namespace_name=:namespaceName AND j.name=:jobName
+        UNION
+        SELECT j.uuid, j.symlink_target_uuid
+        FROM jobs j
+        INNER JOIN job_ids jn ON j.uuid=jn.symlink_target_uuid
+      )
+      SELECT j.*, n.name AS namespace_name
+      FROM jobs AS j
+      INNER JOIN job_ids jn ON jn.uuid=j.uuid AND jn.symlink_target_uuid IS NULL
+      INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
+      """)
   Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
 
   @SqlQuery(
@@ -103,14 +124,17 @@ public interface JobDao extends BaseDao {
           + "    GROUP BY e.run_uuid\n"
           + "  ) f ON f.run_uuid=jv.latest_run_uuid\n"
           + "WHERE j.namespace_name = :namespaceName\n"
+          + "AND j.symlink_target_uuid IS NULL\n"
           + "ORDER BY j.name "
           + "LIMIT :limit OFFSET :offset")
   List<Job> findAll(String namespaceName, int limit, int offset);
 
-  @SqlQuery("SELECT count(*) FROM jobs AS j")
-  int count(String namespaceName);
+  @SqlQuery("SELECT count(*) FROM jobs AS j WHERE symlink_target_uuid IS NULL")
+  int count();
 
-  @SqlQuery("SELECT count(*) FROM jobs AS j WHERE j.namespace_name = :namespaceName")
+  @SqlQuery(
+      "SELECT count(*) FROM jobs AS j WHERE j.namespace_name = :namespaceName\n"
+          + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
   default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
@@ -147,6 +171,15 @@ public interface JobDao extends BaseDao {
 
   default JobRow upsertJobMeta(
       NamespaceName namespaceName, JobName jobName, JobMeta jobMeta, ObjectMapper mapper) {
+    return upsertJobMeta(namespaceName, jobName, null, jobMeta, mapper);
+  }
+
+  default JobRow upsertJobMeta(
+      NamespaceName namespaceName,
+      JobName jobName,
+      UUID symlinkTargetUuid,
+      JobMeta jobMeta,
+      ObjectMapper mapper) {
     Instant createdAt = Instant.now();
     NamespaceRow namespace =
         createNamespaceDao()
@@ -170,6 +203,7 @@ public interface JobDao extends BaseDao {
         jobMeta.getDescription().orElse(null),
         contextRow.getUuid(),
         toUrlString(jobMeta.getLocation().orElse(null)),
+        symlinkTargetUuid,
         toJson(jobMeta.getInputs(), mapper));
   }
 
@@ -192,39 +226,45 @@ public interface JobDao extends BaseDao {
   }
 
   @SqlQuery(
-      "INSERT INTO jobs ("
-          + "uuid, "
-          + "type, "
-          + "created_at, "
-          + "updated_at, "
-          + "namespace_uuid, "
-          + "namespace_name, "
-          + "name, "
-          + "description,"
-          + "current_job_context_uuid,"
-          + "current_location,"
-          + "current_inputs"
-          + ") VALUES ( "
-          + ":uuid, "
-          + ":type, "
-          + ":now, "
-          + ":now, "
-          + ":namespaceUuid, "
-          + ":namespaceName, "
-          + ":name, "
-          + ":description, "
-          + ":jobContextUuid, "
-          + ":location, "
-          + ":inputs "
-          + ") ON CONFLICT (name, namespace_uuid) DO "
-          + "UPDATE SET "
-          + "updated_at = EXCLUDED.updated_at, "
-          + "type = EXCLUDED.type, "
-          + "description = EXCLUDED.description, "
-          + "current_job_context_uuid = EXCLUDED.current_job_context_uuid, "
-          + "current_location = EXCLUDED.current_location, "
-          + "current_inputs = EXCLUDED.current_inputs "
-          + "RETURNING *")
+      """
+          INSERT INTO jobs AS j (
+          uuid,
+          type,
+          created_at,
+          updated_at,
+          namespace_uuid,
+          namespace_name,
+          name,
+          description,
+          current_job_context_uuid,
+          current_location,
+          current_inputs,
+          symlink_target_uuid
+          ) VALUES (
+          :uuid,
+          :type,
+          :now,
+          :now,
+          :namespaceUuid,
+          :namespaceName,
+          :name,
+          :description,
+          :jobContextUuid,
+          :location,
+          :inputs,
+          :symlinkTargetId
+          ) ON CONFLICT (name, namespace_uuid) DO
+          UPDATE SET
+          updated_at = EXCLUDED.updated_at,
+          type = EXCLUDED.type,
+          description = EXCLUDED.description,
+          current_job_context_uuid = EXCLUDED.current_job_context_uuid,
+          current_location = EXCLUDED.current_location,
+          current_inputs = EXCLUDED.current_inputs,
+          -- update the symlink target if not null. otherwise, keep the old value
+          symlink_target_uuid = COALESCE(EXCLUDED.symlink_target_uuid, j.symlink_target_uuid)
+          RETURNING *
+          """)
   JobRow upsertJob(
       UUID uuid,
       JobType type,
@@ -235,5 +275,6 @@ public interface JobDao extends BaseDao {
       String description,
       UUID jobContextUuid,
       String location,
+      UUID symlinkTargetId,
       PGobject inputs);
 }
