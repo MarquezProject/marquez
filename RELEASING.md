@@ -19,3 +19,15 @@
 7. Draft a [new release](https://github.com/MarquezProject/marquez/releases/new) using the release notes for `X.Y.Z` in **step 1** as the release description:
 
    ![](./docs/assets/images/new-release.png)
+
+# Voting on Releases
+
+Anyone may request a new release of the project in the #general Slack channel.
+
+After one is proposed, committers have 48 hours to give a +1 or -1.
+
+Three +1s authorize the release.
+
+Alternatively, if after 2 days the release has received at least one +1 and no -1s, the release is also authorized.
+
+If the proposed release receives no +1s in two days, it is not authorized and the proposer must make a new request to reset the clock.
