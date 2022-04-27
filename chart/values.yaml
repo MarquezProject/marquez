@@ -36,7 +36,7 @@ marquez:
   migrateOnStartup: true
   ## Marquez will run using this hostname
   ##
-  hostname: localhost
+  # hostname: localhost
   ## Marquez API will run on this port
   ##
   port: 5000
