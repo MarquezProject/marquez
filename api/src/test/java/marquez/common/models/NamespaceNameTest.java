@@ -17,14 +17,16 @@ public class NamespaceNameTest {
         "s3://bucket",
         "bigquery:",
         "sqlserver://synapse-test-test001.sql.azuresynapse.net;databaseName=TESTPOOL1;",
-        "\u003D"
+        "\u003D",
+        "@",
+        "abfss://something@.something-else.core.windows.net"
       })
   void testValidNamespaceName(String name) {
     assertThat(NamespaceName.of(name).getValue()).isEqualTo(name);
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"@@@", "\uD83D\uDE02", "!", ""})
+  @ValueSource(strings = {"\uD83D\uDE02", "!", ""})
   void testInvalidNamespaceName(String name) {
     Assertions.assertThrows(IllegalArgumentException.class, () -> NamespaceName.of(name));
   }
