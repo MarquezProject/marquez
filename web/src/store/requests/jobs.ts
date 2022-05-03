@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { Job, Jobs, Run } from '../../types/api'
+import { Jobs } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
 export const getJobs = async (namespace: string, limit = 2000, offset = 0) => {

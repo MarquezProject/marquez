@@ -140,7 +140,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      {tab === 0 && <DatasetInfo datasetFields={dataset.fields} facets={dataset.facets} />}
+      {tab === 0 && (
+        <DatasetInfo
+          datasetFields={dataset.fields}
+          facets={dataset.facets}
+          run={dataset.createdByRun}
+        />
+      )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
     </Box>
   )

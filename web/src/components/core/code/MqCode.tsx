@@ -1,31 +1,30 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { THEME_EXTRA } from '../../../helpers/theme'
-import { Theme, alpha } from '@material-ui/core/styles'
+import { THEME_EXTRA, theme } from '../../../helpers/theme'
+import { alpha } from '@material-ui/core/styles'
+import { ocean } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import Box from '@material-ui/core/Box'
 import MqText from '../text/MqText'
 import React from 'react'
+import SyntaxHighlighter from 'react-syntax-highlighter'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    codeContainer: {
-      padding: `${theme.spacing(2)}px ${theme.spacing(4)}px`,
-      backgroundColor: alpha(theme.palette.common.white, 0.1),
-      borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
-      whiteSpace: 'pre-wrap'
-    }
-  })
+const styles = () => createStyles({})
 
 interface OwnProps {
   code?: string
+  language?: string
   description?: string
 }
 
-const MqCode: React.FC<OwnProps & WithStyles<typeof styles>> = ({ code, description, classes }) => {
+const MqCode: React.FC<OwnProps & WithStyles<typeof styles>> = ({
+  code,
+  description,
+  language
+}) => {
   return (
-    <Box className={classes.codeContainer}>
+    <Box>
       {description && (
         <Box mb={2}>
           <MqText bold font={'mono'} subdued>
@@ -33,9 +32,17 @@ const MqCode: React.FC<OwnProps & WithStyles<typeof styles>> = ({ code, descript
           </MqText>
         </Box>
       )}
-      <MqText font={'mono'} subdued>
-        {code ? code : 'Nothing to show here'}
-      </MqText>
+      <SyntaxHighlighter
+        language={language}
+        style={ocean}
+        customStyle={{
+          backgroundColor: alpha(theme.palette.common.white, 0.1),
+          borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
+          padding: theme.spacing(2)
+        }}
+      >
+        {code ? code : 'No code available'}
+      </SyntaxHighlighter>
     </Box>
   )
 }

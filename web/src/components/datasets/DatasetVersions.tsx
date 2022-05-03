@@ -11,6 +11,7 @@ import DatasetInfo from './DatasetInfo'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
+import RunStatus from '../jobs/RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
 const styles = (theme: ITheme) => {
@@ -25,7 +26,7 @@ const styles = (theme: ITheme) => {
   })
 }
 
-const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count', 'Lifecycle State']
+const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count', 'Dataset Creator (Run)', 'Lifecycle State']
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -53,7 +54,11 @@ const DatasetVersions: FunctionComponent<
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
-        <DatasetInfo datasetFields={infoView.fields} facets={infoView.facets} />
+        <DatasetInfo
+          datasetFields={infoView.fields}
+          facets={infoView.facets}
+          run={infoView.createdByRun}
+        />
       </>
     )
   }
@@ -83,6 +88,18 @@ const DatasetVersions: FunctionComponent<
               <TableCell align='left'>{version.version}</TableCell>
               <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
               <TableCell align='left'>{version.fields.length}</TableCell>
+              <TableCell align='left'>
+                <Box display={'flex'} alignItems={'center'}>
+                  {version.createdByRun ? (
+                    <>
+                      <RunStatus run={version.createdByRun} />
+                      {version.createdByRun ? version.createdByRun.id : 'N/A'}
+                    </>
+                  ) : (
+                    'N/A'
+                  )}
+                </Box>
+              </TableCell>
               <TableCell align='left'>{version.lifecycleState}</TableCell>
             </TableRow>
           )

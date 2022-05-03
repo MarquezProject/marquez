@@ -17,7 +17,8 @@ const MqJson: React.FC<OwnProps> = ({ code }) => {
       style={ocean}
       customStyle={{
         backgroundColor: alpha(theme.palette.common.white, 0.1),
-        borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`
+        borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
+        padding: theme.spacing(2)
       }}
     >
       {JSON.stringify(code, null, '  ')}
