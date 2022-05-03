@@ -5,7 +5,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 1.13.0
+    version: 1.13.1
   - condition: postgresql.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
@@ -29,4 +29,4 @@ name: marquez
 sources:
   - https://github.com/MarquezProject/marquez
   - https://marquezproject.github.io/marquez/
-version: 0.21.8
+version: 0.21.9
