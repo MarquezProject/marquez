@@ -20,8 +20,8 @@ paths:
       summary: Create a namespace
       description: Creates a new namespace object. A namespace enables the contextual grouping of related
         jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`),
-        underscores (`_`), dashes (`-`), colons (`:`), slashes (`/`), or dots (`.`).
-        A namespace is case-insensitive with a maximum length of `1024` characters.
+        underscores (`_`), at (`@`), dashes (`-`), colons (`:`), equals (`=`), semicolons (`;`), slashes (`/`),
+        or dots (`.`). A namespace is case-sensitive with a maximum length of `1024` characters.
         Note jobs and datasets will be unique within a namespace, but not across namespaces.
       tags:
         - Namespaces
@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatedNamespace'
+              $ref: '#/components/schemas/NamespaceMeta'
       responses:
         '200':
           description: OK
@@ -709,7 +709,7 @@ components:
       required: false
 
   schemas:
-    CreatedNamespace:
+    NamespaceMeta:
       type: object
       properties:
         ownerName:
