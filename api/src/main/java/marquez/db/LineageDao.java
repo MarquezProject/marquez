@@ -67,7 +67,7 @@ public interface LineageDao {
   Optional<UUID> getJobUuid(String jobName, String namespace);
 
   @SqlQuery(
-      "SELECT ds.*, dv.fields\n"
+      "SELECT ds.*, dv.fields, dv.lifecycle_state\n"
           + "FROM datasets ds\n"
           + "LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid\n"
           + "WHERE ds.uuid IN (<dsUuids>);")

@@ -40,6 +40,7 @@ export interface Dataset {
   lastModifiedAt: string
   description: string
   facets: object
+  deleted: boolean
 }
 
 export interface DatasetVersions {
@@ -60,6 +61,7 @@ export interface DatasetVersion {
   tags: string[]
   lastModifiedAt: string
   description: string
+  lifecycleState: string
   facets: object
 }
 

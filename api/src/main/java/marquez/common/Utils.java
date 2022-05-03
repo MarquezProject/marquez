@@ -204,6 +204,7 @@ public final class Utils {
    * @param sourceName The source name of the dataset.
    * @param physicalName The physical name of the dataset.
    * @param datasetName The dataset name.
+   * @param lifecycleState The dataset change like CREATE, DROP, TRUNCATE.
    * @param fields The fields of the dataset.
    * @param runId The UUID of the run linked to the dataset.
    * @return A {@link Version} object based on the specified job meta.
@@ -213,6 +214,7 @@ public final class Utils {
       String sourceName,
       String physicalName,
       String datasetName,
+      String lifecycleState,
       List<LineageEvent.SchemaField> fields,
       UUID runId) {
     DatasetVersionData data =
@@ -221,6 +223,7 @@ public final class Utils {
             .sourceName(sourceName)
             .physicalName(physicalName)
             .datasetName(datasetName)
+            .lifecycleState(lifecycleState)
             .schemaFields(fields)
             .runId(runId)
             .build();
@@ -259,6 +262,7 @@ public final class Utils {
                 data.getPhysicalName(),
                 data.getSchemaLocation(),
                 data.getFields().stream().map(Utils::joinField).collect(joining(VERSION_DELIM)),
+                data.getLifecycleState(),
                 data.getRunId())
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
@@ -275,6 +279,7 @@ public final class Utils {
     private String sourceName;
     private String physicalName;
     private String datasetName;
+    private String lifecycleState;
     private String schemaLocation;
     private Set<Triple<String, String, String>> fields;
     private UUID runId;

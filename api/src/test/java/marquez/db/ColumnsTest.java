@@ -285,4 +285,23 @@ public class ColumnsTest {
     final URI actual = Columns.uriOrNull(results, column);
     assertThat(actual).isNull();
   }
+
+  @Test
+  public void testBooleanOrDefault() throws SQLException {
+    final String column = "is_deleted";
+    when(results.getObject(column)).thenReturn(true);
+    when(results.getBoolean(column)).thenReturn(true);
+
+    final boolean actual = Columns.booleanOrDefault(results, column, false);
+    assertThat(actual).isTrue();
+  }
+
+  @Test
+  public void testBooleanOrDefaultWhenNoValue() throws SQLException {
+    final String column = "is_deleted";
+    when(results.getObject(column)).thenReturn(null);
+
+    final boolean actual = Columns.booleanOrDefault(results, column, true);
+    assertThat(actual).isTrue();
+  }
 }

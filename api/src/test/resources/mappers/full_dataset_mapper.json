@@ -4,6 +4,7 @@
     "name": "NAME"
   },
   "type": "DB_TABLE",
+  "lastLifecycleState": "TRUNCATE",
   "description": "DESCRIPTION",
   "name": "NAME",
   "physicalName": "PHYSICAL_NAME",

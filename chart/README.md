@@ -45,25 +45,26 @@ helm delete marquez
 
 ### [Marquez](https://github.com/MarquezProject/marquez) **parameters**
 
-| Parameter                    | Description                      | Default                  |
-|------------------------------|----------------------------------|--------------------------|
-| `marquez.replicaCount`       | Number of desired replicas       | `1`                      |
-| `marquez.image.registry`     | Marquez image registry           | `docker.io`              |
-| `marquez.image.repository`   | Marquez image repository         | `marquezproject/marquez` |
-| `marquez.image.tag`          | Marquez image tag                | `0.15.0`                 |
-| `marquez.image.pullPolicy`   | Image pull policy                | `IfNotPresent`           |
+| Parameter                    | Description                            | Default                  |
+|------------------------------|----------------------------------------|--------------------------|
+| `marquez.replicaCount`       | Number of desired replicas             | `1`                      |
+| `marquez.image.registry`     | Marquez image registry                 | `docker.io`              |
+| `marquez.image.repository`   | Marquez image repository               | `marquezproject/marquez` |
+| `marquez.image.tag`          | Marquez image tag                      | `0.15.0`                 |
+| `marquez.image.pullPolicy`   | Image pull policy                      | `IfNotPresent`           |
 | `marquez.existingSecretName` | Name of an existing secret containing db password ('marquez-db-password' key) | `nil` |
-| `marquez.db.host`            | PostgreSQL host                  | `localhost`              |
-| `marquez.db.port`            | PostgreSQL port                  | `5432`                   |
-| `marquez.db.name`            | PostgreSQL database              | `marquez`                |
-| `marquez.db.user`            | PostgreSQL user                  | `buendia`                |
-| `marquez.db.password`        | PostgreSQL password              | `macondo`                |
-| `marquez.migrateOnStartup`   | Execute Flyway migration         | `true`                   |
-| `marquez.hostname`           | Marquez hostname                 | `localhost`              |
-| `marquez.port`               | API host port                    | `5000`                   |
-| `marquez.adminPort`          | Heath/Liveness host port         | `5001`                   |
-| `marquez.resources.limits`   | K8s resource limit overrides     | `nil`                    |
-| `marquez.resources.requests` | K8s resource requests overrides  | `nil`                    |
+| `marquez.db.host`            | PostgreSQL host                        | `localhost`              |
+| `marquez.db.port`            | PostgreSQL port                        | `5432`                   |
+| `marquez.db.name`            | PostgreSQL database                    | `marquez`                |
+| `marquez.db.user`            | PostgreSQL user                        | `buendia`                |
+| `marquez.db.password`        | PostgreSQL password                    | `macondo`                |
+| `marquez.migrateOnStartup`   | Execute Flyway migration               | `true`                   |
+| `marquez.hostname`           | Marquez hostname                       | `localhost`              |
+| `marquez.port`               | API host port                          | `5000`                   |
+| `marquez.adminPort`          | Heath/Liveness host port               | `5001`                   |
+| `marquez.resources.limits`   | K8s resource limit overrides           | `nil`                    |
+| `marquez.resources.requests` | K8s resource requests overrides        | `nil`                    |
+| `marquez.podAnnotations`     | Additional pod annotations for Marquez | `{}`                     |
 
 ### [Marquez Web UI](https://github.com/MarquezProject/marquez-web) **parameters**
 

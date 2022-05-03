@@ -2,7 +2,10 @@
 
 package marquez.db;
 
+import static marquez.db.DatasetDaoTest.DATASET;
 import static marquez.db.LineageTestUtils.NAMESPACE;
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +28,7 @@ import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -532,6 +536,35 @@ public class LineageDaoTest {
         .hasSize(3)
         .extracting(ds -> ds.getName().getValue())
         .allMatch(str -> str.contains("outputData2"));
+  }
+
+  @Test
+  public void testGetDatasetDatalifecycleStateReturned() {
+    Dataset dataset =
+        new Dataset(
+            NAMESPACE,
+            DATASET,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    UpdateLineageRow row =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+
+    Set<DatasetData> datasetData =
+        lineageDao.getDatasetData(
+            Collections.singleton(row.getOutputs().get().get(0).getDatasetRow().getUuid()));
+
+    assertThat(datasetData)
+        .extracting(ds -> ds.getLastlifecycleState().orElse(""))
+        .anyMatch(str -> str.contains("CREATE"));
   }
 
   @Test

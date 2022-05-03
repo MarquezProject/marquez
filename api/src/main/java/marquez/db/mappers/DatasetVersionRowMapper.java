@@ -2,6 +2,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
@@ -23,6 +24,7 @@ public final class DatasetVersionRowMapper implements RowMapper<DatasetVersionRo
         timestampOrThrow(results, Columns.CREATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         uuidOrThrow(results, Columns.VERSION),
+        stringOrNull(results, Columns.LIFECYCLE_STATE),
         uuidOrNull(results, Columns.RUN_UUID));
   }
 }

@@ -21,7 +21,7 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.3.0'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.4.2'
     }
 }
 
@@ -54,14 +54,14 @@ subprojects {
 
     ext {
         assertjVersion = '3.22.0'
-        dropwizardVersion = '2.0.28'
+        dropwizardVersion = '2.0.29'
         jacocoVersion = '0.8.7'
         junit5Version = '5.8.2'
         lombokVersion = '1.18.22'
         mockitoVersion = '4.4.0'
         openlineageVersion = '0.6.2'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.3.3'
+        postgresqlVersion = '42.3.4'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 

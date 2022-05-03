@@ -2,6 +2,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.booleanOrDefault;
 import static marquez.db.Columns.stringArrayOrThrow;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
@@ -62,9 +63,11 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toFields(results, "fields"),
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
+          stringOrNull(results, Columns.LIFECYCLE_STATE),
           stringOrNull(results, Columns.DESCRIPTION),
           uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
-          toFacetsOrNull(results, Columns.FACETS));
+          toFacetsOrNull(results, Columns.FACETS),
+          booleanOrDefault(results, Columns.IS_DELETED, false));
     } else {
       return new Stream(
           new DatasetId(
@@ -79,9 +82,11 @@ public final class DatasetMapper implements RowMapper<Dataset> {
           toFields(results, "fields"),
           toTags(results, "tags"),
           timestampOrNull(results, Columns.LAST_MODIFIED_AT),
+          stringOrNull(results, Columns.LIFECYCLE_STATE),
           stringOrNull(results, Columns.DESCRIPTION),
           uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
-          toFacetsOrNull(results, Columns.FACETS));
+          toFacetsOrNull(results, Columns.FACETS),
+          booleanOrDefault(results, Columns.IS_DELETED, false));
     }
   }
 
