@@ -17,6 +17,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/namespace'
     put:
+      operationId: putNamespace
       summary: Create a namespace
       description: Creates a new namespace object. A namespace enables the contextual grouping of related
         jobs and datasets. Namespaces must contain only letters (`a-z`, `A-Z`), numbers (`0-9`),
@@ -38,6 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Namespace'
     get:
+      operationId: getNamespace
       summary: Retrieve a namespace
       description: Returns a namespace.
       tags:
@@ -52,6 +54,7 @@ paths:
 
   /namespaces:
     get:
+      operationId: getNamespaces
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -71,6 +74,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/source'
     put:
+      operationId: putSource
       summary: Create a source
       description: Creates a new source object. A source is the physical location of a dataset such as
         a table in PostgreSQL, or topic in Kafka. A source enables the grouping of physical datasets
@@ -91,6 +95,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Source'
     get:
+      operationId: getSource
       summary: Retrieve a source
       description: Returns a source.
       tags:
@@ -105,6 +110,7 @@ paths:
 
   /sources:
     get:
+      operationId: getSources
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -125,6 +131,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/dataset'
     put:
+      operationId: putDataset
       summary: Create a dataset
       description: Creates a new dataset.
       deprecated: true
@@ -145,6 +152,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Dataset'
     get:
+      operationId: getDataset
       summary: Retrieve a dataset
       description: Returns a dataset.
       tags:
@@ -163,6 +171,7 @@ paths:
       - $ref: '#/components/parameters/dataset'
       - $ref: '#/components/parameters/version'
     get:
+      operationId: getDatasetVersion
       summary: Retrieve a version for a dataset
       description: Returns a version for a dataset.
       tags:
@@ -180,6 +189,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/dataset'
     get:
+      operationId: getDatasetVersions
       summary: List all versions for a dataset
       description: Returns a list of versions for a dataset.
       tags:
@@ -197,6 +207,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/dataset'
     get:
+      operationId: getDatasets
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -218,6 +229,7 @@ paths:
       - $ref: '#/components/parameters/dataset'
       - $ref: '#/components/parameters/tag'
     post:
+      operationId: addTagToDataset
       summary: Tag a dataset
       description: Tag an existing dataset.
       tags:
@@ -237,6 +249,7 @@ paths:
       - $ref: '#/components/parameters/field'
       - $ref: '#/components/parameters/tag'
     post:
+      operationId: addTagToFieldOfDataset
       summary: Tag a field
       description: Tag an existing field of a dataset.
       tags:
@@ -254,6 +267,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
     put:
+      operationId: putJob
       summary: Create a job
       description: Creates a new job object. All job objects are immutable and are uniquely identified by a generated ID.
         Marquez will create a version of a job each time the contents of the object is modified. For example, the `location`
@@ -275,6 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Job'
     get:
+      operationId: getJob
       summary: Retrieve a job
       description: Retrieve a job.
       tags:
@@ -291,6 +306,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/namespace'
     get:
+      operationId: getJobs
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -312,6 +328,7 @@ paths:
       - $ref: '#/components/parameters/job'
       - $ref: '#/components/parameters/version'
     get:
+      operationId: getJobVersion
       summary: Retrieve a version for a job
       description: Returns a version for a job.
       tags:
@@ -329,6 +346,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
     get:
+      operationId: getJobVersions
       summary: List all versions for a job
       description: Returns a list of versions for a job.
       tags:
@@ -346,6 +364,7 @@ paths:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
     post:
+      operationId: createRun
       summary: Create a run
       description: Creates a new run object for a job.
       deprecated: true
@@ -364,6 +383,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Run'
     get:
+      operationId: getRuns
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -383,6 +403,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/runId'
     get:
+      operationId: getRun
       summary: Retrieve a run
       description: Retrieve a run.
       tags:
@@ -400,6 +421,7 @@ paths:
       - $ref: '#/components/parameters/runId'
       - $ref: '#/components/parameters/at'
     post:
+      operationId: startRun
       summary: Start a run
       description: Marks the run as `RUNNING`.
       deprecated: true
@@ -418,6 +440,7 @@ paths:
       - $ref: '#/components/parameters/runId'
       - $ref: '#/components/parameters/at'
     post:
+      operationId: completeRun
       summary: Complete a run
       description: Marks the run as `COMPLETED`.
       deprecated: true
@@ -436,6 +459,7 @@ paths:
       - $ref: '#/components/parameters/runId'
       - $ref: '#/components/parameters/at'
     post:
+      operationId: failRun
       summary: Fail a run
       description: Marks the run as `FAILED`.
       deprecated: true
@@ -454,6 +478,7 @@ paths:
       - $ref: '#/components/parameters/runId'
       - $ref: '#/components/parameters/at'
     post:
+      operationId: abortRun
       summary: Abort a run
       description: Marks the run as `ABORTED`.
       deprecated: true
@@ -469,6 +494,7 @@ paths:
 
   /lineage:
     post:
+      operationId: recordLineage
       summary: Record a single lineage event
       description: Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.
       tags:
@@ -482,6 +508,7 @@ paths:
         '200':
           description: OK
     get:
+      operationId: getLineage
       parameters:
         - $ref: '#/components/parameters/nodeId'
         - $ref: '#/components/parameters/depth'
@@ -500,6 +527,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/tag'
     put:
+      operationId: putTag
       summary: Create a tag
       description: Creates a new tag object.
       tags:
@@ -519,6 +547,7 @@ paths:
 
   /tags:
     get:
+      operationId: getTags
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -536,6 +565,7 @@ paths:
 
   /search:
     get:
+      operationId: search
       parameters:
         - $ref: '#/components/parameters/q'
         - $ref: '#/components/parameters/filter'
