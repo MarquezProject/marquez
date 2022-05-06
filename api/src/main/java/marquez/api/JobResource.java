@@ -175,10 +175,6 @@ public class JobResource extends BaseResource {
     JobRow job =
         jobService
             .findJobByNameAsRow(namespaceName.getValue(), jobName.getValue())
-            .or(
-                () ->
-                    jobService.findJobBySimpleNameAsRow(
-                        namespaceName.getValue(), jobName.getValue()))
             .orElseThrow(
                 () ->
                     new IllegalArgumentException(

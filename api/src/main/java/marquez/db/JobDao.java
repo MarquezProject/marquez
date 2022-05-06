@@ -91,28 +91,20 @@ public interface JobDao extends BaseDao {
   @SqlQuery(
       """
       WITH RECURSIVE job_ids AS (
-        SELECT uuid, symlink_target_uuid
-        FROM jobs j
+        SELECT uuid, uuid AS link_target_uuid, symlink_target_uuid
+        FROM jobs_view j
         WHERE j.namespace_name=:namespaceName AND j.name=:jobName
         UNION
-        SELECT j.uuid, j.symlink_target_uuid
-        FROM jobs j
+        SELECT jn.uuid, j.uuid AS link_target_uuid, j.symlink_target_uuid
+        FROM jobs_view j
         INNER JOIN job_ids jn ON j.uuid=jn.symlink_target_uuid
       )
       SELECT j.*, n.name AS namespace_name
       FROM jobs AS j
-      INNER JOIN job_ids jn ON jn.uuid=j.uuid AND jn.symlink_target_uuid IS NULL
+      INNER JOIN job_ids jn ON jn.link_target_uuid=j.uuid AND jn.symlink_target_uuid IS NULL
       INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
       """)
   Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
-
-  @SqlQuery(
-      """
-          SELECT j.* FROM jobs AS j
-          WHERE j.namespace_name = :namespaceName AND
-          j.name = :jobName
-      """)
-  Optional<JobRow> findJobBySimpleNameAsRow(String namespaceName, String jobName);
 
   @SqlQuery(
       "SELECT j.*, jc.context, f.facets\n"
