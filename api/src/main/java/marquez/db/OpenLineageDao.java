@@ -133,6 +133,7 @@ public interface OpenLineageDao extends BaseDao {
             description,
             jobContext.getUuid(),
             location,
+            null,
             jobDao.toJson(toDatasetId(event.getInputs()), mapper));
     bag.setJob(job);
 

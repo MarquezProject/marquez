@@ -14,13 +14,15 @@ export function stopWatchDuration(durationMs: number) {
   if (duration.asMilliseconds() === 0) {
     return '0'
   }
-
-  if (duration.asHours() > 1) {
-    return `${duration.hours()}h ${addLeadingZero(duration.seconds())}s`
+  if (duration.asHours() > 24) {
+    return `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`
+  }
+  if (duration.asMinutes() > 60) {
+    return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`
   }
   if (duration.asSeconds() > 1) {
     return `${duration.minutes()}m ${addLeadingZero(duration.seconds())}s`
   } else {
-    return `${duration.milliseconds()} ms`
+    return `${duration.asMilliseconds()} ms`
   }
 }
