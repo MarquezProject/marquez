@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.validation.Valid;
 import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
@@ -61,6 +62,55 @@ public class LineageTestUtils {
       JobFacet jobFacet,
       List<Dataset> inputs,
       List<Dataset> outputs) {
+    return createLineageRow(dao, jobName, status, jobFacet, inputs, outputs, null);
+  }
+
+  /**
+   * Create an {@link UpdateLineageRow} from the input job details and datasets.
+   *
+   * @param dao
+   * @param jobName
+   * @param status
+   * @param jobFacet
+   * @param inputs
+   * @param outputs
+   * @param parentRunFacet
+   * @return
+   */
+  public static UpdateLineageRow createLineageRow(
+      OpenLineageDao dao,
+      String jobName,
+      String status,
+      JobFacet jobFacet,
+      List<Dataset> inputs,
+      List<Dataset> outputs,
+      @Valid LineageEvent.ParentRunFacet parentRunFacet) {
+    return createLineageRow(
+        dao, jobName, status, jobFacet, inputs, outputs, parentRunFacet, ImmutableMap.of());
+  }
+
+  /**
+   * Create an {@link UpdateLineageRow} from the input job details and datasets.
+   *
+   * @param dao
+   * @param jobName
+   * @param status
+   * @param jobFacet
+   * @param inputs
+   * @param outputs
+   * @param parentRunFacet
+   * @param runFacets
+   * @return
+   */
+  public static UpdateLineageRow createLineageRow(
+      OpenLineageDao dao,
+      String jobName,
+      String status,
+      JobFacet jobFacet,
+      List<Dataset> inputs,
+      List<Dataset> outputs,
+      @Valid LineageEvent.ParentRunFacet parentRunFacet,
+      ImmutableMap<String, Object> runFacets) {
     NominalTimeRunFacet nominalTimeRunFacet = new NominalTimeRunFacet();
     nominalTimeRunFacet.setNominalStartTime(
         Instant.now().atZone(LOCAL_ZONE).truncatedTo(ChronoUnit.HOURS));
@@ -72,7 +122,7 @@ public class LineageTestUtils {
         new LineageEvent(
             status,
             Instant.now().atZone(LOCAL_ZONE),
-            new Run(runId.toString(), new RunFacet(nominalTimeRunFacet, null, ImmutableMap.of())),
+            new Run(runId.toString(), new RunFacet(nominalTimeRunFacet, parentRunFacet, runFacets)),
             new Job(NAMESPACE, jobName, jobFacet),
             inputs,
             outputs,
