@@ -25,6 +25,7 @@ import org.postgresql.util.PGInterval;
 
 @Slf4j
 public final class Columns {
+
   private Columns() {}
 
   private static final ObjectMapper MAPPER = Utils.getMapper();
@@ -77,6 +78,9 @@ public final class Columns {
 
   /* STREAM VERSION ROW COLUMNS */
   public static final String SCHEMA_LOCATION = "schema_location";
+
+  /* JOB ROW COLUMNS */
+  public static final String SYMLINK_TARGET_UUID = "symlink_target_uuid";
 
   /* JOB VERSION I/O ROW COLUMNS */
   public static final String INPUT_UUIDS = "input_uuids";

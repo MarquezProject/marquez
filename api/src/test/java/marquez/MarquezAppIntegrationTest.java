@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -42,11 +43,20 @@ import marquez.client.models.Stream;
 import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.DatasetName;
+import marquez.common.models.JobType;
+import marquez.db.JobDao;
+import marquez.db.NamespaceDao;
+import marquez.db.models.JobRow;
+import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.postgresql.util.PGobject;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
@@ -625,5 +635,69 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     final SearchResult result = searchResults.getResults().get(0);
     assertThat(result.getType()).isEqualTo(SearchResult.ResultType.DATASET);
     assertThat(result.getName()).isEqualTo(datasetName);
+  }
+
+  @Test
+  public void testApp_getJob() throws SQLException {
+    Jdbi jdbi =
+        Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
+            .installPlugin(new SqlObjectPlugin())
+            .installPlugin(new PostgresPlugin());
+    createNamespace(NAMESPACE_NAME);
+
+    // Create job
+    String jobName = newJobName().getValue();
+    final JobMeta jobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    final Job originalJob = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+
+    String targetJobName = newJobName().getValue();
+    final JobMeta targetJobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    final Job targetJob = client.createJob(NAMESPACE_NAME, targetJobName, targetJobMeta);
+
+    JobDao jobDao = jdbi.onDemand(JobDao.class);
+    NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
+    Optional<NamespaceRow> namespaceRow = namespaceDao.findNamespaceByName(NAMESPACE_NAME);
+    Optional<JobRow> originalJobRow = jobDao.findJobByNameAsRow(NAMESPACE_NAME, jobName);
+    Optional<JobRow> targetJobRow = jobDao.findJobByNameAsRow(NAMESPACE_NAME, targetJobName);
+    PGobject inputs = new PGobject();
+    inputs.setType("json");
+    inputs.setValue("[]");
+    originalJobRow.ifPresent(
+        j -> {
+          jobDao.upsertJob(
+              j.getUuid(),
+              JobType.valueOf(JOB_TYPE.name()),
+              Instant.now(),
+              namespaceRow.get().getUuid(),
+              NAMESPACE_NAME,
+              jobName,
+              JOB_DESCRIPTION,
+              j.getJobContextUuid().orElse(null),
+              JOB_LOCATION.toString(),
+              targetJobRow.get().getUuid(),
+              inputs);
+        });
+
+    Job job = client.getJob(NAMESPACE_NAME, jobName);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("namespace", NAMESPACE_NAME)
+        .hasFieldOrPropertyWithValue("name", targetJobName);
   }
 }

@@ -23,6 +23,7 @@ import javax.servlet.DispatcherType;
 import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.filter.JobRedirectFilter;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
 import marquez.db.DbMigration;
@@ -115,9 +116,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
       env.jersey().register(new TracingContainerResponseFilter());
     }
 
-    registerResources(config, env, source);
+    MarquezContext marquezContext = buildMarquezContext(config, env, (ManagedDataSource) source);
+    registerResources(config, env, marquezContext);
     registerServlets(env);
-    registerFilters(env);
+    registerFilters(env, marquezContext);
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
@@ -126,21 +128,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   public void registerResources(
-      @NonNull MarquezConfig config, @NonNull Environment env, @NonNull DataSource source) {
-    final JdbiFactory factory = new JdbiFactory();
-    final Jdbi jdbi =
-        factory
-            .build(env, config.getDataSourceFactory(), (ManagedDataSource) source, DB_POSTGRES)
-            .installPlugin(new SqlObjectPlugin())
-            .installPlugin(new PostgresPlugin());
-    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
-    if (isSentryEnabled(config)) {
-      sqlLogger = new TracingSQLLogger(sqlLogger);
-    }
-    jdbi.setSqlLogger(sqlLogger);
-
-    final MarquezContext context =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+      @NonNull MarquezConfig config, @NonNull Environment env, MarquezContext context) {
 
     if (config.getGraphql().isEnabled()) {
       env.servlets()
@@ -154,6 +142,25 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
   }
 
+  private MarquezContext buildMarquezContext(
+      MarquezConfig config, Environment env, ManagedDataSource source) {
+    final JdbiFactory factory = new JdbiFactory();
+    final Jdbi jdbi =
+        factory
+            .build(env, config.getDataSourceFactory(), source, DB_POSTGRES)
+            .installPlugin(new SqlObjectPlugin())
+            .installPlugin(new PostgresPlugin());
+    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
+    if (isSentryEnabled(config)) {
+      sqlLogger = new TracingSQLLogger(sqlLogger);
+    }
+    jdbi.setSqlLogger(sqlLogger);
+
+    final MarquezContext context =
+        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+    return context;
+  }
+
   private void registerServlets(@NonNull Environment env) {
     log.debug("Registering servlets...");
 
@@ -161,7 +168,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
     env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
   }
 
-  private void registerFilters(@NonNull Environment env) {
+  private void registerFilters(@NonNull Environment env, MarquezContext marquezContext) {
     env.jersey().getResourceConfig().register(new LoggingMdcFilter());
+    env.jersey()
+        .getResourceConfig()
+        .register(new JobRedirectFilter(marquezContext.getJobService()));
   }
 }

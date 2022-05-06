@@ -10,12 +10,12 @@ services:
       - "${API_PORT}:${API_PORT}"
       - "${API_ADMIN_PORT}:${API_ADMIN_PORT}"
     volumes:
-      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
+      - utils:/opt/marquez
     links:
       - "db:postgres"
     depends_on:
       - db
-    entrypoint: ["./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
+    entrypoint: ["/opt/marquez/wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   web:
     image: "marquezproject/marquez-web:${TAG}"
@@ -42,6 +42,10 @@ services:
       - MARQUEZ_USER=marquez
       - MARQUEZ_PASSWORD=marquez
     volumes:
-      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - db-init:/docker-entrypoint-initdb.d
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
+
+volumes:
+  utils:
+  db-init:
