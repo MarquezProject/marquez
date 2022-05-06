@@ -39,7 +39,7 @@ spec:
               port: http
           env:
             - name: MARQUEZ_HOST
-              value: {{ .Values.marquez.hostname | quote }}
+              value: {{ include "common.names.fullname" . }}
             - name: MARQUEZ_PORT
               value: {{ .Values.marquez.port | quote }}
           {{- if .Values.web.resources }}

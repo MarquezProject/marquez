@@ -24,6 +24,7 @@ public class JobRow {
   @Nullable UUID jobContextUuid;
   @Nullable String location;
   @Nullable Set<DatasetId> inputs;
+  @Nullable UUID symlinkTargetId;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

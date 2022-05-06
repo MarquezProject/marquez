@@ -18,7 +18,7 @@ jobs:
   build-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:current
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
@@ -44,7 +44,8 @@ jobs:
 
   build-image-api:
     working_directory: ~/marquez
-    machine: true
+    machine:
+      image: ubuntu-2004:current
     steps:
       - checkout
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
@@ -54,7 +55,8 @@ jobs:
 
   build-image-web:
     working_directory: ~/marquez/web
-    machine: true
+    machine:
+      image: ubuntu-2004:current
     steps:
       - *checkout_project_root
       - run: docker build --no-cache --tag "marquezproject/marquez-web:${CIRCLE_SHA1}" .
@@ -85,7 +87,7 @@ jobs:
   build-client-java:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:current
     steps:
       - checkout
       - restore_cache:
@@ -142,7 +144,7 @@ jobs:
   release-java:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:current
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
@@ -165,7 +167,8 @@ jobs:
 
   release-docker:
     working_directory: ~/marquez
-    machine: true
+    machine:
+      image: ubuntu-2004:current
     steps:
       - checkout
       - run: ./docker/login.sh

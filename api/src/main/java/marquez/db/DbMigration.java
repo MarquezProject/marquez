@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.output.MigrateResult;
 
 @Slf4j
 public final class DbMigration {
@@ -31,8 +32,9 @@ public final class DbMigration {
     // issues before app termination.
     try {
       log.info("Migrating database...");
-      final int migrations = flyway.migrate();
-      log.info("Successfully applied '{}' migrations to database.", migrations);
+      final MigrateResult migrateResult = flyway.migrate();
+      log.info(
+          "Successfully applied '{}' migrations to database.", migrateResult.migrationsExecuted);
     } catch (FlywayException errorOnDbMigrate) {
       log.error("Failed to apply migration to database.", errorOnDbMigrate);
       try {
