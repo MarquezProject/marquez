@@ -19,6 +19,7 @@ public class JobRow {
   @NonNull Instant updatedAt;
   @NonNull String namespaceName;
   @NonNull String name;
+  @NonNull String simpleName;
   @Nullable String description;
   @Nullable UUID currentVersionUuid;
   @Nullable UUID jobContextUuid;

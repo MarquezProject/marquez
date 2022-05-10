@@ -23,11 +23,14 @@ import marquez.client.models.Job;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.service.models.LineageEvent;
+import org.jdbi.v3.core.Jdbi;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 public class OpenLineageIntegrationTest extends BaseIntegrationTest {
@@ -49,6 +52,27 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         // EVENT_LARGE,
         NULL_NOMINAL_END_TIME,
         EVENT_NAMESPACE_NAMING);
+  }
+
+  @AfterEach
+  public void tearDown() {
+    Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
+        .withHandle(
+            handle -> {
+              handle.execute("DELETE FROM lineage_events");
+              handle.execute("DELETE FROM runs_input_mapping");
+              handle.execute("DELETE FROM dataset_versions_field_mapping");
+              handle.execute("DELETE FROM stream_versions");
+              handle.execute("DELETE FROM dataset_versions");
+              handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
+              handle.execute("DELETE FROM run_states");
+              handle.execute("DELETE FROM runs");
+              handle.execute("DELETE FROM run_args");
+              handle.execute("DELETE FROM job_versions_io_mapping");
+              handle.execute("DELETE FROM job_versions");
+              handle.execute("DELETE FROM jobs");
+              return null;
+            });
   }
 
   @Test
@@ -174,6 +198,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final JsonNode jobFacetsAsJson = jobAsJson.path("facets");
 
     final Job job = client.getJob(jobNamespace, jobName);
+    LoggerFactory.getLogger(getClass()).info("Got job from server {}", job);
     if (!jobFacetsAsJson.isMissingNode()) {
       final JsonNode facetsForRunAsJson =
           Utils.getMapper().convertValue(job.getFacets(), JsonNode.class);

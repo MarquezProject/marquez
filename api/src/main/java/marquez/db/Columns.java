@@ -32,6 +32,7 @@ public final class Columns {
 
   /* COMMON ROW COLUMNS */
   public static final String ROW_UUID = "uuid";
+  public static final String PARENT_RUN_UUID = "parent_run_uuid";
   public static final String TYPE = "type";
   public static final String CREATED_AT = "created_at";
   public static final String UPDATED_AT = "updated_at";
@@ -80,6 +81,7 @@ public final class Columns {
   public static final String SCHEMA_LOCATION = "schema_location";
 
   /* JOB ROW COLUMNS */
+  public static final String SIMPLE_NAME = "simple_name";
   public static final String SYMLINK_TARGET_UUID = "symlink_target_uuid";
 
   /* JOB VERSION I/O ROW COLUMNS */

@@ -28,7 +28,7 @@ AS
            f.name,
            f.namespace_name,
            j.name AS simple_name,
-           f.parent_job_uuid,
+           j.parent_job_uuid,
            j.type,
            j.created_at,
            j.updated_at,

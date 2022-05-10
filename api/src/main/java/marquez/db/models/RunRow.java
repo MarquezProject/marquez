@@ -21,7 +21,9 @@ public class RunRow {
   @Getter @NonNull private final UUID uuid;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
+  @Getter @NonNull private final UUID jobUuid;
   @Nullable private final UUID jobVersionUuid;
+  @Nullable private final UUID parentRunUuid;
   @Getter @NonNull private final UUID runArgsUuid;
   @Getter @NonNull private final List<DatasetVersionId> inputVersions;
   @Getter @NonNull private final List<DatasetVersionId> outputVersions;
@@ -37,6 +39,10 @@ public class RunRow {
 
   public boolean hasInputVersionUuids() {
     return !inputVersions.isEmpty();
+  }
+
+  public Optional<UUID> getParentRunUuid() {
+    return Optional.ofNullable(parentRunUuid);
   }
 
   public Optional<UUID> getJobVersionUuid() {
