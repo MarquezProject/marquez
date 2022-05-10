@@ -26,6 +26,7 @@ AS
 SELECT r.uuid,
        r.created_at,
        r.updated_at,
+       r.parent_run_uuid,
        job_version_uuid,
        run_args_uuid,
        nominal_start_time,
