@@ -44,6 +44,7 @@ public final class JobMapper implements RowMapper<Job> {
             JobName.of(stringOrThrow(results, Columns.NAME))),
         JobType.valueOf(stringOrThrow(results, Columns.TYPE)),
         JobName.of(stringOrThrow(results, Columns.NAME)),
+        stringOrThrow(results, Columns.SIMPLE_NAME),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         getDatasetFromJsonOrNull(results, "current_inputs"),

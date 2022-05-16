@@ -26,6 +26,7 @@ public final class Job {
   @Getter private final JobId id;
   @Getter private final JobType type;
   @Getter private final JobName name;
+  @Getter private final String simpleName;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
@@ -42,6 +43,7 @@ public final class Job {
       @NonNull final JobId id,
       @NonNull final JobType type,
       @NonNull final JobName name,
+      @NonNull String simpleName,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final Set<DatasetId> inputs,
@@ -55,6 +57,7 @@ public final class Job {
     this.id = id;
     this.type = type;
     this.name = name;
+    this.simpleName = simpleName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.namespace = id.getNamespace();

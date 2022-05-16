@@ -243,7 +243,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
     assertThat(job)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("simpleName", task1Name);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)
@@ -288,13 +289,15 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     Job airflowTask = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
     assertThat(airflowTask)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("simpleName", task1Name);
 
     Job sparkJob = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name + "." + sparkTaskName);
     assertThat(sparkJob)
         .isNotNull()
         .hasFieldOrPropertyWithValue(
-            "id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name + "." + sparkTaskName));
+            "id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name + "." + sparkTaskName))
+        .hasFieldOrPropertyWithValue("simpleName", sparkTaskName);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)

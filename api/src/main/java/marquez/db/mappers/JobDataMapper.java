@@ -37,6 +37,7 @@ public class JobDataMapper implements RowMapper<JobData> {
             JobName.of(stringOrThrow(results, Columns.NAME))),
         JobType.valueOf(stringOrThrow(results, Columns.TYPE)),
         JobName.of(stringOrThrow(results, Columns.NAME)),
+        stringOrThrow(results, Columns.SIMPLE_NAME),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),

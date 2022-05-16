@@ -211,6 +211,7 @@ public class MarquezClientTest {
           JOB_ID,
           JOB_TYPE,
           JOB_NAME,
+          JOB_NAME,
           CREATED_AT,
           UPDATED_AT,
           NAMESPACE_NAME,
@@ -301,6 +302,7 @@ public class MarquezClientTest {
       new Job(
           JOB_ID,
           JOB_TYPE,
+          JOB_NAME,
           JOB_NAME,
           CREATED_AT,
           UPDATED_AT,
