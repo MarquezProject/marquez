@@ -194,6 +194,7 @@ public final class ModelGenerator {
         newJobType(),
         jobId.getName(),
         jobId.getName(),
+        null,
         now,
         now,
         jobId.getNamespace(),

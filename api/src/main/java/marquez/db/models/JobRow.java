@@ -20,6 +20,7 @@ public class JobRow {
   @NonNull String namespaceName;
   @NonNull String name;
   @NonNull String simpleName;
+  @Nullable String parentJobName;
   @Nullable String description;
   @Nullable UUID currentVersionUuid;
   @Nullable UUID jobContextUuid;

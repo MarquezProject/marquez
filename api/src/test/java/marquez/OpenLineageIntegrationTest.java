@@ -202,12 +202,14 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
     assertThat(job)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
   }
@@ -244,12 +246,14 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(job)
         .isNotNull()
         .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
-        .hasFieldOrPropertyWithValue("simpleName", task1Name);
+        .hasFieldOrPropertyWithValue("simpleName", task1Name)
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
     UUID parentRunUuid = Utils.toNameBasedUuid(dagName, airflowParentRunId);
@@ -290,19 +294,22 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(airflowTask)
         .isNotNull()
         .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
-        .hasFieldOrPropertyWithValue("simpleName", task1Name);
+        .hasFieldOrPropertyWithValue("simpleName", task1Name)
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
 
     Job sparkJob = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name + "." + sparkTaskName);
     assertThat(sparkJob)
         .isNotNull()
         .hasFieldOrPropertyWithValue(
             "id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name + "." + sparkTaskName))
-        .hasFieldOrPropertyWithValue("simpleName", sparkTaskName);
+        .hasFieldOrPropertyWithValue("simpleName", sparkTaskName)
+        .hasFieldOrPropertyWithValue("parentJobName", dagName + "." + task1Name);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)
         .isNotNull()
-        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName));
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
   }

@@ -14,12 +14,13 @@ CREATE OR REPLACE VIEW jobs_view
 AS
     with recursive
      job_fqn AS (
-        SELECT uuid, name, namespace_name, parent_job_uuid
+        SELECT uuid, name, namespace_name, NULL::text AS parent_job_name, parent_job_uuid
         FROM jobs
-        UNION ALL
+        UNION
         SELECT j1.uuid,
                CASE WHEN j2.name IS NOT NULL THEN j2.name || '.' || j1.name ELSE j1.name END AS name,
                CASE WHEN j2.namespace_name IS NOT NULL THEN j2.namespace_name ELSE j1.namespace_name END AS namespace_name,
+               j2.name AS parent_job_name,
                j2.parent_job_uuid
         FROM jobs j1
         INNER JOIN job_fqn j2 ON j2.uuid=j1.parent_job_uuid
@@ -29,6 +30,7 @@ AS
            f.namespace_name,
            j.name AS simple_name,
            j.parent_job_uuid,
+           f.parent_job_name,
            j.type,
            j.created_at,
            j.updated_at,

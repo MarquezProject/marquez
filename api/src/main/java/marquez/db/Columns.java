@@ -81,6 +81,7 @@ public final class Columns {
   public static final String SCHEMA_LOCATION = "schema_location";
 
   /* JOB ROW COLUMNS */
+  public static final String PARENT_JOB_NAME = "parent_job_name";
   public static final String SIMPLE_NAME = "simple_name";
   public static final String SYMLINK_TARGET_UUID = "symlink_target_uuid";
 
