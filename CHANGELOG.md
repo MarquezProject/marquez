@@ -7,10 +7,18 @@
 * Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 * Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [@wslulciuc](https://github.com/wslulciuc)
 * Add support for job renaming/redirection via symlink [@collado-mike](https://github.com/collado-mike)
+* Add `Created by` view for dataset versions along with SQL syntax highlighting in web UI [@phixMe](https://github.com/phixMe)
+* Add `operationId` to openapi spec [@phixMe](https://github.com/phixMe)
 
 ### Changed
 
 * Upgrade Flyway to v7.6.0 [@dakshin-k](https://github.com/dakshin-k)
+
+### Fixed
+
+* Remove size limits on namespaces, dataset names, and and source connection urls [@collado-mike](https://github.com/collado-mike)
+* Update namespace names to allow `=`, `@`, and `;` [@mobuchowski](https://github.com/mobuchowski)
+* Time duration display in web UI [@phixMe](https://github.com/phixMe)
 
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
 
