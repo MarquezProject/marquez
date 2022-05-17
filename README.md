@@ -52,6 +52,8 @@ The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) li
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
+> **Note:** Port 5000 is now reserved for MacOS. If running locally on MacOS, you can run `./docker/up.sh --api-port 9000` to configure the API to listen on port 9000 instead. Keep in mind that you will need to update the URLs below with the appropriate port number.
+
 **`GRAPHQL`**
 
 To explore metadata via graphql, browse to [http://localhost:5000/graphql-playground](http://localhost:5000/graphql-playground). The graphql endpoint is currently in _beta_ and is located at [http://localhost:5000/api/v1-beta/graphql](http://localhost:5000/api/v1-beta/graphql).
