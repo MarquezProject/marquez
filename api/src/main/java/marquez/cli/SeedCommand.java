@@ -53,7 +53,7 @@ import marquez.client.models.SourceMeta;
  * --port}. This command is meant to be used to explore the features of Marquez. For example,
  * lineage graph, dataset schemas, job run history, etc.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
  * For example, to override the {@code port}:
  *

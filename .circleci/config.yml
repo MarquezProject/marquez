@@ -29,6 +29,7 @@ jobs:
             - v1-api-{{ .Branch }}
       - run: ./.circleci/get-jdk17.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
+      - run: ./gradlew --no-daemon --stacktrace api:javadoc
       - run: ./gradlew --no-daemon --stacktrace api:build
       - run: ./gradlew --no-daemon api:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
@@ -95,6 +96,7 @@ jobs:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
       - run: ./.circleci/get-jdk17.sh
+      - run: ./gradlew --no-daemon --stacktrace clients:java:javadoc
       - run: ./gradlew --no-daemon --stacktrace clients:java:build
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
       - run: bash <(curl -s https://codecov.io/bash)
@@ -132,7 +134,7 @@ jobs:
             - ./dist/*.whl
             - ./dist/*.tar.gz
 
-  lint-docs-api:
+  lint-spec-api:
     working_directory: ~/marquez
     docker:
       - image: cimg/node:12.22.7
@@ -187,7 +189,7 @@ workflows:
       - build-client-java
       - unit-test-web
       - unit-test-client-python
-      - lint-docs-api
+      - lint-spec-api
   release:
     jobs:
       - build-client-python:
