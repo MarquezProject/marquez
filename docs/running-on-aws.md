@@ -89,9 +89,9 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
 
    ```bash
    helm upgrade --install marquez .
-     --set marquez.db.host <AWS-RDS-HOST>
-     --set marquez.db.user <AWS-RDS-USERNAME>
-     --set marquez.db.password <AWS-RDS-PASSWORD>
+     --set marquez.db.host=<AWS-RDS-HOST>
+     --set marquez.db.user=<AWS-RDS-USERNAME>
+     --set marquez.db.password=<AWS-RDS-PASSWORD>
      --namespace marquez
      --atomic
      --wait
