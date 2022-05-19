@@ -38,6 +38,8 @@ $ ./docker/up.sh
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide.
 
+> **Note:** Port 5000 is now reserved for MacOS. If running locally on MacOS, you can run `./docker/up.sh --api-port 9000` to configure the API to listen on port 9000 instead. Keep in mind that you will need to update the URLs below with the appropriate port number.
+
 **`WEB UI`**
 
 You can open [http://localhost:3000](http://localhost:3000) to begin exploring the Marquez Web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
