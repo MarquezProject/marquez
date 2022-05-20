@@ -70,7 +70,7 @@ public final class Utils {
    * Airflow integration for constructing some run IDs as UUIDs. We use the same namespace to
    * construct the same UUIDs when absolutely necessary (e.g., backfills, backward compatibility)
    *
-   * @see https://datatracker.ietf.org/doc/html/rfc4122#appendix-C
+   * @see "https://datatracker.ietf.org/doc/html/rfc4122#appendix-C"
    */
   public static final UUID NAMESPACE_URL_UUID =
       UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
@@ -159,7 +159,7 @@ public final class Utils {
    * Construct a name-based {@link UUID} based on the {@link #NAMESPACE_URL_UUID} namespace. Name
    * parts are separated by a dot (.) character.
    *
-   * @see https://datatracker.ietf.org/doc/html/rfc4122#page-13
+   * @see "https://datatracker.ietf.org/doc/html/rfc4122#page-13"
    * @param nameParts
    * @return
    */
@@ -181,7 +181,7 @@ public final class Utils {
    * marquez.service.models.LineageEvent.RunLink#runId} field is a valid {@link UUID}, use it.
    * Otherwise, compute a {@link UUID} from the job name and the reported runId. If the job name
    * contains a dot (.), only return the portion up to the last dot in the name (this attempts to
-   * address airflow tasks, which always report the job name as <dag_name>.<task_name>
+   * address airflow tasks, which always report the job name as &lt;dag_name&gt;.&lt;task_name&lt;
    *
    * @param parent
    * @return
