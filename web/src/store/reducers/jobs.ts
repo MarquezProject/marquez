@@ -1,3 +1,5 @@
+// Copyright 2018-2022 contributors to the Marquez project
+
 // SPDX-License-Identifier: Apache-2.0
 
 import { FETCH_JOBS, FETCH_JOBS_SUCCESS, RESET_JOBS } from '../actionCreators/actionTypes'

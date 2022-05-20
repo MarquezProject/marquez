@@ -1,3 +1,5 @@
+// Copyright 2018-2022 contributors to the Marquez project
+
 //  from webpack
 declare const __NODE_ENV__: string
 declare const __DEVELOPMENT__: boolean
