@@ -1,3 +1,5 @@
+/* Copyright 2018-2022 contributors to the Marquez project */
+
 package marquez.api.filter;
 
 import java.io.IOException;

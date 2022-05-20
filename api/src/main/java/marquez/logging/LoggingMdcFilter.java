@@ -1,3 +1,5 @@
+/* Copyright 2018-2022 contributors to the Marquez project */
+
 package marquez.logging;
 
 import java.io.IOException;

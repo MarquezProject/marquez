@@ -1,3 +1,5 @@
+/* Copyright 2018-2022 contributors to the Marquez project */
+
 package marquez.common.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
