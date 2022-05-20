@@ -1,16 +1,27 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.21.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.22.0...HEAD)
+
+## [0.22.0](https://github.com/MarquezProject/marquez/compare/0.21.0...0.22.0) - 2022-05-16
 
 ### Added
 
-* Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [@wslulciuc](https://github.com/wslulciuc)
-* Add support for job renaming/redirection via symlink [@collado-mike](https://github.com/collado-mike)
+* Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [#1847](https://github.com/MarquezProject/marquez/pull/1847)[@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+* Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [#1945](https://github.com/MarquezProject/marquez/pull/1945) [@wslulciuc](https://github.com/wslulciuc)
+* Add support for job renaming/redirection via symlink [#1947](https://github.com/MarquezProject/marquez/pull/1947) [@collado-mike](https://github.com/collado-mike)
+* Add `Created by` view for dataset versions along with SQL syntax highlighting in web UI [#1929](https://github.com/MarquezProject/marquez/pull/1929) [@phixMe](https://github.com/phixMe)
+* Add `operationId` to openapi spec [#1978](https://github.com/MarquezProject/marquez/pull/1978) [@phixMe](https://github.com/phixMe)
 
 ### Changed
 
-* Upgrade Flyway to v7.6.0 [@dakshin-k](https://github.com/dakshin-k)
+* Upgrade Flyway to v7.6.0 [#1974](https://github.com/MarquezProject/marquez/pull/1974) [@dakshin-k](https://github.com/dakshin-k)
+
+### Fixed
+
+* Remove size limits on namespaces, dataset names, and and source connection urls [#1925](https://github.com/MarquezProject/marquez/pull/1925) [@collado-mike](https://github.com/collado-mike)
+* Update namespace names to allow `=`, `@`, and `;` [#1936](https://github.com/MarquezProject/marquez/pull/1936) [@mobuchowski](https://github.com/mobuchowski)
+* Time duration display in web UI [#1950](https://github.com/MarquezProject/marquez/pull/1950) [@phixMe](https://github.com/phixMe)
+* Enable web UI to access API via Helm Chart [@GZack2000](https://github.com/GZack2000)
 
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
 

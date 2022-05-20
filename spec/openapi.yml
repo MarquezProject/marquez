@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.21.1-SNAPSHOT
+  version: 0.23.0-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:

@@ -24,6 +24,14 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/marquez) incubation project under active development and we'd love your help!
 
+## Adopters
+
+Want to be added? Send a pull request our way!
+
+* [Astronomer](https://astronomer.io)
+* [Datakin](https://datakin.com)
+* [Northwestern Mutual](https://www.northwesternmutual.com)
+
 ## Try it!
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/MarquezProject/marquez)
@@ -37,6 +45,8 @@ $ ./docker/up.sh
 ```
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide.
+
+> **Note:** Port 5000 is now reserved for MacOS. If running locally on MacOS, you can run `./docker/up.sh --api-port 9000` to configure the API to listen on port 9000 instead. Keep in mind that you will need to update the URLs below with the appropriate port number.
 
 **`WEB UI`**
 
