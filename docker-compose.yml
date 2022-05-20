@@ -34,7 +34,7 @@ services:
     image: postgres:12.1
     container_name: marquez-db
     ports:
-      - "5432:5432"
+      - "5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
