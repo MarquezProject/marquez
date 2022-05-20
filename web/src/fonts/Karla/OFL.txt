@@ -1,3 +1,5 @@
+Copyright 2018-2022 contributors to the Marquez project
+
 Copyright (c) 2011-2012, Jonathan Pinhorn (jonpinhorn.typedesign@gmail.com), with Reserved Font Names 'Karla'
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.

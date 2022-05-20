@@ -1,3 +1,5 @@
+Copyright 2018-2022 contributors to the Marquez project
+
     __  ___                               
    /  |/  /___ __________ ___  _____  ____
   / /|_/ / __ `/ ___/ __ `/ / / / _ \/_  /
