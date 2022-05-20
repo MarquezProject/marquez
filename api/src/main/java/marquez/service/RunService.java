@@ -29,6 +29,7 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
+import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.RunRow;
 import marquez.service.RunTransitionListener.JobInputUpdate;
@@ -59,9 +60,9 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
    *     removed in release {@code 0.25.0}.
    */
   public Run createRun(
-      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
-    log.info("Creating run for job '{}'...", jobName.getValue());
-    RunRow runRow = upsertRunMeta(namespaceName, jobName, runMeta, NEW);
+      @NonNull NamespaceName namespaceName, @NonNull JobRow job, @NonNull RunMeta runMeta) {
+    log.info("Creating run for job '{}'...", job.getName());
+    RunRow runRow = upsertRunMeta(namespaceName, job, runMeta, NEW);
     notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
 
     return findRunByUuid(runRow.getUuid()).get();

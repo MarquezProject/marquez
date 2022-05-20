@@ -245,16 +245,17 @@ final class DbTestUtils {
   }
 
   /** Adds a new {@link RunRow} object to the {@code runs} table. */
-  static RunRow newRun(final Jdbi jdbi, final String namespaceName, final String jobName) {
+  static RunRow newRun(final Jdbi jdbi, JobRow jobRow) {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     final RunMeta runMeta = newRunMeta();
     return runDao.upsertRunMeta(
-        NamespaceName.of(namespaceName), JobName.of(jobName), runMeta, RunState.NEW);
+        NamespaceName.of(jobRow.getNamespaceName()), jobRow, runMeta, RunState.NEW);
   }
 
   /** Adds a new {@link RunRow} object to the {@code runs} table. */
   static ExtendedRunRow newRun(
       final Jdbi jdbi,
+      final UUID jobUuid,
       final UUID jobVersionUuid,
       final UUID runArgsUuid,
       final UUID namespaceUuid,
@@ -267,6 +268,7 @@ final class DbTestUtils {
         newRowUuid(),
         newExternalId(),
         newTimestamp(),
+        jobUuid,
         jobVersionUuid,
         runArgsUuid,
         newTimestamp(),

@@ -23,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTable;
@@ -699,5 +700,91 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
         .isNotNull()
         .hasFieldOrPropertyWithValue("namespace", NAMESPACE_NAME)
         .hasFieldOrPropertyWithValue("name", targetJobName);
+  }
+
+  @Test
+  public void testApp_getJobWithFQNFromParent() throws SQLException {
+    Jdbi jdbi =
+        Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
+            .installPlugin(new SqlObjectPlugin())
+            .installPlugin(new PostgresPlugin());
+    createNamespace(NAMESPACE_NAME);
+
+    // Create job
+    String jobName = newJobName().getValue();
+    final JobMeta jobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    final Job originalJob = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
+
+    String parentJobName = newJobName().getValue();
+    final JobMeta parentJobMeta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .context(JOB_CONTEXT)
+            .description(JOB_DESCRIPTION)
+            .build();
+    final Job parentJob = client.createJob(NAMESPACE_NAME, parentJobName, parentJobMeta);
+
+    JobDao jobDao = jdbi.onDemand(JobDao.class);
+    NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
+    Optional<NamespaceRow> namespaceRow = namespaceDao.findNamespaceByName(NAMESPACE_NAME);
+    if (namespaceRow.isEmpty()) {
+      throw new AssertionError("Couldn't find expected namespace row");
+    }
+    Optional<JobRow> originalJobRow = jobDao.findJobByNameAsRow(NAMESPACE_NAME, jobName);
+    if (originalJobRow.isEmpty()) {
+      throw new AssertionError("Couldn't find job row we just inserted");
+    }
+    Optional<JobRow> parentJobRow = jobDao.findJobByNameAsRow(NAMESPACE_NAME, parentJobName);
+    if (parentJobRow.isEmpty()) {
+      throw new AssertionError("Couldn't find parent job we just inserted");
+    }
+    PGobject inputs = new PGobject();
+    inputs.setType("json");
+    inputs.setValue("[]");
+    JobRow jobRow = originalJobRow.get();
+    JobRow targetJobRow =
+        jobDao.upsertJob(
+            UUID.randomUUID(),
+            parentJobRow.get().getUuid(),
+            JobType.valueOf(jobRow.getType()),
+            Instant.now(),
+            namespaceRow.get().getUuid(),
+            namespaceRow.get().getName(),
+            jobRow.getName(),
+            jobRow.getDescription().orElse(null),
+            jobRow.getJobContextUuid().orElse(null),
+            jobRow.getLocation(),
+            null,
+            inputs);
+    // symlink the old job to point to the new one that has a parent uuid
+    jobDao.upsertJob(
+        jobRow.getUuid(),
+        JobType.valueOf(JOB_TYPE.name()),
+        Instant.now(),
+        namespaceRow.get().getUuid(),
+        NAMESPACE_NAME,
+        jobName,
+        JOB_DESCRIPTION,
+        jobRow.getJobContextUuid().orElse(null),
+        JOB_LOCATION.toString(),
+        targetJobRow.getUuid(),
+        inputs);
+
+    Job job = client.getJob(NAMESPACE_NAME, jobName);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("namespace", NAMESPACE_NAME)
+        .hasFieldOrPropertyWithValue("name", parentJobName + "." + jobName);
   }
 }

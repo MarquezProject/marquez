@@ -59,12 +59,9 @@ public interface LineageDao {
           + "    )\n"
           + "SELECT DISTINCT ON (l2.job_uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context\n"
           + "FROM lineage l2\n"
-          + "INNER JOIN jobs j ON j.uuid=l2.job_uuid\n"
+          + "INNER JOIN jobs_view j ON j.uuid=l2.job_uuid\n"
           + "LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid")
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
-
-  @SqlQuery("SELECT uuid from jobs where name = :jobName and namespace_name = :namespace")
-  Optional<UUID> getJobUuid(String jobName, String namespace);
 
   @SqlQuery(
       "SELECT ds.*, dv.fields, dv.lifecycle_state\n"
@@ -86,7 +83,7 @@ public interface LineageDao {
   @SqlQuery(
       "WITH latest_runs AS (\n"
           + "    SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version\n"
-          + "    FROM runs r\n"
+          + "    FROM runs_view r\n"
           + "    INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
           + "    WHERE jv.job_uuid in (<jobUuid>)\n"
           + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"

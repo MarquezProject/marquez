@@ -31,7 +31,7 @@ public interface SearchDao {
           + "   WHERE  d.name ilike '%' || :query || '%'\n"
           + "   UNION\n"
           + "  SELECT 'JOB' AS type, j.name, j.updated_at, j.namespace_name\n"
-          + "    FROM jobs AS j\n"
+          + "    FROM jobs_view AS j\n"
           + "   WHERE  j.name ilike '%' || :query || '%'\n"
           + ") AS results\n"
           + "WHERE type = :filter OR CAST(:filter AS TEXT) IS NULL\n"

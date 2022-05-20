@@ -20,9 +20,11 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
+import marquez.db.JobDao;
 import marquez.db.LineageDao;
 import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
+import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
 import marquez.service.models.Edge;
 import marquez.service.models.Graph;
@@ -34,8 +36,11 @@ import marquez.service.models.Run;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
-  public LineageService(LineageDao delegate) {
+  private final JobDao jobDao;
+
+  public LineageService(LineageDao delegate, JobDao jobDao) {
     super(delegate);
+    this.jobDao = jobDao;
   }
 
   public Lineage lineage(NodeId nodeId, int depth) {
@@ -188,7 +193,9 @@ public class LineageService extends DelegatingLineageDao {
   public Optional<UUID> getJobUuid(NodeId nodeId) {
     if (nodeId.isJobType()) {
       JobId jobId = nodeId.asJobId();
-      return getJobUuid(jobId.getName().getValue(), jobId.getNamespace().getValue());
+      return jobDao
+          .findJobByNameAsRow(jobId.getNamespace().getValue(), jobId.getName().getValue())
+          .map(JobRow::getUuid);
     } else if (nodeId.isDatasetType()) {
       DatasetId datasetId = nodeId.asDatasetId();
       return getJobFromInputOrOutput(
