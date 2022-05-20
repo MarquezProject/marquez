@@ -31,7 +31,8 @@ public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresEx
     database = POSTGRES.getDatabaseName();
     plugins.add(new SqlObjectPlugin());
     plugins.add(new PostgresPlugin());
-    migration = Migration.before().withPath("marquez/db/migration");
+    migration =
+        Migration.before().withPaths("marquez/db/migration", "classpath:marquez/db/migrations");
   }
 
   protected DataSource createDataSource() {
