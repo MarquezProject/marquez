@@ -42,3 +42,5 @@ docker push "${ORG}/marquez-web:${version}"
 docker push "${ORG}/marquez-web:latest"
 
 echo "DONE!"
+
+# Copyright 2018-2022 contributors to the Marquez project

@@ -9,3 +9,4 @@ rm -rf $REPO_DIR/examples/airflow/tmp
 
 cd $REPO_DIR/integrations/airflow && pip wheel -e $REPO_DIR/integrations/common --wheel-dir=$REPO_DIR/examples/airflow/whl .
 ls $REPO_DIR/examples/airflow/whl | sed -e 's/^/\/whl\//' > $REPO_DIR/examples/airflow/requirements.txt
+# Copyright 2018-2022 contributors to the Marquez project

@@ -16,3 +16,5 @@ JAVA_OPTS="${JAVA_OPTS} -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true"
 
 # Start http server with java options and configuration
 java ${JAVA_OPTS} -jar marquez-*.jar server ${MARQUEZ_CONFIG}
+
+# Copyright 2018-2022 contributors to the Marquez project

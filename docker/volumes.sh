@@ -12,3 +12,5 @@ docker cp ./docker/wait-for-it.sh marquez-volume-helper:/opt/marquez-utils/wait-
 docker cp ./docker/init-db.sh marquez-volume-helper:/opt/marquez-db-init/init-db.sh
 
 docker rm marquez-volume-helper
+
+# Copyright 2018-2022 contributors to the Marquez project

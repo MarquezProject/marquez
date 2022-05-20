@@ -191,3 +191,5 @@ else
 fi
 
 echo "DONE!"
+
+# Copyright 2018-2022 contributors to the Marquez project

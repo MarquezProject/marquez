@@ -110,3 +110,5 @@ fi
 $SCRIPTDIR/volumes.sh marquez
 
 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args
+
+# Copyright 2018-2022 contributors to the Marquez project

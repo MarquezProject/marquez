@@ -20,3 +20,5 @@ psql -v ON_ERROR_STOP=1 --username "${POSTGRES_USER}" > /dev/null <<-EOSQL
   CREATE DATABASE ${EXAMPLE_DB};
   GRANT ALL PRIVILEGES ON DATABASE ${EXAMPLE_DB} TO ${EXAMPLE_USER};
 EOSQL
+
+# Copyright 2018-2022 contributors to the Marquez project

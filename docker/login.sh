@@ -7,3 +7,5 @@
 set -eu
 
 docker login --username "${DOCKER_LOGIN}" --password "${DOCKER_PASSWORD}"
+
+# Copyright 2018-2022 contributors to the Marquez project
