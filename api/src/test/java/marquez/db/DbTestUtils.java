@@ -266,6 +266,7 @@ final class DbTestUtils {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     return runDao.upsert(
         newRowUuid(),
+        null,
         newExternalId(),
         newTimestamp(),
         jobUuid,

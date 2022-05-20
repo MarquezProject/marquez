@@ -67,6 +67,7 @@ public class BackfillTestUtils {
     ExtendedRunRow runRow =
         runDao.upsert(
             runUuid,
+            null,
             runUuid.toString(),
             now,
             jobRow.getUuid(),

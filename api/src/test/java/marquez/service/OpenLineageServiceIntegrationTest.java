@@ -10,23 +10,35 @@ import io.dropwizard.util.Resources;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.common.Utils;
+import marquez.common.models.JobType;
+import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.JobDao;
+import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
+import marquez.db.RunArgsDao;
+import marquez.db.RunDao;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
+import marquez.db.models.JobRow;
+import marquez.db.models.NamespaceRow;
+import marquez.db.models.RunArgsRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
@@ -100,6 +112,7 @@ public class OpenLineageServiceIntegrationTest {
   }
 
   public static class ExpectedResults {
+
     public int inputDatasetCount;
     public int outputDatasetCount;
     public int inputEventCount;
@@ -115,7 +128,7 @@ public class OpenLineageServiceIntegrationTest {
   }
 
   @BeforeEach
-  public void setup(Jdbi jdbi) {
+  public void setup(Jdbi jdbi) throws SQLException {
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     runService = mock(RunService.class);
@@ -125,6 +138,49 @@ public class OpenLineageServiceIntegrationTest {
     doNothing().when(runService).notify(runOutputListener.capture());
     lineageService = new OpenLineageService(openLineageDao, runService);
     datasetDao = jdbi.onDemand(DatasetDao.class);
+
+    NamespaceRow namespace =
+        jdbi.onDemand(NamespaceDao.class)
+            .upsertNamespaceRow(UUID.randomUUID(), Instant.now(), NAMESPACE, "me");
+    JobRow job =
+        jdbi.onDemand(JobDao.class)
+            .upsertJob(
+                UUID.randomUUID(),
+                JobType.BATCH,
+                Instant.now(),
+                namespace.getUuid(),
+                NAMESPACE,
+                "parentJob",
+                "description",
+                null,
+                null,
+                null,
+                null);
+    Map<String, String> runArgsMap = new HashMap<>();
+    RunArgsRow argsRow =
+        jdbi.onDemand(RunArgsDao.class)
+            .upsertRunArgs(
+                UUID.randomUUID(),
+                Instant.now(),
+                Utils.toJson(runArgsMap),
+                Utils.checksumFor(runArgsMap));
+    jdbi.onDemand(RunDao.class)
+        .upsert(
+            UUID.fromString("3f5e83fa-3480-44ff-99c5-ff943904e5e8"),
+            null,
+            "3f5e83fa-3480-44ff-99c5-ff943904e5e8",
+            Instant.now(),
+            job.getUuid(),
+            null,
+            argsRow.getUuid(),
+            Instant.now(),
+            Instant.now(),
+            RunState.RUNNING,
+            Instant.now(),
+            NAMESPACE,
+            job.getName(),
+            null,
+            null);
   }
 
   private List<LineageEvent> initEvents(List<URI> uris) {

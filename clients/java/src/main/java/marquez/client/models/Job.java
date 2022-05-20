@@ -22,6 +22,8 @@ import marquez.client.Utils;
 public final class Job extends JobMeta {
   @Getter private final JobId id;
   @Getter private final String name;
+  @Getter private final String simpleName;
+  @Getter private final String parentJobName;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final String namespace;
@@ -33,6 +35,8 @@ public final class Job extends JobMeta {
       @NonNull final JobId id,
       final JobType type,
       @NonNull final String name,
+      @NonNull final String simpleName,
+      final String parentJobName,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final String namespace,
@@ -47,6 +51,8 @@ public final class Job extends JobMeta {
     super(type, inputs, outputs, location, context, description, null);
     this.id = id;
     this.name = name;
+    this.simpleName = simpleName;
+    this.parentJobName = parentJobName;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.namespace = namespace;
