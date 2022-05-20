@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Marquez Committers
 The Marquez Committers are the group of people who can accept Pull Request to Marquez.
 They take responsibility for guiding new pull requests into the main branch.

@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Marquez Java Client
 
 Java client for [Marquez](https://github.com/MarquezProject/marquez).

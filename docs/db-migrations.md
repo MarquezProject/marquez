@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 ## Migrating `marquez` database manually via [`flyway`](https://flywaydb.org)
 
 Before you can manually apply migrations to the `marquez` database, make sure you've installed `flyway`:

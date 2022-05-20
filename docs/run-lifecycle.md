@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Lifecycle
 
 Marquez captures the runs of a job, and changes as they happen.

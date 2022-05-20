@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Marquez [Helm Chart](https://helm.sh)
 
 Helm Chart for [Marquez](https://github.com/MarquezProject/marquez).

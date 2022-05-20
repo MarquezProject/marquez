@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 My grandmother is an avid cooker. Let's say we are trying to build her a service to help her keep
 track of the food she cooks with her recipes. Her recipes are unique to her as they include
 pre-prepared ingredients that she made at an earlier point, for example she will make apple pie

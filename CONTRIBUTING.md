@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # How to Contribute
 
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:

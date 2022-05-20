@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 <div align="center">
   <img src="./docs/assets/images/marquez-logo.png" width="500px" />
   <a href="https://lfaidata.foundation/projects">

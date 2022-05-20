@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Run State Transitions
 Run states change based on the success or failure of a job run. The datasets consumed and/or produced
 by a job run are immutable and do not change based on the success or failure of the run.

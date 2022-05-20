@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

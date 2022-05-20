@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Releasing
 
 1. Update [`CHANGELOG.md`](CHANGELOG.md)

@@ -1,3 +1,5 @@
+<!-- Copyright 2018-2022 contributors to the Marquez project -->
+
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.22.0...HEAD)
