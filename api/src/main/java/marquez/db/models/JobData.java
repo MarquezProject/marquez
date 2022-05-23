@@ -31,6 +31,8 @@ public class JobData implements NodeData {
   @NonNull JobId id;
   @NonNull JobType type;
   @NonNull JobName name;
+  @NonNull String simpleName;
+  @Nullable String parentJobName;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;

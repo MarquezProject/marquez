@@ -31,7 +31,9 @@ public final class FlywayFactory {
   private static final boolean DEFAULT_CLEAN_DISABLED = false;
   private static final boolean DEFAULT_OUT_OF_ORDER = false;
   private static final String DEFAULT_LOCATION = "marquez/db/migration";
-  private static final List<String> DEFAULT_LOCATIONS = ImmutableList.of(DEFAULT_LOCATION);
+  private static final String DEFAULT_MIGRATION_CLASSPATH = "classpath:marquez/db/migrations";
+  private static final List<String> DEFAULT_LOCATIONS =
+      ImmutableList.of(DEFAULT_LOCATION, DEFAULT_MIGRATION_CLASSPATH);
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
   private static final String DEFAULT_TABLE = "flyway_schema_history";
   private static final boolean DEFAULT_PLACEHOLDER_REPLACEMENT = false;

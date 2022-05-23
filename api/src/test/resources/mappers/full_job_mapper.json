@@ -3,6 +3,7 @@
     "namespace": "NAMESPACE",
     "name": "NAME"
   },
+  "simpleName": "SIMPLE_NAME",
   "type": "BATCH",
   "description": "DESCRIPTION",
   "name": "NAME",

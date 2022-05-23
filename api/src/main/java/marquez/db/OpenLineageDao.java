@@ -3,6 +3,7 @@
 package marquez.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -40,13 +42,20 @@ import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
+import marquez.service.models.LineageEvent.DocumentationJobFacet;
 import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.LifecycleStateChangeFacet;
+import marquez.service.models.LineageEvent.NominalTimeRunFacet;
+import marquez.service.models.LineageEvent.ParentRunFacet;
+import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
@@ -104,11 +113,11 @@ public interface OpenLineageDao extends BaseDao {
             DEFAULT_NAMESPACE_OWNER);
     bag.setNamespace(namespace);
 
-    String description = null;
-    if (event.getJob().getFacets() != null
-        && event.getJob().getFacets().getDocumentation() != null) {
-      description = event.getJob().getFacets().getDocumentation().getDescription();
-    }
+    String description =
+        Optional.ofNullable(event.getJob().getFacets())
+            .map(JobFacet::getDocumentation)
+            .map(DocumentationJobFacet::getDescription)
+            .orElse(null);
 
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
@@ -116,25 +125,143 @@ public interface OpenLineageDao extends BaseDao {
             UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
     bag.setJobContext(jobContext);
 
-    String location = null;
-    if (event.getJob().getFacets() != null
-        && event.getJob().getFacets().getSourceCodeLocation() != null) {
-      location = getUrlOrNull(event.getJob().getFacets().getSourceCodeLocation().getUrl());
-    }
+    String location =
+        Optional.ofNullable(event.getJob().getFacets())
+            .flatMap(f -> Optional.ofNullable(f.getSourceCodeLocation()))
+            .flatMap(s -> Optional.ofNullable(s.getUrl()))
+            .orElse(null);
 
+    Instant nominalStartTime =
+        Optional.ofNullable(event.getRun().getFacets())
+            .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
+            .map(NominalTimeRunFacet::getNominalStartTime)
+            .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
+            .orElse(null);
+    Instant nominalEndTime =
+        Optional.ofNullable(event.getRun().getFacets())
+            .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
+            .map(NominalTimeRunFacet::getNominalEndTime)
+            .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
+            .orElse(null);
+
+    Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+    Optional<ParentRunFacet> parentRun =
+        Optional.ofNullable(event.getRun())
+            .map(LineageEvent.Run::getFacets)
+            .map(RunFacet::getParent);
+
+    Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
+    Optional<JobRow> parentJob =
+        parentUuid.map(
+            uuid -> {
+              try {
+                ParentRunFacet facet = parentRun.get(); // facet must be present
+                log.debug("Found parent run event {}", facet);
+                PGobject inputs = new PGobject();
+                inputs.setType("json");
+                inputs.setValue("[]");
+                Optional<ExtendedRunRow> parentRunRow = runDao.findRunByUuidAsRow(uuid);
+                JobRow parentJobRow =
+                    parentRunRow
+                        .flatMap(run -> jobDao.findJobByUuidAsRow(run.getJobUuid()))
+                        .orElseGet(
+                            () -> {
+                              JobRow newParentJobRow =
+                                  jobDao.upsertJob(
+                                      UUID.randomUUID(),
+                                      getJobType(event.getJob()),
+                                      now,
+                                      namespace.getUuid(),
+                                      namespace.getName(),
+                                      Utils.parseParentJobName(facet.getJob().getName()),
+                                      null,
+                                      jobContext.getUuid(),
+                                      location,
+                                      null,
+                                      inputs);
+                              log.info("Created new parent job record {}", newParentJobRow);
+                              return newParentJobRow;
+                            });
+                log.debug("Found parent job record {}", parentJobRow);
+                if (parentRunRow.isEmpty()) {
+                  RunArgsRow argsRow =
+                      runArgsDao.upsertRunArgs(
+                          UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
+                  ExtendedRunRow newRow =
+                      runDao.upsert(
+                          uuid,
+                          null,
+                          facet.getRun().getRunId(),
+                          now,
+                          parentJobRow.getUuid(),
+                          null,
+                          argsRow.getUuid(),
+                          nominalStartTime,
+                          nominalEndTime,
+                          Optional.ofNullable(event.getEventType())
+                              .map(this::getRunState)
+                              .orElse(null),
+                          now,
+                          namespace.getName(),
+                          parentJobRow.getName(),
+                          parentJobRow.getLocation(),
+                          parentJobRow.getJobContextUuid().orElse(null));
+                  log.info("Created new parent run record {}", newRow);
+                }
+                return parentJobRow;
+              } catch (Exception e) {
+                throw new RuntimeException("Unable to insert parent run", e);
+              }
+            });
+
+    // construct the simple name of the job by removing the parent prefix plus the dot '.' separator
+    String jobName =
+        parentJob
+            .map(
+                p -> {
+                  if (event.getJob().getName().startsWith(p.getName() + '.')) {
+                    return event.getJob().getName().substring(p.getName().length() + 1);
+                  } else {
+                    return event.getJob().getName();
+                  }
+                })
+            .orElse(event.getJob().getName());
+    log.debug(
+        "Calculated job name {} from job {} with parent {}",
+        jobName,
+        event.getJob().getName(),
+        parentJob.map(JobRow::getName));
     JobRow job =
-        jobDao.upsertJob(
-            UUID.randomUUID(),
-            getJobType(event.getJob()),
-            now,
-            namespace.getUuid(),
-            namespace.getName(),
-            event.getJob().getName(),
-            description,
-            jobContext.getUuid(),
-            location,
-            null,
-            jobDao.toJson(toDatasetId(event.getInputs()), mapper));
+        parentJob
+            .map(
+                parent ->
+                    jobDao.upsertJob(
+                        UUID.randomUUID(),
+                        parent.getUuid(),
+                        getJobType(event.getJob()),
+                        now,
+                        namespace.getUuid(),
+                        namespace.getName(),
+                        jobName,
+                        description,
+                        jobContext.getUuid(),
+                        location,
+                        null,
+                        jobDao.toJson(toDatasetId(event.getInputs()), mapper)))
+            .orElseGet(
+                () ->
+                    jobDao.upsertJob(
+                        UUID.randomUUID(),
+                        getJobType(event.getJob()),
+                        now,
+                        namespace.getUuid(),
+                        namespace.getName(),
+                        jobName,
+                        description,
+                        jobContext.getUuid(),
+                        location,
+                        null,
+                        jobDao.toJson(toDatasetId(event.getInputs()), mapper)));
     bag.setJob(job);
 
     Map<String, String> runArgsMap = createRunArgs(event);
@@ -142,29 +269,6 @@ public interface OpenLineageDao extends BaseDao {
         runArgsDao.upsertRunArgs(
             UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
     bag.setRunArgs(runArgs);
-
-    Instant nominalStartTime = null;
-    Instant nominalEndTime = null;
-    if (event.getRun().getFacets() != null && event.getRun().getFacets().getNominalTime() != null) {
-      nominalStartTime =
-          event
-              .getRun()
-              .getFacets()
-              .getNominalTime()
-              .getNominalStartTime()
-              .withZoneSameInstant(ZoneId.of("UTC"))
-              .toInstant();
-      if (event.getRun().getFacets().getNominalTime().getNominalEndTime() != null) {
-        nominalEndTime =
-            event
-                .getRun()
-                .getFacets()
-                .getNominalTime()
-                .getNominalEndTime()
-                .withZoneSameInstant(ZoneId.of("UTC"))
-                .toInstant();
-      }
-    }
 
     UUID runUuid = runToUuid(event.getRun().getRunId());
 
@@ -174,6 +278,7 @@ public interface OpenLineageDao extends BaseDao {
       run =
           runDao.upsert(
               runUuid,
+              parentUuid.orElse(null),
               event.getRun().getRunId(),
               now,
               job.getUuid(),
@@ -184,13 +289,14 @@ public interface OpenLineageDao extends BaseDao {
               runStateType,
               now,
               namespace.getName(),
-              job.getName(),
+              jobName,
               location,
               jobContext.getUuid());
     } else {
       run =
           runDao.upsert(
               runUuid,
+              parentUuid.orElse(null),
               event.getRun().getRunId(),
               now,
               job.getUuid(),
@@ -200,7 +306,7 @@ public interface OpenLineageDao extends BaseDao {
               nominalEndTime,
               namespace.getUuid(),
               namespace.getName(),
-              job.getName(),
+              jobName,
               location,
               jobContext.getUuid());
     }

@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -37,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -50,6 +53,7 @@ import marquez.common.models.Version;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.ParentRunFacet;
 import marquez.service.models.StreamMeta;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -60,6 +64,16 @@ public final class Utils {
   public static final Joiner.MapJoiner KV_JOINER = Joiner.on(KV_DELIM).withKeyValueSeparator("=");
   public static final String VERSION_DELIM = ":";
   public static final Joiner VERSION_JOINER = Joiner.on(VERSION_DELIM).skipNulls();
+
+  /**
+   * pre-defined NAMESPACE_URL defined in RFC4122. This is the namespace used by the OpenLineage
+   * Airflow integration for constructing some run IDs as UUIDs. We use the same namespace to
+   * construct the same UUIDs when absolutely necessary (e.g., backfills, backward compatibility)
+   *
+   * @see "https://datatracker.ietf.org/doc/html/rfc4122#appendix-C"
+   */
+  public static final UUID NAMESPACE_URL_UUID =
+      UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
 
   private static final ObjectMapper MAPPER = newObjectMapper();
 
@@ -139,6 +153,70 @@ public final class Utils {
         uuidString.length() == UUID_LENGTH,
         String.format("uuidString length must = %d", UUID_LENGTH));
     return UUID.fromString(uuidString);
+  }
+
+  /**
+   * Construct a name-based {@link UUID} based on the {@link #NAMESPACE_URL_UUID} namespace. Name
+   * parts are separated by a dot (.) character.
+   *
+   * @see "https://datatracker.ietf.org/doc/html/rfc4122#page-13"
+   * @param nameParts
+   * @return
+   */
+  public static UUID toNameBasedUuid(String... nameParts) {
+    String constructedName = String.join(".", nameParts);
+
+    final byte[] nameBytes = constructedName.getBytes(StandardCharsets.UTF_8);
+
+    ByteBuffer buffer = ByteBuffer.allocate(nameBytes.length + 16);
+    buffer.putLong(NAMESPACE_URL_UUID.getMostSignificantBits());
+    buffer.putLong(NAMESPACE_URL_UUID.getLeastSignificantBits());
+    buffer.put(nameBytes);
+
+    return UUID.nameUUIDFromBytes(buffer.array());
+  }
+
+  /**
+   * Construct a UUID from a {@link ParentRunFacet} - if the {@link
+   * marquez.service.models.LineageEvent.RunLink#runId} field is a valid {@link UUID}, use it.
+   * Otherwise, compute a {@link UUID} from the job name and the reported runId. If the job name
+   * contains a dot (.), only return the portion up to the last dot in the name (this attempts to
+   * address airflow tasks, which always report the job name as &lt;dag_name&gt;.&lt;task_name&lt;
+   *
+   * @param parent
+   * @return
+   */
+  public static UUID findParentRunUuid(ParentRunFacet parent) {
+    String jobName = parent.getJob().getName();
+    String parentRunId = parent.getRun().getRunId();
+    return findParentRunUuid(jobName, parentRunId);
+  }
+
+  public static UUID findParentRunUuid(String parentJobName, String parentRunId) {
+    String dagName = parseParentJobName(parentJobName);
+    return toUuid(parentRunId, dagName);
+  }
+
+  public static String parseParentJobName(String parentJobName) {
+    return parentJobName.contains(".")
+        ? parentJobName.substring(0, parentJobName.lastIndexOf('.'))
+        : parentJobName;
+  }
+
+  /**
+   * Compute a UUID from a RunId and a jobName
+   *
+   * @see Utils#toNameBasedUuid(String...) for details on the UUID construction.
+   * @param runId
+   * @param jobName
+   * @return
+   */
+  public static UUID toUuid(@NotNull String runId, String jobName) {
+    try {
+      return UUID.fromString(runId);
+    } catch (IllegalArgumentException e) {
+      return Utils.toNameBasedUuid(jobName, runId);
+    }
   }
 
   public static Instant toInstant(@Nullable final String asIso) {

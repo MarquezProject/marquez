@@ -230,6 +230,7 @@ class RunDaoTest {
     RunRow updatedRow =
         runDao.upsert(
             row.getUuid(),
+            null,
             row.getUuid().toString(),
             row.getUpdatedAt(),
             jobRow.getUuid(),

@@ -37,6 +37,8 @@ class JobMapperTest {
     when(resultSet.getObject(Columns.NAMESPACE_NAME)).thenReturn("NAMESPACE");
     when(resultSet.getString(Columns.NAME)).thenReturn("NAME");
     when(resultSet.getObject(Columns.NAME)).thenReturn("NAME");
+    when(resultSet.getString(Columns.SIMPLE_NAME)).thenReturn("SIMPLE_NAME");
+    when(resultSet.getObject(Columns.SIMPLE_NAME)).thenReturn("SIMPLE_NAME");
     when(resultSet.getString(Columns.TYPE)).thenReturn("BATCH");
     when(resultSet.getObject(Columns.TYPE)).thenReturn("BATCH");
     when(resultSet.getString(Columns.DESCRIPTION)).thenReturn("DESCRIPTION");

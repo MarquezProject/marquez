@@ -270,6 +270,7 @@ public final class JsonGenerator {
     obj.set("id", id);
     obj.put("type", job.getType().toString());
     obj.put("name", job.getName());
+    obj.put("simpleName", job.getName());
     obj.put("createdAt", ISO_INSTANT.format(job.getCreatedAt()));
     obj.put("updatedAt", ISO_INSTANT.format(job.getUpdatedAt()));
     obj.put("namespace", job.getNamespace());
