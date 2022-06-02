@@ -17,7 +17,6 @@ import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.Field;
-import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
@@ -71,9 +70,9 @@ public interface RunDao extends BaseDao {
 
   String BASE_FIND_RUN_SQL =
       "SELECT r.*, ra.args, ctx.context, f.facets,\n"
-          + "jv.namespace_name, jv.job_name, jv.version AS job_version,\n"
+          + "jv.version AS job_version,\n"
           + "ri.input_versions, ro.output_versions\n"
-          + "FROM runs AS r\n"
+          + "FROM runs_view AS r\n"
           + "LEFT OUTER JOIN\n"
           + "(\n"
           + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
@@ -155,9 +154,11 @@ public interface RunDao extends BaseDao {
   @SqlQuery(
       "INSERT INTO runs ( "
           + "uuid, "
+          + "parent_run_uuid, "
           + "external_id, "
           + "created_at, "
           + "updated_at, "
+          + "job_uuid, "
           + "job_version_uuid, "
           + "run_args_uuid, "
           + "nominal_start_time, "
@@ -170,9 +171,11 @@ public interface RunDao extends BaseDao {
           + "job_context_uuid "
           + ") VALUES ( "
           + ":runUuid, "
+          + ":parentRunUuid, "
           + ":externalId, "
           + ":now, "
           + ":now, "
+          + ":jobUuid,"
           + ":jobVersionUuid, "
           + ":runArgsUuid, "
           + ":nominalStartTime, "
@@ -191,11 +194,13 @@ public interface RunDao extends BaseDao {
           + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
           + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
-          + "RETURNING *")
-  ExtendedRunRow upsert(
+          + "RETURNING uuid")
+  UUID upsertWithRunState(
       UUID runUuid,
+      UUID parentRunUuid,
       String externalId,
       Instant now,
+      UUID jobUuid,
       UUID jobVersionUuid,
       UUID runArgsUuid,
       Instant nominalStartTime,
@@ -207,12 +212,50 @@ public interface RunDao extends BaseDao {
       String location,
       UUID jobContextUuid);
 
+  default ExtendedRunRow upsert(
+      UUID runUuid,
+      UUID parentRunUuid,
+      String externalId,
+      Instant now,
+      UUID jobUuid,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      RunState runStateType,
+      Instant runStateTime,
+      String namespaceName,
+      String jobName,
+      String location,
+      UUID jobContextUuid) {
+    UUID rowUuid =
+        upsertWithRunState(
+            runUuid,
+            parentRunUuid,
+            externalId,
+            now,
+            jobUuid,
+            jobVersionUuid,
+            runArgsUuid,
+            nominalStartTime,
+            nominalEndTime,
+            runStateType,
+            runStateTime,
+            namespaceName,
+            jobName,
+            location,
+            jobContextUuid);
+    return findRunByUuidAsRow(rowUuid).get();
+  }
+
   @SqlQuery(
       "INSERT INTO runs ( "
           + "uuid, "
+          + "parent_run_uuid, "
           + "external_id, "
           + "created_at, "
           + "updated_at, "
+          + "job_uuid, "
           + "job_version_uuid, "
           + "run_args_uuid, "
           + "nominal_start_time, "
@@ -223,9 +266,11 @@ public interface RunDao extends BaseDao {
           + "job_context_uuid "
           + ") VALUES ( "
           + ":runUuid, "
+          + ":parentRunUuid, "
           + ":externalId, "
           + ":now, "
           + ":now, "
+          + ":jobUuid, "
           + ":jobVersionUuid, "
           + ":runArgsUuid, "
           + ":nominalStartTime, "
@@ -240,11 +285,13 @@ public interface RunDao extends BaseDao {
           + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
           + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
-          + "RETURNING *")
-  ExtendedRunRow upsert(
+          + "RETURNING uuid")
+  UUID upsertWithoutRunState(
       UUID runUuid,
+      UUID parentRunUuid,
       String externalId,
       Instant now,
+      UUID jobUuid,
       UUID jobVersionUuid,
       UUID runArgsUuid,
       Instant nominalStartTime,
@@ -254,6 +301,40 @@ public interface RunDao extends BaseDao {
       String jobName,
       String location,
       UUID jobContextUuid);
+
+  default ExtendedRunRow upsert(
+      UUID runUuid,
+      UUID parentRunUuid,
+      String externalId,
+      Instant now,
+      UUID jobUuid,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      UUID namespaceUuid,
+      String namespaceName,
+      String jobName,
+      String location,
+      UUID jobContextUuid) {
+    UUID runRowUuid =
+        upsertWithoutRunState(
+            runUuid,
+            parentRunUuid,
+            externalId,
+            now,
+            jobUuid,
+            jobVersionUuid,
+            runArgsUuid,
+            nominalStartTime,
+            nominalEndTime,
+            namespaceUuid,
+            namespaceName,
+            jobName,
+            location,
+            jobContextUuid);
+    return findRunByUuidAsRow(runRowUuid).get();
+  }
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -349,7 +430,7 @@ public interface RunDao extends BaseDao {
   /** Insert from run creates a run but does not associate any datasets. */
   @Transaction
   default RunRow upsertRunMeta(
-      NamespaceName namespaceName, JobName jobName, RunMeta runMeta, RunState currentState) {
+      NamespaceName namespaceName, JobRow jobRow, RunMeta runMeta, RunState currentState) {
     Instant now = Instant.now();
 
     NamespaceRow namespaceRow =
@@ -365,16 +446,15 @@ public interface RunDao extends BaseDao {
                 Utils.toJson(runMeta.getArgs()),
                 Utils.checksumFor(runMeta.getArgs()));
 
-    JobRow jobRow =
-        createJobDao().findJobByNameAsRow(namespaceName.getValue(), jobName.getValue()).get();
-
     UUID uuid = runMeta.getId().map(RunId::getValue).orElse(UUID.randomUUID());
 
     RunRow runRow =
         upsert(
             uuid,
             null,
+            null,
             now,
+            jobRow.getUuid(),
             null,
             runArgsRow.getUuid(),
             runMeta.getNominalStartTime().orElse(null),
@@ -382,7 +462,7 @@ public interface RunDao extends BaseDao {
             currentState,
             now,
             namespaceRow.getName(),
-            jobName.getValue(),
+            jobRow.getName(),
             jobRow.getLocation(),
             jobRow.getJobContextUuid().orElse(null));
 

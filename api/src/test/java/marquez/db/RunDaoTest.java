@@ -91,7 +91,7 @@ class RunDaoTest {
     final JobRow jobRow =
         newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
 
-    final RunRow runRow = DbTestUtils.newRun(jdbi, jobRow.getNamespaceName(), jobRow.getName());
+    final RunRow runRow = DbTestUtils.newRun(jdbi, jobRow);
     DbTestUtils.transitionRunWithOutputs(
         jdbi, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
 
@@ -205,8 +205,7 @@ class RunDaoTest {
     return IntStream.range(0, count)
         .mapToObj(
             i -> {
-              final RunRow runRow =
-                  DbTestUtils.newRun(jdbi, jobRow.getNamespaceName(), jobRow.getName());
+              final RunRow runRow = DbTestUtils.newRun(jdbi, jobRow);
               DbTestUtils.transitionRunWithOutputs(
                   jdbi, runRow.getUuid(), RunState.COMPLETED, outputs);
 
@@ -228,13 +227,15 @@ class RunDaoTest {
     final JobRow jobRow =
         newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
 
-    RunRow row = DbTestUtils.newRun(jdbi, namespaceRow.getName(), jobRow.getName());
+    RunRow row = DbTestUtils.newRun(jdbi, jobRow);
 
     RunRow updatedRow =
         runDao.upsert(
             row.getUuid(),
+            null,
             row.getUuid().toString(),
             row.getUpdatedAt(),
+            jobRow.getUuid(),
             null,
             row.getRunArgsUuid(),
             null,
