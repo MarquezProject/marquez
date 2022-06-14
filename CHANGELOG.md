@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.22.0...HEAD)
 
+### Changed
+
+* Set default limit for listing datasets and jobs in UI from `2000` to `25` [@wslulciuc](https://github.com/wslulciuc)
+
 ## [0.22.0](https://github.com/MarquezProject/marquez/compare/0.21.0...0.22.0) - 2022-05-16
 
 ### Added
