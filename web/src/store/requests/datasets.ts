@@ -4,7 +4,7 @@ import { API_URL } from '../../globals'
 import { DatasetVersions, Datasets } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const getDatasets = async (namespace: string, limit = 2000, offset = 0) => {
+export const getDatasets = async (namespace: string, limit = 25, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(
     namespace
   )}/datasets?limit=${limit}&offset=${offset}`
