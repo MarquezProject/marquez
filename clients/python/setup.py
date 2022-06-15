@@ -23,7 +23,7 @@ extras_require["dev"] = set(sum(extras_require.values(), []))
 
 setup(
     name="marquez-python",
-    version="version="0.23.0"",
+    version="version="0.24.0"",
     description="Marquez Python Client",
     long_description=readme,
     long_description_content_type="text/markdown",
