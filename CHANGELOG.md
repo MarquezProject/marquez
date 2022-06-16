@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
 
-## [0.22.1](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-15
+## [0.23.0](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-16
 
 ### Added
 
