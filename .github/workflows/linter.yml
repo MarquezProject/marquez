@@ -35,8 +35,6 @@ jobs:
     # Load all steps #
     ##################
     steps:
-      - name: Install Dependencies
-        run: pip install pylintfileheader
       ##########################
       # Checkout the code base #
       ##########################

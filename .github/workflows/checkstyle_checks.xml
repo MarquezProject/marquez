@@ -28,6 +28,6 @@
 
   <!-- Headers -->
   <module name="Header">
-    <property name="headerFile" value="checkstyle.header"/>
+    <property name="headerFile" value=".github/workflows/checkstyle.header"/>
   </module>
 </module>
