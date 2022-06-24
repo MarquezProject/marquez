@@ -57,8 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
           LINTER_RULES_PATH: /.github/workflows
-          JAVA_FILE_NAME: checkstyle_checks.xml
-          VALIDATE_JAVA: false
+          # JAVA_FILE_NAME: checkstyle_checks.xml
+          # VALIDATE_JAVA: false
 
           PYTHON_FLAKE8_CONFIG_FILE: setup.cfg
           VALIDATE_PYTHON: true
