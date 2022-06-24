@@ -36,7 +36,7 @@ jobs:
     ##################
     steps:
       - name: Install Dependencies
-      - run: pip install flake8-copyright
+        run: pip install flake8-copyright
       ##########################
       # Checkout the code base #
       ##########################
@@ -58,7 +58,7 @@ jobs:
 
           LINTER_RULES_PATH: /.github/workflows
           JAVA_FILE_NAME: checkstyle_checks.xml
-          VALIDATE_JAVA: true
+          VALIDATE_JAVA: false
 
           PYTHON_FLAKE8_CONFIG_FILE: setup.cfg
           VALIDATE_PYTHON: true
