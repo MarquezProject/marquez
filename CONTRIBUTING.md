@@ -27,9 +27,9 @@ $ ./gradlew test
 You can also run individual tests for a [submodule](https://github.com/MarquezProject/marquez#modules) using the `--tests` flag:
 
 ```bash
-$ ./gradlew :api:test --tests marquez.api.DatasetResourceTest
-$ ./gradlew :api:test --tests marquez.service.DatasetServiceTest
-$ ./gradlew :api:test --tests marquez.db.DatasetDaoTest
+$ ./gradlew :api:test --tests marquez.api.OpenLineageResourceTest
+$ ./gradlew :api:test --tests marquez.service.OpenLineageServiceIntegrationTest
+$ ./gradlew :api:test --tests marquez.db.OpenLineageDaoTest
 ```
 
 Or run tests by category:
@@ -67,7 +67,7 @@ $ pre-commit install
 Each Pull Request executes a series of quality checks, mostly relying upon CircleCI for validation. However, there are
 certain validation checks that execute via GitHub Actions and can be run locally using the steps below.
 
-Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions 
+Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions
 checks that apply to each Pull Request. The first time you run _act_ you will be asked to choose a
 [runner](https://github.com/nektos/act#runners).
 
