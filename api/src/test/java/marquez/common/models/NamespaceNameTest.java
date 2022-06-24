@@ -19,7 +19,8 @@ public class NamespaceNameTest {
         "sqlserver://synapse-test-test001.sql.azuresynapse.net;databaseName=TESTPOOL1;",
         "\u003D",
         "@",
-        "abfss://something@.something-else.core.windows.net"
+        "abfss://something@.something-else.core.windows.net",
+        "databricks+connector://asdf-123456-7890.cloud.databricks.com"
       })
   void testValidNamespaceName(String name) {
     assertThat(NamespaceName.of(name).getValue()).isEqualTo(name);

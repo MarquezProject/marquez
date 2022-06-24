@@ -411,7 +411,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.@]", "_");
+    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.@+]", "_");
   }
 
   default JobType getJobType(Job job) {
