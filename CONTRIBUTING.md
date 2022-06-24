@@ -125,7 +125,7 @@ $ ./gradlew publishToMavenLocal
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Make sure `.java` files contain a [copyright and license header](#copyright-license)
+7. Make sure `.java` files contain a [copyright and license header](#copyright--license)
 8. Make sure to [sign you work](#sign-your-work)
 9. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
 10. Work with project maintainers to get your change reviewed and merged into the `main` branch
