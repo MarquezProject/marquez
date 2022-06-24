@@ -18,3 +18,29 @@ Please describe your change as it relates to the problem, or bug fix, as well as
 - [ ] You've updated any relevant documentation (_if relevant_)
 - [ ] You've updated the [`CHANGELOG.md`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased) with details about your change under the "Unreleased" section (_if relevant, depending on the change, this may not be necessary_)
 - [ ] You've versioned your `.sql` database schema migration according to [Flyway's naming convention](https://flywaydb.org/documentation/concepts/migrations#naming) (_if relevant_)
+- [ ] You've included a header in any source code files (.java, .py, .sh) like so:
+
+    `java`
+
+    ```
+    /* 
+    * Copyright 2018-2022 contributors to the Marquez project
+    * SPDX-License-Identifier: Apache-2.0
+    */
+    ```
+
+    `bash`
+
+    ```   
+    #!/bin/bash
+    #
+    # Copyright 2018-2022 contributors to the Marquez project
+    # SPDX-License-Identifier: Apache-2.0
+    ```
+
+    `py`
+
+    ```
+    # Copyright 2018-2022 contributors to the Marquez project
+    # SPDX-License-Identifier: Apache-2.0
+    ```
