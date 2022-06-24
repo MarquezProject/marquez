@@ -92,7 +92,7 @@ act pull_request --reuse --verbose
 
 > **Note:** Docker must be running in order to utilize _act_.
 
-## Troubleshooting
+# Troubleshooting
 
 There is an issue within the _act_ tool that prevents the _kind_ cluster from being deleted after execution the action.
 When this condition exists, you will experience the error below.
@@ -125,10 +125,11 @@ $ ./gradlew publishToMavenLocal
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Make sure to [sign you work](#sign-your-work)
-8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-9. Work with project maintainers to get your change reviewed and merged into the `main` branch
-10. Delete your branch
+7. Make sure `.java` files contain a [copyright and license header](#copyright-license)
+8. Make sure to [sign you work](#sign-your-work)
+9. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+10. Work with project maintainers to get your change reviewed and merged into the `main` branch
+11. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
@@ -206,6 +207,35 @@ $ redoc-cli serve spec/openapi.yml
 Then browse to: http://localhost:8080
 
 > **Note:** To bundle or serve the API docs, please install [redoc-cli](https://www.npmjs.com/package/redoc-cli).
+
+# `COPYRIGHT` / `LICENSE`
+
+We use [SPDX](https://spdx.dev) for copyright and license information. The following license header **must** be included in all `java,` `bash`, and `py` source files:
+
+`java`
+
+```
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+```
+
+`bash`
+
+```
+#!/bin/bash
+#
+# Copyright 2018-2022 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+```
+
+`py`
+
+```
+# Copyright 2018-2022 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+```
 
 # Resources
 
