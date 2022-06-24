@@ -4,7 +4,7 @@ import { API_URL } from '../../globals'
 import { Jobs } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const getJobs = async (namespace: string, limit = 2000, offset = 0) => {
+export const getJobs = async (namespace: string, limit = 25, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(
     namespace
   )}/jobs?limit=${limit}&offset=${offset}`
