@@ -42,12 +42,12 @@ import org.jdbi.v3.core.result.ResultProducers;
  * run, a job is created with the name field set to the DAG name.
  */
 @Slf4j
-public class V44_1__BackfillAirflowParentRuns implements JavaMigration {
+public class V44_2__BackfillAirflowParentRuns implements JavaMigration {
 
   /**
    * Return a numeric version that is greater than 44 (so it executes after that one) but before 45
    */
-  public static final MigrationVersion MIGRATION_VERSION = MigrationVersion.fromVersion("44.1");
+  public static final MigrationVersion MIGRATION_VERSION = MigrationVersion.fromVersion("44.2");
 
   private static final String FIND_AIRFLOW_PARENT_RUNS_SQL =
       """

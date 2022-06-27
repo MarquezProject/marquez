@@ -23,11 +23,11 @@ import org.flywaydb.core.api.migration.JavaMigration;
  * is intentional as no harm will come from leaving these values in place in case of rollback.
  */
 @Slf4j
-public class V43_1__UpdateRunsWithJobUUID implements JavaMigration {
+public class V44_1__UpdateRunsWithJobUUID implements JavaMigration {
 
   @Override
   public MigrationVersion getVersion() {
-    return MigrationVersion.fromVersion("43.1");
+    return MigrationVersion.fromVersion("44.1");
   }
 
   // don't execute in a transaction so each batch can be committed immediately
