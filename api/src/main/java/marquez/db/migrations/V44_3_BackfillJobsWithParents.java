@@ -22,7 +22,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.ResultProducers;
 
 @Slf4j
-public class V44_2_BackfillJobsWithParents implements JavaMigration {
+public class V44_3_BackfillJobsWithParents implements JavaMigration {
 
   public static final String FIND_JOBS_WITH_PARENT_RUNS =
       """
@@ -65,7 +65,7 @@ public class V44_2_BackfillJobsWithParents implements JavaMigration {
 
   @Override
   public MigrationVersion getVersion() {
-    return MigrationVersion.fromVersion("44.2");
+    return MigrationVersion.fromVersion("44.3");
   }
 
   @Override
