@@ -109,24 +109,24 @@ public interface RunDao extends BaseDao {
       """
           WITH RECURSIVE job_names AS (
             SELECT uuid, namespace_name, name, symlink_target_uuid
-            FROM jobs j
+            FROM jobs_view j
             WHERE j.namespace_name=:namespace AND j.name=:jobName
             UNION
             SELECT j.uuid, j.namespace_name, j.name, j.symlink_target_uuid
-            FROM jobs j
+            FROM jobs_view j
             INNER JOIN job_names jn ON j.uuid=jn.symlink_target_uuid OR j.symlink_target_uuid=jn.uuid
           )
           SELECT r.*, ra.args, ctx.context, f.facets,
           jv.namespace_name, jv.job_name, jv.version AS job_version,
           ri.input_versions, ro.output_versions
-          FROM runs AS r
+          FROM runs_view AS r
           INNER JOIN job_names j ON r.namespace_name=j.namespace_name AND r.job_name=j.name
           LEFT OUTER JOIN
           (
             SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets
             FROM lineage_events le
-            INNER JOIN runs ON runs.uuid=le.run_uuid
-            WHERE runs.job_name=:jobName AND runs.namespace_name=:namespace
+            INNER JOIN runs_view r2 ON r2.uuid=le.run_uuid
+            WHERE r2.job_name=:jobName AND r2.namespace_name=:namespace
             GROUP BY le.run_uuid
           ) AS f ON r.uuid=f.run_uuid
           LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
@@ -481,18 +481,18 @@ public interface RunDao extends BaseDao {
       """
       WITH RECURSIVE job_names AS (
         SELECT uuid, namespace_name, name, symlink_target_uuid
-        FROM jobs j
+        FROM jobs_view j
         WHERE j.namespace_name=:namespace AND j.name=:jobName
         UNION
         SELECT j.uuid, j.namespace_name, j.name, j.symlink_target_uuid
-        FROM jobs j
+        FROM jobs_view j
         INNER JOIN job_names jn ON j.uuid=jn.symlink_target_uuid OR j.symlink_target_uuid=jn.uuid
       )
       """
           + BASE_FIND_RUN_SQL
           + """
       WHERE r.uuid=(
-        SELECT r.uuid FROM runs r
+        SELECT r.uuid FROM runs_view r
         INNER JOIN job_names j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
         ORDER BY transitioned_at DESC
         LIMIT 1
