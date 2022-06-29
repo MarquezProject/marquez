@@ -41,6 +41,7 @@ subprojects {
     apply plugin: 'com.adarshr.test-logger'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "com.diffplug.spotless"
+    apply plugin: "pmd"
 
     project(':api') {
         apply plugin: 'application'
@@ -101,6 +102,21 @@ subprojects {
     task javadocJar(type: Jar, dependsOn: javadoc) {
         classifier 'javadoc'
         from javadoc.destinationDir
+    }
+
+    pmd {
+        consoleOutput = true
+        toolVersion = "6.46.0"
+        rulesMinimumPriority = 5
+        ruleSetFiles = rootProject.files("pmd-marquez.xml")
+        ruleSets = []
+        ignoreFailures = true
+    }
+
+    pmdMain {
+        reports {
+            html.required = true
+        }
     }
 
     spotless {
