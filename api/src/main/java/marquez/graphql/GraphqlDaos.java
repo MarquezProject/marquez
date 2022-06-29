@@ -84,7 +84,7 @@ public interface GraphqlDaos extends SqlObject {
   List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersion(UUID datasetVersionUuid);
 
   @SqlQuery(
-      "SELECT distinct jv.* from dataset_versions dv inner join runs r on r.uuid = dv.run_uuid inner join job_versions jv on jv.uuid = r.job_version_uuid where dv.uuid = :datasetVersionUuid")
+      "SELECT distinct jv.* from dataset_versions dv inner join runs_view r on r.uuid = dv.run_uuid inner join job_versions jv on jv.uuid = r.job_version_uuid where dv.uuid = :datasetVersionUuid")
   List<RowMap<String, Object>> getDistinctJobVersionsByDatasetVersionOutput(
       UUID datasetVersionUuid);
 
@@ -222,7 +222,7 @@ public interface GraphqlDaos extends SqlObject {
           -- output jobs for each input dataset
               left outer join (
                    select io_of_in.dataset_uuid, jsonb_agg((select x from (select j_of_in.name, j_of_in.namespace_name as namespace) as x)) as in_agg
-                   from jobs j_of_in
+                   from jobs_view j_of_in
                    left outer join job_versions_io_mapping io_of_in on io_of_in.job_version_uuid = j_of_in.current_version_uuid
                     and io_of_in.io_type = 'INPUT'
                    group by io_of_in.dataset_uuid
