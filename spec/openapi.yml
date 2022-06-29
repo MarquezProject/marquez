@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.23.0-SNAPSHOT
+  version: 0.24.0-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -1569,6 +1569,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/DatasetVersionId'
+            context:
+              description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
+              type: object
+              deprecated: true
             facets:
               $ref: '#/components/schemas/RunFacets'
       example:
@@ -1582,6 +1586,7 @@ components:
         endedAt: 2019-05-09T20:05:46.815920Z
         durationMs: 4250894125
         args: {'email': 'me@example.com', 'emailOnFailure': 'false', 'emailOnRetry': 'true', 'retries': '1'}
+        context: {'SQL': "SELECT * FROM mytable;"}
         facets: {}
 
     RunList:

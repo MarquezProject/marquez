@@ -1,9 +1,9 @@
 #!/bin/bash
 #
+# Copyright 2018-2022 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 
 set -e
-set -x
 
 SCRIPTDIR=$(dirname $0)
 

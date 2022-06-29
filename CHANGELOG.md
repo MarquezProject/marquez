@@ -1,6 +1,21 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.22.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
+
+## [0.23.0](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-16
+
+### Added
+
+* Update docker-compose.yml: Randomly map postgres db port [#2000](https://github.com/MarquezProject/marquez/pull/2000) [@RNHTTR](https://github.com/RNHTTR) 
+* Job parent hierarchy [#1935](https://github.com/MarquezProject/marquez/pull/1935) [#1980](https://github.com/MarquezProject/marquez/pull/1980) [#1992](https://github.com/MarquezProject/marquez/pull/1992) [@collado-mike](https://github.com/collado-mike)
+
+### Changed
+
+* Set default limit for listing datasets and jobs in UI from `2000` to `25` [#2018](https://github.com/MarquezProject/marquez/pull/2018) [@wslulciuc](https://github.com/wslulciuc)
+
+### Fixed
+
+* Return the tag for postgresql to 12.1.0 [#2015](https://github.com/MarquezProject/marquez/pull/2015) [@rossturk](https://github.com/rossturk)
 
 ## [0.22.0](https://github.com/MarquezProject/marquez/compare/0.21.0...0.22.0) - 2022-05-16
 

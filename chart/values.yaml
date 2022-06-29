@@ -17,7 +17,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-    tag: 0.22.0
+    tag: 0.23.0
     pullPolicy: IfNotPresent
   ## Name of the existing secret containing credentials for the Marquez installation.
   ## When this is specified, it will take precedence over the values configured in the 'db' section.
@@ -75,7 +75,7 @@ web:
   image:
     registry: docker.io
     repository: marquezproject/marquez-web
-    tag: 0.22.0
+    tag: 0.23.0
     pullPolicy: IfNotPresent
   ## Marquez website will run on this port
   ##
@@ -107,7 +107,7 @@ postgresql:
   ## @param image.tag PostgreSQL image tag (immutable tags are recommended)
   ##
   image:
-    tag: 0.22.0
+    tag: 12.1.0
   ## Authentication parameters
   ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#setting-the-root-password-on-first-run
   ## ref: https://github.com/bitnami/bitnami-docker-postgresql/blob/master/README.md#creating-a-database-on-first-run

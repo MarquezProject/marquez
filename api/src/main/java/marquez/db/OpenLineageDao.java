@@ -1,4 +1,7 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 package marquez.db;
 
@@ -411,7 +414,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String formatNamespaceName(String namespace) {
-    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.]", "_");
+    return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.@+]", "_");
   }
 
   default JobType getJobType(Job job) {
