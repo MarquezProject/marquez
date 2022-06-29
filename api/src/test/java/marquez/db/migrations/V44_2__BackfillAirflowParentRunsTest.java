@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.db.migrations;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
@@ -30,7 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-class V44_1__BackfillAirflowParentRunsTest {
+class V44_2__BackfillAirflowParentRunsTest {
 
   static Jdbi jdbi;
   private static OpenLineageDao openLineageDao;
@@ -40,7 +45,7 @@ class V44_1__BackfillAirflowParentRunsTest {
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
-    V44_1__BackfillAirflowParentRunsTest.jdbi = jdbi;
+    V44_2__BackfillAirflowParentRunsTest.jdbi = jdbi;
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     jobDao = jdbi.onDemand(JobDao.class);
     runArgsDao = jdbi.onDemand(RunArgsDao.class);
@@ -72,7 +77,7 @@ class V44_1__BackfillAirflowParentRunsTest {
     jdbi.useHandle(
         handle -> {
           try {
-            new V44_1__BackfillAirflowParentRuns()
+            new V44_2__BackfillAirflowParentRuns()
                 .migrate(
                     new Context() {
                       @Override

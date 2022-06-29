@@ -27,9 +27,9 @@ $ ./gradlew test
 You can also run individual tests for a [submodule](https://github.com/MarquezProject/marquez#modules) using the `--tests` flag:
 
 ```bash
-$ ./gradlew :api:test --tests marquez.api.DatasetResourceTest
-$ ./gradlew :api:test --tests marquez.service.DatasetServiceTest
-$ ./gradlew :api:test --tests marquez.db.DatasetDaoTest
+$ ./gradlew :api:test --tests marquez.api.OpenLineageResourceTest
+$ ./gradlew :api:test --tests marquez.service.OpenLineageServiceIntegrationTest
+$ ./gradlew :api:test --tests marquez.db.OpenLineageDaoTest
 ```
 
 Or run tests by category:
@@ -67,7 +67,7 @@ $ pre-commit install
 Each Pull Request executes a series of quality checks, mostly relying upon CircleCI for validation. However, there are
 certain validation checks that execute via GitHub Actions and can be run locally using the steps below.
 
-Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions 
+Install [act](https://github.com/nektos/act) and run the following command, which will evaluate the GitHub Actions
 checks that apply to each Pull Request. The first time you run _act_ you will be asked to choose a
 [runner](https://github.com/nektos/act#runners).
 
@@ -92,7 +92,7 @@ act pull_request --reuse --verbose
 
 > **Note:** Docker must be running in order to utilize _act_.
 
-## Troubleshooting
+# Troubleshooting
 
 There is an issue within the _act_ tool that prevents the _kind_ cluster from being deleted after execution the action.
 When this condition exists, you will experience the error below.
@@ -125,10 +125,11 @@ $ ./gradlew publishToMavenLocal
 4. Make change on your cool new branch
 5. Write a test for your change
 6. Make sure `.java` files are formatted: `./gradlew spotlessJavaCheck`
-7. Make sure to [sign you work](#sign-your-work)
-8. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
-9. Work with project maintainers to get your change reviewed and merged into the `main` branch
-10. Delete your branch
+7. Make sure `.java` files contain a [copyright and license header](#copyright--license)
+8. Make sure to [sign you work](#sign-your-work)
+9. Push change to your fork and [submit a pull request](https://github.com/MarquezProject/marquez/compare)
+10. Work with project maintainers to get your change reviewed and merged into the `main` branch
+11. Delete your branch
 
 To ensure your pull request is accepted, follow these guidelines:
 
@@ -206,6 +207,35 @@ $ redoc-cli serve spec/openapi.yml
 Then browse to: http://localhost:8080
 
 > **Note:** To bundle or serve the API docs, please install [redoc-cli](https://www.npmjs.com/package/redoc-cli).
+
+# `COPYRIGHT` / `LICENSE`
+
+We use [SPDX](https://spdx.dev) for copyright and license information. The following license header **must** be included in all `java,` `bash`, and `py` source files:
+
+`java`
+
+```
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+```
+
+`bash`
+
+```
+#!/bin/bash
+#
+# Copyright 2018-2022 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+```
+
+`py`
+
+```
+# Copyright 2018-2022 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+```
 
 # Resources
 
