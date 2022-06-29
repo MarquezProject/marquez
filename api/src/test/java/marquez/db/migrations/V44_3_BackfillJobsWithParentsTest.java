@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.db.migrations;
 
 import static marquez.db.BackfillTestUtils.writeNewEvent;
@@ -30,14 +35,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-class V44_2_BackfillJobsWithParentsTest {
+class V44_3_BackfillJobsWithParentsTest {
 
   static Jdbi jdbi;
   private static OpenLineageDao openLineageDao;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
-    V44_2_BackfillJobsWithParentsTest.jdbi = jdbi;
+    V44_3_BackfillJobsWithParentsTest.jdbi = jdbi;
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
 
@@ -80,8 +85,8 @@ class V44_2_BackfillJobsWithParentsTest {
                   }
                 };
             // apply migrations in order
-            new V43_1__UpdateRunsWithJobUUID().migrate(context);
-            new V44_2_BackfillJobsWithParents().migrate(context);
+            new V44_1__UpdateRunsWithJobUUID().migrate(context);
+            new V44_3_BackfillJobsWithParents().migrate(context);
           } catch (Exception e) {
             throw new AssertionError("Unable to execute migration", e);
           }

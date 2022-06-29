@@ -79,7 +79,7 @@ Under `dags/`, create a file named `counter.py` and add the following code:
 ```python
 import random
 
-from openlineage.airflow import DAG
+from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.dates import days_ago
 
@@ -132,7 +132,7 @@ t1 >> t2
 Under `dags/`, create a file named `sum.py` and add the following code:
 
 ```python
-from openlineage.airflow import DAG
+from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.dates import days_ago
 
