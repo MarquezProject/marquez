@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
-version: "3.7"
+version: "3.8"
 services:
   airflow:
-    image: bitnami/airflow:1.10.13
+    image: bitnami/airflow:2
     ports:
       - "8080:8080"
     env_file:
@@ -28,7 +28,7 @@ services:
         target: /bitnami/python/requirements.txt
 
   airflow_scheduler:
-    image: bitnami/airflow-scheduler:1.10.13
+    image: bitnami/airflow-scheduler:2
     env_file:
       - openlineage.env
     environment:
@@ -40,6 +40,7 @@ services:
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_LOAD_EXAMPLES=no
       - AIRFLOW_CONN_EXAMPLE_DB=postgres://example:example@postgres:5432/example
+      - AIRFLOW_WEBSERVER_HOST=airflow
     volumes:
       - ./dags:/opt/bitnami/airflow/dags
       - ${PWD}/whl:/whl
@@ -48,7 +49,7 @@ services:
         target: /bitnami/python/requirements.txt
 
   airflow_worker:
-    image: bitnami/airflow-worker:1.10.13
+    image: bitnami/airflow-worker:2
     env_file:
       - openlineage.env
     environment:
@@ -60,6 +61,7 @@ services:
       - AIRFLOW_EXECUTOR=CeleryExecutor
       - AIRFLOW_LOAD_EXAMPLES=no
       - AIRFLOW_CONN_EXAMPLE_DB=postgres://example:example@postgres:5432/example
+      - AIRFLOW_WEBSERVER_HOST=airflow
     volumes:
       - ./dags:/opt/bitnami/airflow/dags
       - ${PWD}/whl:/whl

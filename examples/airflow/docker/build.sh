@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Copyright 2018-2022 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../../../ &> /dev/null && pwd )"
