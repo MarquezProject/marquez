@@ -261,6 +261,9 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(runsList).isNotEmpty().hasSize(1);
     UUID parentRunUuid = Utils.toNameBasedUuid(dagName, airflowParentRunId);
     assertThat(runsList.get(0)).hasFieldOrPropertyWithValue("id", parentRunUuid.toString());
+
+    List<Run> taskRunsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(taskRunsList).hasSize(1);
   }
 
   @Test
