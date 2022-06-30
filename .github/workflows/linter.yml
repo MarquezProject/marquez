@@ -56,5 +56,5 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          PYTHON_FLAKE8_CONFIG_FILE: setup.cfg
+          PYTHON_FLAKE8_LINTER_RULES: setup.cfg
           VALIDATE_PYTHON_FLAKE8: true
