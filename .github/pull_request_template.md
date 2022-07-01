@@ -18,3 +18,4 @@ Please describe your change as it relates to the problem, or bug fix, as well as
 - [ ] You've updated any relevant documentation (_if relevant_)
 - [ ] You've updated the [`CHANGELOG.md`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased) with details about your change under the "Unreleased" section (_if relevant, depending on the change, this may not be necessary_)
 - [ ] You've versioned your `.sql` database schema migration according to [Flyway's naming convention](https://flywaydb.org/documentation/concepts/migrations#naming) (_if relevant_)
+- [ ] You've included a [header](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#copyright--license) in any source code files (_if relevant_)
