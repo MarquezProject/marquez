@@ -150,6 +150,11 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
+  public Dataset deleteDataset(@NonNull String namespaceName, @NonNull String datasetName) {
+    final String bodyAsJson = http.delete(url.toDatasetUrl(namespaceName, datasetName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
   public DatasetVersion getDatasetVersion(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String version) {
     final String bodyAsJson =

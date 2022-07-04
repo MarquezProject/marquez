@@ -287,20 +287,22 @@ class DatasetDaoTest {
                 ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
 
     String secondDatasetName = "secondDataset";
+    String deletedDatasetName = "deletedDataset";
     createLineageRow(
         openLineageDao,
         "secondWriteJob",
         "COMPLETE",
         jobFacet,
         Collections.emptyList(),
-        Collections.singletonList(
+        List.of(
             new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
                     ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")),
                     new SchemaField("age", "int", "the age"),
-                    new SchemaField("address", "string", "the address")))));
+                    new SchemaField("address", "string", "the address"))),
+            new Dataset(NAMESPACE, deletedDatasetName, newDatasetFacet())));
 
     createLineageRow(
         openLineageDao,
@@ -319,6 +321,11 @@ class DatasetDaoTest {
         Collections.emptyList());
 
     List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
+    assertThat(datasets).hasSize(3);
+
+    datasetDao.softDelete(NAMESPACE, deletedDatasetName);
+
+    datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(2);
 
     // datasets sorted alphabetically, so commonDataset is first
@@ -357,8 +364,7 @@ class DatasetDaoTest {
             InstanceOfAssertFactories.map(String.class, Object.class))
         .isNotEmpty()
         .hasSize(6)
-        .containsKeys(
-            "documentation", "description", "schema", "dataSource", "writeFacet", "inputFacet")
+        .containsKeys("documentation", "description", "schema", "dataSource", "inputFacet")
         .containsEntry(
             "writeFacet",
             ImmutableMap.of(
@@ -377,6 +383,28 @@ class DatasetDaoTest {
                 "http://test.producer/",
                 "_schemaURL",
                 "http://test.schema/"));
+  }
+
+  @Test
+  public void testGetSpecificDatasetReturnsDatasetIfDeleted() {
+    createLineageRow(
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(newCommonDataset(Collections.emptyMap())));
+
+    marquez.service.models.Dataset dataset = datasetDao.findDatasetByName(NAMESPACE, DATASET).get();
+
+    assertThat(dataset)
+        .matches(ds -> ds.getName().getValue().equals(DATASET))
+        .extracting(
+            marquez.service.models.Dataset::getFacets,
+            InstanceOfAssertFactories.map(String.class, Object.class))
+        .isNotEmpty()
+        .hasSize(4)
+        .containsKeys("documentation", "description", "schema", "dataSource");
   }
 
   @Test

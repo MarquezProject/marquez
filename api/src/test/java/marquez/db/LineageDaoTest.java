@@ -53,6 +53,7 @@ import org.postgresql.util.PGobject;
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageDaoTest {
 
+  private static DatasetDao datasetDao;
   private static LineageDao lineageDao;
   private static OpenLineageDao openLineageDao;
   private final Dataset dataset =
@@ -70,6 +71,7 @@ public class LineageDaoTest {
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     LineageDaoTest.jdbi = jdbi;
+    datasetDao = jdbi.onDemand(DatasetDao.class);
     lineageDao = jdbi.onDemand(LineageDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
@@ -664,7 +666,7 @@ public class LineageDaoTest {
             jobFacet,
             dataset);
     Set<DatasetData> datasetData =
-        lineageDao.getDatasetData(
+        lineageDao.getNonDeletedDatasetData(
             newRows.stream()
                 .map(j -> j.getOutput().get().getDatasetRow().getUuid())
                 .collect(Collectors.toSet()));
@@ -695,12 +697,67 @@ public class LineageDaoTest {
             Arrays.asList(dataset));
 
     Set<DatasetData> datasetData =
-        lineageDao.getDatasetData(
+        lineageDao.getNonDeletedDatasetData(
             Collections.singleton(row.getOutputs().get().get(0).getDatasetRow().getUuid()));
 
     assertThat(datasetData)
         .extracting(ds -> ds.getLastLifecycleState().orElse(""))
         .anyMatch(str -> str.contains("CREATE"));
+  }
+
+  @Test
+  public void testGetDatasetDataDoesNotReturnDeletedDataset() {
+    Dataset dataset =
+        new Dataset(
+            NAMESPACE,
+            DATASET,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    String deleteName = DATASET + "-delete";
+    Dataset toDelete =
+        new Dataset(
+            NAMESPACE,
+            deleteName,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    UpdateLineageRow row =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset, toDelete));
+
+    Set<DatasetData> datasetData =
+        lineageDao.getNonDeletedDatasetData(
+            Set.of(
+                row.getOutputs().get().get(0).getDatasetRow().getUuid(),
+                row.getOutputs().get().get(1).getDatasetRow().getUuid()));
+
+    assertThat(datasetData)
+        .hasSize(2)
+        .extracting(ds -> ds.getName().getValue())
+        .anyMatch(str -> str.contains(deleteName));
+
+    datasetDao.softDelete(NAMESPACE, deleteName);
+
+    datasetData =
+        lineageDao.getNonDeletedDatasetData(
+            Set.of(
+                row.getOutputs().get().get(0).getDatasetRow().getUuid(),
+                row.getOutputs().get().get(1).getDatasetRow().getUuid()));
+
+    assertThat(datasetData)
+        .hasSize(1)
+        .extracting(ds -> ds.getName().getValue())
+        .allMatch(str -> str.contains(DATASET));
   }
 
   @Test

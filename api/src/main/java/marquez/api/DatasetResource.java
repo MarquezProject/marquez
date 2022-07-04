@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -148,6 +149,27 @@ public class DatasetResource extends BaseResource {
         datasetService.findAllWithTags(namespaceName.getValue(), limit, offset);
     final int totalCount = datasetService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("datasets", datasets, totalCount)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @DELETE
+  @Path("{dataset}")
+  @Produces(APPLICATION_JSON)
+  public Response delete(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName) {
+    throwIfNotExists(namespaceName);
+
+    datasetService
+        .softDelete(namespaceName.getValue(), datasetName.getValue())
+        .orElseThrow(() -> new DatasetNotFoundException(datasetName));
+    Dataset dataset =
+        datasetService
+            .findDatasetByName(namespaceName.getValue(), datasetName.getValue())
+            .orElseThrow(() -> new DatasetNotFoundException(datasetName));
+    return Response.ok(dataset).build();
   }
 
   @Timed

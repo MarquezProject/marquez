@@ -75,7 +75,7 @@ public class LineageService extends DelegatingLineageDao {
             .collect(Collectors.toSet());
     Set<DatasetData> datasets = new HashSet<>();
     if (!datasetIds.isEmpty()) {
-      datasets.addAll(getDatasetData(datasetIds));
+      datasets.addAll(this.getNonDeletedDatasetData(datasetIds));
     }
 
     return toLineage(jobData, datasets);

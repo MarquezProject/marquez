@@ -7,6 +7,7 @@ package marquez.client;
 
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.MarquezPathV1.path;
+import static marquez.client.models.ModelGenerator.newDatasetId;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newJobName;
 import static marquez.client.models.ModelGenerator.newNamespace;
@@ -30,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.time.Instant;
 import javax.net.ssl.SSLContext;
+import marquez.client.models.DatasetId;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
@@ -38,6 +40,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -230,6 +233,40 @@ public class MarquezHttpTest {
 
   @Test
   public void testGet_throwsOnHttpError() throws Exception {
+    final ByteArrayInputStream stream = new ByteArrayInputStream(HTTP_ERROR_AS_BYTES);
+    when(httpEntity.getContent()).thenReturn(stream);
+    when(httpResponse.getEntity()).thenReturn(httpEntity);
+    when(httpResponse.getStatusLine()).thenReturn(mock(StatusLine.class));
+    when(httpResponse.getStatusLine().getStatusCode()).thenReturn(HTTP_500);
+
+    when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+
+    final URL url = marquezUrl.from(path("/namespace/%s", newNamespaceName()));
+    assertThatExceptionOfType(MarquezHttpException.class).isThrownBy(() -> marquezHttp.get(url));
+  }
+
+  @Test
+  public void testDelete() throws Exception {
+    final Namespace namespace = newNamespace();
+    final DatasetId datasetId = newDatasetId();
+
+    final String json = JsonGenerator.newJsonFor(namespace);
+    final ByteArrayInputStream stream = new ByteArrayInputStream(json.getBytes(UTF_8));
+    when(httpEntity.getContent()).thenReturn(stream);
+    when(httpResponse.getEntity()).thenReturn(httpEntity);
+    when(httpResponse.getStatusLine()).thenReturn(mock(StatusLine.class));
+    when(httpResponse.getStatusLine().getStatusCode()).thenReturn(HTTP_200);
+
+    when(httpClient.execute(any(HttpDelete.class))).thenReturn(httpResponse);
+
+    final URL url =
+        marquezUrl.from(path("/namespace/%s/dataset/%s", namespace.getName(), datasetId.getName()));
+    final String actual = marquezHttp.delete(url);
+    assertThat(actual).isEqualTo(json);
+  }
+
+  @Test
+  public void testDelete_throwsOnHttpError() throws Exception {
     final ByteArrayInputStream stream = new ByteArrayInputStream(HTTP_ERROR_AS_BYTES);
     when(httpEntity.getContent()).thenReturn(stream);
     when(httpResponse.getEntity()).thenReturn(httpEntity);

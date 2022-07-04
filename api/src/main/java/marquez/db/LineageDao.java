@@ -73,11 +73,14 @@ public interface LineageDao {
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
   @SqlQuery(
-      "SELECT ds.*, dv.fields, dv.lifecycle_state\n"
-          + "FROM datasets ds\n"
-          + "LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid\n"
-          + "WHERE ds.uuid IN (<dsUuids>);")
-  Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
+      """
+    SELECT ds.*, dv.fields, dv.lifecycle_state
+    FROM datasets ds
+    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
+    WHERE ds.uuid IN (<dsUuids>)
+    AND ds.is_deleted is false
+    """)
+  Set<DatasetData> getNonDeletedDatasetData(@BindList Set<UUID> dsUuids);
 
   @SqlQuery(
       "select j.uuid from jobs j\n"
