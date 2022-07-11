@@ -5,11 +5,14 @@
 
 package marquez.jdbi;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.spi.JdbiPlugin;
@@ -23,6 +26,11 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 /** JUnit Extension to manage a Jdbi instance pointed to external Postgres instance. */
 public abstract class JdbiExternalPostgresExtension
     implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface FlywayTarget {
+    String value();
+  }
 
   protected final List<JdbiPlugin> plugins = new ArrayList<>();
   private final ReentrantLock lock = new ReentrantLock();
@@ -82,12 +90,18 @@ public abstract class JdbiExternalPostgresExtension
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
     if (migration != null) {
-      flyway =
+      FluentConfiguration flywayConfig =
           Flyway.configure()
               .dataSource(getDataSource())
               .locations(migration.paths.toArray(new String[0]))
-              .schemas(migration.schemas.toArray(new String[0]))
-              .load();
+              .schemas(migration.schemas.toArray(new String[0]));
+
+      FlywayTarget target = context.getRequiredTestClass().getAnnotation(FlywayTarget.class);
+      if (target != null) {
+        flywayConfig.target(target.value());
+      }
+
+      flyway = flywayConfig.load();
       flyway.migrate();
     }
 
