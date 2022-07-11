@@ -37,8 +37,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * java -jar marquez-api.jar seed --url http://localhost:5000 --metadata metadata.json marquez.yml
  * }</pre>
  *
- * <p>where, {@code metadata.json} transitions the run {@code d46e465b-d358-4d32-83d4-df660ff614dd}
- * from {@code START} to {@code COMPLETE}:
+ * <p>where, {@code metadata.json} contains metadata for run {@code
+ * d46e465b-d358-4d32-83d4-df660ff614dd}:
  *
  * <pre>{@code
  * [
@@ -91,15 +91,19 @@ import net.sourceforge.argparse4j.inf.Subparser;
  */
 @Slf4j
 public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
+  /* Default URL for HTTP backend. */
   private static final String DEFAULT_URL = "http://localhost:8080";
 
+  /* Args for seed command. */
   private static final String CMD_ARG_URL = "url";
   private static final String CMD_ARG_METADATA = "metadata";
 
+  /* Define seed command. */
   public SeedCommand() {
     super("seed", "seeds the HTTP API server with metadata");
   }
 
+  /* Configure seed command. */
   @Override
   public void configure(@NonNull final Subparser subparser) {
     super.configure(subparser);
@@ -125,16 +129,19 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
       @NonNull MarquezConfig config) {
     final String olUrl = namespace.getString(CMD_ARG_URL);
     final String olMetadata = namespace.getString(CMD_ARG_METADATA);
-    // Use HTTP transport
+    // Use HTTP transport.
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
-    // Load, then emit events
+    log.info("Connected to '{}', attempting to seeding with metadata...", olUrl);
+    // Load, then emit events.
     loadMetadata(olMetadata).forEach(olClient::emit);
+    log.info("DONE!");
   }
 
-  /** Returns {@link OpenLineage.RunEvent}s contained within the metadata file. */
+  /* Returns {@link OpenLineage.RunEvent}s contained within the provided metadata file. */
   @SneakyThrows
   private ImmutableList<OpenLineage.RunEvent> loadMetadata(@NonNull String olMetadata) {
+    log.info("Loading metadata: '{}'", olMetadata);
     return newObjectMapper()
         .readValue(
             Paths.get(olMetadata).toFile(),
