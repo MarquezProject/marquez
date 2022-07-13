@@ -1,1 +1,344 @@
-[{}]
+[
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_menus",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO menus (id, name, restaurant_id, description)\n  SELECT id, name, restaurant_id, description\n    FROM tmp_menus;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly added restaurant menus daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.menus",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER", "description": "The unique ID of the menu."},
+            {"name": "name", "type": "INTEGER", "description": "The unique ID of the menu."},
+            {"name": "restaurant_id", "type": "INTEGER", "description": "The unique ID of the menu."},
+            {"name": "description", "type": "TEXT", "description": "The description of the menu."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "6f0c13a5-f29b-46a5-90c1-0ffbebbbd1aa"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_categories",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO categories (id, name, menu_id, description)\n  SELECT id, name, menu_id, description\n    FROM tmp_categories;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly added menus categories daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.categories",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER", "description": "The unique ID of the category."},
+            {"name": "name", "type": "VARCHAR", "description": "The name of the category."},
+            {"name": "menu_id", "type": "INTEGER", "description": "The ID of the menu related to the category."},
+            {"name": "description", "type": "TEXT", "description": "The description of the category."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "e05901b1-3a06-4b98-8d9c-aaf188c9a28c"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_menu_items",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO menu_items (id, name, price, category_id, description)\n  SELECT id, name, price, category_id, description\n    FROM tmp_menu_items;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly added restaurant menu items daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.menu_items",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER", "description": "The ID of the menu item."},
+            {"name": "name", "type": "VARCHAR", "description": "The name of the menu item."},
+            {"name": "price", "type": "VARCHAR", "description": "The price of the menu item."},
+            {"name": "category_id", "type": "VARCHAR", "description": "The ID of the category related to the item."},
+            {"name": "description", "type": "TEXT", "description": "The description of the menu item."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "a43a8523-349f-4296-807f-3354ac491990"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_orders",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO orders (id, placed_on, menu_item_id, quantity, discount_id, comment)\n  SELECT id, placed_on, menu_item_id, quantity, discount_id, comment\n    FROM tmp_orders;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly placed orders daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.orders",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER", "description": "The unique ID of the order."},
+            {"name": "placed_on", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+            {"name": "menu_item_id", "type": "INTEGER", "description": "The ID of the menu item related to the order."},
+            {"name": "quantity", "type": "INTEGER",  "description": "The number of the item in the order."},
+            {"name": "discount_id", "type": "INTEGER",  "description": "The unique ID of the discount applied to the order."},
+            {"name": "comment", "type": "TEXT", "description": "The comment of the order."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "ffba2c14-4170-48da-bec3-ab5fd4ec9a3f"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_orders_7_days",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, menu_id, restaurant_id, menu_item_id, category_id)\n SELECT o.id AS order_id, o.placed_on, o.discount_id, m.id AS menu_id, m.restaurant_id, mi.id AS menu_item_id, c.id AS category_id\n    FROM orders AS o\n    INNER JOIN menu_items AS mi\n      ON menu_items.id = o.menu_item_id\n   INNER JOIN categories AS c\n      ON c.id = mi.category_id\n   INNER JOIN menu AS m\n      ON m.id = c.menu_id\n   WHERE o.placed_on >= NOW() - interval '7 days';"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly placed orders weekly."
+        }
+      }
+    },
+    "inputs": [
+      {"namespace": "food_delivery", "name": "public.menus"},
+      {"namespace": "food_delivery", "name": "public.menu_items"},
+      {"namespace": "food_delivery", "name": "public.orders"},
+      {"namespace": "food_delivery", "name": "public.categories"}
+    ],
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.orders_7_days",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "order_id", "type": "INTEGER", "description": "The ID of the order."},
+            {"name": "placed_on", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the order was placed."},
+            {"name": "menu_id", "type": "INTEGER", "description": "The ID of the menu related to the order."},
+            {"name": "menu_item_id", "type": "INTEGER", "description": "The ID of the menu item related to the order."},
+            {"name": "category_id", "type": "INTEGER", "description": "The ID of category related to the order."},
+            {"name": "discount_id", "type": "INTEGER", "description": "The ID of the discount applied to the order"},
+            {"name": "city_id", "type": "INTEGER", "description": "The ID of the city related to the order."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "182a9eaf-881a-4d49-860c-f7e260b8bf60"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_customers",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO customers (id, created_at, updated_at, name, email, phone, city_id)\n  SELECT id, created_at, updated_at, name, email, phone, city_id\n    FROM tmp_customers;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads newly registered customers daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.customers",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INT", "description": "The unique ID of the customer."},
+            {"name": "created_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the customer was created."},
+            {"name": "updated_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the customer was updated."},
+            {"name": "name", "type": "VARCHAR",  "description": "The name of the customer."},
+            {"name": "email", "type": "VARCHAR", "description": "The email address of the customer."},
+            {"name": "address", "type": "VARCHAR", "description": "The address of the customer."},
+            {"name": "phone", "type": "VARCHAR", "description": "The phone number of the customer."},
+            {"name": "city_id", "type": "INT", "description": "The ID of the city related to the customer."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "b7098939-87f0-4207-878f-dfd8e8804d8a"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_order_status",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO order_status (id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id)\n  SELECT id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id\n    FROM tmp_order_status;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads order statues updates daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.order_status",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER","description": "The unique ID of the order status."},
+            {"name": "transitioned_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the order status was transitioned."},
+            {"name": "status", "type": "VARCHAR", "description": "The status of the order status."},
+            {"name": "order_id", "type": "INTEGER", "description": "The ID of the order related to the order status."},
+            {"name": "customer_id", "type": "INTEGER", "description": "The ID of the customer related to the order status."},
+            {"name": "restaurant_id", "type": "INTEGER", "description": "The ID of the restaurant related to the order status."},
+            {"name": "driver_id", "type": "INTEGER", "description": "The ID of the driver related to the order status."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2020-12-28T19:52:00.001+10:00",
+    "run": {
+      "runId": "9f3db1c5-5e9a-4280-8184-18aca4592c77"
+    },
+    "job": {
+      "namespace": "food_delivery",
+      "name": "etl_drivers",
+      "facets": {
+        "sql": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://raw.githubusercontent.com/OpenLineage/OpenLineage/main/spec/facets/SQLJobFacet.json",
+          "query": "INSERT INTO order_status (id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id)\n  SELECT id, transitioned_at, status, order_id, customer_id, restaurant_id, driver_id\n    FROM tmp_order_status;"
+        },
+        "documentation": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "description": "Loads order statues updates daily."
+        }
+      }
+    },
+    "outputs": [{
+      "namespace": "food_delivery",
+      "name": "public.drivers",
+      "facets": {
+        "schema": {
+          "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+          "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+          "fields": [
+            {"name": "id", "type": "INTEGER","description": "The unique ID of the order status."},
+            {"name": "transitioned_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the order status was transitioned."},
+            {"name": "status", "type": "VARCHAR", "description": "The status of the order status."},
+            {"name": "order_id", "type": "INTEGER", "description": "The ID of the order related to the order status."},
+            {"name": "customer_id", "type": "INTEGER", "description": "The ID of the customer related to the order status."},
+            {"name": "restaurant_id", "type": "INTEGER", "description": "The ID of the restaurant related to the order status."},
+            {"name": "driver_id", "type": "INTEGER", "description": "The ID of the driver related to the order status."}
+          ]
+        }
+      }
+    }],
+    "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+  }
+]
