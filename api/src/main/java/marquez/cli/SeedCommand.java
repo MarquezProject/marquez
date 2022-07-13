@@ -132,7 +132,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     // Use HTTP transport.
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
-    log.info("Connected to '{}', attempting to seeding with metadata...", olUrl);
+    log.info("Connected to '{}'... attempting to seed with metadata!", olUrl);
     // Load, then emit events.
     loadMetadata(olMetadata).forEach(olClient::emit);
     log.info("DONE!");
@@ -141,7 +141,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   /* Returns {@link OpenLineage.RunEvent}s contained within the provided metadata file. */
   @SneakyThrows
   private ImmutableList<OpenLineage.RunEvent> loadMetadata(@NonNull String olMetadata) {
-    log.info("Loading metadata: '{}'", olMetadata);
+    log.info("Loading metadata from: '{}'", olMetadata);
     return newObjectMapper()
         .readValue(
             Paths.get(olMetadata).toFile(),
