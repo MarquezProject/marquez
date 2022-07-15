@@ -6,15 +6,25 @@
 package marquez.db;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.RunArgsRowMapper;
 import marquez.db.models.RunArgsRow;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 @RegisterRowMapper(RunArgsRowMapper.class)
 public interface RunArgsDao {
-  @SqlQuery(
+  default RunArgsRow upsertRunArgs(UUID uuid, Instant now, String args, String checksum) {
+    doUpsertRunArgs(uuid, now, args, checksum);
+    return findRunArgsByChecksum(checksum).orElseThrow();
+  }
+
+  @SqlQuery("SELECT * FROM run_args WHERE checksum=:checksum")
+  Optional<RunArgsRow> findRunArgsByChecksum(String checksum);
+
+  @SqlUpdate(
       "INSERT INTO run_args ( "
           + "uuid, "
           + "created_at, "
@@ -25,9 +35,6 @@ public interface RunArgsDao {
           + ":now, "
           + ":args, "
           + ":checksum "
-          + ") ON CONFLICT(checksum) DO "
-          + "UPDATE SET "
-          + "args = :args "
-          + "RETURNING *")
-  RunArgsRow upsertRunArgs(UUID uuid, Instant now, String args, String checksum);
+          + ") ON CONFLICT(checksum) DO NOTHING")
+  void doUpsertRunArgs(UUID uuid, Instant now, String args, String checksum);
 }

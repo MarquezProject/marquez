@@ -36,7 +36,6 @@ import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 /** The DAO for {@code JobVersion}. */
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
@@ -294,7 +293,6 @@ public interface JobVersionDao extends BaseDao {
    * @param transitionedAt The timestamp of the run state transition.
    * @return A {@link BagOfJobVersionInfo} object.
    */
-  @Transaction
   default BagOfJobVersionInfo upsertJobVersionOnRunTransition(
       @NonNull String namespaceName,
       @NonNull String jobName,
@@ -327,7 +325,10 @@ public interface JobVersionDao extends BaseDao {
     final Version jobVersion =
         Utils.newJobVersionFor(
             NamespaceName.of(jobRow.getNamespaceName()),
-            JobName.of(jobRow.getName()),
+            JobName.of(
+                Optional.ofNullable(jobRow.getParentJobName())
+                    .map(pn -> pn + "." + jobRow.getSimpleName())
+                    .orElse(jobRow.getName())),
             toDatasetIds(jobVersionInputs),
             toDatasetIds(jobVersionOutputs),
             jobContext,
