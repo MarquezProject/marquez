@@ -49,7 +49,7 @@ public class DatasetData implements NodeData {
     return Optional.ofNullable(description);
   }
 
-  public Optional<String> getLastlifecycleState() {
+  public Optional<String> getLastLifecycleState() {
     return Optional.ofNullable(lastLifecycleState);
   }
 
