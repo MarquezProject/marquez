@@ -1029,19 +1029,26 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: string
+                type: array
+                items: 
+                  type: string
               description:
                 description: The description of the field.
                 type: string
         tags:
           description: List of tags.
-          type: string
+          type: array
+          items:
+            type: string
         lastModifiedAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset was last modified by a successful run.
           type: string
           format: date-time
+        lastLifecycleState:
+          description: The last lifecycle state of the dataset.
+          type: string
         description:
-          description:  The description of the dataset.
+          description: The description of the dataset.
           type: string
         facets:
           $ref: '#/components/schemas/DatasetFacets'
@@ -1049,6 +1056,9 @@ components:
           description: The current version of the dataset.
           type: string
           format: uuid
+        deleted:
+          description: The deleted state of the dataset.
+          type: boolean
       example:
         id:
           namespace: my-namespace
