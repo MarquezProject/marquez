@@ -39,7 +39,7 @@ public class DatasetData implements NodeData {
   @NonNull ImmutableSet<TagName> tags;
   @Nullable Instant lastModifiedAt;
   @Nullable String description;
-  @Nullable String lastlifecycleState;
+  @Nullable String lastLifecycleState;
 
   public Optional<Instant> getLastModifiedAt() {
     return Optional.ofNullable(lastModifiedAt);
@@ -50,7 +50,7 @@ public class DatasetData implements NodeData {
   }
 
   public Optional<String> getLastlifecycleState() {
-    return Optional.ofNullable(lastlifecycleState);
+    return Optional.ofNullable(lastLifecycleState);
   }
 
   @JsonIgnore
