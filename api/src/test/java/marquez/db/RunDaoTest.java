@@ -243,7 +243,7 @@ class RunDaoTest {
             null,
             namespaceRow.getUuid(),
             namespaceRow.getName(),
-            row.getJobName(),
+            jobRow.getName(),
             null,
             null);
 

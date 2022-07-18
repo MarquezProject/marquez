@@ -27,7 +27,6 @@ import marquez.common.models.Version;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
@@ -128,7 +127,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
 
     // (2) Add a new run.
     final RunArgsRow runArgsRow = DbTestUtils.newRunArgs(jdbiForTesting);
-    final ExtendedRunRow runRow =
+    final RunRow runRow =
         DbTestUtils.newRun(
             jdbiForTesting,
             jobVersionRow.getJobUuid(),

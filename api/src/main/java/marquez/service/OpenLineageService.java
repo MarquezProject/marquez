@@ -34,6 +34,7 @@ import marquez.db.BaseDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
+import marquez.db.models.JobRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.UpdateLineageRow;
@@ -121,7 +122,12 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   private Optional<JobInputUpdate> buildJobInputUpdate(UpdateLineageRow record) {
     RunId runId = RunId.of(record.getRun().getUuid());
     return buildJobInput(
-        record.getRun(), record.getRunArgs(), buildJobVersionId(record), runId, record);
+        record.getRun(),
+        record.getRunArgs(),
+        record.getJob(),
+        buildJobVersionId(record),
+        runId,
+        record);
   }
 
   public JobVersionId buildJobVersionId(UpdateLineageRow record) {
@@ -161,14 +167,15 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
         new JobOutputUpdate(
             runId,
             jobVersionId,
-            JobName.of(record.getRun().getJobName()),
-            NamespaceName.of(record.getRun().getNamespaceName()),
+            JobName.of(record.getJob().getName()),
+            NamespaceName.of(record.getJob().getNamespaceName()),
             runOutputs));
   }
 
   Optional<JobInputUpdate> buildJobInput(
       RunRow run,
       RunArgsRow runArgsRow,
+      JobRow jobRow,
       JobVersionId jobVersionId,
       RunId runId,
       UpdateLineageRow record) {
@@ -203,8 +210,8 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                 .args(runArgs)
                 .build(),
             jobVersionId,
-            JobName.of(run.getJobName()),
-            NamespaceName.of(run.getNamespaceName()),
+            JobName.of(jobRow.getName()),
+            NamespaceName.of(jobRow.getNamespaceName()),
             runInputs));
   }
 

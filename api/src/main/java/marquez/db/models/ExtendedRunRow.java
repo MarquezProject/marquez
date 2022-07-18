@@ -18,6 +18,10 @@ import marquez.common.models.DatasetVersionId;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ExtendedRunRow extends RunRow {
+  @Getter @NonNull private final List<DatasetVersionId> inputVersions;
+  @Getter @NonNull private final List<DatasetVersionId> outputVersions;
+  @Getter private final String namespaceName;
+  @Getter private final String jobName;
   @Getter private final String args;
 
   public ExtendedRunRow(
@@ -48,17 +52,21 @@ public class ExtendedRunRow extends RunRow {
         jobVersionUuid,
         parentRunUuid,
         runArgsUuid,
-        inputVersions,
-        outputVersions,
         nominalStartTime,
         nominalEndTime,
         currentRunState,
         startedAt,
         startRunStateUuid,
         endedAt,
-        endRunStateUuid,
-        namespaceName,
-        jobName);
+        endRunStateUuid);
+    this.inputVersions = inputVersions;
+    this.outputVersions = outputVersions;
     this.args = args;
+    this.jobName = jobName;
+    this.namespaceName = namespaceName;
+  }
+
+  public boolean hasInputVersionUuids() {
+    return !inputVersions.isEmpty();
   }
 }

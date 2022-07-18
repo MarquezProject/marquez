@@ -77,7 +77,7 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     if (transitionedAt == null) {
       transitionedAt = Instant.now();
     }
-    ExtendedRunRow runRow = findRunByUuidAsRow(runId.getValue()).get();
+    ExtendedRunRow runRow = findRunByUuidAsExtendedRow(runId.getValue()).get();
     runStateDao.updateRunStateFor(runId.getValue(), runState, transitionedAt);
 
     if (runState.isDone()) {
