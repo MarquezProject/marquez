@@ -7,26 +7,20 @@ package marquez.db.migrations;
 
 import static marquez.db.BackfillTestUtils.writeNewEvent;
 import static marquez.db.LineageTestUtils.NAMESPACE;
-import static marquez.db.LineageTestUtils.createLineageRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.models.JobName;
-import marquez.db.JobDao;
-import marquez.db.LineageTestUtils;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.NamespaceRow;
-import marquez.db.models.UpdateLineageRow;
+import marquez.jdbi.JdbiExternalPostgresExtension.FlywayTarget;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
-import marquez.service.models.Job;
-import marquez.service.models.LineageEvent.JobFacet;
 import org.flywaydb.core.api.configuration.Configuration;
 import org.flywaydb.core.api.migration.Context;
 import org.jdbi.v3.core.Jdbi;
@@ -35,6 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
+// fix the flyway migration up to v44 since we depend on the database structure as it exists at this
+// point in time. The migration will only ever be applied on a database at this version.
+@FlywayTarget("44")
 class V44_3_BackfillJobsWithParentsTest {
 
   static Jdbi jdbi;
@@ -48,26 +45,16 @@ class V44_3_BackfillJobsWithParentsTest {
 
   @Test
   public void testBackfill() throws SQLException, JsonProcessingException {
-    String parentName = "parentJob";
-    UpdateLineageRow parentJob =
-        createLineageRow(
-            openLineageDao,
-            parentName,
-            "COMPLETE",
-            new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP),
-            Collections.emptyList(),
-            Collections.emptyList());
-
     NamespaceDao namespaceDao = jdbi.onDemand(NamespaceDao.class);
     Instant now = Instant.now();
     NamespaceRow namespace =
         namespaceDao.upsertNamespaceRow(UUID.randomUUID(), now, NAMESPACE, "me");
+    String parentName = "parentJob";
+    ExtendedRunRow parentRun = writeNewEvent(jdbi, parentName, now, namespace, null, null);
 
     String task1Name = "task1";
-    writeNewEvent(
-        jdbi, task1Name, now, namespace, parentJob.getRun().getUuid().toString(), parentName);
-    writeNewEvent(
-        jdbi, "task2", now, namespace, parentJob.getRun().getUuid().toString(), parentName);
+    writeNewEvent(jdbi, task1Name, now, namespace, parentRun.getUuid().toString(), parentName);
+    writeNewEvent(jdbi, "task2", now, namespace, parentRun.getUuid().toString(), parentName);
 
     jdbi.useHandle(
         handle -> {
@@ -92,11 +79,13 @@ class V44_3_BackfillJobsWithParentsTest {
           }
         });
 
-    JobDao jobDao = jdbi.onDemand(JobDao.class);
-    Optional<Job> jobByName = jobDao.findJobByName(NAMESPACE, task1Name);
-    assertThat(jobByName)
-        .isPresent()
-        .get()
-        .hasFieldOrPropertyWithValue("name", new JobName(parentName + "." + task1Name));
+    Optional<String> jobName =
+        jdbi.withHandle(
+            h ->
+                h.createQuery("SELECT name FROM jobs_view WHERE simple_name=:jobName")
+                    .bind("jobName", task1Name)
+                    .mapTo(String.class)
+                    .findFirst());
+    assertThat(jobName).isPresent().get().isEqualTo(parentName + "." + task1Name);
   }
 }

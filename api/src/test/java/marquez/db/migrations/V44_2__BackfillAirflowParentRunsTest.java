@@ -6,27 +6,23 @@
 package marquez.db.migrations;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
-import static marquez.db.LineageTestUtils.createLineageRow;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.db.BackfillTestUtils;
 import marquez.db.JobDao;
-import marquez.db.LineageTestUtils;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.models.NamespaceRow;
+import marquez.jdbi.JdbiExternalPostgresExtension.FlywayTarget;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
-import marquez.service.models.Job;
-import marquez.service.models.LineageEvent.JobFacet;
 import org.flywaydb.core.api.configuration.Configuration;
 import org.flywaydb.core.api.migration.Context;
 import org.jdbi.v3.core.Jdbi;
@@ -35,6 +31,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
+// fix the flyway migration up to v44 since we depend on the database structure as it exists at this
+// point in time. The migration will only ever be applied on a database at this version.
+@FlywayTarget("44")
 class V44_2__BackfillAirflowParentRunsTest {
 
   static Jdbi jdbi;
@@ -66,13 +65,7 @@ class V44_2__BackfillAirflowParentRunsTest {
     BackfillTestUtils.writeNewEvent(
         jdbi, "airflowDag.task2", now, namespace, "schedule:00:00:00", task1Name);
 
-    createLineageRow(
-        openLineageDao,
-        "a_non_airflow_task",
-        BackfillTestUtils.COMPLETE,
-        new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP),
-        Collections.emptyList(),
-        Collections.emptyList());
+    BackfillTestUtils.writeNewEvent(jdbi, "a_non_airflow_task", now, namespace, null, null);
 
     jdbi.useHandle(
         handle -> {
@@ -94,7 +87,18 @@ class V44_2__BackfillAirflowParentRunsTest {
             throw new AssertionError("Unable to execute migration", e);
           }
         });
-    Optional<Job> jobByName = jobDao.findJobByName(NAMESPACE, dagName);
-    assertThat(jobByName).isPresent();
+    Optional<String> jobNameResult =
+        jdbi.withHandle(
+            h ->
+                h.createQuery(
+                        """
+            SELECT name FROM jobs_view
+            WHERE namespace_name=:namespace AND simple_name=:jobName
+            """)
+                    .bind("namespace", NAMESPACE)
+                    .bind("jobName", dagName)
+                    .mapTo(String.class)
+                    .findFirst());
+    assertThat(jobNameResult).isPresent();
   }
 }
