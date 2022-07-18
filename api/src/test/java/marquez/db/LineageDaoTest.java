@@ -566,7 +566,7 @@ public class LineageDaoTest {
             Collections.singleton(row.getOutputs().get().get(0).getDatasetRow().getUuid()));
 
     assertThat(datasetData)
-        .extracting(ds -> ds.getLastlifecycleState().orElse(""))
+        .extracting(ds -> ds.getLastLifecycleState().orElse(""))
         .anyMatch(str -> str.contains("CREATE"));
   }
 
