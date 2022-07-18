@@ -29,7 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-@FlywayTarget("44") // apply migrations up to and including v44 but not beyond
+// fix the flyway migration up to v44 since we depend on the database structure as it exists at this
+// point in time. The migration will only ever be applied on a database at this version.
+@FlywayTarget("44")
 class V44_3_BackfillJobsWithParentsTest {
 
   static Jdbi jdbi;
