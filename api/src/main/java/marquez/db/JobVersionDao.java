@@ -286,22 +286,19 @@ public interface JobVersionDao extends BaseDao {
    * code location, and context. A version for a given job is created <i>only</i> when a {@link Run}
    * transitions into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
    *
-   * @param namespaceName The namespace for the job version.
-   * @param jobName The name of the job.
+   * @param jobRow The job.
    * @param runUuid The unique ID of the run associated with the job version.
    * @param runState The current run state.
    * @param transitionedAt The timestamp of the run state transition.
    * @return A {@link BagOfJobVersionInfo} object.
    */
   default BagOfJobVersionInfo upsertJobVersionOnRunTransition(
-      @NonNull String namespaceName,
-      @NonNull String jobName,
+      @NonNull JobRow jobRow,
       @NonNull UUID runUuid,
       @NonNull RunState runState,
       @NonNull Instant transitionedAt) {
     // Get the job.
     final JobDao jobDao = createJobDao();
-    final JobRow jobRow = jobDao.findJobByNameAsRow(namespaceName, jobName).get();
 
     // Get the job context.
     final UUID jobContextUuid = jobRow.getJobContextUuid().get();

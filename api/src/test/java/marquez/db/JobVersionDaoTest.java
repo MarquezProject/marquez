@@ -215,11 +215,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             jdbiForTesting, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
 
     jobVersionDao.upsertJobVersionOnRunTransition(
-        jobRow.getNamespaceName(),
-        jobRow.getName(),
-        runRow.getUuid(),
-        RunState.COMPLETED,
-        Instant.now());
+        jobRow, runRow.getUuid(), RunState.COMPLETED, Instant.now());
 
     List<JobVersion> jobVersions =
         jobVersionDao.findAllJobVersions(namespaceRow.getName(), jobRow.getName(), 10, 0);
@@ -288,11 +284,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     // (6) Add a new job version on the run state transition to COMPLETED.
     final BagOfJobVersionInfo bagOfJobVersionInfo =
         jobVersionDao.upsertJobVersionOnRunTransition(
-            jobRow.getNamespaceName(),
-            jobRow.getName(),
-            runRow.getUuid(),
-            RunState.COMPLETED,
-            newTimestamp());
+            jobRow, runRow.getUuid(), RunState.COMPLETED, newTimestamp());
 
     // Ensure the job version is associated with the latest run.
     final RunRow latestRunRowForJobVersion = runDao.findRunByUuidAsRow(runRow.getUuid()).get();

@@ -390,8 +390,7 @@ public interface OpenLineageDao extends BaseDao {
     BagOfJobVersionInfo bagOfJobVersionInfo =
         createJobVersionDao()
             .upsertJobVersionOnRunTransition(
-                updateLineageRow.getRun().getNamespaceName(),
-                updateLineageRow.getRun().getJobName(),
+                updateLineageRow.getJob(),
                 updateLineageRow.getRun().getUuid(),
                 runState,
                 event.getEventTime().toInstant());
