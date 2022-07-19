@@ -92,11 +92,11 @@ import net.sourceforge.argparse4j.inf.Subparser;
 @Slf4j
 public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   /* Default URL for HTTP backend. */
-  private static final String DEFAULT_URL = "http://localhost:8080";
+  private static final String DEFAULT_OL_URL = "http://localhost:8080";
 
   /* Args for seed command. */
-  private static final String CMD_ARG_URL = "url";
-  private static final String CMD_ARG_METADATA = "metadata";
+  private static final String CMD_ARG_OL_URL = "url";
+  private static final String CMD_ARG_OL_METADATA = "metadata";
 
   /* Define seed command. */
   public SeedCommand() {
@@ -112,7 +112,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
         .dest("url")
         .type(String.class)
         .required(false)
-        .setDefault(DEFAULT_URL)
+        .setDefault(DEFAULT_OL_URL)
         .help("the HTTP API server url");
     subparser
         .addArgument("--metadata")
@@ -127,8 +127,8 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
       @NonNull Bootstrap<MarquezConfig> bootstrap,
       @NonNull Namespace namespace,
       @NonNull MarquezConfig config) {
-    final String olUrl = namespace.getString(CMD_ARG_URL);
-    final String olMetadata = namespace.getString(CMD_ARG_METADATA);
+    final String olUrl = namespace.getString(CMD_ARG_OL_URL);
+    final String olMetadata = namespace.getString(CMD_ARG_OL_METADATA);
     // Use HTTP transport.
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
