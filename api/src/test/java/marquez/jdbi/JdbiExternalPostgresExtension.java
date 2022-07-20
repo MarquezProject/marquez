@@ -32,6 +32,9 @@ public abstract class JdbiExternalPostgresExtension
     String value();
   }
 
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface FlywaySkipRepeatable {}
+
   protected final List<JdbiPlugin> plugins = new ArrayList<>();
   private final ReentrantLock lock = new ReentrantLock();
   private volatile DataSource dataSource;
@@ -99,6 +102,13 @@ public abstract class JdbiExternalPostgresExtension
       FlywayTarget target = context.getRequiredTestClass().getAnnotation(FlywayTarget.class);
       if (target != null) {
         flywayConfig.target(target.value());
+      }
+      FlywaySkipRepeatable ignore =
+          context.getRequiredTestClass().getAnnotation(FlywaySkipRepeatable.class);
+      if (ignore != null) {
+        // This would be preferable, but we don't have access to Flyway Teams edition, so...
+        // flywayConfig.ignoreMigrationPatterns("repetable:*");
+        flywayConfig.repeatableSqlMigrationPrefix("Z__");
       }
 
       flyway = flywayConfig.load();
