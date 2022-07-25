@@ -133,10 +133,9 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
     log.info("Connected to '{}'... attempting to seed with metadata!", olUrl);
-
     // Load, then emit events.
     final ImmutableList<OpenLineage.RunEvent> olEvents = loadMetadata(olMetadata);
-    log.info("Emitting '{}' events to '{}'...", olEvents.size(), olUrl);
+    log.info("Emitting '{}' events to: '{}'", olEvents.size(), olUrl);
     int olEventsEmitted = 0; // Keep count of events emitted.
     for (final OpenLineage.RunEvent olEvent : olEvents) {
       olClient.emit(olEvent);
