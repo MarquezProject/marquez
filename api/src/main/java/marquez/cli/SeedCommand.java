@@ -44,7 +44,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * [
  *   {
  *     "eventType": "START",
- *     "eventTime": "2020-12-28T19:52:00.001+10:00",
+ *     "eventTime": "2020-02-22T22:42:42.000Z",
  *     "run": {
  *       "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
  *     },
@@ -56,11 +56,11 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *       "namespace": "my-namespace",
  *       "name": "my-input"
  *     }],
- *     "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+ *     "producer": "https://github.com/OpenLineage/OpenLineage/tree/0.11.0/client/java"
  *   },
  *   {
  *     "eventType": "COMPLETE",
- *     "eventTime": "2020-12-28T20:52:00.001+10:00",
+ *     "eventTime": "2020-02-22T22:48:12.000Z",
  *     "run": {
  *       "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
  *     },
@@ -73,8 +73,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *       "name": "my-output",
  *       "facets": {
  *         "schema": {
- *           "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
- *           "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+ *           "_producer": "https://github.com/OpenLineage/OpenLineage/tree/0.11.0/client/java",
+ *           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
  *           "fields": [
  *             { "name": "a", "type": "VARCHAR"},
  *             { "name": "b", "type": "VARCHAR"}
@@ -82,7 +82,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *         }
  *       }
  *     }],
- *     "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+ *     "producer": "https://github.com/OpenLineage/OpenLineage/tree/0.11.0/client/java"
  *   }
  * ]
  * }</pre>
@@ -133,9 +133,16 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
     log.info("Connected to '{}'... attempting to seed with metadata!", olUrl);
+
     // Load, then emit events.
-    loadMetadata(olMetadata).forEach(olClient::emit);
-    log.info("DONE!");
+    final ImmutableList<OpenLineage.RunEvent> olEvents = loadMetadata(olMetadata);
+    log.info("Emitting '{}' events to '{}'...", olEvents.size(), olUrl);
+    int olEventsEmitted = 0; // Keep count of events emitted.
+    for (final OpenLineage.RunEvent olEvent : olEvents) {
+      olClient.emit(olEvent);
+      olEventsEmitted++;
+    }
+    log.info("Successfully emitted '{}' events!", olEventsEmitted);
   }
 
   /* Returns {@link OpenLineage.RunEvent}s contained within the provided metadata file. */
