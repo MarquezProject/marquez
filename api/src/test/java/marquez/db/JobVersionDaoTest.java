@@ -27,7 +27,6 @@ import marquez.common.models.Version;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
@@ -128,7 +127,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
 
     // (2) Add a new run.
     final RunArgsRow runArgsRow = DbTestUtils.newRunArgs(jdbiForTesting);
-    final ExtendedRunRow runRow =
+    final RunRow runRow =
         DbTestUtils.newRun(
             jdbiForTesting,
             jobVersionRow.getJobUuid(),
@@ -216,11 +215,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             jdbiForTesting, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
 
     jobVersionDao.upsertJobVersionOnRunTransition(
-        jobRow.getNamespaceName(),
-        jobRow.getName(),
-        runRow.getUuid(),
-        RunState.COMPLETED,
-        Instant.now());
+        jobRow, runRow.getUuid(), RunState.COMPLETED, Instant.now());
 
     List<JobVersion> jobVersions =
         jobVersionDao.findAllJobVersions(namespaceRow.getName(), jobRow.getName(), 10, 0);
@@ -289,11 +284,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     // (6) Add a new job version on the run state transition to COMPLETED.
     final BagOfJobVersionInfo bagOfJobVersionInfo =
         jobVersionDao.upsertJobVersionOnRunTransition(
-            jobRow.getNamespaceName(),
-            jobRow.getName(),
-            runRow.getUuid(),
-            RunState.COMPLETED,
-            newTimestamp());
+            jobRow, runRow.getUuid(), RunState.COMPLETED, newTimestamp());
 
     // Ensure the job version is associated with the latest run.
     final RunRow latestRunRowForJobVersion = runDao.findRunByUuidAsRow(runRow.getUuid()).get();

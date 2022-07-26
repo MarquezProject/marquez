@@ -17,8 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
-import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.NamespaceRow;
+import marquez.db.models.RunRow;
 import marquez.jdbi.JdbiExternalPostgresExtension.FlywayTarget;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -50,7 +50,7 @@ class V44_3_BackfillJobsWithParentsTest {
     NamespaceRow namespace =
         namespaceDao.upsertNamespaceRow(UUID.randomUUID(), now, NAMESPACE, "me");
     String parentName = "parentJob";
-    ExtendedRunRow parentRun = writeNewEvent(jdbi, parentName, now, namespace, null, null);
+    RunRow parentRun = writeNewEvent(jdbi, parentName, now, namespace, null, null);
 
     String task1Name = "task1";
     writeNewEvent(jdbi, task1Name, now, namespace, parentRun.getUuid().toString(), parentName);

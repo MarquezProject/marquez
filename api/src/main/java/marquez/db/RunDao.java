@@ -22,7 +22,9 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.mappers.ExtendedRunRowMapper;
+import marquez.db.mappers.JobRowMapper;
 import marquez.db.mappers.RunMapper;
+import marquez.db.mappers.RunRowMapper;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
@@ -40,7 +42,9 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 
 @RegisterRowMapper(ExtendedRunRowMapper.class)
+@RegisterRowMapper(RunRowMapper.class)
 @RegisterRowMapper(RunMapper.class)
+@RegisterRowMapper(JobRowMapper.class)
 public interface RunDao extends BaseDao {
   @SqlQuery("SELECT EXISTS (SELECT 1 FROM runs WHERE uuid = :rowUuid)")
   boolean exists(UUID rowUuid);
@@ -103,7 +107,18 @@ public interface RunDao extends BaseDao {
   Optional<Run> findRunByUuid(UUID runUuid);
 
   @SqlQuery(BASE_FIND_RUN_SQL + "WHERE r.uuid = :runUuid")
-  Optional<ExtendedRunRow> findRunByUuidAsRow(UUID runUuid);
+  Optional<ExtendedRunRow> findRunByUuidAsExtendedRow(UUID runUuid);
+
+  @SqlQuery("SELECT * FROM runs r WHERE r.uuid = :runUuid")
+  Optional<RunRow> findRunByUuidAsRow(UUID runUuid);
+
+  @SqlQuery(
+      """
+  SELECT j.* FROM jobs_view j
+  INNER JOIN runs_view r  ON r.job_uuid=j.uuid
+  WHERE r.uuid=:uuid
+""")
+  Optional<JobRow> findJobRowByRunUuid(UUID uuid);
 
   @SqlQuery(
       """
@@ -195,8 +210,8 @@ public interface RunDao extends BaseDao {
           + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
           + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
-          + "RETURNING uuid")
-  UUID upsertWithRunState(
+          + "RETURNING *")
+  RunRow upsert(
       UUID runUuid,
       UUID parentRunUuid,
       String externalId,
@@ -212,42 +227,6 @@ public interface RunDao extends BaseDao {
       String jobName,
       String location,
       UUID jobContextUuid);
-
-  default ExtendedRunRow upsert(
-      UUID runUuid,
-      UUID parentRunUuid,
-      String externalId,
-      Instant now,
-      UUID jobUuid,
-      UUID jobVersionUuid,
-      UUID runArgsUuid,
-      Instant nominalStartTime,
-      Instant nominalEndTime,
-      RunState runStateType,
-      Instant runStateTime,
-      String namespaceName,
-      String jobName,
-      String location,
-      UUID jobContextUuid) {
-    UUID rowUuid =
-        upsertWithRunState(
-            runUuid,
-            parentRunUuid,
-            externalId,
-            now,
-            jobUuid,
-            jobVersionUuid,
-            runArgsUuid,
-            nominalStartTime,
-            nominalEndTime,
-            runStateType,
-            runStateTime,
-            namespaceName,
-            jobName,
-            location,
-            jobContextUuid);
-    return findRunByUuidAsRow(rowUuid).get();
-  }
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -286,8 +265,8 @@ public interface RunDao extends BaseDao {
           + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
           + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
           + "location = EXCLUDED.location "
-          + "RETURNING uuid")
-  UUID upsertWithoutRunState(
+          + "RETURNING *")
+  RunRow upsert(
       UUID runUuid,
       UUID parentRunUuid,
       String externalId,
@@ -302,40 +281,6 @@ public interface RunDao extends BaseDao {
       String jobName,
       String location,
       UUID jobContextUuid);
-
-  default ExtendedRunRow upsert(
-      UUID runUuid,
-      UUID parentRunUuid,
-      String externalId,
-      Instant now,
-      UUID jobUuid,
-      UUID jobVersionUuid,
-      UUID runArgsUuid,
-      Instant nominalStartTime,
-      Instant nominalEndTime,
-      UUID namespaceUuid,
-      String namespaceName,
-      String jobName,
-      String location,
-      UUID jobContextUuid) {
-    UUID runRowUuid =
-        upsertWithoutRunState(
-            runUuid,
-            parentRunUuid,
-            externalId,
-            now,
-            jobUuid,
-            jobVersionUuid,
-            runArgsUuid,
-            nominalStartTime,
-            nominalEndTime,
-            namespaceUuid,
-            namespaceName,
-            jobName,
-            location,
-            jobContextUuid);
-    return findRunByUuidAsRow(runRowUuid).get();
-  }
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "

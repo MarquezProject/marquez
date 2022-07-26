@@ -32,7 +32,6 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
-import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -161,10 +160,9 @@ public interface OpenLineageDao extends BaseDao {
                 PGobject inputs = new PGobject();
                 inputs.setType("json");
                 inputs.setValue("[]");
-                Optional<ExtendedRunRow> parentRunRow = runDao.findRunByUuidAsRow(uuid);
                 JobRow parentJobRow =
-                    parentRunRow
-                        .flatMap(run -> jobDao.findJobByUuidAsRow(run.getJobUuid()))
+                    runDao
+                        .findJobRowByRunUuid(uuid)
                         .orElseGet(
                             () -> {
                               JobRow newParentJobRow =
@@ -181,34 +179,36 @@ public interface OpenLineageDao extends BaseDao {
                                       null,
                                       inputs);
                               log.info("Created new parent job record {}", newParentJobRow);
+
+                              RunArgsRow argsRow =
+                                  runArgsDao.upsertRunArgs(
+                                      UUID.randomUUID(),
+                                      now,
+                                      "{}",
+                                      Utils.checksumFor(ImmutableMap.of()));
+                              RunRow newRow =
+                                  runDao.upsert(
+                                      uuid,
+                                      null,
+                                      facet.getRun().getRunId(),
+                                      now,
+                                      newParentJobRow.getUuid(),
+                                      null,
+                                      argsRow.getUuid(),
+                                      nominalStartTime,
+                                      nominalEndTime,
+                                      Optional.ofNullable(event.getEventType())
+                                          .map(this::getRunState)
+                                          .orElse(null),
+                                      now,
+                                      namespace.getName(),
+                                      newParentJobRow.getName(),
+                                      newParentJobRow.getLocation(),
+                                      newParentJobRow.getJobContextUuid().orElse(null));
+                              log.info("Created new parent run record {}", newRow);
                               return newParentJobRow;
                             });
                 log.debug("Found parent job record {}", parentJobRow);
-                if (parentRunRow.isEmpty()) {
-                  RunArgsRow argsRow =
-                      runArgsDao.upsertRunArgs(
-                          UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
-                  ExtendedRunRow newRow =
-                      runDao.upsert(
-                          uuid,
-                          null,
-                          facet.getRun().getRunId(),
-                          now,
-                          parentJobRow.getUuid(),
-                          null,
-                          argsRow.getUuid(),
-                          nominalStartTime,
-                          nominalEndTime,
-                          Optional.ofNullable(event.getEventType())
-                              .map(this::getRunState)
-                              .orElse(null),
-                          now,
-                          namespace.getName(),
-                          parentJobRow.getName(),
-                          parentJobRow.getLocation(),
-                          parentJobRow.getJobContextUuid().orElse(null));
-                  log.info("Created new parent run record {}", newRow);
-                }
                 return parentJobRow;
               } catch (Exception e) {
                 throw new RuntimeException("Unable to insert parent run", e);
@@ -390,8 +390,7 @@ public interface OpenLineageDao extends BaseDao {
     BagOfJobVersionInfo bagOfJobVersionInfo =
         createJobVersionDao()
             .upsertJobVersionOnRunTransition(
-                updateLineageRow.getRun().getNamespaceName(),
-                updateLineageRow.getRun().getJobName(),
+                updateLineageRow.getJob(),
                 updateLineageRow.getRun().getUuid(),
                 runState,
                 event.getEventTime().toInstant());

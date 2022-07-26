@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.Utils;
-import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
+import marquez.db.models.RunRow;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.JobLink;
@@ -35,7 +35,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 public class BackfillTestUtils {
   public static final String COMPLETE = "COMPLETE";
 
-  public static ExtendedRunRow writeNewEvent(
+  public static RunRow writeNewEvent(
       Jdbi jdbi,
       String jobName,
       Instant now,
@@ -52,7 +52,7 @@ public class BackfillTestUtils {
         runArgsDao.upsertRunArgs(
             UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
     UUID runUuid = UUID.randomUUID();
-    ExtendedRunRow runRow =
+    RunRow runRow =
         runDao.upsert(
             runUuid,
             null,
