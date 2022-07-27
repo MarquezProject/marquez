@@ -29,7 +29,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NamespaceMeta'
+              $ref: '#/components/schemas/CreatedNamespace'
       responses:
         '200':
           description: OK
@@ -75,7 +75,6 @@ paths:
       description: Creates a new source object. A source is the physical location of a dataset such as
         a table in PostgreSQL, or topic in Kafka. A source enables the grouping of physical datasets
         to their physical source.
-      deprecated: true
       tags:
         - Sources
       requestBody:
@@ -345,24 +344,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/job'
-    post:
-      summary: Create a run
-      description: Creates a new run object for a job.
-      deprecated: true
-      tags:
-        - Jobs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreatedRun'
-      responses:
-        '201':
-          description: CREATED
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Run'
     get:
       parameters:
         - $ref: '#/components/parameters/limit'
@@ -395,82 +376,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/IncompleteRun'
 
-  /jobs/runs/{id}/start:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Start a run
-      description: Marks the run as `RUNNING`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
-  /jobs/runs/{id}/complete:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Complete a run
-      description: Marks the run as `COMPLETED`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Run'
-
-  /jobs/runs/{id}/fail:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Fail a run
-      description: Marks the run as `FAILED`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
-  /jobs/runs/{id}/abort:
-    parameters:
-      - $ref: '#/components/parameters/runId'
-      - $ref: '#/components/parameters/at'
-    post:
-      summary: Abort a run
-      description: Marks the run as `ABORTED`.
-      deprecated: true
-      tags:
-        - Jobs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IncompleteRun'
-
   /lineage:
     post:
       summary: Record a single lineage event
-      description: Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.
+      description: Collect lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.
+        OpenLineage is an Open Standard for lineage metadata collection designed to record metadata for a _job_ in execution. The standard defines a generic
+        model of _dataset_, _job_, and _run_ entities uniquely identified using consistent naming strategies. The [core model](https://openlineage.io/getting-started#openlineage-core-model)
+        is highly extensible via facets. A **facet** is user-defined metadata and enables entity enrichment.
       tags:
         - Lineage
       requestBody:
@@ -709,7 +621,7 @@ components:
       required: false
 
   schemas:
-    NamespaceMeta:
+    CreatedNamespace:
       type: object
       properties:
         ownerName:
@@ -1669,6 +1581,36 @@ components:
         description: My first tag!
 
     LineageEvent:
+      type: object
+      properties:
+        eventType:
+          description: The transition state of the run.
+          type: string
+        eventTime:
+          description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the transition time of the run.
+          type: data-time
+        run:
+          description:
+          type: object
+        job:
+          description:
+          type: object
+        inputs:
+          description:
+          type: object
+        outputs:
+          description:
+          type: object
+        producer:
+          description:
+          type: string
+          format: uri
+      required:
+        - eventType
+        - eventTime
+        - run
+        - job
+        - producer
       example:
         eventType: COMPLETE
         eventTime: 2019-05-09T19:49:24.201361Z
@@ -1679,8 +1621,8 @@ components:
           name: my-output,
           facets: {
             schema: {
-              _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
-              _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+              _producer: "https://github.com/OpenLineage/OpenLineage/tree/0.11.0/client/java",
+              _schemaURL: "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
               fields: [
                 {name: a, type: INTEGER},
                 {name: b, type: TIMESTAMP},
@@ -1690,7 +1632,7 @@ components:
             }
           }
         }]
-        producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
+        producer: "https://github.com/OpenLineage/OpenLineage/tree/0.11.0/client/java"
 
     SearchResultList:
       type: object
