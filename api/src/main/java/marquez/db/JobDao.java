@@ -237,7 +237,7 @@ public interface JobDao extends BaseDao {
           current_location,
           current_inputs,
           symlink_target_uuid,
-          parent_job_id_string
+          parent_job_uuid_string
           ) VALUES (
           :uuid,
           :type,
@@ -272,7 +272,7 @@ public interface JobDao extends BaseDao {
           INSERT INTO jobs_view AS j (
           uuid,
           parent_job_uuid,
-          parent_job_id_string,
+          parent_job_uuid_string,
           type,
           created_at,
           updated_at,

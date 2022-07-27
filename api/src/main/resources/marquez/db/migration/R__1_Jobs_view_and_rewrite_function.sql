@@ -16,7 +16,7 @@ SELECT f.uuid,
        j.current_location,
        j.current_inputs,
        j.symlink_target_uuid,
-       j.parent_job_id_string,
+       j.parent_job_uuid_string,
        f.aliases
 FROM jobs_fqn f,
      jobs j
@@ -26,13 +26,13 @@ WHERE j.uuid = f.uuid;
 CREATE OR REPLACE FUNCTION rewrite_jobs_fqn_table() RETURNS TRIGGER AS
 $$
 DECLARE
-    id uuid;
-    inserted jobs_view%rowtype;
+    job_uuid uuid;
+    inserted_job jobs_view%rowtype;
 BEGIN
     INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, description,
                       current_version_uuid, namespace_name, current_job_context_uuid,
                       current_location, current_inputs, symlink_target_uuid, parent_job_uuid,
-                      parent_job_id_string)
+                      parent_job_uuid_string)
     SELECT NEW.uuid,
            NEW.type,
            NEW.created_at,
@@ -48,7 +48,7 @@ BEGIN
            NEW.symlink_target_uuid,
            NEW.parent_job_uuid,
            COALESCE(NEW.parent_job_uuid::char(36), '')
-    ON CONFLICT (name, namespace_uuid, parent_job_id_string)
+    ON CONFLICT (name, namespace_uuid, parent_job_uuid_string)
         DO UPDATE SET updated_at               = EXCLUDED.updated_at,
                       type                     = EXCLUDED.type,
                       description              = EXCLUDED.description,
@@ -59,7 +59,7 @@ BEGIN
                       symlink_target_uuid      = COALESCE(
                               EXCLUDED.symlink_target_uuid,
                               jobs.symlink_target_uuid)
-    RETURNING uuid INTO id;
+    RETURNING uuid INTO job_uuid;
     IF TG_OP = 'INSERT' OR
        (TG_OP = 'UPDATE' AND OLD.symlink_target_uuid IS DISTINCT FROM NEW.symlink_target_uuid) THEN
         WITH RECURSIVE
@@ -82,7 +82,7 @@ BEGIN
                     FROM jobs j
                              LEFT JOIN jobs_fqn jf ON jf.uuid=j.parent_job_uuid
                              LEFT JOIN jobs_symlink js ON js.link_target_uuid=j.uuid
-                    WHERE j.uuid=id OR j.symlink_target_uuid=id OR js.uuid=id
+                    WHERE j.uuid=job_uuid OR j.symlink_target_uuid=job_uuid OR js.uuid=job_uuid
                     UNION
                     SELECT j1.uuid,
                            f.name || '.' || j1.name AS name,
@@ -113,8 +113,8 @@ BEGIN
             SET job_fqn=EXCLUDED.job_fqn,
                 aliases = jobs_fqn.aliases || EXCLUDED.aliases;
     END IF;
-    SELECT * INTO inserted FROM jobs_view WHERE uuid=id;
-    return inserted;
+    SELECT * INTO inserted_job FROM jobs_view WHERE uuid=job_uuid;
+    return inserted_job;
 END;
 $$ LANGUAGE plpgsql;
 
