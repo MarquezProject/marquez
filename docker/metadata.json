@@ -303,14 +303,14 @@
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
           "fields": [
-            {"name": "id", "type": "INT", "description": "The unique ID of the customer."},
+            {"name": "id", "type": "INTEGER", "description": "The unique ID of the customer."},
             {"name": "created_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the customer was created."},
             {"name": "updated_at", "type": "TIMESTAMP", "description": "An ISO-8601 timestamp representing the date/time the customer was updated."},
             {"name": "name", "type": "VARCHAR",  "description": "The name of the customer."},
             {"name": "email", "type": "VARCHAR", "description": "The email address of the customer."},
             {"name": "address", "type": "VARCHAR", "description": "The address of the customer."},
             {"name": "phone", "type": "VARCHAR", "description": "The phone number of the customer."},
-            {"name": "city_id", "type": "INT", "description": "The ID of the city related to the customer."}
+            {"name": "city_id", "type": "INTEGER", "description": "The ID of the city related to the customer."}
           ]
         }
       }
@@ -654,7 +654,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "INSERT INTO popular_orders_day_of_week (order_day_of_week, order_placed_on, orders_placed)\n  SELECT EXTRACT(DOW FROM order_placed_on) AS order_day_of_week, order_placed_on, COUNT(*) AS orders_placed\n    FROM top_delivery_times\n   GROUP BY order_day_of_week\n   ORDER BY orders_placed DESC\n   LIMIT 1;"
+          "query": "INSERT INTO popular_orders_day_of_week (order_day_of_week, order_placed_on, orders_placed)\n  SELECT EXTRACT(DOW FROM t.order_placed_on) AS order_day_of_week, t.order_placed_on, COUNT(*) AS orders_placed\n    FROM top_delivery_times AS t\n   INNER JOIN customers AS c\n      ON d.customer_email = c.email\n   GROUP BY t.order_day_of_week\n   ORDER BY t.orders_placed DESC\n   LIMIT 1;"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -663,7 +663,10 @@
         }
       }
     },
-    "inputs": [{"namespace": "food_delivery", "name": "public.top_delivery_times"}],
+    "inputs": [
+      {"namespace": "food_delivery", "name": "public.top_delivery_times"},
+      {"namespace": "food_delivery", "name": "public.customers"}
+    ],
     "outputs": [{
       "namespace": "food_delivery",
       "name": "public.popular_orders_day_of_week",
@@ -706,7 +709,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "SELECT * FROM discounts;"
+          "query": "SELECT d.id, d.amount_off, d.customer_email, d.starts_on, d.ends_on\n  FROM discounts AS d\n INNER JOIN customers AS c\n    ON d.customer_email = c.email;"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -715,7 +718,10 @@
         }
       }
     },
-    "inputs": [{"namespace": "food_delivery", "name": "public.discounts"}],
+    "inputs": [
+      {"namespace": "food_delivery", "name": "public.discounts"},
+      {"namespace": "food_delivery", "name": "public.customers"}
+    ],
     "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
   },
   {
