@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
 
+### Changed
+* Updated `jobs_view` to stop computing FQN on reads and to compute on _writes_ instead [@collado-mike](https://github.com/collado-mike)
+
 ## [0.23.0](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-16
 
 ### Added
