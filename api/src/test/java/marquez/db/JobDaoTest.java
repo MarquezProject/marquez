@@ -15,11 +15,16 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.common.Utils;
+import marquez.common.models.JobType;
 import marquez.db.models.DbModelGenerator;
+import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -30,6 +35,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.postgresql.util.PGobject;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobDaoTest {
@@ -69,11 +75,10 @@ public class JobDaoTest {
     JobRow symlinkJob =
         createJobWithSymlinkTarget(
             jdbi, namespace, "symlinkJob", targetJob.getUuid(), "the symlink job");
-
     Optional<Job> jobByName =
         jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName());
 
-    assertJobEquals(jobByName, targetJob.getNamespaceName(), targetJob.getName());
+    assertJobIdEquals(jobByName, targetJob.getNamespaceName(), targetJob.getName());
   }
 
   @Test
@@ -147,13 +152,13 @@ public class JobDaoTest {
     // the job queried is returned, since there is no symlink
     Optional<Job> jobByName =
         jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName());
-    assertJobEquals(jobByName, symlinkJob.getNamespaceName(), symlinkJob.getName());
+    assertJobIdEquals(jobByName, symlinkJob.getNamespaceName(), symlinkJob.getName());
 
     createJobWithSymlinkTarget(
         jdbi, namespace, symlinkJobName, targetJob.getUuid(), "the symlink job");
 
     // now the symlink target should be returned
-    assertJobEquals(
+    assertJobIdEquals(
         jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName()),
         targetJob.getNamespaceName(),
         targetJob.getName());
@@ -162,13 +167,82 @@ public class JobDaoTest {
     createJobWithoutSymlinkTarget(jdbi, namespace, symlinkJobName, "the symlink job");
 
     // the symlink target should still be returned
-    assertJobEquals(
+    assertJobIdEquals(
         jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName()),
         targetJob.getNamespaceName(),
         targetJob.getName());
   }
 
-  private AbstractObjectAssert<?, Job> assertJobEquals(
+  public void testSymlinkParentJobRenamesChildren() throws SQLException {
+    String parentJobName = "parentJob";
+    JobRow parentJob =
+        createJobWithoutSymlinkTarget(jdbi, namespace, parentJobName, "the original parent job");
+    Instant now = Instant.now();
+    JobContextRow jobContext =
+        jdbi.onDemand(JobContextDao.class)
+            .upsert(UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
+    PGobject inputs = new PGobject();
+    inputs.setValue("[]");
+    inputs.setType("JSON");
+    String childJob1Name = "child1";
+    JobRow childJob1 =
+        jobDao.upsertJob(
+            UUID.randomUUID(),
+            parentJob.getUuid(),
+            JobType.BATCH,
+            now,
+            namespace.getUuid(),
+            namespace.getName(),
+            childJob1Name,
+            null,
+            jobContext.getUuid(),
+            null,
+            null,
+            inputs);
+
+    String childJob2Name = "child2";
+    JobRow childJob2 =
+        jobDao.upsertJob(
+            UUID.randomUUID(),
+            parentJob.getUuid(),
+            JobType.BATCH,
+            now,
+            namespace.getUuid(),
+            namespace.getName(),
+            childJob2Name,
+            null,
+            jobContext.getUuid(),
+            null,
+            null,
+            inputs);
+
+    // the job queried is returned, since there is no symlink
+    String jobFqn = parentJobName + "." + childJob1Name;
+    Optional<Job> jobByName = jobDao.findJobByName(parentJob.getNamespaceName(), jobFqn);
+    assertJobIdEquals(jobByName, parentJob.getNamespaceName(), jobFqn);
+
+    JobRow targetJob =
+        createJobWithoutSymlinkTarget(jdbi, namespace, "newParentJob", "the target of the symlink");
+
+    createJobWithSymlinkTarget(
+        jdbi, namespace, parentJobName, targetJob.getUuid(), "the symlink job");
+
+    // now the renamed job should be returned
+    String newJobFqn = targetJob.getName() + "." + childJob1Name;
+    assertJobIdEquals(
+        jobDao.findJobByName(parentJob.getNamespaceName(), jobFqn),
+        targetJob.getNamespaceName(),
+        newJobFqn);
+
+    // query the second child by only its simple name
+    String child2Fqn = targetJob.getName() + "." + childJob2Name;
+    assertJobIdEquals(
+        jobDao.findJobByName(parentJob.getNamespaceName(), child2Fqn),
+        targetJob.getNamespaceName(),
+        child2Fqn);
+  }
+
+  private AbstractObjectAssert<?, Job> assertJobIdEquals(
       Optional<Job> jobByName, String namespaceName, String jobName) {
     return assertThat(jobByName)
         .isPresent()

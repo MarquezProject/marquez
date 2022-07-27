@@ -21,6 +21,7 @@ import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.models.NamespaceRow;
+import marquez.jdbi.JdbiExternalPostgresExtension.FlywaySkipRepeatable;
 import marquez.jdbi.JdbiExternalPostgresExtension.FlywayTarget;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -34,6 +35,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 // fix the flyway migration up to v44 since we depend on the database structure as it exists at this
 // point in time. The migration will only ever be applied on a database at this version.
 @FlywayTarget("44")
+// As of the time of this migration, there were no repeatable migrations, so ignore any that are
+// added
+@FlywaySkipRepeatable()
 class V44_2__BackfillAirflowParentRunsTest {
 
   static Jdbi jdbi;
