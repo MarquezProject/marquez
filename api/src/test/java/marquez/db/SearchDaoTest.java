@@ -7,6 +7,10 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import java.net.URL;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -15,17 +19,24 @@ import lombok.NonNull;
 import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
+import marquez.common.Utils;
+import marquez.common.models.JobType;
+import marquez.db.models.JobRow;
+import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.JobMeta;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.postgresql.util.PGobject;
 
 /** The test suite for {@link SearchDao}. */
 @Tag("DataAccessTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class SearchDaoTest {
+
   static final int LIMIT = 25;
   static final int NUM_OF_JOBS = 2;
   /**
@@ -37,7 +48,7 @@ public class SearchDaoTest {
   static SearchDao searchDao;
 
   @BeforeAll
-  public static void setUpOnce(final Jdbi jdbi) {
+  public static void setUpOnce(final Jdbi jdbi) throws SQLException {
     searchDao = jdbi.onDemand(SearchDao.class);
 
     DbTestUtils.newDataset(jdbi, "name_ordering_0");
@@ -48,7 +59,51 @@ public class SearchDaoTest {
     DbTestUtils.newDataset(jdbi, "time_ordering_1");
     DbTestUtils.newDataset(jdbi, "time_ordering_2");
 
-    DbTestUtils.newJobs(jdbi, NUM_OF_JOBS);
+    ImmutableSet<JobRow> jobRows = DbTestUtils.newJobs(jdbi, NUM_OF_JOBS);
+
+    // add a symlinked job - validate that the number of results is the same
+    jobRows.stream()
+        .findAny()
+        .ifPresent(
+            j -> {
+              try {
+                NamespaceRow namespaceRow =
+                    jdbi.onDemand(NamespaceDao.class)
+                        .findNamespaceByName(j.getNamespaceName())
+                        .get();
+                JobRow symlinkTargetJob =
+                    DbTestUtils.newJobWith(
+                        jdbi,
+                        namespaceRow.getName(),
+                        "a_new_symlink_target_job",
+                        new JobMeta(
+                            JobType.valueOf(j.getType()),
+                            ImmutableSet.copyOf(j.getInputs()),
+                            ImmutableSet.of(),
+                            new URL(j.getLocation()),
+                            ImmutableMap.of(),
+                            j.getDescription().orElse(null),
+                            null));
+                PGobject inputs = new PGobject();
+                inputs.setType("json");
+                inputs.setValue(Utils.getMapper().writeValueAsString(j.getInputs()));
+                jdbi.onDemand(JobDao.class)
+                    .upsertJob(
+                        j.getUuid(),
+                        JobType.valueOf(j.getType()),
+                        j.getCreatedAt(),
+                        namespaceRow.getUuid(),
+                        namespaceRow.getName(),
+                        j.getName(),
+                        j.getDescription().orElse(null),
+                        j.getJobContextUuid().orElse(null),
+                        j.getLocation(),
+                        symlinkTargetJob.getUuid(),
+                        inputs);
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 
   @Test
