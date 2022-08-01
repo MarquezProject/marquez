@@ -111,7 +111,7 @@ BEGIN
                  INNER JOIN fqn jf ON jf.uuid = COALESCE(js.link_target_uuid, j.uuid)
         ON CONFLICT (uuid) DO UPDATE
             SET job_fqn=EXCLUDED.job_fqn,
-                aliases = jobs_fqn.aliases || EXCLUDED.aliases;
+                aliases = (SELECT array_agg(DISTINCT a) FROM (SELECT unnest(jobs_fqn.aliases) AS a UNION SELECT unnest(EXCLUDED.aliases) AS a) al);
     END IF;
     SELECT * INTO inserted_job FROM jobs_view WHERE uuid=job_uuid;
     return inserted_job;
