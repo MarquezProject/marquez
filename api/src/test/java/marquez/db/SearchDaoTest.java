@@ -45,6 +45,8 @@ public class SearchDaoTest {
    */
   static final int NUM_OF_DATASETS = 12;
 
+  public static final String NEW_SYMLINK_TARGET_JOB = "a_new_symlink_target_job";
+
   static SearchDao searchDao;
 
   @BeforeAll
@@ -61,7 +63,7 @@ public class SearchDaoTest {
 
     ImmutableSet<JobRow> jobRows = DbTestUtils.newJobs(jdbi, NUM_OF_JOBS);
 
-    // add a symlinked job - validate that the number of results is the same
+    // add a symlinked job - validate that the number of results is the same in the below unit test
     jobRows.stream()
         .findAny()
         .ifPresent(
@@ -75,7 +77,7 @@ public class SearchDaoTest {
                     DbTestUtils.newJobWith(
                         jdbi,
                         namespaceRow.getName(),
-                        "a_new_symlink_target_job",
+                        NEW_SYMLINK_TARGET_JOB,
                         new JobMeta(
                             JobType.valueOf(j.getType()),
                             ImmutableSet.copyOf(j.getInputs()),
@@ -127,6 +129,12 @@ public class SearchDaoTest {
     final List<SearchResult> resultsWithOnlyJobs =
         resultsGroupedByType.get(SearchResult.ResultType.JOB);
     assertThat(resultsWithOnlyJobs).hasSize(NUM_OF_JOBS);
+
+    // Even though we searched for "test" and the symlink target doesn't have "test" in its name,
+    // it is part of the search results because the original job had "test" in its name.
+    assertThat(resultsWithOnlyJobs)
+        .filteredOn(j -> j.getName().equals(NEW_SYMLINK_TARGET_JOB))
+        .isNotEmpty();
   }
 
   @Test
