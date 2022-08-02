@@ -11,12 +11,7 @@
 
 3. Visit [CI](https://app.circleci.com/pipelines/github/MarquezProject/marquez?branch=main) to see the progress of the release! :rocket:
 4. Visit [sonatype](https://oss.sonatype.org) to promote _java_ artifacts
-5. Create a [new project](https://github.com/MarquezProject/marquez/projects/new) board for the _next_ release using the _automated kanban_ template:
-
-   ![](./docs/assets/images/new-project-board.png)
-
-6. Before closing the project board for the _current_ release, move any open issues to the project board created in **step 5**
-7. Draft a [new release](https://github.com/MarquezProject/marquez/releases/new) using the release notes for `X.Y.Z` in **step 1** as the release description:
+6. Draft a [new release](https://github.com/MarquezProject/marquez/releases/new) using the release notes for `X.Y.Z` in **step 1** as the release description:
 
    ![](./docs/assets/images/new-release.png)
 
@@ -33,3 +28,4 @@ Alternatively, if after 2 days the release has received at least one +1 and no -
 If the proposed release receives no +1s in two days, it is not authorized and the proposer must make a new request to reset the clock.
 
 Once a release is authorized, it will be initiated within two business days. Releases will not be made on a Friday unless doing so will address an important defect, an issue with project infrastructure, or a security vulnerability.
+
