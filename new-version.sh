@@ -122,39 +122,34 @@ if [[ "${RELEASE_VERSION}" == *-rc.? ]]; then
   PYTHON_RELEASE_VERSION="${RELEASE_VERSION%-*}${RELEASE_CANDIDATE//.}"
 fi
 
-# (1) Bump python module versions
-PYTHON_MODULES=(clients/python/)
-for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
-  (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${PYTHON_RELEASE_VERSION}" --allow-dirty)
-done
-
-# (2) Bump java module versions
+# (1) Bump java module versions
 sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
-# (3) Bump version in helm chart
+# (2) Bump version in helm chart
 sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
 sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
 
-# (4) Bump version in scripts
+# (3) Bump version in scripts
 sed -i "" "s/TAG=\d.*/TAG=${RELEASE_VERSION}/g" ./docker/up.sh
 sed -i "" "s/TAG=\d.*/TAG=${RELEASE_VERSION}/g" .env.example
 
-# (5) Bump version in docs
+# (4) Bump version in docs
 sed -i "" "s/^  version:.*/  version: ${RELEASE_VERSION}/g" ./spec/openapi.yml
 sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./clients/java/README.md
 sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/README.md
 
-# (6) Bundle openAPI docs
+# (5) Bundle openAPI docs
 redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
 
-# (7) Prepare release commit
+# (6) Prepare release commit
 git commit -sam "Prepare for release ${RELEASE_VERSION}" --no-verify
 
-# (8) Pull latest tags, then prepare release tag
+# (7) Pull latest tags, then prepare release tag
 git fetch --all --tags
 git tag -a "${RELEASE_VERSION}" -m "marquez ${RELEASE_VERSION}"
 
-# (9) Prepare next development version for python and java modules
+# (8) Prepare next development version for python and java modules
+PYTHON_MODULES=(clients/python/)
 for PYTHON_MODULE in "${PYTHON_MODULES[@]}"; do
   (cd "${PYTHON_MODULE}" && bump2version manual --new-version "${NEXT_VERSION}" --allow-dirty)
 done
@@ -167,10 +162,10 @@ fi
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
 
-# (10) Prepare next development version commit
+# (9) Prepare next development version commit
 git commit -sam "Prepare next development version ${NEXT_VERSION}" --no-verify
 
-# (11) Check for commits in log
+# (10) Check for commits in log
 COMMITS=false
 MESSAGE_1=$(git log -1 --grep="Prepare for release ${RELEASE_VERSION}" --pretty=format:%s)
 MESSAGE_2=$(git log -1 --grep="Prepare next development version ${NEXT_VERSION}" --pretty=format:%s)
@@ -182,7 +177,7 @@ else
   exit 0
 fi
 
-# (12) Push commits and tag
+# (11) Push commits and tag
 if [[ $COMMITS = "true" ]] && [[ ${PUSH} = "true" ]]; then
   git push origin main && \
     git push origin "${RELEASE_VERSION}"
