@@ -399,24 +399,24 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     String namespace = "namespace";
     String name = "anotherTable";
     LineageEvent event =
-      new LineageEvent(
-        "COMPLETE",
-        Instant.now().atZone(ZoneId.systemDefault()),
-        new LineageEvent.Run(UUID.randomUUID().toString(), null),
-        new LineageEvent.Job("namespace", "job_name", null),
-        List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
-        Collections.emptyList(),
-        "the_producer");
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job("namespace", "job_name", null),
+            List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
+            Collections.emptyList(),
+            "the_producer");
 
     CompletableFuture<Integer> resp =
-      this.sendLineage(Utils.toJson(event))
-        .thenApply(HttpResponse::statusCode)
-        .whenComplete(
-          (val, error) -> {
-            if (error != null) {
-              Assertions.fail("Could not complete request");
-            }
-          });
+        this.sendLineage(Utils.toJson(event))
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
 
     // Ensure the event was correctly rejected and a proper response code returned.
     assertThat(resp.join()).isEqualTo(201);
@@ -425,19 +425,19 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     List<Dataset> datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(0);
-    resp = this.sendLineage(Utils.toJson(event))
-        .thenApply(HttpResponse::statusCode)
-        .whenComplete(
-          (val, error) -> {
-            if (error != null) {
-              Assertions.fail("Could not complete request");
-            }
-          });
+    resp =
+        this.sendLineage(Utils.toJson(event))
+            .thenApply(HttpResponse::statusCode)
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
 
     assertThat(resp.join()).isEqualTo(201);
 
     datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(1);
   }
-
 }

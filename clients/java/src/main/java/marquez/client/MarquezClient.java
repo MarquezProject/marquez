@@ -215,6 +215,11 @@ public class MarquezClient {
     return Job.fromJson(bodyAsJson);
   }
 
+  public Job deleteJob(@NonNull String namespaceName, @NonNull String jobName) {
+    final String bodyAsJson = http.delete(url.toJobUrl(namespaceName, jobName));
+    return Job.fromJson(bodyAsJson);
+  }
+
   public JobVersion getJobVersion(
       @NonNull String namespaceName, @NonNull String jobName, String version) {
     final String bodyAsJson = http.get(url.toJobVersionUrl(namespaceName, jobName, version));

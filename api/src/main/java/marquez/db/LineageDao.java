@@ -74,22 +74,21 @@ public interface LineageDao {
 
   @SqlQuery(
       """
-    SELECT ds.*, dv.fields, dv.lifecycle_state
-    FROM datasets ds
-    LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
-    WHERE ds.uuid IN (<dsUuids>)
-    AND ds.is_deleted is false
-    """)
-  Set<DatasetData> getNonDeletedDatasetData(@BindList Set<UUID> dsUuids);
+      SELECT ds.*, dv.fields, dv.lifecycle_state
+      FROM datasets_view ds
+      LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
+      WHERE ds.uuid IN (<dsUuids>)""")
+  Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
 
   @SqlQuery(
-      "select j.uuid from jobs j\n"
-          + "inner join job_versions jv on jv.job_uuid = j.uuid\n"
-          + "inner join job_versions_io_mapping io on io.job_version_uuid = jv.uuid\n"
-          + "inner join datasets ds on ds.uuid = io.dataset_uuid\n"
-          + "where ds.name = :datasetName and ds.namespace_name = :namespaceName\n"
-          + "order by io_type DESC, jv.created_at DESC\n"
-          + "limit 1")
+      """
+      SELECT j.uuid FROM jobs j
+      INNER JOIN job_versions jv ON jv.job_uuid = j.uuid
+      INNER JOIN job_versions_io_mapping io ON io.job_version_uuid = jv.uuid
+      INNER JOIN datasets_view ds ON ds.uuid = io.dataset_uuid
+      WHERE ds.name = :datasetName AND ds.namespace_name = :namespaceName
+      ORDER BY io_type DESC, jv.created_at DESC
+      LIMIT 1""")
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
   @SqlQuery(

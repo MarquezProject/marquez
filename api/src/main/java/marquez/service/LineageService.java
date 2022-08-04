@@ -75,7 +75,7 @@ public class LineageService extends DelegatingLineageDao {
             .collect(Collectors.toSet());
     Set<DatasetData> datasets = new HashSet<>();
     if (!datasetIds.isEmpty()) {
-      datasets.addAll(this.getNonDeletedDatasetData(datasetIds));
+      datasets.addAll(this.getDatasetData(datasetIds));
     }
 
     return toLineage(jobData, datasets);
@@ -97,9 +97,15 @@ public class LineageService extends DelegatingLineageDao {
         continue;
       }
       Set<DatasetData> inputs =
-          data.getInputUuids().stream().map(datasetById::get).collect(Collectors.toSet());
+          data.getInputUuids().stream()
+              .map(datasetById::get)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toSet());
       Set<DatasetData> outputs =
-          data.getOutputUuids().stream().map(datasetById::get).collect(Collectors.toSet());
+          data.getOutputUuids().stream()
+              .map(datasetById::get)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toSet());
       data.setInputs(buildDatasetId(inputs));
       data.setOutputs(buildDatasetId(outputs));
 

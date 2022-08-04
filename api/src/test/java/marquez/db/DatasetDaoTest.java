@@ -68,6 +68,7 @@ class DatasetDaoTest {
           handle.execute("DELETE FROM lineage_events");
           handle.execute("DELETE FROM runs_input_mapping");
           handle.execute("DELETE FROM dataset_versions_field_mapping");
+          handle.execute("DELETE FROM stream_versions");
           handle.execute("DELETE FROM dataset_versions");
           handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
           handle.execute("DELETE FROM run_states");
@@ -78,6 +79,7 @@ class DatasetDaoTest {
           handle.execute("DELETE FROM jobs");
           handle.execute("DELETE FROM dataset_fields_tag_mapping");
           handle.execute("DELETE FROM dataset_fields");
+          handle.execute("DELETE FROM datasets_tag_mapping");
           handle.execute("DELETE FROM datasets");
           handle.execute("DELETE FROM sources");
           handle.execute("DELETE FROM namespaces");
@@ -323,7 +325,7 @@ class DatasetDaoTest {
     List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(3);
 
-    datasetDao.softDelete(NAMESPACE, deletedDatasetName);
+    datasetDao.delete(NAMESPACE, deletedDatasetName);
 
     datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(2);

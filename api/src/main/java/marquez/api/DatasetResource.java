@@ -162,13 +162,14 @@ public class DatasetResource extends BaseResource {
       @PathParam("dataset") DatasetName datasetName) {
     throwIfNotExists(namespaceName);
 
-    datasetService
-        .softDelete(namespaceName.getValue(), datasetName.getValue())
-        .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     Dataset dataset =
         datasetService
             .findDatasetByName(namespaceName.getValue(), datasetName.getValue())
             .orElseThrow(() -> new DatasetNotFoundException(datasetName));
+
+    datasetService
+        .delete(namespaceName.getValue(), datasetName.getValue())
+        .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     return Response.ok(dataset).build();
   }
 

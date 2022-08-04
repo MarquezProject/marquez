@@ -666,7 +666,7 @@ public class LineageDaoTest {
             jobFacet,
             dataset);
     Set<DatasetData> datasetData =
-        lineageDao.getNonDeletedDatasetData(
+        lineageDao.getDatasetData(
             newRows.stream()
                 .map(j -> j.getOutput().get().getDatasetRow().getUuid())
                 .collect(Collectors.toSet()));
@@ -697,7 +697,7 @@ public class LineageDaoTest {
             Arrays.asList(dataset));
 
     Set<DatasetData> datasetData =
-        lineageDao.getNonDeletedDatasetData(
+        lineageDao.getDatasetData(
             Collections.singleton(row.getOutputs().get().get(0).getDatasetRow().getUuid()));
 
     assertThat(datasetData)
@@ -736,7 +736,7 @@ public class LineageDaoTest {
             Arrays.asList(dataset, toDelete));
 
     Set<DatasetData> datasetData =
-        lineageDao.getNonDeletedDatasetData(
+        lineageDao.getDatasetData(
             Set.of(
                 row.getOutputs().get().get(0).getDatasetRow().getUuid(),
                 row.getOutputs().get().get(1).getDatasetRow().getUuid()));
@@ -746,10 +746,10 @@ public class LineageDaoTest {
         .extracting(ds -> ds.getName().getValue())
         .anyMatch(str -> str.contains(deleteName));
 
-    datasetDao.softDelete(NAMESPACE, deleteName);
+    datasetDao.delete(NAMESPACE, deleteName);
 
     datasetData =
-        lineageDao.getNonDeletedDatasetData(
+        lineageDao.getDatasetData(
             Set.of(
                 row.getOutputs().get().get(0).getDatasetRow().getUuid(),
                 row.getOutputs().get().get(1).getDatasetRow().getUuid()));

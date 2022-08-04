@@ -52,79 +52,81 @@ public interface JobVersionDao extends BaseDao {
    * Output datasets are constructed as JSON strings that can be deserialized into DatasetIds.
    */
   String BASE_SELECT_ON_JOB_VERSIONS =
-      "WITH job_version_io AS (\n"
-          + "    SELECT io.job_version_uuid,\n"
-          + "           JSON_AGG(json_build_object('namespace', ds.namespace_name,\n"
-          + "                                      'name', ds.name))\n"
-          + "           FILTER (WHERE io.io_type = 'INPUT') AS input_datasets,\n"
-          + "           JSON_AGG(json_build_object('namespace', ds.namespace_name,\n"
-          + "                                      'name', ds.name))\n"
-          + "           FILTER (WHERE io.io_type = 'OUTPUT') AS output_datasets\n"
-          + "    FROM job_versions_io_mapping io\n"
-          + "    INNER JOIN job_versions jv ON jv.uuid = io.job_version_uuid\n"
-          + "    INNER JOIN datasets ds ON ds.uuid = io.dataset_uuid\n"
-          + "    INNER JOIN jobs_view j ON j.uuid=jv.job_uuid\n"
-          + "    WHERE j.namespace_name = :namespaceName\n"
-          + "      AND j.name = :jobName\n"
-          + "    GROUP BY io.job_version_uuid\n"
-          + "), relevant_job_versions AS (\n"
-          + "    SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version, \n"
-          + "    jv.location, jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid, \n"
-          + "    j.namespace_name, j.name AS job_name, jc.context\n"
-          + "    FROM job_versions jv\n"
-          + "    LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid\n"
-          + "    INNER JOIN jobs_view j ON j.uuid=jv.job_uuid\n"
-          + "    WHERE j.name = :jobName AND j.namespace_name=:namespaceName\n"
-          + "    ORDER BY jv.created_at DESC\n"
-          + ")\n"
-          + "SELECT jv.*,\n"
-          + "       dsio.input_datasets,\n"
-          + "       dsio.output_datasets,\n"
-          + "       r.uuid               AS run_uuid,\n"
-          + "       r.created_at         AS run_created_at,\n"
-          + "       r.updated_at         AS run_updated_at,\n"
-          + "       r.nominal_start_time AS run_nominal_start_time,\n"
-          + "       r.nominal_end_time   AS run_nominal_end_time,\n"
-          + "       r.current_run_state  AS run_current_run_state,\n"
-          + "       r.started_at         AS run_started_at,\n"
-          + "       r.ended_at           AS run_ended_at,\n"
-          + "       r.namespace_name     AS run_namespace_name,\n"
-          + "       r.job_name           AS run_job_name,\n"
-          + "       jv.version           AS run_job_version,\n"
-          + "       r.location           AS run_location,\n"
-          + "       ra.args              AS run_args,\n"
-          + "       jv.context           AS run_context,\n"
-          + "       f.facets             AS run_facets,\n"
-          + "       ri.input_versions    AS run_input_versions,\n"
-          + "       ro.output_versions   AS run_output_versions\n"
-          + "FROM relevant_job_versions AS jv\n"
-          + "LEFT JOIN job_version_io dsio ON dsio.job_version_uuid = jv.uuid\n"
-          + "LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid\n"
-          + "LEFT JOIN LATERAL (\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event -> 'run' -> 'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.run_uuid=jv.latest_run_uuid\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid = f.run_uuid\n"
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT JOIN LATERAL (\n"
-          + "    SELECT im.run_uuid,\n"
-          + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
-          + "                                      'name', dv.dataset_name,\n"
-          + "                                      'version', dv.version)) AS input_versions\n"
-          + "    FROM runs_input_mapping im\n"
-          + "    INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
-          + "    WHERE im.run_uuid=jv.latest_run_uuid\n"
-          + "    GROUP BY im.run_uuid\n"
-          + ") ri ON ri.run_uuid = r.uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + "    SELECT run_uuid,\n"
-          + "           JSON_AGG(json_build_object('namespace', namespace_name,\n"
-          + "                                      'name', dataset_name,\n"
-          + "                                      'version', version)) AS output_versions\n"
-          + "    FROM dataset_versions\n"
-          + "    GROUP BY run_uuid\n"
-          + ") ro ON ro.run_uuid = r.uuid\n";
+      """
+      WITH job_version_io AS (
+          SELECT io.job_version_uuid,
+                 JSON_AGG(json_build_object('namespace', ds.namespace_name,
+                                            'name', ds.name))
+                 FILTER (WHERE io.io_type = 'INPUT') AS input_datasets,
+                 JSON_AGG(json_build_object('namespace', ds.namespace_name,
+                                            'name', ds.name))
+                 FILTER (WHERE io.io_type = 'OUTPUT') AS output_datasets
+          FROM job_versions_io_mapping io
+          INNER JOIN job_versions jv ON jv.uuid = io.job_version_uuid
+          INNER JOIN datasets_view ds ON ds.uuid = io.dataset_uuid
+          INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
+          WHERE j.namespace_name = :namespaceName
+            AND j.name = :jobName
+          GROUP BY io.job_version_uuid
+      ), relevant_job_versions AS (
+          SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version,\s
+          jv.location, jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid,\s
+          j.namespace_name, j.name AS job_name, jc.context
+          FROM job_versions jv
+          LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid
+          INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
+          WHERE j.name = :jobName AND j.namespace_name=:namespaceName
+          ORDER BY jv.created_at DESC
+      )
+      SELECT jv.*,
+             dsio.input_datasets,
+             dsio.output_datasets,
+             r.uuid               AS run_uuid,
+             r.created_at         AS run_created_at,
+             r.updated_at         AS run_updated_at,
+             r.nominal_start_time AS run_nominal_start_time,
+             r.nominal_end_time   AS run_nominal_end_time,
+             r.current_run_state  AS run_current_run_state,
+             r.started_at         AS run_started_at,
+             r.ended_at           AS run_ended_at,
+             r.namespace_name     AS run_namespace_name,
+             r.job_name           AS run_job_name,
+             jv.version           AS run_job_version,
+             r.location           AS run_location,
+             ra.args              AS run_args,
+             jv.context           AS run_context,
+             f.facets             AS run_facets,
+             ri.input_versions    AS run_input_versions,
+             ro.output_versions   AS run_output_versions
+      FROM relevant_job_versions AS jv
+      LEFT JOIN job_version_io dsio ON dsio.job_version_uuid = jv.uuid
+      LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid
+      LEFT JOIN LATERAL (
+          SELECT le.run_uuid, JSON_AGG(event -> 'run' -> 'facets') AS facets
+          FROM lineage_events le
+          WHERE le.run_uuid=jv.latest_run_uuid
+          GROUP BY le.run_uuid
+      ) AS f ON r.uuid = f.run_uuid
+      LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
+      LEFT JOIN LATERAL (
+          SELECT im.run_uuid,
+                 JSON_AGG(json_build_object('namespace', dv.namespace_name,
+                                            'name', dv.dataset_name,
+                                            'version', dv.version)) AS input_versions
+          FROM runs_input_mapping im
+          INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
+          WHERE im.run_uuid=jv.latest_run_uuid
+          GROUP BY im.run_uuid
+      ) ri ON ri.run_uuid = r.uuid
+      LEFT OUTER JOIN (
+          SELECT run_uuid,
+                 JSON_AGG(json_build_object('namespace', namespace_name,
+                                            'name', dataset_name,
+                                            'version', version)) AS output_versions
+          FROM dataset_versions
+          GROUP BY run_uuid
+      ) ro ON ro.run_uuid = r.uuid
+      """;
 
   @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "WHERE jv.version = :jobVersionUuid")
   Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
