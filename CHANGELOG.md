@@ -1,6 +1,13 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.24.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.24.1...HEAD)
+
+## [0.24.1](https://github.com/MarquezProject/marquez/compare/0.24.0...0.24.1) - 2022-08-08
+
+### Fixed
+
+* Fix py module release [#2057](https://github.com/MarquezProject/marquez/pull/2057) [@wslulciuc](https://github.com/wslulciuc)
+* Use /bin/sh in web/docker/entrypoint.sh [#2059](https://github.com/MarquezProject/marquez/pull/2059) [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.24.0](https://github.com/MarquezProject/marquez/compare/0.23.0...0.24.0) - 2022-08-02
 
