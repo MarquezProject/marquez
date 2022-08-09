@@ -171,6 +171,19 @@ public class JobDaoTest {
         jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName()),
         targetJob.getNamespaceName(),
         targetJob.getName());
+
+    // try to update the symlink target - it should be ignored
+    JobRow anotherTargetJob =
+        createJobWithoutSymlinkTarget(
+            jdbi, namespace, "anotherTarget", "we'll attempt to update the symlink");
+    createJobWithSymlinkTarget(
+        jdbi, namespace, symlinkJobName, anotherTargetJob.getUuid(), "the symlink job");
+
+    // the original symlink target should be returned
+    assertJobIdEquals(
+        jobDao.findJobByName(symlinkJob.getNamespaceName(), symlinkJob.getName()),
+        targetJob.getNamespaceName(),
+        targetJob.getName());
   }
 
   public void testSymlinkParentJobRenamesChildren() throws SQLException {

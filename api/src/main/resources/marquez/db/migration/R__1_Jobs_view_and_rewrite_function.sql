@@ -55,10 +55,9 @@ BEGIN
                       current_job_context_uuid = EXCLUDED.current_job_context_uuid,
                       current_location         = EXCLUDED.current_location,
                       current_inputs           = EXCLUDED.current_inputs,
-                      -- update the symlink target if not null. otherwise, keep the old value
-                      symlink_target_uuid      = COALESCE(
-                              EXCLUDED.symlink_target_uuid,
-                              jobs.symlink_target_uuid)
+                      -- update the symlink target if null. otherwise, keep the old value
+                      symlink_target_uuid      = COALESCE(jobs.symlink_target_uuid,
+                              EXCLUDED.symlink_target_uuid)
     RETURNING uuid INTO job_uuid;
     IF TG_OP = 'INSERT' OR
        (TG_OP = 'UPDATE' AND OLD.symlink_target_uuid IS DISTINCT FROM NEW.symlink_target_uuid) THEN
