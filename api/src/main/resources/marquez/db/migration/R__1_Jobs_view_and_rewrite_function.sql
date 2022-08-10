@@ -27,6 +27,8 @@ CREATE OR REPLACE FUNCTION rewrite_jobs_fqn_table() RETURNS TRIGGER AS
 $$
 DECLARE
     job_uuid uuid;
+    new_symlink_target_uuid uuid;
+    old_symlink_target_uuid uuid;
     inserted_job jobs_view%rowtype;
 BEGIN
     INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, description,
@@ -55,13 +57,19 @@ BEGIN
                       current_job_context_uuid = EXCLUDED.current_job_context_uuid,
                       current_location         = EXCLUDED.current_location,
                       current_inputs           = EXCLUDED.current_inputs,
-                      -- update the symlink target if not null. otherwise, keep the old value
-                      symlink_target_uuid      = COALESCE(
-                              EXCLUDED.symlink_target_uuid,
-                              jobs.symlink_target_uuid)
-    RETURNING uuid INTO job_uuid;
-    IF TG_OP = 'INSERT' OR
-       (TG_OP = 'UPDATE' AND OLD.symlink_target_uuid IS DISTINCT FROM NEW.symlink_target_uuid) THEN
+                      -- update the symlink target if null. otherwise, keep the old value
+                      symlink_target_uuid      = COALESCE(jobs.symlink_target_uuid,
+                              EXCLUDED.symlink_target_uuid)
+    -- the SELECT statement below will get the OLD symlink_target_uuid in case of update and the NEW
+    -- version in case of insert
+    RETURNING uuid, symlink_target_uuid, (SELECT symlink_target_uuid FROM jobs j2 WHERE j2.uuid=jobs.uuid)
+        INTO job_uuid, new_symlink_target_uuid, old_symlink_target_uuid;
+
+    -- update the jobs_fqn table only when inserting a new record (NEW.uuid will equal the job_uuid
+    -- when inserting a new record) or when the symlink_target_uuid is being updated.
+    IF NEW.uuid = job_uuid OR
+       (new_symlink_target_uuid IS DISTINCT FROM old_symlink_target_uuid) THEN
+        RAISE LOG 'Updating jobs_fqn due to % to job % (%)', TG_OP, NEW.name, job_uuid;
         WITH RECURSIVE
             jobs_symlink AS (SELECT uuid, uuid AS link_target_uuid, symlink_target_uuid
                              FROM jobs j
