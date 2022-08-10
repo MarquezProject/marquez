@@ -276,6 +276,38 @@ public class LineageDaoTest {
             .map(JobData::getUuid)
             .collect(Collectors.toSet());
     assertThat(lineageForOriginalJob).isEqualTo(jobIds);
+
+    UpdateLineageRow updatedTargetJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            symlinkTargetJobName,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(
+                new Dataset(
+                    NAMESPACE,
+                    "a_new_dataset",
+                    newDatasetFacet(new SchemaField("firstname", "string", "the first name")))));
+    assertThat(updatedTargetJob.getJob().getUuid()).isEqualTo(targetJob.getUuid());
+
+    // get lineage for original job - the old datasets/jobs should no longer be present
+    assertThat(
+            lineageDao
+                .getLineage(new HashSet<>(Arrays.asList(writeJob.getJob().getUuid())), 2)
+                .stream()
+                .map(JobData::getUuid)
+                .collect(Collectors.toSet()))
+        .hasSize(1)
+        .containsExactlyInAnyOrder(targetJob.getUuid());
+
+    // fetching lineage for target job should yield the same results
+    assertThat(
+            lineageDao.getLineage(new HashSet<>(Arrays.asList(targetJob.getUuid())), 2).stream()
+                .map(JobData::getUuid)
+                .collect(Collectors.toSet()))
+        .hasSize(1)
+        .containsExactlyInAnyOrder(targetJob.getUuid());
   }
 
   @Test
