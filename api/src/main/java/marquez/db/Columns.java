@@ -80,6 +80,9 @@ public final class Columns {
   public static final String FIELD_UUIDS = "field_uuids";
   public static final String LIFECYCLE_STATE = "lifecycle_state";
 
+  /* DATASET SYMLINK ROW COLUMNS */
+  public static final String IS_PRIMARY = "is_primary";
+
   /* STREAM VERSION ROW COLUMNS */
   public static final String SCHEMA_LOCATION = "schema_location";
 
