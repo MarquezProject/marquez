@@ -40,6 +40,7 @@ import marquez.client.models.JobMeta;
 import marquez.client.models.JobVersion;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.RawLineageEvent;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -85,6 +86,24 @@ public class MarquezClient {
   MarquezClient(@NonNull final MarquezUrl url, @NonNull final MarquezHttp http) {
     this.url = url;
     this.http = http;
+  }
+
+  public List<RawLineageEvent> listEvents() {
+    return listEvents(DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  public List<RawLineageEvent> listEvents(int limit, int offset) {
+    final String bodyAsJson = http.get(url.toEventUrl(limit, offset));
+    return Events.fromJson(bodyAsJson).getValue();
+  }
+
+  public List<RawLineageEvent> listEvents(String namespaceName) {
+    return listEvents(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  }
+
+  public List<RawLineageEvent> listEvents(String namespaceName, int limit, int offset) {
+    final String bodyAsJson = http.get(url.toEventUrl(namespaceName, limit, offset));
+    return Events.fromJson(bodyAsJson).getValue();
   }
 
   public Namespace createNamespace(
@@ -535,6 +554,21 @@ public class MarquezClient {
 
     static Datasets fromJson(final String json) {
       return Utils.fromJson(json, new TypeReference<Datasets>() {});
+    }
+  }
+
+  @Value
+  @EqualsAndHashCode(callSuper = false)
+  public static class Events extends ResultsPage {
+    @Getter List<RawLineageEvent> value;
+
+    @JsonCreator
+    Events(@JsonProperty("events") final List<RawLineageEvent> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Events fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<Events>() {});
     }
   }
 

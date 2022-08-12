@@ -70,6 +70,44 @@ paths:
               schema:
                 $ref: '#/components/schemas/NamespaceList'
 
+  /events:
+    get:
+      operationId: getRawEvents
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: List all received OpenLineage events.
+      description: Returns a list of OpenLineage events.
+      tags:
+        - Events
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineageEventList'
+
+  /events/{namespace}:
+    parameters:
+      - $ref: '#/components/parameters/namespace'
+    get:
+      operationId: getRawEvents
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      summary: List all received OpenLineage events in particular namespace.
+      description: Returns a list of OpenLineage events.
+      tags:
+        - Events
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineageEventList'
+
   /sources/{source}:
     parameters:
       - $ref: '#/components/parameters/source'
@@ -816,6 +854,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Namespace'
+
+    LineageEventList:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineageEvent'
 
     CreatedSource:
       type: object

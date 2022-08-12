@@ -47,6 +47,8 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,6 +62,7 @@ import lombok.NonNull;
 import lombok.Value;
 import marquez.client.MarquezClient.DatasetVersions;
 import marquez.client.MarquezClient.Datasets;
+import marquez.client.MarquezClient.Events;
 import marquez.client.MarquezClient.Jobs;
 import marquez.client.MarquezClient.Namespaces;
 import marquez.client.MarquezClient.Runs;
@@ -79,6 +82,7 @@ import marquez.client.models.JobType;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.RawLineageEvent;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -159,6 +163,18 @@ public class MarquezClientTest {
           DB_TABLE_DESCRIPTION,
           DB_FACETS,
           CURRENT_VERSION);
+
+  // RAW LINEAGE EVENT
+
+  private static final RawLineageEvent RAW_LINEAGE_EVENT =
+      new RawLineageEvent(
+          "START",
+          ZonedDateTime.now(ZoneId.of("UTC")),
+          Collections.emptyMap(),
+          Collections.emptyMap(),
+          Collections.emptyList(),
+          Collections.emptyList(),
+          "MQZ-CLIENT");
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -676,6 +692,26 @@ public class MarquezClientTest {
     final List<DatasetVersion> datasetVersions =
         client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME, 10, 0);
     assertThat(datasetVersions).asList().containsExactly(DB_TABLE_VERSION);
+  }
+
+  @Test
+  public void testListEvents() throws Exception {
+    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
+    when(http.get(buildUrlFor("/events?limit=10&offset=0")))
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+    final List<RawLineageEvent> listEvents = client.listEvents(10, 0);
+    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
+  }
+
+  @Test
+  public void testListEventsWithNamespace() throws Exception {
+    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
+    when(http.get(buildUrlFor("/events/%s?limit=10&offset=0", NAMESPACE_NAME)))
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+    final List<RawLineageEvent> listEvents = client.listEvents(NAMESPACE_NAME, 10, 0);
+    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
   }
 
   @Test

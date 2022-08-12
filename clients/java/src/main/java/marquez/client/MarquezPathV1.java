@@ -72,6 +72,14 @@ class MarquezPathV1 {
     return path("/namespaces/%s", namespaceName);
   }
 
+  static String eventPath() {
+    return path("/events");
+  }
+
+  static String eventPath(String namespaceName) {
+    return path("/events/%s", namespaceName);
+  }
+
   static String sourcePath(String sourceName) {
     return path("/sources/%s", sourceName);
   }
