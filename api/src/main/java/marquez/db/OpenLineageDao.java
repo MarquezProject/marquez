@@ -86,7 +86,7 @@ public interface OpenLineageDao extends BaseDao {
       String producer);
 
   @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
-  List<LineageEvent> listLineageEventsByRunUuid(UUID runUuid);
+  List<LineageEvent> findOlEventsByRunUuid(UUID runUuid);
 
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
