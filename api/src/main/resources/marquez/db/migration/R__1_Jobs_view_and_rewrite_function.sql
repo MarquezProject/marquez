@@ -71,9 +71,11 @@ BEGIN
        (new_symlink_target_uuid IS DISTINCT FROM old_symlink_target_uuid) THEN
         RAISE LOG 'Updating jobs_fqn due to % to job % (%)', TG_OP, NEW.name, job_uuid;
         WITH RECURSIVE
-            jobs_symlink AS (SELECT uuid, uuid AS link_target_uuid, symlink_target_uuid
+            jobs_symlink AS (SELECT j.uuid, j.uuid AS link_target_uuid, j.symlink_target_uuid
                              FROM jobs j
-                             WHERE symlink_target_uuid IS NULL
+                                      -- include only jobs that have symlinks pointing to them to keep this table small
+                                      INNER JOIN jobs js ON js.symlink_target_uuid=j.uuid
+                             WHERE j.symlink_target_uuid IS NULL
                              UNION
                              SELECT j.uuid, jn.link_target_uuid, j.symlink_target_uuid
                              FROM jobs j
@@ -101,9 +103,9 @@ BEGIN
                     FROM jobs j1
                              INNER JOIN fqn f ON f.uuid = j1.parent_job_uuid),
             aliases AS (SELECT s.link_target_uuid,
-                               ARRAY_AGG(DISTINCT f.name) FILTER (WHERE f.name IS NOT NULL) AS aliases
+                               ARRAY_AGG(DISTINCT f.job_fqn) FILTER (WHERE f.job_fqn IS NOT NULL) AS aliases
                         FROM jobs_symlink s
-                                 INNER JOIN fqn f ON f.uuid = s.uuid
+                                 INNER JOIN jobs_fqn f ON f.uuid = s.uuid
                         GROUP BY s.link_target_uuid)
         INSERT
         INTO jobs_fqn

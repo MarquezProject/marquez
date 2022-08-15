@@ -26,6 +26,7 @@ import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.JobMeta;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.MapMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -109,7 +110,22 @@ public class SearchDaoTest {
   }
 
   @Test
-  public void testSearch() {
+  public void testSearch(Jdbi jdbi) {
+    jdbi.withHandle(
+            h ->
+                h.createQuery("SELECT uuid, name, namespace_name FROM jobs")
+                    .map(new MapMapper())
+                    .list())
+        .forEach(System.out::println);
+    jdbi.withHandle(h -> h.createQuery("SELECT * FROM jobs_fqn").map(new MapMapper()).list())
+        .forEach(System.out::println);
+    jdbi.withHandle(
+            h ->
+                h.createQuery(
+                        "SELECT uuid, name, namespace_name, unnest(aliases) AS alias, symlink_target_uuid FROM jobs_view")
+                    .map(new MapMapper())
+                    .list())
+        .forEach(System.out::println);
     final String query = "test";
     final List<SearchResult> results = searchDao.search(query, null, SearchSort.NAME, LIMIT);
 
