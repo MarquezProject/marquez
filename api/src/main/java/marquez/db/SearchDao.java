@@ -35,7 +35,7 @@ public interface SearchDao {
           + "   UNION\n"
           + "  SELECT DISTINCT ON (j.namespace_name, j.name) \n"
           + "    'JOB' AS type, j.name, j.updated_at, j.namespace_name\n"
-          + "    FROM (SELECT namespace_name, name, unnest(aliases) AS alias, updated_at \n"
+          + "    FROM (SELECT namespace_name, name, unnest(COALESCE(aliases, Array[NULL]::varchar[])) AS alias, updated_at \n"
           + "           FROM jobs_view WHERE symlink_target_uuid IS NULL\n"
           + "           ORDER BY updated_at DESC) AS j\n"
           + "   WHERE  j.name ilike '%' || :query || '%'\n"
