@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 /** The test suite for {@link JobResource}. */
 @Tag("IntegrationTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-public class JobResourceIntegrationTest extends BaseIntegrationTest {
+public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
   @Test
   public void testApp_getJob() {
     // (1) Start, then end OL run.

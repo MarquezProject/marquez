@@ -3,4 +3,4 @@
 package marquez.api;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-public class OpenLineageIntegrationTest extends BaseIntegrationTest {}
+public class OpenLineageIntegrationTest extends BaseResourceIntegrationTest {}
