@@ -25,6 +25,7 @@ import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
+import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -87,22 +88,23 @@ public class JobVersionDaoTest {
 
     // (2) Add another job version; conflict on version, not inserted.
     final int rowsBeforeConflict = jobVersionDao.count();
-    jobVersionDao.upsertJobVersion(
-        newRowUuid(),
-        newTimestamp(),
-        jobRow.getUuid(),
-        jobRow.getJobContextUuid().get(),
-        newLocation().toString(),
-        version.getValue(),
-        jobRow.getName(),
-        namespaceRow.getUuid(),
-        namespaceRow.getName());
+    final JobVersionRow jobVersionRow =
+        jobVersionDao.upsertJobVersion(
+            newRowUuid(),
+            newTimestamp(),
+            jobRow.getUuid(),
+            jobRow.getJobContextUuid().get(),
+            newLocation().toString(),
+            version.getValue(),
+            jobRow.getName(),
+            namespaceRow.getUuid(),
+            namespaceRow.getName());
 
     final int rowsAfterConflict = jobVersionDao.count();
     assertThat(rowsAfterConflict).isEqualTo(rowsBeforeConflict);
     Optional<JobVersion> jobVersion =
         jobVersionDao.findJobVersion(
-            jobRow.getNamespaceName(), jobRow.getName(), version.getValue());
+            jobRow.getNamespaceName(), jobRow.getName(), jobVersionRow.getUuid());
     assertThat(jobVersion).isPresent();
   }
 
@@ -185,7 +187,8 @@ public class JobVersionDaoTest {
       jobVersionDao.upsertOutputDatasetFor(jobVersionRow.getUuid(), dataset.getUuid());
     }
     Optional<JobVersion> jobVersion =
-        jobVersionDao.findJobVersion(namespaceRow.getName(), jobRow.getName(), version.getValue());
+        jobVersionDao.findJobVersion(
+            namespaceRow.getName(), jobRow.getName(), jobVersionRow.getUuid());
     assertThat(jobVersion)
         .isPresent()
         .get()
