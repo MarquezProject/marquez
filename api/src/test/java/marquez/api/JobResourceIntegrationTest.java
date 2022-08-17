@@ -17,10 +17,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.collect.ImmutableList;
+import io.openlineage.client.OpenLineage;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import marquez.api.models.ActiveRun;
 import marquez.client.MarquezClientException;
+import marquez.client.models.DatasetId;
 import marquez.client.models.Job;
 import marquez.client.models.JobVersion;
 import marquez.client.models.Run;
@@ -50,13 +53,21 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
     assertThat(job.getNamespace()).isEqualTo(NAMESPACE_NAME);
     assertThat(job.getName()).isEqualTo(olActiveRun.getJobName());
     assertThat(job.getInputs()).hasSize(olActiveRun.getInputs().size());
-    assertThat(job.getInputs()).hasSize(olActiveRun.getOutputs().size());
+    assertThat(job.getOutputs()).hasSize(olActiveRun.getOutputs().size());
     assertThat(job.getCurrentVersion()).isNotEmpty();
 
+    // Ensure the inputs / outputs associated with the OL run have been added to the job.
+    for (final OpenLineage.InputDataset input : olActiveRun.getInputs()) {
+      failIfNotIn(job.getInputs(), input);
+    }
+    for (final OpenLineage.OutputDataset output : olActiveRun.getOutputs()) {
+      failIfNotIn(job.getOutputs(), output);
+    }
+
     // Ensure the run has been associated with the job as latest, and COMPLETED
-    final Run runLatest = job.getLatestRun().orElseThrow();
-    assertThat(runLatest.getId()).isEqualTo(olActiveRun.getRunId().toString());
-    assertThat(runLatest.getState()).isEqualTo(COMPLETED);
+    final Run latestRunForJob = job.getLatestRun().orElseThrow();
+    assertThat(latestRunForJob.getId()).isEqualTo(olActiveRun.getRunId().toString());
+    assertThat(latestRunForJob.getState()).isEqualTo(COMPLETED);
   }
 
   @Test
@@ -259,6 +270,17 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
     assertThatExceptionOfType(MarquezClientException.class)
         .isThrownBy(() -> MARQUEZ_CLIENT.listRuns(NAMESPACE_NAME, unknownJobName))
         .withMessage(ERROR_JOB_NOT_FOUND, unknownJobName);
+  }
+
+  /** Fails if {@code dataset} not found in {@code datasetIds}. */
+  private void failIfNotIn(final Set<DatasetId> datasetIds, final OpenLineage.Dataset dataset) {
+    if (datasetIds.stream()
+        .noneMatch(
+            datasetId ->
+                datasetId.getNamespace().equals(dataset.getNamespace())
+                    && datasetId.getName().equals(dataset.getName()))) {
+      fail(ERROR_FAIL_IF_NOT_IN, dataset.getName(), datasetIds);
+    }
   }
 
   /** Fails if {@code jobName} not found in {@code jobs}. */
