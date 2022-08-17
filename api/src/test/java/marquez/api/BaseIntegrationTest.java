@@ -28,6 +28,7 @@ abstract class BaseIntegrationTest {
   static final String ERROR_NAMESPACE_NOT_FOUND = "Namespace '%s' not found.";
   static final String ERROR_JOB_VERSION_NOT_FOUND = "Job version '%s' not found.";
   static final String ERROR_JOB_NOT_FOUND = "Job '%s' not found.";
+  static final String ERROR_FAIL_IF_NOT_IN = "Expected '%s' in '%s'.";
 
   /* ... */
   static final URI OL_PRODUCER =

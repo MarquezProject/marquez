@@ -258,20 +258,20 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
     // Ensure job name not found.
     assertThatExceptionOfType(MarquezClientException.class)
         .isThrownBy(() -> MARQUEZ_CLIENT.listRuns(NAMESPACE_NAME, unknownJobName))
-        .withMessage("Job '%s' not found.", unknownJobName);
+        .withMessage(ERROR_JOB_NOT_FOUND, unknownJobName);
   }
 
   /** Fails if {@code jobName} not found in {@code jobs}. */
   private void failIfNotIn(final List<Job> jobs, final String jobName) {
     if (jobs.stream().noneMatch(job -> job.getName().equals(jobName))) {
-      fail("Expected '%s' in '%s'", jobName, jobs);
+      fail(ERROR_FAIL_IF_NOT_IN, jobName, jobs);
     }
   }
 
   /** Fails if {@code runId} not found in {@code runs}. */
   private void failIfNotIn(final List<Run> runs, final UUID runId) {
     if (runs.stream().noneMatch(run -> run.getId().equals(runId.toString()))) {
-      fail("Expected '%s' in '%s'", runId, runs);
+      fail(ERROR_FAIL_IF_NOT_IN, runId, runs);
     }
   }
 }
