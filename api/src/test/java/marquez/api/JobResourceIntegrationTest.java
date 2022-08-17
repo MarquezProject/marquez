@@ -95,11 +95,11 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
 
     // (2) Get job, then current version associated with job.
     final Job job = MARQUEZ_CLIENT.getJob(NAMESPACE_NAME, olActiveRun.getJobName());
-    final UUID currentVersion = job.getCurrentVersion().orElseThrow();
+    final UUID currentVersionForJob = job.getCurrentVersion().orElseThrow();
     final JobVersion currentJobVersion =
         MARQUEZ_CLIENT.getJobVersion(
-            NAMESPACE_NAME, olActiveRun.getJobName(), currentVersion.toString());
-    assertThat(currentJobVersion.getVersion()).isEqualTo(currentVersion);
+            NAMESPACE_NAME, olActiveRun.getJobName(), currentVersionForJob.toString());
+    assertThat(currentJobVersion.getVersion()).isEqualTo(currentVersionForJob);
   }
 
   @Test
@@ -111,12 +111,12 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
 
     // (2) Get job, then current version associated with job.
     final Job job = MARQUEZ_CLIENT.getJob(NAMESPACE_NAME, olActiveRun.getJobName());
-    final UUID currentVersion = job.getCurrentVersion().orElseThrow();
+    final UUID currentVersionForJob = job.getCurrentVersion().orElseThrow();
     final JobVersion currentJobVersion =
         MARQUEZ_CLIENT.getJobVersion(
-            NAMESPACE_NAME, olActiveRun.getJobName(), currentVersion.toString());
+            NAMESPACE_NAME, olActiveRun.getJobName(), currentVersionForJob.toString());
 
-    // Ensure current job version present.
+    // Ensure current version in version list for job.
     final List<JobVersion> jobVersions =
         MARQUEZ_CLIENT.listJobVersions(NAMESPACE_NAME, olActiveRun.getJobName());
     assertThat(jobVersions).contains(currentJobVersion);
@@ -135,7 +135,7 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
       olActiveRun.endRun();
     }
 
-    // Ensure all runs associated with job has been created.
+    // Ensure all runs associated with job have been created.
     final List<Run> runs = MARQUEZ_CLIENT.listRuns(NAMESPACE_NAME, jobName);
     for (final ActiveRun olActiveRun : olActiveRuns) {
       failIfNotIn(runs, olActiveRun.getRunId());
@@ -264,7 +264,7 @@ public class JobResourceIntegrationTest extends BaseResourceIntegrationTest {
   @Test
   public void testApp_listRuns_throwsOnUnknownJobName() {
     // (1) Use a randomly generated job name.
-    final String unknownJobName = newNamespaceName().getValue();
+    final String unknownJobName = newJobName().getValue();
 
     // Ensure job name not found.
     assertThatExceptionOfType(MarquezClientException.class)
