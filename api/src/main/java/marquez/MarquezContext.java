@@ -14,6 +14,7 @@ import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
+import marquez.api.RunResource;
 import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
@@ -84,6 +85,7 @@ public final class MarquezContext {
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
   @Getter private final JobResource jobResource;
+  @Getter private final RunResource runResource;
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final SearchResource searchResource;
@@ -146,6 +148,7 @@ public final class MarquezContext {
     this.sourceResource = new SourceResource(serviceFactory);
     this.datasetResource = new DatasetResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao);
+    this.runResource = new RunResource(runDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory);
     this.searchResource = new SearchResource(searchDao);
@@ -156,6 +159,7 @@ public final class MarquezContext {
             sourceResource,
             datasetResource,
             jobResource,
+            runResource,
             tagResource,
             jdbiException,
             openLineageResource,

@@ -3,14 +3,14 @@
 package marquez.jdbi;
 
 import javax.sql.DataSource;
-import marquez.PostgresContainer;
+import marquez.db.DbContainer;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.postgresql.ds.PGSimpleDataSource;
 
 public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresExtension {
 
-  private static final PostgresContainer POSTGRES = PostgresContainer.create("marquez");
+  private static final DbContainer POSTGRES = DbContainer.create("marquez");
 
   static {
     POSTGRES.start();

@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.BaseIntegrationTest;
 import marquez.api.models.JobVersion;
 import marquez.common.models.DatasetId;
 import marquez.common.models.NamespaceName;
@@ -41,7 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 /** The test suite for {@link JobVersionDao}. */
 @org.junit.jupiter.api.Tag("IntegrationTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-public class JobVersionDaoTest extends BaseIntegrationTest {
+public class JobVersionDaoTest {
   static Jdbi jdbiForTesting;
   static DatasetVersionDao datasetVersionDao;
   static JobDao jobDao;

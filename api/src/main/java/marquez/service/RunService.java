@@ -2,17 +2,12 @@
 
 package marquez.service;
 
-import static marquez.common.models.RunState.COMPLETED;
-import static marquez.common.models.RunState.NEW;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -22,95 +17,25 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
-import marquez.common.models.RunState;
 import marquez.db.BaseDao;
-import marquez.db.JobVersionDao;
-import marquez.db.JobVersionDao.BagOfJobVersionInfo;
-import marquez.db.RunStateDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobVersionRow;
-import marquez.db.models.RunRow;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
-import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 
 @Slf4j
 public class RunService extends DelegatingDaos.DelegatingRunDao {
-  private final JobVersionDao jobVersionDao;
-  private final RunStateDao runStateDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
 
   public RunService(
       @NonNull BaseDao baseDao, Collection<RunTransitionListener> runTransitionListeners) {
     super(baseDao.createRunDao());
-    this.jobVersionDao = baseDao.createJobVersionDao();
-    this.runStateDao = baseDao.createRunStateDao();
     this.runTransitionListeners = runTransitionListeners;
-  }
-
-  /**
-   * @deprecated Prefer OpenLineage, see <a
-   *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
-   *     removed in release {@code 0.25.0}.
-   */
-  public Run createRun(
-      @NonNull NamespaceName namespaceName, @NonNull JobName jobName, @NonNull RunMeta runMeta) {
-    log.info("Creating run for job '{}'...", jobName.getValue());
-    RunRow runRow = upsertRunMeta(namespaceName, jobName, runMeta, NEW);
-    notify(new RunTransition(RunId.of(runRow.getUuid()), null, NEW));
-
-    return findRunByUuid(runRow.getUuid()).get();
-  }
-
-  public void markRunAs(
-      @NonNull RunId runId, @NonNull RunState runState, @Nullable Instant transitionedAt) {
-    log.debug("Marking run with ID '{}' as '{}'...", runId, runState);
-    if (transitionedAt == null) {
-      transitionedAt = Instant.now();
-    }
-    ExtendedRunRow runRow = findRunByUuidAsRow(runId.getValue()).get();
-    runStateDao.updateRunStateFor(runId.getValue(), runState, transitionedAt);
-
-    if (runState.isDone()) {
-      BagOfJobVersionInfo bagOfJobVersionInfo =
-          jobVersionDao.upsertJobVersionOnRunTransition(
-              runRow.getNamespaceName(),
-              runRow.getJobName(),
-              runRow.getUuid(),
-              runState,
-              transitionedAt);
-
-      // TODO: We should also notify that the outputs have been updated when a run is in a done
-      // state to be consistent with existing job versioning logic. We'll want to add testing to
-      // confirm the new behavior before updating the logic.
-      if (runState == COMPLETED) {
-        notify(
-            new JobOutputUpdate(
-                RunId.of(runRow.getUuid()),
-                toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
-                JobName.of(runRow.getJobName()),
-                NamespaceName.of(runRow.getNamespaceName()),
-                buildRunOutputs(bagOfJobVersionInfo.getOutputs())));
-      }
-
-      notify(
-          new JobInputUpdate(
-              RunId.of(runRow.getUuid()),
-              buildRunMeta(runRow),
-              toJobVersionId(bagOfJobVersionInfo.getJobVersionRow()),
-              JobName.of(runRow.getJobName()),
-              NamespaceName.of(runRow.getNamespaceName()),
-              buildRunInputs(bagOfJobVersionInfo.getInputs())));
-    }
-
-    final RunState oldRunState = runRow.getCurrentRunState().map(RunState::valueOf).orElse(null);
-    notify(new RunTransition(runId, oldRunState, runState));
-    JobMetrics.emitRunStateCounterMetric(runState);
   }
 
   public static RunMeta buildRunMeta(ExtendedRunRow runRow) {

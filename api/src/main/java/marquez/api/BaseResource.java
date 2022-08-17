@@ -3,10 +3,8 @@
 package marquez.api;
 
 import com.google.common.collect.ImmutableSet;
-import java.net.URI;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import javax.ws.rs.core.UriInfo;
 import lombok.NonNull;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;
@@ -129,13 +127,5 @@ public class BaseResource {
         throw new DatasetNotFoundException(datasetId.getName());
       }
     }
-  }
-
-  URI locationFor(@NonNull UriInfo uriInfo, @NonNull Run run) {
-    return uriInfo
-        .getBaseUriBuilder()
-        .path(JobResource.class)
-        .path(RunResource.class, "getRun")
-        .build(run.getId().getValue());
   }
 }

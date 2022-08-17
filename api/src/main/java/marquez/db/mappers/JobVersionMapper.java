@@ -55,7 +55,7 @@ public class JobVersionMapper implements RowMapper<JobVersion> {
             uuidOrThrow(results, Columns.VERSION)),
         JobName.of(stringOrThrow(results, Columns.JOB_NAME)),
         timestampOrThrow(results, Columns.CREATED_AT),
-        Version.of(uuidOrThrow(results, Columns.VERSION)),
+        Version.of(uuidOrThrow(results, Columns.ROW_UUID)), // NOTE: ...
         urlOrNull(results, Columns.LOCATION),
         mapOrNull(results, Columns.CONTEXT),
         toDatasetIdsList(results, Columns.INPUT_DATASETS),

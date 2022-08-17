@@ -1,29 +1,29 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-package marquez;
+package marquez.db;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
+public final class DbContainer extends PostgreSQLContainer<DbContainer> {
   private static final DockerImageName POSTGRES = DockerImageName.parse("postgres:11.8");
   private static final int JDBC = 5;
 
-  private static final Map<String, PostgresContainer> containers = new HashMap<>();
+  private static final Map<String, DbContainer> containers = new HashMap<>();
 
   private String host;
   private int port;
 
-  private PostgresContainer() {
+  private DbContainer() {
     super(POSTGRES);
   }
 
-  public static PostgresContainer create(String name) {
-    PostgresContainer container = containers.get(name);
+  public static DbContainer create(String name) {
+    DbContainer container = containers.get(name);
     if (container == null) {
-      container = new PostgresContainer();
+      container = new DbContainer();
       containers.put(name, container);
     }
     return container;

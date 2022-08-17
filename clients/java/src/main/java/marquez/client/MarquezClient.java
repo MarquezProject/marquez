@@ -208,7 +208,7 @@ public class MarquezClient {
   }
 
   public JobVersion getJobVersion(
-      @NonNull String namespaceName, @NonNull String jobName, String version) {
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull String version) {
     final String bodyAsJson = http.get(url.toJobVersionUrl(namespaceName, jobName, version));
     return JobVersion.fromJson(bodyAsJson);
   }
@@ -220,6 +220,10 @@ public class MarquezClient {
   public List<Job> listJobs(@NonNull String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toListJobsUrl(namespaceName, limit, offset));
     return Jobs.fromJson(bodyAsJson).getValue();
+  }
+
+  public List<JobVersion> listJobVersions(@NonNull String namespaceName, @NonNull String jobName) {
+    return listJobVersions(namespaceName, jobName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
   public List<JobVersion> listJobVersions(

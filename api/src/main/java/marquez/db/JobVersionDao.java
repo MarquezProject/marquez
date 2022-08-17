@@ -120,7 +120,7 @@ public interface JobVersionDao extends BaseDao {
           + "    GROUP BY run_uuid\n"
           + ") ro ON ro.run_uuid = r.uuid\n";
 
-  @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "WHERE jv.version = :jobVersionUuid")
+  @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "WHERE jv.uuid = :jobVersionUuid")
   Optional<JobVersion> findJobVersion(String namespaceName, String jobName, UUID jobVersionUuid);
 
   @SqlQuery(BASE_SELECT_ON_JOB_VERSIONS + "LIMIT :limit OFFSET :offset")

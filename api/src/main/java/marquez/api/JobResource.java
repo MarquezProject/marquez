@@ -8,41 +8,31 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
 import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.JobVersionNotFoundException;
 import marquez.api.models.JobVersion;
 import marquez.api.models.ResultsPage;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.common.models.Version;
 import marquez.db.JobVersionDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
-import marquez.service.models.RunMeta;
 
 @Path("/api/v1")
 public class JobResource extends BaseResource {
@@ -103,6 +93,23 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
+  @Path("/namespaces/{namespace}/jobs")
+  @Produces(APPLICATION_JSON)
+  public Response listJobs(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
+    throwIfNotExists(namespaceName);
+
+    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
+    final int totalCount = jobService.countFor(namespaceName.getValue());
+    return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Path("/namespaces/{namespace}/jobs/{job}/versions/{version}")
   @Produces(APPLICATION_JSON)
   public Response getJobVersion(
@@ -143,44 +150,6 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/namespaces/{namespace}/jobs")
-  @Produces(APPLICATION_JSON)
-  public Response list(
-      @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
-      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
-    throwIfNotExists(namespaceName);
-
-    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
-    final int totalCount = jobService.countFor(namespaceName.getValue());
-    return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @POST
-  @Path("namespaces/{namespace}/jobs/{job}/runs")
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
-  public Response createRun(
-      @PathParam("namespace") NamespaceName namespaceName,
-      @PathParam("job") JobName jobName,
-      @Valid RunMeta runMeta,
-      @Context UriInfo uriInfo) {
-    throwIfNotExists(namespaceName);
-    throwIfNotExists(namespaceName, jobName);
-    throwIfExists(namespaceName, jobName, runMeta.getId().orElse(null));
-
-    final Run run = runService.createRun(namespaceName, jobName, runMeta);
-    final URI runLocation = locationFor(uriInfo, run);
-    return Response.created(runLocation).entity(run).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
   @Produces(APPLICATION_JSON)
   public Response listRuns(
@@ -196,25 +165,8 @@ public class JobResource extends BaseResource {
     return Response.ok(new Runs(runs)).build();
   }
 
-  @Path("/jobs/runs/{id}")
-  public RunResource runResourceRoot(@PathParam("id") RunId runId) {
-    throwIfNotExists(runId);
-    return new RunResource(runId, runService);
-  }
-
-  @Value
-  static class JobVersions {
-    @NonNull
-    @JsonProperty("versions")
-    List<JobVersion> value;
-  }
-
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Getter
-  public static class Runs {
-    @NonNull
-    @JsonProperty("runs")
-    List<Run> value;
-  }
+  /** List of {@link JobVersions}s */
+  record JobVersions(@NonNull @JsonProperty("versions") List<JobVersion> value) {}
+  /** List of {@link Run}s */
+  record Runs(@NonNull @JsonProperty("runs") List<Run> value) {}
 }

@@ -39,7 +39,7 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
             ? uuidArrayOrThrow(results, Columns.OUTPUT_UUIDS)
             : ImmutableList.<UUID>of(),
         stringOrNull(results, Columns.LOCATION),
-        uuidOrThrow(results, Columns.VERSION),
+        uuidOrThrow(results, Columns.ROW_UUID),
         uuidOrNull(results, Columns.LATEST_RUN_UUID),
         columnNames.contains(Columns.CONTEXT) ? stringOrThrow(results, Columns.CONTEXT) : "",
         stringOrThrow(results, Columns.NAMESPACE_NAME),
