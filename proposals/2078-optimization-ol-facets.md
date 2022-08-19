@@ -40,6 +40,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 
 | **COLUMN**           | **TYPE**  |
 |----------------------|-----------|
+| uuid                 | `UUID`    |
 | dataset_version_uuid | `UUID`    |
 | name                 | `VARCHAR` |
 | facet                | `JSONB`   |
@@ -50,6 +51,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 
 | **COLUMN**       | **TYPE**  |
 |------------------|-----------|
+| uuid             | `UUID`    |
 | job_version_uuid | `UUID`    |
 | name             | `VARCHAR` |
 | facet            | `JSONB`   |
@@ -60,6 +62,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 
 | **COLUMN** | **TYPE**  |
 |------------|-----------|
+| uuid       | `UUID`    |
 | run_uuid   | `UUID`    |
 | name       | `VARCHAR` |
 | facet      | `JSONB`   |
