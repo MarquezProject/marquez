@@ -1,6 +1,6 @@
 # Proposal: Optimize query performance for OpenLineage facets
 
-Author: Willy Lulciuc
+Author: Willy Lulciuc ([@wslulciuc](https://github.com/wslulciuc))
 
 Created: 2022-08-18
 
@@ -44,7 +44,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name                 | `VARCHAR` |
 | facet                | `JSONB`   |
 
-> **Table 1:** Contains facets for a given dataset version.
+> **Table 1:** Facets for a given dataset version.
 
 ### Table `job_version_facets`
 
@@ -54,7 +54,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name             | `VARCHAR` |
 | facet            | `JSONB`   |
 
-> **Table 2:** Contains facets for a given job version.
+> **Table 2:** Facets for a given job version.
 
 ### Table `run_facets`
 
@@ -64,7 +64,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name       | `VARCHAR` |
 | facet      | `JSONB`   |
 
-> **Table 3:** Contains facets for a given run.
+> **Table 3:** Facets for a given run.
 
 ## Implementation
 
@@ -72,3 +72,4 @@ The implementation requires:
 
 1. Schema changes to create the facet tables outlined above.
 2. Using the facet tables instead the `lineage_events` table to query for facets.
+3. Lazy migration, the facet tables will be queried, and if no facets are returned, then the `lineage_events` table; this approach avoids a backfill, but one will still be needed.
