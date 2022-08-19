@@ -44,7 +44,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name                 | `VARCHAR` |
 | facet                | `JSONB`   |
 
-> **Table 1:** Facets for a given dataset version.
+> **Table 1:** Facets for a given dataset version, indexed on `dataset_version_uuid` and `name`.
 
 ### Table `job_version_facets`
 
@@ -54,7 +54,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name             | `VARCHAR` |
 | facet            | `JSONB`   |
 
-> **Table 2:** Facets for a given job version.
+> **Table 2:** Facets for a given job version, indexed on `job_version_uuid` and `name`.
 
 ### Table `run_facets`
 
@@ -64,7 +64,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name       | `VARCHAR` |
 | facet      | `JSONB`   |
 
-> **Table 3:** Facets for a given run.
+> **Table 3:** Facets for a given run, indexed on `run_uuid` and `name`.
 
 ## Implementation
 
