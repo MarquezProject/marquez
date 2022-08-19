@@ -4,7 +4,7 @@ Author: Willy Lulciuc ([@wslulciuc](https://github.com/wslulciuc))
 
 Created: 2022-08-18
 
-Discussion: [https://github.com/MarquezProject/marquez/issues/2073](https://github.com/MarquezProject/marquez/issues/2078)
+Discussion: [https://github.com/MarquezProject/marquez/issues/2078](https://github.com/MarquezProject/marquez/issues/2078)
 
 ## Overview
 
