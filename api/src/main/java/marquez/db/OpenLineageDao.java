@@ -29,6 +29,7 @@ import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
+import marquez.db.mappers.LineageEventMapper;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
@@ -53,11 +54,14 @@ import marquez.service.models.LineageEvent.ParentRunFacet;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@RegisterRowMapper(LineageEventMapper.class)
 public interface OpenLineageDao extends BaseDao {
   public String DEFAULT_SOURCE_NAME = "default";
   public String DEFAULT_NAMESPACE_OWNER = "anonymous";
@@ -80,6 +84,9 @@ public interface OpenLineageDao extends BaseDao {
       String jobNamespace,
       PGobject event,
       String producer);
+
+  @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
+  List<LineageEvent> findOlEventsByRunUuid(UUID runUuid);
 
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);

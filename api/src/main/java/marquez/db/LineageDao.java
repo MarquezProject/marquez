@@ -37,33 +37,39 @@ public interface LineageDao {
    * @return
    */
   @SqlQuery(
-      // dataset_ids: all the input and output datasets of the current version of the specified jobs
-      "WITH RECURSIVE\n"
-          + "    job_io AS (\n"
-          + "        SELECT j.uuid AS job_uuid,\n"
-          + "        ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,\n"
-          + "        ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs\n"
-          + "        FROM jobs j\n"
-          + "        LEFT JOIN job_versions v on j.current_version_uuid = v.uuid\n"
-          + "        LEFT JOIN job_versions_io_mapping io on v.uuid = io.job_version_uuid\n"
-          + "        GROUP BY j.uuid\n"
-          + "    ),\n"
-          + "    lineage(job_uuid, inputs, outputs) AS (\n"
-          + "        SELECT job_uuid, inputs, outputs, 0 AS depth\n"
-          + "        FROM job_io\n"
-          + "        WHERE job_uuid IN (<jobIds>)\n"
-          + "        UNION\n"
-          + "        SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1\n"
-          + "        FROM job_io io,\n"
-          + "             lineage l\n"
-          + "        WHERE io.job_uuid != l.job_uuid AND\n"
-          + "        array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)\n"
-          + "        AND depth < :depth"
-          + "    )\n"
-          + "SELECT DISTINCT ON (l2.job_uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context\n"
-          + "FROM lineage l2\n"
-          + "INNER JOIN jobs_view j ON j.uuid=l2.job_uuid\n"
-          + "LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid")
+      """
+    WITH RECURSIVE
+        job_io AS (
+            SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
+            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
+            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
+            FROM job_versions_io_mapping io
+            INNER JOIN job_versions v ON io.job_version_uuid=v.uuid
+            INNER JOIN jobs_view j on j.current_version_uuid = v.uuid
+            LEFT JOIN jobs_view s ON s.uuid=j.symlink_target_uuid
+            WHERE s.current_version_uuid IS NULL
+            GROUP BY COALESCE(j.symlink_target_uuid, j.uuid)
+        ),
+        lineage(job_uuid, inputs, outputs) AS (
+            SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
+                   COALESCE(inputs, Array[]::uuid[]) AS inputs,
+                   COALESCE(outputs, Array[]::uuid[]) AS outputs,
+                   0 AS depth
+            FROM jobs_view j
+            LEFT JOIN job_io io ON io.job_uuid=j.uuid OR j.symlink_target_uuid=io.job_uuid
+            WHERE j.uuid IN (<jobIds>)
+            UNION
+            SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1
+            FROM job_io io,
+                 lineage l
+            WHERE io.job_uuid != l.job_uuid AND
+            array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
+            AND depth < :depth)
+    SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context
+    FROM lineage l2
+    INNER JOIN jobs_view j ON j.uuid=l2.job_uuid
+    LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid;
+  """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
   @SqlQuery(
@@ -88,7 +94,8 @@ public interface LineageDao {
           + "    SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version\n"
           + "    FROM runs_view r\n"
           + "    INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
-          + "    WHERE jv.job_uuid in (<jobUuid>)\n"
+          + "    INNER JOIN jobs_view j ON j.uuid=jv.job_uuid\n"
+          + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
           + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"
           + ")\n"
           + "SELECT r.*, ra.args, ctx.context, f.facets,\n"

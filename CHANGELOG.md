@@ -1,6 +1,34 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.25.0...HEAD)
+
+## [0.25.0](https://github.com/MarquezProject/marquez/compare/0.24.0...0.25.0) - 2022-08-08
+
+### Fixed
+
+* Fix py module release [#2057](https://github.com/MarquezProject/marquez/pull/2057) [@wslulciuc](https://github.com/wslulciuc)
+* Use /bin/sh in web/docker/entrypoint.sh [#2059](https://github.com/MarquezProject/marquez/pull/2059) [@wslulciuc](https://github.com/wslulciuc)
+
+## [0.24.0](https://github.com/MarquezProject/marquez/compare/0.23.0...0.24.0) - 2022-08-02
+
+### Added
+
+* Add copyright lines to all source files [#1996](https://github.com/MarquezProject/marquez/pull/1996) [@merobi-hub](https://github.com/MarquezProject/marquez/commits?author=merobi-hub)
+* Add copyright and license guidelines in CONTRIBUTING.md [@wslulciuc](https://github.com/wslulciuc)
+* Add @FlywayTarget annotation to migration tests to control flyway upgrades [#2035](https://github.com/MarquezProject/marquez/pull/2035) [@collado-mike](https://github.com/collado-mike) 
+
+### Changed
+
+* Updated `jobs_view` to stop computing FQN on reads and to compute on _writes_ instead [#2036](https://github.com/MarquezProject/marquez/pull/2036) [@collado-mike](https://github.com/collado-mike)
+* Runs row reduction [#2041](https://github.com/MarquezProject/marquez/pull/2041) [@collado-mike](https://github.com/collado-mike)
+
+### Fixed
+
+* Update `Run` in the openapi spec to include a `context` field [#2020](https://github.com/MarquezProject/marquez/pull/2020) [@esaych](https://github.com/Esaych)
+* Fix dataset openapi model [#2038](https://github.com/MarquezProject/marquez/pull/2038) [@esaych](https://github.com/Esaych) 
+* Fix casing on lastLifecycleState [#2039](https://github.com/MarquezProject/marquez/pull/2039) [@esaych](https://github.com/Esaych)
+* Fix V45 migration to include initial population of jobs_fqn table [#2051](https://github.com/MarquezProject/marquez/pull/2051) [@collado-mike](https://github.com/collado-mike)
+* Fix symlinked jobs in queries [#2053](https://github.com/MarquezProject/marquez/pull/2053) [@collado-mike](https://github.com/collado-mike)
 
 ## [0.23.0](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-16
 

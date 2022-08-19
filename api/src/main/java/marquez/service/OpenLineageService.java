@@ -65,19 +65,6 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
-    CompletableFuture<Void> marquez =
-        CompletableFuture.supplyAsync(
-                withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
-            .thenAccept(
-                (update) -> {
-                  if (event.getEventType() != null) {
-                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
-                      buildJobOutputUpdate(update).ifPresent(runService::notify);
-                    }
-                    buildJobInputUpdate(update).ifPresent(runService::notify);
-                  }
-                });
-
     UUID runUuid = runUuidFromEvent(event.getRun());
     CompletableFuture<Void> openLineage =
         CompletableFuture.runAsync(
@@ -93,6 +80,19 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                             createJsonArray(event, mapper),
                             event.getProducer()))),
             executor);
+
+    CompletableFuture<Void> marquez =
+        CompletableFuture.supplyAsync(
+                withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
+            .thenAccept(
+                (update) -> {
+                  if (event.getEventType() != null) {
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                      buildJobOutputUpdate(update).ifPresent(runService::notify);
+                    }
+                    buildJobInputUpdate(update).ifPresent(runService::notify);
+                  }
+                });
 
     return CompletableFuture.allOf(marquez, openLineage);
   }

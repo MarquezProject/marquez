@@ -74,6 +74,8 @@ public final class FlywayFactory {
   @Getter @Setter
   private String repeatableSqlMigrationPrefix = DEFAULT_REPEATABLE_SQL_MIGRATION_PREFIX;
 
+  @Getter @Setter private String schema;
+
   public Flyway build(@NonNull DataSource source) {
     return Flyway.configure()
         .dataSource(source)
@@ -102,6 +104,7 @@ public final class FlywayFactory {
         .placeholderSuffix(placeholderSuffix)
         .sqlMigrationPrefix(sqlMigrationPrefix)
         .repeatableSqlMigrationPrefix(repeatableSqlMigrationPrefix)
+        .defaultSchema(schema)
         .load();
   }
 }
