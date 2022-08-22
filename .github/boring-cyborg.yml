@@ -31,15 +31,15 @@ labelPRBasedOnFilePath:
       - examples/**/*
 
   # Add 'proposal' to any changes within 'proposals' folder or any subfolders
-    common:
+    proposal:
       - proposals/**/*
 
   # Add 'spec' to any changes within 'spec' folder
-    client/java:
+    spec:
       - spec/*
 
   # Add 'web' to any changes within 'web' folder or any subfolders
-    client/java:
+    web:
       - web/**/*
 
 
