@@ -6,65 +6,65 @@
 
 ### Fixed
 
-* Fix py module release [#2057](https://github.com/MarquezProject/marquez/pull/2057) [@wslulciuc](https://github.com/wslulciuc)
-* Use /bin/sh in web/docker/entrypoint.sh [#2059](https://github.com/MarquezProject/marquez/pull/2059) [@wslulciuc](https://github.com/wslulciuc)
+* Fix py module release [`#2057`](https://github.com/MarquezProject/marquez/pull/2057) [@wslulciuc](https://github.com/wslulciuc)
+* Use `/bin/sh` in `web/docker/entrypoint.sh` [`#2059`](https://github.com/MarquezProject/marquez/pull/2059) [@wslulciuc](https://github.com/wslulciuc)
 
 ## [0.24.0](https://github.com/MarquezProject/marquez/compare/0.23.0...0.24.0) - 2022-08-02
 
 ### Added
 
-* Add copyright lines to all source files [#1996](https://github.com/MarquezProject/marquez/pull/1996) [@merobi-hub](https://github.com/MarquezProject/marquez/commits?author=merobi-hub)
-* Add copyright and license guidelines in CONTRIBUTING.md [@wslulciuc](https://github.com/wslulciuc)
-* Add @FlywayTarget annotation to migration tests to control flyway upgrades [#2035](https://github.com/MarquezProject/marquez/pull/2035) [@collado-mike](https://github.com/collado-mike) 
+* Add copyright lines to all source files [`#1996`](https://github.com/MarquezProject/marquez/pull/1996) [@merobi-hub](https://github.com/MarquezProject/marquez/commits?author=merobi-hub)
+* Add copyright and license guidelines in `CONTRIBUTING.md` [@wslulciuc](https://github.com/wslulciuc)
+* Add `@FlywayTarget` annotation to migration tests to control flyway upgrades [`#2035`](https://github.com/MarquezProject/marquez/pull/2035) [@collado-mike](https://github.com/collado-mike)
 
 ### Changed
 
-* Updated `jobs_view` to stop computing FQN on reads and to compute on _writes_ instead [#2036](https://github.com/MarquezProject/marquez/pull/2036) [@collado-mike](https://github.com/collado-mike)
-* Runs row reduction [#2041](https://github.com/MarquezProject/marquez/pull/2041) [@collado-mike](https://github.com/collado-mike)
+* Updated `jobs_view` to stop computing FQN on reads and to compute on _writes_ instead [`#2036`](https://github.com/MarquezProject/marquez/pull/2036) [@collado-mike](https://github.com/collado-mike)
+* Runs row reduction [`#2041`](https://github.com/MarquezProject/marquez/pull/2041) [@collado-mike](https://github.com/collado-mike)
 
 ### Fixed
 
-* Update `Run` in the openapi spec to include a `context` field [#2020](https://github.com/MarquezProject/marquez/pull/2020) [@esaych](https://github.com/Esaych)
-* Fix dataset openapi model [#2038](https://github.com/MarquezProject/marquez/pull/2038) [@esaych](https://github.com/Esaych) 
-* Fix casing on lastLifecycleState [#2039](https://github.com/MarquezProject/marquez/pull/2039) [@esaych](https://github.com/Esaych)
-* Fix V45 migration to include initial population of jobs_fqn table [#2051](https://github.com/MarquezProject/marquez/pull/2051) [@collado-mike](https://github.com/collado-mike)
-* Fix symlinked jobs in queries [#2053](https://github.com/MarquezProject/marquez/pull/2053) [@collado-mike](https://github.com/collado-mike)
+* Update `Run` in the openapi spec to include a `context` field [`#2020`](https://github.com/MarquezProject/marquez/pull/2020) [@esaych](https://github.com/Esaych)
+* Fix dataset openapi model [`#2038`](https://github.com/MarquezProject/marquez/pull/2038) [@esaych](https://github.com/Esaych)
+* Fix casing on `lastLifecycleState` [`#2039`](https://github.com/MarquezProject/marquez/pull/2039) [@esaych](https://github.com/Esaych)
+* Fix V45 migration to include initial population of jobs_fqn table [`#2051`](https://github.com/MarquezProject/marquez/pull/2051) [@collado-mike](https://github.com/collado-mike)
+* Fix symlinked jobs in queries [`#2053`](https://github.com/MarquezProject/marquez/pull/2053) [@collado-mike](https://github.com/collado-mike)
 
 ## [0.23.0](https://github.com/MarquezProject/marquez/compare/0.22.0...0.23.0) - 2022-06-16
 
 ### Added
 
-* Update docker-compose.yml: Randomly map postgres db port [#2000](https://github.com/MarquezProject/marquez/pull/2000) [@RNHTTR](https://github.com/RNHTTR) 
-* Job parent hierarchy [#1935](https://github.com/MarquezProject/marquez/pull/1935) [#1980](https://github.com/MarquezProject/marquez/pull/1980) [#1992](https://github.com/MarquezProject/marquez/pull/1992) [@collado-mike](https://github.com/collado-mike)
+* Update docker-compose.yml: Randomly map postgres db port [`#2000`](https://github.com/MarquezProject/marquez/pull/2000) [@RNHTTR](https://github.com/RNHTTR)
+* Job parent hierarchy [`#1935`](https://github.com/MarquezProject/marquez/pull/1935) [`#1980`](https://github.com/MarquezProject/marquez/pull/1980) [`#1992`](https://github.com/MarquezProject/marquez/pull/1992) [@collado-mike](https://github.com/collado-mike)
 
 ### Changed
 
-* Set default limit for listing datasets and jobs in UI from `2000` to `25` [#2018](https://github.com/MarquezProject/marquez/pull/2018) [@wslulciuc](https://github.com/wslulciuc)
+* Set default limit for listing datasets and jobs in UI from `2000` to `25` [`#2018`](https://github.com/MarquezProject/marquez/pull/2018) [@wslulciuc](https://github.com/wslulciuc)
 * Update OpenLineage write API to be non-transactional and avoid unnecessary locks on records under heavy contention [@collado-mike](https://github.com/collado-mike)
 
 ### Fixed
 
-* Return the tag for postgresql to 12.1.0 [#2015](https://github.com/MarquezProject/marquez/pull/2015) [@rossturk](https://github.com/rossturk)
+* Return the tag for postgresql to 12.1.0 [`#2015`](https://github.com/MarquezProject/marquez/pull/2015) [@rossturk](https://github.com/rossturk)
 
 ## [0.22.0](https://github.com/MarquezProject/marquez/compare/0.21.0...0.22.0) - 2022-05-16
 
 ### Added
 
-* Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [#1847](https://github.com/MarquezProject/marquez/pull/1847)[@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [#1945](https://github.com/MarquezProject/marquez/pull/1945) [@wslulciuc](https://github.com/wslulciuc)
-* Add support for job renaming/redirection via symlink [#1947](https://github.com/MarquezProject/marquez/pull/1947) [@collado-mike](https://github.com/collado-mike)
-* Add `Created by` view for dataset versions along with SQL syntax highlighting in web UI [#1929](https://github.com/MarquezProject/marquez/pull/1929) [@phixMe](https://github.com/phixMe)
-* Add `operationId` to openapi spec [#1978](https://github.com/MarquezProject/marquez/pull/1978) [@phixMe](https://github.com/phixMe)
+* Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [`#1847`](https://github.com/MarquezProject/marquez/pull/1847)[@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+* Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [`#1945`](https://github.com/MarquezProject/marquez/pull/1945) [@wslulciuc](https://github.com/wslulciuc)
+* Add support for job renaming/redirection via symlink [`#1947`](https://github.com/MarquezProject/marquez/pull/1947) [@collado-mike](https://github.com/collado-mike)
+* Add `Created by` view for dataset versions along with SQL syntax highlighting in web UI [`#1929`](https://github.com/MarquezProject/marquez/pull/1929) [@phixMe](https://github.com/phixMe)
+* Add `operationId` to openapi spec [`#1978`](https://github.com/MarquezProject/marquez/pull/1978) [@phixMe](https://github.com/phixMe)
 
 ### Changed
 
-* Upgrade Flyway to v7.6.0 [#1974](https://github.com/MarquezProject/marquez/pull/1974) [@dakshin-k](https://github.com/dakshin-k)
+* Upgrade Flyway to v7.6.0 [`#1974`](https://github.com/MarquezProject/marquez/pull/1974) [@dakshin-k](https://github.com/dakshin-k)
 
 ### Fixed
 
-* Remove size limits on namespaces, dataset names, and and source connection urls [#1925](https://github.com/MarquezProject/marquez/pull/1925) [@collado-mike](https://github.com/collado-mike)
-* Update namespace names to allow `=`, `@`, and `;` [#1936](https://github.com/MarquezProject/marquez/pull/1936) [@mobuchowski](https://github.com/mobuchowski)
-* Time duration display in web UI [#1950](https://github.com/MarquezProject/marquez/pull/1950) [@phixMe](https://github.com/phixMe)
+* Remove size limits on namespaces, dataset names, and and source connection urls [`#1925`](https://github.com/MarquezProject/marquez/pull/1925) [@collado-mike](https://github.com/collado-mike)
+* Update namespace names to allow `=`, `@`, and `;` [`#1936`](https://github.com/MarquezProject/marquez/pull/1936) [@mobuchowski](https://github.com/mobuchowski)
+* Time duration display in web UI [`#1950`](https://github.com/MarquezProject/marquez/pull/1950) [@phixMe](https://github.com/phixMe)
 * Enable web UI to access API via Helm Chart [@GZack2000](https://github.com/GZack2000)
 
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
