@@ -4,11 +4,11 @@ services:
     image: "marquezproject/marquez:${TAG}"
     container_name: seed-marquez-with-metadata
     environment:
-      - MARQUEZ_HOST=api
-      - MARQUEZ_PORT=${API_PORT}
+      - MARQUEZ_URL=http://api:${API_PORT}
     volumes:
       - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./docker/seed.sh:/usr/src/app/seed.sh
+      - ./docker/metadata.json:/usr/src/app/metadata.json
     links:
       - "db:postgres"
     depends_on:
