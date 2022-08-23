@@ -32,7 +32,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * --metadata}. Metadata must be defined as a Json file containing an array of {@code OpenLineage}
  * events.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
  * For example, to override the {@code url}:
  *
