@@ -852,7 +852,7 @@ components:
             $ref: '#/components/schemas/Source'
 
     DatasetType:
-      type: enum
+      type: string
       enum: [DB_TABLE, STREAM]
       description: The type of dataset
 
@@ -1258,7 +1258,7 @@ components:
             $ref: '#/components/schemas/Tag'
 
     JobType:
-      type: enum
+      type: string
       enum: [BATCH, STREAM, SERVICE]
       description: The type of the job.
 
@@ -1692,7 +1692,7 @@ components:
             $ref: '#/components/schemas/GraphEdge'
 
     NodeType:
-      type: enum
+      type: string
       enum: [ JOB, DATASET ]
       description: The type of the diff node.
 
@@ -1776,7 +1776,7 @@ components:
           example: 'dataset:food_delivery:public.delivery_7_days'
 
     SearchResultType:
-      type: enum
+      type: string
       enum: [DATASET, JOB]
       description: The type of search result.
       example: DATASET
