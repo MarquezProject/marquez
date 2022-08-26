@@ -41,10 +41,10 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *
  * <h2>Usage</h2>
  *
- * For example, the following command will generate {@code metadata.json} with {@code 10} events,
- * where each START event will have a size of {@code ~16384} bytes; events will be written to the
- * {@code current} directory. You may specify the location of {@code metadata.json} by using the
- * command-line argument {@code --output}
+ * For example, the following command will generate {@code metadata.json} with {@code 10} runs
+ * ({@code 20} events in total), where each START event will have a size of {@code ~16384} bytes;
+ * events will be written to {@code metadata.json} in the {@code current} directory. You may specify
+ * the location of {@code metadata.json} by using the command-line argument {@code --output}.
  *
  * <pre>{@code
  * java -jar marquez-api.jar metadata --runs 10 --bytes-per-event 16384
@@ -52,7 +52,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  */
 @Slf4j
 public final class MetadataCommand extends Command {
-  /* Used to calculate total bytes per event. */
+  /* Used to calculate (approximate) total bytes per event. */
   private static final int BYTES_PER_RUN = 578;
   private static final int BYTES_PER_JOB = 58;
   private static final int BYTES_PER_FIELD_IN_SCHEMA = 256;
@@ -61,7 +61,7 @@ public final class MetadataCommand extends Command {
   private static final int DEFAULT_NUM_OF_IO_PER_EVENT = 8;
   private static final int DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT = 16;
 
-  /* Default limit. */
+  /* Default runs. */
   private static final int DEFAULT_RUNS = 25;
 
   /* Default bytes. */
@@ -79,6 +79,7 @@ public final class MetadataCommand extends Command {
   private static final String CMD_ARG_METADATA_BYTES = "bytes-per-event";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
 
+  /* Used for event randomization. */
   private static final Random RANDOM = new Random();
   private static final ZoneId AMERICA_LOS_ANGELES = ZoneId.of("America/Los_Angeles");
   private static final List<String> FIELD_TYPES = ImmutableList.of("VARCHAR", "TEXT", "INTEGER");
@@ -103,7 +104,7 @@ public final class MetadataCommand extends Command {
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RUNS)
-        .help("limits runs up to N");
+        .help("limits OL runs up to N");
     subparser
         .addArgument("--bytes-per-event")
         .dest("bytes-per-event")
@@ -205,8 +206,8 @@ public final class MetadataCommand extends Command {
 
   /** Write {@link OpenLineage.RunEvent}s to the specified {@code output}. */
   private static void writeOlEvents(
-      @NonNull final List<OpenLineage.RunEvent> olEvents, @NonNull String output) {
-    System.out.format("Writing '%d' runs to: '%s'\n", olEvents.size() / 2, output);
+      @NonNull final List<OpenLineage.RunEvent> olEvents, @NonNull final String output) {
+    System.out.format("Writing '%d' events to: '%s'\n", olEvents.size(), output);
     FileWriter fileWriter;
     PrintWriter printWriter = null;
     try {
@@ -362,6 +363,6 @@ public final class MetadataCommand extends Command {
     return RANDOM.nextInt(Integer.MAX_VALUE - 1);
   }
 
-  /** ... */
+  /** A container class for run info. */
   record RunEvents(@NonNull OpenLineage.RunEvent start, @NonNull OpenLineage.RunEvent complete) {}
 }
