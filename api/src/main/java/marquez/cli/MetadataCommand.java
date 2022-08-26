@@ -76,7 +76,7 @@ public final class MetadataCommand extends Command {
 
   /* Args for metadata command. */
   private static final String CMD_ARG_METADATA_RUNS = "runs";
-  private static final String CMD_ARG_METADATA_BYTES = "bytes-per-event";
+  private static final String CMD_ARG_METADATA_BYTES_PER_EVENT = "bytes-per-event";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
 
   /* Used for event randomization. */
@@ -124,7 +124,7 @@ public final class MetadataCommand extends Command {
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
-    final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES);
+    final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_EVENT);
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
     // Generate, then write events to metadata file.
