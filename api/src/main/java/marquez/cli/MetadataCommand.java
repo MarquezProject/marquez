@@ -137,17 +137,10 @@ public final class MetadataCommand extends Command {
     System.out.format(
         "Generating '%d' runs, each COMPLETE event will have a size of '~%d' (bytes)...\n",
         numOfRuns, bytesPerEvent);
-    final List<RunEvents> olRunEvents =
-        Stream.generate(() -> newOlRunEvents(bytesPerEvent))
-            .limit(numOfRuns)
-            .collect(toImmutableList());
-
-    final ImmutableList.Builder<OpenLineage.RunEvent> olEvents = ImmutableList.builder();
-    for (final RunEvents startAndComplete : olRunEvents) {
-      olEvents.add(startAndComplete.start()); // Add START event
-      olEvents.add(startAndComplete.complete()); // Add COMPLETE event
-    }
-    return olEvents.build();
+    return Stream.generate(() -> newOlRunEvents(bytesPerEvent))
+        .limit(numOfRuns)
+        .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.complete()))
+        .collect(toImmutableList());
   }
 
   /**
