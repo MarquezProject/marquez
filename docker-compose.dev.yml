@@ -8,3 +8,12 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+
+  # To enable query stats with pghero, see https://github.com/ankane/pghero/blob/master/guides/Query-Stats.md#installation
+  pghero:
+    image: ankane/pghero
+    container_name: pghero
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://marquez:marquez@db:5432
