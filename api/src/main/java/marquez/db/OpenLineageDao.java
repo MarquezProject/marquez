@@ -711,6 +711,22 @@ public interface OpenLineageDao extends BaseDao {
                           dsNamespace.getName(),
                           ds.getName(),
                           dslifecycleState);
+                  // TODO ...
+
+                  createDatasetVersionFacetsDao()
+                      .upsertDatasetVersionFacet(
+                          UUID.randomUUID(),
+                          versionUuid,
+                          "dataSource",
+                          toPgObject(ds.getFacets().getDataSource()));
+                  createDatasetVersionFacetsDao()
+                      .upsertDatasetVersionFacet(
+                          UUID.randomUUID(),
+                          versionUuid,
+                          "schema",
+                          toPgObject(ds.getFacets().getSchema()));
+
+                  // ...
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
@@ -921,6 +937,28 @@ public interface OpenLineageDao extends BaseDao {
       return jsonObject;
     } catch (Exception e) {
       throw new RuntimeException("Could write lineage event to db", e);
+    }
+  }
+
+  default PGobject toPgObject(LineageEvent.DatasourceDatasetFacet datasourceDatasetFacet) {
+    try {
+      PGobject jsonObject = new PGobject();
+      jsonObject.setType("json");
+      jsonObject.setValue(Utils.getMapper().writeValueAsString(datasourceDatasetFacet));
+      return jsonObject;
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  default PGobject toPgObject(LineageEvent.SchemaDatasetFacet schemaDatasetFacet) {
+    try {
+      PGobject jsonObject = new PGobject();
+      jsonObject.setType("json");
+      jsonObject.setValue(Utils.getMapper().writeValueAsString(schemaDatasetFacet));
+      return jsonObject;
+    } catch (Exception e) {
+      return null;
     }
   }
 }
