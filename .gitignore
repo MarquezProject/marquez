@@ -32,6 +32,9 @@ venv
 # Marquez configuration
 marquez.yml
 
+# Metadata
+metadata.json
+
 # jenv
 .java-version
 
