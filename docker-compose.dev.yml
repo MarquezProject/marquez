@@ -9,7 +9,9 @@ services:
       context: ./web
       dockerfile: Dockerfile
 
-  # To enable query stats with pghero, see https://github.com/ankane/pghero/blob/master/guides/Query-Stats.md#installation
+  # NOTE: To enable query stats with pghero:
+  #  (1) Log into marquez database as 'superuser'
+  #  (2) As 'superuser', run 'CREATE EXTENSION pg_stat_statements;'
   pghero:
     image: ankane/pghero
     container_name: pghero
