@@ -28,46 +28,76 @@ The `event` column contains the raw OpenLineage event. When Marquez handles the 
 
 OpenLineage's core model is extensible via _facets_. A `facet` is user-defined metadata and enables entity enrichment. Initially, returning dataset, job, and run facets via the REST API was not supported, but eventually added in release [`0.14.0`](https://github.com/MarquezProject/marquez/compare/0.13.1...0.14.0). The implementation was simple: when querying the `datasets`, `jobs`, or `runs` tables, also query the `lineage_events` table for facets.
 
-We knew the initial implementation would have to eventually be revisited. That is, OpenLineage events can easily exceed **>** **`10MBs`** resulting in out-of-memory (OOM) errors as facet queries require loading the raw `event` in memory, then filtering for relevant facets. This proposal outlines how we can optimize query performance for OpenLineage facets.
+We knew the initial implementation would have to be revisited eventually. That is, the `lineage_events` table may have multiple events for a given `run_uuid` that can easily exceed **>** **`10MBs`** per event, resulting in out-of-memory (OOM) errors as facet queries require first loading the raw `event` in memory, then filtering for any relevant facets. For example, the query snippet below is used to query the `datasets` table:
 
+```sql
+.
+.
+LEFT JOIN LATERAL (
+  SELECT run_uuid, event_time, event FROM lineage_events
+  WHERE run_uuid = dv.run_uuid
+) e ON e.run_uuid = dv.run_uuid
+.
+.
+LEFT JOIN (
+  SELECT d2.uuid AS dataset_uuid, JSONB_AGG(ds->'facets' ORDER BY event_time ASC) AS facets
+  FROM dataset_runs d2,
+    jsonb_array_elements(coalesce(d2.event -> 'inputs', '[]'::jsonb) || coalesce(d2.event -> 'outputs', '[]'::jsonb)) AS ds
+  WHERE d2.run_uuid = d2.run_uuid
+    AND ds -> 'facets' IS NOT NULL
+    AND ds ->> 'name' = d2.name
+    AND ds ->> 'namespace' = d2.namespace_name
+  GROUP BY d2.uuid
+) f ON f.dataset_uuid = d.uuid")
+```
 
+In the above query, the input and output dataset facets for each event are aggregated, then ordered by the event time. This proposal outlines how we can optimize query performance for OpenLineage facets that limit access to the `lineage_events` table.
 
 ## Proposal
 
 To improve query performance for facets, and avoid querying the `lineage_events` table, we propose adding the following tables to group facets by how they will be accessed:
 
-### Table `dataset_version_facets`
+### Table `dataset_facets`
 
-| **COLUMN**           | **TYPE**  |
-|----------------------|-----------|
-| uuid                 | `UUID`    |
-| dataset_version_uuid | `UUID`    |
-| name                 | `VARCHAR` |
-| facet                | `JSONB`   |
+| **COLUMN**         | **TYPE**      |
+|--------------------|---------------|
+| uuid **(PK)**      | `UUID`        |
+| created_at         | `TIMESTAMPTZ` |
+| run_uuid           | `UUID`        |
+| lineage_event_time | `TIMESTAMPTZ` |
+| lineage_event_type | `VARCHAR`     |
+| name               | `VARCHAR`     |
+| facet              | `JSONB`       |
 
-> **Table 1:** Facets for a given dataset version, indexed on `dataset_version_uuid` and `name`.
+> **Table 1:** Facets for a given dataset, indexed on `run_uuid`.
 
-### Table `job_version_facets`
+### Table `job_facets`
 
-| **COLUMN**       | **TYPE**  |
-|------------------|-----------|
-| uuid             | `UUID`    |
-| job_version_uuid | `UUID`    |
-| name             | `VARCHAR` |
-| facet            | `JSONB`   |
+| **COLUMN**         | **TYPE**      |
+|--------------------|---------------|
+| uuid **(PK)**      | `UUID`        |
+| created_at         | `TIMESTAMPTZ` |
+| run_uuid           | `UUID`        |
+| lineage_event_time | `TIMESTAMPTZ` |
+| lineage_event_type | `VARCHAR`     |
+| name               | `VARCHAR`     |
+| facet              | `JSONB`       |
 
-> **Table 2:** Facets for a given job version, indexed on `job_version_uuid` and `name`.
+> **Table 2:** Facets for a given job, indexed on `run_uuid`.
 
 ### Table `run_facets`
 
-| **COLUMN** | **TYPE**  |
-|------------|-----------|
-| uuid       | `UUID`    |
-| run_uuid   | `UUID`    |
-| name       | `VARCHAR` |
-| facet      | `JSONB`   |
+| **COLUMN**         | **TYPE**      |
+|--------------------|---------------|
+| uuid **(PK)**      | `UUID`        |
+| created_at         | `TIMESTAMPTZ` |
+| run_uuid           | `UUID`        |
+| lineage_event_time | `TIMESTAMPTZ` |
+| lineage_event_type | `VARCHAR`     |
+| name               | `VARCHAR`     |
+| facet              | `JSONB`       |
 
-> **Table 3:** Facets for a given run, indexed on `run_uuid` and `name`.
+> **Table 2:** Facets for a given run, indexed on `run_uuid`.
 
 ## Implementation
 
