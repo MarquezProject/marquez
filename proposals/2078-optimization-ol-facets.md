@@ -8,7 +8,7 @@ Discussion: [https://github.com/MarquezProject/marquez/issues/2078](https://gith
 
 ## Overview
 
-[OpenLineage](https://openlineage.io) was initially prototyped using Marquez, with the [initial draft](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#010---2021-08-12) of the spec taking inspiration from Marquez's [data model](https://lucid.app/lucidchart/f918ce01-9eb4-4900-b266-49935da271b8/view?page=8xAE.zxyknLQ#). OpenLineage events are collected via [`POST` `/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage) calls, and can be queried via the `lineage_events` table using the `runID` associated with the event. The _current_ schema for the `lineage_events` table is defined below:
+[OpenLineage](https://openlineage.io) was initially prototyped using Marquez, with the [initial draft](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#010---2021-08-12) of the spec taking inspiration from Marquez's [data model](https://lucid.app/lucidchart/f918ce01-9eb4-4900-b266-49935da271b8/view?page=8xAE.zxyknLQ#). OpenLineage events are collected via [`POST` `/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage) calls, and can be queried via the `lineage_events` table using the `run_uuid` associated with the event. The _current_ schema for the `lineage_events` table is defined below:
 
 ### Table `lineage_events`
 
@@ -51,7 +51,7 @@ LEFT JOIN (
 ) f ON f.dataset_uuid = d.uuid")
 ```
 
-In the above query, the input and output dataset facets for each event are aggregated, then ordered by the event time. This proposal outlines how we can optimize query performance for OpenLineage facets that limit access to the `lineage_events` table.
+In the above query, the `inputs` and `outputs` dataset facets for each event are aggregated, then ordered by the event time. This proposal outlines how we can optimize query performance for OpenLineage facets that limit access to the `lineage_events` table.
 
 ## Proposal
 
@@ -69,7 +69,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name               | `VARCHAR`     |
 | facet              | `JSONB`       |
 
-> **Table 1:** Facets for a given dataset, indexed on `run_uuid`.
+> **Table 1:** Facets for a given dataset.
 
 ### Table `job_facets`
 
@@ -83,7 +83,7 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name               | `VARCHAR`     |
 | facet              | `JSONB`       |
 
-> **Table 2:** Facets for a given job, indexed on `run_uuid`.
+> **Table 2:** Facets for a given job.
 
 ### Table `run_facets`
 
@@ -97,7 +97,13 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | name               | `VARCHAR`     |
 | facet              | `JSONB`       |
 
-> **Table 2:** Facets for a given run, indexed on `run_uuid`.
+> **Table 3:** Facets for a given run.
+
+Note, facet tables will be:
+
+* Append only, mirroring the current insertion pattern of the `lineage_events` table; therefore, avoiding facet conflicts
+* Merging facets will follow a _first-to-last_ received order; meaning, facet rows will be merged post query using [`MapperUtils.toFacetsOrNull()`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/db/mappers/MapperUtils.java#L50) mirroring the current logic (i.e. newer facets will be added or override older facet values based on when the OpenLineage event was received)
+* Indexed on `run_uuid`
 
 ## Implementation
 
