@@ -8,4 +8,4 @@ CREATE TABLE run_facets (
   facet              JSONB NOT NULL
 );
 
-CREATE UNIQUE INDEX run_facets_run_uuid_name_idx ON run_facets (run_uuid, name);
+CREATE UNIQUE INDEX run_facets_run_uuid_idx ON run_facets (run_uuid);
