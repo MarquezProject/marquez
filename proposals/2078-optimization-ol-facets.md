@@ -66,10 +66,13 @@ To improve query performance for facets, and avoid querying the `lineage_events`
 | run_uuid           | `UUID`        |
 | lineage_event_time | `TIMESTAMPTZ` |
 | lineage_event_type | `VARCHAR`     |
+| type               | `VARCHAR`     |
 | name               | `VARCHAR`     |
 | facet              | `JSONB`       |
 
 > **Table 1:** Facets for a given dataset.
+
+> **Note:** The `type` used to determine the type of facet: `DATASET`, `INPUT`, `OUTPUT` (see the [_Standard Facets_](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#dataset-facets) section in the OpenLineage spec).
 
 ### Table `job_facets`
 
