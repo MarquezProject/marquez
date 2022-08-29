@@ -12,7 +12,7 @@ labelPRBasedOnFilePath:
   # Add 'docs' to any changes to `.md` files in root or within 'docs' folder, subfolders
     docs:
       - docs/**/*
-      - ../*.md
+      - "*.md"
 
   # Add 'client/java' to any changes within 'clients/java' folder or any subfolders
     client/java:
