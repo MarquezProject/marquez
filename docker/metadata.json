@@ -26,6 +26,11 @@
         "namespace": "food_delivery",
         "name": "public.menus",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for menus."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -100,6 +105,11 @@
         "namespace": "food_delivery",
         "name": "public.categories",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for categories."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -170,6 +180,11 @@
         "namespace": "food_delivery",
         "name": "public.menu_items",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for menu items."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -245,6 +260,11 @@
         "namespace": "food_delivery",
         "name": "public.orders",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for orders."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -343,6 +363,11 @@
         "namespace": "food_delivery",
         "name": "public.orders_7_days",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for weekly orders."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -428,6 +453,11 @@
         "namespace": "food_delivery",
         "name": "public.customers",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for customers."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -517,6 +547,11 @@
       {
         "namespace": "food_delivery",
         "name": "public.order_status",
+        "documentation": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "A table for order status."
+        },
         "facets": {
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -603,6 +638,11 @@
         "namespace": "food_delivery",
         "name": "public.drivers",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for drivers."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -719,6 +759,11 @@
         "namespace": "food_delivery",
         "name": "public.restaurants",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for restaurants."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -851,6 +896,11 @@
         "namespace": "food_delivery",
         "name": "public.delivery_7_days",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for weekly deliveries."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -973,6 +1023,11 @@
         "namespace": "food_delivery",
         "name": "public.top_delivery_times",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for top delivery times."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -1123,6 +1178,11 @@
         "namespace": "food_delivery",
         "name": "public.popular_orders_day_of_week",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for popular orders by day of week."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
