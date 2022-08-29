@@ -301,12 +301,12 @@ public final class Columns {
     return Utils.fromJson(mapAsString, new TypeReference<>() {});
   }
 
-  public static PGobject toPgObject(@NonNull final Object value) {
+  public static PGobject toPgObject(@NonNull final Object object) {
     final PGobject jsonObject = new PGobject();
     jsonObject.setType("jsonb");
-    final String valueAsJson = Utils.toJson(value);
+    final String json = Utils.toJson(object);
     try {
-      jsonObject.setValue(valueAsJson);
+      jsonObject.setValue(json);
     } catch (SQLException e) {
       log.error("Error when ...", e);
       return null;

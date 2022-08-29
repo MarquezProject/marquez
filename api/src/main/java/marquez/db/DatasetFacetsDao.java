@@ -2,10 +2,12 @@ package marquez.db;
 
 import static marquez.db.Columns.toPgObject;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import marquez.common.Utils;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
@@ -53,6 +55,18 @@ public interface DatasetFacetsDao {
         }
       }
       return null;
+    }
+
+    /** ... */
+    public ObjectNode asJson(@NonNull Object facetValue) {
+      return asJson(name, facetValue);
+    }
+
+    /** ... */
+    public static ObjectNode asJson(@NonNull final String facetName, @NonNull Object facetValue) {
+      final ObjectNode facetAsJson = Utils.getMapper().createObjectNode();
+      facetAsJson.putPOJO(facetName, facetValue);
+      return facetAsJson;
     }
   }
 
@@ -131,7 +145,7 @@ public interface DatasetFacetsDao {
                     lineageEventType,
                     Facet.DOCUMENTATION.getType(),
                     Facet.DOCUMENTATION.getName(),
-                    toPgObject(documentation)));
+                    toPgObject(Facet.DOCUMENTATION.asJson(documentation))));
 
     // Add ...
     Optional.ofNullable(datasetFacets.getSchema())
@@ -146,12 +160,12 @@ public interface DatasetFacetsDao {
                     lineageEventType,
                     Facet.SCHEMA.getType(),
                     Facet.SCHEMA.getName(),
-                    toPgObject(schema)));
+                    toPgObject(Facet.SCHEMA.asJson(schema))));
 
     // Add ...
     Optional.ofNullable(datasetFacets.getDataSource())
         .ifPresent(
-            datasourceDataset ->
+            datasource ->
                 insertDatasetFacet(
                     UUID.randomUUID(),
                     now,
@@ -161,7 +175,7 @@ public interface DatasetFacetsDao {
                     lineageEventType,
                     Facet.DATASOURCE.getType(),
                     Facet.DATASOURCE.getName(),
-                    toPgObject(datasourceDataset)));
+                    toPgObject(Facet.DATASOURCE.asJson(datasource))));
 
     // Add ...
     Optional.ofNullable(datasetFacets.getLifecycleStateChange())
@@ -176,7 +190,7 @@ public interface DatasetFacetsDao {
                     lineageEventType,
                     Facet.LIFECYCLE_STATE_CHANGE.getType(),
                     Facet.LIFECYCLE_STATE_CHANGE.getName(),
-                    toPgObject(lifecycleStateChange)));
+                    toPgObject(Facet.LIFECYCLE_STATE_CHANGE.asJson(lifecycleStateChange))));
 
     // Add ..
     Optional.ofNullable(datasetFacets.getAdditionalFacets())
@@ -196,7 +210,7 @@ public interface DatasetFacetsDao {
                                     lineageEventType,
                                     x.getType(),
                                     x.getName(),
-                                    toPgObject(facet));
+                                    toPgObject(x.asJson(facet)));
                               },
                               () -> {
                                 insertDatasetFacet(
@@ -208,7 +222,7 @@ public interface DatasetFacetsDao {
                                     lineageEventType,
                                     Facet.UNKNOWN,
                                     name,
-                                    toPgObject(facet));
+                                    toPgObject(Facet.asJson(name, facet)));
                               });
                     }));
   }

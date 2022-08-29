@@ -1,6 +1,7 @@
-CREATE TABLE job_version_facets (
+CREATE TABLE job_facets (
   uuid               UUID PRIMARY KEY,
   created_at         TIMESTAMPTZ NOT NULL,
+  job_uuid           UUID REFERENCES jobs(uuid),
   run_uuid           UUID REFERENCES runs(uuid),
   lineage_event_time TIMESTAMPTZ NOT NULL,
   lineage_event_type VARCHAR(64) NOT NULL,
@@ -8,4 +9,4 @@ CREATE TABLE job_version_facets (
   facet              JSONB NOT NULL
 );
 
-CREATE UNIQUE INDEX job_version_facets_run_uuid_idx ON job_version_facets (run_uuid);
+CREATE INDEX job_facets_job_uuid_run_uuid_idx ON job_facets (job_uuid, run_uuid);

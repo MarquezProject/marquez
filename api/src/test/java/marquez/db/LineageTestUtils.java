@@ -182,7 +182,6 @@ public class LineageTestUtils {
         .dataSource(
             new DatasourceDatasetFacet(
                 PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
-        .description("the dataset description")
         .additional(facets)
         .build();
   }
