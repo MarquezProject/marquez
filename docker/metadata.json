@@ -3,7 +3,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
+      "runId": "d46e465b-d358-4d32-83d4-df660ff614dd",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -88,7 +96,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "6f0c13a5-f29b-46a5-90c1-0ffbebbbd1aa"
+      "runId": "6f0c13a5-f29b-46a5-90c1-0ffbebbbd1aa",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -169,7 +185,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "e05901b1-3a06-4b98-8d9c-aaf188c9a28c"
+      "runId": "e05901b1-3a06-4b98-8d9c-aaf188c9a28c",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -255,7 +279,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "a43a8523-349f-4296-807f-3354ac491990"
+      "runId": "a43a8523-349f-4296-807f-3354ac491990",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -346,7 +378,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "ffba2c14-4170-48da-bec3-ab5fd4ec9a3f"
+      "runId": "ffba2c14-4170-48da-bec3-ab5fd4ec9a3f",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -460,7 +500,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "182a9eaf-881a-4d49-860c-f7e260b8bf60"
+      "runId": "182a9eaf-881a-4d49-860c-f7e260b8bf60",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -561,7 +609,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "b7098939-87f0-4207-878f-dfd8e8804d8a"
+      "runId": "b7098939-87f0-4207-878f-dfd8e8804d8a",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -662,7 +718,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "9f3db1c5-5e9a-4280-8184-18aca4592c77"
+      "runId": "9f3db1c5-5e9a-4280-8184-18aca4592c77",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -789,7 +853,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "8ddfb1d9-415f-4850-bcd6-01d02f011abe"
+      "runId": "8ddfb1d9-415f-4850-bcd6-01d02f011abe",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -910,7 +982,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "d5a2a4c4-fc78-428d-ae85-08c942ed8371"
+      "runId": "d5a2a4c4-fc78-428d-ae85-08c942ed8371",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -1059,7 +1139,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "bd41a42a-bf18-4b74-9bb7-cd62637823d8"
+      "runId": "bd41a42a-bf18-4b74-9bb7-cd62637823d8",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -1227,7 +1315,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "adc8507c-595e-4d76-9dac-be2bf0ffe1ee"
+      "runId": "adc8507c-595e-4d76-9dac-be2bf0ffe1ee",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -1316,7 +1412,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "3ab25429-cf9c-4d1d-9166-1e1946f9d3c3"
+      "runId": "3ab25429-cf9c-4d1d-9166-1e1946f9d3c3",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
