@@ -60,6 +60,12 @@
                 "description": "The description of the menu."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -135,6 +141,12 @@
                 "description": "The description of the category."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -215,6 +227,12 @@
                 "description": "The description of the menu item."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -300,6 +318,12 @@
                 "description": "The comment of the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -408,6 +432,12 @@
                 "description": "The ID of category related to the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -503,6 +533,12 @@
                 "description": "The ID of the city related to the customer."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -593,6 +629,12 @@
                 "description": "The ID of the driver related to the order status."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -714,6 +756,12 @@
                 "description": "The license plate number of the car."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -829,6 +877,12 @@
                 "description": "The description of the restaurant."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -972,6 +1026,12 @@
                 "description": "The ID of the driver related to the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -1123,6 +1183,12 @@
                 "description": "An ISO-8601 timestamp representing the date/time the discount ends."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -1206,6 +1272,12 @@
                 "description": "The number of orders placed on day of week."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
