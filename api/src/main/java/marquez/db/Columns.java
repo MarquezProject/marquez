@@ -126,6 +126,13 @@ public final class Columns {
   public static final String RUN_UUID = "run_uuid";
   public static final String STATE = "state";
 
+  /* COLUMN LEVEL LINEAGE ROW COLUMNS */
+  public static final String OUTPUT_COLUMN_NAME = "output_column_name";
+  public static final String INPUT_FIELD = "input_field";
+  public static final String TRANSFORMATION_DESCRIPTION = "transformation_description";
+  public static final String TRANSFORMATION_TYPE = "transformation_type";
+
+
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       return null;
