@@ -29,7 +29,8 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *
  * <p><b>Note:</b> You must specify {@code metadata} using the command-line argument {@code
  * --metadata}. Metadata must be defined as a Json file containing an array of {@code OpenLineage}
- * events.
+ * events. You can use {@link MetadataCommand} to generate {@code metadata.json} containing random
+ * source, dataset, and job metadata.
  *
  * <h2>Usage</h2>
  *
