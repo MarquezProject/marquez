@@ -16,30 +16,34 @@ import org.postgresql.util.PGobject;
 /** The DAO for {@code dataset} facets. */
 public interface DatasetFacetsDao {
   /* An {@code enum} used to determine the dataset facet type. */
+  enum Type {
+    DATASET,
+    INPUT,
+    OUTPUT,
+    UNKNOWN;
+  }
+  /* An {@code enum} used to determine the dataset facet. */
   enum Facet {
-    DOCUMENTATION("dataset", "documentation"),
-    SCHEMA("dataset", "schema"),
-    DATASOURCE("dataset", "dataSource"),
-    LIFECYCLE_STATE_CHANGE("dataset", "lifecycleStateChange"),
-    VERSION("dataset", "version"),
-    COLUMN_LINEAGE("dataset", "columnLineage"),
-    OWNERSHIP("dataset", "ownership"),
-    DATA_QUALITY_METRICS("input", "dataQualityMetrics"),
-    DATA_QUALITY_ASSERTIONS("input", "dataQualityAssertions"),
-    OUTPUT_STATISTICS("output", "outputStatistics");
+    DOCUMENTATION(Type.DATASET, "documentation"),
+    SCHEMA(Type.DATASET, "schema"),
+    DATASOURCE(Type.DATASET, "dataSource"),
+    LIFECYCLE_STATE_CHANGE(Type.DATASET, "lifecycleStateChange"),
+    VERSION(Type.DATASET, "version"),
+    COLUMN_LINEAGE(Type.DATASET, "columnLineage"),
+    OWNERSHIP(Type.DATASET, "ownership"),
+    DATA_QUALITY_METRICS(Type.INPUT, "dataQualityMetrics"),
+    DATA_QUALITY_ASSERTIONS(Type.INPUT, "dataQualityAssertions"),
+    OUTPUT_STATISTICS(Type.OUTPUT, "outputStatistics");
 
-    /* .. */
-    static final String UNKNOWN = "UNKNOWN";
-
-    final String type;
+    final Type type;
     final String name;
 
-    Facet(@NonNull final String type, @NonNull final String name) {
-      this.type = type.toUpperCase();
+    Facet(@NonNull final Type type, @NonNull final String name) {
+      this.type = type;
       this.name = name;
     }
 
-    String getType() {
+    Type getType() {
       return type;
     }
 
@@ -112,7 +116,7 @@ public interface DatasetFacetsDao {
       UUID runUuid,
       Instant lineageEventTime,
       String lineageEventType,
-      String type,
+      Type type,
       String name,
       PGobject facet);
 
@@ -220,7 +224,7 @@ public interface DatasetFacetsDao {
                                     runUuid,
                                     lineageEventTime,
                                     lineageEventType,
-                                    Facet.UNKNOWN,
+                                    Type.UNKNOWN,
                                     name,
                                     toPgObject(Facet.asJson(name, facet)));
                               });
