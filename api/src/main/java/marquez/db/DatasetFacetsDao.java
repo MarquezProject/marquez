@@ -15,13 +15,14 @@ import org.postgresql.util.PGobject;
 
 /** The DAO for {@code dataset} facets. */
 public interface DatasetFacetsDao {
-  /* An {@code enum} used to determine the dataset facet type. */
+  /* An {@code enum} used ... */
   enum Type {
     DATASET,
     INPUT,
     OUTPUT,
     UNKNOWN;
   }
+
   /* An {@code enum} used to determine the dataset facet. */
   enum Facet {
     DOCUMENTATION(Type.DATASET, "documentation"),
