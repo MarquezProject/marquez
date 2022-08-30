@@ -9,7 +9,7 @@ import static marquez.common.Utils.newObjectMapper;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
-import io.dropwizard.cli.ConfiguredCommand;
+import io.dropwizard.cli.Command;
 import io.dropwizard.setup.Bootstrap;
 import io.openlineage.client.OpenLineage;
 import io.openlineage.client.OpenLineageClient;
@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import marquez.MarquezConfig;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -37,7 +36,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * For example, to override the {@code url}:
  *
  * <pre>{@code
- * java -jar marquez-api.jar seed --url http://localhost:5000 --metadata metadata.json marquez.yml
+ * java -jar marquez-api.jar seed --url http://localhost:5000 --metadata metadata.json
  * }</pre>
  *
  * <p>where, {@code metadata.json} contains metadata for run {@code
@@ -93,7 +92,7 @@ import net.sourceforge.argparse4j.inf.Subparser;
  * <p><b>Note:</b> The {@code seed} command requires a running instance of Marquez.
  */
 @Slf4j
-public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
+public final class SeedCommand extends Command {
   /* Default URL for HTTP backend. */
   private static final String DEFAULT_OL_URL = "http://localhost:8080";
 
@@ -109,7 +108,6 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   /* Configure seed command. */
   @Override
   public void configure(@NonNull final Subparser subparser) {
-    super.configure(subparser);
     subparser
         .addArgument("--url")
         .dest("url")
@@ -126,10 +124,7 @@ public final class SeedCommand extends ConfiguredCommand<MarquezConfig> {
   }
 
   @Override
-  protected void run(
-      @NonNull Bootstrap<MarquezConfig> bootstrap,
-      @NonNull Namespace namespace,
-      @NonNull MarquezConfig config) {
+  public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final String olUrl = namespace.getString(CMD_ARG_OL_URL);
     final String olMetadata = namespace.getString(CMD_ARG_OL_METADATA);
     // Use HTTP transport.
