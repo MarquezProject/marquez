@@ -58,7 +58,10 @@ public final class MetadataCommand extends Command {
   private static final int BYTES_PER_FIELD_IN_SCHEMA = 256;
 
   /* Default I/O and schema fields per event. */
-  private static final int DEFAULT_NUM_OF_IO_PER_EVENT = 8;
+  private static final int DEFAULT_INPUTS_PER_EVENT = 4;
+  private static final int DEFAULT_OUTPUTS_PER_EVENT = 2;
+  private static final int DEFAULT_NUM_OF_IO_PER_EVENT =
+      DEFAULT_INPUTS_PER_EVENT + DEFAULT_OUTPUTS_PER_EVENT;
   private static final int DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT = 16;
 
   /* Default runs. */
@@ -77,6 +80,8 @@ public final class MetadataCommand extends Command {
   /* Args for metadata command. */
   private static final String CMD_ARG_METADATA_RUNS = "runs";
   private static final String CMD_ARG_METADATA_BYTES_PER_EVENT = "bytes-per-event";
+  private static final String CMD_ARG_METADATA_INPUTS_PER_EVENT = "inputs-per-event";
+  private static final String CMD_ARG_METADATA_OUTPUTS_PER_EVENT = "outputs-per-event";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
 
   /* Used for event randomization. */
@@ -113,6 +118,20 @@ public final class MetadataCommand extends Command {
         .setDefault(DEFAULT_BYTES_PER_EVENT)
         .help("size (in bytes) per OL event");
     subparser
+        .addArgument("--inputs-per-event")
+        .dest(CMD_ARG_METADATA_INPUTS_PER_EVENT)
+        .type(Integer.class)
+        .required(false)
+        .help("limits OL inputs per event to N")
+        .setDefault(DEFAULT_INPUTS_PER_EVENT);
+    subparser
+        .addArgument("--outputs-per-event")
+        .dest(CMD_ARG_METADATA_OUTPUTS_PER_EVENT)
+        .type(Integer.class)
+        .required(false)
+        .help("limits OL outputs per event to N")
+        .setDefault(DEFAULT_OUTPUTS_PER_EVENT);
+    subparser
         .addArgument("-o", "--output")
         .dest("output")
         .type(String.class)
@@ -125,6 +144,8 @@ public final class MetadataCommand extends Command {
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
     final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_EVENT);
+    final int inputsPerEvent = namespace.getInt(CMD_ARG_METADATA_INPUTS_PER_EVENT);
+    final int outputsPerEvent = namespace.getInt(CMD_ARG_METADATA_INPUTS_PER_EVENT);
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
     // Generate, then write events to metadata file.
