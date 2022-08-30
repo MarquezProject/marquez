@@ -33,8 +33,8 @@ public interface JobFacetsDao {
     }
 
     /** ... */
-    public static DatasetFacetsDao.Facet fromName(@NonNull final String name) {
-      for (final DatasetFacetsDao.Facet facet : DatasetFacetsDao.Facet.values()) {
+    public static Facet fromName(@NonNull final String name) {
+      for (final Facet facet : Facet.values()) {
         if (facet.name().equalsIgnoreCase(name)) {
           return facet;
         }
@@ -130,7 +130,7 @@ public interface JobFacetsDao {
             additional ->
                 additional.forEach(
                     (name, facet) -> {
-                      Optional.ofNullable(RunFacetsDao.Facet.fromName(name))
+                      Optional.ofNullable(Facet.fromName(name))
                           .ifPresentOrElse(
                               (x) -> {
                                 insertJobFacet(

@@ -35,8 +35,8 @@ public interface RunFacetsDao {
     }
 
     /** ... */
-    public static DatasetFacetsDao.Facet fromName(@NonNull final String name) {
-      for (final DatasetFacetsDao.Facet facet : DatasetFacetsDao.Facet.values()) {
+    public static Facet fromName(@NonNull final String name) {
+      for (final Facet facet : Facet.values()) {
         if (facet.name().equalsIgnoreCase(name)) {
           return facet;
         }
