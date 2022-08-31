@@ -60,19 +60,23 @@ public final class MetadataCommand extends Command {
   /* Default I/O and schema fields per event. */
   private static final int DEFAULT_INPUTS_PER_EVENT = 4;
   private static final int DEFAULT_OUTPUTS_PER_EVENT = 2;
-  private static final int DEFAULT_NUM_OF_IO_PER_EVENT =
-      DEFAULT_INPUTS_PER_EVENT + DEFAULT_OUTPUTS_PER_EVENT;
   private static final int DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT = 16;
 
   /* Default runs. */
   private static final int DEFAULT_RUNS = 25;
 
+  /* Default bytes per input/output. */
+  private static final int DEFAULT_BYTES_PER_INPUT =
+      BYTES_PER_FIELD_IN_SCHEMA * DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT;
+  private static final int DEFAULT_BYTES_PER_OUTPUT =
+      BYTES_PER_FIELD_IN_SCHEMA * DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT;
+
   /* Default bytes. */
   private static final int DEFAULT_BYTES_PER_EVENT =
       BYTES_PER_RUN
           + BYTES_PER_JOB
-          + ((BYTES_PER_FIELD_IN_SCHEMA * DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT)
-              * DEFAULT_NUM_OF_IO_PER_EVENT);
+          + (DEFAULT_BYTES_PER_INPUT * DEFAULT_INPUTS_PER_EVENT)
+          + (DEFAULT_BYTES_PER_OUTPUT * DEFAULT_OUTPUTS_PER_EVENT);
 
   /* Default output. */
   private static final String DEFAULT_OUTPUT = "metadata.json";
@@ -82,12 +86,15 @@ public final class MetadataCommand extends Command {
   private static final String CMD_ARG_METADATA_BYTES_PER_EVENT = "bytes-per-event";
   private static final String CMD_ARG_METADATA_INPUTS_PER_EVENT = "inputs-per-event";
   private static final String CMD_ARG_METADATA_OUTPUTS_PER_EVENT = "outputs-per-event";
+  private static final String CMD_ARG_METADATA_BYTES_PER_INPUT = "bytes-per-output";
+  private static final String CMD_ARG_METADATA_BYTES_PER_OUTPUT = "bytes-per-input";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
 
   /* Used for event randomization. */
   private static final Random RANDOM = new Random();
   private static final ZoneId AMERICA_LOS_ANGELES = ZoneId.of("America/Los_Angeles");
   private static final List<String> FIELD_TYPES = ImmutableList.of("VARCHAR", "TEXT", "INTEGER");
+  private static final long DELAY_IN_MINUTES = 10;
 
   private static final String OL_NAMESPACE = newNamespaceName().getValue();
   private static final OpenLineage OL =
@@ -105,25 +112,32 @@ public final class MetadataCommand extends Command {
   public void configure(@NonNull Subparser subparser) {
     subparser
         .addArgument("--runs")
-        .dest("runs")
+        .dest(CMD_ARG_METADATA_RUNS)
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RUNS)
         .help("limits OL runs up to N");
     subparser
         .addArgument("--bytes-per-event")
-        .dest("bytes-per-event")
+        .dest(CMD_ARG_METADATA_BYTES_PER_EVENT)
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_BYTES_PER_EVENT)
-        .help("size (in bytes) per OL event");
+        .help("size (in bytes) per event");
     subparser
         .addArgument("--inputs-per-event")
         .dest(CMD_ARG_METADATA_INPUTS_PER_EVENT)
         .type(Integer.class)
         .required(false)
-        .help("limits OL inputs per event to N")
+        .help("limits inputs per event to N")
         .setDefault(DEFAULT_INPUTS_PER_EVENT);
+    subparser
+        .addArgument("--bytes-per-input")
+        .dest(CMD_ARG_METADATA_BYTES_PER_INPUT)
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_BYTES_PER_INPUT)
+        .help("size (in bytes) per input");
     subparser
         .addArgument("--outputs-per-event")
         .dest(CMD_ARG_METADATA_OUTPUTS_PER_EVENT)
@@ -131,6 +145,13 @@ public final class MetadataCommand extends Command {
         .required(false)
         .help("limits OL outputs per event to N")
         .setDefault(DEFAULT_OUTPUTS_PER_EVENT);
+    subparser
+        .addArgument("--bytes-per-output")
+        .dest(CMD_ARG_METADATA_BYTES_PER_OUTPUT)
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_BYTES_PER_OUTPUT)
+        .help("size (in bytes) per output");
     subparser
         .addArgument("-o", "--output")
         .dest("output")
@@ -145,20 +166,34 @@ public final class MetadataCommand extends Command {
     final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
     final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_EVENT);
     final int inputsPerEvent = namespace.getInt(CMD_ARG_METADATA_INPUTS_PER_EVENT);
-    final int outputsPerEvent = namespace.getInt(CMD_ARG_METADATA_INPUTS_PER_EVENT);
+    final int bytesPerInput = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_INPUT);
+    final int outputsPerEvent = namespace.getInt(CMD_ARG_METADATA_OUTPUTS_PER_EVENT);
+    final int bytesPerOutput = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_OUTPUT);
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
     // Generate, then write events to metadata file.
-    writeOlEvents(newOlEvents(runs, bytesPerEvent), output);
+    writeOlEvents(
+        newOlEvents(
+            runs, bytesPerEvent, inputsPerEvent, bytesPerInput, outputsPerEvent, bytesPerOutput),
+        output);
   }
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
-      final int numOfRuns, final int bytesPerEvent) {
+      final int numOfRuns,
+      final int bytesPerEvent,
+      final int inputsPerEvent,
+      final int bytesPerInput,
+      final int outputsPerEvent,
+      final int bytesPerOutput) {
     System.out.format(
-        "Generating '%d' runs, each COMPLETE event will have a size of '~%d' (bytes)...\n",
-        numOfRuns, bytesPerEvent);
-    return Stream.generate(() -> newOlRunEvents(bytesPerEvent))
+        "Generating '%d' runs, each COMPLETE event will "
+            + "have '%d' inputs, '%d' outputs, and a total size of '~%d' (bytes)...\n",
+        numOfRuns, inputsPerEvent, outputsPerEvent, bytesPerEvent);
+    return Stream.generate(
+            () ->
+                newOlRunEvents(
+                    bytesPerEvent, inputsPerEvent, bytesPerInput, outputsPerEvent, bytesPerOutput))
         .limit(numOfRuns)
         .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.complete()))
         .collect(toImmutableList());
@@ -168,29 +203,35 @@ public final class MetadataCommand extends Command {
    * Returns new {@link RunEvents} objects. A {@link RunEvents} object contains the {@code START}
    * and {@code COMPLETE} event for a given run.
    */
-  private static RunEvents newOlRunEvents(final int bytesPerEvent) {
+  private static RunEvents newOlRunEvents(
+      final int bytesPerEvent,
+      final int inputsPerEvent,
+      final int bytesPerInput,
+      final int outputsPerEvent,
+      final int bytesPerOutput) {
     // (1) Generate run with an optional parent run, then the job.
-    final OpenLineage.Run olRun = newRun(hasParentRunOrNot());
-    final OpenLineage.Job olJob = newJob();
+    final OpenLineage.Run run = newRun(hasParentRunOrNot());
+    final OpenLineage.Job job = newJob();
 
-    // (2) Generate number of I/O for run.
-    int numOfInputs = RANDOM.nextInt(DEFAULT_NUM_OF_IO_PER_EVENT);
-    int numOfOutputs = DEFAULT_NUM_OF_IO_PER_EVENT - numOfInputs;
+    // (2) Randomize number of I/O for run.
+    int numOfInputsPerEvent = RANDOM.nextInt(inputsPerEvent);
+    int numOfOutputsPerEvent = inputsPerEvent - numOfInputsPerEvent;
 
-    // (3) Generate number of schema fields per I/O for run.
+    // (3) Randomize number of schema fields per I/O for run.
     final int numOfFieldsInSchemaForInputs =
         RANDOM.nextInt(DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT);
     final int numOfFieldsInSchemaForOutputs =
         DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT - numOfFieldsInSchemaForInputs;
 
-    // (4) Generate an event of N bytes if provided; otherwise use default.
+    // (4) Generate event of N bytes if provided; otherwise use default.
     if (bytesPerEvent > DEFAULT_BYTES_PER_EVENT) {
       // Bytes per event:
       // +------------+-----------+-------------------+
       // |  run meta  |  job meta |      I/O meta     |
       // +------------+-----------+-------------------+
-      // |->  578B  <-|->  78B  <-|->(256B x N) x P <-|
-      // where, N is number of fields per schema, and P is number of I/O per event.
+      // |->  578B  <-|->  78B  <-|->(I x N) x P <-|
+      // where, I is the bytes per input, N is number of fields per schema, and P is number of I/O
+      // per event.
       //
       // (5) Calculate the total I/O per event to equal the bytes per event.
       final int numOfInputsAndOutputsForEvent =
@@ -198,23 +239,24 @@ public final class MetadataCommand extends Command {
               / (DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT * BYTES_PER_FIELD_IN_SCHEMA);
 
       // (6) Update the number of I/O to generate for run based on calculation.
-      numOfInputs = RANDOM.nextInt(numOfInputsAndOutputsForEvent);
-      numOfOutputs = numOfInputsAndOutputsForEvent - numOfInputs;
+      numOfInputsPerEvent = RANDOM.nextInt(numOfInputsAndOutputsForEvent);
+      numOfOutputsPerEvent = numOfInputsAndOutputsForEvent - numOfInputsPerEvent;
     }
     return new RunEvents(
         OL.newRunEventBuilder()
             .eventType(START)
             .eventTime(newEventTime())
-            .run(olRun)
-            .job(olJob)
-            .inputs(newInputs(numOfInputs, numOfFieldsInSchemaForInputs))
-            .outputs(newOutputs(numOfOutputs, numOfFieldsInSchemaForOutputs))
+            .run(run)
+            .job(job)
+            .inputs(newInputs(numOfInputsPerEvent, numOfFieldsInSchemaForInputs, bytesPerInput))
+            .outputs(
+                newOutputs(numOfOutputsPerEvent, numOfFieldsInSchemaForOutputs, bytesPerOutput))
             .build(),
         OL.newRunEventBuilder()
             .eventType(COMPLETE)
-            .eventTime(newEventTime())
-            .run(olRun)
-            .job(olJob)
+            .eventTime(newEventTime().plusMinutes(newDelayInMinutes()))
+            .run(run)
+            .job(job)
             .build());
   }
 
@@ -278,7 +320,7 @@ public final class MetadataCommand extends Command {
 
   /** Returns new {@link OpenLineage.InputDataset} objects. */
   private static List<OpenLineage.InputDataset> newInputs(
-      final int numOfInputs, final int numOfFields) {
+      final int numOfInputs, final int numOfFields, final int bytesPerInput) {
     return Stream.generate(
             () ->
                 OL.newInputDatasetBuilder()
@@ -292,7 +334,8 @@ public final class MetadataCommand extends Command {
   }
 
   /** Returns new {@link OpenLineage.OutputDataset} objects. */
-  static List<OpenLineage.OutputDataset> newOutputs(final int numOfOutputs, final int numOfFields) {
+  static List<OpenLineage.OutputDataset> newOutputs(
+      final int numOfOutputs, final int numOfFields, final int bytesPerInput) {
     return Stream.generate(
             () ->
                 OL.newOutputDatasetBuilder()
@@ -366,6 +409,10 @@ public final class MetadataCommand extends Command {
   /** Returns a new {@code event} time. */
   private static ZonedDateTime newEventTime() {
     return Instant.now().atZone(AMERICA_LOS_ANGELES);
+  }
+
+  private static long newDelayInMinutes() {
+    return RANDOM.nextLong(DELAY_IN_MINUTES);
   }
 
   /** Returns {@code true} if parent run should be generated; {@code false} otherwise. */
