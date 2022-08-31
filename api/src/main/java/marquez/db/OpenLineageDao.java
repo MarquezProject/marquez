@@ -7,6 +7,8 @@ package marquez.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+
+import java.lang.invoke.StringConcatFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -30,17 +32,7 @@ import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.mappers.LineageEventMapper;
-import marquez.db.models.DatasetFieldRow;
-import marquez.db.models.DatasetRow;
-import marquez.db.models.DatasetVersionRow;
-import marquez.db.models.JobContextRow;
-import marquez.db.models.JobRow;
-import marquez.db.models.NamespaceRow;
-import marquez.db.models.RunArgsRow;
-import marquez.db.models.RunRow;
-import marquez.db.models.RunStateRow;
-import marquez.db.models.SourceRow;
-import marquez.db.models.UpdateLineageRow;
+import marquez.db.models.*;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
@@ -350,7 +342,8 @@ public interface OpenLineageDao extends BaseDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao);
+                runDao,
+                columnLevelLineageDao);
         datasetInputs.add(record);
       }
     }
@@ -371,7 +364,8 @@ public interface OpenLineageDao extends BaseDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao);
+                runDao,
+                columnLevelLineageDao);
         datasetOutputs.add(record);
       }
     }
@@ -436,7 +430,8 @@ public interface OpenLineageDao extends BaseDao {
       DatasetDao datasetDao,
       DatasetVersionDao datasetVersionDao,
       DatasetFieldDao datasetFieldDao,
-      RunDao runDao) {
+      RunDao runDao,
+      ColumnLevelLineageDao columnLevelLineageDao) {
     NamespaceRow dsNamespace =
         namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
@@ -493,6 +488,29 @@ public interface OpenLineageDao extends BaseDao {
             .map(DatasetFacets::getSchema)
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
+
+    List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
+            Optional.ofNullable(ds.getFacets())
+                    .map(DatasetFacets::getColumnLineage)
+                    .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+                    .orElse(null);
+
+
+    if (ds.getFacets().getColumnLineage() != null) {
+      for (LineageEvent.ColumnLineageOutputColumn outputColumn : columnLevelLineageOutputColumnsList) {
+        for (LineageEvent.ColumnLineageInputField inputField : outputColumn.getInputFields()) {
+          ColumnLevelLineageRow columnLevelLineageRow =
+                  columnLevelLineageDao.upsertColumnLevelLineageRow(
+                          UUID.randomUUID(),
+                          datasetRow.getCurrentVersionUuid().get(),
+                          outputColumn.getName(),
+                          String.format("%s.%s", inputField.getDatasetNamespace(), inputField.getDatasetName(), inputField.getFieldName()),
+                          outputColumn.getTransformationDescription(),
+                          outputColumn.getTransformationType(),
+                          now);
+        }
+      }
+    }
 
     final DatasetRow dsRow = datasetRow;
     DatasetVersionRow datasetVersionRow =

@@ -10,6 +10,7 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
@@ -25,6 +26,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import javax.sound.sampled.Line;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 class OpenLineageDaoTest {
@@ -94,6 +97,31 @@ class OpenLineageDaoTest {
         .isEqualTo("TRUNCATE");
   }
 
+  @Test
+  void testUpdateMarquezModelDatasetWithColumnLineageFacet() {
+    Dataset dataset =
+            new Dataset(
+                    LineageTestUtils.NAMESPACE,
+                    DATASET_NAME,
+                    LineageEvent.DatasetFacets.builder()
+                            .columnLineage(
+                                    new LineageEvent.ColumnLineageFacet(
+                                            PRODUCER_URL,
+                                            SCHEMA_URL,
+                                            Collections.singletonList(new LineageEvent.ColumnLineageOutputColumn(
+                                                    "output_column",
+                                                    Collections.singletonList(new LineageEvent.ColumnLineageInputField(
+                                                                    "namespace", "datasetname", "fieldname")),
+                                                    "transformation_description",
+                                                            "transformation_type")
+
+                                            )))
+                            .build());
+
+    //TODO
+    assert(true);
+  }
+
   /**
    * When reading a new dataset, a version is created and the dataset's current version is updated
    * immediately.
@@ -146,6 +174,7 @@ class OpenLineageDaoTest {
                     new SchemaField("eyeColor", "STRING", "my eye color"))),
             this.datasetFacets.getLifecycleStateChange(),
             this.datasetFacets.getDataSource(),
+            this.datasetFacets.getColumnLineage(),
             this.datasetFacets.getDescription(),
             this.datasetFacets.getAdditionalFacets());
     UpdateLineageRow readJob =
