@@ -117,7 +117,7 @@ public final class SeedCommand extends Command {
         .setDefault(DEFAULT_OL_URL)
         .help("the HTTP API server url");
     subparser
-        .addArgument("--metadata")
+        .addArgument("-m", "--metadata")
         .dest("metadata")
         .type(String.class)
         .required(true)
