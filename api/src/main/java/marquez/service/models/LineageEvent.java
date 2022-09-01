@@ -460,7 +460,9 @@ public class LineageEvent extends BaseJsonModel {
 
     @Builder
     public ColumnLineageFacet(
-            @NotNull URI _producer, @NotNull URI _schemaURL, List<ColumnLineageOutputColumn> outputColumnsList) {
+        @NotNull URI _producer,
+        @NotNull URI _schemaURL,
+        List<ColumnLineageOutputColumn> outputColumnsList) {
       super(_producer, _schemaURL);
       this.outputColumnsList = outputColumnsList;
     }

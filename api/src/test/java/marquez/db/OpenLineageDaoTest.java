@@ -12,8 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import marquez.db.models.ColumnLevelLineageRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -28,8 +26,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import javax.sound.sampled.Line;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 class OpenLineageDaoTest {
@@ -102,31 +98,36 @@ class OpenLineageDaoTest {
   @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacet() {
     Dataset dataset =
-            new Dataset(
-                    LineageTestUtils.NAMESPACE,
-                    DATASET_NAME,
-                    LineageEvent.DatasetFacets.builder()
-                            .columnLineage(
-                                    new LineageEvent.ColumnLineageFacet(
-                                            PRODUCER_URL,
-                                            SCHEMA_URL,
-                                            Collections.singletonList(new LineageEvent.ColumnLineageOutputColumn(
-                                                    "output_column",
-                                                    Collections.singletonList(new LineageEvent.ColumnLineageInputField(
-                                                                    "namespace", "datasetname", "fieldname")),
-                                                    "transformation_description",
-                                                            "transformation_type")
-
-                                            )))
-                            .build());
+        new Dataset(
+            LineageTestUtils.NAMESPACE,
+            DATASET_NAME,
+            LineageEvent.DatasetFacets.builder()
+                .columnLineage(
+                    new LineageEvent.ColumnLineageFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Collections.singletonList(
+                            new LineageEvent.ColumnLineageOutputColumn(
+                                "output_column",
+                                Collections.singletonList(
+                                    new LineageEvent.ColumnLineageInputField(
+                                        "namespace", "datasetname", "fieldname")),
+                                "transformation_description",
+                                "transformation_type"))))
+                .build());
 
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
-            LineageTestUtils.createLineageRow(
-                    dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+        LineageTestUtils.createLineageRow(
+            dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
 
-
-    assertThat(writeJob.getOutputs().get().stream().toList().stream().findAny().orElseThrow().getColumnLineageRows()).size().isEqualTo(1);
+    assertThat(
+            writeJob.getOutputs().get().stream().toList().stream()
+                .findAny()
+                .orElseThrow()
+                .getColumnLineageRows())
+        .size()
+        .isEqualTo(1);
   }
 
   /**

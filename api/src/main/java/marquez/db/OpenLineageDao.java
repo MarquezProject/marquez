@@ -7,8 +7,6 @@ package marquez.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-
-import java.lang.invoke.StringConcatFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -554,19 +552,25 @@ public interface OpenLineageDao extends BaseDao {
     if (ds.getFacets().getColumnLineage() != null) {
       columnLineageRows = new ArrayList<>();
       List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
-              Optional.ofNullable(ds.getFacets())
-                      .map(DatasetFacets::getColumnLineage)
-                      .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
-                      .orElse(null);
+          Optional.ofNullable(ds.getFacets())
+              .map(DatasetFacets::getColumnLineage)
+              .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+              .orElse(null);
 
       if (columnLevelLineageOutputColumnsList != null) {
-        for (LineageEvent.ColumnLineageOutputColumn outputColumn : columnLevelLineageOutputColumnsList) {
+        for (LineageEvent.ColumnLineageOutputColumn outputColumn :
+            columnLevelLineageOutputColumnsList) {
           for (LineageEvent.ColumnLineageInputField inputField : outputColumn.getInputFields()) {
-            columnLineageRows.add(columnLevelLineageDao.upsertColumnLevelLineageRow(
+            columnLineageRows.add(
+                columnLevelLineageDao.upsertColumnLevelLineageRow(
                     UUID.randomUUID(),
                     datasetVersionRow.getUuid(),
                     outputColumn.getName(),
-                    String.format("%s.%s.%s", inputField.getDatasetNamespace(), inputField.getDatasetName(), inputField.getFieldName()),
+                    String.format(
+                        "%s.%s.%s",
+                        inputField.getDatasetNamespace(),
+                        inputField.getDatasetName(),
+                        inputField.getFieldName()),
                     outputColumn.getTransformationDescription(),
                     outputColumn.getTransformationType(),
                     now));
