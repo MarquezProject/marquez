@@ -27,17 +27,17 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
-import marquez.db.models.DatasetData;
-import marquez.db.models.JobData;
 import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
+import marquez.service.models.DatasetData;
 import marquez.service.models.Edge;
 import marquez.service.models.Graph;
+import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
-import marquez.service.models.Run;
+import marquez.service.models.RunData;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
@@ -68,13 +68,13 @@ public class LineageService extends DelegatingLineageDao {
       // Log warning, then return an orphan lineage graph; a graph should contain at most one
       // job->dataset relationship.
       log.warn(
-          "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
-          job,
-          nodeId.getValue());
+              "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
+              job,
+              nodeId.getValue());
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 
-    List<Run> runs =
+    List<RunData> runs =
         withRunFacets
             ? getCurrentRunsWithFacets(
                 jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()))
@@ -82,7 +82,7 @@ public class LineageService extends DelegatingLineageDao {
 
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
-        for (Run run : runs) {
+        for (RunData run : runs) {
           if (j.getName().getValue().equalsIgnoreCase(run.getJobName())
               && j.getNamespace().getValue().equalsIgnoreCase(run.getNamespaceName())) {
             j.setLatestRun(run);

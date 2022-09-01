@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package marquez.db.models;
+package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
@@ -24,7 +24,6 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
-import marquez.service.models.Run;
 
 @Getter
 @AllArgsConstructor
@@ -46,7 +45,7 @@ public class JobData implements NodeData {
   @Nullable URL location;
   @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
-  @Nullable @Setter Run latestRun;
+  @Nullable @Setter RunData latestRun;
 
   public Optional<URL> getLocation() {
     return Optional.ofNullable(location);
@@ -56,7 +55,7 @@ public class JobData implements NodeData {
     return Optional.ofNullable(description);
   }
 
-  public Optional<Run> getLatestRun() {
+  public Optional<RunData> getLatestRun() {
     return Optional.ofNullable(latestRun);
   }
 
