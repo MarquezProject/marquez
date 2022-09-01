@@ -192,12 +192,12 @@ public final class Utils {
   public static UUID findParentRunUuid(ParentRunFacet parent) {
     String jobName = parent.getJob().getName();
     String parentRunId = parent.getRun().getRunId();
-    return findParentRunUuid(jobName, parentRunId);
+    return findParentRunUuid(parent.getJob().getNamespace(), jobName, parentRunId);
   }
 
-  public static UUID findParentRunUuid(String parentJobName, String parentRunId) {
+  public static UUID findParentRunUuid(String namespace, String parentJobName, String parentRunId) {
     String dagName = parseParentJobName(parentJobName);
-    return toUuid(parentRunId, dagName);
+    return toUuid(namespace, parentRunId, dagName);
   }
 
   public static String parseParentJobName(String parentJobName) {
@@ -214,11 +214,11 @@ public final class Utils {
    * @param jobName
    * @return
    */
-  public static UUID toUuid(@NotNull String runId, String jobName) {
+  public static UUID toUuid(@NotNull String namespace, @NotNull String runId, String jobName) {
     try {
       return UUID.fromString(runId);
     } catch (IllegalArgumentException e) {
-      return Utils.toNameBasedUuid(jobName, runId);
+      return Utils.toNameBasedUuid(namespace, jobName, runId);
     }
   }
 
