@@ -1,10 +1,12 @@
 package marquez.db.models;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.ToString;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
