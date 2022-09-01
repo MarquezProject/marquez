@@ -489,29 +489,6 @@ public interface OpenLineageDao extends BaseDao {
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
 
-    List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
-            Optional.ofNullable(ds.getFacets())
-                    .map(DatasetFacets::getColumnLineage)
-                    .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
-                    .orElse(null);
-
-
-    if (ds.getFacets().getColumnLineage() != null) {
-      for (LineageEvent.ColumnLineageOutputColumn outputColumn : columnLevelLineageOutputColumnsList) {
-        for (LineageEvent.ColumnLineageInputField inputField : outputColumn.getInputFields()) {
-          ColumnLevelLineageRow columnLevelLineageRow =
-                  columnLevelLineageDao.upsertColumnLevelLineageRow(
-                          UUID.randomUUID(),
-                          datasetRow.getCurrentVersionUuid().get(),
-                          outputColumn.getName(),
-                          String.format("%s.%s", inputField.getDatasetNamespace(), inputField.getDatasetName(), inputField.getFieldName()),
-                          outputColumn.getTransformationDescription(),
-                          outputColumn.getTransformationType(),
-                          now);
-        }
-      }
-    }
-
     final DatasetRow dsRow = datasetRow;
     DatasetVersionRow datasetVersionRow =
         datasetRow
@@ -562,6 +539,31 @@ public interface OpenLineageDao extends BaseDao {
     }
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
 
+    List<ColumnLevelLineageRow> columnLineageRows = null;
+    if (ds.getFacets().getColumnLineage() != null) {
+      columnLineageRows = new ArrayList<>();
+      List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
+              Optional.ofNullable(ds.getFacets())
+                      .map(DatasetFacets::getColumnLineage)
+                      .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+                      .orElse(null);
+
+      if (columnLevelLineageOutputColumnsList != null) {
+        for (LineageEvent.ColumnLineageOutputColumn outputColumn : columnLevelLineageOutputColumnsList) {
+          for (LineageEvent.ColumnLineageInputField inputField : outputColumn.getInputFields()) {
+            columnLineageRows.add(columnLevelLineageDao.upsertColumnLevelLineageRow(
+                    UUID.randomUUID(),
+                    datasetVersionRow.getUuid(),
+                    outputColumn.getName(),
+                    String.format("%s.%s.%s", inputField.getDatasetNamespace(), inputField.getDatasetName(), inputField.getFieldName()),
+                    outputColumn.getTransformationDescription(),
+                    outputColumn.getTransformationType(),
+                    now));
+          }
+        }
+      }
+    }
+
     if (isInput) {
       runDao.updateInputMapping(runUuid, datasetVersionRow.getUuid());
 
@@ -574,7 +576,7 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
+    return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace, columnLineageRows);
   }
 
   default String formatDatasetName(String name) {

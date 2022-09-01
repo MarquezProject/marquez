@@ -12,6 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import marquez.db.models.ColumnLevelLineageRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -118,8 +120,13 @@ class OpenLineageDaoTest {
                                             )))
                             .build());
 
-    //TODO
-    assert(true);
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+            LineageTestUtils.createLineageRow(
+                    dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+
+    assertThat(writeJob.getOutputs().get().stream().toList().stream().findAny().orElseThrow().getColumnLineageRows()).size().isEqualTo(1);
   }
 
   /**

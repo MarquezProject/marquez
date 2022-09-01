@@ -51,7 +51,7 @@ public interface ColumnLevelLineageDao extends BaseDao {
                     + ":transformation_type, "
                     + ":now, "
                     + ":now) "
-                    + "ON CONFLICT (dataset_version_uuid, output_column_name) "
+                    + "ON CONFLICT (dataset_version_uuid, output_column_name, input_field) "
                     + "DO UPDATE SET "
                     + "input_field = EXCLUDED.input_field, "
                     + "transformation_description = EXCLUDED.transformation_description, "
