@@ -9,20 +9,26 @@ import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.service.models.LineageEvent;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The DAO for {@code run} facets. */
 public interface RunFacetsDao {
+  Logger log = LoggerFactory.getLogger(RunFacetsDao.class);
+
   /* An {@code enum} used to determine the dataset facet type. */
   enum Facet {
     NOMINAL_TIME("nominalTime"),
     PARENT("parent"),
-    ERROR_MESSAGE("errorMessage");
+    ERROR_MESSAGE("errorMessage"),
 
-    /* .. */
-    static final String UNKNOWN = "UNKNOWN";
+    // ...
+    SPARK_LOGICAL_PLAN("spark.logicalPlan"),
+    SPARK_UNKNOWN("spark_unknown");
 
     final String name;
 
@@ -37,11 +43,21 @@ public interface RunFacetsDao {
     /** ... */
     public static Facet fromName(@NonNull final String name) {
       for (final Facet facet : Facet.values()) {
-        if (facet.name().equalsIgnoreCase(name)) {
+        if (facet.getName().equalsIgnoreCase(name)) {
           return facet;
         }
       }
       return null;
+    }
+
+    /** ... */
+    public boolean isSparkUnknown() {
+      return this == SPARK_UNKNOWN;
+    }
+
+    /** ... */
+    public boolean isSparkLogicalPlan() {
+      return this == SPARK_LOGICAL_PLAN;
     }
 
     /** ... */
@@ -95,6 +111,9 @@ public interface RunFacetsDao {
       String name,
       PGobject facet);
 
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM run_facets WHERE name = :name)")
+  boolean runFacetExists(String name);
+
   /**
    * @param runUuid
    * @param lineageEventTime
@@ -144,6 +163,20 @@ public interface RunFacetsDao {
                       Optional.ofNullable(Facet.fromName(name))
                           .ifPresentOrElse(
                               (x) -> {
+                                if (x.isSparkUnknown()) {
+                                  // ...
+                                  return;
+                                }
+                                if (x.isSparkLogicalPlan()) {
+                                  if (runFacetExists(x.getName())) {
+                                    log.info(
+                                        "Facet '{}' has already been linked to run '{}', skipping...",
+                                        x.getName(),
+                                        runUuid);
+                                    // ...
+                                    return;
+                                  }
+                                }
                                 insertRunFacet(
                                     UUID.randomUUID(),
                                     now,
