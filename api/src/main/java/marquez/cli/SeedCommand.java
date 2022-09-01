@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.argparse4j.inf.Argument;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -98,8 +99,8 @@ public final class SeedCommand extends Command {
   private static final String DEFAULT_OL_URL = "http://localhost:8080";
 
   /* Args for seed command. */
-  private static final String CMD_ARG_OL_URL = "url";
-  private static final String CMD_ARG_OL_METADATA = "metadata";
+  private Argument urlArg;
+  private Argument metadataArg;
 
   /* Define seed command. */
   public SeedCommand() {
@@ -109,25 +110,27 @@ public final class SeedCommand extends Command {
   /* Configure seed command. */
   @Override
   public void configure(@NonNull final Subparser subparser) {
-    subparser
-        .addArgument("--url")
-        .dest("url")
-        .type(String.class)
-        .required(false)
-        .setDefault(DEFAULT_OL_URL)
-        .help("the HTTP API server url");
-    subparser
-        .addArgument("-m", "--metadata")
-        .dest("metadata")
-        .type(String.class)
-        .required(true)
-        .help("the path to the metadata file (ex: path/to/metadata.json)");
+    urlArg =
+        subparser
+            .addArgument("--url")
+            .dest("url")
+            .type(String.class)
+            .required(false)
+            .setDefault(DEFAULT_OL_URL)
+            .help("the HTTP API server url");
+    metadataArg =
+        subparser
+            .addArgument("-m", "--metadata")
+            .dest("metadata")
+            .type(String.class)
+            .required(true)
+            .help("the path to the metadata file (ex: path/to/metadata.json)");
   }
 
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
-    final String olUrl = namespace.getString(CMD_ARG_OL_URL);
-    final String olMetadata = namespace.getString(CMD_ARG_OL_METADATA);
+    final String olUrl = namespace.getString(urlArg.getDest());
+    final String olMetadata = namespace.getString(metadataArg.getDest());
     // Use HTTP transport.
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
