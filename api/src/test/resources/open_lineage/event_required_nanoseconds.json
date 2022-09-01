@@ -5,7 +5,7 @@
   },
   "job": {
     "namespace": "my-namespace",
-    "name": "myjob.mytask"
+    "name": "myjob"
   },
   "producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
   "schemaURL": "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent"
