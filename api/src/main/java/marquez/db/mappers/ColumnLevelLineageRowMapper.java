@@ -9,7 +9,12 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static marquez.db.Columns.*;
+import static marquez.db.Columns.INPUT_FIELD;
+import static marquez.db.Columns.TRANSFORMATION_DESCRIPTION;
+import static marquez.db.Columns.TRANSFORMATION_TYPE;
+import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrThrow;
 
 public class ColumnLevelLineageRowMapper implements RowMapper<ColumnLevelLineageRow> {
 
