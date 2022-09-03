@@ -25,7 +25,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
@@ -52,7 +51,6 @@ import org.apache.commons.lang3.RandomStringUtils;
  * java -jar marquez-api.jar metadata --runs 10 --bytes-per-event 16384
  * }</pre>
  */
-@Slf4j
 public final class MetadataCommand extends Command {
   /* Used to calculate (approximate) total bytes per event. */
   private static final int BYTES_PER_RUN = 578;
@@ -106,7 +104,7 @@ public final class MetadataCommand extends Command {
 
   /* Define metadata command. */
   public MetadataCommand() {
-    super("metadata", "generate random metadata using the OpenLineage standard");
+    super("metadata", "generate random metadata using OpenLineage");
   }
 
   /* Configure metadata command. */
@@ -114,12 +112,12 @@ public final class MetadataCommand extends Command {
   public void configure(@NonNull Subparser subparser) {
     runArg =
         subparser
-            .addArgument("--runs")
+            .addArgument("-r", "--runs")
             .dest("runs")
             .type(Integer.class)
             .required(false)
             .setDefault(DEFAULT_RUNS)
-            .help("limits OL runs up to N");
+            .help("limits runs up to N");
     bytesPerEventArg =
         subparser
             .addArgument("--bytes-per-event")
@@ -150,7 +148,7 @@ public final class MetadataCommand extends Command {
             .dest("outputs-per-event")
             .type(Integer.class)
             .required(false)
-            .help("limits OL outputs per event to N")
+            .help("limits outputs per event to N")
             .setDefault(DEFAULT_OUTPUTS_PER_EVENT);
     bytesPerOutputArg =
         subparser
@@ -174,11 +172,21 @@ public final class MetadataCommand extends Command {
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int runs = namespace.getInt(runArg.getDest());
     final int bytesPerEvent = namespace.getInt(bytesPerEventArg.getDest());
-    final int inputsPerEvent = namespace.getInt(inputsPerEventArg.getDest());
-    final int bytesPerInput = namespace.getInt(bytesPerInputArg.getDest());
-    final int outputsPerEvent = namespace.getInt(outputsPerEventArg.getDest());
-    final int bytesPerOutput = namespace.getInt(bytesPerOutputArg.getDest());
+    int inputsPerEvent = namespace.getInt(inputsPerEventArg.getDest());
+    int bytesPerInput = namespace.getInt(bytesPerInputArg.getDest());
+    int outputsPerEvent = namespace.getInt(outputsPerEventArg.getDest());
+    int bytesPerOutput = namespace.getInt(bytesPerOutputArg.getDest());
     final String output = namespace.getString(outputArg.getDest());
+
+    // Ensure bytes per event is > total I/O bytes.
+    if (bytesPerEvent < (bytesPerInput + bytesPerOutput)) {
+      final int bytesPerIo = bytesPerEvent / 2;
+      System.out.format(
+          "'%d' (bytes) < '%d' (bytes), defaulting to '%d' (bytes) per I/O...\n",
+          bytesPerEvent, (bytesPerInput + bytesPerOutput), bytesPerIo);
+      bytesPerInput = bytesPerIo;
+      bytesPerOutput = bytesPerIo;
+    }
 
     // Generate, then write events to metadata file.
     writeOlEvents(
@@ -189,24 +197,19 @@ public final class MetadataCommand extends Command {
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
-      final int numOfRuns,
+      final int runs,
       final int bytesPerEvent,
       final int inputsPerEvent,
       final int bytesPerInput,
       final int outputsPerEvent,
       final int bytesPerOutput) {
-    log.info(
-        "Generating '{}' runs, each COMPLETE event will "
-            + "have '{} inputs, '{}' outputs, and a total size of '~{}' (bytes)...",
-        numOfRuns,
-        inputsPerEvent,
-        outputsPerEvent,
-        bytesPerEvent);
+    System.out.format(
+        "Generating '%d' runs, each 'COMPLETE' event will "
+            + "have '%d' inputs, '%d' outputs, and a total size of '~%d' (bytes)...\n",
+        runs, inputsPerEvent, outputsPerEvent, bytesPerEvent);
     return Stream.generate(
-            () ->
-                newOlRunEvents(
-                    bytesPerEvent, inputsPerEvent, bytesPerInput, outputsPerEvent, bytesPerOutput))
-        .limit(numOfRuns)
+            () -> newOlRunEvents(inputsPerEvent, bytesPerInput, outputsPerEvent, bytesPerOutput))
+        .limit(runs)
         .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.complete()))
         .collect(toImmutableList());
   }
@@ -216,24 +219,15 @@ public final class MetadataCommand extends Command {
    * and {@code COMPLETE} event for a given run.
    */
   private static RunEvents newOlRunEvents(
-      int bytesPerEvent,
       final int inputsPerEvent,
-      int bytesPerInput,
+      final int bytesPerInput,
       final int outputsPerEvent,
-      int bytesPerOutput) {
+      final int bytesPerOutput) {
     // (1) Generate run with an optional parent run, then the job.
     final OpenLineage.Run run = newRun(hasParentRunOrNot());
     final OpenLineage.Job job = newJob();
 
-    // ...
-    if (bytesPerEvent < (bytesPerInput + bytesPerOutput)) {
-      log.info("(bytesPerInput +  bytesPerOutput) > bytesPerEvent ...");
-      final int bytesPerIo = bytesPerEvent / 2;
-      bytesPerInput = bytesPerIo;
-      bytesPerOutput = bytesPerIo;
-    }
-
-    // (2) Generate event of N bytes if provided; bytes per event are calculated using:
+    // Bytes per event are calculated using:
     //
     // +------------+-----------+----------------------+
     // |  run meta  |  job meta |   I/O meta           |
@@ -242,13 +236,8 @@ public final class MetadataCommand extends Command {
     //
     // where, K are the bytes per input, M is number of inputs per event, N are the bytes per
     // output, and P is number of outputs per event.
-
-    if (bytesPerEvent > DEFAULT_BYTES_PER_EVENT) {
-      log.info("bytesPerEvent >  DEFAULT_BYTES_PER_EVENT...");
-      final int ioBytesPerInput = bytesPerInput + bytesPerOutput;
-      final int s = bytesPerEvent - ioBytesPerInput;
-    }
-
+    //
+    // (2) Generate event of N bytes.
     return new RunEvents(
         OL.newRunEventBuilder()
             .eventType(START)
