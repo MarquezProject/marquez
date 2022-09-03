@@ -37,7 +37,7 @@ $ java -jar marquez-api.jar metadata --runs 128
 
 > **Note:** You may need to manually [build](https://github.com/MarquezProject/marquez/tree/feature/load-testing-docs#building) `marquez-api.jar`.
 
-> **Note**: The generated `metadata.json` will contain an array OpenLineage events.
+> **Note:** The generated `metadata.json` will contain an array OpenLineage events.
 
 > **Tip**: You may specify the location of `metadata.json` by using `--output`.
 
