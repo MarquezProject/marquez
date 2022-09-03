@@ -27,17 +27,19 @@ $ brew install k6
 | Database         | [bitnami/postgresql](https://hub.docker.com/r/bitnami/postgresql) or cloud provided | A PostgreSQL instance used to store metadata.                                                                          |
 
 
-## `metadata.json`
+## Create `metadata.json`
 
-Use the [`metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java) command to generate random _dataset_, _job_, and _run_ metadata using OpenLineage:
+Use the [`metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java) command to generate random _dataset_, _job_, and _run_ metadata:
 
 ```bash
 $ java -jar marquez-api.jar metadata --runs 128
 ```
 
+> **Note**: The generated `metadata.json` will contain an array OpenLineage events.
+
 > **Tip**: You may specify the location of `metadata.json` by using `--output`.
 
-## `load.js`
+## Create `load.js`
 
 ```js
 import { SharedArray } from 'k6/data';
