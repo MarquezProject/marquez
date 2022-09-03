@@ -2,7 +2,7 @@
 
 **k6** is a developer-centric, free and open-source load testing tool built for making performance testing a productive and enjoyable experience. Below, we'll walk you through running a load test on Marquez using [OpenLineage](https://github.com/OpenLineage/OpenLineage) and k6 to:
 
-* Performance testing on `POST` `/lineage`
+* Performance test `POST` `/lineage` (HTTP request _blocked_, _waiting_, _duration_, etc)
 * Understand query performance on database
 
 ## Setup [`k6 `](https://k6.io)
@@ -35,9 +35,9 @@ Use the [`metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src
 $ java -jar marquez-api.jar metadata --runs 10 --bytes-per-event 16384
 ```
 
-> **Note:** You may need to manually [build](https://github.com/MarquezProject/marquez/tree/feature/load-testing-docs#building) `marquez-api.jar`.
-
 > **Tip**: You may specify the location of `metadata.json` with `--output`.
+
+> **Note:** You may need to manually [build](https://github.com/MarquezProject/marquez/tree/feature/load-testing-docs#building) `marquez-api.jar`.
 
 ## Create `load.js`
 
@@ -54,7 +54,7 @@ const metadata = new SharedArray('metadata', function () {
 });
 
 export default function () {
-  const url = 'http://localhost:5000/api/v1/lineage';
+  const url = 'http://localhost:8080/api/v1/lineage';
   const params = {
     headers: {
       'Content-Type': 'application/json',
@@ -71,19 +71,18 @@ export default function () {
 }
 ```
 
-## Running via Docker
+## Running Load Test with `k6` Locally
 
-1. To start Marquez, run:
+1. Make sure you've created [`marquez.yml`]([configuration](https://github.com/MarquezProject/marquez#configuration)), then start Marquez with:
 
    ```bash
-   # Run under the project root directory ~/marquez
-   $ ./docker/up.sh
+   $ ./gradlew :api:runShadow
    ```
-
-   Open [http://localhost:3000](http://localhost:3000)
 
 2. Run load test:
 
    ```bash
    $ k6 run --vus 25 --duration 30s load.js
    ```
+
+   > **Note:** To learn how to run tests locally with `k6`, see [_Running k6_](https://k6.io/docs/getting-started/running-k6).
