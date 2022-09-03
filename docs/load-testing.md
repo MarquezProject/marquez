@@ -75,7 +75,7 @@ export default function () {
 
 ## Running Load Test with `k6` Locally
 
-1. Make sure you've created [`marquez.yml`]([configuration](https://github.com/MarquezProject/marquez#configuration)), then start Marquez HTTP server with:
+1. Make sure you've created [`marquez.yml`](https://github.com/MarquezProject/marquez#configuration), then start Marquez HTTP server with:
 
    ```bash
    $ ./gradlew :api:runShadow
