@@ -131,11 +131,13 @@ public final class SeedCommand extends Command {
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final String olUrl = namespace.getString(urlArg.getDest());
     final String olMetadata = namespace.getString(metadataArg.getDest());
-    // Use HTTP transport.
+
+    // (1) Use HTTP transport.
     final OpenLineageClient olClient =
         OpenLineageClient.builder().transport(HttpTransport.builder().uri(olUrl).build()).build();
     log.info("Connected to '{}'... attempting to seed with metadata!", olUrl);
-    // Load, then emit events.
+
+    // (2) Load, then emit events.
     final ImmutableList<OpenLineage.RunEvent> olEvents = loadMetadata(olMetadata);
     log.info("Emitting '{}' events to: '{}'", olEvents.size(), olUrl);
     int olEventsEmitted = 0; // Keep count of events emitted.
@@ -143,6 +145,7 @@ public final class SeedCommand extends Command {
       olClient.emit(olEvent);
       olEventsEmitted++;
     }
+
     log.info("Successfully emitted '{}' events!", olEventsEmitted);
   }
 
