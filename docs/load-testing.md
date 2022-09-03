@@ -1,6 +1,6 @@
 # Load Testing with [`k6`](https://k6.io)
 
-**k6** is a developer-centric, free and open-source load testing tool built for making performance testing a productive and enjoyable experience. Below, we'll walk you through running a load test on Marquez using [OpenLineage](https://github.com/OpenLineage/OpenLineage) and k6 to:
+**k6** is a developer-centric, free and open-source load testing tool built for making performance testing a productive and enjoyable experience. Below, we'll walk you through running a load test on Marquez using [OpenLineage](https://github.com/OpenLineage/OpenLineage) and `k6` to:
 
 * Performance test `POST` `/lineage` (HTTP requests _blocked_, _waiting_, _duration_, etc)
 * Understand query performance on database
@@ -75,7 +75,7 @@ export default function () {
 
 ## Running Load Test with `k6` Locally
 
-1. Make sure you've created [`marquez.yml`]([configuration](https://github.com/MarquezProject/marquez#configuration)), then start Marquez with:
+1. Make sure you've created [`marquez.yml`]([configuration](https://github.com/MarquezProject/marquez#configuration)), then start Marquez HTTP server with:
 
    ```bash
    $ ./gradlew :api:runShadow
