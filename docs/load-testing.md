@@ -29,17 +29,15 @@ $ brew install k6
 
 ## Create `metadata.json`
 
-Use the [`metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java) command to generate random _dataset_, _job_, and _run_ metadata:
+Use the [`metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java) command to generate random _dataset_, _job_, and _run_ metadata. Below, we generate `metadata.json` with `128` runs (`20` events in total), where each `START` event will have a size of `~16384` bytes:
 
 ```bash
-$ java -jar marquez-api.jar metadata --runs 128
+$ java -jar marquez-api.jar metadata --runs 10 --bytes-per-event 16384
 ```
 
 > **Note:** You may need to manually [build](https://github.com/MarquezProject/marquez/tree/feature/load-testing-docs#building) `marquez-api.jar`.
 
-> **Note:** The generated `metadata.json` will contain an array OpenLineage events.
-
-> **Tip**: You may specify the location of `metadata.json` by using `--output`.
+> **Tip**: You may specify the location of `metadata.json` with `--output`.
 
 ## Create `load.js`
 
