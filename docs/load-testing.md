@@ -2,8 +2,10 @@
 
 **k6** is a developer-centric, free and open-source load testing tool built for making performance testing a productive and enjoyable experience. Below, we'll walk you through running a load test on Marquez using [OpenLineage](https://github.com/OpenLineage/OpenLineage) and k6 to:
 
-* Performance test `POST` `/lineage` (HTTP request _blocked_, _waiting_, _duration_, etc)
+* Performance test `POST` `/lineage` (HTTP requests _blocked_, _waiting_, _duration_, etc)
 * Understand query performance on database
+
+To view the built-in metrics automatically collects by `k6`, see [_Metrics_](https://k6.io/docs/using-k6/metrics/#http-specific-built-in-metrics).
 
 ## Setup [`k6 `](https://k6.io)
 
