@@ -51,6 +51,7 @@ import marquez.client.models.StreamMeta;
 import marquez.client.models.Tag;
 import marquez.common.models.SourceType;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.junit.jupiter.Container;
@@ -267,5 +268,16 @@ public abstract class BaseIntegrationTest {
 
   protected static Field newFieldWith(final ImmutableSet<String> tags) {
     return new Field(newFieldName().getValue(), newFieldType(), tags, newDescription());
+  }
+
+  protected <T> CompletableFuture<Integer> sendEvent(T event) {
+    return this.sendLineage(Utils.toJson(event))
+        .thenApply(HttpResponse::statusCode)
+        .whenComplete(
+            (val, error) -> {
+              if (error != null) {
+                Assertions.fail("Could not complete request");
+              }
+            });
   }
 }

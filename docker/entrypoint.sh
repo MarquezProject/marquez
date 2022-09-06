@@ -12,8 +12,14 @@ if [[ -z "${MARQUEZ_CONFIG}" ]]; then
   echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
 fi
 
+if [[ -z "${MARQUEZ_VERSION}" ]]; then
+  MARQUEZ_VERSION='*'
+  echo "WARNING 'MARQUEZ_VERSION' not set. Running could fail if directory contains multiple jar versions."
+fi
+
+
 # Adjust java options for the http server
 JAVA_OPTS="${JAVA_OPTS} -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true"
 
 # Start http server with java options and configuration
-java ${JAVA_OPTS} -jar marquez-*.jar server ${MARQUEZ_CONFIG}
+java ${JAVA_OPTS} -jar marquez-${MARQUEZ_VERSION}.jar server ${MARQUEZ_CONFIG}
