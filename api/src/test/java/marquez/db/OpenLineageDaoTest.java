@@ -10,6 +10,7 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -237,5 +238,28 @@ class OpenLineageDaoTest {
 
     assertThat(readJob2.getInputs().get().get(0).getDatasetVersionRow())
         .isEqualTo(writeJob3.getOutputs().get().get(0).getDatasetVersionRow());
+  }
+
+  @Test
+  void testGetOpenLineageEvents() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)));
+
+    List<LineageEvent> lineageEvents = dao.findOlEventsByRunUuid(writeJob.getRun().getUuid());
+    assertThat(lineageEvents).hasSize(1);
+
+    assertThat(lineageEvents.get(0).getEventType()).isEqualTo("COMPLETE");
+
+    LineageEvent.Job job = lineageEvents.get(0).getJob();
+    assertThat(job)
+        .extracting("namespace", "name")
+        .contains(LineageTestUtils.NAMESPACE, WRITE_JOB_NAME);
   }
 }

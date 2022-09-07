@@ -14,6 +14,7 @@ import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Functions;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,10 +26,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import marquez.common.models.JobType;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
+import marquez.db.models.JobRow;
+import marquez.db.models.NamespaceRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
@@ -44,10 +48,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.postgresql.util.PGobject;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageDaoTest {
 
+  private static DatasetDao datasetDao;
   private static LineageDao lineageDao;
   private static OpenLineageDao openLineageDao;
   private final Dataset dataset =
@@ -65,6 +71,7 @@ public class LineageDaoTest {
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     LineageDaoTest.jdbi = jdbi;
+    datasetDao = jdbi.onDemand(DatasetDao.class);
     lineageDao = jdbi.onDemand(LineageDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
@@ -175,6 +182,134 @@ public class LineageDaoTest {
           .containsAll(
               expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
     }
+  }
+
+  @Test
+  public void testGetLineageForSymlinkedJob() throws SQLException {
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    List<JobLineage> jobRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 20, Optional.of("outputData")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+
+    NamespaceRow namespaceRow =
+        jdbi.onDemand(NamespaceDao.class)
+            .findNamespaceByName(writeJob.getJob().getNamespaceName())
+            .get();
+
+    PGobject inputs = new PGobject();
+    inputs.setType("json");
+    inputs.setValue("[]");
+
+    String symlinkTargetJobName = "A_new_write_job";
+    JobRow targetJob =
+        jdbi.onDemand(JobDao.class)
+            .upsertJob(
+                UUID.randomUUID(),
+                JobType.valueOf(writeJob.getJob().getType()),
+                writeJob.getJob().getCreatedAt(),
+                namespaceRow.getUuid(),
+                writeJob.getJob().getNamespaceName(),
+                symlinkTargetJobName,
+                writeJob.getJob().getDescription().orElse(null),
+                writeJob.getJob().getJobContextUuid().orElse(null),
+                writeJob.getJob().getLocation(),
+                null,
+                inputs);
+    jdbi.onDemand(JobDao.class)
+        .upsertJob(
+            writeJob.getJob().getUuid(),
+            JobType.valueOf(writeJob.getJob().getType()),
+            writeJob.getJob().getCreatedAt(),
+            namespaceRow.getUuid(),
+            writeJob.getJob().getNamespaceName(),
+            writeJob.getJob().getName(),
+            writeJob.getJob().getDescription().orElse(null),
+            writeJob.getJob().getJobContextUuid().orElse(null),
+            writeJob.getJob().getLocation(),
+            targetJob.getUuid(),
+            inputs);
+
+    // fetch the first "targetJob" lineage.
+    Set<JobData> connectedJobs =
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(targetJob.getUuid())), 2);
+
+    // 20 readJobs + 1 downstreamJob for each (20) + 1 write job = 41
+    assertThat(connectedJobs).size().isEqualTo(41);
+
+    Set<UUID> jobIds = connectedJobs.stream().map(JobData::getUuid).collect(Collectors.toSet());
+    // expect the job that wrote "commonDataset", which is readJob0's input
+    assertThat(jobIds).contains(targetJob.getUuid());
+
+    // expect all downstream jobs
+    Set<UUID> readJobUUIDs =
+        jobRows.stream()
+            .flatMap(row -> Stream.concat(Stream.of(row), row.getDownstreamJobs().stream()))
+            .map(JobLineage::getId)
+            .collect(Collectors.toSet());
+    assertThat(jobIds).containsAll(readJobUUIDs);
+
+    Map<UUID, JobData> actualJobRows =
+        connectedJobs.stream().collect(Collectors.toMap(JobData::getUuid, Functions.identity()));
+    for (JobLineage expected : jobRows) {
+      JobData job = actualJobRows.get(expected.getId());
+      assertThat(job.getInputUuids())
+          .containsAll(
+              expected.getInput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
+      assertThat(job.getOutputUuids())
+          .containsAll(
+              expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
+    }
+    Set<UUID> lineageForOriginalJob =
+        lineageDao.getLineage(new HashSet<>(Arrays.asList(writeJob.getJob().getUuid())), 2).stream()
+            .map(JobData::getUuid)
+            .collect(Collectors.toSet());
+    assertThat(lineageForOriginalJob).isEqualTo(jobIds);
+
+    UpdateLineageRow updatedTargetJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            symlinkTargetJobName,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(
+                new Dataset(
+                    NAMESPACE,
+                    "a_new_dataset",
+                    newDatasetFacet(new SchemaField("firstname", "string", "the first name")))));
+    assertThat(updatedTargetJob.getJob().getUuid()).isEqualTo(targetJob.getUuid());
+
+    // get lineage for original job - the old datasets/jobs should no longer be present
+    assertThat(
+            lineageDao
+                .getLineage(new HashSet<>(Arrays.asList(writeJob.getJob().getUuid())), 2)
+                .stream()
+                .map(JobData::getUuid)
+                .collect(Collectors.toSet()))
+        .hasSize(1)
+        .containsExactlyInAnyOrder(targetJob.getUuid());
+
+    // fetching lineage for target job should yield the same results
+    assertThat(
+            lineageDao.getLineage(new HashSet<>(Arrays.asList(targetJob.getUuid())), 2).stream()
+                .map(JobData::getUuid)
+                .collect(Collectors.toSet()))
+        .hasSize(1)
+        .containsExactlyInAnyOrder(targetJob.getUuid());
   }
 
   @Test
@@ -566,8 +701,63 @@ public class LineageDaoTest {
             Collections.singleton(row.getOutputs().get().get(0).getDatasetRow().getUuid()));
 
     assertThat(datasetData)
-        .extracting(ds -> ds.getLastlifecycleState().orElse(""))
+        .extracting(ds -> ds.getLastLifecycleState().orElse(""))
         .anyMatch(str -> str.contains("CREATE"));
+  }
+
+  @Test
+  public void testGetDatasetDataDoesNotReturnDeletedDataset() {
+    Dataset dataset =
+        new Dataset(
+            NAMESPACE,
+            DATASET,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    String deleteName = DATASET + "-delete";
+    Dataset toDelete =
+        new Dataset(
+            NAMESPACE,
+            deleteName,
+            LineageEvent.DatasetFacets.builder()
+                .lifecycleStateChange(
+                    new LineageEvent.LifecycleStateChangeFacet(PRODUCER_URL, SCHEMA_URL, "CREATE"))
+                .build());
+
+    UpdateLineageRow row =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset, toDelete));
+
+    Set<DatasetData> datasetData =
+        lineageDao.getDatasetData(
+            Set.of(
+                row.getOutputs().get().get(0).getDatasetRow().getUuid(),
+                row.getOutputs().get().get(1).getDatasetRow().getUuid()));
+
+    assertThat(datasetData)
+        .hasSize(2)
+        .extracting(ds -> ds.getName().getValue())
+        .anyMatch(str -> str.contains(deleteName));
+
+    datasetDao.delete(NAMESPACE, deleteName);
+
+    datasetData =
+        lineageDao.getDatasetData(
+            Set.of(
+                row.getOutputs().get().get(0).getDatasetRow().getUuid(),
+                row.getOutputs().get().get(1).getDatasetRow().getUuid()));
+
+    assertThat(datasetData)
+        .hasSize(1)
+        .extracting(ds -> ds.getName().getValue())
+        .allMatch(str -> str.contains(DATASET));
   }
 
   @Test

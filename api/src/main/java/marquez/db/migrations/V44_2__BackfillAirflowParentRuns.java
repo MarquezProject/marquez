@@ -64,7 +64,7 @@ public class V44_2__BackfillAirflowParentRuns implements JavaMigration {
           FROM lineage_events le
           WHERE le.run_uuid=r.uuid
           AND event->'run'->'facets'->'parent'->'run'->>'runId' IS NOT NULL
-          AND event->'run'->'facets'->'airflow_version' IS NOT NULL
+          AND event->'run'->'facets'->>'airflow_version' IS NOT NULL
           ) e ON e.run_uuid=r.uuid
       WHERE e.parent_run_id IS NOT NULL
 """;
@@ -76,8 +76,8 @@ public class V44_2__BackfillAirflowParentRuns implements JavaMigration {
       current_location
       FROM jobs
       WHERE namespace_name=:namespace AND name=:jobName
-      ON CONFLICT(name, namespace_uuid) WHERE parent_job_uuid IS NULL
-      DO UPDATE SET updated_at=now()
+      ON CONFLICT (name, namespace_uuid) WHERE parent_job_uuid IS NULL
+      DO UPDATE SET updated_at=EXCLUDED.updated_at
       RETURNING uuid
       """;
   public static final String INSERT_PARENT_RUN_QUERY =

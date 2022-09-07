@@ -78,7 +78,27 @@ public interface NamespaceDao extends BaseDao {
   @SqlQuery("SELECT * FROM namespaces ORDER BY name LIMIT :limit OFFSET :offset")
   List<Namespace> findAll(int limit, int offset);
 
-  @SqlQuery(
+  default NamespaceRow upsertNamespaceRow(
+      UUID uuid, Instant now, String name, String currentOwnerName) {
+    doUpsertNamespaceRow(uuid, now, name, currentOwnerName);
+    return findNamespaceByName(name).orElseThrow();
+  }
+
+  /**
+   * This query is executed by the OpenLineage write path, meaning namespaces are written to a LOT.
+   * Updating the record to modify the updateAt timestamp means the same namespace is often under
+   * heavy contention unnecessarily (it's really not being updated), causing some requests to wait
+   * for a lock while other requests are finishing. If a single namespace is under heavy contention,
+   * this can cause some requests to wait a long time - i.e., minutes. This causes unacceptable
+   * latency and failures in the write path. Avoid any updates in this query to avoid unnecessary
+   * locks.
+   *
+   * @param uuid
+   * @param now
+   * @param name
+   * @param currentOwnerName
+   */
+  @SqlUpdate(
       "INSERT INTO namespaces ( "
           + "uuid, "
           + "created_at, "
@@ -91,10 +111,8 @@ public interface NamespaceDao extends BaseDao {
           + ":now, "
           + ":name, "
           + ":currentOwnerName) "
-          + "ON CONFLICT(name) DO "
-          + "UPDATE SET updated_at = EXCLUDED.updated_at "
-          + "RETURNING *")
-  NamespaceRow upsertNamespaceRow(UUID uuid, Instant now, String name, String currentOwnerName);
+          + "ON CONFLICT(name) DO NOTHING")
+  void doUpsertNamespaceRow(UUID uuid, Instant now, String name, String currentOwnerName);
 
   @SqlQuery(
       "INSERT INTO namespaces ( "

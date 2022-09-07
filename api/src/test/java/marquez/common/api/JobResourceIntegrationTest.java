@@ -241,6 +241,19 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void testApp_deleteJob() {
+    client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+
+    List<Job> jobs = client.listJobs(NAMESPACE_NAME);
+    assertThat(jobs).hasSizeGreaterThan(0);
+
+    client.deleteJob(NAMESPACE_NAME, JOB_NAME);
+
+    jobs = client.listJobs(NAMESPACE_NAME);
+    assertThat(jobs).isEmpty();
+  }
+
+  @Test
   public void testApp_getJobVersionWithInputsAndOutputs() {
     createSource(STREAM_SOURCE_NAME);
     createSource(DB_TABLE_SOURCE_NAME);

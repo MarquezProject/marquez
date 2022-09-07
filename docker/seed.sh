@@ -7,9 +7,4 @@
 
 set -e
 
-if [[ -z "${MARQUEZ_CONFIG}" ]]; then
-  MARQUEZ_CONFIG='marquez.dev.yml'
-  echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
-fi
-
-java -jar marquez-api-*.jar seed --host "${MARQUEZ_HOST:-localhost}" --port "${MARQUEZ_PORT:-5000}" "${MARQUEZ_CONFIG}"
+java -jar marquez-api-*.jar seed --url "${MARQUEZ_URL:-http://localhost:5000}" --metadata metadata.json

@@ -148,6 +148,7 @@ To ensure your pull request is accepted, follow these guidelines:
   ```
   feature  Add or expand a feature
   bug      Fix a bug
+  proposal Propose a change
   ```
 
   _For example_:
@@ -156,6 +157,7 @@ To ensure your pull request is accepted, follow these guidelines:
   feature/my-cool-new-feature
   bug/my-bug-fix
   bug/my-other-bug-fix
+  proposal/my-proposal
   ```
 
 * Choose _short_ and _descriptive_ branch names

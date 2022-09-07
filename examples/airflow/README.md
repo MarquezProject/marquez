@@ -38,9 +38,11 @@ Next, we'll need to specify where we want Airflow to send DAG metadata. To do so
 
 ```bash
 OPENLINEAGE_URL=http://marquez:5000  # The URL of the HTTP backend
-OPENLINEAGE_NAMESPACE=example        # The namespace associated with the DAG collected metadata
+OPENLINEAGE_NAMESPACE=example        # The namespace associated with collected metadata associated with jobs
 ```
 > **Note:** The `openlineage.env` config file will be used by the `airflow`, `airflow_scheduler`, and `airflow_worker` containers to send lineage metadata to Marquez.
+
+> **Note:** The namespace refered above is the namespace of jobs, that model your DAG runs. The datasets itself reside in namespaces connected to their data sources, compatible with [OpenLineage naming.](https://github.com/OpenLineage/OpenLineage/blob/main/spec/Naming.md)
 
 Your `examples/airflow/` directory should now contain the following:
 
@@ -65,12 +67,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata.  Notice that the only change required to begin collecting DAG metadata is to use `openlineage.airflow` instead of `airflow`:
-
-```diff
-- from airflow import DAG
-+ from openlineage.airflow import DAG
-```
+When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata. If you're using Airflow 2.3+ no further changes to your dag code, or configuration are needed. If you're using older version of Airflow, please look [here](https://github.com/OpenLineage/OpenLineage/blob/main/integration/airflow/README.md#setup) to understand how to configure Airflow integration. 
 
 # Step 2.1: Create DAG `counter`
 
@@ -80,7 +77,7 @@ Under `dags/`, create a file named `counter.py` and add the following code:
 import random
 
 from airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -133,7 +130,7 @@ Under `dags/`, create a file named `sum.py` and add the following code:
 
 ```python
 from airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
