@@ -164,6 +164,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dataset'
+    delete:
+      operationId: deleteDataset
+      summary: Soft deletes dataset.
+      description: Soft deletes dataset. It will be un-deleted if new OpenLineage event containing this dataset comes.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/datasets/{dataset}/versions/{version}:
     parameters:
@@ -301,6 +314,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+    delete:
+      operationId: deleteJob
+      summary: Soft deletes job.
+      description: Soft deletes job. It will be un-deleted if new OpenLineage event containing this job comes.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/jobs:
     parameters:
