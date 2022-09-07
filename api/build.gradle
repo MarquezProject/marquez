@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.dhatim:dropwizard-sentry:2.0.29'
     implementation "io.sentry:sentry:${sentryVersion}"
-    implementation 'org.flywaydb:flyway-core:8.5.10'
+    implementation 'org.flywaydb:flyway-core:8.5.13'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation 'com.graphql-java:graphql-java:18.1'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
