@@ -9,7 +9,7 @@ dependencies:
   - condition: postgresql.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
-    version: 11.1.26
+    version: 11.1.29
 description: Marquez is an open source metadata service for the collection, aggregation, and visualization of a data ecosystem's metadata.
 home: https://github.com/MarquezProject/marquez/tree/main/chart
 icon: https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/marquez-logo.png
@@ -29,4 +29,4 @@ name: marquez
 sources:
   - https://github.com/MarquezProject/marquez
   - https://marquezproject.github.io/marquez/
-version: 0.25.0
+version: 0.25.1
