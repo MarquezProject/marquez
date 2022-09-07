@@ -70,7 +70,11 @@ public class OpenLineageServiceIntegrationTest {
   public static final ZoneId TIMEZONE = ZoneId.of("America/Los_Angeles");
   public static final String DATASET_NAME = "theDataset";
   private RunService runService;
+
+  private JobService jobService;
   private OpenLineageDao openLineageDao;
+
+  private JobDao jobDao;
   private DatasetDao datasetDao;
   private DatasetVersionDao datasetVersionDao;
   private ArgumentCaptor<JobInputUpdate> runInputListener;
@@ -134,7 +138,9 @@ public class OpenLineageServiceIntegrationTest {
   public void setup(Jdbi jdbi) throws SQLException {
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
+    jobDao = jdbi.onDemand(JobDao.class);
     runService = mock(RunService.class);
+    jobService = new JobService(jobDao, runService);
     runInputListener = ArgumentCaptor.forClass(JobInputUpdate.class);
     doNothing().when(runService).notify(runInputListener.capture());
     runOutputListener = ArgumentCaptor.forClass(JobOutputUpdate.class);
@@ -146,19 +152,18 @@ public class OpenLineageServiceIntegrationTest {
         jdbi.onDemand(NamespaceDao.class)
             .upsertNamespaceRow(UUID.randomUUID(), Instant.now(), NAMESPACE, "me");
     JobRow job =
-        jdbi.onDemand(JobDao.class)
-            .upsertJob(
-                UUID.randomUUID(),
-                JobType.BATCH,
-                Instant.now(),
-                namespace.getUuid(),
-                NAMESPACE,
-                "parentJob",
-                "description",
-                null,
-                null,
-                null,
-                null);
+        jobDao.upsertJob(
+            UUID.randomUUID(),
+            JobType.BATCH,
+            Instant.now(),
+            namespace.getUuid(),
+            NAMESPACE,
+            "parentJob",
+            "description",
+            null,
+            null,
+            null,
+            null);
     Map<String, String> runArgsMap = new HashMap<>();
     RunArgsRow argsRow =
         jdbi.onDemand(RunArgsDao.class)
@@ -380,6 +385,41 @@ public class OpenLineageServiceIntegrationTest {
         .hasSize(1)
         .map(DatasetVersionRow::getVersion)
         .contains(dsVersion1Id);
+  }
+
+  @Test
+  void testJobIsNotHiddenAfterSubsequentOLEvent() throws ExecutionException, InterruptedException {
+    String name = "aNotHiddenJob";
+
+    LineageEvent.LineageEventBuilder builder =
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .job(LineageEvent.Job.builder().name(name).namespace(NAMESPACE).build())
+            .eventTime(Instant.now().atZone(TIMEZONE))
+            .inputs(Collections.emptyList())
+            .outputs(Collections.emptyList());
+
+    lineageService
+        .createAsync(
+            builder
+                .run(new LineageEvent.Run(UUID.randomUUID().toString(), RunFacet.builder().build()))
+                .build())
+        .get();
+
+    assertThat(jobService.findJobByName(NAMESPACE, name)).isNotEmpty();
+
+    jobService.delete(NAMESPACE, name);
+
+    assertThat(jobService.findJobByName(NAMESPACE, name)).isEmpty();
+
+    lineageService
+        .createAsync(
+            builder
+                .run(new LineageEvent.Run(UUID.randomUUID().toString(), RunFacet.builder().build()))
+                .build())
+        .get();
+
+    assertThat(jobService.findJobByName(NAMESPACE, name)).isNotEmpty();
   }
 
   private void checkExists(LineageEvent.Dataset ds) {
