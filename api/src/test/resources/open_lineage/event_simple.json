@@ -6,7 +6,7 @@
   },
   "job": {
     "namespace": "my-scheduler-namespace",
-    "name": "myjob.mytask"
+    "name": "myjob"
   },
   "inputs": [
     {
