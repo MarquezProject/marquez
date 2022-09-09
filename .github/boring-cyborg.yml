@@ -1,0 +1,58 @@
+##### Labeler ##########################################################################################################
+# Enable "labeler" for your PR that would add labels to PRs based on the paths that are modified in the PR.
+labelPRBasedOnFilePath:
+  # Add 'api' to any changes within 'api' folder or any subfolders
+    api:
+      - api/**/*
+
+  # Add 'chart' to any changes within 'chart' folder or any subfolders
+    chart:
+      - chart/**/*
+
+  # Add 'docs' to any changes to `.md` files in root or within 'docs' folder, subfolders
+    docs:
+      - docs/**/*
+      - "*.md"
+
+  # Add 'client/java' to any changes within 'clients/java' folder or any subfolders
+    client/java:
+      - clients/java/**/*
+
+  # Add 'client/python' to any changes within 'clients/python' folder or any subfolders
+    client/python:
+      - clients/python/**/*
+
+  # Add 'docker' to any changes within 'docker' folder
+    docker:
+      - docker/*
+
+  # Add 'example' to any changes within 'examples' folder or any subfolders
+    example:
+      - examples/**/*
+
+  # Add 'proposal' to any changes within 'proposals' folder or any subfolders
+    proposal:
+      - proposals/**/*
+
+  # Add 'spec' to any changes within 'spec' folder
+    spec:
+      - spec/*
+
+  # Add 'web' to any changes within 'web' folder or any subfolders
+    web:
+      - web/**/*
+
+
+
+##### Greetings ########################################################################################################
+# Comment to be posted to welcome users when they open their first PR
+firstPRWelcomeComment: >
+  Thanks for opening your first pull request in the Marquez project! Please check out our contributing guidelines (https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md).
+
+# Comment to be posted to congratulate user on their first merged PR
+firstPRMergeComment: >
+  Great job! Congrats on your first merged pull request in the Marquez project!
+
+# Comment to be posted to on first time issues
+firstIssueWelcomeComment: >
+  Thanks for opening your first issue in the Marquez project! Please be sure to follow the issue template!

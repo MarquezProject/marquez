@@ -74,6 +74,15 @@ public interface JobDao extends BaseDao {
           """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
+  @SqlUpdate(
+      """
+    UPDATE jobs
+    SET is_hidden = true
+    WHERE namespace_name = :namespaceName
+    AND name = :name
+    """)
+  void delete(String namespaceName, String name);
+
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(

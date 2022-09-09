@@ -16,6 +16,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -158,6 +159,25 @@ public class JobResource extends BaseResource {
     final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @DELETE
+  @Path("/namespaces/{namespace}/jobs/{job}")
+  @Produces(APPLICATION_JSON)
+  public Response delete(
+      @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName) {
+    throwIfNotExists(namespaceName);
+
+    Job job =
+        jobService
+            .findJobByName(namespaceName.getValue(), jobName.getValue())
+            .orElseThrow(() -> new JobNotFoundException(jobName));
+
+    jobService.delete(namespaceName.getValue(), jobName.getValue());
+    return Response.ok(job).build();
   }
 
   @Timed

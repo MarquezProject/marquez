@@ -164,6 +164,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dataset'
+    delete:
+      operationId: deleteDataset
+      summary: Soft deletes dataset.
+      description: Soft deletes dataset. It will be un-deleted if new OpenLineage event containing this dataset comes.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/datasets/{dataset}/versions/{version}:
     parameters:
@@ -301,6 +314,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+    delete:
+      operationId: deleteJob
+      summary: Soft deletes job.
+      description: Soft deletes job. It will be un-deleted if new OpenLineage event containing this job comes.
+      tags:
+        - Datasets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
 
   /namespaces/{namespace}/jobs:
     parameters:
@@ -697,7 +723,9 @@ components:
       schema:
         type: string
         example: dataset:food_delivery:public.delivery_7_days
-      description: The ID of the node.
+      description: The ID of the node. A node can either be a dataset node or a job node. The format of
+        nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>` and for job is
+        `job:<namespace_of_the_job>:<name_of_the_job>`.
       required: true
 
     depth:
@@ -850,7 +878,7 @@ components:
             $ref: '#/components/schemas/Source'
 
     DatasetType:
-      type: enum
+      type: string
       enum: [DB_TABLE, STREAM]
       description: The type of dataset
 
@@ -1256,7 +1284,7 @@ components:
             $ref: '#/components/schemas/Tag'
 
     JobType:
-      type: enum
+      type: string
       enum: [BATCH, STREAM, SERVICE]
       description: The type of the job.
 
@@ -1690,7 +1718,7 @@ components:
             $ref: '#/components/schemas/GraphEdge'
 
     NodeType:
-      type: enum
+      type: string
       enum: [ JOB, DATASET ]
       description: The type of the diff node.
 
@@ -1768,11 +1796,13 @@ components:
           example: food_delivery
         nodeId:
           type: string
-          description: The ID of the dataset or job node.
-          example: dataset:food_delivery:public.delivery_7_days
+          description: The ID of the node. A node can either be a dataset node or a job node. The format of
+            nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>` and for job is
+            `job:<namespace_of_the_job>:<name_of_the_job>`.
+          example: 'dataset:food_delivery:public.delivery_7_days'
 
     SearchResultType:
-      type: enum
+      type: string
       enum: [DATASET, JOB]
       description: The type of search result.
       example: DATASET

@@ -27,22 +27,23 @@ public interface SearchDao {
    * @return A {@link SearchResult} object.
    */
   @SqlQuery(
-      "SELECT type, name, updated_at, namespace_name\n"
-          + "FROM (\n"
-          + "  SELECT 'DATASET' AS type, d.name, d.updated_at, d.namespace_name\n"
-          + "    FROM datasets AS d\n"
-          + "   WHERE  d.name ilike '%' || :query || '%'\n"
-          + "   UNION\n"
-          + "  SELECT DISTINCT ON (j.namespace_name, j.name) \n"
-          + "    'JOB' AS type, j.name, j.updated_at, j.namespace_name\n"
-          + "    FROM (SELECT namespace_name, name, unnest(COALESCE(aliases, Array[NULL]::varchar[])) AS alias, updated_at \n"
-          + "           FROM jobs_view WHERE symlink_target_uuid IS NULL\n"
-          + "           ORDER BY updated_at DESC) AS j\n"
-          + "   WHERE  j.name ilike '%' || :query || '%'\n"
-          + "   OR j.alias ilike '%' || :query || '%'\n"
-          + ") AS results\n"
-          + "WHERE type = :filter OR CAST(:filter AS TEXT) IS NULL\n"
-          + "ORDER BY :sort\n"
-          + "LIMIT :limit")
+      """
+      SELECT type, name, updated_at, namespace_name
+      FROM (
+        SELECT 'DATASET' AS type, d.name, d.updated_at, d.namespace_name
+          FROM datasets_view AS d
+         WHERE  d.name ilike '%' || :query || '%'
+         UNION
+        SELECT DISTINCT ON (j.namespace_name, j.name)\s
+          'JOB' AS type, j.name, j.updated_at, j.namespace_name
+          FROM (SELECT namespace_name, name, unnest(COALESCE(aliases, Array[NULL]::varchar[])) AS alias, updated_at\s
+                 FROM jobs_view WHERE symlink_target_uuid IS NULL
+                 ORDER BY updated_at DESC) AS j
+         WHERE  j.name ilike '%' || :query || '%'
+         OR j.alias ilike '%' || :query || '%'
+      ) AS results
+      WHERE type = :filter OR CAST(:filter AS TEXT) IS NULL
+      ORDER BY :sort
+      LIMIT :limit""")
   List<SearchResult> search(String query, SearchFilter filter, SearchSort sort, int limit);
 }

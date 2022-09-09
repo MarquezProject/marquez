@@ -23,20 +23,20 @@ public interface GraphqlDaos extends SqlObject {
    * Note: Use must use a non-map type for returning single entries because a type of Map is already
    * registered to jdbi.
    */
-  @SqlQuery("SELECT * FROM datasets WHERE uuid = :uuid ORDER BY updated_at")
+  @SqlQuery("SELECT * FROM datasets_view WHERE uuid = :uuid ORDER BY updated_at")
   RowMap<String, Object> getDataset(UUID uuid);
 
-  @SqlQuery("SELECT * FROM datasets")
+  @SqlQuery("SELECT * FROM datasets_view")
   List<RowMap<String, Object>> getDatasets();
 
   @SqlQuery(
-      "SELECT * FROM datasets where namespace_name = :namespaceName and datasets.name = :name")
+      "SELECT * FROM datasets_view where namespace_name = :namespaceName and datasets.name = :name")
   RowMap<String, Object> getDatasetByNamespaceAndName(String namespaceName, String name);
 
   @SqlQuery("SELECT * FROM jobs_view where namespace_name = :namespaceName and name = :name")
   RowMap<String, Object> getJobByNamespaceAndName(String namespaceName, String name);
 
-  @SqlQuery("SELECT * FROM datasets where namespace_name = :namespaceName and name = :name")
+  @SqlQuery("SELECT * FROM datasets_view where namespace_name = :namespaceName and name = :name")
   RowMap<String, Object> getDatasetsByNamespaceAndName(String namespaceName, String name);
 
   @SqlQuery("SELECT * FROM jobs_view")
@@ -56,10 +56,10 @@ public interface GraphqlDaos extends SqlObject {
   List<RowMap<String, Object>> getDatasetFieldsByTagUuid(UUID tagUuid);
 
   @SqlQuery(
-      "SELECT d.* FROM datasets d inner join datasets_tag_mapping m on m.dataset_uuid = d.uuid where tag_uuid = :uuid")
+      "SELECT d.* FROM datasets_view d inner join datasets_tag_mapping m on m.dataset_uuid = d.uuid where tag_uuid = :uuid")
   List<RowMap<String, Object>> getDatasetsByTagUuid(UUID tagUuid);
 
-  @SqlQuery("SELECT d.* from datasets d where source_uuid = :sourceUuid")
+  @SqlQuery("SELECT d.* from datasets_view d where source_uuid = :sourceUuid")
   List<RowMap<String, Object>> getDatasetsBySource(UUID sourceUuid);
 
   @SqlQuery("SELECT * from runs_view where uuid = :uuid")
@@ -108,11 +108,11 @@ public interface GraphqlDaos extends SqlObject {
   @SqlQuery("SELECT * from job_contexts where uuid = :uuid")
   RowMap<String, Object> getJobContext(UUID uuid);
 
-  @SqlQuery("SELECT * from datasets where namespace_uuid = :namespaceUuid")
+  @SqlQuery("SELECT * from datasets_view where namespace_uuid = :namespaceUuid")
   List<RowMap<String, Object>> getDatasetsByNamespace(UUID namespaceUuid);
 
   @SqlQuery(
-      "SELECT d.* from datasets d inner join job_versions_io_mapping m on m.dataset_uuid = d.uuid where m.job_version_uuid = :jobVersionUuid and io_type = :ioType")
+      "SELECT d.* from datasets_view d inner join job_versions_io_mapping m on m.dataset_uuid = d.uuid where m.job_version_uuid = :jobVersionUuid and io_type = :ioType")
   List<RowMap<String, Object>> getIOMappingByJobVersion(UUID jobVersionUuid, IoType ioType);
 
   @SqlQuery(
@@ -218,7 +218,7 @@ public interface GraphqlDaos extends SqlObject {
           left outer join (
               select io_out.job_version_uuid, jsonb_agg((SELECT x FROM (SELECT ds_in.name, ds_in.namespace_name as namespace,  o.out_agg as "inEdges", i.in_agg as "outEdges") AS x)) as agg
               from job_versions_io_mapping io_out
-              inner join datasets ds_in on ds_in.uuid = io_out.dataset_uuid
+              inner join datasets_view ds_in on ds_in.uuid = io_out.dataset_uuid
           -- output jobs for each input dataset
               left outer join (
                    select io_of_in.dataset_uuid, jsonb_agg((select x from (select j_of_in.name, j_of_in.namespace_name as namespace) as x)) as in_agg
@@ -244,7 +244,7 @@ public interface GraphqlDaos extends SqlObject {
           left outer join(
               select io_out.job_version_uuid, jsonb_agg((SELECT x FROM (SELECT ds_in.name, ds_in.namespace_name as namespace, o.out_agg as "inEdges", i.in_agg as "outEdges") AS x)) as agg
               from job_versions_io_mapping io_out
-              inner join datasets ds_in on ds_in.uuid = io_out.dataset_uuid
+              inner join datasets_view ds_in on ds_in.uuid = io_out.dataset_uuid
               -- output jobs for each output dataset
               left outer join (
                    select io_of_in.dataset_uuid, jsonb_agg((select x from (select j_of_in.name, j_of_in.namespace_name as namespace) as x)) as in_agg

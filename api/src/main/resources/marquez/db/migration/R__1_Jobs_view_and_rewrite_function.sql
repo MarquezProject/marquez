@@ -20,7 +20,8 @@ SELECT f.uuid,
        f.aliases
 FROM jobs_fqn f,
      jobs j
-WHERE j.uuid = f.uuid;
+WHERE j.uuid = f.uuid
+AND j.is_hidden IS FALSE;
 
 
 CREATE OR REPLACE FUNCTION rewrite_jobs_fqn_table() RETURNS TRIGGER AS

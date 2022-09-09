@@ -15,6 +15,10 @@
 
    ![](./docs/assets/images/new-release.png)
 
+# Release Cadence
+
+A release will be initiated on the 15th day of each month unless this falls on a Friday, Saturday, Sunday or US holiday, in which case the release will commence on the following business day.
+
 # Voting on Releases
 
 Anyone may request a new release of the project in the #general Slack channel.
