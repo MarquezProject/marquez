@@ -622,7 +622,7 @@ public interface OpenLineageDao extends BaseDao {
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
 
     List<ColumnLevelLineageRow> columnLineageRows = null;
-    if (ds.getFacets().getColumnLineage() != null) {
+    if (ds.getFacets() != null && ds.getFacets().getColumnLineage() != null) {
       columnLineageRows = new ArrayList<>();
       List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
           Optional.ofNullable(ds.getFacets())

@@ -43,31 +43,33 @@ public interface ColumnLevelLineageDao extends BaseDao {
       UUID datasetVersionUuid, String outputColumnName, String inputField);
 
   @SqlUpdate(
-      "INSERT INTO column_level_lineage ("
-          + "uuid, "
-          + "dataset_version_uuid, "
-          + "output_column_name, "
-          + "input_field, "
-          + "transformation_description, "
-          + "transformation_type, "
-          + "created_at, "
-          + "updated_at"
-          + ") VALUES ( "
-          + ":uuid, "
-          + ":dataset_version_uuid, "
-          + ":output_column_name, "
-          + ":input_field, "
-          + ":transformation_description, "
-          + ":transformation_type, "
-          + ":now, "
-          + ":now) "
-          + "ON CONFLICT (dataset_version_uuid, output_column_name, input_field) "
-          + "DO UPDATE SET "
-          + "input_field = EXCLUDED.input_field, "
-          + "transformation_description = EXCLUDED.transformation_description, "
-          + "transformation_type = EXCLUDED.transformation_type, "
-          + "updated_at = EXCLUDED.updated_at "
-          + "RETURNING *")
+      """
+          INSERT INTO column_level_lineage (
+          uuid,
+          dataset_version_uuid,
+          output_column_name,
+          input_field,
+          transformation_description,
+          transformation_type,
+          created_at,
+          updated_at
+          ) VALUES ( 
+          :uuid,
+          :dataset_version_uuid,
+          :output_column_name,
+          :input_field,
+          :transformation_description,
+          :transformation_type,
+          :now,
+          :now)
+          ON CONFLICT (dataset_version_uuid, output_column_name, input_field)
+          DO UPDATE SET
+          input_field = EXCLUDED.input_field,
+          transformation_description = EXCLUDED.transformation_description,
+          transformation_type = EXCLUDED.transformation_type,
+          updated_at = EXCLUDED.updated_at
+          RETURNING *
+          """)
   void doUpsertColumnLevelLineageRow(
       UUID uuid,
       UUID dataset_version_uuid,
