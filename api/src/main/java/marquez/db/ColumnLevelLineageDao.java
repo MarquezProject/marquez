@@ -53,7 +53,7 @@ public interface ColumnLevelLineageDao extends BaseDao {
           transformation_type,
           created_at,
           updated_at
-          ) VALUES ( 
+          ) VALUES (
           :uuid,
           :dataset_version_uuid,
           :output_column_name,
