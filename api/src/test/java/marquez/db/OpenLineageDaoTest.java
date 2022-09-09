@@ -22,6 +22,7 @@ import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.groups.Tuple;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,14 @@ class OpenLineageDaoTest {
 
   @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacet() {
+
+    final String OUTPUT_COLUMN = "output_column";
+    final String INPUT_NAMESPACE = "input_namespace";
+    final String INPUT_DATASET = "input_dataset";
+    final String INPUT_FIELD_NAME = "input_field_name";
+    final String TRANSFORMATION_TYPE = "transformation_type";
+    final String TRANSFORMATION_DESCRIPTION = "transformation_description";
+
     Dataset dataset =
         new Dataset(
             LineageTestUtils.NAMESPACE,
@@ -108,12 +117,12 @@ class OpenLineageDaoTest {
                         SCHEMA_URL,
                         Collections.singletonList(
                             new LineageEvent.ColumnLineageOutputColumn(
-                                "output_column",
+                                OUTPUT_COLUMN,
                                 Collections.singletonList(
                                     new LineageEvent.ColumnLineageInputField(
-                                        "namespace", "datasetname", "fieldname")),
-                                "transformation_description",
-                                "transformation_type"))))
+                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                TRANSFORMATION_DESCRIPTION,
+                                TRANSFORMATION_TYPE))))
                 .build());
 
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
@@ -128,6 +137,23 @@ class OpenLineageDaoTest {
                 .getColumnLineageRows())
         .size()
         .isEqualTo(1);
+
+    assertThat(
+            writeJob.getOutputs().get().stream().toList().stream()
+                .findAny()
+                .orElseThrow()
+                .getColumnLineageRows())
+        .extracting(
+            (ds) -> ds.getOutputColumnName(),
+            (ds) -> ds.getTransformationDescription(),
+            (ds) -> ds.getTransformationType(),
+            (ds) -> ds.getInputField())
+        .containsExactly(
+            Tuple.tuple(
+                OUTPUT_COLUMN,
+                TRANSFORMATION_DESCRIPTION,
+                TRANSFORMATION_TYPE,
+                String.join(".", INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)));
   }
 
   /**
