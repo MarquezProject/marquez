@@ -10,7 +10,6 @@ import lombok.experimental.Delegate;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.EventDao;
 import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
@@ -98,10 +97,5 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingLineageDao implements LineageDao {
     @Delegate private final LineageDao delegate;
-  }
-
-  @RequiredArgsConstructor
-  public static class DelegatingEventDao implements EventDao {
-    @Delegate private final EventDao delegate;
   }
 }

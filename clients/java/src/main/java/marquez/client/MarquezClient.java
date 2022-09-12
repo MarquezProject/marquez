@@ -38,9 +38,9 @@ import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobVersion;
+import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import marquez.client.models.RawLineageEvent;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -88,20 +88,20 @@ public class MarquezClient {
     this.http = http;
   }
 
-  public List<RawLineageEvent> listEvents() {
-    return listEvents(DEFAULT_LIMIT, DEFAULT_OFFSET);
+  public List<LineageEvent> listLineageEvents() {
+    return listLineageEvents(DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<RawLineageEvent> listEvents(int limit, int offset) {
+  public List<LineageEvent> listLineageEvents(int limit, int offset) {
     final String bodyAsJson = http.get(url.toEventUrl(limit, offset));
     return Events.fromJson(bodyAsJson).getValue();
   }
 
-  public List<RawLineageEvent> listEvents(String namespaceName) {
-    return listEvents(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  public List<LineageEvent> listLineageEvents(String namespaceName) {
+    return listLineageEvents(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
   }
 
-  public List<RawLineageEvent> listEvents(String namespaceName, int limit, int offset) {
+  public List<LineageEvent> listLineageEvents(String namespaceName, int limit, int offset) {
     final String bodyAsJson = http.get(url.toEventUrl(namespaceName, limit, offset));
     return Events.fromJson(bodyAsJson).getValue();
   }
@@ -560,10 +560,10 @@ public class MarquezClient {
   @Value
   @EqualsAndHashCode(callSuper = false)
   public static class Events extends ResultsPage {
-    @Getter List<RawLineageEvent> value;
+    @Getter List<LineageEvent> value;
 
     @JsonCreator
-    Events(@JsonProperty("events") final List<RawLineageEvent> value) {
+    Events(@JsonProperty("events") final List<LineageEvent> value) {
       this.value = ImmutableList.copyOf(value);
     }
 

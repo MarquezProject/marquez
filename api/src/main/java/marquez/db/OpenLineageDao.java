@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -55,6 +56,7 @@ import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
@@ -86,7 +88,56 @@ public interface OpenLineageDao extends BaseDao {
       String producer);
 
   @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
-  List<LineageEvent> findOlEventsByRunUuid(UUID runUuid);
+  List<LineageEvent> findLineageEventsByRunUuid(UUID runUuid);
+
+  @SqlQuery(
+      """
+  SELECT event
+  FROM lineage_events le
+  WHERE (le.event_time < :before
+  AND le.event_time >= :after)
+  ORDER BY le.event_time DESC
+  LIMIT :limit""")
+  List<LineageEvent> getAllLineageEvents(ZonedDateTime before, ZonedDateTime after, int limit);
+
+  /**
+   * This is a "hack" to get inputs/outputs namespace from jsonb column: <a
+   * href="https://github.com/jdbi/jdbi/issues/1510#issuecomment-485423083">explanation</a>
+   */
+  @SqlQuery(
+      """
+  WITH job_events AS (
+      SELECT le.event
+      FROM lineage_events le
+      WHERE le.job_namespace = :namespace
+      AND (le.event_time < :before
+      AND le.event_time >= :after)
+      ORDER BY le.event_time DESC
+  ), dataset_events AS (
+      SELECT le.event, le.event_time
+      FROM lineage_events le
+      JOIN dataset_versions dv on le.run_uuid = dv.run_uuid
+      JOIN datasets ds on dv.dataset_uuid = ds.uuid
+      JOIN namespaces n on ds.namespace_uuid = n.uuid
+      WHERE n.name = :namespace
+      AND (le.event_time < :before
+      AND le.event_time >= :after)
+      ORDER BY le.event_time DESC
+  )
+  SELECT le.event
+  FROM (
+      SELECT * FROM dataset_events
+      UNION ALL
+      SELECT * FROM job_events
+  ) le
+  ORDER BY le.event_time
+  LIMIT :limit
+  """)
+  List<LineageEvent> getLineageEventsByNamespace(
+      @Bind("namespace") String namespace,
+      @Bind("before") ZonedDateTime before,
+      @Bind("after") ZonedDateTime after,
+      @Bind("limit") int limit);
 
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);

@@ -11,7 +11,6 @@ import java.util.Map;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
 import marquez.service.DatasetVersionService;
-import marquez.service.EventService;
 import marquez.service.JobService;
 import marquez.service.LineageService;
 import marquez.service.NamespaceService;
@@ -54,8 +53,6 @@ public class ApiTestUtils {
             (SourceService) mocks.getOrDefault(SourceService.class, (mock(SourceService.class))))
         .datasetService(
             (DatasetService) mocks.getOrDefault(DatasetService.class, (mock(DatasetService.class))))
-        .eventService(
-            (EventService) mocks.getOrDefault(EventService.class, (mock(EventService.class))))
         .build();
   }
 }

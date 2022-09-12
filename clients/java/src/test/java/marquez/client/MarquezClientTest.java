@@ -80,9 +80,9 @@ import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
 import marquez.client.models.JsonGenerator;
+import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
-import marquez.client.models.RawLineageEvent;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -166,15 +166,15 @@ public class MarquezClientTest {
 
   // RAW LINEAGE EVENT
 
-  private static final RawLineageEvent RAW_LINEAGE_EVENT =
-      new RawLineageEvent(
+  private static final LineageEvent RAW_LINEAGE_EVENT =
+      new LineageEvent(
           "START",
           ZonedDateTime.now(ZoneId.of("UTC")),
           Collections.emptyMap(),
           Collections.emptyMap(),
           Collections.emptyList(),
           Collections.emptyList(),
-          "MQZ-CLIENT");
+          URI.create("http://localhost:8080"));
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -697,20 +697,20 @@ public class MarquezClientTest {
   @Test
   public void testListEvents() throws Exception {
     Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/events?limit=10&offset=0")))
+    when(http.get(buildUrlFor("/events/lineage?limit=10&offset=0")))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<RawLineageEvent> listEvents = client.listEvents(10, 0);
+    final List<LineageEvent> listEvents = client.listLineageEvents(10, 0);
     assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
   }
 
   @Test
   public void testListEventsWithNamespace() throws Exception {
     Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/events/%s?limit=10&offset=0", NAMESPACE_NAME)))
+    when(http.get(buildUrlFor("/namespace/%s/events/lineage?limit=10&offset=0", NAMESPACE_NAME)))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<RawLineageEvent> listEvents = client.listEvents(NAMESPACE_NAME, 10, 0);
+    final List<LineageEvent> listEvents = client.listLineageEvents(NAMESPACE_NAME, 10, 0);
     assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
   }
 

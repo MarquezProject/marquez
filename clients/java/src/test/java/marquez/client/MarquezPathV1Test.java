@@ -39,7 +39,8 @@ public class MarquezPathV1Test {
   @Test
   void testPath_eventUrl() {
     Assertions.assertEquals(
-        "/api/v1/events/s3%3A%2F%2Fbuckets", MarquezPathV1.eventPath("s3://buckets"));
+        "/api/v1/namespace/s3%3A%2F%2Fbuckets/events/lineage",
+        MarquezPathV1.lineageEventPath("s3://buckets"));
   }
 
   @Test

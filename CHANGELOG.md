@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.25.0...HEAD)
 * Add job/dataset soft delete API [`#2032`](https://github.com/MarquezProject/marquez/pull/2032)
+* Add new API for retrieving OpenLineage events [`#2070`](https://github.com/MarquezProject/marquez/pull/2070) [@mobuchowski](https://github.com/mobuchowski)
 
 ## [0.25.0](https://github.com/MarquezProject/marquez/compare/0.24.0...0.25.0) - 2022-08-08
 

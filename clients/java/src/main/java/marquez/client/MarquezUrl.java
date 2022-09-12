@@ -12,10 +12,10 @@ import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
 import static marquez.client.MarquezPathV1.datasetVersionPath;
-import static marquez.client.MarquezPathV1.eventPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
+import static marquez.client.MarquezPathV1.lineageEventPath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
 import static marquez.client.MarquezPathV1.listJobVersionsPath;
@@ -91,11 +91,11 @@ class MarquezUrl {
   }
 
   URL toEventUrl(int limit, int offset) {
-    return from(eventPath(), newQueryParamsWith(limit, offset));
+    return from(MarquezPathV1.lineageEventPath(), newQueryParamsWith(limit, offset));
   }
 
   URL toEventUrl(String namespaceName, int limit, int offset) {
-    return from(eventPath(namespaceName), newQueryParamsWith(limit, offset));
+    return from(lineageEventPath(namespaceName), newQueryParamsWith(limit, offset));
   }
 
   URL toSourceUrl(String sourceName) {

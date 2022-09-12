@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.sql.DataSource;
+import marquez.common.Utils;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.spi.JdbiPlugin;
+import org.jdbi.v3.jackson2.Jackson2Config;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -120,6 +122,8 @@ public abstract class JdbiExternalPostgresExtension
       jdbi.installPlugins();
     }
     plugins.forEach(jdbi::installPlugin);
+    jdbi.getConfig(Jackson2Config.class).setMapper(Utils.getMapper());
+
     handle = jdbi.open();
   }
 

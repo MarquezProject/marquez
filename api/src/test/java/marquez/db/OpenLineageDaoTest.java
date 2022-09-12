@@ -252,7 +252,7 @@ class OpenLineageDaoTest {
             Arrays.asList(),
             Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)));
 
-    List<LineageEvent> lineageEvents = dao.findOlEventsByRunUuid(writeJob.getRun().getUuid());
+    List<LineageEvent> lineageEvents = dao.findLineageEventsByRunUuid(writeJob.getRun().getUuid());
     assertThat(lineageEvents).hasSize(1);
 
     assertThat(lineageEvents.get(0).getEventType()).isEqualTo("COMPLETE");

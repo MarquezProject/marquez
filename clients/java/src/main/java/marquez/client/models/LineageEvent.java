@@ -5,18 +5,19 @@
 
 package marquez.client.models;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import lombok.Value;
 
 @Value
-public class RawLineageEvent {
+public class LineageEvent {
   String eventType;
   ZonedDateTime eventTime;
   Map<String, Object> run;
   Map<String, Object> job;
   List<Object> inputs;
   List<Object> outputs;
-  String producer;
+  URI producer;
 }

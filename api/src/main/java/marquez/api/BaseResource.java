@@ -28,7 +28,6 @@ import marquez.common.models.SourceName;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
 import marquez.service.DatasetVersionService;
-import marquez.service.EventService;
 import marquez.service.JobService;
 import marquez.service.LineageService;
 import marquez.service.NamespaceService;
@@ -51,7 +50,6 @@ public class BaseResource {
   protected DatasetVersionService datasetVersionService;
   protected DatasetFieldService datasetFieldService;
   protected LineageService lineageService;
-  protected EventService eventService;
 
   public BaseResource(ServiceFactory serviceFactory) {
     this.serviceFactory = serviceFactory;
@@ -65,7 +63,6 @@ public class BaseResource {
     this.datasetVersionService = serviceFactory.getDatasetVersionService();
     this.datasetFieldService = serviceFactory.getDatasetFieldService();
     this.lineageService = serviceFactory.getLineageService();
-    this.eventService = serviceFactory.getEventService();
   }
 
   void throwIfNotExists(@NonNull NamespaceName namespaceName) {

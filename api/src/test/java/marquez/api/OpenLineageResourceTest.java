@@ -17,6 +17,7 @@ import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
 import java.util.Map;
 import marquez.common.Utils;
+import marquez.db.OpenLineageDao;
 import marquez.service.LineageService;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Lineage;
@@ -32,6 +33,7 @@ class OpenLineageResourceTest {
 
   static {
     LineageService lineageService = mock(LineageService.class);
+    OpenLineageDao openLineageDao = mock(OpenLineageDao.class);
 
     Node testNode =
         Utils.fromJson(
@@ -44,7 +46,9 @@ class OpenLineageResourceTest {
         ApiTestUtils.mockServiceFactory(Map.of(LineageService.class, lineageService));
 
     UNDER_TEST =
-        ResourceExtension.builder().addResource(new OpenLineageResource(serviceFactory)).build();
+        ResourceExtension.builder()
+            .addResource(new OpenLineageResource(serviceFactory, openLineageDao))
+            .build();
   }
 
   @Test

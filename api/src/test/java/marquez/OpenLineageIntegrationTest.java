@@ -40,11 +40,10 @@ import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
-import marquez.client.models.RawLineageEvent;
+import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
-import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -104,13 +103,14 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     // Namespaces can't have emojis, so this will get rejected
     String badNamespace =
         "sqlserver://myhost:3342;user=auser;password=\uD83D\uDE02\uD83D\uDE02\uD83D\uDE02;database=TheDatabase";
-    LineageEvent event =
-        new LineageEvent(
+    marquez.service.models.LineageEvent event =
+        new marquez.service.models.LineageEvent(
             "COMPLETE",
             Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job("namespace", "job_name", null),
-            List.of(new LineageEvent.Dataset(badNamespace, "the_table", null)),
+            new marquez.service.models.LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new marquez.service.models.LineageEvent.Job("namespace", "job_name", null),
+            List.of(
+                new marquez.service.models.LineageEvent.Dataset(badNamespace, "the_table", null)),
             Collections.emptyList(),
             "the_producer");
 
@@ -372,18 +372,26 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testSendEventAndGetItBack() {
-    LineageEvent.Run run =
-        new LineageEvent.Run(UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build());
-    LineageEvent.Job job =
-        LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build();
-    LineageEvent.Dataset dataset =
-        LineageEvent.Dataset.builder().namespace(NAMESPACE_NAME).name(DB_TABLE_NAME).build();
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder().build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
+    marquez.service.models.LineageEvent.Dataset dataset =
+        marquez.service.models.LineageEvent.Dataset.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(DB_TABLE_NAME)
+            .build();
 
     // We're losing zone info on write, so I have to UTC it here to compare later
     ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
 
-    final LineageEvent lineageEvent =
-        LineageEvent.builder()
+    final marquez.service.models.LineageEvent lineageEvent =
+        marquez.service.models.LineageEvent.builder()
             .producer("testSendEventAndGetItBack")
             .eventType("COMPLETE")
             .run(run)
@@ -396,7 +404,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
     assertThat(resp.join()).isEqualTo(201);
 
-    List<RawLineageEvent> events = client.listEvents();
+    List<LineageEvent> events = client.listLineageEvents();
 
     assertThat(events.size()).isEqualTo(1);
 
@@ -407,15 +415,20 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testFindEventByDatasetNamespace() {
-    LineageEvent.Run run =
-        new LineageEvent.Run(UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build());
-    LineageEvent.Job job =
-        LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build();
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder().build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
 
     ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
 
-    LineageEvent.LineageEventBuilder builder =
-        LineageEvent.builder()
+    marquez.service.models.LineageEvent.LineageEventBuilder builder =
+        marquez.service.models.LineageEvent.builder()
             .producer("testFindEventByDatasetNamespace")
             .eventType("COMPLETE")
             .run(run)
@@ -424,25 +437,26 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .inputs(Collections.emptyList());
 
     for (int i = 0; i < 10; i++) {
-      LineageEvent.Dataset dataset =
-          LineageEvent.Dataset.builder()
+      marquez.service.models.LineageEvent.Dataset dataset =
+          marquez.service.models.LineageEvent.Dataset.builder()
               .namespace(String.format("namespace%d", i))
               .name(DB_TABLE_NAME)
               .build();
 
-      LineageEvent event = builder.outputs(Collections.singletonList(dataset)).build();
+      marquez.service.models.LineageEvent event =
+          builder.outputs(Collections.singletonList(dataset)).build();
 
       final CompletableFuture<Integer> resp = sendEvent(event);
       assertThat(resp.join()).isEqualTo(201);
     }
 
-    List<RawLineageEvent> rawEvents = client.listEvents("namespace3");
+    List<LineageEvent> rawEvents = client.listLineageEvents("namespace3");
 
-    LineageEvent thirdEvent =
+    marquez.service.models.LineageEvent thirdEvent =
         builder
             .outputs(
                 Collections.singletonList(
-                    LineageEvent.Dataset.builder()
+                    marquez.service.models.LineageEvent.Dataset.builder()
                         .namespace(String.format("namespace3"))
                         .name(DB_TABLE_NAME)
                         .build()))
@@ -456,35 +470,44 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testFindEventIsSortedByTime() {
-    LineageEvent.Run run =
-        new LineageEvent.Run(UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build());
-    LineageEvent.Job job =
-        LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build();
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder().build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
 
     ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
-    LineageEvent.Dataset dataset =
-        LineageEvent.Dataset.builder().namespace(NAMESPACE_NAME).name(DB_TABLE_NAME).build();
+    marquez.service.models.LineageEvent.Dataset dataset =
+        marquez.service.models.LineageEvent.Dataset.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(DB_TABLE_NAME)
+            .build();
 
-    LineageEvent.LineageEventBuilder builder =
-        LineageEvent.builder()
+    marquez.service.models.LineageEvent.LineageEventBuilder builder =
+        marquez.service.models.LineageEvent.builder()
             .producer("testFindEventIsSortedByTime")
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
             .outputs(Collections.singletonList(dataset));
 
-    LineageEvent firstEvent = builder.eventTime(time).eventType("START").build();
+    marquez.service.models.LineageEvent firstEvent =
+        builder.eventTime(time).eventType("START").build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
 
-    LineageEvent secondEvent =
+    marquez.service.models.LineageEvent secondEvent =
         builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
 
-    List<RawLineageEvent> rawEvents = client.listEvents(NAMESPACE_NAME);
+    List<LineageEvent> rawEvents = client.listLineageEvents(NAMESPACE_NAME);
 
     assertThat(rawEvents.size()).isEqualTo(2);
     ObjectMapper mapper = Utils.getMapper();
@@ -494,7 +517,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
   }
 
-  private CompletableFuture<Integer> sendEvent(LineageEvent event) {
+  private CompletableFuture<Integer> sendEvent(marquez.service.models.LineageEvent event) {
     return this.sendLineage(Utils.toJson(event))
         .thenApply(HttpResponse::statusCode)
         .whenComplete(
