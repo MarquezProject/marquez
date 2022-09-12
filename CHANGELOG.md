@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.25.0...HEAD)
+* Add job/dataset soft delete API [`#2032`](https://github.com/MarquezProject/marquez/pull/2032)
 
 ## [0.25.0](https://github.com/MarquezProject/marquez/compare/0.24.0...0.25.0) - 2022-08-08
 
