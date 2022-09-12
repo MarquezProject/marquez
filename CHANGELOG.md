@@ -9,7 +9,6 @@
     *Updates the FlywayFactory to support an argument to customize the schema programatically. Note: this change does not aim to support custom schemas from configuration.*
 * Add steps on proposing changes to Marquez [`#2065`](https://github.com/MarquezProject/marquez/pull/2065) [@wslulciuc](https://github.com/wslulciuc)  
     *Adds steps on how to submit a proposal for review along with a design doc template.*
-* Add job/dataset soft delete API [`#2032`](https://github.com/MarquezProject/marquez/pull/2032)
 * Add `--metadata` option to seed backend with ol events [`#2082`](https://github.com/MarquezProject/marquez/pull/2082) [@wslulciuc](https://github.com/wslulciuc)  
     *Updates the `seed` command to load metadata from a file containing an array of OpenLineage events via the `--metadata` option. (Metadata used in the command was not being defined using the OpenLineage standard.)*
 * Improve documentation on `nodeId` in the spec [`#2084`](https://github.com/MarquezProject/marquez/pull/2084) [@howardyoo](https://github.com/howardyoo)  
