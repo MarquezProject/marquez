@@ -156,6 +156,86 @@ class OpenLineageDaoTest {
                 String.join(".", INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)));
   }
 
+  @Test
+  /**
+   * When trying to insert new column level lineage data, do not create additional row if triad
+   * (dataset_version_uuid, output_column_name and input_field) is the same.
+   * Upsert instead.
+   */
+  void testUpsertColumnLineageData() {
+
+    final String OUTPUT_COLUMN = "output_column";
+    final String INPUT_NAMESPACE = "input_namespace";
+    final String INPUT_DATASET = "input_dataset";
+    final String INPUT_FIELD_NAME = "input_field_name";
+    final String TRANSFORMATION_TYPE = "transformation_type";
+    final String UPDATED_TRANSFORMATION_TYPE = "transformation_type";
+    final String TRANSFORMATION_DESCRIPTION = "transformation_description";
+    final String UPDATED_TRANSFORMATION_DESCRIPTION = "updated_transformation_description";
+
+    Dataset dataset =
+            new Dataset(
+                    LineageTestUtils.NAMESPACE,
+                    DATASET_NAME,
+                    LineageEvent.DatasetFacets.builder()
+                            .columnLineage(
+                                    new LineageEvent.ColumnLineageFacet(
+                                            PRODUCER_URL,
+                                            SCHEMA_URL,
+                                            Collections.singletonList(
+                                                    new LineageEvent.ColumnLineageOutputColumn(
+                                                            OUTPUT_COLUMN,
+                                                            Collections.singletonList(
+                                                                    new LineageEvent.ColumnLineageInputField(
+                                                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                                            TRANSFORMATION_DESCRIPTION,
+                                                            TRANSFORMATION_TYPE))))
+                            .build());
+
+    Dataset updateDataset =
+            new Dataset(
+                    LineageTestUtils.NAMESPACE,
+                    DATASET_NAME,
+                    LineageEvent.DatasetFacets.builder()
+                            .columnLineage(
+                                    new LineageEvent.ColumnLineageFacet(
+                                            PRODUCER_URL,
+                                            SCHEMA_URL,
+                                            Collections.singletonList(
+                                                    new LineageEvent.ColumnLineageOutputColumn(
+                                                            OUTPUT_COLUMN,
+                                                            Collections.singletonList(
+                                                                    new LineageEvent.ColumnLineageInputField(
+                                                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                                            UPDATED_TRANSFORMATION_DESCRIPTION,
+                                                            UPDATED_TRANSFORMATION_TYPE))))
+                            .build());
+
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob1 =
+            LineageTestUtils.createLineageRow(
+                    dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+    UpdateLineageRow writeJob2 =
+            LineageTestUtils.createLineageRow(
+                    dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(updateDataset));
+
+    // try to read with same inputs as writeJob1 and check if size=1
+    UpdateLineageRow readJob2 =
+            LineageTestUtils.createLineageRow(
+                    dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(dataset), Arrays.asList());
+
+    // only 1 row should be present (no multiple Optional<DatasetVersionRow> candidates)
+    assertThat(readJob2.getInputs()).isPresent().get().asList().size().isEqualTo(1);
+
+    // finally, test if upsert was successful
+    assertThat(readJob2.getInputs().get().get(0).getDatasetVersionRow())
+            .isNotEqualTo(writeJob1.getOutputs().get().get(0).getDatasetVersionRow());
+
+    assertThat(readJob2.getInputs().get().get(0).getDatasetVersionRow())
+            .isEqualTo(writeJob2.getOutputs().get().get(0).getDatasetVersionRow());
+  }
+
   /**
    * When reading a new dataset, a version is created and the dataset's current version is updated
    * immediately.
