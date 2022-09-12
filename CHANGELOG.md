@@ -24,6 +24,8 @@
     *Changes the lineage query to query the `job_versions_io_mapping` table and INNER join with the `jobs_view` so that only jobs that have inputs or outputs are present in the `jobs_io` CTE. Hence, the table becomes very small and the recursive join in the lineage CTE very fast. (In many environments, a large number of jobs reporting events have no inputs or outputs - e.g., PythonOperators in an Airflow deployment. If a Marquez installation has many of these, the lineage query spends much of its time searching for overlaps with jobs that have no inputs or outputs.)*
 * Persist OpenLineage event before updating Marquez model [`#2069`](https://github.com/MarquezProject/marquez/pull/2069) [@fm100](https://github.com/fm100)  
     *Switches the order of the code in order to persist the OpenLineage event first and then update the Marquez model. (When the `RunTransitionListener` was invoked, the OpenLineage event was not persisted to the database. Because the OpenLineage event is the source of truth for all Marquez run transitions, it should be available from `RunTransitionListener`.)*   
+* Drop requirement to provide marquez.yml for `seed` cmd [`#2094`](https://github.com/MarquezProject/marquez/pull/2094) [@wslulciuc](https://github.com/wslulciuc)  
+    *Use `io.dropwizard.cli.Command` instead of `io.dropwizard.cli.ConfiguredCommand` to no longer require passing marquez.yml as an argument to the `seed` cmd. (The marquez.yml argument is not used in the `seed` cmd.)*
 
 ### Fixed
 
@@ -33,8 +35,6 @@
     *Changes the type to `string`. (`type: enum` was not valid in OpenAPI spec.)*
 * Fix incorrect PostgresSQL version [`#2089`](https://github.com/MarquezProject/marquez/pull/2089) [@jabbera](https://github.com/jabbera)  
     *Corrects the tag for PostgresSQL.*
-* Drop requirement to provide marquez.yml for `seed` cmd [`#2094`](https://github.com/MarquezProject/marquez/pull/2094) [@wslulciuc](https://github.com/wslulciuc)  
-    *Use `io.dropwizard.cli.Command` instead of `io.dropwizard.cli.ConfiguredCommand` to no longer require passing marquez.yml as an argument to the `seed` cmd. (The marquez.yml argument is not used in the `seed` cmd.)*
 * Update `OpenLineageDao` to handle Airflow run UUID conflicts [`#2097`](https://github.com/MarquezProject/marquez/pull/2097) [@collado-mike](https://github.com/collado-mike)  
     *Alleviates the problem for Airflow installations that will continue to publish events with the older OpenLineage library. This checks the namespace of the parent run and verifies that it matches the namespace in the `ParentRunFacet`. If not, it generates a new parent run ID that will be written with the correct namespace. (The Airflow integration was generating conflicting UUIDs based on the DAG name and the DagRun ID without accounting for different namespaces. In Marquez installations that have multiple Airflow deployments with duplicated DAG names, we generated jobs whose parents have the wrong namespace.)* 
 
