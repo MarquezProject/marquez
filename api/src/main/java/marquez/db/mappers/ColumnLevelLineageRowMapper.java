@@ -1,6 +1,5 @@
 package marquez.db.mappers;
 
-import static marquez.db.Columns.INPUT_FIELD;
 import static marquez.db.Columns.TRANSFORMATION_DESCRIPTION;
 import static marquez.db.Columns.TRANSFORMATION_TYPE;
 import static marquez.db.Columns.stringOrThrow;
@@ -21,10 +20,9 @@ public class ColumnLevelLineageRowMapper implements RowMapper<ColumnLevelLineage
   public ColumnLevelLineageRow map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     return new ColumnLevelLineageRow(
-        uuidOrThrow(results, Columns.ROW_UUID),
-        uuidOrThrow(results, Columns.DATASET_VERSION_UUID),
-        stringOrThrow(results, Columns.OUTPUT_COLUMN_NAME),
-        stringOrThrow(results, INPUT_FIELD),
+        uuidOrThrow(results, Columns.OUTPUT_DATASET_VERSION_UUID),
+        uuidOrThrow(results, Columns.OUTPUT_DATASET_FIELD_UUID),
+        uuidOrThrow(results, Columns.INPUT_DATASET_FIELD_UUID),
         stringOrThrow(results, TRANSFORMATION_DESCRIPTION),
         stringOrThrow(results, TRANSFORMATION_TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),

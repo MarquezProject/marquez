@@ -127,8 +127,10 @@ public final class Columns {
   public static final String STATE = "state";
 
   /* COLUMN LEVEL LINEAGE ROW COLUMNS */
-  public static final String OUTPUT_COLUMN_NAME = "output_column_name";
-  public static final String INPUT_FIELD = "input_field";
+  public static final String FIELD_NAME = "field_name";
+  public static final String OUTPUT_DATASET_VERSION_UUID = "output_dataset_version_uuid";
+  public static final String OUTPUT_DATASET_FIELD_UUID = "output_dataset_field_uuid";
+  public static final String INPUT_DATASET_FIELD_UUID = "input_dataset_field_uuid";
   public static final String TRANSFORMATION_DESCRIPTION = "transformation_description";
   public static final String TRANSFORMATION_TYPE = "transformation_type";
 

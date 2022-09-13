@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -34,6 +36,7 @@ import marquez.db.models.ColumnLevelLineageRow;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.FieldData;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -605,6 +608,7 @@ public interface OpenLineageDao extends BaseDao {
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
+    List<DatasetFieldRow> datasetFields = new ArrayList<>();
     if (fields != null) {
       for (SchemaField field : fields) {
         DatasetFieldRow datasetFieldRow =
@@ -615,42 +619,12 @@ public interface OpenLineageDao extends BaseDao {
                 field.getType(),
                 field.getDescription(),
                 datasetRow.getUuid());
+        datasetFields.add(datasetFieldRow);
         datasetFieldMappings.add(
             new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
       }
     }
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
-
-    List<ColumnLevelLineageRow> columnLineageRows = null;
-    if (ds.getFacets() != null && ds.getFacets().getColumnLineage() != null) {
-      columnLineageRows = new ArrayList<>();
-      List<LineageEvent.ColumnLineageOutputColumn> columnLevelLineageOutputColumnsList =
-          Optional.ofNullable(ds.getFacets())
-              .map(DatasetFacets::getColumnLineage)
-              .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
-              .orElse(null);
-
-      if (columnLevelLineageOutputColumnsList != null) {
-        for (LineageEvent.ColumnLineageOutputColumn outputColumn :
-            columnLevelLineageOutputColumnsList) {
-          for (LineageEvent.ColumnLineageInputField inputField : outputColumn.getInputFields()) {
-            columnLineageRows.add(
-                columnLevelLineageDao.upsertColumnLevelLineageRow(
-                    UUID.randomUUID(),
-                    datasetVersionRow.getUuid(),
-                    outputColumn.getName(),
-                    String.format(
-                        "%s.%s.%s",
-                        inputField.getDatasetNamespace(),
-                        inputField.getDatasetName(),
-                        inputField.getFieldName()),
-                    outputColumn.getTransformationDescription(),
-                    outputColumn.getTransformationType(),
-                    now));
-          }
-        }
-      }
-    }
 
     if (isInput) {
       runDao.updateInputMapping(runUuid, datasetVersionRow.getUuid());
@@ -664,7 +638,75 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
+    List<ColumnLevelLineageRow> columnLineageRows = Collections.emptyList();
+    if (!isInput) {
+      columnLineageRows =
+          upsertColumnLineage(
+              runUuid,
+              ds,
+              now,
+              datasetFields,
+              columnLevelLineageDao,
+              datasetFieldDao,
+              datasetVersionRow);
+    }
+
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace, columnLineageRows);
+  }
+
+  // TODO: write more extensive tests to upsert column lineage
+  private List<ColumnLevelLineageRow> upsertColumnLineage(
+      UUID runUuid,
+      Dataset ds,
+      Instant now,
+      List<DatasetFieldRow> datasetFields,
+      ColumnLevelLineageDao columnLevelLineageDao,
+      DatasetFieldDao datasetFieldDao,
+      DatasetVersionRow datasetVersionRow) {
+    // get all the fields related to this particular run
+    List<FieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
+
+    return Optional.ofNullable(ds.getFacets())
+        .map(DatasetFacets::getColumnLineage)
+        .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+        .stream()
+        .flatMap(list -> list.stream())
+        .flatMap(
+            outputColumn -> {
+              Optional<DatasetFieldRow> outputField =
+                  datasetFields.stream()
+                      .filter(dfr -> dfr.getName().equals(outputColumn.getName()))
+                      .findAny(); // TODO: get rid of optional, break flow if output column not
+              // present
+
+              // get field uuids of input columns related to this run
+              List<UUID> inputFields =
+                  runFields.stream()
+                      .filter(
+                          fieldData ->
+                              outputColumn.getInputFields().stream()
+                                  .filter(
+                                      of ->
+                                          of.getDatasetNamespace().equals(fieldData.getNamespace())
+                                              && of.getDatasetName()
+                                                  .equals(fieldData.getDatasetName())
+                                              && of.getFieldName().equals(fieldData.getField()))
+                                  .findAny()
+                                  .isPresent())
+                      .map(fieldData -> fieldData.getDatasetFieldUuid())
+                      .collect(Collectors.toList());
+
+              return columnLevelLineageDao
+                  .upsertColumnLevelLineageRow(
+                      datasetVersionRow.getUuid(),
+                      outputField.get().getUuid(),
+                      inputFields,
+                      outputColumn.getTransformationDescription(),
+                      outputColumn.getTransformationType(),
+                      now)
+                  .stream();
+            })
+        .collect(Collectors.toList());
   }
 
   default String formatDatasetName(String name) {
