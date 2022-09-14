@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.25.0...HEAD)
 * Add job/dataset soft delete API [`#2032`](https://github.com/MarquezProject/marquez/pull/2032)
+* Store column lineage facets in separate table [`#2096`](https://github.com/MarquezProject/marquez/pull/2096) [@mzareba382](https://github.com/mzareba382) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 
 ## [0.25.0](https://github.com/MarquezProject/marquez/compare/0.24.0...0.25.0) - 2022-08-08
 

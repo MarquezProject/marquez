@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -654,7 +655,6 @@ public interface OpenLineageDao extends BaseDao {
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace, columnLineageRows);
   }
 
-  // TODO: write more extensive tests to upsert column lineage
   private List<ColumnLevelLineageRow> upsertColumnLineage(
       UUID runUuid,
       Dataset ds,
@@ -676,8 +676,15 @@ public interface OpenLineageDao extends BaseDao {
               Optional<DatasetFieldRow> outputField =
                   datasetFields.stream()
                       .filter(dfr -> dfr.getName().equals(outputColumn.getName()))
-                      .findAny(); // TODO: get rid of optional, break flow if output column not
-              // present
+                      .findAny();
+
+              if (outputField.isEmpty()) {
+                Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+                log.error(
+                    "Cannot produce column lineage for missing output field in output dataset: %s",
+                    outputColumn.getName());
+                return Stream.empty();
+              }
 
               // get field uuids of input columns related to this run
               List<UUID> inputFields =

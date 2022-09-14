@@ -127,8 +127,8 @@ public class ColumnLevelLineageDaoTest {
     assertEquals(outputDatasetFieldUuid, rows.get(0).getOutputDatasetFieldUuid());
     assertEquals(transformationDescription, rows.get(0).getTransformationDescription());
     assertEquals(transformationType, rows.get(0).getTransformationType());
-    assertEquals(now, rows.get(0).getCreatedAt());
-    assertEquals(now, rows.get(0).getUpdatedAt());
+    assertEquals(now.getEpochSecond(), rows.get(0).getCreatedAt().getEpochSecond());
+    assertEquals(now.getEpochSecond(), rows.get(0).getUpdatedAt().getEpochSecond());
   }
 
   @Test
@@ -169,6 +169,6 @@ public class ColumnLevelLineageDaoTest {
 
     // make sure there is one row with updatedAt modified
     assertEquals(1, rows.size());
-    assertEquals(now.plusSeconds(1000), rows.get(0).getUpdatedAt());
+    assertEquals(now.plusSeconds(1000).getEpochSecond(), rows.get(0).getUpdatedAt().getEpochSecond());
   }
 }

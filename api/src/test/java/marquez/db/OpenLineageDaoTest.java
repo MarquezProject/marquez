@@ -8,6 +8,7 @@ package marquez.db;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +36,13 @@ class OpenLineageDaoTest {
   public static final String WRITE_JOB_NAME = "writeJobName";
   public static final String READ_JOB_NAME = "readJobName";
   public static final String DATASET_NAME = "theDataset";
+
+  public static final String OUTPUT_COLUMN = "output_column";
+  public static final String INPUT_NAMESPACE = "input_namespace";
+  public static final String INPUT_DATASET = "input_dataset";
+  public static final String INPUT_FIELD_NAME = "input_field_name";
+  public static final String TRANSFORMATION_TYPE = "transformation_type";
+  public static final String TRANSFORMATION_DESCRIPTION = "transformation_description";
 
   private static OpenLineageDao dao;
   private static DatasetFieldDao datasetFieldDao;
@@ -101,49 +109,6 @@ class OpenLineageDaoTest {
 
   @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacet() {
-    final String OUTPUT_COLUMN = "output_column";
-    final String INPUT_NAMESPACE = "input_namespace";
-    final String INPUT_DATASET = "input_dataset";
-    final String INPUT_FIELD_NAME = "input_field_name";
-    final String TRANSFORMATION_TYPE = "transformation_type";
-    final String TRANSFORMATION_DESCRIPTION = "transformation_description";
-
-    Dataset inputDataset =
-        new Dataset(
-            INPUT_NAMESPACE,
-            INPUT_DATASET,
-            LineageEvent.DatasetFacets.builder()
-                .schema(
-                    new SchemaDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Arrays.asList(new SchemaField(INPUT_FIELD_NAME, "STRING", "my name"))))
-                .build());
-
-    Dataset outputDataset =
-        new Dataset(
-            LineageTestUtils.NAMESPACE,
-            DATASET_NAME,
-            LineageEvent.DatasetFacets.builder()
-                .schema(
-                    new SchemaDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
-                .columnLineage(
-                    new LineageEvent.ColumnLineageFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Collections.singletonList(
-                            new LineageEvent.ColumnLineageOutputColumn(
-                                OUTPUT_COLUMN,
-                                Collections.singletonList(
-                                    new LineageEvent.ColumnLineageInputField(
-                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
-                                TRANSFORMATION_DESCRIPTION,
-                                TRANSFORMATION_TYPE))))
-                .build());
-
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -151,8 +116,8 @@ class OpenLineageDaoTest {
             WRITE_JOB_NAME,
             "COMPLETE",
             jobFacet,
-            Arrays.asList(inputDataset),
-            Arrays.asList(outputDataset));
+            Arrays.asList(getInputDataset()),
+            Arrays.asList(getOutputDatasetWithColumnLineage()));
 
     UUID inputDatasetVersion = writeJob.getInputs().get().get(0).getDatasetVersionRow().getUuid();
     UUID outputDatasetVersion = writeJob.getOutputs().get().get(0).getDatasetVersionRow().getUuid();
@@ -193,42 +158,28 @@ class OpenLineageDaoTest {
   }
 
   @Test
-  /**
-   * When trying to insert new column level lineage data, do not create additional row if triad
-   * (dataset_version_uuid, output_column_name and input_field) is the same. Upsert instead.
-   */
-  void testUpsertColumnLineageData() {
-    final String OUTPUT_COLUMN = "output_column";
-    final String INPUT_NAMESPACE = "input_namespace";
-    final String INPUT_DATASET = "input_dataset";
-    final String INPUT_FIELD_NAME = "input_field_name";
-    final String TRANSFORMATION_TYPE = "transformation_type";
-    final String UPDATED_TRANSFORMATION_TYPE = "transformation_type";
-    final String TRANSFORMATION_DESCRIPTION = "transformation_description";
-    final String UPDATED_TRANSFORMATION_DESCRIPTION = "updated_transformation_description";
+  void testUpdateMarquezModelDatasetWithColumnLineageFacetWhenInputFieldDoesNotExist() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Collections.emptyList(),
+            Arrays.asList(getOutputDatasetWithColumnLineage()));
 
-    Dataset inputDataset =
-        new Dataset(
-            INPUT_NAMESPACE,
-            INPUT_DATASET,
-            LineageEvent.DatasetFacets.builder()
-                .schema(
-                    new SchemaDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Arrays.asList(new SchemaField(INPUT_FIELD_NAME, "STRING", "my name"))))
-                .build());
+    // make sure no column lineage was written
+    assertEquals(0, writeJob.getOutputs().get().get(0).getColumnLineageRows().size());
+  }
 
-    Dataset dataset =
+  @Test
+  void testUpdateMarquezModelDatasetWithColumnLineageFacetWhenOutputFieldDoesNotExist() {
+    Dataset outputDatasetWithoutOutputFieldSchema =
         new Dataset(
             LineageTestUtils.NAMESPACE,
             DATASET_NAME,
-            LineageEvent.DatasetFacets.builder()
-                .schema(
-                    new SchemaDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
+            LineageEvent.DatasetFacets.builder() // schema is missing
                 .columnLineage(
                     new LineageEvent.ColumnLineageFacet(
                         PRODUCER_URL,
@@ -242,6 +193,32 @@ class OpenLineageDaoTest {
                                 TRANSFORMATION_DESCRIPTION,
                                 TRANSFORMATION_TYPE))))
                 .build());
+
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(getInputDataset()),
+            Arrays.asList(outputDatasetWithoutOutputFieldSchema));
+
+    // make sure no column lineage was written
+    assertEquals(0, writeJob.getOutputs().get().get(0).getColumnLineageRows().size());
+  }
+
+  @Test
+  /**
+   * When trying to insert new column level lineage data, do not create additional row if triad
+   * (dataset_version_uuid, output_column_name and input_field) is the same. Upsert instead.
+   */
+  void testUpsertColumnLineageData() {
+    final String UPDATED_TRANSFORMATION_TYPE = "transformation_type";
+    final String UPDATED_TRANSFORMATION_DESCRIPTION = "updated_transformation_description";
+
+    Dataset inputDataset = getInputDataset();
+    Dataset dataset = getOutputDatasetWithColumnLineage();
 
     Dataset updateDataset =
         new Dataset(
@@ -470,5 +447,43 @@ class OpenLineageDaoTest {
     assertThat(job)
         .extracting("namespace", "name")
         .contains(LineageTestUtils.NAMESPACE, WRITE_JOB_NAME);
+  }
+
+  private Dataset getInputDataset() {
+    return new Dataset(
+        INPUT_NAMESPACE,
+        INPUT_DATASET,
+        LineageEvent.DatasetFacets.builder()
+            .schema(
+                new SchemaDatasetFacet(
+                    PRODUCER_URL,
+                    SCHEMA_URL,
+                    Arrays.asList(new SchemaField(INPUT_FIELD_NAME, "STRING", "my name"))))
+            .build());
+  }
+
+  private Dataset getOutputDatasetWithColumnLineage() {
+    return new Dataset(
+        LineageTestUtils.NAMESPACE,
+        DATASET_NAME,
+        LineageEvent.DatasetFacets.builder()
+            .schema(
+                new SchemaDatasetFacet(
+                    PRODUCER_URL,
+                    SCHEMA_URL,
+                    Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
+            .columnLineage(
+                new LineageEvent.ColumnLineageFacet(
+                    PRODUCER_URL,
+                    SCHEMA_URL,
+                    Collections.singletonList(
+                        new LineageEvent.ColumnLineageOutputColumn(
+                            OUTPUT_COLUMN,
+                            Collections.singletonList(
+                                new LineageEvent.ColumnLineageInputField(
+                                    INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                            TRANSFORMATION_DESCRIPTION,
+                            TRANSFORMATION_TYPE))))
+            .build());
   }
 }
