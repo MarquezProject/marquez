@@ -140,11 +140,6 @@ public interface DatasetDao extends BaseDao {
   Optional<DatasetRow> getUuid(String namespaceName, String datasetName);
 
   @SqlQuery(
-      "SELECT * FROM datasets_view WHERE name = :datasetName AND namespace_name = :namespaceName")
-  List<DatasetRow> getUuids(
-      String namespaceName, String datasetName); // TOOD: write test to this method
-
-  @SqlQuery(
       """
       WITH selected_datasets AS (
           SELECT d.*

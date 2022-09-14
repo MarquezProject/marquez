@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -36,6 +37,7 @@ class OpenLineageDaoTest {
   public static final String DATASET_NAME = "theDataset";
 
   private static OpenLineageDao dao;
+  private static DatasetFieldDao datasetFieldDao;
   private final DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
           new SchemaField("name", "STRING", "my name"), new SchemaField("age", "INT", "my age"));
@@ -43,6 +45,7 @@ class OpenLineageDaoTest {
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     dao = jdbi.onDemand(OpenLineageDao.class);
+    datasetFieldDao = jdbi.onDemand(DatasetFieldDao.class);
   }
 
   /** When reading a dataset, the version is assumed to be the version last written */
@@ -151,6 +154,9 @@ class OpenLineageDaoTest {
             Arrays.asList(inputDataset),
             Arrays.asList(outputDataset));
 
+    UUID inputDatasetVersion = writeJob.getInputs().get().get(0).getDatasetVersionRow().getUuid();
+    UUID outputDatasetVersion = writeJob.getOutputs().get().get(0).getDatasetVersionRow().getUuid();
+
     assertThat(
             writeJob.getOutputs().get().stream().toList().stream()
                 .findAny()
@@ -165,15 +171,25 @@ class OpenLineageDaoTest {
                 .orElseThrow()
                 .getColumnLineageRows())
         .extracting(
-            // (ds) -> ds.getOutputColumnName(), // TODO: fix test
-            (ds) -> ds.getTransformationDescription(), (ds) -> ds.getTransformationType())
-        // (ds) -> ds.getInputField())
+            (ds) -> ds.getInputDatasetFieldUuid(),
+            (ds) -> ds.getOutputDatasetFieldUuid(),
+            (ds) -> ds.getOutputDatasetVersionUuid(),
+            (ds) -> ds.getTransformationDescription(),
+            (ds) -> ds.getTransformationType())
         .containsExactly(
             Tuple.tuple(
-                // OUTPUT_COLUMN,
-                TRANSFORMATION_DESCRIPTION, TRANSFORMATION_TYPE
-                // String.join(".", INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)
-                ));
+                datasetFieldDao
+                    .findUuid(
+                        writeJob.getInputs().get().get(0).getDatasetRow().getUuid(),
+                        INPUT_FIELD_NAME)
+                    .get(),
+                datasetFieldDao
+                    .findUuid(
+                        writeJob.getOutputs().get().get(0).getDatasetRow().getUuid(), OUTPUT_COLUMN)
+                    .get(),
+                writeJob.getOutputs().get().get(0).getDatasetVersionRow().getUuid(),
+                TRANSFORMATION_DESCRIPTION,
+                TRANSFORMATION_TYPE));
   }
 
   @Test
@@ -182,7 +198,6 @@ class OpenLineageDaoTest {
    * (dataset_version_uuid, output_column_name and input_field) is the same. Upsert instead.
    */
   void testUpsertColumnLineageData() {
-
     final String OUTPUT_COLUMN = "output_column";
     final String INPUT_NAMESPACE = "input_namespace";
     final String INPUT_DATASET = "input_dataset";
@@ -192,13 +207,28 @@ class OpenLineageDaoTest {
     final String TRANSFORMATION_DESCRIPTION = "transformation_description";
     final String UPDATED_TRANSFORMATION_DESCRIPTION = "updated_transformation_description";
 
-    // TODO: input dataset is never created, isn'it ?
+    Dataset inputDataset =
+        new Dataset(
+            INPUT_NAMESPACE,
+            INPUT_DATASET,
+            LineageEvent.DatasetFacets.builder()
+                .schema(
+                    new SchemaDatasetFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Arrays.asList(new SchemaField(INPUT_FIELD_NAME, "STRING", "my name"))))
+                .build());
 
     Dataset dataset =
         new Dataset(
             LineageTestUtils.NAMESPACE,
             DATASET_NAME,
             LineageEvent.DatasetFacets.builder()
+                .schema(
+                    new SchemaDatasetFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
                 .columnLineage(
                     new LineageEvent.ColumnLineageFacet(
                         PRODUCER_URL,
@@ -218,6 +248,11 @@ class OpenLineageDaoTest {
             LineageTestUtils.NAMESPACE,
             DATASET_NAME,
             LineageEvent.DatasetFacets.builder()
+                .schema(
+                    new SchemaDatasetFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
                 .columnLineage(
                     new LineageEvent.ColumnLineageFacet(
                         PRODUCER_URL,
@@ -235,7 +270,12 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob1 =
         LineageTestUtils.createLineageRow(
-            dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(inputDataset),
+            Arrays.asList(dataset));
 
     UpdateLineageRow writeJob2 =
         LineageTestUtils.createLineageRow(
@@ -243,7 +283,7 @@ class OpenLineageDaoTest {
             WRITE_JOB_NAME,
             "COMPLETE",
             jobFacet,
-            Arrays.asList(),
+            Arrays.asList(inputDataset),
             Arrays.asList(updateDataset));
 
     // try to read with same inputs as writeJob1 and check if size=1
