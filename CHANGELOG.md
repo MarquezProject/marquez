@@ -5,8 +5,8 @@
 
 ### Added
 
-* Update FlywayFactory to support custom schema [`#2055`](https://github.com/MarquezProject/marquez/pull/2055) [@collado-mike](https://github.com/collado-mike)   
-    *Updates the FlywayFactory to support an argument to customize the schema programatically. Note: this change does not aim to support custom schemas from configuration.*
+* Update FlywayFactory to support an argument to customize the schema programatically [`#2055`](https://github.com/MarquezProject/marquez/pull/2055) [@collado-mike](https://github.com/collado-mike)   
+    *Note: this change does not aim to support custom schemas from configuration.*
 * Add steps on proposing changes to Marquez [`#2065`](https://github.com/MarquezProject/marquez/pull/2065) [@wslulciuc](https://github.com/wslulciuc)  
     *Adds steps on how to submit a proposal for review along with a design doc template.*
 * Add `--metadata` option to seed backend with ol events [`#2082`](https://github.com/MarquezProject/marquez/pull/2082) [@wslulciuc](https://github.com/wslulciuc)  
