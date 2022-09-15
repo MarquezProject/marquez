@@ -17,6 +17,10 @@
     *Adds cmd `metadata` to generate OpenLineage events; generated events will be saved to a file called `metadata.json` that can be used to seed Marquez via the `seed` cmd. (We lacked a way to performance test the data model of Marquez with significantly large OL events.)*
 * Add possibility to soft-delete datasets and jobs [`#2032`](https://github.com/MarquezProject/marquez/pull/2032) [`#2099`](https://github.com/MarquezProject/marquez/pull/2099) [`#2101`](https://github.com/MarquezProject/marquez/pull/2101) [@mobuchowski](https://github.com/mobuchowski)  
     *Adds the ability to "hide" inactive datasets and jobs through the UI. (This PR does not include the UI part.) The feature works by adding an `is_hidden` flag to both datasets and jobs tables. Then, it changes `jobs_view` and adds `datasets_view`, which hides rows where the `is_hidden` flag is set to True. This makes writing proper queries easier since there is no need to do this filtering manually. The soft-delete is reversed if the job or dataset is updated again because the new version reverts the flag.*
+* Add raw OpenLineage events API [`#2070`](https://github.com/MarquezProject/marquez/pull/2070) [@mobuchowski](https://github.com/mobuchowski)  
+    *Adds an API that returns raw OpenLineage events sorted by time and optionally filtered by namespace. Filtering by namespace takes into account both job and dataset namespaces*
+* Create column lineage endpoint proposal [`#2077`](https://github.com/MarquezProject/marquez/pull/2077) [@julienledem](https://github.com/julienledem) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds a proposal to implement a column-level lineage endpoint in Marquez to leverage the column-level lineage facet in OpenLineage.*
 
 ### Changed
 
@@ -26,6 +30,8 @@
     *Switches the order of the code in order to persist the OpenLineage event first and then update the Marquez model. (When the `RunTransitionListener` was invoked, the OpenLineage event was not persisted to the database. Because the OpenLineage event is the source of truth for all Marquez run transitions, it should be available from `RunTransitionListener`.)*   
 * Drop requirement to provide marquez.yml for `seed` cmd [`#2094`](https://github.com/MarquezProject/marquez/pull/2094) [@wslulciuc](https://github.com/wslulciuc)  
     *Use `io.dropwizard.cli.Command` instead of `io.dropwizard.cli.ConfiguredCommand` to no longer require passing marquez.yml as an argument to the `seed` cmd. (The marquez.yml argument is not used in the `seed` cmd.)*
+* Deletes: "undelete" job on subsequent OpenLineage event [`#2101`](https://github.com/MarquezProject/marquez/pull/2101) [@mobuchowski](https://github.com/mobuchowski)  
+    *Changes the Postgres function that modifies `jobs_view` to clear the soft delete flag from the jobs table upon receipt of another event referencing the same job.*
 
 ### Fixed
 
