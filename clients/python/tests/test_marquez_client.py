@@ -30,6 +30,7 @@ DESCRIPTION = 'test description'
 TAG_NAME = 'test'
 TAGS = [TAG_NAME]
 VERSION = str(uuid.uuid4())
+PRODUCER = 'marquez-client'
 
 # NAMESPACE
 NAMESPACE_NAME = 'test-namespace'
@@ -221,6 +222,21 @@ TAG_LIST = {
     'tags': [{TAG_NAME: DESCRIPTION}, {TAG_NAME2: TAG_DESCRIPTION2}]
 }
 
+EVENT = {
+    'eventType': "START",
+    'eventTime': NOW_AS_ISO,
+    'run': {
+        'runId': RUN_ID
+    },
+    'job': {
+        'name': JOB_NAME,
+        'namespace': NAMESPACE_NAME
+    },
+    'inputs': [],
+    'outputs': [],
+    'producer': PRODUCER
+}
+
 
 @pytest.fixture
 def client():
@@ -286,6 +302,25 @@ def test_list_namespaces(mock_get, client):
 
     mock_get.assert_called_once_with(
         url=client._url('/namespaces'),
+        params={
+            'limit': DEFAULT_LIMIT,
+            'offset': DEFAULT_OFFSET
+        },
+        headers=mock.ANY,
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.get')
+def test_list_events(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = [EVENT]
+
+    events = client.list_events(NAMESPACE_NAME)
+
+    assert len(events) == 1
+    mock_get.assert_called_once_with(
+        url=client._url('/events/' + NAMESPACE_NAME),
         params={
             'limit': DEFAULT_LIMIT,
             'offset': DEFAULT_OFFSET

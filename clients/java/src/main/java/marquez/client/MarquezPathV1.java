@@ -72,6 +72,10 @@ class MarquezPathV1 {
     return path("/namespaces/%s", namespaceName);
   }
 
+  static String lineageEventPath() {
+    return path("/events/lineage");
+  }
+
   static String sourcePath(String sourceName) {
     return path("/sources/%s", sourceName);
   }

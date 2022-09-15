@@ -71,7 +71,6 @@ public final class MarquezContext {
   @Getter private final OpenLineageDao openLineageDao;
   @Getter private final LineageDao lineageDao;
   @Getter private final SearchDao searchDao;
-
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
   @Getter private final NamespaceService namespaceService;
@@ -82,7 +81,6 @@ public final class MarquezContext {
   @Getter private final RunService runService;
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
-
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
@@ -90,7 +88,6 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final SearchResource searchResource;
-
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
@@ -150,7 +147,7 @@ public final class MarquezContext {
     this.datasetResource = new DatasetResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao);
     this.tagResource = new TagResource(serviceFactory);
-    this.openLineageResource = new OpenLineageResource(serviceFactory);
+    this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
 
     this.resources =

@@ -39,6 +39,8 @@ import marquez.tracing.TracingServletFilter;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
+import org.jdbi.v3.jackson2.Jackson2Config;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
@@ -154,12 +156,14 @@ public final class MarquezApp extends Application<MarquezConfig> {
         factory
             .build(env, config.getDataSourceFactory(), source, DB_POSTGRES)
             .installPlugin(new SqlObjectPlugin())
-            .installPlugin(new PostgresPlugin());
+            .installPlugin(new PostgresPlugin())
+            .installPlugin(new Jackson2Plugin());
     SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
     if (isSentryEnabled(config)) {
       sqlLogger = new TracingSQLLogger(sqlLogger);
     }
     jdbi.setSqlLogger(sqlLogger);
+    jdbi.getConfig(Jackson2Config.class).setMapper(Utils.getMapper());
 
     final MarquezContext context =
         MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
