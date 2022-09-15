@@ -7,6 +7,7 @@ package marquez.service.models;
 
 public enum NodeType {
   DATASET,
+  DATASET_FIELD,
   JOB,
   RUN;
 }

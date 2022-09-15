@@ -52,6 +52,10 @@ public final class Node implements Comparable<Node> {
     return new Builder(NodeType.DATASET);
   }
 
+  public static Builder datasetField() {
+    return new Builder(NodeType.DATASET_FIELD);
+  }
+
   public static Builder job() {
     return new Builder(NodeType.JOB);
   }
