@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import marquez.client.MarquezClient;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
@@ -414,61 +416,6 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testFindEventByDatasetNamespace() {
-    marquez.service.models.LineageEvent.Run run =
-        new marquez.service.models.LineageEvent.Run(
-            UUID.randomUUID().toString(),
-            marquez.service.models.LineageEvent.RunFacet.builder().build());
-    marquez.service.models.LineageEvent.Job job =
-        marquez.service.models.LineageEvent.Job.builder()
-            .namespace(NAMESPACE_NAME)
-            .name(JOB_NAME)
-            .build();
-
-    ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
-
-    marquez.service.models.LineageEvent.LineageEventBuilder builder =
-        marquez.service.models.LineageEvent.builder()
-            .producer("testFindEventByDatasetNamespace")
-            .eventType("COMPLETE")
-            .run(run)
-            .job(job)
-            .eventTime(time)
-            .inputs(Collections.emptyList());
-
-    for (int i = 0; i < 10; i++) {
-      marquez.service.models.LineageEvent.Dataset dataset =
-          marquez.service.models.LineageEvent.Dataset.builder()
-              .namespace(String.format("namespace%d", i))
-              .name(DB_TABLE_NAME)
-              .build();
-
-      marquez.service.models.LineageEvent event =
-          builder.outputs(Collections.singletonList(dataset)).build();
-
-      final CompletableFuture<Integer> resp = sendEvent(event);
-      assertThat(resp.join()).isEqualTo(201);
-    }
-
-    List<LineageEvent> rawEvents = client.listLineageEvents("namespace3");
-
-    marquez.service.models.LineageEvent thirdEvent =
-        builder
-            .outputs(
-                Collections.singletonList(
-                    marquez.service.models.LineageEvent.Dataset.builder()
-                        .namespace(String.format("namespace3"))
-                        .name(DB_TABLE_NAME)
-                        .build()))
-            .build();
-
-    assertThat(rawEvents.size()).isEqualTo(1);
-    ObjectMapper mapper = Utils.getMapper();
-    assertThat((JsonNode) mapper.valueToTree(thirdEvent))
-        .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
-  }
-
-  @Test
   public void testFindEventIsSortedByTime() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -507,12 +454,114 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
 
-    List<LineageEvent> rawEvents = client.listLineageEvents(NAMESPACE_NAME);
+    List<LineageEvent> rawEvents = client.listLineageEvents();
 
     assertThat(rawEvents.size()).isEqualTo(2);
     ObjectMapper mapper = Utils.getMapper();
     assertThat((JsonNode) mapper.valueToTree(firstEvent))
         .isEqualTo(mapper.valueToTree(rawEvents.get(1)));
+    assertThat((JsonNode) mapper.valueToTree(secondEvent))
+        .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
+  }
+
+  @Test
+  public void testFindEventIsSortedByTimeAsc() {
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder().build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
+
+    ZonedDateTime time = ZonedDateTime.now(ZoneId.of("UTC"));
+    marquez.service.models.LineageEvent.Dataset dataset =
+        marquez.service.models.LineageEvent.Dataset.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(DB_TABLE_NAME)
+            .build();
+
+    marquez.service.models.LineageEvent.LineageEventBuilder builder =
+        marquez.service.models.LineageEvent.builder()
+            .producer("testFindEventIsSortedByTime")
+            .run(run)
+            .job(job)
+            .inputs(Collections.emptyList())
+            .outputs(Collections.singletonList(dataset));
+
+    marquez.service.models.LineageEvent firstEvent =
+        builder.eventTime(time).eventType("START").build();
+
+    CompletableFuture<Integer> resp = sendEvent(firstEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    marquez.service.models.LineageEvent secondEvent =
+        builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
+
+    resp = sendEvent(secondEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<LineageEvent> rawEvents = client.listLineageEvents(MarquezClient.SortDirection.ASC, 10);
+
+    assertThat(rawEvents.size()).isEqualTo(2);
+    ObjectMapper mapper = Utils.getMapper();
+    assertThat((JsonNode) mapper.valueToTree(firstEvent))
+        .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
+    assertThat((JsonNode) mapper.valueToTree(secondEvent))
+        .isEqualTo(mapper.valueToTree(rawEvents.get(1)));
+  }
+
+  @Test
+  public void testFindEventBeforeAfterTime() {
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder().build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
+
+    ZonedDateTime after = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+    ZonedDateTime before = ZonedDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+
+    marquez.service.models.LineageEvent.Dataset dataset =
+        marquez.service.models.LineageEvent.Dataset.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(DB_TABLE_NAME)
+            .build();
+
+    marquez.service.models.LineageEvent.LineageEventBuilder builder =
+        marquez.service.models.LineageEvent.builder()
+            .producer("testFindEventIsSortedByTime")
+            .run(run)
+            .job(job)
+            .inputs(Collections.emptyList())
+            .outputs(Collections.singletonList(dataset));
+
+    marquez.service.models.LineageEvent firstEvent =
+        builder.eventTime(after.minus(1, ChronoUnit.YEARS)).eventType("START").build();
+
+    CompletableFuture<Integer> resp = sendEvent(firstEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    marquez.service.models.LineageEvent secondEvent =
+        builder.eventTime(after.plusSeconds(10)).eventType("COMPLETE").build();
+
+    resp = sendEvent(secondEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    marquez.service.models.LineageEvent thirdEvent =
+        builder.eventTime(before.plusSeconds(10)).eventType("COMPLETE").build();
+
+    List<LineageEvent> rawEvents =
+        client.listLineageEvents(MarquezClient.SortDirection.ASC, before, after, 10);
+
+    assertThat(rawEvents.size()).isEqualTo(1);
+    ObjectMapper mapper = Utils.getMapper();
     assertThat((JsonNode) mapper.valueToTree(secondEvent))
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
   }

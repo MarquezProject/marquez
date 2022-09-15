@@ -70,34 +70,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/NamespaceList'
 
-  /events:
+  /events/lineage:
     get:
-      operationId: getRawEvents
+      operationId: getLineageEvents
       parameters:
+        - $ref: '#/components/parameters/sortDirection'
+        - $ref: '#/components/parameters/before'
+        - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
       summary: List all received OpenLineage events.
-      description: Returns a list of OpenLineage events.
-      tags:
-        - Events
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LineageEventList'
-
-  /events/{namespace}:
-    parameters:
-      - $ref: '#/components/parameters/namespace'
-    get:
-      operationId: getRawEvents
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/offset'
-      summary: List all received OpenLineage events in particular namespace.
-      description: Returns a list of OpenLineage events.
+      description: Returns a list of OpenLineage events, sorted in direction of passed sort parameter. By default it is desc.
       tags:
         - Events
       responses:
@@ -803,6 +785,35 @@ components:
         example: name
         description: Sorts the results of your query by `name` or `updated_at`.
       required: false
+
+    sortDirection:
+      name: sortDirection
+      in: query
+      schema:
+        type: string
+        example: name
+        description: Sorts the results of your query by indicated direction `asc` or `desc`.
+      required: false
+
+    before:
+      name: version
+      in: query
+      description: Returns events before passed date.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 2022-09-15T07:47:19Z
+
+    after:
+      name: after
+      in: query
+      description: Returns events after passed date.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 2022-09-15T07:47:19Z
 
   schemas:
     CreatedNamespace:

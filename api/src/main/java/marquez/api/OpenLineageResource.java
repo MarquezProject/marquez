@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import javax.validation.Valid;
@@ -26,7 +27,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.models.SortDirection;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.LineageEvent;
@@ -107,26 +108,15 @@ public class OpenLineageResource extends BaseResource {
   public Response getLineageEvents(
       @QueryParam("before") @DefaultValue("2030-01-01T00:00:00+00:00") ZonedDateTimeParam before,
       @QueryParam("after") @DefaultValue("1970-01-01T00:00:00+00:00") ZonedDateTimeParam after,
+      @QueryParam("sortDirection") @DefaultValue("desc") SortDirection sortDirection,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit) {
-    final List<LineageEvent> events =
-        openLineageDao.getAllLineageEvents(before.get(), after.get(), limit);
+    List<LineageEvent> events = Collections.emptyList();
+    switch (sortDirection) {
+      case DESC -> events =
+          openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit);
+      case ASC -> events = openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit);
+    }
     return Response.ok(new Events(events)).build();
-  }
-
-  @Timed
-  @ResponseMetered
-  @ExceptionMetered
-  @GET
-  @Path("/namespace/{namespace}/events/lineage")
-  @Produces(APPLICATION_JSON)
-  public Response getLineageEventsByNamespace(
-      @PathParam("namespace") String namespace,
-      @QueryParam("before") @DefaultValue("2030-01-01T00:00:00+00:00") ZonedDateTimeParam before,
-      @QueryParam("after") @DefaultValue("1970-01-01T00:00:00+00:00") ZonedDateTimeParam after,
-      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit) {
-    final List<LineageEvent> event =
-        openLineageDao.getLineageEventsByNamespace(namespace, before.get(), after.get(), limit);
-    return Response.ok(new Events(event)).build();
   }
 
   @Value

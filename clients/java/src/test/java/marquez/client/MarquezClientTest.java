@@ -697,20 +697,39 @@ public class MarquezClientTest {
   @Test
   public void testListEvents() throws Exception {
     Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/events/lineage?limit=10&offset=0")))
+    when(http.get(buildUrlFor("/events/lineage?sortDirection=desc&limit=100")))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<LineageEvent> listEvents = client.listLineageEvents(10, 0);
+    final List<LineageEvent> listEvents = client.listLineageEvents();
     assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
   }
 
   @Test
-  public void testListEventsWithNamespace() throws Exception {
+  public void testListEventsWithSortDirection() throws Exception {
     Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/namespace/%s/events/lineage?limit=10&offset=0", NAMESPACE_NAME)))
+    when(http.get(buildUrlFor("/events/lineage?sortDirection=desc&limit=10")))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<LineageEvent> listEvents = client.listLineageEvents(NAMESPACE_NAME, 10, 0);
+    final List<LineageEvent> listEvents =
+        client.listLineageEvents(MarquezClient.SortDirection.DESC, 10);
+    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
+  }
+
+  @Test
+  public void testListEventsWithSortDirectionBeforeAfter() throws Exception {
+    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
+    when(http.get(
+            URI.create(
+                    "http://localhost:8080/api/v1/events/lineage?sortDirection=desc&before=2020-01-01T00%3A00Z&limit=10&after=2022-01-01T00%3A00%2B01%3A00")
+                .toURL()))
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+    final List<LineageEvent> listEvents =
+        client.listLineageEvents(
+            MarquezClient.SortDirection.DESC,
+            ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")),
+            ZonedDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneId.of("Europe/Warsaw")),
+            10);
     assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
   }
 

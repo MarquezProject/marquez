@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -89,21 +91,26 @@ public class MarquezClient {
   }
 
   public List<LineageEvent> listLineageEvents() {
-    return listLineageEvents(DEFAULT_LIMIT, DEFAULT_OFFSET);
+    return listLineageEvents(SortDirection.DESC, DEFAULT_LIMIT);
   }
 
-  public List<LineageEvent> listLineageEvents(int limit, int offset) {
-    final String bodyAsJson = http.get(url.toEventUrl(limit, offset));
+  public List<LineageEvent> listLineageEvents(MarquezClient.SortDirection sort, int limit) {
+    final String bodyAsJson = http.get(url.toEventUrl(sort, limit));
     return Events.fromJson(bodyAsJson).getValue();
   }
 
-  public List<LineageEvent> listLineageEvents(String namespaceName) {
-    return listLineageEvents(namespaceName, DEFAULT_LIMIT, DEFAULT_OFFSET);
+  public List<LineageEvent> listLineageEvents(
+      MarquezClient.SortDirection sort, ZonedDateTime before, ZonedDateTime after, int limit) {
+    final String bodyAsJson = http.get(url.toEventUrl(sort, before, after, limit));
+    return Events.fromJson(bodyAsJson).getValue();
   }
 
-  public List<LineageEvent> listLineageEvents(String namespaceName, int limit, int offset) {
-    final String bodyAsJson = http.get(url.toEventUrl(namespaceName, limit, offset));
-    return Events.fromJson(bodyAsJson).getValue();
+  @AllArgsConstructor
+  public enum SortDirection {
+    DESC("desc"),
+    ASC("asc");
+
+    @Getter public final String value;
   }
 
   public Namespace createNamespace(

@@ -15,7 +15,6 @@ import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
-import static marquez.client.MarquezPathV1.lineageEventPath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
 import static marquez.client.MarquezPathV1.listJobVersionsPath;
@@ -37,6 +36,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -90,12 +91,28 @@ class MarquezUrl {
     return from(namespacePath(namespaceName));
   }
 
-  URL toEventUrl(int limit, int offset) {
-    return from(MarquezPathV1.lineageEventPath(), newQueryParamsWith(limit, offset));
+  URL toEventUrl(MarquezClient.SortDirection sort, int limit) {
+    return toEventUrl(sort, null, null, limit);
   }
 
-  URL toEventUrl(String namespaceName, int limit, int offset) {
-    return from(lineageEventPath(namespaceName), newQueryParamsWith(limit, offset));
+  URL toEventUrl(
+      @Nullable MarquezClient.SortDirection sort,
+      @Nullable ZonedDateTime before,
+      @Nullable ZonedDateTime after,
+      int limit) {
+    Map<String, Object> queryParams = new HashMap<>();
+
+    if (sort != null) {
+      queryParams.put("sortDirection", sort.getValue());
+    }
+    if (before != null) {
+      queryParams.put("before", before.toOffsetDateTime().toString());
+    }
+    if (after != null) {
+      queryParams.put("after", after.toOffsetDateTime().toString());
+    }
+    queryParams.put("limit", limit);
+    return from(MarquezPathV1.lineageEventPath(), queryParams);
   }
 
   URL toSourceUrl(String sourceName) {
