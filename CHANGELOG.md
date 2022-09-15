@@ -30,8 +30,6 @@
     *Switches the order of the code in order to persist the OpenLineage event first and then update the Marquez model. (When the `RunTransitionListener` was invoked, the OpenLineage event was not persisted to the database. Because the OpenLineage event is the source of truth for all Marquez run transitions, it should be available from `RunTransitionListener`.)*   
 * Drop requirement to provide marquez.yml for `seed` cmd [`#2094`](https://github.com/MarquezProject/marquez/pull/2094) [@wslulciuc](https://github.com/wslulciuc)  
     *Use `io.dropwizard.cli.Command` instead of `io.dropwizard.cli.ConfiguredCommand` to no longer require passing marquez.yml as an argument to the `seed` cmd. (The marquez.yml argument is not used in the `seed` cmd.)*
-* Deletes: "undelete" job on subsequent OpenLineage event [`#2101`](https://github.com/MarquezProject/marquez/pull/2101) [@mobuchowski](https://github.com/mobuchowski)  
-    *Changes the Postgres function that modifies `jobs_view` to clear the soft delete flag from the jobs table upon receipt of another event referencing the same job.*
 
 ### Fixed
 
