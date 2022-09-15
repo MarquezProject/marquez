@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -86,7 +87,27 @@ public interface OpenLineageDao extends BaseDao {
       String producer);
 
   @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
-  List<LineageEvent> findOlEventsByRunUuid(UUID runUuid);
+  List<LineageEvent> findLineageEventsByRunUuid(UUID runUuid);
+
+  @SqlQuery(
+      """
+  SELECT event
+  FROM lineage_events le
+  WHERE (le.event_time < :before
+  AND le.event_time >= :after)
+  ORDER BY le.event_time DESC
+  LIMIT :limit""")
+  List<LineageEvent> getAllLineageEventsDesc(ZonedDateTime before, ZonedDateTime after, int limit);
+
+  @SqlQuery(
+      """
+  SELECT event
+  FROM lineage_events le
+  WHERE (le.event_time < :before
+  AND le.event_time >= :after)
+  ORDER BY le.event_time ASC
+  LIMIT :limit""")
+  List<LineageEvent> getAllLineageEventsAsc(ZonedDateTime before, ZonedDateTime after, int limit);
 
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);

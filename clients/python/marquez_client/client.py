@@ -8,6 +8,7 @@ import requests
 
 import marquez_client
 
+from typing import Optional
 from deprecation import deprecated
 from six.moves.urllib.parse import quote
 
@@ -65,6 +66,19 @@ class MarquezClient:
     def list_namespaces(self, limit=None, offset=None):
         return self._get(
             self._url('/namespaces'),
+            params={
+                'limit': limit or DEFAULT_LIMIT,
+                'offset': offset or DEFAULT_OFFSET
+            }
+        )
+
+    def list_events(self, namespace: Optional[str] = None, limit=None, offset=None):
+        url = '/events'
+        if namespace:
+            url = f'/events/{namespace}'
+
+        return self._get(
+            self._url(url),
             params={
                 'limit': limit or DEFAULT_LIMIT,
                 'offset': offset or DEFAULT_OFFSET

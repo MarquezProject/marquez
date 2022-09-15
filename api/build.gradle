@@ -40,6 +40,7 @@ dependencies {
     implementation "io.prometheus:simpleclient_hotspot:${prometheusVersion}"
     implementation "io.prometheus:simpleclient_servlet:${prometheusVersion}"
     implementation "org.jdbi:jdbi3-core:${jdbi3Version}"
+    implementation "org.jdbi:jdbi3-jackson2:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
     implementation 'com.google.guava:guava:31.1-jre'

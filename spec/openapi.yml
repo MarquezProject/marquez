@@ -70,6 +70,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/NamespaceList'
 
+  /events/lineage:
+    get:
+      operationId: getLineageEvents
+      parameters:
+        - $ref: '#/components/parameters/sortDirection'
+        - $ref: '#/components/parameters/before'
+        - $ref: '#/components/parameters/after'
+        - $ref: '#/components/parameters/limit'
+      summary: List all received OpenLineage events.
+      description: Returns a list of OpenLineage events, sorted in direction of passed sort parameter. By default it is desc.
+      tags:
+        - Events
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineageEventList'
+
   /sources/{source}:
     parameters:
       - $ref: '#/components/parameters/source'
@@ -766,6 +786,35 @@ components:
         description: Sorts the results of your query by `name` or `updated_at`.
       required: false
 
+    sortDirection:
+      name: sortDirection
+      in: query
+      schema:
+        type: string
+        example: name
+        description: Sorts the results of your query by indicated direction `asc` or `desc`.
+      required: false
+
+    before:
+      name: version
+      in: query
+      description: Returns events before passed date.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 2022-09-15T07:47:19Z
+
+    after:
+      name: after
+      in: query
+      description: Returns events after passed date.
+      required: false
+      schema:
+        type: string
+        format: uuid
+        example: 2022-09-15T07:47:19Z
+
   schemas:
     CreatedNamespace:
       type: object
@@ -816,6 +865,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Namespace'
+
+    LineageEventList:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineageEvent'
 
     CreatedSource:
       type: object
