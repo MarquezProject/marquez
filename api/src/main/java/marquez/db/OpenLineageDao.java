@@ -37,7 +37,7 @@ import marquez.db.models.ColumnLevelLineageRow;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
-import marquez.db.models.FieldData;
+import marquez.db.models.InputFieldData;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -59,6 +59,7 @@ import marquez.service.models.LineageEvent.ParentRunFacet;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -664,7 +665,7 @@ public interface OpenLineageDao extends BaseDao {
       DatasetFieldDao datasetFieldDao,
       DatasetVersionRow datasetVersionRow) {
     // get all the fields related to this particular run
-    List<FieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
+    List<InputFieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
 
     return Optional.ofNullable(ds.getFacets())
         .map(DatasetFacets::getColumnLineage)
@@ -687,7 +688,7 @@ public interface OpenLineageDao extends BaseDao {
               }
 
               // get field uuids of input columns related to this run
-              List<UUID> inputFields =
+              List<Pair<UUID, UUID>> inputFields =
                   runFields.stream()
                       .filter(
                           fieldData ->
@@ -700,7 +701,11 @@ public interface OpenLineageDao extends BaseDao {
                                               && of.getFieldName().equals(fieldData.getField()))
                                   .findAny()
                                   .isPresent())
-                      .map(fieldData -> fieldData.getDatasetFieldUuid())
+                      .map(
+                          fieldData ->
+                              Pair.of(
+                                  fieldData.getDatasetVersionUuid(),
+                                  fieldData.getDatasetFieldUuid()))
                       .collect(Collectors.toList());
 
               return columnLevelLineageDao

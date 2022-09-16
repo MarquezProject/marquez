@@ -7,6 +7,7 @@ package marquez.db;
 
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,8 +43,10 @@ public class ColumnLevelLineageDaoTest {
   private String transformationDescription = "some-description";
   private String transformationType = "some-type";
   private Instant now = Instant.now();
-  private DatasetRow datasetRow;
-  private DatasetVersionRow versionRow;
+  private DatasetRow inputDatasetRow;
+  private DatasetRow outputDatasetRow;
+  private DatasetVersionRow inputDatasetVersionRow;
+  private DatasetVersionRow outputDatasetVersionRow;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
@@ -60,7 +64,7 @@ public class ColumnLevelLineageDaoTest {
     NamespaceRow namespaceRow =
         namespaceDao.upsertNamespaceRow(UUID.randomUUID(), now, "", DEFAULT_NAMESPACE_OWNER);
     SourceRow sourceRow = sourceDao.upsertOrDefault(UUID.randomUUID(), "", now, "", "");
-    datasetRow =
+    inputDatasetRow =
         datasetDao.upsert(
             UUID.randomUUID(),
             DatasetType.DB_TABLE,
@@ -73,11 +77,48 @@ public class ColumnLevelLineageDaoTest {
             "",
             "",
             false);
-    versionRow =
+    outputDatasetRow =
+        datasetDao.upsert(
+            UUID.randomUUID(),
+            DatasetType.DB_TABLE,
+            now,
+            namespaceRow.getUuid(),
+            "",
+            sourceRow.getUuid(),
+            "",
+            "",
+            "",
+            "",
+            false);
+
+    inputDatasetVersionRow =
         datasetVersionDao.upsert(
             UUID.randomUUID(),
             now,
-            datasetRow.getUuid(),
+            inputDatasetRow.getUuid(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            null,
+            "",
+            "",
+            "");
+    outputDatasetVersionRow =
+        datasetVersionDao.upsert(
+            UUID.randomUUID(),
+            now,
+            outputDatasetRow.getUuid(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            null,
+            "",
+            "",
+            "");
+
+    inputDatasetVersionRow =
+        datasetVersionDao.upsert(
+            UUID.randomUUID(),
+            now,
+            inputDatasetRow.getUuid(),
             UUID.randomUUID(),
             UUID.randomUUID(),
             null,
@@ -87,7 +128,7 @@ public class ColumnLevelLineageDaoTest {
 
     // insert output dataset field
     fieldDao.upsert(
-        outputDatasetFieldUuid, now, "output-field", "string", "desc", datasetRow.getUuid());
+        outputDatasetFieldUuid, now, "output-field", "string", "desc", outputDatasetRow.getUuid());
   }
 
   @AfterEach
@@ -106,25 +147,31 @@ public class ColumnLevelLineageDaoTest {
 
   @Test
   void testUpsertMultipleColumns() {
-    UUID input1 = UUID.randomUUID();
-    UUID input2 = UUID.randomUUID();
+    UUID inputFieldUuid1 = UUID.randomUUID();
+    UUID inputFieldUuid2 = UUID.randomUUID();
 
     // insert input dataset fields
-    fieldDao.upsert(input1, now, "a", "string", "desc", datasetRow.getUuid());
-    fieldDao.upsert(input2, now, "b", "string", "desc", datasetRow.getUuid());
+    fieldDao.upsert(inputFieldUuid1, now, "a", "string", "desc", inputDatasetRow.getUuid());
+    fieldDao.upsert(inputFieldUuid2, now, "b", "string", "desc", inputDatasetRow.getUuid());
 
     List<ColumnLevelLineageRow> rows =
         dao.upsertColumnLevelLineageRow(
-            versionRow.getUuid(),
+            outputDatasetVersionRow.getUuid(),
             outputDatasetFieldUuid,
-            Arrays.asList(input1, input2),
+            Arrays.asList(
+                Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid1),
+                Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid2)),
             transformationDescription,
             transformationType,
             now);
 
     assertEquals(2, rows.size());
-    assertEquals(versionRow.getUuid(), rows.get(0).getOutputDatasetVersionUuid());
+    assertEquals(inputDatasetVersionRow.getUuid(), rows.get(0).getInputDatasetVersionUuid());
+    assertEquals(outputDatasetVersionRow.getUuid(), rows.get(0).getOutputDatasetVersionUuid());
     assertEquals(outputDatasetFieldUuid, rows.get(0).getOutputDatasetFieldUuid());
+    assertTrue(
+        Arrays.asList(inputFieldUuid1, inputFieldUuid2)
+            .contains(rows.get(0).getInputDatasetFieldUuid())); // ordering may differ per run
     assertEquals(transformationDescription, rows.get(0).getTransformationDescription());
     assertEquals(transformationType, rows.get(0).getTransformationType());
     assertEquals(now.getEpochSecond(), rows.get(0).getCreatedAt().getEpochSecond());
@@ -148,27 +195,28 @@ public class ColumnLevelLineageDaoTest {
   @Test
   void testUpsertOnUpdatePreventsDuplicates() {
     // insert input dataset fields
-    UUID input = UUID.randomUUID();
-    fieldDao.upsert(input, now, "a", "string", "desc", datasetRow.getUuid());
+    UUID inputFieldUuid = UUID.randomUUID();
+    fieldDao.upsert(inputFieldUuid, now, "a", "string", "desc", inputDatasetRow.getUuid());
 
     dao.upsertColumnLevelLineageRow(
-        versionRow.getUuid(),
+        inputDatasetVersionRow.getUuid(),
         outputDatasetFieldUuid,
-        Arrays.asList(input),
+        Arrays.asList(Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid)),
         transformationDescription,
         transformationType,
         now);
     List<ColumnLevelLineageRow> rows =
         dao.upsertColumnLevelLineageRow(
-            versionRow.getUuid(),
+            inputDatasetVersionRow.getUuid(),
             outputDatasetFieldUuid,
-            Arrays.asList(input),
+            Arrays.asList(Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid)),
             transformationDescription,
             transformationType,
             now.plusSeconds(1000));
 
     // make sure there is one row with updatedAt modified
     assertEquals(1, rows.size());
-    assertEquals(now.plusSeconds(1000).getEpochSecond(), rows.get(0).getUpdatedAt().getEpochSecond());
+    assertEquals(
+        now.plusSeconds(1000).getEpochSecond(), rows.get(0).getUpdatedAt().getEpochSecond());
   }
 }

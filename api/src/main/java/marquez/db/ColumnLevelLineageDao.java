@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import marquez.db.mappers.ColumnLevelLineageRowMapper;
 import marquez.db.models.ColumnLevelLineageRow;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBeanList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -23,23 +24,24 @@ public interface ColumnLevelLineageDao extends BaseDao {
   default List<ColumnLevelLineageRow> upsertColumnLevelLineageRow(
       UUID outputDatasetVersionUuid,
       UUID outputDatasetFieldUuid,
-      List<UUID> inputDatasetFieldUuids,
+      List<Pair<UUID, UUID>> inputs,
       String transformationDescription,
       String transformationType,
       Instant now) {
 
-    if (inputDatasetFieldUuids.isEmpty()) {
+    if (inputs.isEmpty()) {
       return Collections.emptyList();
     }
 
     List<ColumnLevelLineageRow> rows =
-        inputDatasetFieldUuids.stream()
+        inputs.stream()
             .map(
-                uuid ->
+                input ->
                     new ColumnLevelLineageRow(
                         outputDatasetVersionUuid,
                         outputDatasetFieldUuid,
-                        uuid,
+                        input.getLeft(), // input_dataset_version_uuid
+                        input.getRight(), // input_dataset_field_uuid
                         transformationDescription,
                         transformationType,
                         now,
@@ -60,13 +62,14 @@ public interface ColumnLevelLineageDao extends BaseDao {
           INSERT INTO column_level_lineage (
           output_dataset_version_uuid,
           output_dataset_field_uuid,
+          input_dataset_version_uuid,
           input_dataset_field_uuid,
           transformation_description,
           transformation_type,
           created_at,
           updated_at
           ) VALUES <values>
-          ON CONFLICT (output_dataset_version_uuid, output_dataset_field_uuid, input_dataset_field_uuid)
+          ON CONFLICT (output_dataset_version_uuid, output_dataset_field_uuid, input_dataset_version_uuid, input_dataset_field_uuid)
           DO UPDATE SET
           transformation_description = EXCLUDED.transformation_description,
           transformation_type = EXCLUDED.transformation_type,
@@ -78,6 +81,7 @@ public interface ColumnLevelLineageDao extends BaseDao {
               propertyNames = {
                 "outputDatasetVersionUuid",
                 "outputDatasetFieldUuid",
+                "inputDatasetVersionUuid",
                 "inputDatasetFieldUuid",
                 "transformationDescription",
                 "transformationType",

@@ -137,6 +137,7 @@ class OpenLineageDaoTest {
                 .getColumnLineageRows())
         .extracting(
             (ds) -> ds.getInputDatasetFieldUuid(),
+            (ds) -> ds.getInputDatasetVersionUuid(),
             (ds) -> ds.getOutputDatasetFieldUuid(),
             (ds) -> ds.getOutputDatasetVersionUuid(),
             (ds) -> ds.getTransformationDescription(),
@@ -148,11 +149,12 @@ class OpenLineageDaoTest {
                         writeJob.getInputs().get().get(0).getDatasetRow().getUuid(),
                         INPUT_FIELD_NAME)
                     .get(),
+                inputDatasetVersion,
                 datasetFieldDao
                     .findUuid(
                         writeJob.getOutputs().get().get(0).getDatasetRow().getUuid(), OUTPUT_COLUMN)
                     .get(),
-                writeJob.getOutputs().get().get(0).getDatasetVersionRow().getUuid(),
+                outputDatasetVersion,
                 TRANSFORMATION_DESCRIPTION,
                 TRANSFORMATION_TYPE));
   }

@@ -19,7 +19,7 @@ import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.mappers.FieldDataMapper;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
-import marquez.db.models.FieldData;
+import marquez.db.models.InputFieldData;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetVersion;
@@ -106,7 +106,13 @@ public interface DatasetFieldDao extends BaseDao {
 
   @SqlQuery(
       """
-          SELECT datasets_view.namespace_name as namespace_name, datasets_view.name as dataset_name, dataset_fields.name as field_name, datasets_view.uuid as dataset_uuid, dataset_fields.uuid as dataset_field_uuid
+          SELECT
+            datasets_view.namespace_name as namespace_name,
+            datasets_view.name as dataset_name,
+            dataset_fields.name as field_name,
+            datasets_view.uuid as dataset_uuid,
+            dataset_versions.uuid as dataset_version_uuid,
+            dataset_fields.uuid as dataset_field_uuid
           FROM dataset_fields
           JOIN dataset_versions_field_mapping fm ON fm.dataset_field_uuid = dataset_fields.uuid
           JOIN dataset_versions ON dataset_versions.uuid = fm.dataset_version_uuid
@@ -114,7 +120,7 @@ public interface DatasetFieldDao extends BaseDao {
           JOIN runs_input_mapping ON runs_input_mapping.dataset_version_uuid =  dataset_versions.uuid
           WHERE runs_input_mapping.run_uuid = :runUuid
           """)
-  List<FieldData> findInputFieldsDataAssociatedWithRun(UUID runUuid);
+  List<InputFieldData> findInputFieldsDataAssociatedWithRun(UUID runUuid);
 
   @SqlQuery(
       "INSERT INTO dataset_fields ("

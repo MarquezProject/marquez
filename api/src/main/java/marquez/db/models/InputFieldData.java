@@ -12,10 +12,11 @@ import lombok.NonNull;
 
 @Getter
 @AllArgsConstructor
-public class FieldData {
+public class InputFieldData {
   @NonNull String namespace;
   @NonNull String datasetName;
   @NonNull String field;
   @NonNull UUID datasetUuid;
   @NonNull UUID datasetFieldUuid;
+  @NonNull UUID datasetVersionUuid;
 }

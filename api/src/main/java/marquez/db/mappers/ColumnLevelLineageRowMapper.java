@@ -27,6 +27,7 @@ public class ColumnLevelLineageRowMapper implements RowMapper<ColumnLevelLineage
     return new ColumnLevelLineageRow(
         uuidOrThrow(results, Columns.OUTPUT_DATASET_VERSION_UUID),
         uuidOrThrow(results, Columns.OUTPUT_DATASET_FIELD_UUID),
+        uuidOrThrow(results, Columns.INPUT_DATASET_VERSION_UUID),
         uuidOrThrow(results, Columns.INPUT_DATASET_FIELD_UUID),
         stringOrThrow(results, TRANSFORMATION_DESCRIPTION),
         stringOrThrow(results, TRANSFORMATION_TYPE),

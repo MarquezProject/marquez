@@ -19,6 +19,7 @@ import lombok.ToString;
 public class ColumnLevelLineageRow {
   @Getter @NonNull private final UUID outputDatasetVersionUuid;
   @Getter @NonNull private final UUID outputDatasetFieldUuid;
+  @Getter @NonNull private final UUID inputDatasetVersionUuid;
   @Getter @NonNull private final UUID inputDatasetFieldUuid;
   @Getter @NonNull private final String transformationDescription;
   @Getter @NonNull private final String transformationType;
