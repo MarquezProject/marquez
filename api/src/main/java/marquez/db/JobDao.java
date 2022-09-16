@@ -231,6 +231,10 @@ public interface JobDao extends BaseDao {
     }
   }
 
+  /*
+   Note: following SQL never executes. There is database trigger on `jobs_view` that replaces following SQL
+   with rewrite_jobs_fqn_table plpgsql function. Code of that function is at R__1 migration file.
+  */
   @SqlQuery(
       """
           INSERT INTO jobs_view AS j (
@@ -276,6 +280,10 @@ public interface JobDao extends BaseDao {
       UUID symlinkTargetId,
       PGobject inputs);
 
+  /*
+   Note: following SQL never executes. There is database trigger on `jobs_view` that replaces following SQL
+   with rewrite_jobs_fqn_table plpgsql function. Code of that function is at R__1 migration file.
+  */
   @SqlQuery(
       """
           INSERT INTO jobs_view AS j (

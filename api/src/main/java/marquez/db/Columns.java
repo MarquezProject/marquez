@@ -135,6 +135,9 @@ public final class Columns {
   public static final String TRANSFORMATION_DESCRIPTION = "transformation_description";
   public static final String TRANSFORMATION_TYPE = "transformation_type";
 
+  /* LINEAGE EVENT ROW COLUMNS */
+  public static final String EVENT = "event";
+
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       return null;

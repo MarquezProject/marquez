@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +40,7 @@ import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobVersion;
+import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Run;
@@ -85,6 +88,29 @@ public class MarquezClient {
   MarquezClient(@NonNull final MarquezUrl url, @NonNull final MarquezHttp http) {
     this.url = url;
     this.http = http;
+  }
+
+  public List<LineageEvent> listLineageEvents() {
+    return listLineageEvents(SortDirection.DESC, DEFAULT_LIMIT);
+  }
+
+  public List<LineageEvent> listLineageEvents(MarquezClient.SortDirection sort, int limit) {
+    final String bodyAsJson = http.get(url.toEventUrl(sort, limit));
+    return Events.fromJson(bodyAsJson).getValue();
+  }
+
+  public List<LineageEvent> listLineageEvents(
+      MarquezClient.SortDirection sort, ZonedDateTime before, ZonedDateTime after, int limit) {
+    final String bodyAsJson = http.get(url.toEventUrl(sort, before, after, limit));
+    return Events.fromJson(bodyAsJson).getValue();
+  }
+
+  @AllArgsConstructor
+  public enum SortDirection {
+    DESC("desc"),
+    ASC("asc");
+
+    @Getter public final String value;
   }
 
   public Namespace createNamespace(
@@ -535,6 +561,21 @@ public class MarquezClient {
 
     static Datasets fromJson(final String json) {
       return Utils.fromJson(json, new TypeReference<Datasets>() {});
+    }
+  }
+
+  @Value
+  @EqualsAndHashCode(callSuper = false)
+  public static class Events extends ResultsPage {
+    @Getter List<LineageEvent> value;
+
+    @JsonCreator
+    Events(@JsonProperty("events") final List<LineageEvent> value) {
+      this.value = ImmutableList.copyOf(value);
+    }
+
+    static Events fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<Events>() {});
     }
   }
 

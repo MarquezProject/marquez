@@ -36,6 +36,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -87,6 +89,30 @@ class MarquezUrl {
 
   URL toNamespaceUrl(String namespaceName) {
     return from(namespacePath(namespaceName));
+  }
+
+  URL toEventUrl(MarquezClient.SortDirection sort, int limit) {
+    return toEventUrl(sort, null, null, limit);
+  }
+
+  URL toEventUrl(
+      @Nullable MarquezClient.SortDirection sort,
+      @Nullable ZonedDateTime before,
+      @Nullable ZonedDateTime after,
+      int limit) {
+    Map<String, Object> queryParams = new HashMap<>();
+
+    if (sort != null) {
+      queryParams.put("sortDirection", sort.getValue());
+    }
+    if (before != null) {
+      queryParams.put("before", before.toOffsetDateTime().toString());
+    }
+    if (after != null) {
+      queryParams.put("after", after.toOffsetDateTime().toString());
+    }
+    queryParams.put("limit", limit);
+    return from(MarquezPathV1.lineageEventPath(), queryParams);
   }
 
   URL toSourceUrl(String sourceName) {

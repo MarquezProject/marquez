@@ -7,6 +7,7 @@ package marquez.jdbi;
 
 import javax.sql.DataSource;
 import marquez.PostgresContainer;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -34,6 +35,7 @@ public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresEx
     database = POSTGRES.getDatabaseName();
     plugins.add(new SqlObjectPlugin());
     plugins.add(new PostgresPlugin());
+    plugins.add(new Jackson2Plugin());
     migration =
         Migration.before().withPaths("marquez/db/migration", "classpath:marquez/db/migrations");
   }
