@@ -703,7 +703,7 @@ public interface OpenLineageDao extends BaseDao {
               if (outputField.isEmpty()) {
                 Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
                 log.error(
-                    "Cannot produce column lineage for missing output field in output dataset: %s",
+                    "Cannot produce column lineage for missing output field in output dataset: {}",
                     outputColumn.getName());
                 return Stream.empty();
               }
