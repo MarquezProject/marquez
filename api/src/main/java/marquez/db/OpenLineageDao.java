@@ -64,8 +64,8 @@ import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(LineageEventMapper.class)
 public interface OpenLineageDao extends BaseDao {
-  public String DEFAULT_SOURCE_NAME = "default";
-  public String DEFAULT_NAMESPACE_OWNER = "anonymous";
+  String DEFAULT_SOURCE_NAME = "default";
+  String DEFAULT_NAMESPACE_OWNER = "anonymous";
 
   @SqlUpdate(
       "INSERT INTO lineage_events ("
@@ -370,7 +370,10 @@ public interface OpenLineageDao extends BaseDao {
               .findJobRowByRunUuid(uuid)
               .map(
                   j -> {
-                    String parentJobName = Utils.parseParentJobName(facet.getJob().getName());
+                    String parentJobName =
+                        facet.getJob().getName().equals(event.getJob().getName())
+                            ? Utils.parseParentJobName(facet.getJob().getName())
+                            : facet.getJob().getName();
                     if (j.getNamespaceName().equals(facet.getJob().getNamespace())
                         && j.getName().equals(parentJobName)) {
                       return j;
@@ -432,6 +435,10 @@ public interface OpenLineageDao extends BaseDao {
       PGobject inputs) {
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
     Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+    String parentJobName =
+        facet.getJob().getName().equals(event.getJob().getName())
+            ? Utils.parseParentJobName(facet.getJob().getName())
+            : facet.getJob().getName();
     JobRow newParentJobRow =
         createJobDao()
             .upsertJob(
@@ -440,7 +447,7 @@ public interface OpenLineageDao extends BaseDao {
                 now,
                 namespace.getUuid(),
                 namespace.getName(),
-                Utils.parseParentJobName(facet.getJob().getName()),
+                parentJobName,
                 null,
                 jobContext.getUuid(),
                 location,
