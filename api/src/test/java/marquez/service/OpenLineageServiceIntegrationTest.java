@@ -45,6 +45,7 @@ import marquez.db.models.RunArgsRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
+import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.Dataset;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent;
@@ -79,6 +80,7 @@ public class OpenLineageServiceIntegrationTest {
   private DatasetVersionDao datasetVersionDao;
   private ArgumentCaptor<JobInputUpdate> runInputListener;
   private ArgumentCaptor<JobOutputUpdate> runOutputListener;
+  private ArgumentCaptor<RunTransition> runTransitionListener;
   private OpenLineageService lineageService;
 
   public static String EVENT_REQUIRED_ONLY = "open_lineage/event_required_only.json";
@@ -145,6 +147,8 @@ public class OpenLineageServiceIntegrationTest {
     doNothing().when(runService).notify(runInputListener.capture());
     runOutputListener = ArgumentCaptor.forClass(JobOutputUpdate.class);
     doNothing().when(runService).notify(runOutputListener.capture());
+    runTransitionListener = ArgumentCaptor.forClass(RunTransition.class);
+    doNothing().when(runService).notify(runTransitionListener.capture());
     lineageService = new OpenLineageService(openLineageDao, runService);
     datasetDao = jdbi.onDemand(DatasetDao.class);
 
@@ -240,6 +244,19 @@ public class OpenLineageServiceIntegrationTest {
           expectedResults.outputDatasetCount,
           runOutputListener.getAllValues().get(0).getOutputs().size(),
           "Dataset output count");
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getData")
+  public void testRunTransition(List<URI> uris, ExpectedResults expectedResults) {
+    initEvents(uris);
+
+    if (expectedResults.inputEventCount > 0) {
+      Assertions.assertEquals(
+          uris.size(),
+          runTransitionListener.getAllValues().size(),
+          "RunTransition happens once for each run");
     }
   }
 
