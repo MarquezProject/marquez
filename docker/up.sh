@@ -5,7 +5,7 @@
 
 set -e
 
-SCRIPTDIR=$(dirname $0)
+readonly DOCKER_DIR=$(dirname $0)
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -55,7 +55,7 @@ args="-V --force-recreate --remove-orphans"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=0.19.0
+TAG=latest
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -101,12 +101,14 @@ fi
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
+else [[ "${TAG}" = "latest" ]]; then
+  docker-compose pull --quiet # Pull image when 'latest'
 fi
 
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-$SCRIPTDIR/volumes.sh marquez
+${DOCKER_DIR}/volumes.sh marquez
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args
+API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $args
