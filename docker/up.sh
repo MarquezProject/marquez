@@ -5,6 +5,7 @@
 
 set -e
 
+readonly VERSION=0.26.0
 readonly DOCKER_DIR=$(dirname $0)
 
 title() {
@@ -35,7 +36,7 @@ usage() {
   echo "  -a, --api-port int          api port (default: 5000)"
   echo "  -m, --api-admin-port int    api admin port (default: 5001)"
   echo "  -w, --web-port int          web port (default: 3000)"
-  echo "  -t, --tag string            image tag (default: latest)"
+  echo "  -t, --tag string            image tag (default: ${VERSION})"
   echo
   title "FLAGS:"
   echo "  -b, --build           build images from source"
@@ -55,7 +56,7 @@ args="-V --force-recreate --remove-orphans"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=latest
+TAG=${VERSION}
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -101,8 +102,6 @@ fi
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   args+=" --build"
-else [[ "${TAG}" = "latest" ]]; then
-  docker-compose pull --quiet # Pull image when 'latest'
 fi
 
 if [[ "${SEED}" = "true" ]]; then
