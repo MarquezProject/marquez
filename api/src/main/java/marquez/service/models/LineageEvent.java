@@ -5,6 +5,7 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -71,7 +72,11 @@ public class LineageEvent extends BaseJsonModel {
   public static class RunFacet {
 
     @Valid private NominalTimeRunFacet nominalTime;
-    @Valid private ParentRunFacet parent;
+
+    @JsonAlias(
+        "parentRun") // the Airflow integration previously reported parentRun instead of parent
+    @Valid
+    private ParentRunFacet parent;
 
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
