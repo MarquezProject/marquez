@@ -15,6 +15,7 @@ only-on-release: &only-on-release
       ignore: /.*/
 
 orbs:
+  # https://circleci.com/orbs/registry/orb/codecov/codecov
   codecov: codecov/codecov@3.2.3
 
 jobs:
@@ -35,7 +36,7 @@ jobs:
       - run: ./gradlew --no-daemon --stacktrace api:javadoc
       - run: ./gradlew --no-daemon --stacktrace api:build
       - run: ./gradlew --no-daemon api:jacocoTestReport
-      - run: codecov/upload
+      - codecov/upload
       - store_test_results:
           path: api/build/test-results/test
       - store_artifacts:
@@ -102,7 +103,7 @@ jobs:
       - run: ./gradlew --no-daemon --stacktrace clients:java:javadoc
       - run: ./gradlew --no-daemon --stacktrace clients:java:build
       - run: ./gradlew --no-daemon clients:java:jacocoTestReport
-      - run: codecov/upload
+      - codecov/upload
       - store_test_results:
           path: clients/java/build/test-results/test
       - store_artifacts:
@@ -122,7 +123,7 @@ jobs:
       - run: pip install -e .[dev]
       - run: flake8
       - run: pytest --cov=marquez_python tests/
-      - run: codecov/upload
+      - codecov/upload
 
   build-client-python:
     working_directory: ~/marquez/clients/python
