@@ -339,14 +339,14 @@ paths:
       summary: Soft deletes job.
       description: Soft deletes job. It will be un-deleted if new OpenLineage event containing this job comes.
       tags:
-        - Datasets
+        - Jobs
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dataset'
+                $ref: '#/components/schemas/Job'
 
   /namespaces/{namespace}/jobs:
     parameters:

@@ -30,6 +30,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.RunState;
 import marquez.db.BaseDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
@@ -37,11 +38,13 @@ import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
+import marquez.db.models.RunStateRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
+import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
@@ -91,6 +94,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                       buildJobOutputUpdate(update).ifPresent(runService::notify);
                     }
                     buildJobInputUpdate(update).ifPresent(runService::notify);
+                    buildRunTransition(update).ifPresent(runService::notify);
                   }
                 });
 
@@ -221,5 +225,16 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
         .namespace(NamespaceName.of(ds.getNamespaceName()))
         .name(DatasetName.of(ds.getDatasetName()))
         .build();
+  }
+
+  private Optional<RunTransition> buildRunTransition(UpdateLineageRow record) {
+    RunId runId = RunId.of(record.getRun().getUuid());
+    RunStateRow runStateRow = record.getRunState();
+    if (runStateRow == null) {
+      return Optional.empty();
+    }
+    RunState newState = RunState.valueOf(runStateRow.getState());
+    RunState oldState = newState.isStarting() ? null : RunState.RUNNING;
+    return Optional.of(new RunTransition(runId, oldState, newState));
   }
 }

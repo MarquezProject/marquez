@@ -5,7 +5,8 @@
 
 set -e
 
-SCRIPTDIR=$(dirname $0)
+VERSION=0.26.0
+DOCKER_DIR=$(dirname $0)
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -35,7 +36,7 @@ usage() {
   echo "  -a, --api-port int          api port (default: 5000)"
   echo "  -m, --api-admin-port int    api admin port (default: 5001)"
   echo "  -w, --web-port int          web port (default: 3000)"
-  echo "  -t, --tag string            image tag (default: latest)"
+  echo "  -t, --tag string            image tag (default: ${VERSION})"
   echo
   title "FLAGS:"
   echo "  -b, --build           build images from source"
@@ -55,7 +56,7 @@ args="-V --force-recreate --remove-orphans"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=0.19.0
+TAG=${VERSION}
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -107,6 +108,6 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-$SCRIPTDIR/volumes.sh marquez
+${DOCKER_DIR}/volumes.sh marquez
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG="${TAG}" docker-compose $compose_files up $args
+API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $args
