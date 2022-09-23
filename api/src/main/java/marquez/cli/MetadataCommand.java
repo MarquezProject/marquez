@@ -13,25 +13,13 @@ import com.google.common.collect.ImmutableList;
 import io.dropwizard.cli.Command;
 import io.dropwizard.setup.Bootstrap;
 import io.openlineage.client.OpenLineage;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import marquez.common.Utils;
-import marquez.common.models.DatasetName;
-import marquez.common.models.FieldName;
-import marquez.common.models.JobName;
-import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -84,11 +72,13 @@ public final class MetadataCommand extends Command {
   private static final ZoneId AMERICA_LOS_ANGELES = ZoneId.of("America/Los_Angeles");
   private static final List<String> FIELD_TYPES = ImmutableList.of("VARCHAR", "TEXT", "INTEGER");
 
-  private static final String OL_NAMESPACE = newNamespaceName().getValue();
+  private static final String OL_NAMESPACE = MetadataUtils.newNamespaceName().getValue();
   private static final OpenLineage OL =
       new OpenLineage(
           URI.create(
               "https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java"));
+
+  private static final SingleJobDAGGenerator GENERATOR = new SingleJobDAGGenerator();
 
   /* Define metadata command. */
   public MetadataCommand() {
@@ -128,7 +118,7 @@ public final class MetadataCommand extends Command {
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
     // Generate, then write events to metadata file.
-    writeOlEvents(newOlEvents(runs, bytesPerEvent), output);
+    MetadataUtils.writeOlEvents(newOlEvents(runs, bytesPerEvent), output);
   }
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
@@ -144,25 +134,21 @@ public final class MetadataCommand extends Command {
   }
 
   /**
-   * Returns new {@link RunEvents} objects. A {@link RunEvents} object contains the {@code START}
-   * and {@code COMPLETE} event for a given run.
+   * Returns new {@link MetadataUtils.RunEvents} objects. A {@link MetadataUtils.RunEvents} object
+   * contains the {@code START} and {@code COMPLETE} event for a given run.
    */
-  private static RunEvents newOlRunEvents(final int bytesPerEvent) {
-    // (1) Generate run with an optional parent run, then the job.
-    final OpenLineage.Run olRun = newRun(hasParentRunOrNot());
-    final OpenLineage.Job olJob = newJob();
-
-    // (2) Generate number of I/O for run.
+  private static MetadataUtils.RunEvents newOlRunEvents(final int bytesPerEvent) {
+    // (1) Generate number of I/O for run.
     int numOfInputs = RANDOM.nextInt(DEFAULT_NUM_OF_IO_PER_EVENT);
     int numOfOutputs = DEFAULT_NUM_OF_IO_PER_EVENT - numOfInputs;
 
-    // (3) Generate number of schema fields per I/O for run.
+    // (2) Generate number of schema fields per I/O for run.
     final int numOfFieldsInSchemaForInputs =
         RANDOM.nextInt(DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT);
     final int numOfFieldsInSchemaForOutputs =
         DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT - numOfFieldsInSchemaForInputs;
 
-    // (4) Generate an event of N bytes if provided; otherwise use default.
+    // (3) Generate an event of N bytes if provided; otherwise use default.
     if (bytesPerEvent > DEFAULT_BYTES_PER_EVENT) {
       // Bytes per event:
       // +------------+-----------+-------------------+
@@ -171,191 +157,48 @@ public final class MetadataCommand extends Command {
       // |->  578B  <-|->  78B  <-|->(256B x N) x P <-|
       // where, N is number of fields per schema, and P is number of I/O per event.
       //
-      // (5) Calculate the total I/O per event to equal the bytes per event.
+      // (4) Calculate the total I/O per event to equal the bytes per event.
       final int numOfInputsAndOutputsForEvent =
           (bytesPerEvent - BYTES_PER_RUN - BYTES_PER_JOB)
               / (DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT * BYTES_PER_FIELD_IN_SCHEMA);
 
-      // (6) Update the number of I/O to generate for run based on calculation.
+      // (5) Update the number of I/O to generate for run based on calculation.
       numOfInputs = RANDOM.nextInt(numOfInputsAndOutputsForEvent);
       numOfOutputs = numOfInputsAndOutputsForEvent - numOfInputs;
     }
-    return new RunEvents(
+
+    JobTemplate jobTemplate = GENERATOR.generateGraph(numOfInputs, numOfOutputs).get(0);
+
+    // (6) Generate run with an optional parent run, then the job.
+    final OpenLineage.Run olRun = MetadataUtils.newRun(jobTemplate);
+    final OpenLineage.Job olJob = MetadataUtils.newJob(jobTemplate);
+
+    return new MetadataUtils.RunEvents(
         OL.newRunEventBuilder()
             .eventType(START)
-            .eventTime(newEventTime())
+            .eventTime(MetadataUtils.newEventTime())
             .run(olRun)
             .job(olJob)
-            .inputs(newInputs(numOfInputs, numOfFieldsInSchemaForInputs))
-            .outputs(newOutputs(numOfOutputs, numOfFieldsInSchemaForOutputs))
+            .inputs(
+                MetadataUtils.newInputs(
+                    jobTemplate.getInputDatasetNames(),
+                    Stream.generate(
+                            () -> MetadataUtils.newDatasetSchema(numOfFieldsInSchemaForInputs))
+                        .limit(jobTemplate.getInputDatasetNames().size())
+                        .toList()))
+            .outputs(
+                MetadataUtils.newOutputs(
+                    jobTemplate.getOutputDatasetNames(),
+                    Stream.generate(
+                            () -> MetadataUtils.newDatasetSchema(numOfFieldsInSchemaForOutputs))
+                        .limit(jobTemplate.getOutputDatasetNames().size())
+                        .toList()))
             .build(),
         OL.newRunEventBuilder()
             .eventType(COMPLETE)
-            .eventTime(newEventTime())
+            .eventTime(MetadataUtils.newEventTime())
             .run(olRun)
             .job(olJob)
             .build());
   }
-
-  /** Write {@link OpenLineage.RunEvent}s to the specified {@code output}. */
-  private static void writeOlEvents(
-      @NonNull final List<OpenLineage.RunEvent> olEvents, @NonNull final String output) {
-    System.out.format("Writing '%d' events to: '%s'\n", olEvents.size(), output);
-    FileWriter fileWriter;
-    PrintWriter printWriter = null;
-    try {
-      fileWriter = new FileWriter(output);
-      printWriter = new PrintWriter(fileWriter);
-      printWriter.write(Utils.toJson(olEvents));
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (printWriter != null) {
-        printWriter.close();
-      }
-    }
-  }
-
-  /**
-   * Returns a new {@link OpenLineage.Run} object. A {@code parent} run will be associated with
-   * {@code child} run if {@code hasParentRun} is {@code true}; otherwise, the {@code child} run
-   * will not have a {@code parent} run.
-   */
-  private static OpenLineage.Run newRun(final boolean hasParentRun) {
-    return OL.newRun(
-        newRunId().getValue(),
-        OL.newRunFacetsBuilder()
-            .parent(
-                hasParentRun
-                    ? OL.newParentRunFacetBuilder().run(newParentRun()).job(newParentJob()).build()
-                    : null)
-            .nominalTime(
-                OL.newNominalTimeRunFacetBuilder()
-                    .nominalStartTime(newNominalTime())
-                    .nominalEndTime(newNominalTime().plusHours(1))
-                    .build())
-            .build());
-  }
-
-  /** Returns a new {@link OpenLineage.ParentRunFacetRun} object. */
-  private static OpenLineage.ParentRunFacetRun newParentRun() {
-    return OL.newParentRunFacetRunBuilder().runId(newRunId().getValue()).build();
-  }
-
-  /** Returns a new {@link OpenLineage.ParentRunFacetJob} object. */
-  private static OpenLineage.ParentRunFacetJob newParentJob() {
-    return OL.newParentRunFacetJobBuilder()
-        .namespace(OL_NAMESPACE)
-        .name(newJobName().getValue())
-        .build();
-  }
-
-  /** Returns a new {@link OpenLineage.Job} object. */
-  static OpenLineage.Job newJob() {
-    return OL.newJobBuilder().namespace(OL_NAMESPACE).name(newJobName().getValue()).build();
-  }
-
-  /** Returns new {@link OpenLineage.InputDataset} objects. */
-  private static List<OpenLineage.InputDataset> newInputs(
-      final int numOfInputs, final int numOfFields) {
-    return Stream.generate(
-            () ->
-                OL.newInputDatasetBuilder()
-                    .namespace(OL_NAMESPACE)
-                    .name(newDatasetName().getValue())
-                    .facets(
-                        OL.newDatasetFacetsBuilder().schema(newDatasetSchema(numOfFields)).build())
-                    .build())
-        .limit(numOfInputs)
-        .collect(toImmutableList());
-  }
-
-  /** Returns new {@link OpenLineage.OutputDataset} objects. */
-  static List<OpenLineage.OutputDataset> newOutputs(final int numOfOutputs, final int numOfFields) {
-    return Stream.generate(
-            () ->
-                OL.newOutputDatasetBuilder()
-                    .namespace(OL_NAMESPACE)
-                    .name(newDatasetName().getValue())
-                    .facets(
-                        OL.newDatasetFacetsBuilder().schema(newDatasetSchema(numOfFields)).build())
-                    .build())
-        .limit(numOfOutputs)
-        .collect(toImmutableList());
-  }
-
-  /** Returns a new {@link OpenLineage.SchemaDatasetFacet} object. */
-  private static OpenLineage.SchemaDatasetFacet newDatasetSchema(final int numOfFields) {
-    return OL.newSchemaDatasetFacetBuilder().fields(newFields(numOfFields)).build();
-  }
-
-  /** Returns new {@link OpenLineage.SchemaDatasetFacetFields} objects. */
-  private static List<OpenLineage.SchemaDatasetFacetFields> newFields(final int numOfFields) {
-    return Stream.generate(
-            () ->
-                OL.newSchemaDatasetFacetFieldsBuilder()
-                    .name(newFieldName().getValue())
-                    .type(newFieldType())
-                    .description(newDescription())
-                    .build())
-        .limit(numOfFields)
-        .collect(toImmutableList());
-  }
-
-  /** Returns a new {@link NamespaceName} object. */
-  private static NamespaceName newNamespaceName() {
-    return NamespaceName.of("namespace" + newId());
-  }
-
-  /** Returns a new {@link RunId} object. */
-  private static RunId newRunId() {
-    return RunId.of(UUID.randomUUID());
-  }
-
-  /** Returns a new {@link DatasetName} object. */
-  private static DatasetName newDatasetName() {
-    return DatasetName.of("dataset" + newId());
-  }
-
-  /** Returns a new {@link FieldName} object. */
-  private static FieldName newFieldName() {
-    return FieldName.of("field" + newId());
-  }
-
-  /** Returns a new field {@code type}. */
-  private static String newFieldType() {
-    return FIELD_TYPES.get(RANDOM.nextInt(FIELD_TYPES.size()));
-  }
-
-  /** Returns a new {@link JobName} object. */
-  private static JobName newJobName() {
-    return JobName.of("job" + newId());
-  }
-
-  /** Returns a new {@code description}. */
-  private static String newDescription() {
-    return "description" + newId();
-  }
-
-  /** Returns a new {@code nominal} time. */
-  private static ZonedDateTime newNominalTime() {
-    return Instant.now().atZone(AMERICA_LOS_ANGELES);
-  }
-
-  /** Returns a new {@code event} time. */
-  private static ZonedDateTime newEventTime() {
-    return Instant.now().atZone(AMERICA_LOS_ANGELES);
-  }
-
-  /** Returns {@code true} if parent run should be generated; {@code false} otherwise. */
-  private static boolean hasParentRunOrNot() {
-    return RANDOM.nextBoolean();
-  }
-
-  private static int newId() {
-    return RANDOM.nextInt(Integer.MAX_VALUE - 1);
-  }
-
-  /** A container class for run info. */
-  record RunEvents(@NonNull OpenLineage.RunEvent start, @NonNull OpenLineage.RunEvent complete) {}
 }

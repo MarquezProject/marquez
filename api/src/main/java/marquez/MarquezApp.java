@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
+import marquez.cli.GraphCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
@@ -79,6 +80,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     // Add CLI commands
     bootstrap.addCommand(new MetadataCommand());
+    bootstrap.addCommand(new GraphCommand());
     bootstrap.addCommand(new SeedCommand());
 
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
