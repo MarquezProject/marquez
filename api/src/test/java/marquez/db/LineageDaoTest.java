@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Functions;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -220,7 +221,7 @@ public class LineageDaoTest {
             .upsertJob(
                 UUID.randomUUID(),
                 JobType.valueOf(writeJob.getJob().getType()),
-                writeJob.getJob().getCreatedAt(),
+                Instant.now(),
                 namespaceRow.getUuid(),
                 writeJob.getJob().getNamespaceName(),
                 symlinkTargetJobName,
@@ -233,7 +234,7 @@ public class LineageDaoTest {
         .upsertJob(
             writeJob.getJob().getUuid(),
             JobType.valueOf(writeJob.getJob().getType()),
-            writeJob.getJob().getCreatedAt(),
+            Instant.now(),
             namespaceRow.getUuid(),
             writeJob.getJob().getNamespaceName(),
             writeJob.getJob().getName(),
