@@ -1,6 +1,6 @@
 *.md
 .*
 Dockerfile
-build
+api/build
 docs
 web/node_modules

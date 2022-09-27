@@ -12,7 +12,7 @@ COPY build.gradle build.gradle
 COPY api ./api
 COPY api/build.gradle ./api/build.gradle
 COPY clients/java ./clients/java
-RUN ./gradlew --no-daemon :api:shadowJar
+RUN ./gradlew --no-daemon clean :api:shadowJar
 
 FROM eclipse-temurin:17
 RUN apt-get update && apt-get install -y postgresql-client bash coreutils
