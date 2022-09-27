@@ -34,7 +34,7 @@ interface DispatchProps {
 
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
-const DATASET_COLUMNS = ['Name', 'Namespace', 'Source', 'Updated At']
+const DATASET_COLUMNS = ['NAME', 'NAMESPACE', 'SOURCE', 'UPDATED']
 
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {
@@ -73,7 +73,7 @@ class Datasets extends React.Component<DatasetsProps> {
             ) : (
               <>
                 <Box p={2}>
-                  <MqText heading>Datasets</MqText>
+                  <MqText heading>DATASETS</MqText>
                 </Box>
                 <Table size='small'>
                   <TableHead>

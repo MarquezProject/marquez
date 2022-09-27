@@ -55,7 +55,7 @@ class Sidenav extends React.Component<SidenavProps> {
             <RouterLink to={'/'} className={classes.link}>
               <MqIconButton
                 id={'homeDrawerButton'}
-                title={'Jobs'}
+                title={'JOBS'}
                 active={this.props.location.pathname === '/'}
               >
                 <FontAwesomeIcon icon={faCogs} size={'2x'} />
@@ -64,7 +64,7 @@ class Sidenav extends React.Component<SidenavProps> {
             <RouterLink to={'/datasets'} className={classes.link}>
               <MqIconButton
                 id={'datasetsDrawerButton'}
-                title={'Datasets'}
+                title={'DATASETS'}
                 active={this.props.location.pathname === '/datasets'}
               >
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
