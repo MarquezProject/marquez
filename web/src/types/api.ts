@@ -141,7 +141,7 @@ export interface Run {
   facets: object
 }
 
-export type RunState = 'NEW' | 'COMPLETED' | 'FAILED' | 'ABORTED'
+export type RunState = 'NEW' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'ABORTED'
 
 export interface SearchResult {
   name: string

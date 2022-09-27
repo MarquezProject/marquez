@@ -16,6 +16,8 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
+import { Run } from '../../../../types/api'
+import { Nullable } from '../../../../types/util/Nullable'
 
 export type Vertex = {
   x: number
@@ -38,6 +40,17 @@ interface OwnProps {
 }
 
 type NodeProps = DispatchProps & OwnProps
+
+function runStateToNodeColor(run: Nullable<Run>) {
+  switch (run?.state) {
+    case 'RUNNING': return theme.palette.primary.main;
+    case 'COMPLETED': return theme.palette.primary.main;
+    case 'FAILED': return theme.palette.error.main;
+    case 'ABORTED': return theme.palette.primary.main;
+    default:
+      break;
+  }
+}
 
 class Node extends React.Component<NodeProps> {
   determineLink = (node: GraphNode<MqNode>) => {
@@ -62,11 +75,11 @@ class Node extends React.Component<NodeProps> {
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
-              fill={theme.palette.common.white}
+              fill={runStateToNodeColor(job.latestRun)}
               stroke={
                 selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
+                  ? theme.palette.common.white
+                  : runStateToNodeColor(job.latestRun)
               }
               strokeWidth={BORDER}
               cx={node.x}
@@ -75,8 +88,8 @@ class Node extends React.Component<NodeProps> {
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS - 2}
-              fill={theme.palette.common.white}
-              stroke={theme.palette.common.white}
+              fill={runStateToNodeColor(job.latestRun)}
+              stroke={runStateToNodeColor(job.latestRun)}
               strokeWidth={2}
               cx={node.x}
               cy={node.y}
@@ -88,11 +101,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
+              color={theme.palette.common.white}
             />
           </g>
         ) : (
