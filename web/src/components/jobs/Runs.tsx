@@ -27,7 +27,7 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
-const RUN_COLUMNS = ['ID', 'State', 'Created At', 'Started At', 'Ended At', 'Duration']
+const RUN_COLUMNS = ['ID', 'STATE', 'CREATED AT', 'STARTED AT', 'ENDED AT', 'DURATION']
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -116,7 +116,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>Facets</MqText>
+            <MqText subheading>FACETS</MqText>
           </Box>
           <MqCode code={JSON.stringify(facets, null, '\t')} />
         </Box>

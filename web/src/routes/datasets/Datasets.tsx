@@ -34,7 +34,7 @@ interface DispatchProps {
 
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
-const DATASET_COLUMNS = ['NAME', 'NAMESPACE', 'SOURCE', 'UPDATED']
+const DATASET_COLUMNS = ['NAME', 'NAMESPACE', 'SOURCE', 'UPDATED AT']
 
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {

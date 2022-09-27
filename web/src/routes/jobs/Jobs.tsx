@@ -31,7 +31,7 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const JOB_COLUMNS = ['NAME', 'NAMESPACE', 'UPDATED', 'LATEST RUN DURATION']
+const JOB_COLUMNS = ['NAME', 'NAMESPACE', 'UPDATED AT', 'LATEST RUN DURATION']
 
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {

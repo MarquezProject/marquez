@@ -10,7 +10,7 @@ import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 import RunStatus from '../jobs/RunStatus'
 
-const DATASET_COLUMNS = ['Field', 'Type', 'Description']
+const DATASET_COLUMNS = ['NAME', 'TYPE', 'DESCRIPTION']
 
 interface DatasetInfoProps {
   datasetFields: Field[]
@@ -56,7 +56,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>Facets</MqText>
+            <MqText subheading>FACETS</MqText>
           </Box>
           <MqJson code={facets} />
         </Box>
