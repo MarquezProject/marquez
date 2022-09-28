@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Functions;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -84,6 +85,7 @@ public class LineageDaoTest {
           handle.execute("DELETE FROM runs_input_mapping");
           handle.execute("DELETE FROM dataset_versions_field_mapping");
           handle.execute("DELETE FROM dataset_versions");
+          handle.execute("DELETE FROM dataset_symlinks");
           handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
           handle.execute("DELETE FROM run_states");
           handle.execute("DELETE FROM runs");
@@ -220,7 +222,7 @@ public class LineageDaoTest {
             .upsertJob(
                 UUID.randomUUID(),
                 JobType.valueOf(writeJob.getJob().getType()),
-                writeJob.getJob().getCreatedAt(),
+                Instant.now(),
                 namespaceRow.getUuid(),
                 writeJob.getJob().getNamespaceName(),
                 symlinkTargetJobName,
@@ -233,7 +235,7 @@ public class LineageDaoTest {
         .upsertJob(
             writeJob.getJob().getUuid(),
             JobType.valueOf(writeJob.getJob().getType()),
-            writeJob.getJob().getCreatedAt(),
+            Instant.now(),
             namespaceRow.getUuid(),
             writeJob.getJob().getNamespaceName(),
             writeJob.getJob().getName(),

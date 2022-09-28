@@ -10,6 +10,7 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
@@ -34,6 +35,8 @@ class OpenLineageDaoTest {
   public static final String DATASET_NAME = "theDataset";
 
   private static OpenLineageDao dao;
+  private static DatasetSymlinkDao symlinkDao;
+  private static NamespaceDao namespaceDao;
   private final DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
           new SchemaField("name", "STRING", "my name"), new SchemaField("age", "INT", "my age"));
@@ -41,6 +44,8 @@ class OpenLineageDaoTest {
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     dao = jdbi.onDemand(OpenLineageDao.class);
+    symlinkDao = jdbi.onDemand(DatasetSymlinkDao.class);
+    namespaceDao = jdbi.onDemand(NamespaceDao.class);
   }
 
   /** When reading a dataset, the version is assumed to be the version last written */
@@ -92,6 +97,56 @@ class OpenLineageDaoTest {
     assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(writeJob.getOutputs().get().get(0).getDatasetVersionRow().getLifecycleState())
         .isEqualTo("TRUNCATE");
+  }
+
+  @Test
+  void testUpdateMarquezModelDatasetWithSymlinks() {
+    Dataset dataset =
+        new Dataset(
+            LineageTestUtils.NAMESPACE,
+            DATASET_NAME,
+            LineageEvent.DatasetFacets.builder()
+                .symlinks(
+                    new LineageEvent.DatasetSymlinkFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Collections.singletonList(
+                            new LineageEvent.SymlinkIdentifier(
+                                "symlinkNamespace", "symlinkName", "some-type"))))
+                .build());
+
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+
+    UpdateLineageRow readJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(
+                new Dataset(
+                    "symlinkNamespace",
+                    "symlinkName",
+                    LineageEvent.DatasetFacets.builder().build())),
+            Arrays.asList());
+
+    // make sure writeJob output dataset and readJob input dataset are the same (have the same uuid)
+    assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
+    assertThat(writeJob.getOutputs().get().get(0).getDatasetRow().getUuid())
+        .isEqualTo(readJob.getInputs().get().get(0).getDatasetRow().getUuid());
+    // make sure symlink is stored with type in dataset_symlinks table
+    assertThat(
+            symlinkDao
+                .findDatasetSymlinkByNamespaceUuidAndName(
+                    namespaceDao.findNamespaceByName("symlinkNamespace").get().getUuid(),
+                    "symlinkName")
+                .get()
+                .getType()
+                .get())
+        .isEqualTo("some-type");
   }
 
   /**
@@ -146,6 +201,7 @@ class OpenLineageDaoTest {
                     new SchemaField("eyeColor", "STRING", "my eye color"))),
             this.datasetFacets.getLifecycleStateChange(),
             this.datasetFacets.getDataSource(),
+            null,
             this.datasetFacets.getDescription(),
             this.datasetFacets.getAdditionalFacets());
     UpdateLineageRow readJob =
