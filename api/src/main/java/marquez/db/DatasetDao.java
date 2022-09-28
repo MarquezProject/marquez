@@ -23,6 +23,7 @@ import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetMapper;
 import marquez.db.mappers.DatasetRowMapper;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetSymlinkRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
@@ -73,8 +74,7 @@ public interface DatasetDao extends BaseDao {
       WITH selected_datasets AS (
           SELECT d.*
           FROM datasets_view d
-          WHERE d.namespace_name = :namespaceName
-          AND d.name = :datasetName
+          WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
       ), dataset_runs AS (
           SELECT d.uuid, d.name, d.namespace_name, dv.run_uuid, dv.lifecycle_state, event_time, event
           FROM selected_datasets d
@@ -229,7 +229,7 @@ public interface DatasetDao extends BaseDao {
             :description,
             :isDeleted,
             false
-          ) ON CONFLICT (namespace_uuid, name)
+          ) ON CONFLICT (uuid)
           DO UPDATE SET
           type = EXCLUDED.type,
           updated_at = EXCLUDED.updated_at,
@@ -275,7 +275,7 @@ public interface DatasetDao extends BaseDao {
           + ":sourceName, "
           + ":name, "
           + ":physicalName) "
-          + "ON CONFLICT (namespace_uuid, name) "
+          + "ON CONFLICT (uuid) "
           + "DO UPDATE SET "
           + "type = EXCLUDED.type, "
           + "updated_at = EXCLUDED.updated_at, "
@@ -296,8 +296,10 @@ public interface DatasetDao extends BaseDao {
       """
   UPDATE datasets
   SET is_hidden = true
-  WHERE namespace_name = :namespaceName
-  AND name = :name
+  FROM dataset_symlinks, namespaces
+  WHERE dataset_symlinks.dataset_uuid = datasets.uuid
+  AND namespaces.uuid = dataset_symlinks.namespace_uuid
+  AND namespaces.name=:namespaceName AND dataset_symlinks.name=:name
   RETURNING *
   """)
   Optional<DatasetRow> delete(String namespaceName, String name);
@@ -310,6 +312,10 @@ public interface DatasetDao extends BaseDao {
         createNamespaceDao()
             .upsertNamespaceRow(
                 UUID.randomUUID(), now, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
+    DatasetSymlinkRow symlinkRow =
+        createDatasetSymlinkDao()
+            .upsertDatasetSymlinkRow(
+                UUID.randomUUID(), datasetName.getValue(), namespaceRow.getUuid(), true, null, now);
     SourceRow sourceRow =
         createSourceDao()
             .upsertOrDefault(
@@ -318,13 +324,12 @@ public interface DatasetDao extends BaseDao {
                 now,
                 datasetMeta.getSourceName().getValue(),
                 "");
-    UUID newDatasetUuid = UUID.randomUUID();
     DatasetRow datasetRow;
 
     if (datasetMeta.getDescription().isPresent()) {
       datasetRow =
           upsert(
-              newDatasetUuid,
+              symlinkRow.getUuid(),
               datasetMeta.getType(),
               now,
               namespaceRow.getUuid(),
@@ -338,7 +343,7 @@ public interface DatasetDao extends BaseDao {
     } else {
       datasetRow =
           upsert(
-              newDatasetUuid,
+              symlinkRow.getUuid(),
               datasetMeta.getType(),
               now,
               namespaceRow.getUuid(),
@@ -349,7 +354,8 @@ public interface DatasetDao extends BaseDao {
               datasetMeta.getPhysicalName().getValue());
     }
 
-    updateDatasetMetric(namespaceName, datasetMeta.getType(), newDatasetUuid, datasetRow.getUuid());
+    updateDatasetMetric(
+        namespaceName, datasetMeta.getType(), symlinkRow.getUuid(), datasetRow.getUuid());
 
     TagDao tagDao = createTagDao();
     List<DatasetTagMapping> datasetTagMappings = new ArrayList<>();

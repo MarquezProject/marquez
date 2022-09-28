@@ -5,6 +5,7 @@
 
 package marquez.service.models;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -71,7 +72,11 @@ public class LineageEvent extends BaseJsonModel {
   public static class RunFacet {
 
     @Valid private NominalTimeRunFacet nominalTime;
-    @Valid private ParentRunFacet parent;
+
+    @JsonAlias(
+        "parentRun") // the Airflow integration previously reported parentRun instead of parent
+    @Valid
+    private ParentRunFacet parent;
 
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
@@ -319,6 +324,7 @@ public class LineageEvent extends BaseJsonModel {
     "description",
     "lifecycleStateChange",
     "columnLineage",
+    "symlinks"
   })
   public static class DatasetFacets {
 
@@ -327,6 +333,7 @@ public class LineageEvent extends BaseJsonModel {
     @Valid private LifecycleStateChangeFacet lifecycleStateChange;
     @Valid private DatasourceDatasetFacet dataSource;
     @Valid private ColumnLineageFacet columnLineage;
+    @Valid private DatasetSymlinkFacet symlinks;
     private String description;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
@@ -346,6 +353,10 @@ public class LineageEvent extends BaseJsonModel {
 
     public SchemaDatasetFacet getSchema() {
       return schema;
+    }
+
+    public DatasetSymlinkFacet getSymlinks() {
+      return symlinks;
     }
 
     public LifecycleStateChangeFacet getLifecycleStateChange() {
@@ -411,6 +422,36 @@ public class LineageEvent extends BaseJsonModel {
     @NotNull private String name;
     @Nullable private String type;
     private String description;
+  }
+
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  public static class DatasetSymlinkFacet extends BaseFacet {
+
+    @Valid private List<SymlinkIdentifier> identifiers;
+
+    @Builder
+    public DatasetSymlinkFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, List<SymlinkIdentifier> identifiers) {
+      super(_producer, _schemaURL);
+      this.identifiers = identifiers;
+    }
+  }
+
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class SymlinkIdentifier extends BaseJsonModel {
+
+    @NotNull private String namespace;
+    @NotNull private String name;
+    @Nullable private String type;
   }
 
   @NoArgsConstructor

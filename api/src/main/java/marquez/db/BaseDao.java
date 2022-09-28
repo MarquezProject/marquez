@@ -31,6 +31,9 @@ public interface BaseDao extends SqlObject {
   NamespaceDao createNamespaceDao();
 
   @CreateSqlObject
+  DatasetSymlinkDao createDatasetSymlinkDao();
+
+  @CreateSqlObject
   RunDao createRunDao();
 
   @CreateSqlObject

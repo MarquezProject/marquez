@@ -37,6 +37,7 @@ import marquez.db.mappers.LineageEventMapper;
 import marquez.db.models.ColumnLevelLineageRow;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetSymlinkRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.InputFieldData;
 import marquez.db.models.JobContextRow;
@@ -70,8 +71,8 @@ import org.slf4j.LoggerFactory;
 
 @RegisterRowMapper(LineageEventMapper.class)
 public interface OpenLineageDao extends BaseDao {
-  public String DEFAULT_SOURCE_NAME = "default";
-  public String DEFAULT_NAMESPACE_OWNER = "anonymous";
+  String DEFAULT_SOURCE_NAME = "default";
+  String DEFAULT_NAMESPACE_OWNER = "anonymous";
 
   @SqlUpdate(
       "INSERT INTO lineage_events ("
@@ -126,6 +127,7 @@ public interface OpenLineageDao extends BaseDao {
 
   default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
     NamespaceDao namespaceDao = createNamespaceDao();
+    DatasetSymlinkDao datasetSymlinkDao = createDatasetSymlinkDao();
     DatasetDao datasetDao = createDatasetDao();
     SourceDao sourceDao = createSourceDao();
     JobDao jobDao = createJobDao();
@@ -323,6 +325,7 @@ public interface OpenLineageDao extends BaseDao {
                 runUuid,
                 true,
                 namespaceDao,
+                datasetSymlinkDao,
                 sourceDao,
                 datasetDao,
                 datasetVersionDao,
@@ -345,6 +348,7 @@ public interface OpenLineageDao extends BaseDao {
                 runUuid,
                 false,
                 namespaceDao,
+                datasetSymlinkDao,
                 sourceDao,
                 datasetDao,
                 datasetVersionDao,
@@ -379,7 +383,10 @@ public interface OpenLineageDao extends BaseDao {
               .findJobRowByRunUuid(uuid)
               .map(
                   j -> {
-                    String parentJobName = Utils.parseParentJobName(facet.getJob().getName());
+                    String parentJobName =
+                        facet.getJob().getName().equals(event.getJob().getName())
+                            ? Utils.parseParentJobName(facet.getJob().getName())
+                            : facet.getJob().getName();
                     if (j.getNamespaceName().equals(facet.getJob().getNamespace())
                         && j.getName().equals(parentJobName)) {
                       return j;
@@ -441,6 +448,10 @@ public interface OpenLineageDao extends BaseDao {
       PGobject inputs) {
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
     Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+    String parentJobName =
+        facet.getJob().getName().equals(event.getJob().getName())
+            ? Utils.parseParentJobName(facet.getJob().getName())
+            : facet.getJob().getName();
     JobRow newParentJobRow =
         createJobDao()
             .upsertJob(
@@ -449,7 +460,7 @@ public interface OpenLineageDao extends BaseDao {
                 now,
                 namespace.getUuid(),
                 namespace.getName(),
-                Utils.parseParentJobName(facet.getJob().getName()),
+                parentJobName,
                 null,
                 jobContext.getUuid(),
                 location,
@@ -534,6 +545,7 @@ public interface OpenLineageDao extends BaseDao {
       UUID runUuid,
       boolean isInput,
       NamespaceDao namespaceDao,
+      DatasetSymlinkDao datasetSymlinkDao,
       SourceDao sourceDao,
       DatasetDao datasetDao,
       DatasetVersionDao datasetVersionDao,
@@ -571,6 +583,35 @@ public interface OpenLineageDao extends BaseDao {
             formatNamespaceName(ds.getNamespace()),
             DEFAULT_NAMESPACE_OWNER);
 
+    DatasetSymlinkRow symlink =
+        datasetSymlinkDao.upsertDatasetSymlinkRow(
+            UUID.randomUUID(),
+            formatDatasetName(ds.getName()),
+            dsNamespace.getUuid(),
+            true,
+            null,
+            now);
+
+    Optional.ofNullable(ds.getFacets())
+        .map(facets -> facets.getSymlinks())
+        .ifPresent(
+            el ->
+                el.getIdentifiers().stream()
+                    .forEach(
+                        id ->
+                            datasetSymlinkDao.doUpsertDatasetSymlinkRow(
+                                symlink.getUuid(),
+                                id.getName(),
+                                namespaceDao
+                                    .upsertNamespaceRow(
+                                        UUID.randomUUID(),
+                                        now,
+                                        id.getNamespace(),
+                                        DEFAULT_NAMESPACE_OWNER)
+                                    .getUuid(),
+                                false,
+                                id.getType(),
+                                now)));
     String dslifecycleState =
         Optional.ofNullable(ds.getFacets())
             .map(DatasetFacets::getLifecycleStateChange)
@@ -579,7 +620,7 @@ public interface OpenLineageDao extends BaseDao {
 
     DatasetRow datasetRow =
         datasetDao.upsert(
-            UUID.randomUUID(),
+            symlink.getUuid(),
             getDatasetType(ds),
             now,
             datasetNamespace.getUuid(),
@@ -612,7 +653,7 @@ public interface OpenLineageDao extends BaseDao {
                               dsNamespace.getName(),
                               source.getName(),
                               dsRow.getPhysicalName(),
-                              dsRow.getName(),
+                              symlink.getName(),
                               dslifecycleState,
                               fields,
                               runUuid)

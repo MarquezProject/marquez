@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Helm
-        uses: azure/setup-helm@v2.1
+        uses: azure/setup-helm@v2.2
 
       - name: Setup Python
         uses: actions/setup-python@v3
@@ -24,7 +24,7 @@ jobs:
           python-version: 3.7
 
       - name: Setup chart-testing
-        uses: helm/chart-testing-action@v2.2.1
+        uses: helm/chart-testing-action@v2.3.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -38,7 +38,7 @@ jobs:
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.2.0
+        uses: helm/kind-action@v1.4.0
 
       - name: Run chart-testing (install)
         run: ct install --config ct.yaml
