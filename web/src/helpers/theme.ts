@@ -32,6 +32,12 @@ export const theme = createTheme({
     error: {
       main: '#ee7b7b'
     },
+    warning: {
+      main: '#7D7D7D'
+    },
+    info: {
+      main: '#FECC00'
+    },
     background: {
       default: '#191f26'
     },

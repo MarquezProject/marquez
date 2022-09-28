@@ -43,10 +43,11 @@ type NodeProps = DispatchProps & OwnProps
 
 function runStateToNodeColor(run: Nullable<Run>) {
   switch (run?.state) {
-    case 'RUNNING': return theme.palette.primary.main;
+    case 'NEW': return theme.palette.secondary.main;
+    case 'RUNNING': return theme.palette.info.main;
     case 'COMPLETED': return theme.palette.primary.main;
     case 'FAILED': return theme.palette.error.main;
-    case 'ABORTED': return theme.palette.primary.main;
+    case 'ABORTED': return theme.palette.warning.main;
     default:
       break;
   }
