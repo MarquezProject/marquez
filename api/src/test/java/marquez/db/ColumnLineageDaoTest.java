@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import marquez.common.models.DatasetType;
-import marquez.db.models.ColumnLevelLineageRow;
+import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -30,9 +30,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-public class ColumnLevelLineageDaoTest {
+public class ColumnLineageDaoTest {
 
-  private static ColumnLevelLineageDao dao;
+  private static ColumnLineageDao dao;
   private static DatasetFieldDao fieldDao;
   private static DatasetDao datasetDao;
   private static NamespaceDao namespaceDao;
@@ -50,7 +50,7 @@ public class ColumnLevelLineageDaoTest {
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
-    dao = jdbi.onDemand(ColumnLevelLineageDao.class);
+    dao = jdbi.onDemand(ColumnLineageDao.class);
     fieldDao = jdbi.onDemand(DatasetFieldDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
@@ -73,7 +73,7 @@ public class ColumnLevelLineageDaoTest {
             "",
             sourceRow.getUuid(),
             "",
-            "",
+            "inputDataset",
             "",
             "",
             false);
@@ -86,7 +86,7 @@ public class ColumnLevelLineageDaoTest {
             "",
             sourceRow.getUuid(),
             "",
-            "",
+            "outputDataset",
             "",
             "",
             false);
@@ -135,7 +135,7 @@ public class ColumnLevelLineageDaoTest {
   public void tearDown(Jdbi jdbi) {
     jdbi.inTransaction(
         handle -> {
-          handle.execute("DELETE FROM column_level_lineage");
+          handle.execute("DELETE FROM column_lineage");
           handle.execute("DELETE FROM dataset_versions");
           handle.execute("DELETE FROM dataset_fields");
           handle.execute("DELETE FROM datasets");
@@ -154,8 +154,8 @@ public class ColumnLevelLineageDaoTest {
     fieldDao.upsert(inputFieldUuid1, now, "a", "string", "desc", inputDatasetRow.getUuid());
     fieldDao.upsert(inputFieldUuid2, now, "b", "string", "desc", inputDatasetRow.getUuid());
 
-    List<ColumnLevelLineageRow> rows =
-        dao.upsertColumnLevelLineageRow(
+    List<ColumnLineageRow> rows =
+        dao.upsertColumnLineageRow(
             outputDatasetVersionRow.getUuid(),
             outputDatasetFieldUuid,
             Arrays.asList(
@@ -180,8 +180,8 @@ public class ColumnLevelLineageDaoTest {
 
   @Test
   void testUpsertEmptyList() {
-    List<ColumnLevelLineageRow> rows =
-        dao.upsertColumnLevelLineageRow(
+    List<ColumnLineageRow> rows =
+        dao.upsertColumnLineageRow(
             UUID.randomUUID(),
             outputDatasetFieldUuid,
             Collections.emptyList(), // provide empty list
@@ -198,15 +198,15 @@ public class ColumnLevelLineageDaoTest {
     UUID inputFieldUuid = UUID.randomUUID();
     fieldDao.upsert(inputFieldUuid, now, "a", "string", "desc", inputDatasetRow.getUuid());
 
-    dao.upsertColumnLevelLineageRow(
+    dao.upsertColumnLineageRow(
         inputDatasetVersionRow.getUuid(),
         outputDatasetFieldUuid,
         Arrays.asList(Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid)),
         transformationDescription,
         transformationType,
         now);
-    List<ColumnLevelLineageRow> rows =
-        dao.upsertColumnLevelLineageRow(
+    List<ColumnLineageRow> rows =
+        dao.upsertColumnLineageRow(
             inputDatasetVersionRow.getUuid(),
             outputDatasetFieldUuid,
             Arrays.asList(Pair.of(inputDatasetVersionRow.getUuid(), inputFieldUuid)),

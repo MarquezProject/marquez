@@ -55,5 +55,5 @@ public interface BaseDao extends SqlObject {
   OpenLineageDao createOpenLineageDao();
 
   @CreateSqlObject
-  ColumnLevelLineageDao createColumnLevelLineageDao();
+  ColumnLineageDao createColumnLineageDao();
 }

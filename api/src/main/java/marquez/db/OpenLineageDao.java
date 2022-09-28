@@ -34,7 +34,7 @@ import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.mappers.LineageEventMapper;
-import marquez.db.models.ColumnLevelLineageRow;
+import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetSymlinkRow;
@@ -137,7 +137,7 @@ public interface OpenLineageDao extends BaseDao {
     RunDao runDao = createRunDao();
     RunArgsDao runArgsDao = createRunArgsDao();
     RunStateDao runStateDao = createRunStateDao();
-    ColumnLevelLineageDao columnLevelLineageDao = createColumnLevelLineageDao();
+    ColumnLineageDao columnLineageDao = createColumnLineageDao();
 
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
@@ -331,7 +331,7 @@ public interface OpenLineageDao extends BaseDao {
                 datasetVersionDao,
                 datasetFieldDao,
                 runDao,
-                columnLevelLineageDao);
+                columnLineageDao);
         datasetInputs.add(record);
       }
     }
@@ -354,7 +354,7 @@ public interface OpenLineageDao extends BaseDao {
                 datasetVersionDao,
                 datasetFieldDao,
                 runDao,
-                columnLevelLineageDao);
+                columnLineageDao);
         datasetOutputs.add(record);
       }
     }
@@ -551,7 +551,7 @@ public interface OpenLineageDao extends BaseDao {
       DatasetVersionDao datasetVersionDao,
       DatasetFieldDao datasetFieldDao,
       RunDao runDao,
-      ColumnLevelLineageDao columnLevelLineageDao) {
+      ColumnLineageDao columnLineageDao) {
     NamespaceRow dsNamespace =
         namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
@@ -702,7 +702,7 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    List<ColumnLevelLineageRow> columnLineageRows = Collections.emptyList();
+    List<ColumnLineageRow> columnLineageRows = Collections.emptyList();
     if (!isInput) {
       columnLineageRows =
           upsertColumnLineage(
@@ -710,7 +710,7 @@ public interface OpenLineageDao extends BaseDao {
               ds,
               now,
               datasetFields,
-              columnLevelLineageDao,
+              columnLineageDao,
               datasetFieldDao,
               datasetVersionRow);
     }
@@ -718,12 +718,12 @@ public interface OpenLineageDao extends BaseDao {
     return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace, columnLineageRows);
   }
 
-  private List<ColumnLevelLineageRow> upsertColumnLineage(
+  private List<ColumnLineageRow> upsertColumnLineage(
       UUID runUuid,
       Dataset ds,
       Instant now,
       List<DatasetFieldRow> datasetFields,
-      ColumnLevelLineageDao columnLevelLineageDao,
+      ColumnLineageDao columnLineageDao,
       DatasetFieldDao datasetFieldDao,
       DatasetVersionRow datasetVersionRow) {
     // get all the fields related to this particular run
@@ -770,8 +770,8 @@ public interface OpenLineageDao extends BaseDao {
                                   fieldData.getDatasetFieldUuid()))
                       .collect(Collectors.toList());
 
-              return columnLevelLineageDao
-                  .upsertColumnLevelLineageRow(
+              return columnLineageDao
+                  .upsertColumnLineageRow(
                       datasetVersionRow.getUuid(),
                       outputField.get().getUuid(),
                       inputFields,

@@ -16,7 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class ColumnLevelLineageRow {
+public class ColumnLineageRow {
   @Getter @NonNull private final UUID outputDatasetVersionUuid;
   @Getter @NonNull private final UUID outputDatasetFieldUuid;
   @Getter @NonNull private final UUID inputDatasetVersionUuid;
