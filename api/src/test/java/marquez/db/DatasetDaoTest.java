@@ -70,6 +70,7 @@ class DatasetDaoTest {
           handle.execute("DELETE FROM dataset_versions_field_mapping");
           handle.execute("DELETE FROM stream_versions");
           handle.execute("DELETE FROM dataset_versions");
+          handle.execute("DELETE FROM dataset_symlinks");
           handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
           handle.execute("DELETE FROM run_states");
           handle.execute("DELETE FROM runs");
@@ -193,6 +194,33 @@ class DatasetDaoTest {
     // make sure it's returned by DAO and marked as deleted
     assertThat(datasetDao.findDatasetByName(NAMESPACE, DATASET).get().isDeleted()).isTrue();
     assertThat(datasetDao.findWithTags(NAMESPACE, DATASET).get().isDeleted()).isTrue();
+  }
+
+  @Test
+  public void testGetDatasetBySymlink() {
+    createLineageRow(
+        openLineageDao,
+        "aJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            new Dataset(
+                NAMESPACE,
+                DATASET,
+                LineageEvent.DatasetFacets.builder()
+                    .symlinks(
+                        new LineageEvent.DatasetSymlinkFacet(
+                            PRODUCER_URL,
+                            SCHEMA_URL,
+                            Collections.singletonList(
+                                new LineageEvent.SymlinkIdentifier(
+                                    "symlinkNamespace", "symlinkName", "type"))))
+                    .build())));
+
+    // verify dataset is returned by its name and symlink name
+    assertThat(datasetDao.findDatasetByName(NAMESPACE, DATASET)).isPresent();
+    assertThat(datasetDao.findDatasetByName("symlinkNamespace", "symlinkName")).isPresent();
   }
 
   @Test
