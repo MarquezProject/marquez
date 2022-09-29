@@ -23,12 +23,15 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
 import marquez.db.ColumnLineageDao;
 import marquez.db.ColumnLineageTestUtils;
+import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.LineageTestUtils;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.ColumnLineageInputField;
+import marquez.service.models.Dataset;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.Node;
@@ -45,6 +48,7 @@ public class ColumnLineageServiceTest {
   private static ColumnLineageDao dao;
   private static OpenLineageDao openLineageDao;
   private static DatasetFieldDao fieldDao;
+  private static DatasetDao datasetDao;
   private static ColumnLineageService lineageService;
   private static LineageEvent.JobFacet jobFacet;
 
@@ -53,6 +57,7 @@ public class ColumnLineageServiceTest {
     dao = jdbi.onDemand(ColumnLineageDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     fieldDao = jdbi.onDemand(DatasetFieldDao.class);
+    datasetDao = jdbi.onDemand(DatasetDao.class);
     lineageService = new ColumnLineageService(dao, fieldDao);
     jobFacet = new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
   }
@@ -209,6 +214,84 @@ public class ColumnLineageServiceTest {
                     Instant.now())
                 .getGraph())
         .hasSize(0);
+  }
+
+  @Test
+  public void testEnrichDatasets() {
+    LineageEvent.Dataset dataset_A = getDatasetA();
+    LineageEvent.Dataset dataset_B = getDatasetB();
+    LineageEvent.Dataset dataset_C = getDatasetC();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job2",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_B),
+        Arrays.asList(dataset_C));
+
+    Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
+    Dataset dataset_c = datasetDao.findDatasetByName("namespace", "dataset_c").get();
+    lineageService.enrichWithColumnLineage(Arrays.asList(dataset_b, dataset_c));
+
+    assertThat(dataset_b.getColumnLineage()).hasSize(1);
+    assertThat(dataset_b.getColumnLineage().get(0).getName()).isEqualTo("col_c");
+    assertThat(dataset_b.getColumnLineage().get(0).getTransformationType()).isEqualTo("type1");
+    assertThat(dataset_b.getColumnLineage().get(0).getTransformationDescription())
+        .isEqualTo("description1");
+
+    List<ColumnLineageInputField> inputFields_b =
+        dataset_b.getColumnLineage().get(0).getInputFields();
+    assertThat(inputFields_b)
+        .hasSize(2)
+        .contains(new ColumnLineageInputField("namespace", "dataset_a", "col_a"))
+        .contains(new ColumnLineageInputField("namespace", "dataset_a", "col_b"));
+
+    assertThat(dataset_c.getColumnLineage()).hasSize(1);
+    assertThat(dataset_c.getColumnLineage().get(0).getName()).isEqualTo("col_d");
+    assertThat(dataset_c.getColumnLineage().get(0).getTransformationType()).isEqualTo("type2");
+    assertThat(dataset_c.getColumnLineage().get(0).getTransformationDescription())
+        .isEqualTo("description2");
+
+    List<ColumnLineageInputField> inputFields_c =
+        dataset_c.getColumnLineage().get(0).getInputFields();
+    assertThat(inputFields_c)
+        .hasSize(1)
+        .contains(new ColumnLineageInputField("namespace", "dataset_b", "col_c"));
+  }
+
+  @Test
+  public void testEnrichDatasetsHasNoDuplicates() {
+    LineageEvent.Dataset dataset_A = getDatasetA();
+    LineageEvent.Dataset dataset_B = getDatasetB();
+
+    // run job twice
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+
+    Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
+    lineageService.enrichWithColumnLineage(Arrays.asList(dataset_b));
+    assertThat(dataset_b.getColumnLineage()).hasSize(1);
   }
 
   private Optional<Node> getNode(Lineage lineage, String datasetName, String fieldName) {

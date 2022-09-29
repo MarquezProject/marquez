@@ -153,4 +153,54 @@ public interface ColumnLineageDao extends BaseDao {
       int depth,
       @BindList(onEmpty = NULL_STRING) List<UUID> datasetFieldUuids,
       Instant createdAtUntil);
+
+  @SqlQuery(
+      """
+        WITH selected_column_lineage AS (
+          SELECT DISTINCT ON (cl.output_dataset_field_uuid, cl.input_dataset_field_uuid) cl.*
+          FROM column_lineage cl
+          JOIN dataset_fields df ON df.uuid = cl.output_dataset_field_uuid
+          JOIN datasets_view dv ON dv.uuid = df.dataset_uuid
+          WHERE ARRAY[<values>]::DATASET_NAME[] && dv.dataset_symlinks -- array of string pairs is cast onto array of DATASET_NAME types to be checked if it has non-empty intersection with dataset symlinks
+          ORDER BY output_dataset_field_uuid, input_dataset_field_uuid, updated_at DESC, updated_at
+        ),
+        dataset_fields_view AS (
+          SELECT d.namespace_name as namespace_name, d.name as dataset_name, df.name as field_name, df.type, df.uuid
+          FROM dataset_fields df
+          INNER JOIN datasets_view d ON d.uuid = df.dataset_uuid
+        )
+        SELECT
+          output_fields.namespace_name,
+          output_fields.dataset_name,
+          output_fields.field_name,
+          output_fields.type,
+          ARRAY_AGG(ARRAY[input_fields.namespace_name, input_fields.dataset_name, input_fields.field_name]) AS inputFields,
+          c.transformation_description,
+          c.transformation_type,
+          c.created_at,
+          c.updated_at
+        FROM selected_column_lineage c
+        INNER JOIN dataset_fields_view output_fields ON c.output_dataset_field_uuid = output_fields.uuid
+        LEFT JOIN dataset_fields_view input_fields ON c.input_dataset_field_uuid = input_fields.uuid
+        GROUP BY
+          output_fields.namespace_name,
+          output_fields.dataset_name,
+          output_fields.field_name,
+          output_fields.type,
+          c.transformation_description,
+          c.transformation_type,
+          c.created_at,
+          c.updated_at
+      """)
+  /**
+   * Each dataset is identified by a pair of strings (namespace and name). A query returns column
+   * lineage for multiple datasets, that's why a list of pairs is expected as an argument. "left"
+   * and "right" properties correspond to Java Pair class properties defined to bind query template
+   * with values
+   */
+  Set<ColumnLineageNodeData> getLineageRowsForDatasets(
+      @BindBeanList(
+              propertyNames = {"left", "right"},
+              value = "values")
+          List<Pair<String, String>> datasets);
 }
