@@ -27,7 +27,7 @@ export type Vertex = {
 const RADIUS = 14
 const OUTER_RADIUS = RADIUS + 8
 const ICON_SIZE = 16
-const BORDER = 2
+const BORDER = 4
 
 interface DispatchProps {
   setSelectedNode: (payload: string) => void
@@ -45,11 +45,11 @@ function runStateToNodeColor(run: Nullable<Run>) {
   switch (run?.state) {
     case 'NEW': return theme.palette.secondary.main;
     case 'RUNNING': return theme.palette.info.main;
-    case 'COMPLETED': return theme.palette.primary.main;
+    case 'COMPLETED': return theme.palette.secondary.main;
     case 'FAILED': return theme.palette.error.main;
     case 'ABORTED': return theme.palette.warning.main;
     default:
-      break;
+      return theme.palette.secondary.main;
   }
 }
 
@@ -66,6 +66,7 @@ class Node extends React.Component<NodeProps> {
   render() {
     const { node, edgeEnds, selectedNode } = this.props
     const job = isJob(node)
+    const isSelected = selectedNode === node.label;
     return (
       <Link
         to={this.determineLink(node)}
@@ -77,11 +78,7 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               r={RADIUS}
               fill={runStateToNodeColor(job.latestRun)}
-              stroke={
-                selectedNode === node.label
-                  ? theme.palette.common.white
-                  : runStateToNodeColor(job.latestRun)
-              }
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
               strokeWidth={BORDER}
               cx={node.x}
               cy={node.y}
@@ -89,8 +86,8 @@ class Node extends React.Component<NodeProps> {
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS - 2}
-              fill={runStateToNodeColor(job.latestRun)}
-              stroke={runStateToNodeColor(job.latestRun)}
+              fill={theme.palette.common.white}
+              stroke={theme.palette.common.white}
               strokeWidth={2}
               cx={node.x}
               cy={node.y}
@@ -102,7 +99,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={theme.palette.common.white}
+              color={runStateToNodeColor(job.latestRun)}
             />
           </g>
         ) : (
@@ -113,7 +110,7 @@ class Node extends React.Component<NodeProps> {
               y={node.y - RADIUS}
               fill={theme.palette.common.white}
               stroke={
-                selectedNode === node.label
+                isSelected
                   ? theme.palette.primary.main
                   : theme.palette.secondary.main
               }
@@ -139,11 +136,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
+              color={theme.palette.secondary.main}
             />
           </g>
         )}
