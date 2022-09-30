@@ -129,6 +129,15 @@ public final class Columns {
   public static final String RUN_UUID = "run_uuid";
   public static final String STATE = "state";
 
+  /* COLUMN LEVEL LINEAGE ROW COLUMNS */
+  public static final String FIELD_NAME = "field_name";
+  public static final String OUTPUT_DATASET_VERSION_UUID = "output_dataset_version_uuid";
+  public static final String OUTPUT_DATASET_FIELD_UUID = "output_dataset_field_uuid";
+  public static final String INPUT_DATASET_FIELD_UUID = "input_dataset_field_uuid";
+  public static final String INPUT_DATASET_VERSION_UUID = "input_dataset_version_uuid";
+  public static final String TRANSFORMATION_DESCRIPTION = "transformation_description";
+  public static final String TRANSFORMATION_TYPE = "transformation_type";
+
   /* LINEAGE EVENT ROW COLUMNS */
   public static final String EVENT = "event";
 

@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -31,10 +34,12 @@ import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.mappers.LineageEventMapper;
+import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetSymlinkRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.InputFieldData;
 import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -56,6 +61,7 @@ import marquez.service.models.LineageEvent.ParentRunFacet;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -131,6 +137,7 @@ public interface OpenLineageDao extends BaseDao {
     RunDao runDao = createRunDao();
     RunArgsDao runArgsDao = createRunArgsDao();
     RunStateDao runStateDao = createRunStateDao();
+    ColumnLineageDao columnLineageDao = createColumnLineageDao();
 
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
@@ -323,7 +330,8 @@ public interface OpenLineageDao extends BaseDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao);
+                runDao,
+                columnLineageDao);
         datasetInputs.add(record);
       }
     }
@@ -345,7 +353,8 @@ public interface OpenLineageDao extends BaseDao {
                 datasetDao,
                 datasetVersionDao,
                 datasetFieldDao,
-                runDao);
+                runDao,
+                columnLineageDao);
         datasetOutputs.add(record);
       }
     }
@@ -541,7 +550,8 @@ public interface OpenLineageDao extends BaseDao {
       DatasetDao datasetDao,
       DatasetVersionDao datasetVersionDao,
       DatasetFieldDao datasetFieldDao,
-      RunDao runDao) {
+      RunDao runDao,
+      ColumnLineageDao columnLineageDao) {
     NamespaceRow dsNamespace =
         namespaceDao.upsertNamespaceRow(
             UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
@@ -662,6 +672,7 @@ public interface OpenLineageDao extends BaseDao {
                   return row;
                 });
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
+    List<DatasetFieldRow> datasetFields = new ArrayList<>();
     if (fields != null) {
       for (SchemaField field : fields) {
         DatasetFieldRow datasetFieldRow =
@@ -672,6 +683,7 @@ public interface OpenLineageDao extends BaseDao {
                 field.getType(),
                 field.getDescription(),
                 datasetRow.getUuid());
+        datasetFields.add(datasetFieldRow);
         datasetFieldMappings.add(
             new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
       }
@@ -690,7 +702,85 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace);
+    List<ColumnLineageRow> columnLineageRows = Collections.emptyList();
+    if (!isInput) {
+      columnLineageRows =
+          upsertColumnLineage(
+              runUuid,
+              ds,
+              now,
+              datasetFields,
+              columnLineageDao,
+              datasetFieldDao,
+              datasetVersionRow);
+    }
+
+    return new DatasetRecord(datasetRow, datasetVersionRow, datasetNamespace, columnLineageRows);
+  }
+
+  private List<ColumnLineageRow> upsertColumnLineage(
+      UUID runUuid,
+      Dataset ds,
+      Instant now,
+      List<DatasetFieldRow> datasetFields,
+      ColumnLineageDao columnLineageDao,
+      DatasetFieldDao datasetFieldDao,
+      DatasetVersionRow datasetVersionRow) {
+    // get all the fields related to this particular run
+    List<InputFieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
+
+    return Optional.ofNullable(ds.getFacets())
+        .map(DatasetFacets::getColumnLineage)
+        .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+        .stream()
+        .flatMap(list -> list.stream())
+        .flatMap(
+            outputColumn -> {
+              Optional<DatasetFieldRow> outputField =
+                  datasetFields.stream()
+                      .filter(dfr -> dfr.getName().equals(outputColumn.getName()))
+                      .findAny();
+
+              if (outputField.isEmpty()) {
+                Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+                log.error(
+                    "Cannot produce column lineage for missing output field in output dataset: {}",
+                    outputColumn.getName());
+                return Stream.empty();
+              }
+
+              // get field uuids of input columns related to this run
+              List<Pair<UUID, UUID>> inputFields =
+                  runFields.stream()
+                      .filter(
+                          fieldData ->
+                              outputColumn.getInputFields().stream()
+                                  .filter(
+                                      of ->
+                                          of.getDatasetNamespace().equals(fieldData.getNamespace())
+                                              && of.getDatasetName()
+                                                  .equals(fieldData.getDatasetName())
+                                              && of.getFieldName().equals(fieldData.getField()))
+                                  .findAny()
+                                  .isPresent())
+                      .map(
+                          fieldData ->
+                              Pair.of(
+                                  fieldData.getDatasetVersionUuid(),
+                                  fieldData.getDatasetFieldUuid()))
+                      .collect(Collectors.toList());
+
+              return columnLineageDao
+                  .upsertColumnLineageRow(
+                      datasetVersionRow.getUuid(),
+                      outputField.get().getUuid(),
+                      inputFields,
+                      outputColumn.getTransformationDescription(),
+                      outputColumn.getTransformationType(),
+                      now)
+                  .stream();
+            })
+        .collect(Collectors.toList());
   }
 
   default String formatDatasetName(String name) {
