@@ -8,6 +8,8 @@ import { Node as GraphNode } from 'dagre'
 import { Link } from 'react-router-dom'
 import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
+import { Nullable } from '../../../../types/util/Nullable'
+import { Run } from '../../../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
@@ -16,8 +18,6 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
-import { Run } from '../../../../types/api'
-import { Nullable } from '../../../../types/util/Nullable'
 
 export type Vertex = {
   x: number
@@ -43,13 +43,13 @@ type NodeProps = DispatchProps & OwnProps
 
 function runStateToNodeColor(run: Nullable<Run>) {
   switch (run?.state) {
-    case 'NEW': return theme.palette.secondary.main;
-    case 'RUNNING': return theme.palette.info.main;
-    case 'COMPLETED': return theme.palette.secondary.main;
-    case 'FAILED': return theme.palette.error.main;
-    case 'ABORTED': return theme.palette.warning.main;
+    case 'NEW': return theme.palette.secondary.main
+    case 'RUNNING': return theme.palette.info.main
+    case 'COMPLETED': return theme.palette.secondary.main
+    case 'FAILED': return theme.palette.error.main
+    case 'ABORTED': return theme.palette.warning.main
     default:
-      return theme.palette.secondary.main;
+      return theme.palette.secondary.main
   }
 }
 
@@ -66,7 +66,7 @@ class Node extends React.Component<NodeProps> {
   render() {
     const { node, edgeEnds, selectedNode } = this.props
     const job = isJob(node)
-    const isSelected = selectedNode === node.label;
+    const isSelected = selectedNode === node.label
     return (
       <Link
         to={this.determineLink(node)}

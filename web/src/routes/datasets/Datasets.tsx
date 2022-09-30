@@ -88,33 +88,35 @@ class Datasets extends React.Component<DatasetsProps> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {datasets.filter(dataset => !dataset.deleted).map(dataset => {
-                      return (
-                        <TableRow key={dataset.name}>
-                          <TableCell align='left'>
-                            <MqText
-                              link
-                              linkTo={`/lineage/${encodeNode(
-                                'DATASET',
-                                dataset.namespace,
-                                dataset.name
-                              )}`}
-                            >
-                              {dataset.name}
-                            </MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.namespace}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.sourceName}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                    {datasets
+                      .filter(dataset => !dataset.deleted)
+                      .map(dataset => {
+                        return (
+                          <TableRow key={dataset.name}>
+                            <TableCell align='left'>
+                              <MqText
+                                link
+                                linkTo={`/lineage/${encodeNode(
+                                  'DATASET',
+                                  dataset.namespace,
+                                  dataset.name
+                                )}`}
+                              >
+                                {dataset.name}
+                              </MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{dataset.namespace}</MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{dataset.sourceName}</MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                   </TableBody>
                 </Table>
               </>
