@@ -323,6 +323,7 @@ public class LineageEvent extends BaseJsonModel {
     "dataSource",
     "description",
     "lifecycleStateChange",
+    "columnLineage",
     "symlinks"
   })
   public static class DatasetFacets {
@@ -331,6 +332,7 @@ public class LineageEvent extends BaseJsonModel {
     @Valid private SchemaDatasetFacet schema;
     @Valid private LifecycleStateChangeFacet lifecycleStateChange;
     @Valid private DatasourceDatasetFacet dataSource;
+    @Valid private ColumnLineageFacet columnLineage;
     @Valid private DatasetSymlinkFacet symlinks;
     private String description;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
@@ -363,6 +365,10 @@ public class LineageEvent extends BaseJsonModel {
 
     public DatasourceDatasetFacet getDataSource() {
       return dataSource;
+    }
+
+    public ColumnLineageFacet getColumnLineage() {
+      return columnLineage;
     }
 
     public String getDescription() {
@@ -482,5 +488,53 @@ public class LineageEvent extends BaseJsonModel {
       super(_producer, _schemaURL);
       this.lifecycleStateChange = lifecycleStateChange;
     }
+  }
+
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  public static class ColumnLineageFacet extends BaseFacet {
+
+    private List<ColumnLineageOutputColumn> outputColumnsList;
+
+    @Builder
+    public ColumnLineageFacet(
+        @NotNull URI _producer,
+        @NotNull URI _schemaURL,
+        List<ColumnLineageOutputColumn> outputColumnsList) {
+      super(_producer, _schemaURL);
+      this.outputColumnsList = outputColumnsList;
+    }
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class ColumnLineageOutputColumn extends BaseJsonModel {
+
+    @NotNull private String name;
+    @NotNull private List<ColumnLineageInputField> inputFields;
+    @NotNull private String transformationDescription;
+    @NotNull private String transformationType;
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class ColumnLineageInputField extends BaseJsonModel {
+
+    @NotNull private String datasetNamespace;
+    @NotNull private String datasetName;
+    @NotNull private String fieldName;
   }
 }
