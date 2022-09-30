@@ -31,7 +31,7 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const JOB_COLUMNS = ['Name', 'Namespace', 'Updated At', 'Last Runtime']
+const JOB_COLUMNS = ['NAME', 'NAMESPACE', 'UPDATED AT', 'LATEST RUN DURATION']
 
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {
@@ -70,7 +70,7 @@ class Jobs extends React.Component<JobsProps> {
             ) : (
               <>
                 <Box p={2}>
-                  <MqText heading>Jobs</MqText>
+                  <MqText heading>JOBS</MqText>
                 </Box>
                 <Table size='small'>
                   <TableHead>

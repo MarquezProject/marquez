@@ -26,7 +26,13 @@ const styles = (theme: ITheme) => {
   })
 }
 
-const DATASET_VERSIONS_COLUMNS = ['Version', 'Created At', 'Field Count', 'Dataset Creator (Run)', 'Lifecycle State']
+const DATASET_VERSIONS_COLUMNS = [
+  'VERSION',
+  'CREATED AT',
+  'FIELDS',
+  'CREATED BY RUN',
+  'LIFECYCLE STATE'
+]
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]

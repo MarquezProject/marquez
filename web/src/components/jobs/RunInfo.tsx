@@ -26,7 +26,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>Facets</MqText>
+            <MqText subheading>FACETS</MqText>
           </Box>
           <MqJson code={run.facets} />
         </Box>

@@ -34,7 +34,7 @@ interface DispatchProps {
 
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
-const DATASET_COLUMNS = ['Name', 'Namespace', 'Source', 'Updated At']
+const DATASET_COLUMNS = ['NAME', 'NAMESPACE', 'SOURCE', 'UPDATED AT']
 
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {
@@ -73,7 +73,7 @@ class Datasets extends React.Component<DatasetsProps> {
             ) : (
               <>
                 <Box p={2}>
-                  <MqText heading>Datasets</MqText>
+                  <MqText heading>DATASETS</MqText>
                 </Box>
                 <Table size='small'>
                   <TableHead>
@@ -88,33 +88,35 @@ class Datasets extends React.Component<DatasetsProps> {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {datasets.filter(dataset => !dataset.deleted).map(dataset => {
-                      return (
-                        <TableRow key={dataset.name}>
-                          <TableCell align='left'>
-                            <MqText
-                              link
-                              linkTo={`/lineage/${encodeNode(
-                                'DATASET',
-                                dataset.namespace,
-                                dataset.name
-                              )}`}
-                            >
-                              {dataset.name}
-                            </MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.namespace}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.sourceName}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                    {datasets
+                      .filter(dataset => !dataset.deleted)
+                      .map(dataset => {
+                        return (
+                          <TableRow key={dataset.name}>
+                            <TableCell align='left'>
+                              <MqText
+                                link
+                                linkTo={`/lineage/${encodeNode(
+                                  'DATASET',
+                                  dataset.namespace,
+                                  dataset.name
+                                )}`}
+                              >
+                                {dataset.name}
+                              </MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{dataset.namespace}</MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{dataset.sourceName}</MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                   </TableBody>
                 </Table>
               </>
