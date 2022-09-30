@@ -42,12 +42,17 @@ interface OwnProps {
 type NodeProps = DispatchProps & OwnProps
 
 function runStateToNodeColor(run: Nullable<Run>) {
-  switch (run?.state) {
-    case 'NEW': return theme.palette.secondary.main
-    case 'RUNNING': return theme.palette.info.main
-    case 'COMPLETED': return theme.palette.secondary.main
-    case 'FAILED': return theme.palette.error.main
-    case 'ABORTED': return theme.palette.warning.main
+  switch (run && run.state) {
+    case 'NEW':
+      return theme.palette.secondary.main
+    case 'RUNNING':
+      return theme.palette.info.main
+    case 'COMPLETED':
+      return theme.palette.secondary.main
+    case 'FAILED':
+      return theme.palette.error.main
+    case 'ABORTED':
+      return theme.palette.warning.main
     default:
       return theme.palette.secondary.main
   }
@@ -109,11 +114,7 @@ class Node extends React.Component<NodeProps> {
               x={node.x - RADIUS}
               y={node.y - RADIUS}
               fill={theme.palette.common.white}
-              stroke={
-                isSelected
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
               strokeWidth={BORDER}
               width={RADIUS * 2}
               height={RADIUS * 2}
