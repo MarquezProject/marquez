@@ -2,6 +2,15 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.27.0...HEAD)
 
+### Added
+* Add possibility to soft-delete namespaces [`#2244`](https://github.com/MarquezProject/marquez/pull/2244) [@mobuchowski](https://github.com/mobuchowski)  
+  *Adds the ability to "hide" inactive namespaces. The namespaces are being undeleted when relevant OL event is received.*
+
+### Fixed
+* Fix bug where job isn't properly deleted [`#2244`](https://github.com/MarquezProject/marquez/pull/2244) [@mobuchowski](https://github.com/mobuchowski)  
+  *It wasn't possible to delete jobs created from events that had `ParentRunFacet`. Now it's possible.*
+
+
 ## [0.27.0](https://github.com/MarquezProject/marquez/compare/0.26.0...0.27.0) - 2022-10-24
 
 ### Added

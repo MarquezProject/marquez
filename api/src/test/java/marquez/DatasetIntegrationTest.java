@@ -30,7 +30,9 @@ import marquez.client.models.Dataset;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTableMeta;
+import marquez.client.models.Job;
 import marquez.client.models.JobMeta;
+import marquez.client.models.Namespace;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
@@ -139,15 +141,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
                         .build()))
             .build();
 
-    final CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(lineageEvent))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
+    final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     datasetFacets.setAdditional(inputFacets);
@@ -170,15 +164,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .outputs(Collections.emptyList())
             .build();
 
-    final CompletableFuture<Integer> readResp =
-        this.sendLineage(Utils.toJson(readEvent))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
+    final CompletableFuture<Integer> readResp = sendEvent(readEvent);
     assertThat(readResp.join()).isEqualTo(201);
 
     // update dataset facet to include input and output facets
@@ -389,17 +375,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             Collections.emptyList(),
             "the_producer");
 
-    final CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
-    // Ensure the event was correctly rejected and a proper response code returned.
+    final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
 
     client.deleteDataset(namespace, name);
@@ -422,33 +398,14 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             Collections.emptyList(),
             "the_producer");
 
-    CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
-    // Ensure the event was correctly rejected and a proper response code returned.
+    CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
 
     client.deleteDataset(namespace, name);
 
     List<Dataset> datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(0);
-    resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
+    resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
 
     datasets = client.listDatasets(namespace);
@@ -494,5 +451,110 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     columnLineage = client.getDataset("namespace", "dataset_b").getColumnLineage();
     assertThat(columnLineage).hasSize(1);
     assertThat(columnLineage.get(0).getInputFields()).hasSize(2);
+  }
+
+  @Test
+  public void testApp_doesNotShowDeletedDatasetAfterDeleteNamespace() throws IOException {
+    String namespace = "namespace";
+    String name = "table";
+    LineageEvent event =
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job("namespace", "job_name", null),
+            List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
+            Collections.emptyList(),
+            "the_producer");
+
+    final CompletableFuture<Integer> resp = sendEvent(event);
+    assertThat(resp.join()).isEqualTo(201);
+
+    client.deleteNamespace(namespace);
+
+    List<Dataset> datasets = client.listDatasets(namespace);
+    assertThat(datasets).hasSize(0);
+  }
+
+  @Test
+  public void testApp_doesNotShowDeletedDatasetAfterUndeleteNamespace() throws IOException {
+    String namespaceName = "namespace";
+    String name = "table";
+
+    LineageEvent firstEvent =
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job(namespaceName, "job_name", null),
+            List.of(
+                new LineageEvent.Dataset(namespaceName, name, LineageTestUtils.newDatasetFacet())),
+            Collections.emptyList(),
+            "the_producer");
+
+    LineageEvent secondEvent =
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job(namespaceName, "second_job_name", null),
+            List.of(
+                new LineageEvent.Dataset(
+                    namespaceName, name + "2", LineageTestUtils.newDatasetFacet())),
+            Collections.emptyList(),
+            "the_producer");
+
+    CompletableFuture<Integer> resp = sendEvent(firstEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    resp = sendEvent(secondEvent);
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<Dataset> datasets = client.listDatasets(namespaceName);
+    assertThat(datasets).hasSize(2);
+
+    client.deleteNamespace(namespaceName);
+
+    List<Namespace> namespaces = client.listNamespaces();
+    assertThat(namespaces)
+        .anySatisfy(
+            namespace -> {
+              assertThat(namespace.getIsHidden()).isTrue();
+              assertThat(namespace.getName()).isEqualTo(namespaceName);
+            });
+
+    datasets = client.listDatasets(namespaceName);
+    assertThat(datasets).hasSize(0);
+
+    List<Job> jobs = client.listJobs(namespaceName);
+    assertThat(jobs).hasSize(0);
+
+    LineageEvent eventThatWillUndeleteNamespace =
+        new LineageEvent(
+            "COMPLETE",
+            Instant.now().atZone(ZoneId.systemDefault()),
+            new LineageEvent.Run(UUID.randomUUID().toString(), null),
+            new LineageEvent.Job(namespaceName, "job_name", null),
+            List.of(
+                new LineageEvent.Dataset(namespaceName, name, LineageTestUtils.newDatasetFacet())),
+            Collections.emptyList(),
+            "the_producer");
+
+    resp = sendEvent(eventThatWillUndeleteNamespace);
+    assertThat(resp.join()).isEqualTo(201);
+
+    namespaces = client.listNamespaces();
+    assertThat(namespaces)
+        .anySatisfy(
+            namespace -> {
+              assertThat(namespace.getIsHidden()).isFalse();
+              assertThat(namespace.getName()).isEqualTo(namespaceName);
+            });
+
+    datasets = client.listDatasets(namespaceName);
+    assertThat(datasets).hasSize(1);
+
+    jobs = client.listJobs(namespaceName);
+    assertThat(jobs).hasSize(1);
   }
 }

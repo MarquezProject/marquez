@@ -307,4 +307,22 @@ public class ColumnsTest {
     final boolean actual = Columns.booleanOrDefault(results, column, true);
     assertThat(actual).isTrue();
   }
+
+  @Test
+  public void testBooleanOrThrow() throws SQLException {
+    final String column = "is_deleted";
+    when(results.getObject(column)).thenReturn(true);
+    when(results.getBoolean(column)).thenReturn(true);
+
+    final boolean actual = Columns.booleanOrThrow(results, column);
+    assertThat(actual).isTrue();
+  }
+
+  @Test
+  public void testBooleanOrThrowNoValue() throws SQLException {
+    final String column = "is_deleted";
+    when(results.getObject(column)).thenReturn(null);
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> Columns.booleanOrThrow(results, column));
+  }
 }

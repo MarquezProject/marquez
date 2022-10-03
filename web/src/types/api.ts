@@ -20,6 +20,7 @@ export interface Namespace {
   updatedAt: string
   ownerName: string
   description: string
+  isHidden: boolean
 }
 
 export interface Datasets {
