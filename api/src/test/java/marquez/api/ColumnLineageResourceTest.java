@@ -7,7 +7,7 @@ package marquez.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +40,7 @@ public class ColumnLineageResourceTest {
             ColumnLineageResourceTest.class.getResourceAsStream("/column_lineage/node.json"),
             new TypeReference<>() {});
     LINEAGE = new Lineage(ImmutableSortedSet.of(testNode));
-    when(lineageService.lineage(any(NodeId.class), anyInt(), any(Instant.class)))
+    when(lineageService.lineage(any(NodeId.class), eq(20), eq(false), any(Instant.class)))
         .thenReturn(LINEAGE);
 
     ServiceFactory serviceFactory =

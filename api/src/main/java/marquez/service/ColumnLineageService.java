@@ -40,13 +40,12 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
     this.datasetFieldDao = datasetFieldDao;
   }
 
-  public Lineage lineage(NodeId nodeId, int depth, Instant createdAtUntil) {
+  public Lineage lineage(NodeId nodeId, int depth, boolean withDownstream, Instant createdAtUntil) {
     List<UUID> columnNodeUuids = getColumnNodeUuids(nodeId);
     if (columnNodeUuids.isEmpty()) {
       throw new NodeIdNotFoundException("Could not find node");
     }
-
-    return toLineage(getLineage(depth, columnNodeUuids, createdAtUntil));
+    return toLineage(getLineage(depth, columnNodeUuids, withDownstream, createdAtUntil));
   }
 
   private Lineage toLineage(Set<ColumnLineageNodeData> lineageNodeData) {
