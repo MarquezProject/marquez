@@ -21,7 +21,7 @@ export default (
   switch (type) {
     case FETCH_NAMESPACES_SUCCESS:
       return {
-        result: payload.namespaces,
+        result: payload.namespaces.filter(namespace => !namespace.isHidden),
         selectedNamespace:
           window.localStorage.getItem('selectedNamespace') &&
           action.payload.namespaces.find(

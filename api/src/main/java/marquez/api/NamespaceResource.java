@@ -15,6 +15,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -75,6 +76,23 @@ public class NamespaceResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     final List<Namespace> namespaces = namespaceService.findAll(limit, offset);
     return Response.ok(new Namespaces(namespaces)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @DELETE
+  @Path("/namespaces/{namespace}")
+  @Produces(APPLICATION_JSON)
+  public Response delete(@PathParam("namespace") NamespaceName name) {
+    final Namespace namespace =
+        namespaceService
+            .findBy(name.getValue())
+            .orElseThrow(() -> new NamespaceNotFoundException(name));
+    datasetService.deleteByNamespaceName(namespace.getName().getValue());
+    jobService.deleteByNamespaceName(namespace.getName().getValue());
+    namespaceService.delete(namespace.getName().getValue());
+    return Response.ok(namespace).build();
   }
 
   @Value

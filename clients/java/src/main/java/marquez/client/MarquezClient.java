@@ -213,6 +213,10 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
+  public void deleteNamespace(@NonNull String namespaceName) {
+    http.delete(url.toNamespaceUrl(namespaceName));
+  }
+
   public DatasetVersion getDatasetVersion(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String version) {
     final String bodyAsJson =

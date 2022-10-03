@@ -118,7 +118,8 @@ public class MarquezClientTest {
   private static final String OWNER_NAME = newOwnerName();
   private static final String NAMESPACE_DESCRIPTION = newDescription();
   private static final Namespace NAMESPACE =
-      new Namespace(NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION);
+      new Namespace(
+          NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION, false);
 
   // SOURCE
   private static final String SOURCE_TYPE = newSourceType();

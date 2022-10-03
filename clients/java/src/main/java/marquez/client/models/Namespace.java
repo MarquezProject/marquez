@@ -21,16 +21,20 @@ public final class Namespace extends NamespaceMeta {
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
 
+  @Getter private final Boolean isHidden;
+
   public Namespace(
       @NonNull final String name,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       final String ownerName,
-      @Nullable final String description) {
+      @Nullable final String description,
+      @NonNull final Boolean isHidden) {
     super(ownerName, description);
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.isHidden = isHidden;
   }
 
   public static Namespace fromJson(@NonNull final String json) {

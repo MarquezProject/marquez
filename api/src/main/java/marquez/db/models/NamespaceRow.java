@@ -20,6 +20,7 @@ public class NamespaceRow {
   @NonNull String name;
   @Nullable String description;
   @NonNull String currentOwnerName;
+  @NonNull Boolean isHidden;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

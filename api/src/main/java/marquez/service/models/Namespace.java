@@ -20,6 +20,7 @@ public class Namespace {
   @NonNull Instant updatedAt;
   @NonNull OwnerName ownerName;
   @Nullable String description;
+  @NonNull Boolean isHidden;
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);

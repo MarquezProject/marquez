@@ -105,17 +105,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             Collections.emptyList(),
             "the_producer");
 
-    final CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
-    // Ensure the event was correctly rejected and a proper response code returned.
+    final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(400);
   }
 
@@ -888,17 +878,6 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     ObjectMapper mapper = Utils.getMapper();
     assertThat((JsonNode) mapper.valueToTree(secondEvent))
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
-  }
-
-  private CompletableFuture<Integer> sendEvent(marquez.service.models.LineageEvent event) {
-    return this.sendLineage(Utils.toJson(event))
-        .thenApply(HttpResponse::statusCode)
-        .whenComplete(
-            (val, error) -> {
-              if (error != null) {
-                Assertions.fail("Could not complete request");
-              }
-            });
   }
 
   private CompletableFuture<Integer> sendAllEvents(RunEvent... events) {

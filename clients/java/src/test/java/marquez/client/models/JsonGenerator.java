@@ -38,6 +38,7 @@ public final class JsonGenerator {
         .put("updatedAt", ISO_INSTANT.format(namespace.getUpdatedAt()))
         .put("ownerName", namespace.getOwnerName())
         .put("description", namespace.getDescription().orElse(null))
+        .put("isHidden", namespace.getIsHidden())
         .toString();
   }
 
