@@ -396,9 +396,9 @@ public class ColumnLineageDaoTest {
     assertThat(dao.getLineage(20, Collections.singletonList(field_col_e), false, Instant.now()))
         .hasSize(3);
 
-    // verify graph size is 2 when max depth is 1
+    // depth 1 corresponds to single ColumnLineageData with other nodes as node inputFields
     assertThat(dao.getLineage(1, Collections.singletonList(field_col_e), false, Instant.now()))
-        .hasSize(2);
+        .hasSize(1);
   }
 
   @Test

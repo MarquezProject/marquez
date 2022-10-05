@@ -7,6 +7,7 @@ package marquez.client;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -24,6 +25,14 @@ public class UtilsTest {
   private static final Object OBJECT = new Object(VALUE);
   private static final TypeReference<Object> TYPE = new TypeReference<Object>() {};
   private static final String JSON = "{\"value\":\"" + VALUE + "\"}";
+  private static final String NULL_ERROR_MESSAGE = null;
+  private static final String NON_NULL_ERROR_MESSAGE = "test error message";
+  private static final String NON_NULL_ERROR_MESSAGE_WITH_ARGS = "test error message with %s";
+  private static final String ARG = "test arg";
+  private static final String BLANK_STRING = " ";
+  private static final String EMPTY_STRING = "";
+  private static final String NON_BLANK_STRING = "test string";
+  private static final String NULL_STRING = null;
 
   // Http Auth
   private static final String API_KEY = "PuRx8GT3huSXlheDIRUK1YUatGpLVEuL";
@@ -97,5 +106,27 @@ public class UtilsTest {
     Object(final String value) {
       this.value = value;
     }
+  }
+
+  @Test
+  public void testNotBlank() {
+    assertThat(Utils.checkNotBlank(NON_BLANK_STRING)).isEqualTo(NON_BLANK_STRING);
+  }
+
+  @Test
+  public void testCheckNotBlank_throwsOnNullString_noErrorMessage() {
+    assertThatNullPointerException().isThrownBy(() -> Utils.checkNotBlank(NULL_STRING));
+  }
+
+  @Test
+  public void testCheckNotBlank_throwsOnBlankString_noErrorMessage() {
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> Utils.checkNotBlank(BLANK_STRING));
+  }
+
+  @Test
+  public void testCheckNotBlank_throwsOnEmptyString_noErrorMessage() {
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> Utils.checkNotBlank(EMPTY_STRING));
   }
 }

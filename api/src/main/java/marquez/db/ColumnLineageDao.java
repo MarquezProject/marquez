@@ -138,7 +138,7 @@ public interface ColumnLineageDao extends BaseDao {
                 (node.input_dataset_field_uuid = adjacent_node.output_dataset_field_uuid) --upstream lineage
                 OR (:withDownstream AND adjacent_node.input_dataset_field_uuid = node.output_dataset_field_uuid) --optional downstream lineage
               )
-              AND node.depth < :depth
+              AND node.depth < :depth - 1 -- fetching single row means fetching single edge which is size 1
               AND NOT is_cycle
             )
             SELECT

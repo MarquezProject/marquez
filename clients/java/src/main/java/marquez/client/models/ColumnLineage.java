@@ -18,7 +18,7 @@ import lombok.ToString;
 @Getter
 public class ColumnLineage {
   @NonNull private String name;
-  @NonNull private List<ColumnLineageInputField> inputFields;
+  @NonNull private List<DatasetFieldId> inputFields;
   @NonNull private String transformationDescription;
   @NonNull private String transformationType;
 }

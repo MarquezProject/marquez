@@ -68,12 +68,15 @@ import marquez.client.MarquezClient.Namespaces;
 import marquez.client.MarquezClient.Runs;
 import marquez.client.MarquezClient.Sources;
 import marquez.client.MarquezClient.Tags;
+import marquez.client.models.ColumnLineageNodeData;
 import marquez.client.models.Dataset;
+import marquez.client.models.DatasetFieldId;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.DbTableVersion;
+import marquez.client.models.Edge;
 import marquez.client.models.Field;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
@@ -83,6 +86,9 @@ import marquez.client.models.JsonGenerator;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Node;
+import marquez.client.models.NodeId;
+import marquez.client.models.NodeType;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -132,6 +138,7 @@ public class MarquezClientTest {
   private static final List<Field> FIELDS = newFields(4);
   private static final Set<String> TAGS = newTagNames(4);
   private static final Map<String, Object> DB_FACETS = newDatasetFacets(4);
+  private static final String FIELD_NAME = "test_field";
 
   private static final DbTable DB_TABLE =
       new DbTable(
@@ -381,6 +388,8 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION,
           CREATED_BY_RUN,
           DB_FACETS);
+  private static final DatasetFieldId DATASET_FIELD_ID =
+      new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
 
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
@@ -940,6 +949,92 @@ public class MarquezClientTest {
 
     assertThat(createdTag.getName()).isEqualTo("tag2");
     assertThat(createdTag.getDescription()).isNotEmpty().contains("description");
+  }
+
+  @Test
+  public void testGetColumnLineage() throws Exception {
+    Node node =
+        new Node(
+            NodeId.of(DATASET_FIELD_ID),
+            NodeType.DATASET_FIELD,
+            new ColumnLineageNodeData(
+                NAMESPACE_NAME,
+                DB_TABLE_NAME,
+                FIELD_NAME,
+                "String",
+                "transformationDescription",
+                "transformationType",
+                Collections.singletonList(
+                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(DATASET_FIELD_ID),
+                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
+                    NodeId.of(DATASET_FIELD_ID))));
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
+    String lineageJson = lineage.toJson();
+    when(http.get(
+            buildUrlFor(
+                "/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=false")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client.getColumnLineage("namespace", "dataset").getGraph().stream().findAny().get();
+    assertThat(retrievedNode.getId()).isEqualTo(node.getId());
+    assertThat(retrievedNode.getData()).isEqualTo(node.getData());
+    assertThat(retrievedNode.getInEdges().stream().findFirst())
+        .isEqualTo(node.getInEdges().stream().findFirst());
+    assertThat(retrievedNode.getOutEdges().stream().findFirst())
+        .isEqualTo(node.getOutEdges().stream().findFirst());
+  }
+
+  @Test
+  public void testGetColumnLineageByField() throws Exception {
+    Node node =
+        new Node(
+            NodeId.of(DATASET_FIELD_ID),
+            NodeType.DATASET_FIELD,
+            new ColumnLineageNodeData(
+                NAMESPACE_NAME,
+                DB_TABLE_NAME,
+                FIELD_NAME,
+                "String",
+                "transformationDescription",
+                "transformationType",
+                Collections.singletonList(
+                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(DATASET_FIELD_ID),
+                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
+                    NodeId.of(DATASET_FIELD_ID))));
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
+    String lineageJson = lineage.toJson();
+    when(http.get(
+            buildUrlFor(
+                "/column-lineage?nodeId=datasetField%3Anamespace%3Adataset%3Asome-col1&depth=20&withDownstream=false")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client.getColumnLineage("namespace", "dataset", "some-col1").getGraph().stream()
+            .findAny()
+            .get();
+    assertThat(retrievedNode.getId()).isEqualTo(node.getId());
+    assertThat(retrievedNode.getData()).isEqualTo(node.getData());
+    assertThat(retrievedNode.getInEdges().stream().findFirst())
+        .isEqualTo(node.getInEdges().stream().findFirst());
+    assertThat(retrievedNode.getOutEdges().stream().findFirst())
+        .isEqualTo(node.getOutEdges().stream().findFirst());
+  }
+
+  private URL buildUrlFor(String pathTemplate) throws Exception {
+    return new URL(DEFAULT_BASE_URL + BASE_PATH + pathTemplate);
   }
 
   private URL buildUrlFor(String pathTemplate, String... pathArgs) throws Exception {

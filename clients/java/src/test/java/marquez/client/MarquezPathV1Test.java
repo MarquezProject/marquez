@@ -81,4 +81,9 @@ public class MarquezPathV1Test {
           MarquezPathV1.path("/whatever/%s/next/%s");
         });
   }
+
+  @Test
+  void testPath_columnLineage() {
+    Assertions.assertEquals("/api/v1/column-lineage", MarquezPathV1.columnLineagePath());
+  }
 }
