@@ -12,6 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.util.Resources;
 import io.openlineage.client.OpenLineage;
@@ -353,6 +355,60 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
     CompletableFuture<Integer> future = sendAllEvents(airflowTask1, airflowTask2);
     future.get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
+    assertThat(runsList).isNotEmpty().hasSize(1);
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowIntegrationWithParentOnStartEventOnly()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+    JsonNode eventOneJson = mapper.valueToTree(event1);
+    ((ObjectNode) eventOneJson).set("eventType", new TextNode("START"));
+
+    event1.getRun().getFacets().getAdditionalProperties().remove("parent");
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(eventOneJson))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event1));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
 
     Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
     assertThat(job)

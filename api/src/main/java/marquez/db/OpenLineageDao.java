@@ -58,6 +58,7 @@ import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.LifecycleStateChangeFacet;
 import marquez.service.models.LineageEvent.NominalTimeRunFacet;
 import marquez.service.models.LineageEvent.ParentRunFacet;
+import marquez.service.models.LineageEvent.Run;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
@@ -150,23 +151,11 @@ public interface OpenLineageDao extends BaseDao {
             DEFAULT_NAMESPACE_OWNER);
     bag.setNamespace(namespace);
 
-    String description =
-        Optional.ofNullable(event.getJob().getFacets())
-            .map(JobFacet::getDocumentation)
-            .map(DocumentationJobFacet::getDescription)
-            .orElse(null);
-
     Map<String, String> context = buildJobContext(event);
     JobContextRow jobContext =
         jobContextDao.upsert(
             UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
     bag.setJobContext(jobContext);
-
-    String location =
-        Optional.ofNullable(event.getJob().getFacets())
-            .flatMap(f -> Optional.ofNullable(f.getSourceCodeLocation()))
-            .flatMap(s -> Optional.ofNullable(s.getUrl()))
-            .orElse(null);
 
     Instant nominalStartTime =
         Optional.ofNullable(event.getRun().getFacets())
@@ -181,75 +170,26 @@ public interface OpenLineageDao extends BaseDao {
             .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
             .orElse(null);
 
-    Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
     Optional<ParentRunFacet> parentRun =
-        Optional.ofNullable(event.getRun())
-            .map(LineageEvent.Run::getFacets)
-            .map(RunFacet::getParent);
-
+        Optional.ofNullable(event.getRun()).map(Run::getFacets).map(RunFacet::getParent);
     Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
-    Optional<JobRow> parentJob =
-        parentUuid.map(
-            uuid ->
-                findParentJobRow(
-                    event,
-                    namespace,
-                    jobContext,
-                    location,
-                    nominalStartTime,
-                    nominalEndTime,
-                    log,
-                    parentRun.get(),
-                    uuid));
 
-    // construct the simple name of the job by removing the parent prefix plus the dot '.' separator
-    String jobName =
-        parentJob
-            .map(
-                p -> {
-                  if (event.getJob().getName().startsWith(p.getName() + '.')) {
-                    return event.getJob().getName().substring(p.getName().length() + 1);
-                  } else {
-                    return event.getJob().getName();
-                  }
-                })
-            .orElse(event.getJob().getName());
-    log.debug(
-        "Calculated job name {} from job {} with parent {}",
-        jobName,
-        event.getJob().getName(),
-        parentJob.map(JobRow::getName));
     JobRow job =
-        parentJob
-            .map(
-                parent ->
-                    jobDao.upsertJob(
-                        UUID.randomUUID(),
-                        parent.getUuid(),
-                        getJobType(event.getJob()),
-                        now,
-                        namespace.getUuid(),
-                        namespace.getName(),
-                        jobName,
-                        description,
-                        jobContext.getUuid(),
-                        location,
-                        null,
-                        jobDao.toJson(toDatasetId(event.getInputs()), mapper)))
+        runDao
+            .findJobRowByRunUuid(runToUuid(event.getRun().getRunId()))
             .orElseGet(
                 () ->
-                    jobDao.upsertJob(
-                        UUID.randomUUID(),
-                        getJobType(event.getJob()),
+                    buildJobFromEvent(
+                        event,
+                        mapper,
+                        jobDao,
                         now,
-                        namespace.getUuid(),
-                        namespace.getName(),
-                        jobName,
-                        description,
-                        jobContext.getUuid(),
-                        location,
-                        null,
-                        jobDao.toJson(toDatasetId(event.getInputs()), mapper)));
+                        namespace,
+                        jobContext,
+                        nominalStartTime,
+                        nominalEndTime,
+                        parentRun));
+
     bag.setJob(job);
 
     Map<String, String> runArgsMap = createRunArgs(event);
@@ -277,8 +217,8 @@ public interface OpenLineageDao extends BaseDao {
               runStateType,
               now,
               namespace.getName(),
-              jobName,
-              location,
+              job.getName(),
+              job.getLocation(),
               jobContext.getUuid());
     } else {
       run =
@@ -294,8 +234,8 @@ public interface OpenLineageDao extends BaseDao {
               nominalEndTime,
               namespace.getUuid(),
               namespace.getName(),
-              jobName,
-              location,
+              job.getName(),
+              job.getLocation(),
               jobContext.getUuid());
     }
     bag.setRun(run);
@@ -361,6 +301,93 @@ public interface OpenLineageDao extends BaseDao {
 
     bag.setOutputs(Optional.ofNullable(datasetOutputs));
     return bag;
+  }
+
+  private JobRow buildJobFromEvent(
+      LineageEvent event,
+      ObjectMapper mapper,
+      JobDao jobDao,
+      Instant now,
+      NamespaceRow namespace,
+      JobContextRow jobContext,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      Optional<ParentRunFacet> parentRun) {
+    Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+    String description =
+        Optional.ofNullable(event.getJob().getFacets())
+            .map(JobFacet::getDocumentation)
+            .map(DocumentationJobFacet::getDescription)
+            .orElse(null);
+
+    String location =
+        Optional.ofNullable(event.getJob().getFacets())
+            .flatMap(f -> Optional.ofNullable(f.getSourceCodeLocation()))
+            .flatMap(s -> Optional.ofNullable(s.getUrl()))
+            .orElse(null);
+
+    Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
+    Optional<JobRow> parentJob =
+        parentUuid.map(
+            uuid ->
+                findParentJobRow(
+                    event,
+                    namespace,
+                    jobContext,
+                    location,
+                    nominalStartTime,
+                    nominalEndTime,
+                    log,
+                    parentRun.get(),
+                    uuid));
+
+    // construct the simple name of the job by removing the parent prefix plus the dot '.' separator
+    String jobName =
+        parentJob
+            .map(
+                p -> {
+                  if (event.getJob().getName().startsWith(p.getName() + '.')) {
+                    return event.getJob().getName().substring(p.getName().length() + 1);
+                  } else {
+                    return event.getJob().getName();
+                  }
+                })
+            .orElse(event.getJob().getName());
+    log.debug(
+        "Calculated job name {} from job {} with parent {}",
+        jobName,
+        event.getJob().getName(),
+        parentJob.map(JobRow::getName));
+    return parentJob
+        .map(
+            parent ->
+                jobDao.upsertJob(
+                    UUID.randomUUID(),
+                    parent.getUuid(),
+                    getJobType(event.getJob()),
+                    now,
+                    namespace.getUuid(),
+                    namespace.getName(),
+                    jobName,
+                    description,
+                    jobContext.getUuid(),
+                    location,
+                    null,
+                    jobDao.toJson(toDatasetId(event.getInputs()), mapper)))
+        .orElseGet(
+            () ->
+                jobDao.upsertJob(
+                    UUID.randomUUID(),
+                    getJobType(event.getJob()),
+                    now,
+                    namespace.getUuid(),
+                    namespace.getName(),
+                    jobName,
+                    description,
+                    jobContext.getUuid(),
+                    location,
+                    null,
+                    jobDao.toJson(toDatasetId(event.getInputs()), mapper)));
   }
 
   private JobRow findParentJobRow(
