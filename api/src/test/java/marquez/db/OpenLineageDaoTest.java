@@ -144,8 +144,8 @@ class OpenLineageDaoTest {
             (ds) -> ds.getInputDatasetVersionUuid(),
             (ds) -> ds.getOutputDatasetFieldUuid(),
             (ds) -> ds.getOutputDatasetVersionUuid(),
-            (ds) -> ds.getTransformationDescription(),
-            (ds) -> ds.getTransformationType())
+            (ds) -> ds.getTransformationDescription().get(),
+            (ds) -> ds.getTransformationType().get())
         .containsExactly(
             Tuple.tuple(
                 datasetFieldDao
@@ -187,17 +187,18 @@ class OpenLineageDaoTest {
             DATASET_NAME,
             LineageEvent.DatasetFacets.builder() // schema is missing
                 .columnLineage(
-                    new LineageEvent.ColumnLineageFacet(
+                    new LineageEvent.ColumnLineageDatasetFacet(
                         PRODUCER_URL,
                         SCHEMA_URL,
-                        Collections.singletonList(
-                            new LineageEvent.ColumnLineageOutputColumn(
+                        new LineageEvent.ColumnLineageDatasetFacetFields(
+                            Collections.singletonMap(
                                 OUTPUT_COLUMN,
-                                Collections.singletonList(
-                                    new LineageEvent.ColumnLineageInputField(
-                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
-                                TRANSFORMATION_DESCRIPTION,
-                                TRANSFORMATION_TYPE))))
+                                new LineageEvent.ColumnLineageOutputColumn(
+                                    Collections.singletonList(
+                                        new LineageEvent.ColumnLineageInputField(
+                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                    TRANSFORMATION_DESCRIPTION,
+                                    TRANSFORMATION_TYPE)))))
                 .build());
 
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
@@ -237,17 +238,18 @@ class OpenLineageDaoTest {
                         SCHEMA_URL,
                         Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
                 .columnLineage(
-                    new LineageEvent.ColumnLineageFacet(
+                    new LineageEvent.ColumnLineageDatasetFacet(
                         PRODUCER_URL,
                         SCHEMA_URL,
-                        Collections.singletonList(
-                            new LineageEvent.ColumnLineageOutputColumn(
+                        new LineageEvent.ColumnLineageDatasetFacetFields(
+                            Collections.singletonMap(
                                 OUTPUT_COLUMN,
-                                Collections.singletonList(
-                                    new LineageEvent.ColumnLineageInputField(
-                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
-                                UPDATED_TRANSFORMATION_DESCRIPTION,
-                                UPDATED_TRANSFORMATION_TYPE))))
+                                new LineageEvent.ColumnLineageOutputColumn(
+                                    Collections.singletonList(
+                                        new LineageEvent.ColumnLineageInputField(
+                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                    UPDATED_TRANSFORMATION_DESCRIPTION,
+                                    UPDATED_TRANSFORMATION_TYPE)))))
                 .build());
 
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
@@ -530,17 +532,18 @@ class OpenLineageDaoTest {
                     SCHEMA_URL,
                     Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
             .columnLineage(
-                new LineageEvent.ColumnLineageFacet(
+                new LineageEvent.ColumnLineageDatasetFacet(
                     PRODUCER_URL,
                     SCHEMA_URL,
-                    Collections.singletonList(
-                        new LineageEvent.ColumnLineageOutputColumn(
+                    new LineageEvent.ColumnLineageDatasetFacetFields(
+                        Collections.singletonMap(
                             OUTPUT_COLUMN,
-                            Collections.singletonList(
-                                new LineageEvent.ColumnLineageInputField(
-                                    INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
-                            TRANSFORMATION_DESCRIPTION,
-                            TRANSFORMATION_TYPE))))
+                            new LineageEvent.ColumnLineageOutputColumn(
+                                Collections.singletonList(
+                                    new LineageEvent.ColumnLineageInputField(
+                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                TRANSFORMATION_DESCRIPTION,
+                                TRANSFORMATION_TYPE)))))
             .build());
   }
 }

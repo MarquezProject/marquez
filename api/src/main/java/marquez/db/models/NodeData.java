@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DatasetData.class, name = "DATASET"),
-  @JsonSubTypes.Type(value = JobData.class, name = "JOB")
+  @JsonSubTypes.Type(value = JobData.class, name = "JOB"),
+  @JsonSubTypes.Type(value = ColumnLineageNodeData.class, name = "DATASET_FIELD")
 })
 public interface NodeData {}

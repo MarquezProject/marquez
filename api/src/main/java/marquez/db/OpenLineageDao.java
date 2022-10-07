@@ -758,22 +758,27 @@ public interface OpenLineageDao extends BaseDao {
 
     return Optional.ofNullable(ds.getFacets())
         .map(DatasetFacets::getColumnLineage)
-        .map(LineageEvent.ColumnLineageFacet::getOutputColumnsList)
+        .map(LineageEvent.ColumnLineageDatasetFacet::getFields)
+        .map(LineageEvent.ColumnLineageDatasetFacetFields::getAdditional)
         .stream()
-        .flatMap(list -> list.stream())
+        .flatMap(map -> map.keySet().stream())
+        .filter(
+            columnName ->
+                ds.getFacets().getColumnLineage().getFields().getAdditional().get(columnName)
+                    instanceof LineageEvent.ColumnLineageOutputColumn)
         .flatMap(
-            outputColumn -> {
+            columnName -> {
+              LineageEvent.ColumnLineageOutputColumn columnLineage =
+                  ds.getFacets().getColumnLineage().getFields().getAdditional().get(columnName);
               Optional<DatasetFieldRow> outputField =
-                  datasetFields.stream()
-                      .filter(dfr -> dfr.getName().equals(outputColumn.getName()))
-                      .findAny();
+                  datasetFields.stream().filter(dfr -> dfr.getName().equals(columnName)).findAny();
 
               if (outputField.isEmpty()) {
                 Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
                 log.error(
                     "Cannot produce column lineage for missing output field in output dataset: {}",
-                    outputColumn.getName());
-                return Stream.empty();
+                    columnName);
+                return Stream.<ColumnLineageRow>empty();
               }
 
               // get field uuids of input columns related to this run
@@ -781,13 +786,12 @@ public interface OpenLineageDao extends BaseDao {
                   runFields.stream()
                       .filter(
                           fieldData ->
-                              outputColumn.getInputFields().stream()
+                              columnLineage.getInputFields().stream()
                                   .filter(
                                       of ->
-                                          of.getDatasetNamespace().equals(fieldData.getNamespace())
-                                              && of.getDatasetName()
-                                                  .equals(fieldData.getDatasetName())
-                                              && of.getFieldName().equals(fieldData.getField()))
+                                          of.getNamespace().equals(fieldData.getNamespace())
+                                              && of.getName().equals(fieldData.getDatasetName())
+                                              && of.getField().equals(fieldData.getField()))
                                   .findAny()
                                   .isPresent())
                       .map(
@@ -802,8 +806,8 @@ public interface OpenLineageDao extends BaseDao {
                       datasetVersionRow.getUuid(),
                       outputField.get().getUuid(),
                       inputFields,
-                      outputColumn.getTransformationDescription(),
-                      outputColumn.getTransformationType(),
+                      columnLineage.getTransformationDescription(),
+                      columnLineage.getTransformationType(),
                       now)
                   .stream();
             })
