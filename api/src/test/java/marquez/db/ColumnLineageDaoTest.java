@@ -565,4 +565,32 @@ public class ColumnLineageDaoTest {
                 20, Collections.singletonList(field_col_b), columnLineageCreatedAt.plusSeconds(1)))
         .hasSize(1);
   }
+
+  @Test
+  void testGetLineageWhenJobRunMultipleTimes() {
+    Dataset dataset_A = getDatasetA();
+    Dataset dataset_B = getDatasetB();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "job1",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(dataset_A),
+            Arrays.asList(dataset_B));
+
+    UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
+    UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
+
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_b), Instant.now()))
+        .hasSize(1);
+  }
 }

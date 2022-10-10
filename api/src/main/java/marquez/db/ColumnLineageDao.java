@@ -105,9 +105,12 @@ public interface ColumnLineageDao extends BaseDao {
               INNER JOIN datasets_view d ON d.uuid = df.dataset_uuid
             ),
             column_lineage_recursive AS (
-              SELECT *, 0 as depth
-              FROM column_lineage
-              WHERE output_dataset_field_uuid IN (<datasetFieldUuids>) AND created_at <= :createdAtUntil
+              (
+                SELECT DISTINCT ON (output_dataset_field_uuid, input_dataset_field_uuid) *, 0 as depth
+                FROM column_lineage
+                WHERE output_dataset_field_uuid IN (<datasetFieldUuids>) AND created_at <= :createdAtUntil
+                ORDER BY output_dataset_field_uuid, input_dataset_field_uuid, updated_at DESC, updated_at
+              )
               UNION
               SELECT
                 upstream_node.output_dataset_version_uuid,
