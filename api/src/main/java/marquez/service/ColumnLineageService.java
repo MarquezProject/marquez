@@ -22,10 +22,14 @@ import marquez.common.models.DatasetId;
 import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.models.ColumnLineageNodeData;
+import marquez.service.models.ColumnLineage;
+import marquez.service.models.ColumnLineageInputField;
+import marquez.service.models.Dataset;
 import marquez.service.models.Edge;
 import marquez.service.models.Lineage;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineageDao {
@@ -123,5 +127,52 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
           .ifPresent(uuid -> columnNodeUuids.add(uuid));
     }
     return columnNodeUuids;
+  }
+
+  public void enrichWithColumnLineage(List<Dataset> datasets) {
+    if (datasets.isEmpty()) {
+      return;
+    }
+
+    Set<ColumnLineageNodeData> lineageRowsForDatasets =
+        getLineageRowsForDatasets(
+            datasets.stream()
+                .map(d -> Pair.of(d.getNamespace().getValue(), d.getName().getValue()))
+                .collect(Collectors.toList()));
+
+    Map<Dataset, List<ColumnLineage>> datasetLineage = new HashMap<>();
+    lineageRowsForDatasets.stream()
+        .forEach(
+            nodeData -> {
+              Dataset dataset =
+                  datasets.stream()
+                      .filter(d -> d.getNamespace().getValue().equals(nodeData.getNamespace()))
+                      .filter(d -> d.getName().getValue().equals(nodeData.getDataset()))
+                      .findAny()
+                      .get();
+
+              if (!datasetLineage.containsKey(dataset)) {
+                datasetLineage.put(dataset, new LinkedList<>());
+              }
+              datasetLineage
+                  .get(dataset)
+                  .add(
+                      ColumnLineage.builder()
+                          .name(nodeData.getField())
+                          .transformationDescription(nodeData.getTransformationDescription())
+                          .transformationType(nodeData.getTransformationType())
+                          .inputFields(
+                              nodeData.getInputFields().stream()
+                                  .map(
+                                      f ->
+                                          new ColumnLineageInputField(
+                                              f.getNamespace(), f.getDataset(), f.getField()))
+                                  .collect(Collectors.toList()))
+                          .build());
+            });
+
+    datasets.stream()
+        .filter(dataset -> datasetLineage.containsKey(dataset))
+        .forEach(dataset -> dataset.setColumnLineage(datasetLineage.get(dataset)));
   }
 }

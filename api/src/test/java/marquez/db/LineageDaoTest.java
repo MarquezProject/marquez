@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import marquez.api.JdbiUtils;
 import marquez.common.models.JobType;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
@@ -79,27 +80,7 @@ public class LineageDaoTest {
 
   @AfterEach
   public void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("DELETE FROM dataset_symlinks");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          handle.execute("DELETE FROM dataset_fields_tag_mapping");
-          handle.execute("DELETE FROM dataset_fields");
-          handle.execute("DELETE FROM datasets");
-          handle.execute("DELETE FROM sources");
-          handle.execute("DELETE FROM namespaces");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   @Test

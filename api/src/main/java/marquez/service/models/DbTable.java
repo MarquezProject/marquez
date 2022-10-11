@@ -53,6 +53,7 @@ public final class DbTable extends Dataset {
         lastLifecycleState,
         description,
         currentVersion,
+        null,
         facets,
         isDeleted);
   }

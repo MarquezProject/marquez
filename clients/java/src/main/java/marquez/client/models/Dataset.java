@@ -47,6 +47,7 @@ public abstract class Dataset {
   @Getter @NonNull private final Set<String> tags;
   @Nullable private final Instant lastModifiedAt;
   @Nullable private final String description;
+  @Getter @Nullable private List<ColumnLineage> columnLineage;
   @Getter private final Map<String, Object> facets;
   @Nullable private final UUID currentVersion;
 
@@ -63,6 +64,7 @@ public abstract class Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
+      @Nullable final List<ColumnLineage> columnLineage,
       @Nullable final Map<String, Object> facets,
       @Nullable final UUID currentVersion) {
     this.id = id;
@@ -77,6 +79,7 @@ public abstract class Dataset {
     this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
     this.lastModifiedAt = lastModifiedAt;
     this.description = description;
+    this.columnLineage = columnLineage;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
     this.currentVersion = currentVersion;
   }
