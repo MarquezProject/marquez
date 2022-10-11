@@ -7,7 +7,7 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.TRANSFORMATION_DESCRIPTION;
 import static marquez.db.Columns.TRANSFORMATION_TYPE;
-import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrThrow;
 
@@ -29,8 +29,8 @@ public class ColumnLineageRowMapper implements RowMapper<ColumnLineageRow> {
         uuidOrThrow(results, Columns.OUTPUT_DATASET_FIELD_UUID),
         uuidOrThrow(results, Columns.INPUT_DATASET_VERSION_UUID),
         uuidOrThrow(results, Columns.INPUT_DATASET_FIELD_UUID),
-        stringOrThrow(results, TRANSFORMATION_DESCRIPTION),
-        stringOrThrow(results, TRANSFORMATION_TYPE),
+        stringOrNull(results, TRANSFORMATION_DESCRIPTION),
+        stringOrNull(results, TRANSFORMATION_TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT));
   }

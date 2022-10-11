@@ -146,6 +146,7 @@ public class MarquezClientTest {
           TAGS,
           null,
           DB_TABLE_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
   private static final DbTable DB_TABLE_MODIFIED =
@@ -161,6 +162,7 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           DB_TABLE_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
 
@@ -197,6 +199,7 @@ public class MarquezClientTest {
           null,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
   private static final Stream STREAM_MODIFIED =
@@ -213,6 +216,7 @@ public class MarquezClientTest {
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
 

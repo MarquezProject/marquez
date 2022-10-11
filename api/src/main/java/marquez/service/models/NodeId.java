@@ -20,9 +20,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.models.DatasetFieldId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
+import marquez.common.models.FieldName;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
@@ -40,11 +42,14 @@ public final class NodeId implements Comparable<NodeId> {
   public static final Joiner ID_JOINER = Joiner.on(ID_DELIM);
 
   private static final String ID_PREFX_DATASET = "dataset";
+  private static final String ID_PREFX_DATASET_FIELD = "datasetField";
   private static final String ID_PREFX_JOB = "job";
   private static final String ID_PREFX_RUN = "run";
   private static final Pattern ID_PATTERN =
       Pattern.compile(
-          String.format("^(%s|%s|%s):.*$", ID_PREFX_DATASET, ID_PREFX_JOB, ID_PREFX_RUN));
+          String.format(
+              "^(%s|%s|%s|%s):.*$",
+              ID_PREFX_DATASET, ID_PREFX_DATASET_FIELD, ID_PREFX_JOB, ID_PREFX_RUN));
 
   public static final String VERSION_DELIM = "#";
 
@@ -53,9 +58,10 @@ public final class NodeId implements Comparable<NodeId> {
   public NodeId(final String value) {
     checkArgument(
         ID_PATTERN.matcher(value).matches(),
-        "node ID (%s) must start with '%s', '%s', or '%s'",
+        "node ID (%s) must start with '%s', '%s', '%s' or '%s'",
         value,
         ID_PREFX_DATASET,
+        ID_PREFX_DATASET_FIELD,
         ID_PREFX_JOB,
         ID_PREFX_RUN);
     this.value = value;
@@ -110,6 +116,15 @@ public final class NodeId implements Comparable<NodeId> {
     return NodeId.of(datasetId.getNamespace(), datasetId.getName());
   }
 
+  public static NodeId of(@NonNull DatasetFieldId datasetFieldIdId) {
+    return of(
+        ID_JOINER.join(
+            ID_PREFX_DATASET_FIELD,
+            datasetFieldIdId.getDatasetId().getNamespace().getValue(),
+            datasetFieldIdId.getDatasetId().getName().getValue(),
+            datasetFieldIdId.getFieldName().getValue()));
+  }
+
   public static NodeId of(@NonNull JobId jobId) {
     return NodeId.of(jobId.getNamespace(), jobId.getName());
   }
@@ -133,7 +148,12 @@ public final class NodeId implements Comparable<NodeId> {
 
   @JsonIgnore
   public boolean isDatasetType() {
-    return value.startsWith(ID_PREFX_DATASET);
+    return value.startsWith(ID_PREFX_DATASET + ID_DELIM);
+  }
+
+  @JsonIgnore
+  public boolean isDatasetFieldType() {
+    return value.startsWith(ID_PREFX_DATASET_FIELD);
   }
 
   @JsonIgnore
@@ -167,7 +187,8 @@ public final class NodeId implements Comparable<NodeId> {
         || (this.isDatasetVersionType() && o.isDatasetVersionType())
         || (this.isJobType() && o.isJobType())
         || (this.isJobVersionType() && o.isJobVersionType())
-        || (this.isRunType() && o.isRunType());
+        || (this.isRunType() && o.isRunType())
+        || (this.isDatasetFieldType() && o.isDatasetFieldType());
   }
 
   @JsonIgnore
@@ -218,6 +239,14 @@ public final class NodeId implements Comparable<NodeId> {
   public DatasetId asDatasetId() {
     String[] parts = parts(3, ID_PREFX_DATASET);
     return new DatasetId(NamespaceName.of(parts[1]), DatasetName.of(parts[2]));
+  }
+
+  @JsonIgnore
+  public DatasetFieldId asDatasetFieldId() {
+    String[] parts = parts(4, ID_PREFX_DATASET);
+    return new DatasetFieldId(
+        new DatasetId(NamespaceName.of(parts[1]), DatasetName.of(parts[2])),
+        FieldName.of(parts[3]));
   }
 
   @JsonIgnore
