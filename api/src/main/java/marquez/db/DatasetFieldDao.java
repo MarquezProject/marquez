@@ -94,6 +94,25 @@ public interface DatasetFieldDao extends BaseDao {
   Optional<UUID> findUuid(UUID datasetUuid, String name);
 
   @SqlQuery(
+      """
+          SELECT df.uuid
+          FROM dataset_fields  df
+          INNER JOIN datasets_view AS d
+          ON d.uuid = df.dataset_uuid AND d.name = :datasetName AND d.namespace_name = :namespace
+      """)
+  List<UUID> findDatasetFieldsUuids(String namespace, String datasetName);
+
+  @SqlQuery(
+      """
+          SELECT df.uuid
+          FROM dataset_fields  df
+          INNER JOIN datasets_view AS d
+          ON d.uuid = df.dataset_uuid AND d.name = :datasetName AND d.namespace_name = :namespace
+          WHERE df.name = :name
+      """)
+  Optional<UUID> findUuid(String namespace, String datasetName, String name);
+
+  @SqlQuery(
       "SELECT f.*, "
           + "ARRAY(SELECT t.name "
           + "      FROM dataset_fields_tag_mapping m "

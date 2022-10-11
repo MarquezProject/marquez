@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import marquez.common.models.DatasetFieldId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.FieldName;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -110,5 +112,33 @@ class NodeIdTest {
     assertEquals(dataset, nodeId.asDatasetId().getName().getValue());
     assertEquals(
         dataset.split(VERSION_DELIM)[1], nodeId.asDatasetVersionId().getVersion().toString());
+  }
+
+  @ParameterizedTest(name = "testDatasetField-{index} {argumentsWithNames}")
+  @CsvSource(
+      value = {
+        "my-namespace$my-dataset$colA",
+        "gs://bucket$/path/to/data$colA",
+        "gs://bucket$/path/to/data$col_A"
+      },
+      delimiter = '$')
+  public void testDatasetField(String namespace, String dataset, String field) {
+    NamespaceName namespaceName = NamespaceName.of(namespace);
+    FieldName fieldName = FieldName.of(field);
+    DatasetName datasetName = DatasetName.of(dataset);
+    DatasetId dsId = new DatasetId(namespaceName, datasetName);
+    DatasetFieldId dsfId = new DatasetFieldId(dsId, fieldName);
+    NodeId nodeId = NodeId.of(dsfId);
+    assertFalse(nodeId.isRunType());
+    assertFalse(nodeId.isJobType());
+    assertFalse(nodeId.isDatasetType());
+    assertFalse(nodeId.hasVersion());
+    assertTrue(nodeId.isDatasetFieldType());
+
+    assertEquals(dsfId, nodeId.asDatasetFieldId());
+    assertEquals(nodeId, NodeId.of(nodeId.getValue()));
+    assertEquals(namespace, nodeId.asDatasetFieldId().getDatasetId().getNamespace().getValue());
+    assertEquals(dataset, nodeId.asDatasetFieldId().getDatasetId().getName().getValue());
+    assertEquals(field, nodeId.asDatasetFieldId().getFieldName().getValue());
   }
 }

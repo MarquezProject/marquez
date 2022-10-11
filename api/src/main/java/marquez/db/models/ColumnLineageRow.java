@@ -6,6 +6,7 @@
 package marquez.db.models;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -21,8 +22,16 @@ public class ColumnLineageRow {
   @Getter @NonNull private final UUID outputDatasetFieldUuid;
   @Getter @NonNull private final UUID inputDatasetVersionUuid;
   @Getter @NonNull private final UUID inputDatasetFieldUuid;
-  @Getter @NonNull private final String transformationDescription;
-  @Getter @NonNull private final String transformationType;
+  private final String transformationDescription;
+  private final String transformationType;
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private Instant updatedAt;
+
+  public Optional<String> getTransformationDescription() {
+    return Optional.ofNullable(transformationDescription);
+  }
+
+  public Optional<String> getTransformationType() {
+    return Optional.ofNullable(transformationType);
+  }
 }
