@@ -90,7 +90,10 @@ public class ColumnLineageServiceTest {
 
     Lineage lineage =
         lineageService.lineage(
-            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")), 20, Instant.now());
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
+            20,
+            false,
+            Instant.now());
 
     assertThat(lineage.getGraph()).hasSize(3);
 
@@ -156,12 +159,16 @@ public class ColumnLineageServiceTest {
 
     Lineage lineageByField =
         lineageService.lineage(
-            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")), 20, Instant.now());
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
+            20,
+            false,
+            Instant.now());
 
     Lineage lineageByDataset =
         lineageService.lineage(
             NodeId.of(new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_b"))),
             20,
+            false,
             Instant.now());
 
     // lineage of dataset and column should be equal
@@ -195,6 +202,7 @@ public class ColumnLineageServiceTest {
             lineageService.lineage(
                 NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_d")),
                 20,
+                false,
                 Instant.now()));
 
     assertThrows(
@@ -204,6 +212,7 @@ public class ColumnLineageServiceTest {
                 NodeId.of(
                     new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_d"))),
                 20,
+                false,
                 Instant.now()));
 
     assertThat(
@@ -211,6 +220,7 @@ public class ColumnLineageServiceTest {
                 .lineage(
                     NodeId.of(DatasetFieldId.of("namespace", "dataset_a", "col_a")),
                     20,
+                    false,
                     Instant.now())
                 .getGraph())
         .hasSize(0);
@@ -266,6 +276,48 @@ public class ColumnLineageServiceTest {
     assertThat(inputFields_c)
         .hasSize(1)
         .contains(new ColumnLineageInputField("namespace", "dataset_b", "col_c"));
+  }
+
+  @Test
+  public void testGetLineageWithDownstream() {
+    LineageEvent.Dataset dataset_A = getDatasetA();
+    LineageEvent.Dataset dataset_B = getDatasetB();
+    LineageEvent.Dataset dataset_C = getDatasetC();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job2",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_B),
+        Arrays.asList(dataset_C));
+
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
+            20,
+            true,
+            Instant.now());
+
+    // assert that get lineage of dataset_B should co also return dataset_A and dataset_C
+    assertThat(
+            lineage.getGraph().stream()
+                .filter(c -> c.getId().asDatasetFieldId().getFieldName().getValue().equals("col_a"))
+                .findAny())
+        .isPresent();
+    assertThat(
+            lineage.getGraph().stream()
+                .filter(c -> c.getId().asDatasetFieldId().getFieldName().getValue().equals("col_d"))
+                .findAny())
+        .isPresent();
   }
 
   @Test

@@ -41,8 +41,10 @@ public class ColumnLineageResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response getLineage(
       @QueryParam("nodeId") @NotNull NodeId nodeId,
-      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth)
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
+      @QueryParam("withDownstream") @DefaultValue("false") boolean withDownstream)
       throws ExecutionException, InterruptedException {
-    return Response.ok(columnLineageService.lineage(nodeId, depth, Instant.now())).build();
+    return Response.ok(columnLineageService.lineage(nodeId, depth, withDownstream, Instant.now()))
+        .build();
   }
 }

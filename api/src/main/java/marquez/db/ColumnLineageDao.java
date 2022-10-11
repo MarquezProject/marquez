@@ -113,17 +113,20 @@ public interface ColumnLineageDao extends BaseDao {
               )
               UNION
               SELECT
-                upstream_node.output_dataset_version_uuid,
-                upstream_node.output_dataset_field_uuid,
-                upstream_node.input_dataset_version_uuid,
-                upstream_node.input_dataset_field_uuid,
-                upstream_node.transformation_description,
-                upstream_node.transformation_type,
-                upstream_node.created_at,
-                upstream_node.updated_at,
+                adjacent_node.output_dataset_version_uuid,
+                adjacent_node.output_dataset_field_uuid,
+                adjacent_node.input_dataset_version_uuid,
+                adjacent_node.input_dataset_field_uuid,
+                adjacent_node.transformation_description,
+                adjacent_node.transformation_type,
+                adjacent_node.created_at,
+                adjacent_node.updated_at,
                 node.depth + 1 as depth
-              FROM column_lineage upstream_node, column_lineage_recursive node
-              WHERE node.input_dataset_field_uuid = upstream_node.output_dataset_field_uuid
+              FROM column_lineage adjacent_node, column_lineage_recursive node
+              WHERE (
+                (node.input_dataset_field_uuid = adjacent_node.output_dataset_field_uuid) --upstream lineage
+                OR (:withDownstream AND adjacent_node.input_dataset_field_uuid = node.output_dataset_field_uuid) --optional downstream lineage
+              )
               AND node.depth < :depth
             )
             SELECT
@@ -152,6 +155,7 @@ public interface ColumnLineageDao extends BaseDao {
   Set<ColumnLineageNodeData> getLineage(
       int depth,
       @BindList(onEmpty = NULL_STRING) List<UUID> datasetFieldUuids,
+      boolean withDownstream,
       Instant createdAtUntil);
 
   @SqlQuery(

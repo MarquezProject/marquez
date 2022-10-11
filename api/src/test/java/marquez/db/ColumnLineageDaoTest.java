@@ -257,7 +257,7 @@ public class ColumnLineageDaoTest {
     UpdateLineageRow.DatasetRecord datasetRecord_c = lineageRow.getOutputs().get().get(0);
     UUID field_col_d = fieldDao.findUuid(datasetRecord_c.getDatasetRow().getUuid(), "col_d").get();
     Set<ColumnLineageNodeData> lineage =
-        dao.getLineage(20, Collections.singletonList(field_col_d), Instant.now());
+        dao.getLineage(20, Collections.singletonList(field_col_d), false, Instant.now());
 
     assertEquals(2, lineage.size());
 
@@ -326,7 +326,8 @@ public class ColumnLineageDaoTest {
     UUID field_col_a = fieldDao.findUuid(datasetRecord_a.getDatasetRow().getUuid(), "col_a").get();
 
     // assert lineage is empty
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_a), Instant.now())).isEmpty();
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_a), false, Instant.now()))
+        .isEmpty();
   }
 
   /**
@@ -392,11 +393,12 @@ public class ColumnLineageDaoTest {
     UUID field_col_e = fieldDao.findUuid(datasetRecord_d.getDatasetRow().getUuid(), "col_e").get();
 
     // make sure dataset are constructed properly
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_e), Instant.now()))
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_e), false, Instant.now()))
         .hasSize(3);
 
     // verify graph size is 2 when max depth is 1
-    assertThat(dao.getLineage(1, Collections.singletonList(field_col_e), Instant.now())).hasSize(2);
+    assertThat(dao.getLineage(1, Collections.singletonList(field_col_e), false, Instant.now()))
+        .hasSize(2);
   }
 
   @Test
@@ -462,9 +464,9 @@ public class ColumnLineageDaoTest {
     UUID field_col_d = fieldDao.findUuid(datasetRecord_c.getDatasetRow().getUuid(), "col_d").get();
 
     // column lineages for col_a and col_e should be of size 3
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_a), Instant.now()))
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_a), false, Instant.now()))
         .hasSize(3);
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_d), Instant.now()))
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_d), false, Instant.now()))
         .hasSize(3);
   }
 
@@ -524,7 +526,7 @@ public class ColumnLineageDaoTest {
 
     // assert input fields for col_d contain col_a and col_c
     List<String> inputFields =
-        dao.getLineage(20, Collections.singletonList(field_col_c), Instant.now()).stream()
+        dao.getLineage(20, Collections.singletonList(field_col_c), false, Instant.now()).stream()
             .filter(node -> node.getDataset().equals("dataset_b"))
             .flatMap(node -> node.getInputFields().stream())
             .map(input -> input.getField())
@@ -558,11 +560,17 @@ public class ColumnLineageDaoTest {
     // assert lineage is empty before and present after
     assertThat(
             dao.getLineage(
-                20, Collections.singletonList(field_col_b), columnLineageCreatedAt.minusSeconds(1)))
+                20,
+                Collections.singletonList(field_col_b),
+                false,
+                columnLineageCreatedAt.minusSeconds(1)))
         .isEmpty();
     assertThat(
             dao.getLineage(
-                20, Collections.singletonList(field_col_b), columnLineageCreatedAt.plusSeconds(1)))
+                20,
+                Collections.singletonList(field_col_b),
+                false,
+                columnLineageCreatedAt.plusSeconds(1)))
         .hasSize(1);
   }
 
@@ -590,7 +598,7 @@ public class ColumnLineageDaoTest {
     UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
     UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
 
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_b), Instant.now()))
+    assertThat(dao.getLineage(20, Collections.singletonList(field_col_b), false, Instant.now()))
         .hasSize(1);
   }
 }
