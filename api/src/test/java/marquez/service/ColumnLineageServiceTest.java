@@ -318,6 +318,15 @@ public class ColumnLineageServiceTest {
                 .filter(c -> c.getId().asDatasetFieldId().getFieldName().getValue().equals("col_d"))
                 .findAny())
         .isPresent();
+
+    ColumnLineageNodeData nodeData_C =
+        (ColumnLineageNodeData)
+            lineage.getGraph().stream()
+                .filter(c -> c.getId().asDatasetFieldId().getFieldName().getValue().equals("col_c"))
+                .findAny()
+                .get()
+                .getData();
+    assertThat(nodeData_C.getInputFields()).hasSize(2);
   }
 
   @Test
