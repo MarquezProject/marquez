@@ -71,7 +71,7 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
                               DatasetFieldId.of(i.getNamespace(), i.getDataset(), i.getField())))
                   .forEach(
                       inputNodeId -> {
-                        graphNodes.put(inputNodeId, Node.datasetField().id(inputNodeId));
+                        graphNodes.putIfAbsent(inputNodeId, Node.datasetField().id(inputNodeId));
                         Optional.ofNullable(outEdges.get(inputNodeId))
                             .ifPresentOrElse(
                                 nodeEdges -> nodeEdges.add(nodeId),
