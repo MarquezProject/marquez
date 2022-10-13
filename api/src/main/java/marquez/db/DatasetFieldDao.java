@@ -34,11 +34,14 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(FieldDataMapper.class)
 public interface DatasetFieldDao extends BaseDao {
   @SqlQuery(
-      "SELECT EXISTS ("
-          + "SELECT 1 FROM dataset_fields AS df "
-          + "INNER JOIN datasets_view AS d "
-          + "  ON d.uuid = df.dataset_uuid AND d.name = :datasetName AND d.namespace_name = :namespaceName "
-          + "WHERE df.name = :name)")
+      """
+          SELECT EXISTS (
+            SELECT 1 FROM dataset_fields AS df
+            INNER JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
+            WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
+            AND df.name = :name
+          )
+      """)
   boolean exists(String namespaceName, String datasetName, String name);
 
   default Dataset updateTags(
@@ -92,6 +95,25 @@ public interface DatasetFieldDao extends BaseDao {
           + "FROM dataset_fields "
           + "WHERE dataset_uuid = :datasetUuid AND name = :name")
   Optional<UUID> findUuid(UUID datasetUuid, String name);
+
+  @SqlQuery(
+      """
+          SELECT df.uuid
+          FROM dataset_fields  df
+          JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
+          WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
+      """)
+  List<UUID> findDatasetFieldsUuids(String namespaceName, String datasetName);
+
+  @SqlQuery(
+      """
+          SELECT df.uuid
+          FROM dataset_fields  df
+          JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
+          WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
+          AND df.name = :name
+      """)
+  Optional<UUID> findUuid(String namespaceName, String datasetName, String name);
 
   @SqlQuery(
       "SELECT f.*, "

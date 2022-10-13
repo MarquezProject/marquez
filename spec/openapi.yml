@@ -161,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - $ref: '#/components/schemas/DbTable'
                 - $ref: '#/components/schemas/Stream'
       responses:
@@ -1031,7 +1031,9 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: string
+                type: array
+                items:
+                  type: string
               description:
                 description: The description of the field.
                 type: string
@@ -1040,7 +1042,9 @@ components:
               - type
         tags:
           description: List of tags.
-          type: string
+          type: array
+          items:
+            type: string
         description:
           description: The description of the stream.
           type: string
@@ -1115,7 +1119,7 @@ components:
               tags:
                 description: List of tags.
                 type: array
-                items: 
+                items:
                   type: string
               description:
                 description: The description of the field.
@@ -1575,7 +1579,7 @@ components:
       properties:
         id:
           description: An _optional_ user-provided unique ID of the run. A run ID **must** be an [UUID](https://tools.ietf.org/html/rfc4122).
-                       If an ID for the run is not provided, a random UUID will be generated for the given run.
+            If an ID for the run is not provided, a random UUID will be generated for the given run.
           type: string
           format: uuid
         nominalStartTime:
@@ -1712,7 +1716,7 @@ components:
 
     CustomFacet:
       description: A custom facet enables the extension of _dataset_, _job_, and _run_ metadata. A custom facet **must** also have a schema,
-                   where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
+        where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
       allOf:
         - $ref: '#/components/schemas/BaseFacet'
         - type: object

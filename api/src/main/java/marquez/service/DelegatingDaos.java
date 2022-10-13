@@ -7,6 +7,7 @@ package marquez.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
+import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -97,5 +98,10 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingLineageDao implements LineageDao {
     @Delegate private final LineageDao delegate;
+  }
+
+  @RequiredArgsConstructor
+  public static class DelegatingColumnLineageDao implements ColumnLineageDao {
+    @Delegate private final ColumnLineageDao delegate;
   }
 }

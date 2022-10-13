@@ -59,6 +59,7 @@ public final class Stream extends Dataset {
         lastLifecycleState,
         description,
         currentVersion,
+        null,
         facets,
         isDeleted);
     this.schemaLocation = schemaLocation;
