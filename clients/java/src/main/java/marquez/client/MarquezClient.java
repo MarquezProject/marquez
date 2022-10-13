@@ -43,6 +43,7 @@ import marquez.client.models.JobVersion;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Node;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -57,6 +58,7 @@ import marquez.client.models.Tag;
 public class MarquezClient {
 
   static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080");
+  static final int DEFAULT_LINEAGE_GRAPH_DEPTH = 20;
 
   @VisibleForTesting static final int DEFAULT_LIMIT = 100;
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
@@ -111,6 +113,36 @@ public class MarquezClient {
     ASC("asc");
 
     @Getter public final String value;
+  }
+
+  public Lineage getColumnLineage(@NonNull String namespaceName, @NonNull String datasetName) {
+    return getColumnLineage(namespaceName, datasetName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  }
+
+  public Lineage getColumnLineage(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String field) {
+    return getColumnLineage(namespaceName, datasetName, field, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  }
+
+  public Lineage getColumnLineage(
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      int depth,
+      boolean withDownstream) {
+    final String bodyAsJson =
+        http.get(url.toColumnLineageUrl(namespaceName, datasetName, depth, withDownstream));
+    return Lineage.fromJson(bodyAsJson);
+  }
+
+  public Lineage getColumnLineage(
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      @NonNull String field,
+      int depth,
+      boolean withDownstream) {
+    final String bodyAsJson =
+        http.get(url.toColumnLineageUrl(namespaceName, datasetName, field, depth, withDownstream));
+    return Lineage.fromJson(bodyAsJson);
   }
 
   public Namespace createNamespace(
@@ -655,6 +687,24 @@ public class MarquezClient {
     @Getter
     @JsonProperty("description")
     String value;
+
+    String toJson() {
+      return Utils.toJson(this);
+    }
+  }
+
+  @Value
+  public static class Lineage {
+    @Getter Set<Node> graph;
+
+    @JsonCreator
+    Lineage(@JsonProperty("graph") final Set<Node> value) {
+      this.graph = ImmutableSet.copyOf(value);
+    }
+
+    static Lineage fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<Lineage>() {});
+    }
 
     String toJson() {
       return Utils.toJson(this);
