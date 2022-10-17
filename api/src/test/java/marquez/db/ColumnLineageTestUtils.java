@@ -10,35 +10,14 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 
 import java.util.Arrays;
 import java.util.Collections;
+import marquez.api.JdbiUtils;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 
 public class ColumnLineageTestUtils {
 
   public static void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM column_lineage");
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM datasets_tag_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          handle.execute("DELETE FROM dataset_fields_tag_mapping");
-          handle.execute("DELETE FROM dataset_fields");
-          handle.execute("DELETE FROM datasets");
-          handle.execute("DELETE FROM sources");
-          handle.execute("DELETE FROM dataset_symlinks");
-          handle.execute("DELETE FROM namespaces");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   // dataset_A (col_a, col_b)
@@ -100,6 +79,9 @@ public class ColumnLineageTestUtils {
         "namespace",
         "dataset_c",
         LineageEvent.DatasetFacets.builder()
+            .dataSource(
+                new LineageEvent.DatasourceDatasetFacet(
+                    PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
             .schema(
                 new LineageEvent.SchemaDatasetFacet(
                     PRODUCER_URL,

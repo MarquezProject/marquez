@@ -86,6 +86,7 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newDescription(),
+        null,
         newDatasetFacets(2),
         currentVersion);
   }
@@ -134,6 +135,7 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription(),
+        null,
         newDatasetFacets(2),
         currentVersion);
   }

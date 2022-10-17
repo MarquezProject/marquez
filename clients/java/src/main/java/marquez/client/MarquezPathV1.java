@@ -177,4 +177,8 @@ class MarquezPathV1 {
   static String searchPath() {
     return path("/search");
   }
+
+  static String columnLineagePath() {
+    return path("/column-lineage/");
+  }
 }

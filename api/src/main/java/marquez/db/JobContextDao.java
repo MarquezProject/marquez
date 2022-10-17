@@ -28,10 +28,12 @@ public interface JobContextDao {
   }
 
   @SqlUpdate(
-      "INSERT INTO job_contexts "
-          + "(uuid, created_at, context, checksum) "
-          + "VALUES "
-          + "(:uuid, :now, :context, :checksum) "
-          + "ON CONFLICT (checksum) DO NOTHING")
+      """
+    INSERT INTO job_contexts
+    (uuid, created_at, context, checksum)
+    VALUES
+    (:uuid, :now, :context, :checksum)
+    ON CONFLICT (checksum) DO NOTHING
+  """)
   void doUpsert(UUID uuid, Instant now, String context, String checksum);
 }

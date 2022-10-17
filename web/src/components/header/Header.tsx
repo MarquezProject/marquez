@@ -46,7 +46,7 @@ const Header = (props: HeaderProps): ReactElement => {
       <Toolbar>
         <Box className={classes.innerToolbar}>
           <Link to='/'>
-            <img src={require('../../img/marquez_logo.svg')} height={48} alt='Marquez Logo' />
+            <img src={'/img/marquez_logo.svg'} height={48} alt='Marquez Logo' />
           </Link>
           <Box display={'flex'} alignItems={'center'}>
             <Search />

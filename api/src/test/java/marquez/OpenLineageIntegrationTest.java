@@ -40,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
@@ -84,23 +85,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @AfterEach
   public void tearDown() {
-    Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
-        .withHandle(
-            handle -> {
-              handle.execute("DELETE FROM lineage_events");
-              handle.execute("DELETE FROM runs_input_mapping");
-              handle.execute("DELETE FROM dataset_versions_field_mapping");
-              handle.execute("DELETE FROM stream_versions");
-              handle.execute("DELETE FROM dataset_versions");
-              handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-              handle.execute("DELETE FROM run_states");
-              handle.execute("DELETE FROM runs");
-              handle.execute("DELETE FROM run_args");
-              handle.execute("DELETE FROM job_versions_io_mapping");
-              handle.execute("DELETE FROM job_versions");
-              handle.execute("DELETE FROM jobs");
-              return null;
-            });
+    JdbiUtils.cleanDatabase(
+        Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword()));
   }
 
   @Test
