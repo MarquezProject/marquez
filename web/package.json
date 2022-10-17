@@ -105,7 +105,7 @@
     "ts-jest": "^27.0.7",
     "typescript": "^3.3.1",
     "webpack": "^5.69.1",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^4.6.1",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
   }
