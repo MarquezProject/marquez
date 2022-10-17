@@ -824,13 +824,13 @@ components:
       required: false
 
     before:
-      name: version
+      name: before
       in: query
       description: Returns events before passed date.
       required: false
       schema:
         type: string
-        format: uuid
+        format: date-time
         example: 2022-09-15T07:47:19Z
 
     after:
@@ -840,7 +840,7 @@ components:
       required: false
       schema:
         type: string
-        format: uuid
+        format: date-time
         example: 2022-09-15T07:47:19Z
 
   schemas:
