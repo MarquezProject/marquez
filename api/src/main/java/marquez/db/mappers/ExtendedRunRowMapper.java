@@ -41,6 +41,7 @@ public final class ExtendedRunRowMapper implements RowMapper<ExtendedRunRow> {
         uuidOrNull(results, Columns.JOB_VERSION_UUID),
         uuidOrNull(results, Columns.PARENT_RUN_UUID),
         uuidOrThrow(results, Columns.RUN_ARGS_UUID),
+        stringOrNull(results, Columns.EXTERNAL_ID),
         columnNames.contains(Columns.INPUT_VERSIONS)
             ? toDatasetVersion(results, Columns.INPUT_VERSIONS)
             : ImmutableList.of(),
