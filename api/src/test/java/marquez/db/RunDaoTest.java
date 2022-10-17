@@ -28,6 +28,7 @@ import marquez.common.models.DatasetVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunRow;
@@ -225,5 +226,55 @@ class RunDaoTest {
     assertThat(row.getNominalEndTime()).isNotNull();
     assertThat(updatedRow.getNominalStartTime()).isEqualTo(row.getNominalStartTime());
     assertThat(updatedRow.getNominalEndTime()).isEqualTo(row.getNominalEndTime());
+  }
+
+  @Test
+  public void updateRowWithExternalId() {
+    final RunDao runDao = jdbi.onDemand(RunDao.class);
+
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+
+    RunRow row = DbTestUtils.newRun(jdbi, jobRow);
+
+    runDao.upsert(
+        row.getUuid(),
+        null,
+        row.getUuid().toString(),
+        row.getUpdatedAt(),
+        jobRow.getUuid(),
+        null,
+        row.getRunArgsUuid(),
+        null,
+        null,
+        namespaceRow.getUuid(),
+        namespaceRow.getName(),
+        jobRow.getName(),
+        null,
+        null);
+
+    runDao.upsert(
+        row.getUuid(),
+        null,
+        "updated-external-id",
+        row.getUpdatedAt(),
+        jobRow.getUuid(),
+        null,
+        row.getRunArgsUuid(),
+        null,
+        null,
+        namespaceRow.getUuid(),
+        namespaceRow.getName(),
+        jobRow.getName(),
+        null,
+        null);
+
+    Optional<ExtendedRunRow> runRowOpt = runDao.findRunByUuidAsExtendedRow(row.getUuid());
+    assertThat(runRowOpt)
+        .isPresent()
+        .get()
+        .extracting("externalId")
+        .isEqualTo("updated-external-id");
   }
 }
