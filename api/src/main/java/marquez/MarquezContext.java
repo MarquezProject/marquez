@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.api.ColumnLineageResource;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
@@ -22,6 +23,7 @@ import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
 import marquez.db.BaseDao;
+import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
@@ -39,6 +41,7 @@ import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
+import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
 import marquez.service.DatasetVersionService;
@@ -70,6 +73,7 @@ public final class MarquezContext {
   @Getter private final TagDao tagDao;
   @Getter private final OpenLineageDao openLineageDao;
   @Getter private final LineageDao lineageDao;
+  @Getter private final ColumnLineageDao columnLineageDao;
   @Getter private final SearchDao searchDao;
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
@@ -81,9 +85,11 @@ public final class MarquezContext {
   @Getter private final RunService runService;
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
+  @Getter private final ColumnLineageService columnLineageService;
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
+  @Getter private final ColumnLineageResource columnLineageResource;
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
@@ -115,6 +121,7 @@ public final class MarquezContext {
     this.tagDao = jdbi.onDemand(TagDao.class);
     this.openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     this.lineageDao = jdbi.onDemand(LineageDao.class);
+    this.columnLineageDao = jdbi.onDemand(ColumnLineageDao.class);
     this.searchDao = jdbi.onDemand(SearchDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
@@ -128,6 +135,7 @@ public final class MarquezContext {
     this.tagService.init(tags);
     this.openLineageService = new OpenLineageService(baseDao, runService);
     this.lineageService = new LineageService(lineageDao, jobDao);
+    this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
     this.jdbiException = new JdbiExceptionExceptionMapper();
     final ServiceFactory serviceFactory =
         ServiceFactory.builder()
@@ -139,12 +147,14 @@ public final class MarquezContext {
             .openLineageService(openLineageService)
             .sourceService(sourceService)
             .lineageService(lineageService)
+            .columnLineageService(columnLineageService)
             .datasetFieldService(new DatasetFieldService(baseDao))
             .datasetVersionService(new DatasetVersionService(baseDao))
             .build();
     this.namespaceResource = new NamespaceResource(serviceFactory);
     this.sourceResource = new SourceResource(serviceFactory);
     this.datasetResource = new DatasetResource(serviceFactory);
+    this.columnLineageResource = new ColumnLineageResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
@@ -155,6 +165,7 @@ public final class MarquezContext {
             namespaceResource,
             sourceResource,
             datasetResource,
+            columnLineageResource,
             jobResource,
             tagResource,
             jdbiException,

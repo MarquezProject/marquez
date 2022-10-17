@@ -7,6 +7,7 @@ package marquez.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static marquez.client.MarquezPathV1.columnLineagePath;
 import static marquez.client.MarquezPathV1.createRunPath;
 import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
@@ -41,6 +42,9 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.client.models.DatasetFieldId;
+import marquez.client.models.DatasetId;
+import marquez.client.models.NodeId;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
 import marquez.client.models.SearchSort;
@@ -204,5 +208,22 @@ class MarquezUrl {
     }
     queryParams.put("limit", limit);
     return from(searchPath(), queryParams.build());
+  }
+
+  URL toColumnLineageUrl(
+      String namespace, String dataset, String field, int depth, boolean withDownstream) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", NodeId.of(new DatasetFieldId(namespace, dataset, field)).getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    queryParams.put("withDownstream", String.valueOf(withDownstream));
+    return from(columnLineagePath(), queryParams.build());
+  }
+
+  URL toColumnLineageUrl(String namespace, String dataset, int depth, boolean withDownstream) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", NodeId.of(new DatasetId(namespace, dataset)).getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    queryParams.put("withDownstream", String.valueOf(withDownstream));
+    return from(columnLineagePath(), queryParams.build());
   }
 }

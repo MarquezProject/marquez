@@ -70,4 +70,15 @@ public final class Utils {
       @NonNull final HttpRequestBase request, @NonNull final String apiKey) {
     request.addHeader(AUTHORIZATION, "Bearer " + apiKey);
   }
+
+  public static String checkNotBlank(@NonNull final String arg) {
+    if (emptyOrBlank(arg)) {
+      throw new IllegalArgumentException();
+    }
+    return arg;
+  }
+
+  private static boolean emptyOrBlank(final String arg) {
+    return arg.trim().isEmpty();
+  }
 }

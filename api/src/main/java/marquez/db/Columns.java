@@ -109,6 +109,7 @@ public final class Columns {
   public static final String CONTEXT = "context";
 
   /* RUN ROW COLUMNS */
+  public static final String EXTERNAL_ID = "external_id";
   public static final String RUN_ARGS_UUID = "run_args_uuid";
   public static final String INPUT_VERSION_UUIDS = "input_version_uuids";
   public static final String NOMINAL_START_TIME = "nominal_start_time";

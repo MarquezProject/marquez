@@ -22,11 +22,13 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunRow;
@@ -62,28 +64,7 @@ class RunDaoTest {
 
   @AfterEach
   public void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM datasets_tag_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("DELETE FROM dataset_symlinks");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          handle.execute("DELETE FROM dataset_fields_tag_mapping");
-          handle.execute("DELETE FROM dataset_fields");
-          handle.execute("DELETE FROM datasets");
-          handle.execute("DELETE FROM sources");
-          handle.execute("DELETE FROM namespaces");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   @Test
@@ -245,5 +226,55 @@ class RunDaoTest {
     assertThat(row.getNominalEndTime()).isNotNull();
     assertThat(updatedRow.getNominalStartTime()).isEqualTo(row.getNominalStartTime());
     assertThat(updatedRow.getNominalEndTime()).isEqualTo(row.getNominalEndTime());
+  }
+
+  @Test
+  public void updateRowWithExternalId() {
+    final RunDao runDao = jdbi.onDemand(RunDao.class);
+
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+
+    RunRow row = DbTestUtils.newRun(jdbi, jobRow);
+
+    runDao.upsert(
+        row.getUuid(),
+        null,
+        row.getUuid().toString(),
+        row.getUpdatedAt(),
+        jobRow.getUuid(),
+        null,
+        row.getRunArgsUuid(),
+        null,
+        null,
+        namespaceRow.getUuid(),
+        namespaceRow.getName(),
+        jobRow.getName(),
+        null,
+        null);
+
+    runDao.upsert(
+        row.getUuid(),
+        null,
+        "updated-external-id",
+        row.getUpdatedAt(),
+        jobRow.getUuid(),
+        null,
+        row.getRunArgsUuid(),
+        null,
+        null,
+        namespaceRow.getUuid(),
+        namespaceRow.getName(),
+        jobRow.getName(),
+        null,
+        null);
+
+    Optional<ExtendedRunRow> runRowOpt = runDao.findRunByUuidAsExtendedRow(row.getUuid());
+    assertThat(runRowOpt)
+        .isPresent()
+        .get()
+        .extracting("externalId")
+        .isEqualTo("updated-external-id");
   }
 }

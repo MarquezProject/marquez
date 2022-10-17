@@ -2,7 +2,7 @@
 
 import { Box, Container, CssBaseline } from '@material-ui/core'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
-import { Helmet } from 'react-helmet'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
@@ -42,33 +42,35 @@ const TITLE = 'Marquez'
 const App = (): ReactElement => {
   return (
     <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <MuiThemeProvider theme={theme}>
-          <Helmet>
-            <title>{TITLE}</title>
-          </Helmet>
-          <CssBaseline />
-          <Box ml={12}>
-            <Sidenav />
-            <Container maxWidth={'lg'} disableGutters={true}>
-              <Header />
-            </Container>
-            <Switch>
-              <Route path={'/'} exact>
-                <Jobs />
-              </Route>
-              <Route path={'/datasets'} exact>
-                <Datasets />
-              </Route>
-              <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
-                <Lineage />
-                <BottomBar />
-              </Route>
-            </Switch>
-            <Toast />
-          </Box>
-        </MuiThemeProvider>
-      </ConnectedRouter>
+      <HelmetProvider>
+        <ConnectedRouter history={history}>
+          <MuiThemeProvider theme={theme}>
+            <Helmet>
+              <title>{TITLE}</title>
+            </Helmet>
+            <CssBaseline />
+            <Box ml={12}>
+              <Sidenav />
+              <Container maxWidth={'lg'} disableGutters={true}>
+                <Header />
+              </Container>
+              <Switch>
+                <Route path={'/'} exact>
+                  <Jobs />
+                </Route>
+                <Route path={'/datasets'} exact>
+                  <Datasets />
+                </Route>
+                <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
+                  <Lineage />
+                  <BottomBar />
+                </Route>
+              </Switch>
+              <Toast />
+            </Box>
+          </MuiThemeProvider>
+        </ConnectedRouter>
+      </HelmetProvider>
     </Provider>
   )
 }
