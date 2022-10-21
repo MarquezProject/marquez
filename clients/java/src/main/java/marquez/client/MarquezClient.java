@@ -115,33 +115,50 @@ public class MarquezClient {
     @Getter public final String value;
   }
 
-  public Lineage getColumnLineage(@NonNull String namespaceName, @NonNull String datasetName) {
-    return getColumnLineage(namespaceName, datasetName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  public Lineage getColumnLineageByDataset(
+      @NonNull String namespaceName, @NonNull String datasetName) {
+    return getColumnLineageByDataset(
+        namespaceName, datasetName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
   }
 
-  public Lineage getColumnLineage(
+  public Lineage getColumnLineageByDataset(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String field) {
-    return getColumnLineage(namespaceName, datasetName, field, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+    return getColumnLineageByDatasetField(
+        namespaceName, datasetName, field, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
   }
 
-  public Lineage getColumnLineage(
+  public Lineage getColumnLineageByDataset(
       @NonNull String namespaceName,
       @NonNull String datasetName,
       int depth,
       boolean withDownstream) {
     final String bodyAsJson =
-        http.get(url.toColumnLineageUrl(namespaceName, datasetName, depth, withDownstream));
+        http.get(
+            url.toColumnLineageUrlByDataset(namespaceName, datasetName, depth, withDownstream));
     return Lineage.fromJson(bodyAsJson);
   }
 
-  public Lineage getColumnLineage(
+  public Lineage getColumnLineageByDatasetField(
       @NonNull String namespaceName,
       @NonNull String datasetName,
       @NonNull String field,
       int depth,
       boolean withDownstream) {
     final String bodyAsJson =
-        http.get(url.toColumnLineageUrl(namespaceName, datasetName, field, depth, withDownstream));
+        http.get(
+            url.toColumnLineageUrlByDatasetField(
+                namespaceName, datasetName, field, depth, withDownstream));
+    return Lineage.fromJson(bodyAsJson);
+  }
+
+  public Lineage getColumnLineageByJob(@NonNull String namespaceName, @NonNull String jobName) {
+    return getColumnLineageByJob(namespaceName, jobName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  }
+
+  public Lineage getColumnLineageByJob(
+      @NonNull String namespaceName, @NonNull String jobName, int depth, boolean withDownstream) {
+    final String bodyAsJson =
+        http.get(url.toColumnLineageUrlByJob(namespaceName, jobName, depth, withDownstream));
     return Lineage.fromJson(bodyAsJson);
   }
 

@@ -64,7 +64,7 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testColumnLineageEndpointByDataset() {
-    MarquezClient.Lineage lineage = client.getColumnLineage("namespace", "dataset_b");
+    MarquezClient.Lineage lineage = client.getColumnLineageByDataset("namespace", "dataset_b");
 
     assertThat(lineage.getGraph()).hasSize(3);
     assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
@@ -74,7 +74,8 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testColumnLineageEndpointByDatasetField() {
-    MarquezClient.Lineage lineage = client.getColumnLineage("namespace", "dataset_b", "col_c");
+    MarquezClient.Lineage lineage =
+        client.getColumnLineageByDataset("namespace", "dataset_b", "col_c");
 
     assertThat(lineage.getGraph()).hasSize(3);
     assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
@@ -85,7 +86,7 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testColumnLineageEndpointWithDepthLimit() {
     MarquezClient.Lineage lineage =
-        client.getColumnLineage("namespace", "dataset_c", "col_d", 1, false);
+        client.getColumnLineageByDatasetField("namespace", "dataset_c", "col_d", 1, false);
 
     assertThat(lineage.getGraph()).hasSize(2);
     assertThat(getNodeByFieldName(lineage, "col_c")).isPresent();
@@ -95,10 +96,20 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testColumnLineageEndpointWithDownstream() {
     MarquezClient.Lineage lineage =
-        client.getColumnLineage("namespace", "dataset_b", "col_c", 10, true);
+        client.getColumnLineageByDatasetField("namespace", "dataset_b", "col_c", 10, true);
 
     assertThat(lineage.getGraph()).hasSize(4);
     assertThat(getNodeByFieldName(lineage, "col_d")).isPresent();
+  }
+
+  @Test
+  public void testColumnLineageEndpointByJob() {
+    MarquezClient.Lineage lineage = client.getColumnLineageByJob("namespace", "job1");
+
+    assertThat(lineage.getGraph()).hasSize(3);
+    assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
+    assertThat(getNodeByFieldName(lineage, "col_b")).isPresent();
+    assertThat(getNodeByFieldName(lineage, "col_c")).isPresent();
   }
 
   private Optional<Node> getNodeByFieldName(MarquezClient.Lineage lineage, String field) {

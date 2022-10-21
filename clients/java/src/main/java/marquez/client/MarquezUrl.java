@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.DatasetFieldId;
 import marquez.client.models.DatasetId;
+import marquez.client.models.JobId;
 import marquez.client.models.NodeId;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
@@ -210,7 +211,7 @@ class MarquezUrl {
     return from(searchPath(), queryParams.build());
   }
 
-  URL toColumnLineageUrl(
+  URL toColumnLineageUrlByDatasetField(
       String namespace, String dataset, String field, int depth, boolean withDownstream) {
     final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
     queryParams.put("nodeId", NodeId.of(new DatasetFieldId(namespace, dataset, field)).getValue());
@@ -219,9 +220,18 @@ class MarquezUrl {
     return from(columnLineagePath(), queryParams.build());
   }
 
-  URL toColumnLineageUrl(String namespace, String dataset, int depth, boolean withDownstream) {
+  URL toColumnLineageUrlByDataset(
+      String namespace, String dataset, int depth, boolean withDownstream) {
     final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
     queryParams.put("nodeId", NodeId.of(new DatasetId(namespace, dataset)).getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    queryParams.put("withDownstream", String.valueOf(withDownstream));
+    return from(columnLineagePath(), queryParams.build());
+  }
+
+  URL toColumnLineageUrlByJob(String namespace, String job, int depth, boolean withDownstream) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", NodeId.of(new JobId(namespace, job)).getValue());
     queryParams.put("depth", String.valueOf(depth));
     queryParams.put("withDownstream", String.valueOf(withDownstream));
     return from(columnLineagePath(), queryParams.build());

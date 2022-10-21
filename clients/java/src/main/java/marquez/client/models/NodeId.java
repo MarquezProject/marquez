@@ -70,6 +70,10 @@ public final class NodeId implements Comparable<NodeId> {
             datasetFieldId.getField()));
   }
 
+  public static NodeId of(@NonNull JobId jobId) {
+    return of(ID_JOINER.join(ID_PREFX_JOB, jobId.getNamespace(), jobId.getName()));
+  }
+
   @JsonIgnore
   public boolean isDatasetFieldType() {
     return value.startsWith(ID_PREFX_DATASET_FIELD);
@@ -78,6 +82,11 @@ public final class NodeId implements Comparable<NodeId> {
   @JsonIgnore
   public boolean isDatasetType() {
     return value.startsWith(ID_PREFX_DATASET + ID_DELIM);
+  }
+
+  @JsonIgnore
+  public boolean isJobType() {
+    return value.startsWith(ID_PREFX_JOB);
   }
 
   @JsonIgnore
@@ -122,6 +131,12 @@ public final class NodeId implements Comparable<NodeId> {
   public DatasetFieldId asDatasetFieldId() {
     String[] parts = parts(4, ID_PREFX_DATASET);
     return new DatasetFieldId(parts[1], parts[2], parts[3]);
+  }
+
+  @JsonIgnore
+  public JobId asJobId() {
+    String[] parts = parts(3, ID_PREFX_JOB);
+    return new JobId(parts[1], parts[2]);
   }
 
   public static class FromValue extends StdConverter<String, NodeId> {
