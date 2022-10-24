@@ -158,9 +158,6 @@ public class LineageServiceTest {
     runAssert
         .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
-    runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
-        .hasSize(0);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
@@ -265,9 +262,6 @@ public class LineageServiceTest {
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
         .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
-        .hasSize(0);
-    runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
 
     // check the output edges for the commonDataset node
