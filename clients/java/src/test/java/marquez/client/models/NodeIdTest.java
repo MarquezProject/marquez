@@ -47,4 +47,19 @@ public class NodeIdTest {
     assertEquals(dataset, nodeId.asDatasetFieldId().getDataset());
     assertEquals(field, nodeId.asDatasetFieldId().getField());
   }
+
+  @ParameterizedTest(name = "testJob-{index} {argumentsWithNames}")
+  @CsvSource(
+      value = {"my-namespace$my-job", "org://team$my-job"},
+      delimiter = '$')
+  public void testJob(String namespace, String job) {
+    JobId jobId = new JobId(namespace, job);
+    NodeId nodeId = NodeId.of(jobId);
+    assertTrue(nodeId.isJobType());
+    assertFalse(nodeId.isDatasetType());
+    assertEquals(jobId, nodeId.asJobId());
+    assertEquals(nodeId, NodeId.of(nodeId.getValue()));
+    assertEquals(namespace, nodeId.asJobId().getNamespace());
+    assertEquals(job, nodeId.asJobId().getName());
+  }
 }

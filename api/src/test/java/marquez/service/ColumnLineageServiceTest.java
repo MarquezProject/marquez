@@ -20,6 +20,8 @@ import java.util.Optional;
 import marquez.common.models.DatasetFieldId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.JobId;
+import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.ColumnLineageDao;
 import marquez.db.ColumnLineageTestUtils;
@@ -353,6 +355,44 @@ public class ColumnLineageServiceTest {
     Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
     lineageService.enrichWithColumnLineage(Arrays.asList(dataset_b));
     assertThat(dataset_b.getColumnLineage()).hasSize(1);
+  }
+
+  @Test
+  public void testGetLineageByJob() {
+    LineageEvent.Dataset dataset_A = getDatasetA();
+    LineageEvent.Dataset dataset_B = getDatasetB();
+    LineageEvent.Dataset dataset_C = getDatasetC();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job1",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_A),
+        Arrays.asList(dataset_B));
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job2",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(dataset_B),
+        Arrays.asList(dataset_C));
+
+    // getting lineage by job_1 should be the same as getting it by dataset_B
+    assertThat(
+            lineageService.lineage(
+                NodeId.of(JobId.of(NamespaceName.of("namespace"), JobName.of("job1"))),
+                20,
+                true,
+                Instant.now()))
+        .isEqualTo(
+            lineageService.lineage(
+                NodeId.of(
+                    new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_b"))),
+                20,
+                true,
+                Instant.now()));
   }
 
   private Optional<Node> getNode(Lineage lineage, String datasetName, String fieldName) {

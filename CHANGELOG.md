@@ -26,6 +26,10 @@
     *Creates a method in `ColumnLineageService` to enrich `Dataset` with column lineage information and uses the method in `DatasetResource`.*
 * Add indices on the job table [`#2161`](https://github.com/MarquezProject/marquez/pull/2161) [@phixMe](https://github.com/phixMe)  
     *Adds indices to the fields used we join on inside the lineage query to speed up the join operation in the `/lineage` query.*
+* Add endpoint to get column lineage by a job [`#2204`](https://github.com/MarquezProject/marquez/pull/2204) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Changes the API to make column lineage available for jobs.*
+* Add column lineage methods to Python client [`#2209`](https://github.com/MarquezProject/marquez/pull/2209) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Implements methods for column lineage in the Python client.*   
 
 ### Changed
 

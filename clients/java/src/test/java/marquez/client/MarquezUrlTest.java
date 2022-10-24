@@ -38,10 +38,12 @@ public class MarquezUrlTest {
   void testToColumnLineageUrl() {
     Assertions.assertEquals(
         "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=true",
-        marquezUrl.toColumnLineageUrl("namespace", "dataset", 20, true).toString());
+        marquezUrl.toColumnLineageUrlByDataset("namespace", "dataset", 20, true).toString());
 
     Assertions.assertEquals(
         "http://marquez:5000/api/v1/column-lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield&depth=20&withDownstream=true",
-        marquezUrl.toColumnLineageUrl("namespace", "dataset", "field", 20, true).toString());
+        marquezUrl
+            .toColumnLineageUrlByDatasetField("namespace", "dataset", "field", 20, true)
+            .toString());
   }
 }

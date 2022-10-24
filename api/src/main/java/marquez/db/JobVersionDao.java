@@ -151,31 +151,33 @@ public interface JobVersionDao extends BaseDao {
    */
   // TODO: A JobVersionRow object should be immutable; replace with JobVersionDao.insertJobVersion()
   @SqlQuery(
-      "INSERT INTO job_versions ("
-          + "uuid, "
-          + "created_at, "
-          + "updated_at, "
-          + "job_uuid, "
-          + "job_context_uuid, "
-          + "location, "
-          + "version, "
-          + "job_name, "
-          + "namespace_uuid, "
-          + "namespace_name"
-          + ") VALUES ("
-          + ":jobVersionUuid, "
-          + ":now, "
-          + ":now, "
-          + ":jobUuid, "
-          + ":jobContextUuid, "
-          + ":jobLocation, "
-          + ":version, "
-          + ":jobName, "
-          + ":namespaceUuid, "
-          + ":namespaceName) "
-          + "ON CONFLICT(version) DO "
-          + "UPDATE SET updated_at = EXCLUDED.updated_at "
-          + "RETURNING *")
+      """
+    INSERT INTO job_versions (
+      uuid,
+      created_at,
+      updated_at,
+      job_uuid,
+      job_context_uuid,
+      location,
+      version,
+      job_name,
+      namespace_uuid,
+      namespace_name
+    ) VALUES (
+      :jobVersionUuid,
+      :now,
+      :now,
+      :jobUuid,
+      :jobContextUuid,
+      :jobLocation,
+      :version,
+      :jobName,
+      :namespaceUuid,
+      :namespaceName)
+    ON CONFLICT(version) DO
+    UPDATE SET updated_at = EXCLUDED.updated_at
+    RETURNING *
+  """)
   ExtendedJobVersionRow upsertJobVersion(
       UUID jobVersionUuid,
       Instant now,
@@ -215,9 +217,12 @@ public interface JobVersionDao extends BaseDao {
    * @param ioType The {@link IoType} of the dataset.
    */
   @SqlUpdate(
-      "INSERT INTO job_versions_io_mapping ("
-          + "job_version_uuid, dataset_uuid, io_type) "
-          + "VALUES (:jobVersionUuid, :datasetUuid, :ioType) ON CONFLICT DO NOTHING")
+      """
+    INSERT INTO job_versions_io_mapping (
+      job_version_uuid, dataset_uuid, io_type)
+    VALUES (:jobVersionUuid, :datasetUuid, :ioType)
+    ON CONFLICT DO NOTHING
+  """)
   void upsertInputOrOutputDatasetFor(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
 
   /**
@@ -247,8 +252,12 @@ public interface JobVersionDao extends BaseDao {
    * @param ioType The {@link IoType} of the dataset.
    */
   @SqlQuery(
-      "SELECT dataset_uuid FROM job_versions_io_mapping "
-          + "WHERE job_version_uuid = :jobVersionUuid AND io_type = :ioType")
+      """
+    SELECT dataset_uuid
+    FROM job_versions_io_mapping
+    WHERE job_version_uuid = :jobVersionUuid
+    AND io_type = :ioType
+  """)
   List<UUID> findInputOrOutputDatasetsFor(UUID jobVersionUuid, IoType ioType);
 
   /**
@@ -262,10 +271,12 @@ public interface JobVersionDao extends BaseDao {
    * @param latestRunUuid The unique ID of the {@link Run} associated with the job version.
    */
   @SqlUpdate(
-      "UPDATE job_versions "
-          + "SET updated_at = :updatedAt, "
-          + "    latest_run_uuid = :latestRunUuid "
-          + "WHERE uuid = :jobVersionUuid")
+      """
+    UPDATE job_versions
+    SET updated_at = :updatedAt,
+      latest_run_uuid = :latestRunUuid
+    WHERE uuid = :jobVersionUuid
+  """)
   void updateLatestRunFor(UUID jobVersionUuid, Instant updatedAt, UUID latestRunUuid);
 
   /** Returns the unique ID of the latest {@link Run} for a given job version. */

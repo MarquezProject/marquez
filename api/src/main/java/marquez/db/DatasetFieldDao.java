@@ -107,6 +107,22 @@ public interface DatasetFieldDao extends BaseDao {
 
   @SqlQuery(
       """
+          WITH latest_run AS (
+            SELECT DISTINCT r.uuid as uuid, r.created_at
+            FROM runs_view r
+            WHERE r.namespace_name = :namespaceName AND r.job_name = :jobName
+            ORDER BY r.created_at DESC
+            LIMIT 1
+          )
+          SELECT dataset_fields.uuid
+          FROM dataset_fields
+          JOIN dataset_versions ON dataset_versions.dataset_uuid = dataset_fields.dataset_uuid
+          JOIN latest_run ON dataset_versions.run_uuid = latest_run.uuid
+      """)
+  List<UUID> findFieldsUuidsByJob(String namespaceName, String jobName);
+
+  @SqlQuery(
+      """
           SELECT df.uuid
           FROM dataset_fields  df
           JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
