@@ -982,13 +982,10 @@ public class MarquezClientTest {
         .thenReturn(lineageJson);
 
     Node retrievedNode =
-        client.getColumnLineage("namespace", "dataset").getGraph().stream().findAny().get();
-    assertThat(retrievedNode.getId()).isEqualTo(node.getId());
-    assertThat(retrievedNode.getData()).isEqualTo(node.getData());
-    assertThat(retrievedNode.getInEdges().stream().findFirst())
-        .isEqualTo(node.getInEdges().stream().findFirst());
-    assertThat(retrievedNode.getOutEdges().stream().findFirst())
-        .isEqualTo(node.getOutEdges().stream().findFirst());
+        client.getColumnLineageByDataset("namespace", "dataset").getGraph().stream()
+            .findAny()
+            .get();
+    assertThat(retrievedNode).isEqualTo(node);
   }
 
   @Test
@@ -1022,15 +1019,45 @@ public class MarquezClientTest {
         .thenReturn(lineageJson);
 
     Node retrievedNode =
-        client.getColumnLineage("namespace", "dataset", "some-col1").getGraph().stream()
+        client.getColumnLineageByDataset("namespace", "dataset", "some-col1").getGraph().stream()
             .findAny()
             .get();
-    assertThat(retrievedNode.getId()).isEqualTo(node.getId());
-    assertThat(retrievedNode.getData()).isEqualTo(node.getData());
-    assertThat(retrievedNode.getInEdges().stream().findFirst())
-        .isEqualTo(node.getInEdges().stream().findFirst());
-    assertThat(retrievedNode.getOutEdges().stream().findFirst())
-        .isEqualTo(node.getOutEdges().stream().findFirst());
+    assertThat(retrievedNode).isEqualTo(node);
+  }
+
+  @Test
+  public void testGetColumnLineageByJob() throws Exception {
+    Node node =
+        new Node(
+            NodeId.of(DATASET_FIELD_ID),
+            NodeType.DATASET_FIELD,
+            new ColumnLineageNodeData(
+                NAMESPACE_NAME,
+                DB_TABLE_NAME,
+                FIELD_NAME,
+                "String",
+                "transformationDescription",
+                "transformationType",
+                Collections.singletonList(
+                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(DATASET_FIELD_ID),
+                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
+            ImmutableSet.of(
+                Edge.of(
+                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
+                    NodeId.of(DATASET_FIELD_ID))));
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
+    String lineageJson = lineage.toJson();
+    when(http.get(
+            buildUrlFor(
+                "/column-lineage?nodeId=job%3Anamespace%3Ajob&depth=20&withDownstream=false")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client.getColumnLineageByJob("namespace", "job").getGraph().stream().findAny().get();
+    assertThat(retrievedNode).isEqualTo(node);
   }
 
   private URL buildUrlFor(String pathTemplate) throws Exception {

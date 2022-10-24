@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetFieldId;
 import marquez.common.models.DatasetId;
+import marquez.common.models.JobId;
 import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.models.ColumnLineageNodeData;
@@ -124,6 +125,11 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
               datasetFieldId.getDatasetId().getName().getValue(),
               datasetFieldId.getFieldName().getValue())
           .ifPresent(uuid -> columnNodeUuids.add(uuid));
+    } else if (nodeId.isJobType()) {
+      JobId jobId = nodeId.asJobId();
+      columnNodeUuids.addAll(
+          datasetFieldDao.findFieldsUuidsByJob(
+              jobId.getNamespace().getValue(), jobId.getName().getValue()));
     }
     return columnNodeUuids;
   }
