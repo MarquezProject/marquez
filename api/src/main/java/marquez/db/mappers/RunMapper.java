@@ -17,6 +17,7 @@ import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -71,7 +72,7 @@ public final class RunMapper implements RowMapper<Run> {
             ? timestampOrNull(results, columnPrefix + Columns.ENDED_AT)
             : null,
         durationMs.orElse(null),
-        toArgs(results, columnPrefix + Columns.ARGS),
+        toArgsOrNull(results, columnPrefix + Columns.ARGS),
         stringOrThrow(results, columnPrefix + Columns.NAMESPACE_NAME),
         stringOrThrow(results, columnPrefix + Columns.JOB_NAME),
         uuidOrNull(results, columnPrefix + Columns.JOB_VERSION),
@@ -82,7 +83,9 @@ public final class RunMapper implements RowMapper<Run> {
         columnNames.contains(columnPrefix + Columns.OUTPUT_VERSIONS)
             ? toDatasetVersion(results, columnPrefix + Columns.OUTPUT_VERSIONS)
             : ImmutableList.of(),
-        JobMapper.toContext(results, columnPrefix + Columns.CONTEXT),
+        columnNames.contains(columnPrefix + Columns.CONTEXT)
+            ? JobMapper.toContext(results, columnPrefix + Columns.CONTEXT)
+            : null,
         toFacetsOrNull(results, columnPrefix + Columns.FACETS));
   }
 
@@ -94,8 +97,12 @@ public final class RunMapper implements RowMapper<Run> {
     return Utils.fromJson(dsString, new TypeReference<List<DatasetVersionId>>() {});
   }
 
-  private Map<String, String> toArgs(ResultSet results, String column) throws SQLException {
-    String args = stringOrNull(results, column);
+  private Map<String, String> toArgsOrNull(ResultSet results, String argsColumn)
+      throws SQLException {
+    if (!Columns.exists(results, argsColumn)) {
+      return ImmutableMap.of();
+    }
+    String args = stringOrNull(results, argsColumn);
     if (args == null) {
       return null;
     }

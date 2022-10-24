@@ -160,7 +160,7 @@ public class LineageServiceTest {
         .hasSize(0);
     runAssert
         .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
-        .hasSize(1);
+        .hasSize(0);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
@@ -268,7 +268,7 @@ public class LineageServiceTest {
         .hasSize(0);
     runAssert
         .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
-        .hasSize(1);
+        .hasSize(0);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
