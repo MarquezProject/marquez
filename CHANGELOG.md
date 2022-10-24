@@ -1,20 +1,63 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.26.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.27.0...HEAD)
+
+## [0.27.0](https://github.com/MarquezProject/marquez/compare/0.26.0...0.27.0) - 2022-10-24
 
 ### Added
-* Implemented dataset symlink feature which allows providing multiple names for a dataset and adds edges to lineage graph based on symlinks [`#2066`](https://github.com/MarquezProject/marquez/pull/2066) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Store column lineage facets in separate table [`#2096`](https://github.com/MarquezProject/marquez/pull/2096) [@mzareba382](https://github.com/mzareba382) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Lineage graph endpoint for column lineage [`#2124`](https://github.com/MarquezProject/marquez/pull/2124) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Enrich returned dataset resource with column lineage information [`#2113`](https://github.com/MarquezProject/marquez/pull/2113) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Downstream column lineage [`#2159`](https://github.com/MarquezProject/marquez/pull/2159) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Column lineage within Marquez Java client  [`#2163`](https://github.com/MarquezProject/marquez/pull/2163) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Endpoint to get column lineage by a job [`#2204`](https://github.com/MarquezProject/marquez/pull/2204) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-* Python client for column lineage [`#2209`](https://github.com/MarquezProject/marquez/pull/2209) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 
+* Implement dataset symlink feature [`#2066`](https://github.com/MarquezProject/marquez/pull/2066) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds support for multiple dataset names and adds edges to the lineage graph based on symlinks.*
+* Store column lineage facets in separate table [`#2096`](https://github.com/MarquezProject/marquez/pull/2096) [@mzareba382](https://github.com/mzareba382) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds a column-level lineage representation and API endpoint to retrieve column-level lineage data from the Marquez database.*
+* Add a lineage graph endpoint for column lineage [`#2124`](https://github.com/MarquezProject/marquez/pull/2124) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Allows for the storing of column-lineage information from events in the Marquez database and exposes column lineage through a graph endpoint.*
+* Enrich returned dataset resource with column lineage information [`#2113`](https://github.com/MarquezProject/marquez/pull/2113) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Extends the `/api/v1/namespaces/{namespace}/datasets` endpoint to return the `columnLineage` facet.*
+* Add downstream column lineage [`#2159`](https://github.com/MarquezProject/marquez/pull/2159) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Extends the recursive query that returns column lineage nodes to traverse the graph for downstream nodes.*
+* Implement column lineage within Marquez Java client  [`#2163`](https://github.com/MarquezProject/marquez/pull/2163) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds Marquez API client methods for column lineage.*
+* Provide `dataset_symlinks` table for `SymlinkDatasetFacet` [`#2087`](https://github.com/MarquezProject/marquez/pull/2087) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Modifies Marquez to handle the new `SymlinkDatasetFacet` in the OpenLineage spec.*
+* Display current run state for job node in lineage graph [`#2146`](https://github.com/MarquezProject/marquez/pull/2146) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fills job nodes in the lineage graph with the latest run state and makes some minor changes to column names used to display dataset and job metadata.*
+* Include column lineage in dataset resource [`#2148`](https://github.com/MarquezProject/marquez/pull/2148) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Creates a method in `ColumnLineageService` to enrich `Dataset` with column lineage information and uses the method in `DatasetResource`.*
+* Add indices on the job table [`#2161`](https://github.com/MarquezProject/marquez/pull/2161) [@phixMe](https://github.com/phixMe)  
+    *Adds indices to the fields used we join on inside the lineage query to speed up the join operation in the `/lineage` query.*
+* Add endpoint to get column lineage by a job [`#2204`](https://github.com/MarquezProject/marquez/pull/2204) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Changes the API to make column lineage available for jobs.*
+* Add column lineage methods to Python client [`#2209`](https://github.com/MarquezProject/marquez/pull/2209) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Implements methods for column lineage in the Python client.*   
+
+### Changed
+
+* Update insert job function to avoid joining on symlinks for jobs with no symlinks [`#2144`](https://github.com/MarquezProject/marquez/pull/2144) [@collado-mike](https://github.com/collado-mike)  
+    *Radically reduces the database compute load in Marquez installations that frequently create a large number of new jobs.*
+* Increase size of `column-lineage.description` column [`#2205`](https://github.com/MarquezProject/marquez/pull/2205) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *`VARCHAR(255)` was too small for some users.*
 
 ### Fixed
-* Add support for `parentRun` facet as reported by older Airflow OpenLineage versions [@collado-mike](https://github.com/collado-mike)
+
+* Add support for `parentRun` facet as reported by older Airflow OpenLineage versions [`#2130`](https://github.com/MarquezProject/marquez/pull/2130) [@collado-mike](https://github.com/collado-mike)  
+    *Adds a `parentRun` alias to the `LineageEvent` `RunFacet`.*
+* Add fix and tests for handling Airflow DAGs with dots and task groups [`2126`](https://github.com/MarquezProject/marquez/pull/2126) [@collado-mike](https://github.com/collado-mike) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fixes a recent change that broke how Marquez handles DAGs with dots and tasks within task groups and adds test cases to validate.*
+* Fix version bump in `docker/up.sh` [`2129`](https://github.com/MarquezProject/marquez/pull/2129) [@wslulciuc](https://github.com/wslulciuc)  
+    *Defines a `VERSION` variable to bump on a release.*
+* Use `clean` when running `shadowJar` in Dockerfile [`2145`](https://github.com/MarquezProject/marquez/pull/2145) [@wslulciuc](https://github.com/wslulciuc)  
+    *Ensures the directory `api/build/libs/` is cleaned before building the JAR again and updates `.dockerignore` to ignore `api/build/*`.*
+* Fix bug that caused a single run event to create multiple jobs [`#2162`](https://github.com/MarquezProject/marquez/pull/2162) [@collado-mike](https://github.com/collado-mike)  
+    *Checks to see if a run with the given ID already exists and uses the pre-associated job if so.*
+* Fix column lineage returning multiple entries for job run multiple times [`#2176`](https://github.com/MarquezProject/marquez/pull/2176) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Makes column lineage return a column dependency only once if a job has been run several times.*
+* Fix API spec issues [`#2178`](https://github.com/MarquezProject/marquez/pull/2178) [@phixMe](https://github.com/phixMe)  
+    *Fixes issues with type generators in the `putDataset` API.*
+* Fix downstream recursion [`#2181`](https://github.com/MarquezProject/marquez/pull/2181) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Fixes issue causing same node to be added to recursive table multiple times.*
+* Update `jobs_current_version_uuid_index` and `jobs_symlink_target_uuid_index` to ignore `NULL` values [`#2186`](https://github.com/MarquezProject/marquez/pull/2186) [@collado-mike](https://github.com/collado-mike)  
+    *Avoids writing to the indices when the indexed values added by [#2161](https://github.com/MarquezProject/marquez/pull/2161) are null.*
 
 ## [0.26.0](https://github.com/MarquezProject/marquez/compare/0.25.0...0.26.0) - 2022-09-15
 
