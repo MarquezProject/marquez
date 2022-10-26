@@ -21,11 +21,10 @@ Before you begin, make sure you have installed:
 
 # Step 1: Setup
 
-First, if you haven't already, clone the Marquez repository and change into the `examples/airflow` directory:
+First, if you haven't already, clone the Marquez repository and change into the [`examples/airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) directory:
 
 ```bash
-$ git clone https://github.com/MarquezProject/marquez.git
-$ cd examples/airflow
+git clone https://github.com/MarquezProject/marquez && cd examples/airflow
 ```
 
 To make sure the latest [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) library is downloaded and installed when starting Airflow, you'll need to create a `requirements.txt` file with the following content:
@@ -38,7 +37,7 @@ Next, we'll need to specify where we want Airflow to send DAG metadata. To do so
 
 ```bash
 OPENLINEAGE_URL=http://marquez:5000  # The URL of the HTTP backend
-OPENLINEAGE_NAMESPACE=example        # The namespace associated with collected metadata associated with jobs
+OPENLINEAGE_NAMESPACE=example        # The namespace associated with the dataset, job, and run metadata collected
 ```
 > **Note:** The `openlineage.env` config file will be used by the `airflow`, `airflow_scheduler`, and `airflow_worker` containers to send lineage metadata to Marquez.
 
@@ -67,7 +66,7 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata. If you're using Airflow 2.3+ no further changes to your dag code, or configuration are needed. If you're using older version of Airflow, please look [here](https://github.com/OpenLineage/OpenLineage/blob/main/integration/airflow/README.md#setup) to understand how to configure Airflow integration. 
+When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata. If you're using Airflow 2.3+ no further changes to your dag code, or configuration are needed. If you're using older version of Airflow, please look [here](https://github.com/OpenLineage/OpenLineage/blob/main/integration/airflow/README.md#setup) to understand how to configure Airflow integration.
 
 # Step 2.1: Create DAG `counter`
 
@@ -94,6 +93,7 @@ dag = DAG(
     schedule_interval='*/1 * * * *',
     catchup=False,
     is_paused_upon_creation=False,
+    max_active_runs=1,
     default_args=default_args,
     description='DAG that generates a new count value between 1-10.'
 )
@@ -147,6 +147,7 @@ dag = DAG(
     schedule_interval='*/5 * * * *',
     catchup=False,
     is_paused_upon_creation=False,
+    max_active_runs=1,
     default_args=default_args,
     description='DAG that sums the total of generated count values.'
 )
