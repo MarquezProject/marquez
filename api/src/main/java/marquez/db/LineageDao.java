@@ -92,11 +92,51 @@ public interface LineageDao {
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
   @SqlQuery(
+      "WITH latest_runs AS (\n"
+          + "    SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version\n"
+          + "    FROM runs_view r\n"
+          + "    INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
+          + "    INNER JOIN jobs_view j ON j.uuid=jv.job_uuid\n"
+          + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
+          + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"
+          + ")\n"
+          + "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+          + "  r.version AS job_version, ri.input_versions, ro.output_versions\n"
+          + "  from latest_runs AS r\n"
+          + "LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
+          + "LEFT JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
+          + "    FROM lineage_events le\n"
+          + "    WHERE le.run_uuid=r.uuid\n"
+          + "    GROUP BY le.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT im.run_uuid,\n"
+          + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
+          + "                                      'name', dv.dataset_name,\n"
+          + "                                      'version', dv.version)) AS input_versions\n"
+          + "    FROM runs_input_mapping im\n"
+          + "    INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
+          + "    WHERE im.run_uuid=r.uuid\n"
+          + "    GROUP BY im.run_uuid\n"
+          + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
+          + "                                                'name', dataset_name,\n"
+          + "                                                'version', version)) AS output_versions\n"
+          + "    FROM dataset_versions\n"
+          + "    WHERE run_uuid=r.uuid\n"
+          + "    GROUP BY run_uuid\n"
+          + ") ro ON ro.run_uuid=r.uuid")
+  List<Run> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
+
+  @SqlQuery(
       "SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version as job_version\n"
           + "    FROM runs_view r\n"
           + "    INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
           + "    INNER JOIN jobs_view j ON j.uuid=jv.job_uuid\n"
           + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
-          + "    ORDER BY r.job_name, r.namespace_name, created_at DESC")
+          + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 }

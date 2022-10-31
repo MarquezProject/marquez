@@ -124,7 +124,8 @@ public class LineageServiceTest {
         dataset);
     String jobName = writeJob.getJob().getName();
     Lineage lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 1 commonDataset
     // 20 readJob           + 20 outputData
@@ -158,6 +159,9 @@ public class LineageServiceTest {
     runAssert
         .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
+    runAssert
+        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .hasSize(1);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
@@ -229,7 +233,8 @@ public class LineageServiceTest {
 
     String jobName = writeJob.getJob().getName();
     Lineage lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 0 commonDataset is hidden
     // 20 readJob           + 20 outputData
@@ -263,6 +268,9 @@ public class LineageServiceTest {
     runAssert
         .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
+    runAssert
+        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .hasSize(1);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
@@ -275,7 +283,8 @@ public class LineageServiceTest {
     jobDao.delete(NAMESPACE, "downstreamJob0<-outputData<-readJob0<-commonDataset");
 
     lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 0 commonDataset is hidden
     // 20 readJob           + 20 outputData
@@ -305,7 +314,9 @@ public class LineageServiceTest {
             openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
     Lineage lineage =
         lineageService.lineage(
-            NodeId.of(new NamespaceName(NAMESPACE), new JobName(writeJob.getJob().getName())), 5);
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(writeJob.getJob().getName())),
+            5,
+            true);
     assertThat(lineage.getGraph())
         .hasSize(1)
         .first()
@@ -356,7 +367,8 @@ public class LineageServiceTest {
         lineageService.lineage(
             NodeId.of(
                 new NamespaceName(NAMESPACE), new JobName(intermediateJob.getJob().getName())),
-            5);
+            5,
+            true);
     assertThat(lineage.getGraph()).extracting(Node::getId).hasSize(6);
     ObjectAssert<Node> datasetNode =
         assertThat(lineage.getGraph())
