@@ -46,6 +46,7 @@ public class LineageService extends DelegatingLineageDao {
     this.jobDao = jobDao;
   }
 
+  // TODO make input parameters easily extendable if adding more options like 'withJobFacets'
   public Lineage lineage(NodeId nodeId, int depth, boolean withRunFacets) {
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
@@ -61,7 +62,6 @@ public class LineageService extends DelegatingLineageDao {
                 jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()))
             : getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
 
-    // todo fix runtime
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
         for (Run run : runs) {
