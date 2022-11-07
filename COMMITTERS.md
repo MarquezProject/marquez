@@ -1,5 +1,5 @@
 # Marquez Committers
-The Marquez Committers are the group of people who can accept Pull Request to Marquez.
+The Marquez Committers are the group of people who can accept Pull Requests to Marquez.
 They take responsibility for guiding new pull requests into the main branch.
 
 
@@ -26,7 +26,7 @@ They take responsibility for guiding new pull requests into the main branch.
 ## Emeritus
 
 The following people are no longer working on the Marquez project.
-However they have been a committer in the past and through their
+However, they have been committers in the past and, through their
 contributions, we have a strong foundation to build on.
 
 | Name             | Handle                      |
@@ -34,5 +34,5 @@ contributions, we have a strong foundation to build on.
 
 # Becoming a Committer
 
-A Contributor may become a Committer by a majority approval of the
-existing Committers. (per the project [charter](https://wiki.lfaidata.foundation/download/attachments/18481434/Marquez%20Project%20Technical%20Charter%20Final_Adopted%2005.21.20.pdf?version=1&modificationDate=1591718661000&api=v2))
+A Contributor may become a Committer by the approval of a majority of the
+existing Committers (as per the project [charter](https://wiki.lfaidata.foundation/download/attachments/18481434/Marquez%20Project%20Technical%20Charter%20Final_Adopted%2005.21.20.pdf?version=1&modificationDate=1591718661000&api=v2)).
