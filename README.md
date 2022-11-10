@@ -152,3 +152,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 ## Contributing
 
 See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md) for more details about how to contribute.
+
+## Reporting a Vulnerability
+
+If you discover a vulnerability in the project, please open an issue and attach the "security" label.
