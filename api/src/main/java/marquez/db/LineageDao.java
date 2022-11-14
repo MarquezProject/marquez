@@ -129,5 +129,15 @@ public interface LineageDao {
           + "    WHERE run_uuid=r.uuid\n"
           + "    GROUP BY run_uuid\n"
           + ") ro ON ro.run_uuid=r.uuid")
+  List<Run> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
+
+  @SqlQuery(
+      """
+      SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version as job_version
+      FROM runs_view r
+      INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
+      INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
+      WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)
+      ORDER BY r.job_name, r.namespace_name, created_at DESC""")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 }

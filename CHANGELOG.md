@@ -42,11 +42,11 @@
 
 * Add support for `parentRun` facet as reported by older Airflow OpenLineage versions [`#2130`](https://github.com/MarquezProject/marquez/pull/2130) [@collado-mike](https://github.com/collado-mike)  
     *Adds a `parentRun` alias to the `LineageEvent` `RunFacet`.*
-* Add fix and tests for handling Airflow DAGs with dots and task groups [`2126`](https://github.com/MarquezProject/marquez/pull/2126) [@collado-mike](https://github.com/collado-mike) [@wslulciuc](https://github.com/wslulciuc)  
+* Add fix and tests for handling Airflow DAGs with dots and task groups [`#2126`](https://github.com/MarquezProject/marquez/pull/2126) [@collado-mike](https://github.com/collado-mike) [@wslulciuc](https://github.com/wslulciuc)  
     *Fixes a recent change that broke how Marquez handles DAGs with dots and tasks within task groups and adds test cases to validate.*
-* Fix version bump in `docker/up.sh` [`2129`](https://github.com/MarquezProject/marquez/pull/2129) [@wslulciuc](https://github.com/wslulciuc)  
+* Fix version bump in `docker/up.sh` [`#2129`](https://github.com/MarquezProject/marquez/pull/2129) [@wslulciuc](https://github.com/wslulciuc)  
     *Defines a `VERSION` variable to bump on a release.*
-* Use `clean` when running `shadowJar` in Dockerfile [`2145`](https://github.com/MarquezProject/marquez/pull/2145) [@wslulciuc](https://github.com/wslulciuc)  
+* Use `clean` when running `shadowJar` in Dockerfile [`#2145`](https://github.com/MarquezProject/marquez/pull/2145) [@wslulciuc](https://github.com/wslulciuc)  
     *Ensures the directory `api/build/libs/` is cleaned before building the JAR again and updates `.dockerignore` to ignore `api/build/*`.*
 * Fix bug that caused a single run event to create multiple jobs [`#2162`](https://github.com/MarquezProject/marquez/pull/2162) [@collado-mike](https://github.com/collado-mike)  
     *Checks to see if a run with the given ID already exists and uses the pre-associated job if so.*
