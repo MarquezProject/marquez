@@ -176,7 +176,8 @@ public class JobResource extends BaseResource {
             .findJobByName(namespaceName.getValue(), jobName.getValue())
             .orElseThrow(() -> new JobNotFoundException(jobName));
 
-    jobService.delete(namespaceName.getValue(), jobName.getValue());
+    // Should be simple name from `jobs_fqn`.
+    jobService.delete(namespaceName.getValue(), job.getSimpleName());
     return Response.ok(job).build();
   }
 

@@ -890,6 +890,56 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
   }
 
+  @Test
+  public void testSendAndDeleteParentRunRelationshipFacet() {
+    marquez.service.models.LineageEvent.Run run =
+      new marquez.service.models.LineageEvent.Run(
+        UUID.randomUUID().toString(),
+        marquez.service.models.LineageEvent.RunFacet.builder()
+          .parent(marquez.service.models.LineageEvent.ParentRunFacet.builder()
+            .run(marquez.service.models.LineageEvent.RunLink.builder()
+              .runId(UUID.randomUUID().toString()).build())
+            .job(marquez.service.models.LineageEvent.JobLink.builder()
+              .name("parent")
+              .namespace(NAMESPACE_NAME)
+              .build())
+            .build())
+          .build());
+    marquez.service.models.LineageEvent.Job job =
+      marquez.service.models.LineageEvent.Job.builder()
+        .namespace(NAMESPACE_NAME)
+        .name(JOB_NAME)
+        .build();
+
+    marquez.service.models.LineageEvent event =
+      marquez.service.models.LineageEvent.builder()
+        .eventType("START")
+        .eventTime(ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
+        .producer("testSendAndDeleteParentRunRelationshipFacet")
+        .run(run)
+        .job(job)
+        .inputs(Collections.emptyList())
+        .outputs(Collections.emptyList())
+        .build();
+
+    CompletableFuture<Integer> resp = sendEvent(event);
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<Job> jobs = client.listJobs(NAMESPACE_NAME);
+
+    String marquezJobName = String.format("parent.%s", JOB_NAME);
+
+    assertThat(jobs.size()).isEqualTo(2);
+    assertThat(jobs).anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
+
+    client.deleteJob(NAMESPACE_NAME, marquezJobName);
+
+    jobs = client.listJobs(NAMESPACE_NAME);
+    assertThat(jobs.size()).isEqualTo(1);
+    assertThat(jobs).anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
+  }
+
+
   private CompletableFuture<Integer> sendEvent(marquez.service.models.LineageEvent event) {
     return this.sendLineage(Utils.toJson(event))
         .thenApply(HttpResponse::statusCode)
