@@ -1,6 +1,23 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.27.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.28.0...HEAD)
+
+## [0.28.0](https://github.com/MarquezProject/marquez/compare/0.27.0...0.28.0) - 2022-11-15
+
+### Added
+
+* Optimize current runs query for lineage API [`#2211`](https://github.com/MarquezProject/marquez/pull/2211) [@prachim-collab](https://github.com/prachim-collab)   
+    *Add a simpler, alternate `getCurrentRuns` query that gets only simple runs from the database without the additional data from tables such as `run_args`, `job_context`, `facets`, etc., which required extra table joins.*
+* Add Code Quality, DCO and Governance docs to project [`#2237`](https://github.com/MarquezProject/marquez/pull/2237) [`#2241`](https://github.com/MarquezProject/marquez/pull/2241) [@merobi-hub](https://github.com/MarquezProject/marquez/commits?author=merobi-hub)  
+    *Adds a number of standard governance and procedure docs to the project.*
+
+### Fixed
+
+* Show facets even when dataset has no fields [`#2214`](https://github.com/MarquezProject/marquez/pull/2214) [@JDarDagran](https://github.com/JDarDagran)  
+    *Changes the logic in the `DatasetInfo` component to always show facets so that dataset facets are visible in the UI even if no dataset fields have been set.* 
+* Appreciate column prefix when given for `ended_at` [`#2231`](https://github.com/MarquezProject/marquez/pull/2231) [@fm100](https://github.com/fm100)  
+    *The `ended_at` column was always null when querying if `columnPrefix` was given for the mapper. Now, `columnPrefix` is included when checking for column existence.*
+
 
 ## [0.27.0](https://github.com/MarquezProject/marquez/compare/0.26.0...0.27.0) - 2022-10-24
 
