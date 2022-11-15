@@ -6,13 +6,19 @@ layout: deployment-overview
 
 ## Helm Chart
 
-Marquez uses [Helm](https://helm.sh) to manage deployments onto [Kubernetes](https://kubernetes.io) in a cloud environment. The chart and templates for the [HTTP API](https://github.com/MarquezProject/marquez/tree/main/api) server and [Web UI](https://github.com/MarquezProject/marquez/tree/main/web) are maintained in the Marquez [repository](https://github.com/MarquezProject/marquez) and can be found in the [chart](https://github.com/MarquezProject/marquez/tree/main/chart) directory. The chart's base `values.yaml` file includes an option to easily override deployment [settings](https://github.com/MarquezProject/marquez/tree/main/chart#configuration).
+Marquez uses [Helm](https://helm.sh) to manage deployments onto [Kubernetes](https://kubernetes.io) in a cloud environment. The chart and templates for the [HTTP API](https://github.com/MarquezProject/marquez/tree/main/api) server and [Web UI](https://github.com/MarquezProject/marquez/tree/main/web) are maintained in the Marquez [repository](https://github.com/MarquezProject/marquez) and can be found in the [chart](https://github.com/MarquezProject/marquez/tree/main/chart) directory. The chart's base [`values.yaml`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L183) file includes an option to easily override deployment [settings](https://github.com/MarquezProject/marquez/tree/main/chart#configuration).
 
-> **Note:** The Marquez HTTP API server and Web UI images are publshed to [DockerHub](https://hub.docker.com/r/marquezproject/marquez).
+> **Note:** The Marquez HTTP API server and Web UI images are published to [DockerHub](https://hub.docker.com/r/marquezproject/marquez).
+
+### `TLS/HTTPS`
+
+To enable HTTPS traffic when deploying Marquez onto Kubernetes, use the flag [`ingress.enabled`](https://github.com/MarquezProject/marquez/tree/main/chart#ingress-parameters) to configure the ingress controller. To secure ingress traffic, use the [`ingress.tls`](https://github.com/MarquezProject/marquez/tree/main/chart#ingress-parameters) section to define your TLS `secret` and `hosts` (see `ingress` in the chart's base [`values.yaml`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L183) for more details).
 
 ## Database
 
 The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) server relies only on PostgreSQL to store dataset, job, and run metadata allowing for minimal operational overhead. We recommend a cloud provided databases, such as AWS [RDS](https://aws.amazon.com/rds/postgresql), when deploying Marquez onto Kubernetes.
+
+> **Note:** We encourage enabling encryption at rest when provisioning your database.
 
 ## Architecture
 
@@ -44,7 +50,9 @@ The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) se
 
 ## Authentication
 
-Our [clients](https://github.com/MarquezProject/marquez/tree/main/clients) support authentication by automatically sending an API key on each request via [_Bearer Auth_](https://datatracker.ietf.org/doc/html/rfc6750) when configured on client instantiation. By default, the Marquez HTTP API does not require any form of authentication or authorization.
+Our [clients](https://github.com/MarquezProject/marquez/tree/main/clients) support authentication by automatically sending an API key on each request via [_Bearer Auth_](https://datatracker.ietf.org/doc/html/rfc6750) when configured on client instantiation.
+
+> **Note:**  By default, the Marquez HTTP API server does not require any form of authentication or authorization.
 
 ## Next Steps
 
