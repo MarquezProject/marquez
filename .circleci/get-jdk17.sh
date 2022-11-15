@@ -14,8 +14,6 @@
 #
 # Usage: $ ./get-jdk17.sh
 
-set -x
-
 wget -qO - https://adoptium.jfrog.io/adoptium/api/gpg/key/public | sudo apt-key add -
 sudo add-apt-repository --yes https://adoptium.jfrog.io/adoptium/deb
 sudo apt-get update --allow-releaseinfo-change && sudo apt-get install --yes temurin-17-jdk
