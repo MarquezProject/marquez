@@ -14,7 +14,7 @@
 #
 # Usage: $ ./get-jdk17.sh
 
-set -ex
+set -x
 
 wget -qO - https://adoptium.jfrog.io/adoptium/api/gpg/key/public | sudo apt-key add -
 sudo add-apt-repository --yes https://adoptium.jfrog.io/adoptium/deb
