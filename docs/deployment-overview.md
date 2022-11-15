@@ -18,7 +18,7 @@ To enable HTTPS traffic when deploying Marquez onto Kubernetes, use the flag [`i
 
 The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) server relies only on PostgreSQL to store dataset, job, and run metadata allowing for minimal operational overhead. We recommend a cloud provided databases, such as AWS [RDS](https://aws.amazon.com/rds/postgresql), when deploying Marquez onto Kubernetes.
 
-> **Note:** We encourage enabling encryption at rest when provisioning your cloud provided database.
+> **Note:** We encourage enabling encryption at rest when provisioning your database.
 
 ## Architecture
 
