@@ -31,6 +31,8 @@ jobs:
           keys:
             - v1-api-{{ .Branch }}-{{ .Revision }}
             - v1-api-{{ .Branch }}
+      # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/4
+      - run: sudo rm -rf /etc/apt/sources.list.d/heroku.list
       - run: ./.circleci/get-jdk17.sh
       - run: echo "checks.disable=true" > ~/.testcontainers.properties
       - run: ./gradlew --no-daemon --stacktrace api:javadoc
@@ -99,6 +101,8 @@ jobs:
           keys:
             - v1-client-java-{{ .Branch }}-{{ .Revision }}
             - v1-client-java-{{ .Branch }}
+      # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/4
+      - run: sudo rm -rf /etc/apt/sources.list.d/heroku.list
       - run: ./.circleci/get-jdk17.sh
       - run: ./gradlew --no-daemon --stacktrace clients:java:javadoc
       - run: ./gradlew --no-daemon --stacktrace clients:java:build
@@ -153,6 +157,8 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
+      # https://discuss.circleci.com/t/heroku-gpg-issues-in-ubuntu-images/43834/4
+      - run: sudo rm -rf /etc/apt/sources.list.d/heroku.list
       - run: ./.circleci/get-jdk17.sh
       - run: |
           # Get, then decode the GPG private key used to sign *.jar
