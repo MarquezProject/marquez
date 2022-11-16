@@ -21,12 +21,10 @@ interface DatasetInfoProps {
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
   const { datasetFields, facets, run } = props
 
-  if (datasetFields.length === 0) {
-    return <MqEmpty title={'No Fields'} body={'Try adding dataset fields.'} />
-  }
-
   return (
     <Box>
+      {datasetFields.length === 0 && <MqEmpty title={'No Fields'} body={'Try adding dataset fields.'} />}
+      {datasetFields.length > 0 && (
       <Table size='small'>
         <TableHead>
           <TableRow>
@@ -53,6 +51,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
           })}
         </TableBody>
       </Table>
+      )}
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
