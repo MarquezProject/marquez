@@ -2,7 +2,7 @@
 
 CREATE TABLE dataset_symlinks (
   dataset_uuid      UUID,
-  name              VARCHAR(255) NOT NULL,
+  name              VARCHAR NOT NULL,
   namespace_uuid    UUID REFERENCES namespaces(uuid),
   type              VARCHAR(64),
   is_primary        BOOLEAN DEFAULT FALSE,
