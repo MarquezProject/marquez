@@ -22,6 +22,36 @@ export interface Namespace {
   description: string
 }
 
+export interface Events {
+  events: Event[]
+}
+
+export interface Event {
+  eventType: string
+  eventTime: string
+  producer: string
+  schemaURL: string
+  run: {
+    runId: string
+    facets: object
+  }
+  job: {
+    name: string
+    namespace: string
+    facets: object
+  }
+  inputs: {
+    name: string,
+    namespace: string,
+    facets: object
+  }[]
+  outputs: {
+    name: string,
+    namespace: string,
+    facets: object
+  }[]
+}
+
 export interface Datasets {
   datasets: Dataset[]
 }

@@ -13,7 +13,6 @@ import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 const styles = (theme: Theme) =>
   createStyles({
     root: {
-      padding: theme.spacing(4),
       width: theme.spacing(8),
       height: theme.spacing(8),
       borderRadius: theme.spacing(2),
