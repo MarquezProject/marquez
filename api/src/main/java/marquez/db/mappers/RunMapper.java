@@ -68,7 +68,7 @@ public final class RunMapper implements RowMapper<Run> {
         columnNames.contains(columnPrefix + Columns.STARTED_AT)
             ? timestampOrNull(results, columnPrefix + Columns.STARTED_AT)
             : null,
-        columnNames.contains(Columns.ENDED_AT)
+        columnNames.contains(columnPrefix + Columns.ENDED_AT)
             ? timestampOrNull(results, columnPrefix + Columns.ENDED_AT)
             : null,
         durationMs.orElse(null),
