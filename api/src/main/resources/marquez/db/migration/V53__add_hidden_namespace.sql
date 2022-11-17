@@ -1,0 +1,1 @@
+ALTER TABLE namespaces ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE;

@@ -292,15 +292,24 @@ public interface DatasetDao extends BaseDao {
       String name,
       String physicalName);
 
+  @SqlUpdate(
+      """
+    UPDATE datasets d
+    SET is_hidden = true
+    FROM namespaces n
+    WHERE n.uuid=d.namespace_uuid
+    AND n.name=:namespaceName
+  """)
+  void deleteByNamespaceName(String namespaceName);
+
   @SqlQuery(
       """
-  UPDATE datasets
-  SET is_hidden = true
-  FROM dataset_symlinks, namespaces
-  WHERE dataset_symlinks.dataset_uuid = datasets.uuid
-  AND namespaces.uuid = dataset_symlinks.namespace_uuid
-  AND namespaces.name=:namespaceName AND dataset_symlinks.name=:name
-  RETURNING *
+    UPDATE datasets d
+    SET is_hidden = true
+    FROM namespaces n
+    WHERE n.uuid = d.namespace_uuid
+    AND n.name=:namespaceName AND d.name=:name
+    RETURNING *
   """)
   Optional<DatasetRow> delete(String namespaceName, String name);
 

@@ -38,7 +38,7 @@ public final class ModelGenerator {
 
   public static Namespace newNamespace() {
     final Instant now = newTimestamp();
-    return new Namespace(newNamespaceName(), now, now, newOwnerName(), newDescription());
+    return new Namespace(newNamespaceName(), now, now, newOwnerName(), newDescription(), false);
   }
 
   public static SourceMeta newSourceMeta() {

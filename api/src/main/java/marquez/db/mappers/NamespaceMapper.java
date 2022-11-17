@@ -5,6 +5,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.booleanOrThrow;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
@@ -28,6 +29,7 @@ public final class NamespaceMapper implements RowMapper<Namespace> {
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         OwnerName.of(stringOrThrow(results, Columns.CURRENT_OWNER_NAME)),
-        stringOrNull(results, Columns.DESCRIPTION));
+        stringOrNull(results, Columns.DESCRIPTION),
+        booleanOrThrow(results, Columns.IS_HIDDEN));
   }
 }
