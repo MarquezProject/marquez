@@ -23,6 +23,7 @@ import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import '../../i18n/config'
 
 const BOTTOM_OFFSET = 8
 
@@ -155,13 +156,14 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
   render() {
     const { classes } = this.props
+    const i18next = require("i18next")
     return (
       <Box className={classes.lineageContainer}>
         {this.props.selectedNode === null && (
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
-            <MqEmpty title={'No node selected'}>
+            <MqEmpty title={i18next.t('lineage.empty_title')}>
               <MqText subdued>
-                Try selecting a node through search or the jobs or datasets page.
+                {i18next.t('lineage.empty_body')}
               </MqText>
             </MqEmpty>
           </Box>

@@ -24,6 +24,8 @@ import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import Runs from './Runs'
+import '../../i18n/config'
+import { useTranslation } from 'react-i18next'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -52,6 +54,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
     setTab(newValue)
   }
+  const { t } = useTranslation()
 
   useEffect(() => {
     fetchRuns(job.name, job.namespace)
@@ -82,13 +85,13 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-          <Tab label='LATEST RUN' disableRipple={true} />
-          <Tab label='RUN HISTORY' disableRipple={true} />
+          <Tab label={t('jobs.latest_tab')} disableRipple={true} />
+          <Tab label={t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
             <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
-              Location
+              {t('jobs.location')}
             </Button>
           </Box>
           <IconButton onClick={() => history.push('/')}>
@@ -116,8 +119,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         ) : (
           !job.latestRun && (
             <MqEmpty
-              title={'No Run Information Available'}
-              body={'Try adding some runs for this job.'}
+              title={t('jobs.empty_title')}
+              body={t('jobs.empty_body')}
             />
           )
         )

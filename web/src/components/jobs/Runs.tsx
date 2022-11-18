@@ -26,6 +26,8 @@ import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
+import '../../i18n/config'
+import { useTranslation } from 'react-i18next'
 
 const RUN_COLUMNS = ['ID', 'STATE', 'CREATED AT', 'STARTED AT', 'ENDED AT', 'DURATION']
 
@@ -54,8 +56,9 @@ interface RunsProps {
 
 const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => {
   const { runs, facets, classes } = props
+  const { t } = useTranslation()
   if (runs.length === 0) {
-    return <MqEmpty title={'No Runs Found'} body={'Try adding some runs for this job.'} />
+    return <MqEmpty title={t('jobs.empty_title')} body={t('jobs.empty_body')} />
   }
 
   const [infoView, setInfoView] = React.useState<Run | null>(null)
@@ -116,7 +119,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>FACETS</MqText>
+            <MqText subheading>{t('jobs.runs_subhead')}</MqText>
           </Box>
           <MqCode code={JSON.stringify(facets, null, '\t')} />
         </Box>

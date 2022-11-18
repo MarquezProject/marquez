@@ -14,6 +14,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs, faDatabase } from '@fortawesome/free-solid-svg-icons'
 import MqIconButton from '../core/icon-button/MqIconButton'
 
+import '../../i18n/config' // for i18n
+import { FormControl, MenuItem, Select } from '@material-ui/core'
+import { MqInputBase } from '../core/input-base/MqInputBase'
+import resources from '../../types/i18next'
+import MqText from '../core/text/MqText'
+import { theme } from '../../helpers/theme'
+
 const styles = (theme: Theme) =>
   createStyles({
     drawer: {
@@ -31,17 +38,29 @@ const styles = (theme: Theme) =>
     },
     link: {
       textDecoration: 'none'
+    },
+    formControl: {
+      maxWidth: '100px',
     }
   })
 
-type SidenavProps = WithStyles<typeof styles> & RouteComponentProps
+interface CustomTypeOptions {
+  languages: typeof resources
+}
+
+type SidenavProps = WithStyles<typeof styles> & RouteComponentProps & CustomTypeOptions
 
 class Sidenav extends React.Component<SidenavProps> {
   render() {
     const { classes } = this.props
+    const i18next = require("i18next")
+    const changeLanguage = (lng: string) => {
+      i18next.changeLanguage(lng);
+    }
     return (
       <Drawer className={classes.drawer} variant='permanent'>
         <Box
+          position={'relative'}
           width={DRAWER_WIDTH}
           display={'flex'}
           flexDirection={'column'}
@@ -55,7 +74,7 @@ class Sidenav extends React.Component<SidenavProps> {
             <RouterLink to={'/'} className={classes.link}>
               <MqIconButton
                 id={'homeDrawerButton'}
-                title={'JOBS'}
+                title={i18next.t('sidenav.jobs')}
                 active={this.props.location.pathname === '/'}
               >
                 <FontAwesomeIcon icon={faCogs} size={'2x'} />
@@ -64,7 +83,7 @@ class Sidenav extends React.Component<SidenavProps> {
             <RouterLink to={'/datasets'} className={classes.link}>
               <MqIconButton
                 id={'datasetsDrawerButton'}
-                title={'DATASETS'}
+                title={i18next.t('sidenav.datasets')}
                 active={this.props.location.pathname === '/datasets'}
               >
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
@@ -81,6 +100,27 @@ class Sidenav extends React.Component<SidenavProps> {
             {/*  </MqIconButton>*/}
             {/*</RouterLink>*/}
           </Box>
+          <FormControl variant='outlined' className={classes.formControl}>
+            <Box position={'relative'}>
+              <Box position={'absolute'} left={12} top={9}>
+                <MqText color={theme.palette.primary.main} font={'mono'}>
+                  🌍
+                </MqText>
+              </Box>
+            </Box>
+            <Select
+              value={i18next.resolvedLanguage}
+              onChange={event => {
+                changeLanguage(event.target.value as string)
+              }}
+              input={<MqInputBase />}
+            >
+              <MenuItem key={'en'} value={'en'}>{'en'}</MenuItem>
+              <MenuItem key={'es'} value={'es'}>{'es'}</MenuItem>
+              <MenuItem key={'fr'} value={'fr'}>{'fr'}</MenuItem>
+              <MenuItem key={'pl'} value={'pl'}>{'pl'}</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
       </Drawer>
     )

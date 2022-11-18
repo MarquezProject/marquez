@@ -5,6 +5,8 @@ import { theme } from '../../helpers/theme'
 import MqText from '../core/text/MqText'
 import React from 'react'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
+import '../../i18n/config'
+import { useTranslation } from 'react-i18next'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -20,24 +22,25 @@ const styles = (theme: Theme) =>
   })
 
 const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {
+  const { t } = useTranslation();
   return (
     <Box className={classes.root}>
       <Box display={'inline'}>
         <MqText disabled inline>
           {' '}
-          Search
+          {t('search.search')}
         </MqText>{' '}
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
-          Jobs
+          {t('search.jobs')}
         </MqText>{' '}
         <MqText disabled inline>
           {' '}
-          and
+          {t('search.and')}
         </MqText>{' '}
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
-          Datasets
+          {t('search.datasets')}
         </MqText>
       </Box>
     </Box>
