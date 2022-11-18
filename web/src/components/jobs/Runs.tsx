@@ -54,8 +54,9 @@ interface RunsProps {
 
 const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => {
   const { runs, facets, classes } = props
+  const i18next = require('i18next')
   if (runs.length === 0) {
-    return <MqEmpty title={'No Runs Found'} body={'Try adding some runs for this job.'} />
+    return <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
   }
 
   const [infoView, setInfoView] = React.useState<Run | null>(null)
@@ -116,7 +117,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>FACETS</MqText>
+            <MqText subheading>{i18next.t('jobs.runs_subhead')}</MqText>
           </Box>
           <MqCode code={JSON.stringify(facets, null, '\t')} />
         </Box>

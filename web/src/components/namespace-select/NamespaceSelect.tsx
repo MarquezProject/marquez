@@ -37,13 +37,14 @@ type NamespaceSelectProps = WithStyles<typeof styles> & OwnProps & StateProps & 
 class NamespaceSelect extends React.Component<NamespaceSelectProps, StateProps> {
   render() {
     const { classes, namespaces, selectedNamespace } = this.props
+    const i18next = require('i18next')
     if (selectedNamespace) {
       return (
         <FormControl variant='outlined' className={classes.formControl}>
           <Box position={'relative'}>
             <Box position={'absolute'} left={12} top={9}>
               <MqText color={theme.palette.primary.main} font={'mono'}>
-                ns
+                {i18next.t('namespace_select.prompt')}
               </MqText>
             </Box>
           </Box>

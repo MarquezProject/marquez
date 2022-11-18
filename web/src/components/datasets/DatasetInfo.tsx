@@ -20,42 +20,48 @@ interface DatasetInfoProps {
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
   const { datasetFields, facets, run } = props
+  const i18next = require('i18next')
 
   return (
     <Box>
-      {datasetFields.length === 0 && <MqEmpty title={'No Fields'} body={'Try adding dataset fields.'} />}
+      {datasetFields.length === 0 && (
+        <MqEmpty
+          title={i18next.t('dataset_info.empty_title')}
+          body={i18next.t('dataset_info.empty_body')}
+        />
+      )}
       {datasetFields.length > 0 && (
-      <Table size='small'>
-        <TableHead>
-          <TableRow>
-            {DATASET_COLUMNS.map(column => {
+        <Table size='small'>
+          <TableHead>
+            <TableRow>
+              {DATASET_COLUMNS.map(column => {
+                return (
+                  <TableCell key={column} align='left'>
+                    <MqText subheading inline>
+                      {column}
+                    </MqText>
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {datasetFields.map(field => {
               return (
-                <TableCell key={column} align='left'>
-                  <MqText subheading inline>
-                    {column}
-                  </MqText>
-                </TableCell>
+                <TableRow key={field.name}>
+                  <TableCell align='left'>{field.name}</TableCell>
+                  <TableCell align='left'>{field.type}</TableCell>
+                  <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                </TableRow>
               )
             })}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {datasetFields.map(field => {
-            return (
-              <TableRow key={field.name}>
-                <TableCell align='left'>{field.name}</TableCell>
-                <TableCell align='left'>{field.type}</TableCell>
-                <TableCell align='left'>{field.description || 'no description'}</TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
       )}
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>FACETS</MqText>
+            <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
           <MqJson code={facets} />
         </Box>
@@ -66,10 +72,10 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
               <Box display={'flex'} alignItems={'center'}>
                 <RunStatus run={run} />
-                <MqText subheading>Created by Run</MqText>
+                <MqText subheading>{i18next.t('dataset_info.run_subhead')}</MqText>
               </Box>
               <Box display={'flex'}>
-                <MqText bold>Duration:&nbsp;</MqText>
+                <MqText bold>{i18next.t('dataset_info.duration')}&nbsp;</MqText>
                 <MqText subdued>{stopWatchDuration(run.durationMs)}</MqText>
               </Box>
             </Box>
