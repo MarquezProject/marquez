@@ -8,6 +8,7 @@ package marquez.service;
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,13 +49,22 @@ public class LineageService extends DelegatingLineageDao {
 
   // TODO make input parameters easily extendable if adding more options like 'withJobFacets'
   public Lineage lineage(NodeId nodeId, int depth, boolean withRunFacets) {
+    log.debug("Attempting to get lineage for node '{}' with depth '{}'", nodeId.getValue(), depth);
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
-      throw new NodeIdNotFoundException("Could not find node");
+      throw new NodeIdNotFoundException(String.format("Node '%s' not found!", nodeId.getValue()));
     }
     UUID job = optionalUUID.get();
-
+    log.debug("Attempting to get lineage for job '{}'", job);
     Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
+
+    if (jobData.isEmpty()) {
+      log.warn(
+          "Failed to get lineage for job '{}' associated with the node '{}'",
+          job,
+          nodeId.getValue());
+      return toLineage(Sets.newHashSet(), Sets.newHashSet());
+    }
 
     List<Run> runs =
         withRunFacets
