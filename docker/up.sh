@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION=0.27.0
+VERSION=0.28.0
 DOCKER_DIR=$(dirname $0)
 
 title() {
