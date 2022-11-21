@@ -1,14 +1,30 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.27.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.28.0...HEAD)
+
+## [0.28.0](https://github.com/MarquezProject/marquez/compare/0.27.0...0.28.0) - 2022-11-21
 
 ### Added
+
+* Optimize current runs query for lineage API [`#2211`](https://github.com/MarquezProject/marquez/pull/2211) [@prachim-collab](https://github.com/prachim-collab)   
+    *Add a simpler, alternate `getCurrentRuns` query that gets only simple runs from the database without the additional data from tables such as `run_args`, `job_context`, `facets`, etc., which required extra table joins.*
+* Add Code Quality, DCO and Governance docs to project [`#2237`](https://github.com/MarquezProject/marquez/pull/2237) [`#2241`](https://github.com/MarquezProject/marquez/pull/2241) [@merobi-hub](https://github.com/MarquezProject/marquez/commits?author=merobi-hub)  
+    *Adds a number of standard governance and procedure docs to the project.*
 * Add possibility to soft-delete namespaces [`#2244`](https://github.com/MarquezProject/marquez/pull/2244) [@mobuchowski](https://github.com/mobuchowski)  
-  *Adds the ability to "hide" inactive namespaces. The namespaces are being undeleted when relevant OL event is received.*
+    *Adds the ability to "hide" inactive namespaces. The namespaces are undeleted when a relevant OL event is received.*
+* Add search service proposal [`#2203`](https://github.com/MarquezProject/marquez/pull/2203) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Proposes using ElasticSearch as a pluggable search service to enhance the search feature in Marquez and adding the ability to turn it off, as well. Includes ideas about what should be indexed and the requirements for the interface.*
 
 ### Fixed
-* Fix bug where job isn't properly deleted [`#2244`](https://github.com/MarquezProject/marquez/pull/2244) [@mobuchowski](https://github.com/mobuchowski)  
-  *It wasn't possible to delete jobs created from events that had `ParentRunFacet`. Now it's possible.*
+
+* Show facets even when dataset has no fields [`#2214`](https://github.com/MarquezProject/marquez/pull/2214) [@JDarDagran](https://github.com/JDarDagran)  
+    *Changes the logic in the `DatasetInfo` component to always show facets so that dataset facets are visible in the UI even if no dataset fields have been set.* 
+* Appreciate column prefix when given for `ended_at` [`#2231`](https://github.com/MarquezProject/marquez/pull/2231) [@fm100](https://github.com/fm100)  
+    *The `ended_at` column was always null when querying if `columnPrefix` was given for the mapper. Now, `columnPrefix` is included when checking for column existence.*
+* Fix bug keeping jobs from being properly deleted [`#2244`](https://github.com/MarquezProject/marquez/pull/2244) [@mobuchowski](https://github.com/mobuchowski)  
+    *It wasn't possible to delete jobs created from events that had a `ParentRunFacet`. Now it's possible.*
+* Fix symlink table column length ['#2217'](https://github.com/MarquezProject/marquez/pull/2217) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *The dataset's name column in the `dataset_symlinks` table was shorter than the column in the datasets table. Changes the existing V48 migration script to allow proper migration for users who did not upgrade yet, and adds an extra migration script to extend the column length for users who did upgrade but did not experience the issues.*
 
 
 ## [0.27.0](https://github.com/MarquezProject/marquez/compare/0.26.0...0.27.0) - 2022-10-24
