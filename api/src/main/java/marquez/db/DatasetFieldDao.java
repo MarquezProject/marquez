@@ -17,12 +17,14 @@ import marquez.common.models.TagName;
 import marquez.db.mappers.DatasetFieldMapper;
 import marquez.db.mappers.DatasetFieldRowMapper;
 import marquez.db.mappers.FieldDataMapper;
+import marquez.db.mappers.PairUuidInstantMapper;
 import marquez.db.models.DatasetFieldRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.InputFieldData;
 import marquez.db.models.TagRow;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetVersion;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
@@ -32,6 +34,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 @RegisterRowMapper(DatasetFieldRowMapper.class)
 @RegisterRowMapper(DatasetFieldMapper.class)
 @RegisterRowMapper(FieldDataMapper.class)
+@RegisterRowMapper(PairUuidInstantMapper.class)
 public interface DatasetFieldDao extends BaseDao {
   @SqlQuery(
       """
@@ -98,12 +101,25 @@ public interface DatasetFieldDao extends BaseDao {
 
   @SqlQuery(
       """
-          SELECT df.uuid
-          FROM dataset_fields  df
+          SELECT df.uuid, max(dv.created_at)
+          FROM dataset_fields df
           JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
+          JOIN dataset_versions_field_mapping AS fm ON fm.dataset_field_uuid = df.uuid
+          JOIN dataset_versions AS dv ON dv.uuid = fm.dataset_version_uuid
           WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
+          GROUP BY df.uuid
       """)
   List<UUID> findDatasetFieldsUuids(String namespaceName, String datasetName);
+
+  @SqlQuery(
+      """
+          SELECT df.uuid, dv.created_at
+          FROM dataset_fields  df
+          JOIN dataset_versions_field_mapping AS fm ON fm.dataset_field_uuid = df.uuid
+          JOIN dataset_versions AS dv ON dv.uuid = :datasetVersion
+          WHERE fm.dataset_version_uuid = :datasetVersion
+      """)
+  List<Pair<UUID, Instant>> findDatasetVersionFieldsUuids(UUID datasetVersion);
 
   @SqlQuery(
       """
@@ -123,6 +139,15 @@ public interface DatasetFieldDao extends BaseDao {
 
   @SqlQuery(
       """
+          SELECT dataset_fields.uuid, r.created_at
+          FROM dataset_fields
+          JOIN dataset_versions ON dataset_versions.dataset_uuid = dataset_fields.dataset_uuid
+          JOIN runs_view r ON r.job_version_uuid = :jobVersion
+      """)
+  List<Pair<UUID, Instant>> findFieldsUuidsByJobVersion(UUID jobVersion);
+
+  @SqlQuery(
+      """
           SELECT df.uuid
           FROM dataset_fields  df
           JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
@@ -130,6 +155,17 @@ public interface DatasetFieldDao extends BaseDao {
           AND df.name = :name
       """)
   Optional<UUID> findUuid(String namespaceName, String datasetName, String name);
+
+  @SqlQuery(
+      """
+          SELECT df.uuid, dv.created_at
+          FROM dataset_fields  df
+          JOIN datasets_view AS d ON d.uuid = df.dataset_uuid
+          JOIN dataset_versions AS dv ON dv.uuid = :datasetVersion
+          JOIN dataset_versions_field_mapping AS fm ON fm.dataset_field_uuid = df.uuid
+          WHERE fm.dataset_version_uuid = :datasetVersion AND df.name = :fieldName
+      """)
+  List<Pair<UUID, Instant>> findDatasetVersionFieldsUuids(String fieldName, UUID datasetVersion);
 
   @SqlQuery(
       "SELECT f.*, "

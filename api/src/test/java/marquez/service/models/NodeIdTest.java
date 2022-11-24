@@ -141,4 +141,34 @@ class NodeIdTest {
     assertEquals(dataset, nodeId.asDatasetFieldId().getDatasetId().getName().getValue());
     assertEquals(field, nodeId.asDatasetFieldId().getFieldName().getValue());
   }
+
+  @ParameterizedTest(name = "testDatasetField-{index} {argumentsWithNames}")
+  @CsvSource(
+      value = {
+        "my-namespace$my-dataset$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "gs://bucket$/path/to/data$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "gs://bucket$/path/to/data$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      },
+      delimiter = '$')
+  public void testDatasetFieldVersion(String namespace, String dataset, String field) {
+    NamespaceName namespaceName = NamespaceName.of(namespace);
+    FieldName fieldName = FieldName.of(field);
+    DatasetName datasetName = DatasetName.of(dataset);
+    DatasetId dsId = new DatasetId(namespaceName, datasetName);
+    DatasetFieldId dsfId = new DatasetFieldId(dsId, fieldName);
+    NodeId nodeId = NodeId.of(dsfId);
+    assertFalse(nodeId.isRunType());
+    assertFalse(nodeId.isJobType());
+    assertFalse(nodeId.isDatasetType());
+    assertTrue(nodeId.hasVersion());
+    assertTrue(nodeId.isDatasetFieldVersionType());
+
+    assertEquals(dsfId, nodeId.asDatasetFieldId());
+    assertEquals(nodeId, NodeId.of(nodeId.getValue()));
+    assertEquals(namespace, nodeId.asDatasetFieldId().getDatasetId().getNamespace().getValue());
+    assertEquals(dataset, nodeId.asDatasetFieldId().getDatasetId().getName().getValue());
+    assertEquals(field, nodeId.asDatasetFieldId().getFieldName().getValue());
+    assertEquals(
+        field.split(VERSION_DELIM)[1], nodeId.asDatasetFieldVersionId().getVersion().toString());
+  }
 }
