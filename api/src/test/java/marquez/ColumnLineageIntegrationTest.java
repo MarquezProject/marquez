@@ -14,7 +14,11 @@ import java.util.Arrays;
 import java.util.Optional;
 import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
+import marquez.client.models.DatasetFieldId;
+import marquez.client.models.DatasetId;
+import marquez.client.models.JobId;
 import marquez.client.models.Node;
+import marquez.client.models.NodeId;
 import marquez.db.LineageTestUtils;
 import marquez.db.OpenLineageDao;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -64,7 +68,8 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testColumnLineageEndpointByDataset() {
-    MarquezClient.Lineage lineage = client.getColumnLineageByDataset("namespace", "dataset_b");
+    MarquezClient.Lineage lineage =
+        client.getColumnLineage(NodeId.of(new DatasetId("namespace", "dataset_b")));
 
     assertThat(lineage.getGraph()).hasSize(3);
     assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
@@ -75,7 +80,7 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testColumnLineageEndpointByDatasetField() {
     MarquezClient.Lineage lineage =
-        client.getColumnLineageByDataset("namespace", "dataset_b", "col_c");
+        client.getColumnLineage(NodeId.of(new DatasetFieldId("namespace", "dataset_b", "col_c")));
 
     assertThat(lineage.getGraph()).hasSize(3);
     assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
@@ -86,7 +91,8 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testColumnLineageEndpointWithDepthLimit() {
     MarquezClient.Lineage lineage =
-        client.getColumnLineageByDatasetField("namespace", "dataset_c", "col_d", 1, false);
+        client.getColumnLineage(
+            NodeId.of(new DatasetFieldId("namespace", "dataset_c", "col_d")), 1, false);
 
     assertThat(lineage.getGraph()).hasSize(2);
     assertThat(getNodeByFieldName(lineage, "col_c")).isPresent();
@@ -96,7 +102,7 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testColumnLineageEndpointWithDownstream() {
     MarquezClient.Lineage lineage =
-        client.getColumnLineageByDatasetField("namespace", "dataset_b", "col_c", 10, true);
+        client.getColumnLineage(NodeId.of(new JobId("namespace", "job1")), 10, true);
 
     assertThat(lineage.getGraph()).hasSize(4);
     assertThat(getNodeByFieldName(lineage, "col_d")).isPresent();
@@ -104,7 +110,8 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
 
   @Test
   public void testColumnLineageEndpointByJob() {
-    MarquezClient.Lineage lineage = client.getColumnLineageByJob("namespace", "job1");
+    MarquezClient.Lineage lineage =
+        client.getColumnLineage(NodeId.of(new JobId("namespace", "job1")), 1, false);
 
     assertThat(lineage.getGraph()).hasSize(3);
     assertThat(getNodeByFieldName(lineage, "col_a")).isPresent();
