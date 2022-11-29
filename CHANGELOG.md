@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.28.0...HEAD)
 
+* Include error message for JSON processing exception [`#2271`](https://github.com/MarquezProject/marquez/pull/2271) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *In case of JSON processing exceptions Marquez API should return exception message to a client.*
+
 ## [0.28.0](https://github.com/MarquezProject/marquez/compare/0.27.0...0.28.0) - 2022-11-21
 
 ### Added
