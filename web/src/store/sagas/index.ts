@@ -104,10 +104,10 @@ export function* fetchEventsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_EVENTS)
-      const events = yield call(getEvents, payload.after, payload.before)
+      const events = yield call(getEvents, payload.after, payload.before, payload.limit)
       yield put(fetchEventsSuccess(events))
     } catch (e) {
-      yield put(applicationError('Something went wrong while fetching dataset runs'))
+      yield put(applicationError('Something went wrong while fetching event runs'))
     }
   }
 }
