@@ -2,8 +2,28 @@
 
 import * as actionTypes from './actionTypes'
 
-import { Dataset, DatasetVersion, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
+import { Event, Dataset, DatasetVersion, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
+
+export const fetchEvents = (after: string, before: string, limit: number) => ({
+  type: actionTypes.FETCH_EVENTS,
+  payload: {
+    before,
+    after,
+    limit
+  }
+})
+
+export const fetchEventsSuccess = (events: Event[]) => ({ 
+  type: actionTypes.FETCH_EVENTS_SUCCESS,
+  payload: {
+    events
+  }
+})
+
+export const resetEvents = () => ({
+  type: actionTypes.RESET_EVENTS
+})
 
 export const fetchDatasets = (namespace: string) => ({
   type: actionTypes.FETCH_DATASETS,

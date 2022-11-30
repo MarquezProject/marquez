@@ -8,13 +8,17 @@ import SyntaxHighlighter from 'react-syntax-highlighter'
 
 interface OwnProps {
   code: object
+  showLineNumbers?: boolean
+  wrapLongLines?: boolean
 }
 
-const MqJson: React.FC<OwnProps> = ({ code }) => {
+const MqJson: React.FC<OwnProps> = ({ code, wrapLongLines = false, showLineNumbers = false }) => {
   return (
     <SyntaxHighlighter
       language='json'
       style={ocean}
+      wrapLongLines={wrapLongLines}
+      showLineNumbers={showLineNumbers}
       customStyle={{
         backgroundColor: alpha(theme.palette.common.white, 0.1),
         borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
