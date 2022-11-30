@@ -181,7 +181,8 @@ public class MarquezHttpTest {
     final String ownerName = newOwnerName();
     final String description = newDescription();
 
-    final Namespace namespace = new Namespace(namespaceName, now, now, ownerName, description);
+    final Namespace namespace =
+        new Namespace(namespaceName, now, now, ownerName, description, false);
     final String json = JsonGenerator.newJsonFor(namespace);
     final ByteArrayInputStream stream = new ByteArrayInputStream(json.getBytes(UTF_8));
     when(httpEntity.getContent()).thenReturn(stream);

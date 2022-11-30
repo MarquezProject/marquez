@@ -5,6 +5,8 @@
 
 package marquez;
 
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -105,17 +107,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             Collections.emptyList(),
             "the_producer");
 
-    final CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
-    // Ensure the event was correctly rejected and a proper response code returned.
+    final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(400);
   }
 
@@ -888,6 +880,65 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     ObjectMapper mapper = Utils.getMapper();
     assertThat((JsonNode) mapper.valueToTree(secondEvent))
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
+  }
+
+  @Test
+  public void testSendAndDeleteParentRunRelationshipFacet() {
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder()
+                .parent(
+                    marquez.service.models.LineageEvent.ParentRunFacet.builder()
+                        .run(
+                            marquez.service.models.LineageEvent.RunLink.builder()
+                                .runId(UUID.randomUUID().toString())
+                                .build())
+                        .job(
+                            marquez.service.models.LineageEvent.JobLink.builder()
+                                .name("parent")
+                                .namespace(NAMESPACE_NAME)
+                                .build())
+                        ._producer(PRODUCER_URL)
+                        ._schemaURL(SCHEMA_URL)
+                        .build())
+                .build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
+
+    marquez.service.models.LineageEvent event =
+        marquez.service.models.LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
+            .producer(PRODUCER_URL.toString())
+            .run(run)
+            .job(job)
+            .inputs(Collections.emptyList())
+            .outputs(Collections.emptyList())
+            .build();
+
+    CompletableFuture<Integer> resp = sendEvent(event);
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<Job> jobs = client.listJobs(NAMESPACE_NAME);
+
+    String marquezJobName = String.format("parent.%s", JOB_NAME);
+
+    assertThat(jobs.size()).isEqualTo(2);
+    assertThat(jobs)
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo("parent"))
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
+
+    client.deleteJob(NAMESPACE_NAME, marquezJobName);
+
+    jobs = client.listJobs(NAMESPACE_NAME);
+    assertThat(jobs.size()).isEqualTo(1);
+    assertThat(jobs)
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo("parent"))
+        .noneSatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
   }
 
   private CompletableFuture<Integer> sendEvent(marquez.service.models.LineageEvent event) {

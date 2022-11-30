@@ -395,6 +395,36 @@ class DatasetDaoTest {
   }
 
   @Test
+  public void testDeleteDatasetByNamespaceDoesNotReturnFromDeletedNamespace() {
+    createLineageRow(
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(newCommonDataset(Collections.emptyMap())));
+
+    createLineageRow(
+        openLineageDao,
+        "writeJob2",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            new Dataset(
+                NAMESPACE,
+                DATASET,
+                LineageEvent.DatasetFacets.builder()
+                    .lifecycleStateChange(
+                        new LineageEvent.LifecycleStateChangeFacet(
+                            PRODUCER_URL, SCHEMA_URL, "DROP"))
+                    .build())));
+
+    datasetDao.deleteByNamespaceName(NAMESPACE);
+    assertThat(datasetDao.findDatasetByName(NAMESPACE, DATASET)).isEmpty();
+  }
+
+  @Test
   public void testGetSpecificDatasetReturnsDatasetIfDeleted() {
     createLineageRow(
         openLineageDao,

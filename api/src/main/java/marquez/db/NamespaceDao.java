@@ -78,10 +78,20 @@ public interface NamespaceDao extends BaseDao {
   @SqlQuery("SELECT * FROM namespaces ORDER BY name LIMIT :limit OFFSET :offset")
   List<Namespace> findAll(int limit, int offset);
 
+  @SqlQuery("UPDATE namespaces SET is_hidden=false WHERE name = :name RETURNING *")
+  NamespaceRow undelete(String name);
+
+  @SqlUpdate("UPDATE namespaces SET is_hidden=true WHERE name = :name")
+  void delete(String name);
+
   default NamespaceRow upsertNamespaceRow(
       UUID uuid, Instant now, String name, String currentOwnerName) {
     doUpsertNamespaceRow(uuid, now, name, currentOwnerName);
-    return findNamespaceByName(name).orElseThrow();
+    NamespaceRow namespaceRow = findNamespaceByName(name).orElseThrow();
+    if (namespaceRow.getIsHidden()) {
+      namespaceRow = undelete(namespaceRow.getName());
+    }
+    return namespaceRow;
   }
 
   /**
@@ -99,40 +109,47 @@ public interface NamespaceDao extends BaseDao {
    * @param currentOwnerName
    */
   @SqlUpdate(
-      "INSERT INTO namespaces ( "
-          + "uuid, "
-          + "created_at, "
-          + "updated_at, "
-          + "name, "
-          + "current_owner_name "
-          + ") VALUES ("
-          + ":uuid, "
-          + ":now, "
-          + ":now, "
-          + ":name, "
-          + ":currentOwnerName) "
-          + "ON CONFLICT(name) DO NOTHING")
+      """
+    INSERT INTO namespaces (
+      uuid,
+      created_at,
+      updated_at,
+      name,
+      current_owner_name
+      ) VALUES (
+      :uuid,
+      :now,
+      :now,
+      :name,
+      :currentOwnerName)
+      ON CONFLICT(name) DO NOTHING
+  """)
   void doUpsertNamespaceRow(UUID uuid, Instant now, String name, String currentOwnerName);
 
   @SqlQuery(
-      "INSERT INTO namespaces ( "
-          + "uuid, "
-          + "created_at, "
-          + "updated_at, "
-          + "name, "
-          + "current_owner_name, "
-          + "description "
-          + ") VALUES ("
-          + ":uuid, "
-          + ":now, "
-          + ":now, "
-          + ":name, "
-          + ":currentOwnerName, "
-          + ":description "
-          + ") ON CONFLICT(name) DO "
-          + "UPDATE SET "
-          + "updated_at = EXCLUDED.updated_at "
-          + "RETURNING *")
+      """
+    INSERT INTO namespaces (
+      uuid,
+      created_at,
+      updated_at,
+      name,
+      current_owner_name,
+      description,
+      is_hidden
+      ) VALUES (
+      :uuid,
+      :now,
+      :now,
+      :name,
+      :currentOwnerName,
+      :description,
+      false
+      ) ON CONFLICT(name) DO
+      UPDATE SET
+      updated_at = EXCLUDED.updated_at,
+      is_hidden = false
+      RETURNING *
+    """)
   NamespaceRow upsertNamespaceRow(
       UUID uuid, Instant now, String name, String currentOwnerName, String description);
 
