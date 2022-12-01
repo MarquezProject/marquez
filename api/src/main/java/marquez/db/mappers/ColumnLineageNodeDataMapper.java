@@ -39,7 +39,7 @@ public class ColumnLineageNodeDataMapper implements RowMapper<ColumnLineageNodeD
         stringOrThrow(results, Columns.DATASET_NAME),
         uuidOrThrow(results, Columns.DATASET_VERSION_UUID),
         stringOrThrow(results, Columns.FIELD_NAME),
-        stringOrThrow(results, Columns.TYPE),
+        stringOrNull(results, Columns.TYPE),
         stringOrNull(results, TRANSFORMATION_DESCRIPTION),
         stringOrNull(results, TRANSFORMATION_TYPE),
         toInputFields(results, "inputFields"));

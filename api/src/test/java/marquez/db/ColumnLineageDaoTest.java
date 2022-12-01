@@ -474,6 +474,15 @@ public class ColumnLineageDaoTest {
         .isEqualTo(lineageRow.getInputs().get().get(0).getDatasetVersionRow().getUuid());
   }
 
+  @Test
+  void testGetLineageWhenDataTypeIsEmpty() {
+    Dataset datasetWithNullDataType = getDatasetB();
+    datasetWithNullDataType.getFacets().getSchema().getFields().get(0).setType(null);
+
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, datasetWithNullDataType);
+    getColumnLineage(lineageRow, "col_c");
+  }
+
   private Set<ColumnLineageNodeData> getColumnLineage(UpdateLineageRow lineageRow, String field) {
     UpdateLineageRow.DatasetRecord datasetRecord = lineageRow.getOutputs().get().get(0);
     UUID field_UUID = fieldDao.findUuid(datasetRecord.getDatasetRow().getUuid(), field).get();

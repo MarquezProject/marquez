@@ -1,9 +1,15 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.28.0...HEAD)
+
+### Added
+
 * Column-lineage endpoints supports point-in-time requests [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
     *Enable requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
 
+### Fixed
+
+* Allow null column type in column-lineage [`#2272`](https://github.com/MarquezProject/marquez/pull/2272) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 * Include error message for JSON processing exception [`#2271`](https://github.com/MarquezProject/marquez/pull/2271) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *In case of JSON processing exceptions Marquez API should return exception message to a client.*
 
