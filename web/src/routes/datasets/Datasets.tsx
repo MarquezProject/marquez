@@ -54,8 +54,6 @@ class Datasets extends React.Component<DatasetsProps> {
     this.props.resetDatasets()
   }
 
-
-
   render() {
     const { datasets, isDatasetsLoading, isDatasetsInit } = this.props
     const i18next = require('i18next')
@@ -66,9 +64,7 @@ class Datasets extends React.Component<DatasetsProps> {
             {datasets.length === 0 ? (
               <Box p={2}>
                 <MqEmpty title={i18next.t('datasets_route.empty_title')}>
-                  <MqText subdued>
-                    {i18next.t('datasets_route.empty_body')}
-                  </MqText>
+                  <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
                 </MqEmpty>
               </Box>
             ) : (
@@ -89,7 +85,7 @@ class Datasets extends React.Component<DatasetsProps> {
                         <MqText subheading>{i18next.t('datasets_route.source_col')}</MqText>
                       </TableCell>
                       <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText> 
+                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                       </TableCell>
                     </TableRow>
                   </TableHead>

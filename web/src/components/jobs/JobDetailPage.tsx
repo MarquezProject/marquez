@@ -116,7 +116,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         job.latestRun ? (
           <RunInfo run={job.latestRun} />
         ) : (
-          !job.latestRun && <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
+          !job.latestRun && (
+            <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
+          )
         )
       ) : null}
       {tab === 1 && <Runs runs={runs} />}

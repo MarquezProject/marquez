@@ -61,9 +61,7 @@ class Jobs extends React.Component<JobsProps> {
             {jobs.length === 0 ? (
               <Box p={2}>
                 <MqEmpty title={i18next.t('jobs_route.empty_title')}>
-                  <MqText subdued>
-                    {i18next.t('jobs_route.empty_body')}
-                  </MqText>
+                  <MqText subdued>{i18next.t('jobs_route.empty_body')}</MqText>
                 </MqEmpty>
               </Box>
             ) : (
@@ -81,7 +79,7 @@ class Jobs extends React.Component<JobsProps> {
                         <MqText subheading>{i18next.t('datasets_route.namespace_col')}</MqText>
                       </TableCell>
                       <TableCell key={i18next.t('jobs_route.updated_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText> 
+                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                       </TableCell>
                       <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
                         <MqText subheading>{i18next.t('jobs_route.latest_run_col')}</MqText>
