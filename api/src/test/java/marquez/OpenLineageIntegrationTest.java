@@ -151,6 +151,25 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void testSendOpenLineageEventFailsJsonProcessing() throws IOException {
+    String eventWithIncorrectEventTimeFormat =
+        "{\"eventTime\": \"2021-11-03\", \"eventType\": \"START\", \"inputs\": [], \"job\": {\"facets\": {}, \"name\": \"job\", \"namespace\": \"openlineage\"}, \"outputs\": [], \"run\": {\"facets\": {}, \"runId\": \"123e4567-e89b-12d3-a456-426614174000\"}}";
+
+    final CompletableFuture<String> resp =
+        this.sendLineage(eventWithIncorrectEventTimeFormat)
+            .thenApply(HttpResponse::body)
+            .whenComplete(
+                (val, err) -> {
+                  if (err != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+    assertThat(resp.join())
+        .contains(
+            "Cannot deserialize value of type `java.time.ZonedDateTime` from String \\\"2021-11-03\\\"");
+  }
+
+  @Test
   public void testGetLineageForNonExistantDataset() {
     CompletableFuture<Integer> response =
         this.fetchLineage("dataset:Imadethisup:andthistoo")
