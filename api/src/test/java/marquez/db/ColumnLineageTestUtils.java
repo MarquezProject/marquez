@@ -10,7 +10,9 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 import marquez.api.JdbiUtils;
+import marquez.db.models.UpdateLineageRow;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 
@@ -104,5 +106,18 @@ public class ColumnLineageTestUtils {
                 new LineageEvent.DatasourceDatasetFacet(
                     PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
             .build());
+  }
+
+  public static UpdateLineageRow createLineage(
+      OpenLineageDao openLineageDao, LineageEvent.Dataset input, LineageEvent.Dataset output) {
+    LineageEvent.JobFacet jobFacet =
+        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    return LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "job_" + UUID.randomUUID(),
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(input),
+        Arrays.asList(output));
   }
 }

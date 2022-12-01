@@ -20,3 +20,11 @@ export const formatUpdatedAt = (updatedAt: string) => {
     return `${dateString.slice(0, -2)}${dateString.slice(-2).toLowerCase()}`
   }
 }
+
+export const fileSize = (data: string) => {
+  const size = encodeURI(data).split(/%..|./).length - 1;
+  return {
+    kiloBytes: size / 1024, 
+    megaBytes: (size / 1024) / 1024
+  }
+}

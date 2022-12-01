@@ -5,6 +5,7 @@
 
 package marquez.db;
 
+import static marquez.db.ColumnLineageTestUtils.createLineage;
 import static marquez.db.ColumnLineageTestUtils.getDatasetA;
 import static marquez.db.ColumnLineageTestUtils.getDatasetB;
 import static marquez.db.ColumnLineageTestUtils.getDatasetC;
@@ -61,6 +62,10 @@ public class ColumnLineageDaoTest {
   private DatasetVersionRow inputDatasetVersionRow;
   private DatasetVersionRow outputDatasetVersionRow;
   private LineageEvent.JobFacet jobFacet;
+
+  private Dataset dataset_A = getDatasetA(); // dataset_A (col_a, col_b)
+  private Dataset dataset_B = getDatasetB(); // dataset_B (col_c) depends on (col_a, col_b)
+  private Dataset dataset_C = getDatasetC(); // dataset_C (col_d) depends on col_c
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
@@ -144,8 +149,6 @@ public class ColumnLineageDaoTest {
     // insert output dataset field
     fieldDao.upsert(
         outputDatasetFieldUuid, now, "output-field", "string", "desc", outputDatasetRow.getUuid());
-
-    jobFacet = new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
   }
 
   @AfterEach
@@ -228,36 +231,11 @@ public class ColumnLineageDaoTest {
         now.plusSeconds(1000).getEpochSecond(), rows.get(0).getUpdatedAt().getEpochSecond());
   }
 
-  // dataset_A (col_a, col_b)
-  // dataset_B (col_c) depends on (col_a, col_b)
-  // dataset_C (col_d) depends on col_c
   @Test
   void testGetLineage() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
-    Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job2",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_B),
-            Arrays.asList(dataset_C));
-
-    UpdateLineageRow.DatasetRecord datasetRecord_c = lineageRow.getOutputs().get().get(0);
-    UUID field_col_d = fieldDao.findUuid(datasetRecord_c.getDatasetRow().getUuid(), "col_d").get();
-    Set<ColumnLineageNodeData> lineage =
-        dao.getLineage(20, Collections.singletonList(field_col_d), false, Instant.now());
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_B, dataset_C);
+    Set<ColumnLineageNodeData> lineage = getColumnLineage(lineageRow, "col_d");
 
     assertEquals(2, lineage.size());
 
@@ -301,26 +279,8 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineageWhenNoLineageForColumn() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
-    Dataset dataset_C = getDatasetC();
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job1",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_A),
-            Arrays.asList(dataset_B));
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     UpdateLineageRow.DatasetRecord datasetRecord_a = lineageRow.getInputs().get().get(0);
     UUID field_col_a = fieldDao.findUuid(datasetRecord_a.getDatasetRow().getUuid(), "col_a").get();
@@ -336,9 +296,6 @@ public class ColumnLineageDaoTest {
    */
   @Test
   void testGetLineageWithLimitedDepth() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
-    Dataset dataset_C = getDatasetC();
     Dataset dataset_D =
         new Dataset(
             "namespace",
@@ -364,30 +321,9 @@ public class ColumnLineageDaoTest {
                                     "")))))
                 .build());
 
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job2",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_C),
-            Arrays.asList(dataset_D));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_D);
 
     UpdateLineageRow.DatasetRecord datasetRecord_d = lineageRow.getOutputs().get().get(0);
     UUID field_col_e = fieldDao.findUuid(datasetRecord_d.getDatasetRow().getUuid(), "col_e").get();
@@ -429,33 +365,10 @@ public class ColumnLineageDaoTest {
                                     "description3",
                                     "type3")))))
                 .build());
-    Dataset dataset_B = getDatasetB();
-    Dataset dataset_C = getDatasetC();
 
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job3",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_C),
-            Arrays.asList(dataset_A));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_A);
 
     UpdateLineageRow.DatasetRecord datasetRecord_a = lineageRow.getOutputs().get().get(0);
     UpdateLineageRow.DatasetRecord datasetRecord_c = lineageRow.getInputs().get().get(0);
@@ -476,9 +389,6 @@ public class ColumnLineageDaoTest {
    */
   @Test
   void testGetLineageWhenTwoJobsWriteToSameDataset() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
-    Dataset dataset_C = getDatasetC();
     Dataset dataset_B_another_job =
         new Dataset(
             "namespace",
@@ -504,29 +414,12 @@ public class ColumnLineageDaoTest {
                                     "type1")))))
                 .build());
 
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job1",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_C),
-            Arrays.asList(dataset_B_another_job));
-
-    UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
-    UUID field_col_c = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_B_another_job);
 
     // assert input fields for col_d contain col_a and col_c
     List<String> inputFields =
-        dao.getLineage(20, Collections.singletonList(field_col_c), false, Instant.now()).stream()
+        getColumnLineage(lineageRow, "col_c").stream()
             .filter(node -> node.getDataset().equals("dataset_b"))
             .flatMap(node -> node.getInputFields().stream())
             .map(input -> input.getField())
@@ -537,17 +430,7 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineagePointInTime() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
-
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job1",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_A),
-            Arrays.asList(dataset_B));
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
 
     UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
     UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
@@ -576,29 +459,25 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineageWhenJobRunMultipleTimes() {
-    Dataset dataset_A = getDatasetA();
-    Dataset dataset_B = getDatasetB();
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
 
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-    UpdateLineageRow lineageRow =
-        LineageTestUtils.createLineageRow(
-            openLineageDao,
-            "job1",
-            "COMPLETE",
-            jobFacet,
-            Arrays.asList(dataset_A),
-            Arrays.asList(dataset_B));
+    Set<ColumnLineageNodeData> columnLineage = getColumnLineage(lineageRow, "col_c");
+    assertThat(columnLineage).hasSize(1);
 
-    UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
-    UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
+    ColumnLineageNodeData node = columnLineage.stream().findAny().get();
 
-    assertThat(dao.getLineage(20, Collections.singletonList(field_col_b), false, Instant.now()))
-        .hasSize(1);
+    assertThat(node.getDatasetVersion())
+        .isEqualTo(lineageRow.getOutputs().get().get(0).getDatasetVersionRow().getUuid());
+    assertThat(node.getInputFields().get(0).getDatasetVersion())
+        .isEqualTo(lineageRow.getInputs().get().get(0).getDatasetVersionRow().getUuid());
+  }
+
+  private Set<ColumnLineageNodeData> getColumnLineage(UpdateLineageRow lineageRow, String field) {
+    UpdateLineageRow.DatasetRecord datasetRecord = lineageRow.getOutputs().get().get(0);
+    UUID field_UUID = fieldDao.findUuid(datasetRecord.getDatasetRow().getUuid(), field).get();
+
+    return dao.getLineage(20, Collections.singletonList(field_UUID), false, Instant.now());
   }
 }

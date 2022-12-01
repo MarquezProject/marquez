@@ -5,6 +5,7 @@
 
 package marquez.service;
 
+import static marquez.db.ColumnLineageTestUtils.createLineage;
 import static marquez.db.ColumnLineageTestUtils.getDatasetA;
 import static marquez.db.ColumnLineageTestUtils.getDatasetB;
 import static marquez.db.ColumnLineageTestUtils.getDatasetC;
@@ -13,15 +14,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import marquez.common.models.DatasetFieldId;
+import marquez.common.models.DatasetFieldVersionId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
+import marquez.common.models.FieldName;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
+import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.db.ColumnLineageDao;
 import marquez.db.ColumnLineageTestUtils;
@@ -31,6 +35,7 @@ import marquez.db.LineageTestUtils;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
+import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
@@ -54,6 +59,10 @@ public class ColumnLineageServiceTest {
   private static ColumnLineageService lineageService;
   private static LineageEvent.JobFacet jobFacet;
 
+  private LineageEvent.Dataset dataset_A = getDatasetA();
+  private LineageEvent.Dataset dataset_B = getDatasetB();
+  private LineageEvent.Dataset dataset_C = getDatasetC();
+
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     dao = jdbi.onDemand(ColumnLineageDao.class);
@@ -71,31 +80,12 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testLineageByDatasetFieldId() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     Lineage lineage =
         lineageService.lineage(
-            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
-            20,
-            false,
-            Instant.now());
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")), 20, false);
 
     assertThat(lineage.getGraph()).hasSize(3);
 
@@ -136,76 +126,47 @@ public class ColumnLineageServiceTest {
 
     // verify dataset_C not present in the graph
     assertThat(getNode(lineage, "dataset_c", "col_d")).isEmpty();
+    assertThat(
+            lineage.getGraph().stream()
+                .filter(node -> node.getId().isDatasetFieldVersionType())
+                .findAny())
+        .isEmpty(); // none of the graph nodes contains version
   }
 
   @Test
   public void testLineageByDatasetId() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     Lineage lineageByField =
         lineageService.lineage(
-            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
-            20,
-            false,
-            Instant.now());
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")), 20, false);
 
     Lineage lineageByDataset =
         lineageService.lineage(
             NodeId.of(new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_b"))),
             20,
-            false,
-            Instant.now());
+            false);
 
     // lineage of dataset and column should be equal
     assertThat(lineageByField).isEqualTo(lineageByDataset);
+    assertThat(
+            lineageByDataset.getGraph().stream()
+                .filter(node -> node.getId().isDatasetFieldVersionType())
+                .findAny())
+        .isEmpty(); // none of the graph nodes contains version
   }
 
   @Test
   public void testLineageWhenLineageEmpty() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     assertThrows(
         NodeIdNotFoundException.class,
         () ->
             lineageService.lineage(
-                NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_d")),
-                20,
-                false,
-                Instant.now()));
+                NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_d")), 20, false));
 
     assertThrows(
         NodeIdNotFoundException.class,
@@ -214,41 +175,19 @@ public class ColumnLineageServiceTest {
                 NodeId.of(
                     new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_d"))),
                 20,
-                false,
-                Instant.now()));
+                false));
 
     assertThat(
             lineageService
-                .lineage(
-                    NodeId.of(DatasetFieldId.of("namespace", "dataset_a", "col_a")),
-                    20,
-                    false,
-                    Instant.now())
+                .lineage(NodeId.of(DatasetFieldId.of("namespace", "dataset_a", "col_a")), 20, false)
                 .getGraph())
         .hasSize(0);
   }
 
   @Test
   public void testEnrichDatasets() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
     Dataset dataset_c = datasetDao.findDatasetByName("namespace", "dataset_c").get();
@@ -282,32 +221,12 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testGetLineageWithDownstream() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job2",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_B),
-        Arrays.asList(dataset_C));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     Lineage lineage =
         lineageService.lineage(
-            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")),
-            20,
-            true,
-            Instant.now());
+            NodeId.of(DatasetFieldId.of("namespace", "dataset_b", "col_c")), 20, true);
 
     // assert that get lineage of dataset_B should co also return dataset_A and dataset_C
     assertThat(
@@ -333,24 +252,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testEnrichDatasetsHasNoDuplicates() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-
-    // run job twice
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
-    LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job1",
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(dataset_A),
-        Arrays.asList(dataset_B));
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, dataset_B, dataset_C);
 
     Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
     lineageService.enrichWithColumnLineage(Arrays.asList(dataset_b));
@@ -359,10 +262,6 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testGetLineageByJob() {
-    LineageEvent.Dataset dataset_A = getDatasetA();
-    LineageEvent.Dataset dataset_B = getDatasetB();
-    LineageEvent.Dataset dataset_C = getDatasetC();
-
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "job1",
@@ -382,22 +281,83 @@ public class ColumnLineageServiceTest {
     // getting lineage by job_1 should be the same as getting it by dataset_B
     assertThat(
             lineageService.lineage(
-                NodeId.of(JobId.of(NamespaceName.of("namespace"), JobName.of("job1"))),
-                20,
-                true,
-                Instant.now()))
+                NodeId.of(JobId.of(NamespaceName.of("namespace"), JobName.of("job1"))), 20, true))
         .isEqualTo(
             lineageService.lineage(
                 NodeId.of(
                     new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_b"))),
                 20,
-                true,
-                Instant.now()));
+                true));
+  }
+
+  @Test
+  public void testGetLineagePointInTime() {
+    createLineage(openLineageDao, dataset_A, dataset_B);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, dataset_A, dataset_B); // we will obtain this version
+    createLineage(openLineageDao, dataset_A, dataset_B);
+
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetVersionId(
+                    NamespaceName.of("namespace"),
+                    DatasetName.of("dataset_b"),
+                    lineageRow.getOutputs().get().get(0).getDatasetVersionRow().getUuid())),
+            20,
+            false);
+
+    assertThat(lineage.getGraph().size()).isEqualTo(3); // col_a, col_b and col_c
+    assertThat(
+            getNode(lineage, "dataset_a", "col_b")
+                .get()
+                .getId()
+                .asDatasetFieldVersionId()
+                .getVersion())
+        .isEqualTo(lineageRow.getInputs().get().get(0).getDatasetVersionRow().getUuid());
+    assertThat(
+            getNode(lineage, "dataset_b", "col_c")
+                .get()
+                .getId()
+                .asDatasetFieldVersionId()
+                .getVersion())
+        .isEqualTo(lineageRow.getOutputs().get().get(0).getDatasetVersionRow().getUuid());
+
+    // assert lineage by field version and by job are the same
+    assertThat(lineage)
+        .isEqualTo(
+            lineageService.lineage(
+                NodeId.of(
+                    new DatasetFieldVersionId(
+                        new DatasetId(NamespaceName.of("namespace"), DatasetName.of("dataset_b")),
+                        FieldName.of("col_c"),
+                        lineageRow.getOutputs().get().get(0).getDatasetVersionRow().getUuid())),
+                20,
+                false));
+
+    assertThat(lineage)
+        .isEqualTo(
+            lineageService.lineage(
+                NodeId.of(
+                    JobVersionId.of(
+                        NamespaceName.of("namespace"),
+                        JobName.of("job1"),
+                        lineageRow.getJobVersionBag().getJobVersionRow().getUuid())),
+                20,
+                true));
   }
 
   private Optional<Node> getNode(Lineage lineage, String datasetName, String fieldName) {
     return lineage.getGraph().stream()
-        .filter(n -> n.getId().asDatasetFieldId().getFieldName().getValue().equals(fieldName))
+        .filter(
+            n ->
+                n.getId().isDatasetFieldVersionType()
+                        && n.getId()
+                            .asDatasetFieldVersionId()
+                            .getFieldName()
+                            .getValue()
+                            .equals(fieldName)
+                    || n.getId().asDatasetFieldId().getFieldName().getValue().equals(fieldName))
         .filter(
             n ->
                 n.getId()

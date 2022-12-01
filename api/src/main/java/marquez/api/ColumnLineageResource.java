@@ -10,7 +10,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import java.time.Instant;
 import java.util.concurrent.ExecutionException;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
@@ -44,7 +43,10 @@ public class ColumnLineageResource extends BaseResource {
       @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
       @QueryParam("withDownstream") @DefaultValue("false") boolean withDownstream)
       throws ExecutionException, InterruptedException {
-    return Response.ok(columnLineageService.lineage(nodeId, depth, withDownstream, Instant.now()))
-        .build();
+    if (nodeId.hasVersion() && withDownstream) {
+      return Response.status(400, "Node version cannot be specified when withDownstream is true")
+          .build();
+    }
+    return Response.ok(columnLineageService.lineage(nodeId, depth, withDownstream)).build();
   }
 }
