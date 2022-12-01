@@ -9,12 +9,14 @@ import static marquez.db.Columns.TRANSFORMATION_DESCRIPTION;
 import static marquez.db.Columns.TRANSFORMATION_TYPE;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.uuidOrThrow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -35,6 +37,7 @@ public class ColumnLineageNodeDataMapper implements RowMapper<ColumnLineageNodeD
     return new ColumnLineageNodeData(
         stringOrThrow(results, Columns.NAMESPACE_NAME),
         stringOrThrow(results, Columns.DATASET_NAME),
+        uuidOrThrow(results, Columns.DATASET_VERSION_UUID),
         stringOrThrow(results, Columns.FIELD_NAME),
         stringOrThrow(results, Columns.TYPE),
         stringOrNull(results, TRANSFORMATION_DESCRIPTION),
@@ -54,7 +57,7 @@ public class ColumnLineageNodeDataMapper implements RowMapper<ColumnLineageNodeD
     return ImmutableList.copyOf(
         Arrays.asList(deserializedArray).stream()
             .map(o -> (String[]) o)
-            .map(arr -> new InputFieldNodeData(arr[0], arr[1], arr[2]))
+            .map(arr -> new InputFieldNodeData(arr[0], arr[1], UUID.fromString(arr[2]), arr[3]))
             .collect(Collectors.toList()));
   }
 }

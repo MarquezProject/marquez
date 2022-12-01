@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.28.0...HEAD)
+* Column-lineage endpoints supports point-in-time requests [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+    *Enable requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
 
 ## [0.28.0](https://github.com/MarquezProject/marquez/compare/0.27.0...0.28.0) - 2022-11-21
 
