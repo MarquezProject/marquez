@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
+import SVG from 'react-inlinesvg'
 
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
@@ -70,6 +71,19 @@ class Sidenav extends React.Component<SidenavProps> {
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
               </MqIconButton>
             </RouterLink>
+            <RouterLink to={'/events'} className={classes.link}>
+              <MqIconButton
+                id={'eventsButton'}
+                title={'EVENTS'}
+                active={this.props.location.pathname === '/events'}
+              >
+                <SVG
+                  src="../../img/iconSearchArrow.svg"
+                  width={'30px'}
+                />
+              </MqIconButton>
+            </RouterLink>
+
             {/* todo remove this link for now until direct linking available */}
             {/*<RouterLink to={'/lineage'} className={classes.link}>*/}
             {/*  <MqIconButton*/}

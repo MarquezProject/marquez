@@ -3,6 +3,7 @@
 import { Box, Container, CssBaseline } from '@material-ui/core'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
@@ -12,9 +13,11 @@ import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
 import BottomBar from './bottom-bar/BottomBar'
 import Datasets from '../routes/datasets/Datasets'
+import Events from '../routes/events/Events'
 import Header from './header/Header'
 import Jobs from '../routes/jobs/Jobs'
 import Lineage from './lineage/Lineage'
+import MomentUtils from '@date-io/moment'
 import React, { ReactElement } from 'react'
 import Sidenav from './sidenav/Sidenav'
 import Toast from './Toast'
@@ -45,29 +48,34 @@ const App = (): ReactElement => {
       <HelmetProvider>
         <ConnectedRouter history={history}>
           <MuiThemeProvider theme={theme}>
-            <Helmet>
-              <title>{TITLE}</title>
-            </Helmet>
-            <CssBaseline />
-            <Box ml={12}>
-              <Sidenav />
-              <Container maxWidth={'lg'} disableGutters={true}>
-                <Header />
-              </Container>
-              <Switch>
-                <Route path={'/'} exact>
-                  <Jobs />
-                </Route>
-                <Route path={'/datasets'} exact>
-                  <Datasets />
-                </Route>
-                <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
-                  <Lineage />
-                  <BottomBar />
-                </Route>
-              </Switch>
-              <Toast />
-            </Box>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+              <Helmet>
+                <title>{TITLE}</title>
+              </Helmet>
+              <CssBaseline />
+              <Box ml={12}>
+                <Sidenav />
+                <Container maxWidth={'lg'} disableGutters={true}>
+                  <Header />
+                </Container>
+                <Switch>
+                  <Route path={'/'} exact>
+                    <Jobs />
+                  </Route>
+                  <Route path={'/datasets'} exact>
+                    <Datasets />
+                  </Route>
+                  <Route path={'/events'} exact>
+                    <Events />
+                  </Route>
+                  <Route path={'/lineage/:nodeType/:namespace/:nodeName'}>
+                    <Lineage />
+                    <BottomBar />
+                  </Route>
+                </Switch>
+                <Toast />
+              </Box>
+            </MuiPickersUtilsProvider>
           </MuiThemeProvider>
         </ConnectedRouter>
       </HelmetProvider>

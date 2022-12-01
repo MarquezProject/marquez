@@ -5,6 +5,7 @@ import { Reducer, combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
+import events, { IEventsState } from './events'
 import display, { IDisplayState } from './display'
 import jobs, { IJobsState } from './jobs'
 import lineage, { ILineageState } from './lineage'
@@ -15,6 +16,7 @@ import search, { ISearchState } from './search'
 export interface IState {
   datasets: IDatasetsState
   datasetVersions: IDatasetVersionsState
+  events: IEventsState
   jobs: IJobsState
   runs: IRunsState
   namespaces: INamespacesState
@@ -29,6 +31,7 @@ export default (history: History): Reducer =>
     router: connectRouter(history),
     datasets,
     datasetVersions,
+    events,
     jobs,
     runs,
     namespaces,
