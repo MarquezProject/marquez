@@ -22,6 +22,7 @@ import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
+import marquez.api.exceptions.JsonProcessingExceptionMapper;
 import marquez.db.BaseDao;
 import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
@@ -96,6 +97,7 @@ public final class MarquezContext {
   @Getter private final SearchResource searchResource;
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
+  @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
 
   private MarquezContext(
@@ -137,6 +139,7 @@ public final class MarquezContext {
     this.lineageService = new LineageService(lineageDao, jobDao);
     this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
     this.jdbiException = new JdbiExceptionExceptionMapper();
+    this.jsonException = new JsonProcessingExceptionMapper();
     final ServiceFactory serviceFactory =
         ServiceFactory.builder()
             .datasetService(datasetService)
@@ -169,6 +172,7 @@ public final class MarquezContext {
             jobResource,
             tagResource,
             jdbiException,
+            jsonException,
             openLineageResource,
             searchResource);
 

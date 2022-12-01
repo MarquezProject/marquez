@@ -19,4 +19,9 @@ public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName name;
   @NonNull UUID version;
+
+  public static JobVersionId of(
+      final NamespaceName namespaceName, final JobName jobName, final UUID version) {
+    return new JobVersionId(namespaceName, jobName, version);
+  }
 }
