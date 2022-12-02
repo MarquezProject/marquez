@@ -67,6 +67,5 @@ spec:
               serviceName: {{ include "common.names.fullname" $ }}-web
               servicePort: http
             {{- end }}
-        {{- end }}
   {{- end }}
 {{- end }}
