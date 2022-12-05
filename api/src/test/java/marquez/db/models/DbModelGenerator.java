@@ -26,7 +26,9 @@ public final class DbModelGenerator extends Generator {
 
   /** Returns new {@link NamespaceRow} objects with a specified {@code limit}. */
   public static List<NamespaceRow> newNamespaceRows(int limit) {
-    return Stream.generate(() -> newNamespaceRow()).limit(limit).collect(toImmutableList());
+    return Stream.generate(DbModelGenerator::newNamespaceRow)
+        .limit(limit)
+        .collect(toImmutableList());
   }
 
   /** Returns a new {@link NamespaceRow} object. */
@@ -38,7 +40,8 @@ public final class DbModelGenerator extends Generator {
         now,
         newNamespaceName().getValue(),
         newDescription(),
-        newOwnerName().getValue());
+        newOwnerName().getValue(),
+        false);
   }
 
   /** Returns a new {@code row} uuid. */

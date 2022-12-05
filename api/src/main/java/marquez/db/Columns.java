@@ -55,6 +55,7 @@ public final class Columns {
   public static final String DATASET_NAME = "dataset_name";
   public static final String FACETS = "facets";
   public static final String TAGS = "tags";
+  public static final String IS_HIDDEN = "is_hidden";
 
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
@@ -193,6 +194,14 @@ public final class Columns {
       throws SQLException {
     if (results.getObject(column) == null) {
       return defaultValue;
+    }
+    return results.getBoolean(column);
+  }
+
+  public static boolean booleanOrThrow(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException();
     }
     return results.getBoolean(column);
   }

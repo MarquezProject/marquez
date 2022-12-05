@@ -5,6 +5,7 @@
 
 package marquez.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableSortedSet;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
-import java.time.Instant;
 import java.util.Map;
 import marquez.common.Utils;
 import marquez.service.ColumnLineageService;
@@ -40,8 +40,7 @@ public class ColumnLineageResourceTest {
             ColumnLineageResourceTest.class.getResourceAsStream("/column_lineage/node.json"),
             new TypeReference<>() {});
     LINEAGE = new Lineage(ImmutableSortedSet.of(testNode));
-    when(lineageService.lineage(any(NodeId.class), eq(20), eq(false), any(Instant.class)))
-        .thenReturn(LINEAGE);
+    when(lineageService.lineage(any(NodeId.class), eq(20), eq(false))).thenReturn(LINEAGE);
 
     ServiceFactory serviceFactory =
         ApiTestUtils.mockServiceFactory(Map.of(ColumnLineageService.class, lineageService));
@@ -74,5 +73,20 @@ public class ColumnLineageResourceTest {
             .readEntity(Lineage.class);
 
     assertEquals(lineage, LINEAGE);
+  }
+
+  @Test
+  public void testGetColumnLineageByVersionedNodeWithDownstream() {
+    assertThat(
+            UNDER_TEST
+                .target("/api/v1/column-lineage")
+                .queryParam(
+                    "nodeId",
+                    "dataset:namespace:commonDataset#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+                .queryParam("withDownstream", "true")
+                .request()
+                .get()
+                .getStatus())
+        .isEqualTo(400);
   }
 }

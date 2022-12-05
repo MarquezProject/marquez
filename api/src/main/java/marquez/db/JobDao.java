@@ -88,6 +88,16 @@ public interface JobDao extends BaseDao {
   """)
   void delete(String namespaceName, String name);
 
+  @SqlUpdate(
+      """
+  UPDATE jobs
+  SET is_hidden = true
+  FROM namespaces n
+  WHERE jobs.namespace_uuid = n.uuid
+  AND n.name = :namespaceName
+  """)
+  void deleteByNamespaceName(String namespaceName);
+
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(

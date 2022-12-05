@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import marquez.common.models.DatasetFieldId;
+import marquez.common.models.DatasetFieldVersionId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
@@ -116,13 +117,24 @@ public final class NodeId implements Comparable<NodeId> {
     return NodeId.of(datasetId.getNamespace(), datasetId.getName());
   }
 
-  public static NodeId of(@NonNull DatasetFieldId datasetFieldIdId) {
+  public static NodeId of(@NonNull DatasetFieldId datasetFieldId) {
     return of(
         ID_JOINER.join(
             ID_PREFX_DATASET_FIELD,
-            datasetFieldIdId.getDatasetId().getNamespace().getValue(),
-            datasetFieldIdId.getDatasetId().getName().getValue(),
-            datasetFieldIdId.getFieldName().getValue()));
+            datasetFieldId.getDatasetId().getNamespace().getValue(),
+            datasetFieldId.getDatasetId().getName().getValue(),
+            datasetFieldId.getFieldName().getValue()));
+  }
+
+  public static NodeId of(@NonNull DatasetFieldVersionId datasetFieldVersionId) {
+    return of(
+        appendVersionTo(
+            ID_JOINER.join(
+                ID_PREFX_DATASET_FIELD,
+                datasetFieldVersionId.getDatasetId().getNamespace().getValue(),
+                datasetFieldVersionId.getDatasetId().getName().getValue(),
+                datasetFieldVersionId.getFieldName().getValue()),
+            datasetFieldVersionId.getVersion()));
   }
 
   public static NodeId of(@NonNull JobId jobId) {
@@ -154,6 +166,11 @@ public final class NodeId implements Comparable<NodeId> {
   @JsonIgnore
   public boolean isDatasetFieldType() {
     return value.startsWith(ID_PREFX_DATASET_FIELD);
+  }
+
+  @JsonIgnore
+  public boolean isDatasetFieldVersionType() {
+    return value.startsWith(ID_PREFX_DATASET_FIELD) && hasVersion();
   }
 
   @JsonIgnore
@@ -243,10 +260,20 @@ public final class NodeId implements Comparable<NodeId> {
 
   @JsonIgnore
   public DatasetFieldId asDatasetFieldId() {
-    String[] parts = parts(4, ID_PREFX_DATASET);
+    String[] parts = parts(4, ID_PREFX_DATASET_FIELD);
     return new DatasetFieldId(
         new DatasetId(NamespaceName.of(parts[1]), DatasetName.of(parts[2])),
         FieldName.of(parts[3]));
+  }
+
+  @JsonIgnore
+  public DatasetFieldVersionId asDatasetFieldVersionId() {
+    String[] parts = parts(4, ID_PREFX_DATASET_FIELD);
+    String[] nameAndVersion = parts[3].split(VERSION_DELIM);
+    return new DatasetFieldVersionId(
+        new DatasetId(NamespaceName.of(parts[1]), DatasetName.of(parts[2])),
+        FieldName.of(nameAndVersion[0]),
+        UUID.fromString(nameAndVersion[1]));
   }
 
   @JsonIgnore

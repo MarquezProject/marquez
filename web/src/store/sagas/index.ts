@@ -7,7 +7,8 @@ import {
   FETCH_JOBS,
   FETCH_LINEAGE,
   FETCH_RUNS,
-  FETCH_SEARCH
+  FETCH_SEARCH,
+  FETCH_EVENTS
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
@@ -18,13 +19,14 @@ import {
   applicationError,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
+  fetchEventsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess
 } from '../actionCreators'
-import { getDatasetVersions, getDatasets, getJobs, getNamespaces, getRuns } from '../requests'
+import { getDatasetVersions, getDatasets, getEvents, getJobs, getNamespaces, getRuns } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 
@@ -98,6 +100,18 @@ export function* fetchDatasetsSaga() {
   }
 }
 
+export function* fetchEventsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_EVENTS)
+      const events = yield call(getEvents, payload.after, payload.before, payload.limit)
+      yield put(fetchEventsSuccess(events))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching event runs'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -117,6 +131,7 @@ export default function* rootSaga(): Generator {
     fetchRunsSaga(),
     fetchDatasetsSaga(),
     fetchDatasetVersionsSaga(),
+    fetchEventsSaga(),
     fetchLineage(),
     fetchSearch()
   ]

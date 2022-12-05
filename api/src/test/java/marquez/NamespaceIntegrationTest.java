@@ -66,5 +66,21 @@ public class NamespaceIntegrationTest extends BaseIntegrationTest {
     assertThat(namespace.getUpdatedAt()).isNotNull();
     assertThat(namespace.getCreatedAt()).isNotNull();
     assertThat(namespace.getDescription().get()).isEqualTo(NAMESPACE_DESCRIPTION);
+    assertThat(namespace.getIsHidden()).isFalse();
+  }
+
+  @Test
+  public void testApp_deleteNamespace() {
+    NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+    Namespace namespace = client.getNamespace(NAMESPACE_NAME);
+    assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
+    assertThat(namespace.getIsHidden()).isFalse();
+
+    client.deleteNamespace(NAMESPACE_NAME);
+    namespace = client.getNamespace(NAMESPACE_NAME);
+    assertThat(namespace.getName()).isEqualTo(NAMESPACE_NAME);
+    assertThat(namespace.getIsHidden()).isTrue();
   }
 }
