@@ -58,9 +58,13 @@ public class LineageService extends DelegatingLineageDao {
     log.debug("Attempting to get lineage for job '{}'", job);
     Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
 
+    // Ensure job data is not empty, an empty set cannot be passed to LineageDao.getCurrentRuns() or
+    // LineageDao.getCurrentRunsWithFacets().
     if (jobData.isEmpty()) {
+      // Log warning, then return an empty lineage graph; a graph must contain at most one
+      // job->dataset relationship.
       log.warn(
-          "Failed to get lineage for job '{}' associated with the node '{}'",
+          "Failed to get lineage for job '{}' associated with node '{}', returning empty graph...",
           job,
           nodeId.getValue());
       return toLineage(Sets.newHashSet(), Sets.newHashSet());
