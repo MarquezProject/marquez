@@ -68,9 +68,9 @@ public class LineageService extends DelegatingLineageDao {
       // Log warning, then return an orphan lineage graph; a graph should contain at most one
       // job->dataset relationship.
       log.warn(
-              "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
-              job,
-              nodeId.getValue());
+          "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
+          job,
+          nodeId.getValue());
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 

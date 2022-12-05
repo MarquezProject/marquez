@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.db;
 
 import static marquez.db.Columns.toPgObject;
@@ -19,6 +24,7 @@ public interface JobFacetsDao {
   enum Facet {
     SOURCE_CODE_LOCATION("sourceCodeLocation"),
     SOURCE_CODE("sourceCode"),
+    DOCUMENTATION("documentation"),
     SQL("sql"),
     OWNERSHIP("ownership");
 
@@ -95,6 +101,20 @@ public interface JobFacetsDao {
       @NonNull String lineageEventType,
       @NonNull LineageEvent.JobFacet jobFacet) {
     final Instant now = Instant.now();
+
+    // Add ...
+    Optional.ofNullable(jobFacet.getDocumentation())
+        .ifPresent(
+            documentation ->
+                insertJobFacet(
+                    UUID.randomUUID(),
+                    now,
+                    jobUuid,
+                    runUuid,
+                    lineageEventTime,
+                    lineageEventType,
+                    DatasetFacetsDao.Facet.DOCUMENTATION.getName(),
+                    toPgObject(DatasetFacetsDao.Facet.DOCUMENTATION.asJson(documentation))));
 
     // Add ...
     Optional.ofNullable(jobFacet.getSourceCodeLocation())

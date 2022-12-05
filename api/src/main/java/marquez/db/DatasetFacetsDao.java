@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2022 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.db;
 
 import static marquez.db.Columns.toPgObject;
@@ -28,6 +33,7 @@ public interface DatasetFacetsDao {
     DOCUMENTATION(Type.DATASET, "documentation"),
     SCHEMA(Type.DATASET, "schema"),
     DATASOURCE(Type.DATASET, "dataSource"),
+    DESCRIPTION(Type.DATASET, "description"),
     LIFECYCLE_STATE_CHANGE(Type.DATASET, "lifecycleStateChange"),
     VERSION(Type.DATASET, "version"),
     COLUMN_LINEAGE(Type.DATASET, "columnLineage"),
@@ -181,6 +187,21 @@ public interface DatasetFacetsDao {
                     Facet.DATASOURCE.getType(),
                     Facet.DATASOURCE.getName(),
                     toPgObject(Facet.DATASOURCE.asJson(datasource))));
+
+    // Add ...
+    Optional.ofNullable(datasetFacets.getDescription())
+        .ifPresent(
+            description ->
+                insertDatasetFacet(
+                    UUID.randomUUID(),
+                    now,
+                    datasetUuid,
+                    runUuid,
+                    lineageEventTime,
+                    lineageEventType,
+                    Facet.DESCRIPTION.getType(),
+                    Facet.DESCRIPTION.getName(),
+                    toPgObject(Facet.DESCRIPTION.asJson(description))));
 
     // Add ...
     Optional.ofNullable(datasetFacets.getLifecycleStateChange())

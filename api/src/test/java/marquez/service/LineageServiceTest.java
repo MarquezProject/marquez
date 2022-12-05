@@ -38,7 +38,7 @@ import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
-import marquez.service.models.Run;
+import marquez.service.models.RunData;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Condition;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -145,7 +145,7 @@ public class LineageServiceTest {
         .isEmpty();
 
     // assert the second run of writeJob is returned
-    AbstractObjectAssert<?, Run> runAssert =
+    AbstractObjectAssert<?, RunData> runAssert =
         assertThat(lineage.getGraph())
             .filteredOn(
                 node -> node.getType().equals(NodeType.JOB) && jobNameEquals(node, "writeJob"))
@@ -153,15 +153,17 @@ public class LineageServiceTest {
             .first()
             .extracting(
                 n -> ((JobData) n.getData()).getLatestRun(),
-                InstanceOfAssertFactories.optional(Run.class))
+                InstanceOfAssertFactories.optional(RunData.class))
             .isPresent()
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            RunData::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            RunData::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node
@@ -254,7 +256,7 @@ public class LineageServiceTest {
         .isEmpty();
 
     // assert the second run of writeJob is returned
-    AbstractObjectAssert<?, Run> runAssert =
+    AbstractObjectAssert<?, RunData> runAssert =
         assertThat(lineage.getGraph())
             .filteredOn(
                 node -> node.getType().equals(NodeType.JOB) && jobNameEquals(node, "writeJob"))
@@ -262,15 +264,17 @@ public class LineageServiceTest {
             .first()
             .extracting(
                 n -> ((JobData) n.getData()).getLatestRun(),
-                InstanceOfAssertFactories.optional(Run.class))
+                InstanceOfAssertFactories.optional(RunData.class))
             .isPresent()
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            RunData::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            RunData::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node

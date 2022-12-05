@@ -7,6 +7,7 @@ package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import marquez.db.models.ColumnLineageNodeData;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
