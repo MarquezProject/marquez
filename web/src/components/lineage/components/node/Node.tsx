@@ -48,7 +48,7 @@ function runStateToNodeColor(run: Nullable<Run>) {
     case 'RUNNING':
       return theme.palette.info.main
     case 'COMPLETED':
-      return theme.palette.secondary.main
+      return theme.palette.primary.main
     case 'FAILED':
       return theme.palette.error.main
     case 'ABORTED':
