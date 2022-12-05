@@ -979,21 +979,16 @@ def test_get_column_lineage_by_dataset(mock_get, client):
     mock_get.return_value.json.return_value = COLUMN_LINEAGE
 
     column_lineage = client.get_column_lineage_by_dataset(
-        "namespace_a",
-        "dataset_a",
-        DEFAULT_DEPTH,
-        DEFAULT_WITH_DOWNSTREAM
+        namespace="namespace_a", dataset="dataset_a", depth=DEFAULT_DEPTH,
+        with_downstream=DEFAULT_WITH_DOWNSTREAM, version="some-version"
     )
 
     assert column_lineage == COLUMN_LINEAGE
-
     mock_get.assert_called_once_with(
-        url=client._url(
-            '/column-lineage'
-        ),
+        url=client._url('/column-lineage'),
         headers=mock.ANY,
         params={
-            'nodeId': 'dataset:namespace_a:dataset_a',
+            'nodeId': 'dataset:namespace_a:dataset_a#some-version',
             'depth': DEFAULT_DEPTH,
             'withDownstream': DEFAULT_WITH_DOWNSTREAM
         },
@@ -1005,24 +1000,17 @@ def test_get_column_lineage_by_dataset(mock_get, client):
 def test_get_column_lineage_by_dataset_field(mock_get, client):
     mock_get.return_value.status_code.return_value = HTTPStatus.OK
     mock_get.return_value.json.return_value = COLUMN_LINEAGE
-
     column_lineage = client.get_column_lineage_by_dataset_field(
-        "namespace_a",
-        "dataset_a",
-        "field_a",
-        DEFAULT_DEPTH,
-        DEFAULT_WITH_DOWNSTREAM
+        namespace="namespace_a", dataset="dataset_a", field="field_a", depth=DEFAULT_DEPTH,
+        with_downstream=DEFAULT_WITH_DOWNSTREAM, version="some-version"
     )
 
     assert column_lineage == COLUMN_LINEAGE
-
     mock_get.assert_called_once_with(
-        url=client._url(
-            '/column-lineage'
-        ),
+        url=client._url('/column-lineage'),
         headers=mock.ANY,
         params={
-            'nodeId': 'datasetField:namespace_a:dataset_a:field_a',
+            'nodeId': 'datasetField:namespace_a:dataset_a:field_a#some-version',
             'depth': DEFAULT_DEPTH,
             'withDownstream': DEFAULT_WITH_DOWNSTREAM
         },
@@ -1034,23 +1022,17 @@ def test_get_column_lineage_by_dataset_field(mock_get, client):
 def test_get_column_lineage_by_job(mock_get, client):
     mock_get.return_value.status_code.return_value = HTTPStatus.OK
     mock_get.return_value.json.return_value = COLUMN_LINEAGE
-
     column_lineage = client.get_column_lineage_by_job(
-        "namespace_a",
-        "job_a",
-        DEFAULT_DEPTH,
-        DEFAULT_WITH_DOWNSTREAM
+        namespace="namespace_a", job="job_a", depth=DEFAULT_DEPTH,
+        with_downstream=DEFAULT_WITH_DOWNSTREAM, version="some-version"
     )
 
     assert column_lineage == COLUMN_LINEAGE
-
     mock_get.assert_called_once_with(
-        url=client._url(
-            '/column-lineage'
-        ),
+        url=client._url('/column-lineage'),
         headers=mock.ANY,
         params={
-            'nodeId': 'job:namespace_a:job_a',
+            'nodeId': 'job:namespace_a:job_a#some-version',
             'depth': DEFAULT_DEPTH,
             'withDownstream': DEFAULT_WITH_DOWNSTREAM
         },
