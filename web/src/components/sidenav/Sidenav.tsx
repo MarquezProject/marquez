@@ -92,7 +92,7 @@ class Sidenav extends React.Component<SidenavProps> {
             <RouterLink to={'/events'} className={classes.link}>
               <MqIconButton
                 id={'eventsButton'}
-                title={'EVENTS'}
+                title={i18next.t('sidenav.events')}
                 active={this.props.location.pathname === '/events'}
               >
                 <SVG

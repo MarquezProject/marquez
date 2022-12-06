@@ -45,7 +45,8 @@ i18next
           },
           sidenav: {
             jobs: 'JOBS',
-            datasets: 'DATASETS'
+            datasets: 'DATASETS',
+            events: 'EVENTS'
           },
           namespace_select: {
             prompt: 'ns'
@@ -116,7 +117,8 @@ i18next
           },
           sidenav: {
             jobs: 'EMPLOIS',
-            datasets: 'JEUX DE DONNÉES'
+            datasets: 'JEUX DE DONNÉES',
+            events: 'ÉVÉNEMENTS'
           },
           namespace_select: {
             prompt: 'en'
@@ -189,7 +191,8 @@ i18next
           },
           sidenav: {
             jobs: 'TRABAJOS',
-            datasets: 'CONJUNTOS DE DATOS'
+            datasets: 'CONJUNTOS DE DATOS',
+            events: 'EVENTOS'
           },
           namespace_select: {
             prompt: 'en'
@@ -262,7 +265,8 @@ i18next
           },
           sidenav: {
             jobs: 'ZADANIA',
-            datasets: 'ZBIORY DANYCH'
+            datasets: 'ZBIORY DANYCH',
+            events: 'WYDARZENIA'
           },
           namespace_select: {
             prompt: 'pn'
