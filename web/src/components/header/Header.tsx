@@ -10,8 +10,6 @@ import MqText from '../core/text/MqText'
 import NamespaceSelect from '../namespace-select/NamespaceSelect'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
-import '../../i18n/config'
-import { useTranslation } from 'react-i18next'
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -42,21 +40,27 @@ const styles = (theme: Theme) => {
 type HeaderProps = WithStyles<typeof styles>
 
 const Header = (props: HeaderProps): ReactElement => {
-  const { t } = useTranslation();
   const { classes } = props
+  const i18next = require('i18next')
   return (
     <AppBar position='fixed' elevation={0} className={classes.appBar}>
       <Toolbar>
         <Box className={classes.innerToolbar}>
           <Link to='/'>
-            <img src={'https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/marquez_logo.svg'} height={48} alt='Marquez Logo' />
+            <img
+              src={
+                'https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/marquez_logo.svg'
+              }
+              height={48}
+              alt='Marquez Logo'
+            />
           </Link>
           <Box display={'flex'} alignItems={'center'}>
             <Search />
             <NamespaceSelect />
             <Box ml={2}>
               <MqText link href={API_DOCS_URL}>
-                {t('header.docs_link')}
+                {i18next.t('header.docs_link')}
               </MqText>
             </Box>
           </Box>

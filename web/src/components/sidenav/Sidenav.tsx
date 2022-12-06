@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
+import SVG from 'react-inlinesvg'
 
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
@@ -14,12 +15,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs, faDatabase } from '@fortawesome/free-solid-svg-icons'
 import MqIconButton from '../core/icon-button/MqIconButton'
 
-import '../../i18n/config' // for i18n
+// for i18n
+import '../../i18n/config'
 import { FormControl, MenuItem, Select } from '@material-ui/core'
 import { MqInputBase } from '../core/input-base/MqInputBase'
 import resources from '../../types/i18next'
-import MqText from '../core/text/MqText'
-import { theme } from '../../helpers/theme'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -40,7 +40,7 @@ const styles = (theme: Theme) =>
       textDecoration: 'none'
     },
     formControl: {
-      maxWidth: '100px',
+      maxWidth: '100px'
     }
   })
 
@@ -53,9 +53,9 @@ type SidenavProps = WithStyles<typeof styles> & RouteComponentProps & CustomType
 class Sidenav extends React.Component<SidenavProps> {
   render() {
     const { classes } = this.props
-    const i18next = require("i18next")
+    const i18next = require('i18next')
     const changeLanguage = (lng: string) => {
-      i18next.changeLanguage(lng);
+      i18next.changeLanguage(lng)
     }
     return (
       <Drawer className={classes.drawer} variant='permanent'>
@@ -89,6 +89,19 @@ class Sidenav extends React.Component<SidenavProps> {
                 <FontAwesomeIcon icon={faDatabase} size={'2x'} />
               </MqIconButton>
             </RouterLink>
+            <RouterLink to={'/events'} className={classes.link}>
+              <MqIconButton
+                id={'eventsButton'}
+                title={i18next.t('sidenav.events')}
+                active={this.props.location.pathname === '/events'}
+              >
+                <SVG
+                  src="../../img/iconSearchArrow.svg"
+                  width={'30px'}
+                />
+              </MqIconButton>
+            </RouterLink>
+
             {/* todo remove this link for now until direct linking available */}
             {/*<RouterLink to={'/lineage'} className={classes.link}>*/}
             {/*  <MqIconButton*/}
@@ -101,13 +114,6 @@ class Sidenav extends React.Component<SidenavProps> {
             {/*</RouterLink>*/}
           </Box>
           <FormControl variant='outlined' className={classes.formControl}>
-            <Box position={'relative'}>
-              <Box position={'absolute'} left={12} top={9}>
-                <MqText color={theme.palette.primary.main} font={'mono'}>
-                  🌍
-                </MqText>
-              </Box>
-            </Box>
             <Select
               value={i18next.resolvedLanguage}
               onChange={event => {
@@ -115,10 +121,18 @@ class Sidenav extends React.Component<SidenavProps> {
               }}
               input={<MqInputBase />}
             >
-              <MenuItem key={'en'} value={'en'}>{'en'}</MenuItem>
-              <MenuItem key={'es'} value={'es'}>{'es'}</MenuItem>
-              <MenuItem key={'fr'} value={'fr'}>{'fr'}</MenuItem>
-              <MenuItem key={'pl'} value={'pl'}>{'pl'}</MenuItem>
+              <MenuItem key={'en'} value={'en'}>
+                {'en'}
+              </MenuItem>
+              <MenuItem key={'es'} value={'es'}>
+                {'es'}
+              </MenuItem>
+              <MenuItem key={'fr'} value={'fr'}>
+                {'fr'}
+              </MenuItem>
+              <MenuItem key={'pl'} value={'pl'}>
+                {'pl'}
+              </MenuItem>
             </Select>
           </FormControl>
         </Box>

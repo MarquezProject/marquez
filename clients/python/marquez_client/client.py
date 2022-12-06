@@ -343,8 +343,18 @@ class MarquezClient:
         Utils.is_valid_uuid(run_id, 'run_id')
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
-    def get_column_lineage_by_dataset(self, namespace, dataset, depth=None, with_downstream=None):
-        node_id = "dataset:{0}:{1}".format(namespace, dataset)
+    def get_column_lineage_by_dataset(
+            self,
+            namespace,
+            dataset,
+            depth=None,
+            with_downstream=None,
+            version=None
+    ):
+        node_id = self._append_version_to_node_id(
+            "dataset:{0}:{1}".format(namespace, dataset),
+            version
+        )
         return self._get_column_lineage(node_id, depth, with_downstream)
 
     def get_column_lineage_by_dataset_field(
@@ -353,14 +363,28 @@ class MarquezClient:
             dataset,
             field,
             depth=None,
-            with_downstream=None
+            with_downstream=None,
+            version=None,
     ):
-        node_id = "datasetField:{0}:{1}:{2}".format(namespace, dataset, field)
+        node_id = self._append_version_to_node_id(
+            "datasetField:{0}:{1}:{2}".format(namespace, dataset, field),
+            version
+        )
         return self._get_column_lineage(node_id, depth, with_downstream)
 
-    def get_column_lineage_by_job(self, namespace, job, depth=None, with_downstream=None):
-        node_id = "job:{0}:{1}".format(namespace, job)
+    def get_column_lineage_by_job(self, namespace, job, depth=None,
+                                  with_downstream=None, version=None):
+        node_id = self._append_version_to_node_id(
+            "job:{0}:{1}".format(namespace, job),
+            version
+        )
         return self._get_column_lineage(node_id, depth, with_downstream)
+
+    def _append_version_to_node_id(self, node_id, version):
+        if version is not None:
+            return node_id + "#" + version
+        else:
+            return node_id
 
     def _get_column_lineage(self, node_id, depth, with_downstream):
         return self._get(

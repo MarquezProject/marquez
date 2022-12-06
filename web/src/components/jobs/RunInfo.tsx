@@ -7,8 +7,6 @@ import MqCode from '../core/code/MqCode'
 import MqJson from '../core/code/MqJson'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
-import '../../i18n/config'
-import { useTranslation } from 'react-i18next'
 
 interface RunInfoProps {
   run: Run
@@ -16,7 +14,7 @@ interface RunInfoProps {
 
 const RunInfo: FunctionComponent<RunInfoProps> = props => {
   const { run } = props
-  const { t } = useTranslation()
+  const i18next = require('i18next')
 
   return (
     <Box mt={2}>
@@ -29,7 +27,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>{t('jobs.runinfo_subhead')}</MqText>
+            <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
           </Box>
           <MqJson code={run.facets} />
         </Box>

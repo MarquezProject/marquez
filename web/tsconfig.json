@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "sourceMap": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
     "module": "commonjs",
@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": false
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/__tests__/*"]
