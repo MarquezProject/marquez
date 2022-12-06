@@ -4,8 +4,8 @@ import { initReactI18next } from 'react-i18next'
 const i18next = require('i18next')
 
 // comment this out if using the language detector
-const ISSERVER = typeof window === "undefined";
-if(!ISSERVER) {
+const ISSERVER = typeof window === 'undefined'
+if (!ISSERVER) {
   if (localStorage.getItem('i18nextLng') === null) {
     localStorage.setItem('i18nextLng', 'en')
   }
@@ -16,7 +16,7 @@ i18next
   .use(initReactI18next)
   .init({
     lng: i18next.options.lng, //if you're using a language detector, do not define the lng option
-    debug: true,
+    debug: false,
     fallbackLng: 'en',
     resources: {
       en: {
@@ -209,7 +209,8 @@ i18next
             previous_page: 'Page précédente',
             next_page: 'Page suivante',
             empty_title: 'Aucun événement trouvé',
-            empty_body: 'Essayez de changer les dates ou consultez notre documentation pour ajouter des événements.'
+            empty_body:
+              'Essayez de changer les dates ou consultez notre documentation pour ajouter des événements.'
           },
           events_columns: {
             id: 'ID',
@@ -311,7 +312,8 @@ i18next
             previous_page: 'Pagina anterior',
             next_page: 'Siguiente página',
             empty_title: 'No se encontraron eventos',
-            empty_body: 'Prueba a cambiar las fechas o consulta nuestra documentación para añadir eventos.'
+            empty_body:
+              'Prueba a cambiar las fechas o consulta nuestra documentación para añadir eventos.'
           },
           events_columns: {
             id: 'ID',
@@ -413,7 +415,8 @@ i18next
             previous_page: 'Poprzednia strona',
             next_page: 'Następna strona',
             empty_title: 'Nie znaleziono wydarzeń',
-            empty_body: 'Spróbuj zmienić daty lub zapoznaj się z naszą dokumentacją, aby dodać wydarzenia.'
+            empty_body:
+              'Spróbuj zmienić daty lub zapoznaj się z naszą dokumentacją, aby dodać wydarzenia.'
           },
           events_columns: {
             id: 'ID',

@@ -18,7 +18,7 @@ import MqIconButton from '../core/icon-button/MqIconButton'
 // for i18n
 import '../../i18n/config'
 import { FormControl, MenuItem, Select } from '@material-ui/core'
-import { MqInputBase } from '../core/input-base/MqInputBase'
+import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import resources from '../../types/i18next'
 
 const styles = (theme: Theme) =>
@@ -95,10 +95,7 @@ class Sidenav extends React.Component<SidenavProps> {
                 title={i18next.t('sidenav.events')}
                 active={this.props.location.pathname === '/events'}
               >
-                <SVG
-                  src="../../img/iconSearchArrow.svg"
-                  width={'30px'}
-                />
+                <SVG src='../../img/iconSearchArrow.svg' width={'30px'} />
               </MqIconButton>
             </RouterLink>
 
@@ -114,26 +111,29 @@ class Sidenav extends React.Component<SidenavProps> {
             {/*</RouterLink>*/}
           </Box>
           <FormControl variant='outlined' className={classes.formControl}>
-            <Select
-              value={i18next.resolvedLanguage}
-              onChange={event => {
-                changeLanguage(event.target.value as string)
-              }}
-              input={<MqInputBase />}
-            >
-              <MenuItem key={'en'} value={'en'}>
-                {'en'}
-              </MenuItem>
-              <MenuItem key={'es'} value={'es'}>
-                {'es'}
-              </MenuItem>
-              <MenuItem key={'fr'} value={'fr'}>
-                {'fr'}
-              </MenuItem>
-              <MenuItem key={'pl'} value={'pl'}>
-                {'pl'}
-              </MenuItem>
-            </Select>
+            <Box px={1}>
+              <Select
+                fullWidth
+                value={i18next.resolvedLanguage}
+                onChange={event => {
+                  changeLanguage(event.target.value as string)
+                }}
+                input={<MqInputNoIcon />}
+              >
+                <MenuItem key={'en'} value={'en'}>
+                  {'en'}
+                </MenuItem>
+                <MenuItem key={'es'} value={'es'}>
+                  {'es'}
+                </MenuItem>
+                <MenuItem key={'fr'} value={'fr'}>
+                  {'fr'}
+                </MenuItem>
+                <MenuItem key={'pl'} value={'pl'}>
+                  {'pl'}
+                </MenuItem>
+              </Select>
+            </Box>
           </FormControl>
         </Box>
       </Drawer>
