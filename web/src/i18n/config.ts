@@ -99,6 +99,22 @@ i18next
             fields: 'FIELDS',
             created_by_run: 'CREATED BY RUN',
             lifecycle_state: 'LIFECYCLE STATE'
+          },
+          events_route: {
+            title: 'EVENTS',
+            from_date: 'From date',
+            to_date: 'To date',
+            previous_page: 'Previous page',
+            next_page: 'Next page',
+            empty_title: 'No events found',
+            empty_body: 'Try changing dates or consulting our documentation to add events.'
+          },
+          events_columns: {
+            id: 'ID',
+            state: 'STATE',
+            name: 'NAME',
+            namespace: 'NAMESPACE',
+            time: 'TIME'
           }
         }
       },
@@ -185,6 +201,22 @@ i18next
             fields: 'DOMAINES',
             created_by_run: 'CRÉÉ PAR RUN',
             lifecycle_state: 'ÉTAT DU CYCLE DE VIE'
+          },
+          events_route: {
+            title: 'ÉVÉNEMENTS',
+            from_date: 'Partir de la date',
+            to_date: 'À la date',
+            previous_page: 'Page précédente',
+            next_page: 'Page suivante',
+            empty_title: 'Aucun événement trouvé',
+            empty_body: 'Essayez de changer les dates ou consultez notre documentation pour ajouter des événements.'
+          },
+          events_columns: {
+            id: 'ID',
+            state: 'ETAT',
+            name: 'NOM',
+            namespace: 'ESPACE DE NOMS',
+            time: 'TEMPS'
           }
         }
       },
@@ -271,6 +303,22 @@ i18next
             fields: 'CAMPOS',
             created_by_run: 'CREADO POR EJECUTAR',
             lifecycle_state: 'ESTADO DEL CICLO DE VIDA'
+          },
+          events_route: {
+            title: 'EVENTOS',
+            from_date: 'Partir de la fecha',
+            to_date: 'Hasta la fecha',
+            previous_page: 'Pagina anterior',
+            next_page: 'Siguiente página',
+            empty_title: 'No se encontraron eventos',
+            empty_body: 'Prueba a cambiar las fechas o consulta nuestra documentación para añadir eventos.'
+          },
+          events_columns: {
+            id: 'ID',
+            state: 'ESTADO',
+            name: 'NOMBRE',
+            namespace: 'ESPACIO DE NOMBRES',
+            time: 'TIEMPO'
           }
         }
       },
@@ -357,6 +405,22 @@ i18next
             fields: 'KIERUNKI',
             created_by_run: 'STWORZONY PRZEZ URUCHOM',
             lifecycle_state: 'STAN CYKLU ŻYCIA'
+          },
+          events_route: {
+            title: 'WYDARZENIA',
+            from_date: 'Od daty',
+            to_date: 'Spotykać się z kimś',
+            previous_page: 'Poprzednia strona',
+            next_page: 'Następna strona',
+            empty_title: 'Nie znaleziono wydarzeń',
+            empty_body: 'Spróbuj zmienić daty lub zapoznaj się z naszą dokumentacją, aby dodać wydarzenia.'
+          },
+          events_columns: {
+            id: 'ID',
+            state: 'PAŃSTWO',
+            name: 'NAZWA',
+            namespace: 'PRZESTRZEŃ NAZW',
+            time: 'CZAS'
           }
         }
       }

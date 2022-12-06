@@ -163,23 +163,24 @@ class Events extends React.Component<EventsProps, EventsState> {
   render() {
     const { classes, isEventsLoading, isEventsInit } = this.props
     const { events, rowExpanded, page, dateFrom, dateTo, pageIsLast } = this.state
+    const i18next = require('i18next')
 
     return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
           <>
             <Box p={2}>
-              <MqText heading>EVENTS</MqText>
+              <MqText heading>{i18next.t('events_route.title')}</MqText>
               Page: {this.pageNavigation()}
             </Box>
             <Box p={2} className={classes.nav}>
               <MqDatePicker
-                label="From date"
+                label={i18next.t('events_route.from_date')}
                 value={formatDatePicker(dateFrom)}
                 onChange={(e: any) => this.handleChangeDatepicker(e, 'from')}
               />
               <MqDatePicker
-                label="To date"
+                label={i18next.t('events_route.to_date')}
                 value={formatDatePicker(dateTo)}
                 onChange={(e: any) => this.handleChangeDatepicker(e, 'to')}
               />
@@ -189,7 +190,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                 disabled={page === 1}
                 onClick={() => this.handleClickPage('prev')}
               >
-                Previous page
+                {i18next.t('events_route.previous_page')}
               </Button>
               <Button
                 variant='outlined'
@@ -197,14 +198,14 @@ class Events extends React.Component<EventsProps, EventsState> {
                 disabled={pageIsLast}
                 onClick={() => this.handleClickPage('next')}
               >
-                Next page
+                {i18next.t('events_route.next_page')}
               </Button>
             </Box>
             {events.length === 0 ? (
               <Box p={2}>
-                <MqEmpty title={'No events found'}>
+                <MqEmpty title={i18next.t('events_route.empty_title')}>
                   <MqText subdued>
-                    Try changing dates or consulting our documentation to add events.
+                    {i18next.t('events_route.empty_body')}
                   </MqText>
                 </MqEmpty>
               </Box>
@@ -213,13 +214,25 @@ class Events extends React.Component<EventsProps, EventsState> {
                 <Table className={classes.table} size='small'>
                   <TableHead>
                     <TableRow>
-                      {EVENTS_COLUMNS.map(field => {
-                        return (
-                          <TableCell key={field} align='left'>
-                            <MqText subheading>{field}</MqText>
+                      {/* {EVENTS_COLUMNS.map(field => {
+                        return ( */}
+                          <TableCell align='left'>
+                            <MqText subheading>{i18next.t('events_columns.id')}</MqText>
                           </TableCell>
-                        )
-                      })}
+                          <TableCell align='left'>
+                            <MqText subheading>{i18next.t('events_columns.state')}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subheading>{i18next.t('events_columns.name')}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subheading>{i18next.t('events_columns.namespace')}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subheading>{i18next.t('events_columns.time')}</MqText>
+                          </TableCell>
+                        {/* )
+                      })} */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
