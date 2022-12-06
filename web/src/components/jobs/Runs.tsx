@@ -27,7 +27,6 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
-const RUN_COLUMNS = ['ID', 'STATE', 'CREATED AT', 'STARTED AT', 'ENDED AT', 'DURATION']
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -83,15 +82,36 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       <Table size='small'>
         <TableHead>
           <TableRow>
-            {RUN_COLUMNS.map(column => {
-              return (
-                <TableCell key={column} align='left'>
-                  <MqText subheading inline>
-                    {column}
-                  </MqText>
-                </TableCell>
-              )
-            })}
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.id')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.state')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.created_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.started_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.ended_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.duration')}
+              </MqText>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

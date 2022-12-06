@@ -78,6 +78,14 @@ i18next
             namespace_col: 'NAMESPACE',
             updated_col: 'UPDATED AT',
             latest_run_col: 'LATEST RUN DURATION'
+          },
+          runs_columns: {
+            id: 'ID',
+            state: 'STATE',
+            created_at: 'CREATED AT',
+            started_at: 'STARTED AT',
+            ended_at: 'ENDED AT',
+            duration: 'DURATION'
           }
         }
       },
@@ -143,6 +151,14 @@ i18next
             namespace_col: 'ESPACE DE NOMS',
             updated_col: 'MISE À JOUR À',
             latest_run_col: 'DERNIÈRE DURÉE D\'EXÉCUTION'
+          },
+          runs_columns: {
+            id: 'ID',
+            state: 'ETAT',
+            created_at: 'CRÉÉ À',
+            started_at: 'COMMENCÉ À',
+            ended_at: 'TERMINÉ À',
+            duration: 'DURÉE'
           }
         }
       },
@@ -208,6 +224,14 @@ i18next
             namespace_col: 'ESPACIO DE NOMBRES',
             updated_col: 'ACTUALIZADO EN',
             latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN'
+          },
+          runs_columns: {
+            id: 'ID',
+            state: 'ESTADO',
+            created_at: 'CREADO EN',
+            started_at: 'EMPEZÓ A LAS',
+            ended_at: 'TERMINÓ EN',
+            duration: 'DURACIÓN'
           }
         }
       },
@@ -273,6 +297,14 @@ i18next
             namespace_col: 'PRZESTRZEŃ NAZW',
             updated_col: 'ZAKTUALIZOWANO',
             latest_run_col: 'NAJNOWSZY CZAS TRWANIA'
+          },
+          runs_columns: {
+            id: 'ID',
+            state: 'PAŃSTWO',
+            created_at: 'UTWORZONY W',
+            started_at: 'ROZPOCZĘŁO SIĘ O GODZ',
+            ended_at: 'ZAKOŃCZONE O GODZ',
+            duration: 'TRWANIE'
           }
         }
       }
