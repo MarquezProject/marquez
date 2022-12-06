@@ -6,6 +6,9 @@
 package marquez.service.models;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -19,6 +22,31 @@ import lombok.ToString;
 public class ColumnLineage {
   @NotNull private String name;
   @NotNull private List<ColumnLineageInputField> inputFields;
-  @NotNull private String transformationDescription;
-  @NotNull private String transformationType;
+
+  @Nullable private String transformationDescription;
+  @Nullable private String transformationType;
+
+  /**
+   * @deprecated Moved into {@link ColumnLineageInputField} to support multiple jobs writing to a
+   *     single dataset. This method is scheduled to be removed in release {@code 0.30.0}.
+   */
+  public String getTransformationDescription() {
+    return Optional.ofNullable(inputFields).map(List::stream).stream()
+        .flatMap(Function.identity())
+        .findAny()
+        .map(d -> d.getTransformationDescription())
+        .orElse(null);
+  }
+
+  /**
+   * @deprecated Moved into {@link ColumnLineageInputField} to support multiple jobs writing to a
+   *     single dataset. This method is scheduled to be removed in release {@code 0.30.0}.
+   */
+  public String getTransformationType() {
+    return Optional.ofNullable(inputFields).map(List::stream).stream()
+        .flatMap(Function.identity())
+        .findAny()
+        .map(d -> d.getTransformationType())
+        .orElse(null);
+  }
 }

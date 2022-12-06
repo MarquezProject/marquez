@@ -21,9 +21,7 @@ public class ColumnLineageNodeData implements NodeData {
   @NonNull String dataset;
   @NonNull String field;
   @NonNull String fieldType;
-  @NonNull String transformationDescription;
-  @NonNull String transformationType;
-  @NonNull List<DatasetFieldId> inputFields;
+  @NonNull List<ColumnLineageInputField> inputFields;
 
   public static ColumnLineageNodeData fromJson(@NonNull final String json) {
     return Utils.fromJson(json, new TypeReference<ColumnLineageNodeData>() {});
