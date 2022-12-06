@@ -87,6 +87,18 @@ i18next
             started_at: 'STARTED AT',
             ended_at: 'ENDED AT',
             duration: 'DURATION'
+          },
+          dataset_info_columns: {
+            name: 'NAME',
+            type: 'TYPE',
+            description: 'DESCRIPTION'
+          },
+          dataset_versions_columns: {
+            version: 'VERSION',
+            created_at: 'CREATED AT',
+            fields: 'FIELDS',
+            created_by_run: 'CREATED BY RUN',
+            lifecycle_state: 'LIFECYCLE STATE'
           }
         }
       },
@@ -161,6 +173,18 @@ i18next
             started_at: 'COMMENCÉ À',
             ended_at: 'TERMINÉ À',
             duration: 'DURÉE'
+          },
+          dataset_info_columns: {
+            name: 'NOM',
+            type: 'TAPER',
+            description: 'DESCRIPTION'
+          },
+          dataset_versions_columns: {
+            version: 'VERSION',
+            created_at: 'CRÉÉ À',
+            fields: 'DOMAINES',
+            created_by_run: 'CRÉÉ PAR RUN',
+            lifecycle_state: 'ÉTAT DU CYCLE DE VIE'
           }
         }
       },
@@ -235,6 +259,18 @@ i18next
             started_at: 'EMPEZÓ A LAS',
             ended_at: 'TERMINÓ EN',
             duration: 'DURACIÓN'
+          },
+          dataset_info_columns: {
+            name: 'NOMBRE',
+            type: 'ESCRIBE',
+            description: 'DESCRIPCIÓN'
+          },
+          dataset_versions_columns: {
+            version: 'VERSIÓN',
+            created_at: 'CREADO EN',
+            fields: 'CAMPOS',
+            created_by_run: 'CREADO POR EJECUTAR',
+            lifecycle_state: 'ESTADO DEL CICLO DE VIDA'
           }
         }
       },
@@ -309,6 +345,18 @@ i18next
             started_at: 'ROZPOCZĘŁO SIĘ O GODZ',
             ended_at: 'ZAKOŃCZONE O GODZ',
             duration: 'TRWANIE'
+          },
+          dataset_info_columns: {
+            name: 'NAZWA',
+            type: 'RODZAJ',
+            description: 'OPIS'
+          },
+          dataset_versions_columns: {
+            version: 'WERSJA',
+            created_at: 'UTWORZONY W',
+            fields: 'KIERUNKI',
+            created_by_run: 'STWORZONY PRZEZ URUCHOM',
+            lifecycle_state: 'STAN CYKLU ŻYCIA'
           }
         }
       }

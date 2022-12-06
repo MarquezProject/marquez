@@ -10,8 +10,6 @@ import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 import RunStatus from '../jobs/RunStatus'
 
-const DATASET_COLUMNS = ['NAME', 'TYPE', 'DESCRIPTION']
-
 interface DatasetInfoProps {
   datasetFields: Field[]
   facets?: object
@@ -34,15 +32,21 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
         <Table size='small'>
           <TableHead>
             <TableRow>
-              {DATASET_COLUMNS.map(column => {
-                return (
-                  <TableCell key={column} align='left'>
-                    <MqText subheading inline>
-                      {column}
-                    </MqText>
-                  </TableCell>
-                )
-              })}
+              <TableCell align='left'>
+                <MqText subheading inline>
+                  {i18next.t('dataset_info_columns.name')}
+                </MqText>
+              </TableCell>
+              <TableCell align='left'>
+                <MqText subheading inline>
+                  {i18next.t('dataset_info_columns.type')}
+                </MqText>
+              </TableCell>
+              <TableCell align='left'>
+                <MqText subheading inline>
+                  {i18next.t('dataset_info_columns.description')}
+                </MqText>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
