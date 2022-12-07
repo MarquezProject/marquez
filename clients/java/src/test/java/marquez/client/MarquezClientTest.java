@@ -68,6 +68,7 @@ import marquez.client.MarquezClient.Namespaces;
 import marquez.client.MarquezClient.Runs;
 import marquez.client.MarquezClient.Sources;
 import marquez.client.MarquezClient.Tags;
+import marquez.client.models.ColumnLineageInputField;
 import marquez.client.models.ColumnLineageNodeData;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetFieldId;
@@ -963,10 +964,13 @@ public class MarquezClientTest {
                 DB_TABLE_NAME,
                 FIELD_NAME,
                 "String",
-                "transformationDescription",
-                "transformationType",
                 Collections.singletonList(
-                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+                    new ColumnLineageInputField(
+                        "namespace",
+                        "inDataset",
+                        "some-col1",
+                        "transformationDescription",
+                        "transformationType"))),
             ImmutableSet.of(
                 Edge.of(
                     NodeId.of(DATASET_FIELD_ID),
@@ -1000,10 +1004,13 @@ public class MarquezClientTest {
                 DB_TABLE_NAME,
                 FIELD_NAME,
                 "String",
-                "transformationDescription",
-                "transformationType",
                 Collections.singletonList(
-                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+                    new ColumnLineageInputField(
+                        "namespace",
+                        "inDataset",
+                        "some-col1",
+                        "transformationDescription",
+                        "transformationType"))),
             ImmutableSet.of(
                 Edge.of(
                     NodeId.of(DATASET_FIELD_ID),
@@ -1037,10 +1044,13 @@ public class MarquezClientTest {
                 DB_TABLE_NAME,
                 FIELD_NAME,
                 "String",
-                "transformationDescription",
-                "transformationType",
                 Collections.singletonList(
-                    new DatasetFieldId("namespace", "inDataset", "some-col1"))),
+                    new ColumnLineageInputField(
+                        "namespace",
+                        "inDataset",
+                        "some-col1",
+                        "transformationDescription",
+                        "transformationType"))),
             ImmutableSet.of(
                 Edge.of(
                     NodeId.of(DATASET_FIELD_ID),

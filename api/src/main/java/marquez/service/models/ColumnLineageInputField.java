@@ -19,4 +19,6 @@ public class ColumnLineageInputField {
   @NotNull private String namespace;
   @NotNull private String dataset;
   @NotNull private String field;
+  @NotNull private String transformationDescription;
+  @NotNull private String transformationType;
 }
