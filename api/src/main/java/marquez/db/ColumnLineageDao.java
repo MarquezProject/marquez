@@ -146,12 +146,15 @@ public interface ColumnLineageDao extends BaseDao {
                 output_fields.dataset_name,
                 output_fields.field_name,
                 output_fields.type,
-                ARRAY_AGG(DISTINCT ARRAY[input_fields.namespace_name, input_fields.dataset_name, CAST(clr.input_dataset_version_uuid AS VARCHAR), input_fields.field_name]) AS inputFields,
-                clr.output_dataset_version_uuid as dataset_version_uuid,
-                clr.transformation_description,
-                clr.transformation_type,
-                clr.created_at,
-                clr.updated_at
+                ARRAY_AGG(DISTINCT ARRAY[
+                  input_fields.namespace_name,
+                  input_fields.dataset_name,
+                  CAST(clr.input_dataset_version_uuid AS VARCHAR),
+                  input_fields.field_name,
+                  clr.transformation_description,
+                  clr.transformation_type
+                ]) AS inputFields,
+                clr.output_dataset_version_uuid as dataset_version_uuid
             FROM column_lineage_recursive clr
             INNER JOIN dataset_fields_view output_fields ON clr.output_dataset_field_uuid = output_fields.uuid -- hidden datasets will be filtered
             LEFT JOIN dataset_fields_view input_fields ON clr.input_dataset_field_uuid = input_fields.uuid
@@ -161,11 +164,7 @@ public interface ColumnLineageDao extends BaseDao {
                 output_fields.dataset_name,
                 output_fields.field_name,
                 output_fields.type,
-                clr.output_dataset_version_uuid,
-                clr.transformation_description,
-                clr.transformation_type,
-                clr.created_at,
-                clr.updated_at
+                clr.output_dataset_version_uuid
           """)
   Set<ColumnLineageNodeData> getLineage(
       int depth,
@@ -193,12 +192,15 @@ public interface ColumnLineageDao extends BaseDao {
           output_fields.dataset_name,
           output_fields.field_name,
           output_fields.type,
-          ARRAY_AGG(DISTINCT ARRAY[input_fields.namespace_name, input_fields.dataset_name, CAST(c.input_dataset_version_uuid AS VARCHAR), input_fields.field_name]) AS inputFields,
-          c.output_dataset_version_uuid as dataset_version_uuid,
-          c.transformation_description,
-          c.transformation_type,
-          c.created_at,
-          c.updated_at
+          ARRAY_AGG(DISTINCT ARRAY[
+            input_fields.namespace_name,
+            input_fields.dataset_name,
+            CAST(c.input_dataset_version_uuid AS VARCHAR),
+            input_fields.field_name,
+            c.transformation_description,
+            c.transformation_type
+          ]) AS inputFields,
+          null as dataset_version_uuid
         FROM selected_column_lineage c
         INNER JOIN dataset_fields_view output_fields ON c.output_dataset_field_uuid = output_fields.uuid
         LEFT JOIN dataset_fields_view input_fields ON c.input_dataset_field_uuid = input_fields.uuid
@@ -206,12 +208,7 @@ public interface ColumnLineageDao extends BaseDao {
           output_fields.namespace_name,
           output_fields.dataset_name,
           output_fields.field_name,
-          output_fields.type,
-          c.output_dataset_version_uuid,
-          c.transformation_description,
-          c.transformation_type,
-          c.created_at,
-          c.updated_at
+          output_fields.type
       """)
   /**
    * Each dataset is identified by a pair of strings (namespace and name). A query returns column

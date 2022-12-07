@@ -20,4 +20,6 @@ public class InputFieldNodeData {
   @NonNull String dataset;
   @Nullable UUID datasetVersion;
   @NonNull String field;
+  String transformationDescription;
+  String transformationType;
 }

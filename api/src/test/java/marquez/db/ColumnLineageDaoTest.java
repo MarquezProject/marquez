@@ -28,6 +28,7 @@ import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.InputFieldNodeData;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.UpdateLineageRow;
@@ -250,8 +251,8 @@ public class ColumnLineageDaoTest {
     assertEquals("namespace", dataset_c.getInputFields().get(0).getNamespace());
     assertEquals("dataset_b", dataset_c.getInputFields().get(0).getDataset());
     assertEquals("col_c", dataset_c.getInputFields().get(0).getField());
-    assertEquals("type2", dataset_c.getTransformationType());
-    assertEquals("description2", dataset_c.getTransformationDescription());
+    assertEquals("type2", dataset_c.getInputFields().get(0).getTransformationType());
+    assertEquals("description2", dataset_c.getInputFields().get(0).getTransformationDescription());
 
     // test dataset_b
     assertThat(dataset_b.getInputFields()).hasSize(2);
@@ -273,8 +274,8 @@ public class ColumnLineageDaoTest {
 
     assertEquals("namespace", dataset_b.getInputFields().get(0).getNamespace());
     assertEquals("dataset_a", dataset_b.getInputFields().get(0).getDataset());
-    assertEquals("type1", dataset_b.getTransformationType());
-    assertEquals("description1", dataset_b.getTransformationDescription());
+    assertEquals("type1", dataset_b.getInputFields().get(0).getTransformationType());
+    assertEquals("description1", dataset_b.getInputFields().get(0).getTransformationDescription());
   }
 
   @Test
@@ -389,35 +390,37 @@ public class ColumnLineageDaoTest {
    */
   @Test
   void testGetLineageWhenTwoJobsWriteToSameDataset() {
-    Dataset dataset_B_another_job =
-        new Dataset(
-            "namespace",
-            "dataset_b",
-            LineageEvent.DatasetFacets.builder()
-                .schema(
-                    new LineageEvent.SchemaDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        Arrays.asList(new LineageEvent.SchemaField("col_c", "STRING", ""))))
-                .columnLineage(
-                    new LineageEvent.ColumnLineageDatasetFacet(
-                        PRODUCER_URL,
-                        SCHEMA_URL,
-                        new LineageEvent.ColumnLineageDatasetFacetFields(
-                            Collections.singletonMap(
-                                "col_c",
-                                new LineageEvent.ColumnLineageOutputColumn(
-                                    Arrays.asList(
-                                        new LineageEvent.ColumnLineageInputField(
-                                            "namespace", "dataset_c", "col_d")),
-                                    "description1",
-                                    "type1")))))
-                .build());
+    List<LineageEvent.ColumnLineageInputField> fields =
+        getDatasetB()
+            .getFacets()
+            .getColumnLineage()
+            .getFields()
+            .getAdditionalFacets()
+            .get("col_c")
+            .getInputFields();
 
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_B_another_job);
+    Dataset datasetWithColAAsInputField = getDatasetB();
+    datasetWithColAAsInputField
+        .getFacets()
+        .getColumnLineage()
+        .getFields()
+        .getAdditionalFacets()
+        .get("col_c")
+        .setInputFields(Collections.singletonList(fields.get(0)));
+    createLineage(openLineageDao, getDatasetA(), datasetWithColAAsInputField);
 
-    // assert input fields for col_d contain col_a and col_c
+    Dataset datasetWithColBAsInputField = getDatasetB();
+    datasetWithColBAsInputField
+        .getFacets()
+        .getColumnLineage()
+        .getFields()
+        .getAdditionalFacets()
+        .get("col_c")
+        .setInputFields(Collections.singletonList(fields.get(1)));
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, getDatasetA(), datasetWithColBAsInputField);
+
+    // assert input fields for col_c contain col_a and col_b
     List<String> inputFields =
         getColumnLineage(lineageRow, "col_c").stream()
             .filter(node -> node.getDataset().equals("dataset_b"))
@@ -425,7 +428,7 @@ public class ColumnLineageDaoTest {
             .map(input -> input.getField())
             .collect(Collectors.toList());
 
-    assertThat(inputFields).hasSize(3).contains("col_a", "col_b", "col_d");
+    assertThat(inputFields).hasSize(2).contains("col_a", "col_b");
   }
 
   @Test
@@ -481,6 +484,47 @@ public class ColumnLineageDaoTest {
 
     UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, datasetWithNullDataType);
     getColumnLineage(lineageRow, "col_c");
+  }
+
+  @Test
+  void testGetLineageRowsForDatasetsWhenMultipleJobsWriteToADataset() {
+    List<LineageEvent.ColumnLineageInputField> fields =
+        getDatasetB()
+            .getFacets()
+            .getColumnLineage()
+            .getFields()
+            .getAdditionalFacets()
+            .get("col_c")
+            .getInputFields();
+
+    Dataset datasetWithColAAsInputField = getDatasetB();
+    datasetWithColAAsInputField
+        .getFacets()
+        .getColumnLineage()
+        .getFields()
+        .getAdditionalFacets()
+        .get("col_c")
+        .setInputFields(Collections.singletonList(fields.get(0)));
+    createLineage(openLineageDao, getDatasetA(), datasetWithColAAsInputField);
+
+    Dataset datasetWithColBAsInputField = getDatasetB();
+    datasetWithColBAsInputField
+        .getFacets()
+        .getColumnLineage()
+        .getFields()
+        .getAdditionalFacets()
+        .get("col_c")
+        .setInputFields(Collections.singletonList(fields.get(1)));
+    createLineage(openLineageDao, getDatasetA(), datasetWithColBAsInputField);
+
+    List<InputFieldNodeData> inputFields =
+        dao
+            .getLineageRowsForDatasets(Collections.singletonList(Pair.of("namespace", "dataset_b")))
+            .stream()
+            .findAny()
+            .get()
+            .getInputFields();
+    assertThat(inputFields).hasSize(2); // should contain col_a and col_b
   }
 
   private Set<ColumnLineageNodeData> getColumnLineage(UpdateLineageRow lineageRow, String field) {
