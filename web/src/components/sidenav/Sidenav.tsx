@@ -78,7 +78,7 @@ class Sidenav extends React.Component<SidenavProps> {
                 active={this.props.location.pathname === '/events'}
               >
                 <SVG
-                  src="../../img/iconSearchArrow.svg"
+                  src="https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg"
                   width={'30px'}
                 />
               </MqIconButton>
