@@ -117,6 +117,7 @@ class Sidenav extends React.Component<SidenavProps> {
                 value={i18next.resolvedLanguage}
                 onChange={event => {
                   changeLanguage(event.target.value as string)
+                  window.location.reload()
                 }}
                 input={<MqInputNoIcon />}
               >

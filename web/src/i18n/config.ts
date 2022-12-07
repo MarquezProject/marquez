@@ -1,21 +1,17 @@
 import { initReactI18next } from 'react-i18next'
-// import LanguageDetector from 'i18next-browser-languagedetector'
+import LanguageDetector from 'i18next-browser-languagedetector'
 
 const i18next = require('i18next')
 
-// comment this out if using the language detector
-const ISSERVER = typeof window === 'undefined'
-if (!ISSERVER) {
-  if (localStorage.getItem('i18nextLng') === null) {
-    localStorage.setItem('i18nextLng', 'en')
-  }
-}
+const DETECTION_OPTIONS = {
+  order: ['localStorage', 'navigator'],
+  caches: ['localStorage']
+};
 
 i18next
-  // .use(LanguageDetector)
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: i18next.options.lng, //if you're using a language detector, do not define the lng option
     debug: false,
     fallbackLng: 'en',
     resources: {
@@ -427,5 +423,6 @@ i18next
           }
         }
       }
-    }
+    },
+    detection: DETECTION_OPTIONS
   })
