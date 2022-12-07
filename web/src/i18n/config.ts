@@ -4,7 +4,8 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 const i18next = require('i18next')
 
 const DETECTION_OPTIONS = {
-  order: ['localStorage', 'navigator'],
+  order: ['localStorage'],
+  lookupLocalStorage: 'lng',
   caches: ['localStorage']
 };
 
