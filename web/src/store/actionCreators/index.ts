@@ -73,6 +73,10 @@ export const resetDatasetVersions = () => ({
   type: actionTypes.RESET_DATASET_VERSIONS
 })
 
+export const resetDataset = () => ({
+  type: actionTypes.RESET_DATASET
+})
+
 export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS
 })
