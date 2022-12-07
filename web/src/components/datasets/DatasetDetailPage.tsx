@@ -4,7 +4,7 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import * as Redux from 'redux'
 import { Box, Chip, Tab, Tabs } from '@material-ui/core'
-import { DatasetVersion } from '../../types/api'
+import { Dataset, DatasetVersion } from '../../types/api';
 import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
@@ -15,10 +15,15 @@ import {
 import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasetVersions, resetDatasetVersions } from '../../store/actionCreators'
+import {
+  fetchDataset,
+  fetchDatasetVersions,
+  resetDatasetVersions
+} from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
+import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import IconButton from '@material-ui/core/IconButton'
@@ -55,13 +60,15 @@ const styles = ({ spacing }: ITheme) => {
 }
 
 interface StateProps {
-  dataset: LineageDataset
+  lineageDataset: LineageDataset
   versions: DatasetVersion[]
+  dataset: Dataset
   versionsLoading: boolean
 }
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
+  fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
 }
 
@@ -75,13 +82,13 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
+  const { classes, fetchDatasetVersions, fetchDataset, resetDatasetVersions, versions, versionsLoading } = props
   const { root } = classes
   const history = useHistory()
 
   useEffect(() => {
-    fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
-  }, [props.dataset.name])
+    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
+  }, [props.lineageDataset.name])
 
   // unmounting
   useEffect(() => {
@@ -89,6 +96,10 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       resetDatasetVersions()
     }
   }, [])
+
+  // useEffect(() => {
+  //   fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
+  // }, [props.lineageDataset.name])
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -107,8 +118,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     return null
   }
 
-  const dataset = versions[0]
-  const { name, tags, description } = dataset
+  const firstVersion = versions[0]
+  const { name, tags, description } = firstVersion
 
   return (
     <Box my={2} className={root}>
@@ -127,6 +138,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
               <Tab label='LATEST SCHEMA' {...a11yProps(0)} disableRipple={true} />
               <Tab label='VERSION HISTORY' {...a11yProps(1)} disableRipple={true} />
+              <Tab label='COLUMN LINEAGE' {...a11yProps(2)} disableRipple={true} />
             </Tabs>
           </Box>
           <IconButton onClick={() => history.push('/datasets')}>
@@ -142,12 +154,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
       {tab === 0 && (
         <DatasetInfo
-          datasetFields={dataset.fields}
-          facets={dataset.facets}
-          run={dataset.createdByRun}
+          datasetFields={firstVersion.fields}
+          facets={firstVersion.facets}
+          run={firstVersion.createdByRun}
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
+      {tab === 2 && (props.dataset.name !== undefined || fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)) && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
     </Box>
   )
 }
@@ -155,6 +168,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
   versions: state.datasetVersions.result.versions,
+  dataset: state.dataset.result,
   versionsLoading: state.datasetVersions.isLoading
 })
 
@@ -162,6 +176,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
+      fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions
     },
     dispatch
