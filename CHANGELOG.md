@@ -6,6 +6,10 @@
 
 * Column-lineage endpoints supports point-in-time requests [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
     *Enable requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
+* Present column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+    *Column lineage of a dataset with a single level of depth can
+    be displayed in datase details tab.*
+
 
 ### Fixed
 

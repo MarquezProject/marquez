@@ -72,6 +72,7 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
+  columnLineage: object
 }
 
 export interface DatasetVersions {

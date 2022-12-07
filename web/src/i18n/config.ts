@@ -57,7 +57,8 @@ i18next
           },
           datasets: {
             latest_tab: 'LATEST SCHEMA',
-            history_tab: 'VERSION HISTORY'
+            history_tab: 'VERSION HISTORY',git 
+            column_lineage: 'COLUMN LINEAGE'
           },
           datasets_route: {
             empty_title: 'No datasets found',
