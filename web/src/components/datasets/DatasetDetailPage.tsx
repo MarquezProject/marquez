@@ -55,6 +55,7 @@ interface StateProps {
   versions: DatasetVersion[]
   dataset: Dataset
   versionsLoading: boolean
+  isDatasetInit: boolean
 }
 
 interface DispatchProps {
@@ -79,7 +80,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const history = useHistory()
 
   useEffect(() => {
-    fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
   }, [props.lineageDataset.name])
 
@@ -92,6 +92,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
     setTab(newValue)
+  }
+
+  const handleFetchDataset = () => {
+    if(!props.isDatasetInit) {
+      fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
+    }
+    return true
   }
 
   if (versionsLoading) {
@@ -148,7 +155,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
-      {tab === 2 && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
+      {tab === 2 && handleFetchDataset() && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
     </Box>
   )
 }
@@ -157,7 +164,8 @@ const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
   versions: state.datasetVersions.result.versions,
   dataset: state.dataset.result,
-  versionsLoading: state.datasetVersions.isLoading
+  versionsLoading: state.datasetVersions.isLoading,
+  isDatasetInit: state.dataset.init,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
