@@ -14,12 +14,16 @@ const DatasetColumnLineage: FunctionComponent<DatasetColumnLineageProps> = props
 
   return (
     <Box>
-      {columnLineage === null && <MqEmpty title={'No column lineage'} body={'Column lineage not available for the specified dataset.'} />}
-      {columnLineage && (
-        <Box mt={2}>
-          <MqJson code={columnLineage} />
-        </Box>
-      )}
+      {columnLineage
+        ? (
+          <Box mt={2}>
+            <MqJson code={columnLineage} />
+          </Box>
+        )
+        : (
+          <MqEmpty title={'No column lineage'} body={'Column lineage not available for the specified dataset.'} />
+        )
+      }
     </Box>
   )
 }
