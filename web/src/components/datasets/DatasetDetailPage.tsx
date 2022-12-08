@@ -80,6 +80,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const history = useHistory()
 
   useEffect(() => {
+    fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
   }, [props.lineageDataset.name])
 
