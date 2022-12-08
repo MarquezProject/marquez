@@ -51,6 +51,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Namespace'
+    delete:
+      operationId: deleteNamespace
+      summary: Deletes a namespace
+      description: Soft deletes a namespace, and every job and dataset inside. On next event containing this namespace, the namespace will be undeleted.
+      tags:
+        - Namespaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Namespace'
 
   /namespaces:
     get:
