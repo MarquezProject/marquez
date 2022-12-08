@@ -61,7 +61,7 @@ subprojects {
         lombokVersion = '1.18.24'
         mockitoVersion = '4.9.0'
         openlineageVersion = '0.17.0'
-        slf4jVersion = '1.7.36'
+        slf4jVersion = '2.0.5'
         postgresqlVersion = '42.5.1'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
