@@ -81,7 +81,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
   }, [props.lineageDataset.name])
 
