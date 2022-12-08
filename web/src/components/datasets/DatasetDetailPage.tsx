@@ -4,7 +4,7 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import * as Redux from 'redux'
 import { Box, Chip, Tab, Tabs } from '@material-ui/core'
-import { Dataset, DatasetVersion } from '../../types/api';
+import { Dataset, DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import {
   Theme as ITheme,
@@ -17,6 +17,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
   fetchDataset,
+  resetDataset,
   fetchDatasetVersions,
   resetDatasetVersions
 } from '../../store/actionCreators'
@@ -45,16 +46,6 @@ const styles = ({ spacing }: ITheme) => {
       '&:not(:last-of-type)': {
         marginRight: spacing(1)
       }
-    },
-    noData: {
-      padding: '125px 0 0 0'
-    },
-    infoIcon: {
-      paddingLeft: '3px',
-      paddingTop: '3px'
-    },
-    updated: {
-      marginTop: '10px'
     }
   })
 }
@@ -70,6 +61,7 @@ interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
   fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
+  resetDataset: typeof resetDataset
 }
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
@@ -82,20 +74,20 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, fetchDataset, resetDatasetVersions, versions, versionsLoading } = props
+  const { classes, fetchDatasetVersions, fetchDataset, resetDataset, resetDatasetVersions, versions, versionsLoading } = props
   const { root } = classes
   const history = useHistory()
   const i18next = require('i18next')
 
   useEffect(() => {
+    fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
   }, [props.lineageDataset.name])
 
   // unmounting
-  useEffect(() => {
-    return () => {
-      resetDatasetVersions()
-    }
+  useEffect(() => () => { 
+    resetDataset()
+    resetDatasetVersions()
   }, [])
 
   const [tab, setTab] = React.useState(0)
@@ -169,7 +161,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
-      {tab === 2 && (props.dataset.name !== undefined || fetchDataset(props.lineageDataset.namespace, props.lineageDataset.name)) && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
+      {tab === 2 && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
     </Box>
   )
 }
@@ -186,7 +178,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       fetchDatasetVersions: fetchDatasetVersions,
       fetchDataset: fetchDataset,
-      resetDatasetVersions: resetDatasetVersions
+      resetDatasetVersions: resetDatasetVersions,
+      resetDataset: resetDataset
     },
     dispatch
   )
