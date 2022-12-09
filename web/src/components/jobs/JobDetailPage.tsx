@@ -2,7 +2,6 @@
 
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
-import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
 import { IState } from '../../store/reducers'
@@ -53,7 +52,6 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
     setTab(newValue)
   }
-  const i18next = require('i18next')
 
   useEffect(() => {
     fetchRuns(job.name, job.namespace)
@@ -84,13 +82,13 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-          <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
-          <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
+          <Tab label='LATEST RUN' disableRipple={true} />
+          <Tab label='RUN HISTORY' disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
             <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
-              {i18next.t('jobs.location')}
+              Location
             </Button>
           </Box>
           <IconButton onClick={() => history.push('/')}>
@@ -117,7 +115,10 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <RunInfo run={job.latestRun} />
         ) : (
           !job.latestRun && (
-            <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
+            <MqEmpty
+              title={'No Run Information Available'}
+              body={'Try adding some runs for this job.'}
+            />
           )
         )
       ) : null}

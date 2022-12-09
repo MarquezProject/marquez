@@ -20,25 +20,24 @@ const styles = (theme: Theme) =>
   })
 
 const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {
-  const i18next = require('i18next')
   return (
     <Box className={classes.root}>
       <Box display={'inline'}>
         <MqText disabled inline>
           {' '}
-          {i18next.t('search.search')}
+          Search
         </MqText>{' '}
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
-          {i18next.t('search.jobs')}
+          Jobs
         </MqText>{' '}
         <MqText disabled inline>
           {' '}
-          {i18next.t('search.and')}
+          and
         </MqText>{' '}
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
-          {i18next.t('search.datasets')}
+          Datasets
         </MqText>
       </Box>
     </Box>
