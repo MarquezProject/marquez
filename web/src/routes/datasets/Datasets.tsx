@@ -34,6 +34,8 @@ interface DispatchProps {
 
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
+const DATASET_COLUMNS = ['NAME', 'NAMESPACE', 'SOURCE', 'UPDATED AT']
+
 class Datasets extends React.Component<DatasetsProps> {
   componentDidMount() {
     if (this.props.selectedNamespace) {
@@ -56,37 +58,33 @@ class Datasets extends React.Component<DatasetsProps> {
 
   render() {
     const { datasets, isDatasetsLoading, isDatasetsInit } = this.props
-    const i18next = require('i18next')
     return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isDatasetsLoading || !isDatasetsInit}>
           <>
             {datasets.length === 0 ? (
               <Box p={2}>
-                <MqEmpty title={i18next.t('datasets_route.empty_title')}>
-                  <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
+                <MqEmpty title={'No datasets found'}>
+                  <MqText subdued>
+                    Try changing namespaces or consulting our documentation to add datasets.
+                  </MqText>
                 </MqEmpty>
               </Box>
             ) : (
               <>
                 <Box p={2}>
-                  <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                  <MqText heading>DATASETS</MqText>
                 </Box>
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
-                      <TableCell key={i18next.t('datasets_route.name_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.name_col')}</MqText>
-                      </TableCell>
-                      <TableCell key={i18next.t('datasets_route.namespace_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.namespace_col')}</MqText>
-                      </TableCell>
-                      <TableCell key={i18next.t('datasets_route.source_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.source_col')}</MqText>
-                      </TableCell>
-                      <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
-                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
-                      </TableCell>
+                      {DATASET_COLUMNS.map(field => {
+                        return (
+                          <TableCell key={field} align='left'>
+                            <MqText subheading>{field}</MqText>
+                          </TableCell>
+                        )
+                      })}
                     </TableRow>
                   </TableHead>
                   <TableBody>

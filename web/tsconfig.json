@@ -11,8 +11,7 @@
     "lib": ["es2016", "es2017", "dom"],
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "downlevelIteration": true,
-    "resolveJsonModule": false
+    "downlevelIteration": true
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/__tests__/*"]

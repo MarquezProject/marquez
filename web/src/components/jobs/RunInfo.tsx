@@ -14,7 +14,6 @@ interface RunInfoProps {
 
 const RunInfo: FunctionComponent<RunInfoProps> = props => {
   const { run } = props
-  const i18next = require('i18next')
 
   return (
     <Box mt={2}>
@@ -27,7 +26,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
+            <MqText subheading>FACETS</MqText>
           </Box>
           <MqJson code={run.facets} />
         </Box>
