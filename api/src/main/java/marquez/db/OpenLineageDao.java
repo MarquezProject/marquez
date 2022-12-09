@@ -498,25 +498,40 @@ public interface OpenLineageDao extends BaseDao {
     RunArgsRow argsRow =
         createRunArgsDao()
             .upsertRunArgs(UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
+
+    Optional<RunState> runState = Optional.ofNullable(event.getEventType()).map(this::getRunState);
+    RunDao runDao = createRunDao();
     RunRow newRow =
-        createRunDao()
-            .upsert(
-                uuid,
-                null,
-                facet.getRun().getRunId(),
-                now,
-                newParentJobRow.getUuid(),
-                null,
-                argsRow.getUuid(),
-                nominalStartTime,
-                nominalEndTime,
-                Optional.ofNullable(event.getEventType()).map(this::getRunState).orElse(null),
-                now,
-                namespace.getName(),
-                newParentJobRow.getName(),
-                newParentJobRow.getLocation(),
-                newParentJobRow.getJobContextUuid().orElse(null));
+        runDao.upsert(
+            uuid,
+            null,
+            facet.getRun().getRunId(),
+            now,
+            newParentJobRow.getUuid(),
+            null,
+            argsRow.getUuid(),
+            nominalStartTime,
+            nominalEndTime,
+            runState.orElse(null),
+            now,
+            namespace.getName(),
+            newParentJobRow.getName(),
+            newParentJobRow.getLocation(),
+            newParentJobRow.getJobContextUuid().orElse(null));
     log.info("Created new parent run record {}", newRow);
+
+    runState
+        .map(rs -> createRunStateDao().upsert(UUID.randomUUID(), now, uuid, rs))
+        .ifPresent(
+            runStateRow -> {
+              UUID runStateUuid = runStateRow.getUuid();
+              if (RunState.valueOf(runStateRow.getState()).isDone()) {
+                runDao.updateEndState(uuid, now, runStateUuid);
+              } else {
+                runDao.updateStartState(uuid, now, runStateUuid);
+              }
+            });
+
     return newParentJobRow;
   }
 

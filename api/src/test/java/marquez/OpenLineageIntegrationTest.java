@@ -7,6 +7,7 @@ package marquez;
 
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.SCHEMA_URL;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -52,6 +53,7 @@ import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -170,7 +172,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetLineageForNonExistantDataset() {
+  public void testGetLineageForNonExistentDataset() {
     CompletableFuture<Integer> response =
         this.fetchLineage("dataset:Imadethisup:andthistoo")
             .thenApply(HttpResponse::statusCode)
@@ -419,7 +421,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
         .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
-    assertThat(runsList).isNotEmpty().hasSize(1);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .extracting("startedAt", as(InstanceOfAssertFactories.OPTIONAL))
+        .get()
+        .isNotNull();
   }
 
   @Test

@@ -27,7 +27,6 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
-const RUN_COLUMNS = ['ID', 'STATE', 'CREATED AT', 'STARTED AT', 'ENDED AT', 'DURATION']
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -54,8 +53,9 @@ interface RunsProps {
 
 const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => {
   const { runs, facets, classes } = props
+  const i18next = require('i18next')
   if (runs.length === 0) {
-    return <MqEmpty title={'No Runs Found'} body={'Try adding some runs for this job.'} />
+    return <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
   }
 
   const [infoView, setInfoView] = React.useState<Run | null>(null)
@@ -82,15 +82,36 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       <Table size='small'>
         <TableHead>
           <TableRow>
-            {RUN_COLUMNS.map(column => {
-              return (
-                <TableCell key={column} align='left'>
-                  <MqText subheading inline>
-                    {column}
-                  </MqText>
-                </TableCell>
-              )
-            })}
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.id')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.state')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.created_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.started_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.ended_at')}
+              </MqText>
+            </TableCell>
+            <TableCell align='left'>
+              <MqText subheading inline>
+                {i18next.t('runs_columns.duration')}
+              </MqText>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -116,7 +137,7 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>FACETS</MqText>
+            <MqText subheading>{i18next.t('jobs.runs_subhead')}</MqText>
           </Box>
           <MqCode code={JSON.stringify(facets, null, '\t')} />
         </Box>
