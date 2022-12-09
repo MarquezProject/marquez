@@ -1,0 +1,14 @@
+/* COLORS */
+@value neptune: #319795;
+@value telescopeBlack: #2B2B33;
+@value offWhite: #E5E5E5;
+@value deepRed: #CC0E1D;
+@value vibrantGreen: #71ddbf;
+@value jobNodeGrey: #7d7d7d;
+@value datasetNodeWhite: #fff;
+@value linkGrey: #f3f3f3;
+@value jobRunNew: #3199FF;
+@value jobRunFailed: #ee7b7b;
+@value jobRunCompleted: #71ddbf;
+@value jobRunAborted: #7D7D7D;
+@value jobRunRunning: #FECC00;

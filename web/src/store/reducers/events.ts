@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: Apache-2.0
+
+import { Event } from '../../types/api'
+import {
+  FETCH_EVENTS,
+  FETCH_EVENTS_SUCCESS,
+  RESET_EVENTS
+} from '../actionCreators/actionTypes'
+import { fetchEventsSuccess } from '../actionCreators'
+
+export type IEventsState = { isLoading: boolean; result: Event[]; init: boolean }
+
+export const initialState: IEventsState = { isLoading: false, init: false, result: [] }
+
+type IEventsAction = ReturnType<typeof fetchEventsSuccess>
+
+export default (state: IEventsState = initialState, action: IEventsAction): IEventsState => {
+  const { type, payload } = action
+
+  switch (type) {
+    case FETCH_EVENTS:
+      return { ...state, isLoading: true }
+    case FETCH_EVENTS_SUCCESS:
+      return { ...state, isLoading: false, init: true, result: payload.events }
+    case RESET_EVENTS:
+      return initialState
+    default:
+      return state
+  }
+}
