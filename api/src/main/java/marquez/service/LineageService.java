@@ -53,7 +53,10 @@ public class LineageService extends DelegatingLineageDao {
     log.debug("Attempting to get lineage for node '{}' with depth '{}'", nodeId.getValue(), depth);
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
-      throw new NodeIdNotFoundException(String.format("Node '%s' not found!", nodeId.getValue()));
+      log.warn(
+          "Failed to get job associated with node '{}', returning orphan graph...",
+          nodeId.getValue());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
     UUID job = optionalUUID.get();
     log.debug("Attempting to get lineage for job '{}'", job);
@@ -99,7 +102,7 @@ public class LineageService extends DelegatingLineageDao {
     if (nodeId.isDatasetType()
         && datasets.stream().noneMatch(n -> n.getId().equals(nodeId.asDatasetId()))) {
       log.warn(
-          "Found jobs '{}' which no longer share lineage with dataset '{}' - discarding",
+          "Found jobs {} which no longer share lineage with dataset '{}' - discarding",
           jobData.stream().map(JobData::getId).toList(),
           nodeId.getValue());
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
