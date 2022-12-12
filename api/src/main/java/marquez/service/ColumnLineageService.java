@@ -226,14 +226,16 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
                   .add(
                       ColumnLineage.builder()
                           .name(nodeData.getField())
-                          .transformationDescription(nodeData.getTransformationDescription())
-                          .transformationType(nodeData.getTransformationType())
                           .inputFields(
                               nodeData.getInputFields().stream()
                                   .map(
                                       f ->
                                           new ColumnLineageInputField(
-                                              f.getNamespace(), f.getDataset(), f.getField()))
+                                              f.getNamespace(),
+                                              f.getDataset(),
+                                              f.getField(),
+                                              f.getTransformationDescription(),
+                                              f.getTransformationType()))
                                   .collect(Collectors.toList()))
                           .build());
             });

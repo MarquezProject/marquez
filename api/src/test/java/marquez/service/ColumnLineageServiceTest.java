@@ -93,9 +93,8 @@ public class ColumnLineageServiceTest {
     Node col_c = getNode(lineage, "dataset_b", "col_c").get();
     List<InputFieldNodeData> inputFields =
         ((ColumnLineageNodeData) col_c.getData()).getInputFields();
-    assertEquals(
-        "description1", ((ColumnLineageNodeData) col_c.getData()).getTransformationDescription());
-    assertEquals("type1", ((ColumnLineageNodeData) col_c.getData()).getTransformationType());
+    assertEquals("description1", inputFields.get(0).getTransformationDescription());
+    assertEquals("type1", inputFields.get(0).getTransformationType());
     assertEquals("STRING", ((ColumnLineageNodeData) col_c.getData()).getFieldType());
     assertThat(inputFields).hasSize(2);
     assertEquals("dataset_a", inputFields.get(0).getDataset());
@@ -195,28 +194,27 @@ public class ColumnLineageServiceTest {
 
     assertThat(dataset_b.getColumnLineage()).hasSize(1);
     assertThat(dataset_b.getColumnLineage().get(0).getName()).isEqualTo("col_c");
-    assertThat(dataset_b.getColumnLineage().get(0).getTransformationType()).isEqualTo("type1");
-    assertThat(dataset_b.getColumnLineage().get(0).getTransformationDescription())
-        .isEqualTo("description1");
 
     List<ColumnLineageInputField> inputFields_b =
         dataset_b.getColumnLineage().get(0).getInputFields();
     assertThat(inputFields_b)
         .hasSize(2)
-        .contains(new ColumnLineageInputField("namespace", "dataset_a", "col_a"))
-        .contains(new ColumnLineageInputField("namespace", "dataset_a", "col_b"));
+        .contains(
+            new ColumnLineageInputField("namespace", "dataset_a", "col_a", "description1", "type1"))
+        .contains(
+            new ColumnLineageInputField(
+                "namespace", "dataset_a", "col_b", "description1", "type1"));
 
     assertThat(dataset_c.getColumnLineage()).hasSize(1);
     assertThat(dataset_c.getColumnLineage().get(0).getName()).isEqualTo("col_d");
-    assertThat(dataset_c.getColumnLineage().get(0).getTransformationType()).isEqualTo("type2");
-    assertThat(dataset_c.getColumnLineage().get(0).getTransformationDescription())
-        .isEqualTo("description2");
 
     List<ColumnLineageInputField> inputFields_c =
         dataset_c.getColumnLineage().get(0).getInputFields();
     assertThat(inputFields_c)
         .hasSize(1)
-        .contains(new ColumnLineageInputField("namespace", "dataset_b", "col_c"));
+        .contains(
+            new ColumnLineageInputField(
+                "namespace", "dataset_b", "col_c", "description2", "type2"));
   }
 
   @Test
