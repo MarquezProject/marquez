@@ -1,7 +1,9 @@
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
+// import i18next from 'i18next';
 
 const i18next = require('i18next')
+export const defaultNS = 'translation'
 
 const DETECTION_OPTIONS = {
   order: ['localStorage'],
@@ -425,5 +427,13 @@ i18next
         }
       }
     },
+    defaultNS,
     detection: DETECTION_OPTIONS
   })
+
+// export default i18n
+// export const resources = {
+//   en: {
+//     translation
+//   }
+// };
