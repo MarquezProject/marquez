@@ -62,7 +62,7 @@ public class LineageService extends DelegatingLineageDao {
     // Ensure job data is not empty, an empty set cannot be passed to LineageDao.getCurrentRuns() or
     // LineageDao.getCurrentRunsWithFacets().
     if (jobData.isEmpty()) {
-      // Log warning, then return an empty lineage graph; a graph must contain at most one
+      // Log warning, then return an orphan lineage graph; a graph should contain at most one
       // job->dataset relationship.
       log.warn(
           "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
