@@ -19,7 +19,6 @@ import MqIconButton from '../core/icon-button/MqIconButton'
 import '../../i18n/config'
 import { FormControl, MenuItem, Select } from '@material-ui/core'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
-import resources from '../../types/i18next'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -44,11 +43,7 @@ const styles = (theme: Theme) =>
     }
   })
 
-interface CustomTypeOptions {
-  languages: typeof resources
-}
-
-type SidenavProps = WithStyles<typeof styles> & RouteComponentProps & CustomTypeOptions
+type SidenavProps = WithStyles<typeof styles> & RouteComponentProps
 
 class Sidenav extends React.Component<SidenavProps> {
   render() {
