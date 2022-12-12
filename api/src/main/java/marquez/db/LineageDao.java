@@ -82,6 +82,14 @@ public interface LineageDao {
 
   @SqlQuery(
       """
+      SELECT ds.*, dv.fields, dv.lifecycle_state
+      FROM datasets_view ds
+      LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
+      WHERE ds.name = :datasetName AND ds.namespace_name = :namespaceName""")
+  DatasetData getDatasetData(String namespaceName, String datasetName);
+
+  @SqlQuery(
+      """
       SELECT j.uuid FROM jobs j
       INNER JOIN job_versions jv ON jv.job_uuid = j.uuid
       INNER JOIN job_versions_io_mapping io ON io.job_version_uuid = jv.uuid

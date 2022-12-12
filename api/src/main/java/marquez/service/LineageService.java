@@ -7,6 +7,7 @@ package marquez.service;
 
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,6 +81,18 @@ public class LineageService extends DelegatingLineageDao {
     Set<DatasetData> datasets = new HashSet<>();
     if (!datasetIds.isEmpty()) {
       datasets.addAll(this.getDatasetData(datasetIds));
+    }
+    if (nodeId.isDatasetType()
+        && datasets.stream().noneMatch(n -> n.getId().equals(nodeId.asDatasetId()))) {
+      log.warn(
+          "Found jobs {} which no longer share lineage with dataset {} - discarding",
+          jobData.stream().map(JobData::getId).toList());
+      DatasetId datasetId = nodeId.asDatasetId();
+      DatasetData datasetData =
+          getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+      return new Lineage(
+          ImmutableSortedSet.of(
+              Node.dataset().data(datasetData).id(NodeId.of(datasetData.getId())).build()));
     }
 
     return toLineage(jobData, datasets);
