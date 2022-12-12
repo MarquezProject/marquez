@@ -99,7 +99,7 @@ public class LineageService extends DelegatingLineageDao {
     if (nodeId.isDatasetType()
         && datasets.stream().noneMatch(n -> n.getId().equals(nodeId.asDatasetId()))) {
       log.warn(
-          "Found jobs '{}' which no longer share lineage with dataset {} - discarding",
+          "Found jobs '{}' which no longer share lineage with dataset '{}' - discarding",
           jobData.stream().map(JobData::getId).toList(),
           nodeId.getValue());
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
