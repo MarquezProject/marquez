@@ -9,7 +9,6 @@ import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
@@ -65,10 +65,10 @@ public class LineageService extends DelegatingLineageDao {
       // Log warning, then return an empty lineage graph; a graph must contain at most one
       // job->dataset relationship.
       log.warn(
-          "Failed to get lineage for job '{}' associated with node '{}', returning empty graph...",
+          "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
           job,
           nodeId.getValue());
-      return toLineage(Sets.newHashSet(), Sets.newHashSet());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 
     List<Run> runs =
@@ -99,17 +99,21 @@ public class LineageService extends DelegatingLineageDao {
     if (nodeId.isDatasetType()
         && datasets.stream().noneMatch(n -> n.getId().equals(nodeId.asDatasetId()))) {
       log.warn(
-          "Found jobs {} which no longer share lineage with dataset {} - discarding",
-          jobData.stream().map(JobData::getId).toList());
-      DatasetId datasetId = nodeId.asDatasetId();
-      DatasetData datasetData =
-          getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
-      return new Lineage(
-          ImmutableSortedSet.of(
-              Node.dataset().data(datasetData).id(NodeId.of(datasetData.getId())).build()));
+          "Found jobs '{}' which no longer share lineage with dataset {} - discarding",
+          jobData.stream().map(JobData::getId).toList(),
+          nodeId.getValue());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 
     return toLineage(jobData, datasets);
+  }
+
+  private Lineage toLineageWithOrphanDataset(@NonNull DatasetId datasetId) {
+    final DatasetData datasetData =
+        getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+    return new Lineage(
+        ImmutableSortedSet.of(
+            Node.dataset().data(datasetData).id(NodeId.of(datasetData.getId())).build()));
   }
 
   private Lineage toLineage(Set<JobData> jobData, Set<DatasetData> datasets) {
@@ -241,7 +245,8 @@ public class LineageService extends DelegatingLineageDao {
       return getJobFromInputOrOutput(
           datasetId.getName().getValue(), datasetId.getNamespace().getValue());
     } else {
-      throw new NodeIdNotFoundException("Node must be a dataset node or job node");
+      throw new NodeIdNotFoundException(
+          String.format("Node '%s' must be of type dataset or job!", nodeId.getValue()));
     }
   }
 }
