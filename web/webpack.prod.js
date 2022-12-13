@@ -13,7 +13,7 @@ const webpackProd = {
       title: 'Telescope Web',
       hash: true,
       minify: true,
-      inject: true,
+      inject: false,
       template: 'src/index.prod.html'
     }),
     new webpack.DefinePlugin({

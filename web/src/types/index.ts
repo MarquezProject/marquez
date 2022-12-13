@@ -11,4 +11,3 @@ export interface IJob extends Job {
 }
 
 export type IFilterByDisplay = 'namespace' | 'sourceName'
-

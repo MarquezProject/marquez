@@ -5,6 +5,6 @@ import App from './components/App'
 // fonts
 import './index.css'
 
-import 'i18next'
+import './i18n/config'
 
 ReactDOM.render(<App />, document.getElementById('root'))
