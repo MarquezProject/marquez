@@ -25,6 +25,7 @@ ext {
     prometheusVersion = '0.16.0'
     testcontainersVersion = '1.17.6'
     sentryVersion = '6.9.2'
+    debeziumVersion = '2.0.0.Final'
 }
 
 dependencies {
@@ -50,6 +51,9 @@ dependencies {
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation 'com.graphql-java:graphql-java:20.0'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
+    implementation "io.debezium:debezium-api:${debeziumVersion}"
+    implementation "io.debezium:debezium-embedded:${debeziumVersion}"
+    implementation "io.debezium:debezium-connector-postgres:${debeziumVersion}"
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"
