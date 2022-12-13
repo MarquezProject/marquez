@@ -62,7 +62,7 @@ public interface RunDao extends BaseDao {
           + "SET updated_at = :transitionedAt, "
           + "    start_run_state_uuid = :startRunStateUuid,"
           + "    started_at = :transitionedAt "
-          + "WHERE uuid = :rowUuid AND (updated_at < :transitionedAt or start_run_state_uuid is null)")
+          + "WHERE uuid = :rowUuid")
   void updateStartState(UUID rowUuid, Instant transitionedAt, UUID startRunStateUuid);
 
   @SqlUpdate(
