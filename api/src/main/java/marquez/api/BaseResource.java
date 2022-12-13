@@ -18,9 +18,11 @@ import marquez.api.exceptions.NamespaceNotFoundException;
 import marquez.api.exceptions.RunAlreadyExistsException;
 import marquez.api.exceptions.RunNotFoundException;
 import marquez.api.exceptions.SourceNotFoundException;
+import marquez.common.models.DatasetFieldId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
@@ -37,6 +39,7 @@ import marquez.service.RunService;
 import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
 import marquez.service.TagService;
+import marquez.service.models.NodeId;
 import marquez.service.models.Run;
 
 public class BaseResource {
@@ -74,6 +77,10 @@ public class BaseResource {
     }
   }
 
+  void throwIfNotExists(@NonNull DatasetId datasetId) {
+    throwIfNotExists(datasetId.getNamespace(), datasetId.getName());
+  }
+
   void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull DatasetName datasetName) {
     if (!datasetService.exists(namespaceName.getValue(), datasetName.getValue())) {
       throw new DatasetNotFoundException(datasetName);
@@ -86,6 +93,13 @@ public class BaseResource {
     }
   }
 
+  void throwIfNotExists(@NonNull DatasetFieldId datasetFieldId) {
+    throwIfNotExists(
+        datasetFieldId.getDatasetId().getNamespace(),
+        datasetFieldId.getDatasetId().getName(),
+        datasetFieldId.getFieldName());
+  }
+
   void throwIfNotExists(
       @NonNull NamespaceName namespaceName,
       @NonNull DatasetName datasetName,
@@ -94,6 +108,10 @@ public class BaseResource {
         namespaceName.getValue(), datasetName.getValue(), fieldName.getValue())) {
       throw new FieldNotFoundException(datasetName, fieldName);
     }
+  }
+
+  void throwIfNotExists(@NonNull JobId jobId) {
+    throwIfNotExists(jobId.getNamespace(), jobId.getName());
   }
 
   void throwIfNotExists(@NonNull NamespaceName namespaceName, @NonNull JobName jobName) {
@@ -133,6 +151,20 @@ public class BaseResource {
       if (!datasetService.exists(
           datasetId.getNamespace().getValue(), datasetId.getName().getValue())) {
         throw new DatasetNotFoundException(datasetId.getName());
+      }
+    }
+  }
+
+  void throwIfNotExists(@NonNull NodeId nodeId) {
+    if (!nodeId.hasVersion()) {
+      if (nodeId.isDatasetType()) {
+        throwIfNotExists(nodeId.asDatasetId());
+      } else if (nodeId.isDatasetFieldType()) {
+        throwIfNotExists(nodeId.asDatasetFieldId());
+      } else if (nodeId.isJobType()) {
+        throwIfNotExists(nodeId.asJobId());
+      } else if (nodeId.isRunType()) {
+        throwIfNotExists(nodeId.asRunId());
       }
     }
   }
