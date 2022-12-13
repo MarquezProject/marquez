@@ -21,9 +21,7 @@ const styles = (theme: Theme) =>
 
 const importI18next = () => {
   const i18next = require('i18next')
-  return (
-    i18next
-  )
+  return i18next
 }
 
 const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {

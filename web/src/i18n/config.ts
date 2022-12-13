@@ -8,7 +8,7 @@ const DETECTION_OPTIONS = {
   order: ['localStorage'],
   lookupLocalStorage: 'lng',
   caches: ['localStorage']
-};
+}
 
 i18next
   .use(LanguageDetector)
