@@ -13,6 +13,7 @@ import java.util.Arrays;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -36,10 +37,14 @@ class OpenLineageDaoTest {
   private final DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
           new SchemaField("name", "STRING", "my name"), new SchemaField("age", "INT", "my age"));
+  private static LifecycleService lifecycleService;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     dao = jdbi.onDemand(OpenLineageDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   /** When reading a dataset, the version is assumed to be the version last written */
@@ -48,6 +53,7 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "COMPLETE",
@@ -57,6 +63,7 @@ class OpenLineageDaoTest {
 
     UpdateLineageRow readJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             READ_JOB_NAME,
             "COMPLETE",
@@ -86,7 +93,13 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            lifecycleService,
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
 
     assertThat(writeJob.getOutputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(writeJob.getOutputs().get().get(0).getDatasetVersionRow().getLifecycleState())
@@ -102,6 +115,7 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "RUNNING",
@@ -126,6 +140,7 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "COMPLETE",
@@ -149,6 +164,7 @@ class OpenLineageDaoTest {
             this.datasetFacets.getAdditionalFacets());
     UpdateLineageRow readJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             READ_JOB_NAME,
             "COMPLETE",
@@ -171,6 +187,7 @@ class OpenLineageDaoTest {
     JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
     UpdateLineageRow writeJob1 =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "COMPLETE",
@@ -179,6 +196,7 @@ class OpenLineageDaoTest {
             Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)));
     UpdateLineageRow readJob1 =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             READ_JOB_NAME,
             "COMPLETE",
@@ -188,6 +206,7 @@ class OpenLineageDaoTest {
 
     UpdateLineageRow writeJob2 =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "COMPLETE",
@@ -196,6 +215,7 @@ class OpenLineageDaoTest {
             Arrays.asList(new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets)));
     UpdateLineageRow writeJob3 =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             WRITE_JOB_NAME,
             "COMPLETE",
@@ -205,6 +225,7 @@ class OpenLineageDaoTest {
 
     UpdateLineageRow readJob2 =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             dao,
             READ_JOB_NAME,
             "COMPLETE",

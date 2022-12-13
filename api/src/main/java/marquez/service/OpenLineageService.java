@@ -49,24 +49,32 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   private final RunService runService;
   private final DatasetVersionDao datasetVersionDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
+  private final LifecycleService lifecycleService;
 
   private final Executor executor;
 
-  public OpenLineageService(BaseDao baseDao, RunService runService) {
-    this(baseDao, runService, ForkJoinPool.commonPool());
+  public OpenLineageService(
+      BaseDao baseDao, RunService runService, LifecycleService lifecycleService) {
+    this(baseDao, runService, lifecycleService, ForkJoinPool.commonPool());
   }
 
-  public OpenLineageService(BaseDao baseDao, RunService runService, Executor executor) {
+  public OpenLineageService(
+      BaseDao baseDao,
+      RunService runService,
+      LifecycleService lifecycleService,
+      Executor executor) {
     super(baseDao.createOpenLineageDao());
     this.runService = runService;
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
     this.executor = executor;
+    this.lifecycleService = lifecycleService;
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
-                withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
+                withSentry(withMdc(() -> updateMarquezModel(event, mapper, lifecycleService))),
+                executor)
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {

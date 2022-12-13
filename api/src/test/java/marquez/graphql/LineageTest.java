@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutionException;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.models.LineageEvent;
@@ -53,7 +54,9 @@ public class LineageTest {
               .readValue(
                   Resources.getResource(String.format("apples/%s", event)), LineageEvent.class);
 
-      OpenLineageService service = new OpenLineageService(openLineageDao, mock(RunService.class));
+      OpenLineageService service =
+          new OpenLineageService(
+              openLineageDao, mock(RunService.class), mock(LifecycleService.class));
       service.createAsync(lineageEvent).get();
     }
   }

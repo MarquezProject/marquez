@@ -139,7 +139,8 @@ public class OpenLineageServiceIntegrationTest {
     doNothing().when(runService).notify(runInputListener.capture());
     runOutputListener = ArgumentCaptor.forClass(JobOutputUpdate.class);
     doNothing().when(runService).notify(runOutputListener.capture());
-    lineageService = new OpenLineageService(openLineageDao, runService);
+    lineageService =
+        new OpenLineageService(openLineageDao, runService, mock(LifecycleService.class));
     datasetDao = jdbi.onDemand(DatasetDao.class);
 
     NamespaceRow namespace =

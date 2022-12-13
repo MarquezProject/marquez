@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
@@ -39,6 +40,7 @@ class DatasetDaoTest {
   public static final String DATASET = "commonDataset";
   private static DatasetDao datasetDao;
   private static OpenLineageDao openLineageDao;
+  private static LifecycleService lifecycleService;
 
   private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
 
@@ -49,6 +51,9 @@ class DatasetDaoTest {
     DatasetDaoTest.jdbi = jdbi;
     datasetDao = jdbi.onDemand(DatasetDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   private Dataset newCommonDataset(Map<String, Object> facets) {
@@ -88,6 +93,7 @@ class DatasetDaoTest {
   @Test
   public void testGetDataset() {
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -98,6 +104,7 @@ class DatasetDaoTest {
                 ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -106,6 +113,7 @@ class DatasetDaoTest {
             newCommonDataset(ImmutableMap.of("inputFacet", new CustomValueFacet("aFacetValue")))),
         Collections.emptyList());
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aSecondReadJob",
         "COMPLETE",
@@ -147,6 +155,7 @@ class DatasetDaoTest {
                 .build());
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -163,6 +172,7 @@ class DatasetDaoTest {
   public void testGetDatasetWithDatasetMarkedDeleted() {
     // create dataset
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -173,6 +183,7 @@ class DatasetDaoTest {
 
     // mark it deleted
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -196,6 +207,7 @@ class DatasetDaoTest {
   @Test
   public void testGetDatasetWithMultipleVersions() {
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -205,6 +217,7 @@ class DatasetDaoTest {
             newCommonDataset(
                 ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -215,6 +228,7 @@ class DatasetDaoTest {
         Collections.emptyList());
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -224,6 +238,7 @@ class DatasetDaoTest {
             newCommonDataset(
                 ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")))));
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -233,6 +248,7 @@ class DatasetDaoTest {
                 ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")))),
         Collections.emptyList());
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aSecondReadJob",
         "COMPLETE",
@@ -277,6 +293,7 @@ class DatasetDaoTest {
   @Test
   public void testGetDatasets() {
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -288,6 +305,7 @@ class DatasetDaoTest {
 
     String secondDatasetName = "secondDataset";
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "secondWriteJob",
         "COMPLETE",
@@ -303,6 +321,7 @@ class DatasetDaoTest {
                     new SchemaField("address", "string", "the address")))));
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -383,6 +402,7 @@ class DatasetDaoTest {
   public void testGetDatasetsWithMultipleVersions() {
     String secondDatasetName = "secondDataset";
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -392,6 +412,7 @@ class DatasetDaoTest {
             newCommonDataset(
                 ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -409,6 +430,7 @@ class DatasetDaoTest {
                     new SchemaField("address", "string", "the address")))));
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",
@@ -419,6 +441,7 @@ class DatasetDaoTest {
                 ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")))));
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aReadJob",
         "COMPLETE",
@@ -488,6 +511,7 @@ class DatasetDaoTest {
     // write a third version of the writeJob
     // since there is no read of this version, all input facets will be missing from the response
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "aWriteJob",
         "COMPLETE",

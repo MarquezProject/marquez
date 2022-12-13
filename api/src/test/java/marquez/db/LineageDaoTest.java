@@ -31,6 +31,7 @@ import marquez.db.models.DatasetData;
 import marquez.db.models.JobData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
@@ -59,6 +60,7 @@ public class LineageDaoTest {
               new SchemaField("lastname", "string", "the last name"),
               new SchemaField("birthdate", "date", "the date of birth")));
   private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+  private static LifecycleService lifecycleService;
 
   static Jdbi jdbi;
 
@@ -67,6 +69,9 @@ public class LineageDaoTest {
     LineageDaoTest.jdbi = jdbi;
     lineageDao = jdbi.onDemand(LineageDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   @AfterEach
@@ -98,6 +103,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -106,6 +112,7 @@ public class LineageDaoTest {
             Arrays.asList(dataset));
     List<JobLineage> jobRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -117,6 +124,7 @@ public class LineageDaoTest {
     // don't expect a failed job in the returned lineage
     UpdateLineageRow failedJobRow =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "readJobFailed",
             "FAILED",
@@ -127,6 +135,7 @@ public class LineageDaoTest {
     // don't expect a disjoint job in the returned lineage
     UpdateLineageRow disjointJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeRandomDataset",
             "COMPLETE",
@@ -182,6 +191,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -200,7 +210,13 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
+            lifecycleService,
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList());
     Set<UUID> lineage =
         lineageDao.getLineage(Collections.singleton(writeJob.getJob().getUuid()), 2).stream()
             .map(JobData::getUuid)
@@ -214,6 +230,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "RUNNING",
@@ -244,6 +261,7 @@ public class LineageDaoTest {
   public void testGetLineageWithJobThatSharesNoDatasets() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -262,6 +280,7 @@ public class LineageDaoTest {
                 new SchemaField("birthdate", "date", "the date of birth")));
     // write a bunch of jobs that share nothing with the writeJob
     writeDownstreamLineage(
+        lifecycleService,
         openLineageDao,
         Arrays.asList(new DatasetConsumerJob("consumer", 5, Optional.empty())),
         jobFacet,
@@ -280,6 +299,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -287,6 +307,7 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "failedConsumer",
         "FAILED",
@@ -311,6 +332,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -319,6 +341,7 @@ public class LineageDaoTest {
             Arrays.asList(dataset));
 
     writeDownstreamLineage(
+        lifecycleService,
         openLineageDao,
         new LinkedList<>(
             Arrays.asList(
@@ -337,6 +360,7 @@ public class LineageDaoTest {
     // readJobV2 produces outputData2 and not outputData
     List<JobLineage> newRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -400,6 +424,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -407,6 +432,7 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "failedProducer",
         "FAILED",
@@ -429,6 +455,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -436,7 +463,13 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     LineageTestUtils.createLineageRow(
-        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
+        lifecycleService,
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(),
+        Arrays.asList());
 
     // the new job is still returned, even though it isn't connected
     Set<JobData> jobData =
@@ -455,6 +488,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -462,6 +496,7 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "consumerJob",
         "COMPLETE",
@@ -481,6 +516,7 @@ public class LineageDaoTest {
     // the first job created
     for (int i = 0; i < 5; i++) {
       LineageTestUtils.createLineageRow(
+          lifecycleService,
           openLineageDao,
           "consumerJob" + i,
           "COMPLETE",
@@ -490,6 +526,7 @@ public class LineageDaoTest {
     }
     // older write job- should be ignored.
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "olderWriteJob",
         "COMPLETE",
@@ -499,6 +536,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -506,6 +544,7 @@ public class LineageDaoTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "consumerJob",
         "COMPLETE",
@@ -520,9 +559,16 @@ public class LineageDaoTest {
   @Test
   public void testGetDatasetData() {
     LineageTestUtils.createLineageRow(
-        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+        lifecycleService,
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(),
+        Arrays.asList(dataset));
     List<JobLineage> newRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -554,6 +600,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow row =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -575,6 +622,7 @@ public class LineageDaoTest {
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -583,6 +631,7 @@ public class LineageDaoTest {
             Arrays.asList(dataset));
     List<JobLineage> newRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -613,7 +662,13 @@ public class LineageDaoTest {
   public void testGetCurrentRunsWithFailedJob() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            lifecycleService,
+            openLineageDao,
+            "writeJob",
+            "FAIL",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
 
     Set<UUID> jobids = Collections.singleton(writeJob.getJob().getUuid());
 
@@ -630,6 +685,7 @@ public class LineageDaoTest {
   public void testGetCurrentRunsGetsLatestRun() {
     for (int i = 0; i < 5; i++) {
       LineageTestUtils.createLineageRow(
+          lifecycleService,
           openLineageDao,
           "writeJob",
           "COMPLETE",
@@ -640,6 +696,7 @@ public class LineageDaoTest {
 
     List<JobLineage> newRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -649,7 +706,13 @@ public class LineageDaoTest {
             dataset);
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "FAIL", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+            lifecycleService,
+            openLineageDao,
+            "writeJob",
+            "FAIL",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
 
     Set<UUID> expectedRunIds =
         Stream.concat(

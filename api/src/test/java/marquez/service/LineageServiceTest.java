@@ -19,6 +19,7 @@ import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.JobDao;
+import marquez.db.LifecycleDao;
 import marquez.db.LineageDao;
 import marquez.db.LineageTestUtils;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
@@ -51,6 +52,7 @@ public class LineageServiceTest {
 
   private static LineageDao lineageDao;
   private static LineageService lineageService;
+  private static LifecycleService lifecycleService;
   private static OpenLineageDao openLineageDao;
   private final Dataset dataset =
       new Dataset(
@@ -70,6 +72,9 @@ public class LineageServiceTest {
     lineageDao = jdbi.onDemand(LineageDao.class);
     lineageService = new LineageService(lineageDao, jdbi.onDemand(JobDao.class));
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   @AfterEach
@@ -101,6 +106,7 @@ public class LineageServiceTest {
   public void testLineage() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -109,6 +115,7 @@ public class LineageServiceTest {
             Arrays.asList(dataset));
     List<JobLineage> jobRows =
         writeDownstreamLineage(
+            lifecycleService,
             openLineageDao,
             new LinkedList<>(
                 Arrays.asList(
@@ -120,6 +127,7 @@ public class LineageServiceTest {
 
     UpdateLineageRow secondRun =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "writeJob",
             "COMPLETE",
@@ -127,6 +135,7 @@ public class LineageServiceTest {
             Arrays.asList(),
             Arrays.asList(dataset));
     writeDownstreamLineage(
+        lifecycleService,
         openLineageDao,
         new LinkedList<>(
             Arrays.asList(
@@ -207,7 +216,13 @@ public class LineageServiceTest {
   public void testLineageWithNoDatasets() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
-            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
+            lifecycleService,
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList());
     Lineage lineage =
         lineageService.lineage(
             NodeId.of(new NamespaceName(NAMESPACE), new JobName(writeJob.getJob().getName())), 5);
@@ -227,6 +242,7 @@ public class LineageServiceTest {
                 new SchemaField("firstname", "string", "the first name"),
                 new SchemaField("birthdate", "date", "the date of birth")));
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "writeJob",
         "COMPLETE",
@@ -243,6 +259,7 @@ public class LineageServiceTest {
                 new SchemaField("lastname", "string", "the last name")));
     UpdateLineageRow intermediateJob =
         LineageTestUtils.createLineageRow(
+            lifecycleService,
             openLineageDao,
             "intermediateJob",
             "COMPLETE",
@@ -251,6 +268,7 @@ public class LineageServiceTest {
             Arrays.asList(finalDataset));
 
     LineageTestUtils.createLineageRow(
+        lifecycleService,
         openLineageDao,
         "cycleJob",
         "COMPLETE",

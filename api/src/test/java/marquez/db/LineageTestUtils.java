@@ -24,6 +24,7 @@ import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
+import marquez.service.LifecycleService;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -59,13 +60,15 @@ public class LineageTestUtils {
    * @return
    */
   public static UpdateLineageRow createLineageRow(
+      LifecycleService lifecycleService,
       OpenLineageDao dao,
       String jobName,
       String status,
       JobFacet jobFacet,
       List<Dataset> inputs,
       List<Dataset> outputs) {
-    return createLineageRow(dao, jobName, status, jobFacet, inputs, outputs, null);
+    return createLineageRow(
+        lifecycleService, dao, jobName, status, jobFacet, inputs, outputs, null);
   }
 
   /**
@@ -81,6 +84,7 @@ public class LineageTestUtils {
    * @return
    */
   public static UpdateLineageRow createLineageRow(
+      LifecycleService lifecycleService,
       OpenLineageDao dao,
       String jobName,
       String status,
@@ -89,7 +93,15 @@ public class LineageTestUtils {
       List<Dataset> outputs,
       @Valid LineageEvent.ParentRunFacet parentRunFacet) {
     return createLineageRow(
-        dao, jobName, status, jobFacet, inputs, outputs, parentRunFacet, ImmutableMap.of());
+        lifecycleService,
+        dao,
+        jobName,
+        status,
+        jobFacet,
+        inputs,
+        outputs,
+        parentRunFacet,
+        ImmutableMap.of());
   }
 
   /**
@@ -106,6 +118,7 @@ public class LineageTestUtils {
    * @return
    */
   public static UpdateLineageRow createLineageRow(
+      LifecycleService lifecycleService,
       OpenLineageDao dao,
       String jobName,
       String status,
@@ -136,7 +149,8 @@ public class LineageTestUtils {
         .put(
             "_schemaURL",
             "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent");
-    UpdateLineageRow updateLineageRow = dao.updateMarquezModel(event, Utils.getMapper());
+    UpdateLineageRow updateLineageRow =
+        dao.updateMarquezModel(event, Utils.getMapper(), lifecycleService);
     PGobject jsonObject = new PGobject();
     jsonObject.setType("json");
     try {
@@ -200,6 +214,7 @@ public class LineageTestUtils {
    * @return
    */
   public static List<JobLineage> writeDownstreamLineage(
+      LifecycleService lifecycleService,
       OpenLineageDao openLineageDao,
       List<DatasetConsumerJob> downstream,
       JobFacet jobFacet,
@@ -223,6 +238,7 @@ public class LineageTestUtils {
                                       new SchemaField("anInteger", "int", "an integer field"))));
               UpdateLineageRow row =
                   createLineageRow(
+                      lifecycleService,
                       openLineageDao,
                       jobName,
                       "COMPLETE",
@@ -235,6 +251,7 @@ public class LineageTestUtils {
                           out -> {
                             if (consumer.numConsumers > 0) {
                               return writeDownstreamLineage(
+                                  lifecycleService,
                                   openLineageDao,
                                   downstream.subList(1, downstream.size()),
                                   jobFacet,

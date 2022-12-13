@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.db.BackfillTestUtils;
 import marquez.db.JobDao;
+import marquez.db.LifecycleDao;
 import marquez.db.LineageTestUtils;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
@@ -25,6 +26,7 @@ import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
 import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent.JobFacet;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -42,6 +44,7 @@ class V44_2__BackfillAirflowParentRunsTest {
   private static JobDao jobDao;
   private static RunArgsDao runArgsDao;
   private static RunDao runDao;
+  private static LifecycleService lifecycleService;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
@@ -50,6 +53,9 @@ class V44_2__BackfillAirflowParentRunsTest {
     jobDao = jdbi.onDemand(JobDao.class);
     runArgsDao = jdbi.onDemand(RunArgsDao.class);
     runDao = jdbi.onDemand(RunDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   @Test
@@ -67,6 +73,7 @@ class V44_2__BackfillAirflowParentRunsTest {
         jdbi, "airflowDag.task2", now, namespace, "schedule:00:00:00", task1Name);
 
     createLineageRow(
+        lifecycleService,
         openLineageDao,
         "a_non_airflow_task",
         BackfillTestUtils.COMPLETE,

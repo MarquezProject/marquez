@@ -19,12 +19,14 @@ import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.JobName;
 import marquez.db.JobDao;
+import marquez.db.LifecycleDao;
 import marquez.db.LineageTestUtils;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LifecycleService;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent.JobFacet;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -39,11 +41,15 @@ class V44_3_BackfillJobsWithParentsTest {
 
   static Jdbi jdbi;
   private static OpenLineageDao openLineageDao;
+  private static LifecycleService lifecycleService;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
     V44_3_BackfillJobsWithParentsTest.jdbi = jdbi;
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+
+    final LifecycleDao lifecycleDao = jdbi.onDemand(LifecycleDao.class);
+    lifecycleService = new LifecycleService(lifecycleDao);
   }
 
   @Test
@@ -51,6 +57,7 @@ class V44_3_BackfillJobsWithParentsTest {
     String parentName = "parentJob";
     UpdateLineageRow parentJob =
         createLineageRow(
+            lifecycleService,
             openLineageDao,
             parentName,
             "COMPLETE",

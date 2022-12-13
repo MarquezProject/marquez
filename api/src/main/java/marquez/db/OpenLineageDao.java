@@ -42,6 +42,8 @@ import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
+import marquez.service.LifecycleService;
+import marquez.service.LifecycleService.Lifecycle;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -84,11 +86,12 @@ public interface OpenLineageDao extends BaseDao {
       String producer);
 
   @Transaction
-  default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
+  default UpdateLineageRow updateMarquezModel(
+      LineageEvent event, ObjectMapper mapper, LifecycleService lifecycleService) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
     RunState runState = getRunState(event.getEventType());
     if (event.getEventType() != null && runState.isDone()) {
-      updateMarquezOnComplete(event, updateLineageRow, runState);
+      updateMarquezOnComplete(event, updateLineageRow, runState, lifecycleService);
     }
     return updateLineageRow;
   }
@@ -388,7 +391,10 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default void updateMarquezOnComplete(
-      LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
+      LineageEvent event,
+      UpdateLineageRow updateLineageRow,
+      RunState runState,
+      LifecycleService lifecycleService) {
     BagOfJobVersionInfo bagOfJobVersionInfo =
         createJobVersionDao()
             .upsertJobVersionOnRunTransition(
@@ -397,6 +403,15 @@ public interface OpenLineageDao extends BaseDao {
                 updateLineageRow.getRun().getUuid(),
                 runState,
                 event.getEventTime().toInstant());
+    lifecycleService.handleLifecycleEvent(
+        new Lifecycle.Event(
+            Lifecycle.State.NEW_VERSION,
+            bagOfJobVersionInfo.getJobVersionRow().getNamespaceName(),
+            Instant.now(),
+            String.format(
+                "Version '%s' created for job '%s'.",
+                bagOfJobVersionInfo.getJobVersionRow().getVersion(),
+                bagOfJobVersionInfo.getJobVersionRow().getJobName())));
     updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
   }
 
