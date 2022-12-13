@@ -774,8 +774,8 @@ components:
       schema:
         type: string
         example: dataset:food_delivery:public.delivery_7_days
-      description: The ID of the node. A node can either be a dataset node, a dataset field node or a job node. 
-        The format of nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>`, for dataset field 
+      description: The ID of the node. A node can either be a dataset node, a dataset field node or a job node.
+        The format of nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>`, for dataset field
         is `datasetField:<namespace_of_dataset>:<name_of_the_dataset>:<name_of_field>`, and for job is
         `job:<namespace_of_the_job>:<name_of_the_job>`.
       required: true
@@ -1165,6 +1165,9 @@ components:
               description:
                 description: The description of the field.
                 type: string
+            required:
+              - name
+              - type
         tags:
           description: List of tags.
           type: array
