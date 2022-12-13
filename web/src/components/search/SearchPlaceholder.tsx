@@ -19,8 +19,15 @@ const styles = (theme: Theme) =>
     }
   })
 
-const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {
+const importI18next = () => {
   const i18next = require('i18next')
+  return (
+    i18next
+  )
+}
+
+const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {
+  const i18next = importI18next()
   return (
     <Box className={classes.root}>
       <Box display={'inline'}>

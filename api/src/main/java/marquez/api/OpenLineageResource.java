@@ -96,6 +96,7 @@ public class OpenLineageResource extends BaseResource {
   public Response getLineage(
       @QueryParam("nodeId") @NotNull NodeId nodeId,
       @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth) {
+    throwIfNotExists(nodeId);
     return Response.ok(lineageService.lineage(nodeId, depth, true)).build();
   }
 
