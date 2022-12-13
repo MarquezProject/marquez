@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
+import marquez.cdc.CaptureChangeEvents;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
@@ -127,6 +128,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     registerResources(config, env, marquezContext);
     registerServlets(env);
     registerFilters(env, marquezContext);
+    CaptureChangeEvents.startCDC();
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
