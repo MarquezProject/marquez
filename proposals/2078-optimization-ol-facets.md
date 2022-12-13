@@ -1,6 +1,6 @@
 # Proposal: Optimize query performance for OpenLineage facets
 
-Author: Willy Lulciuc ([@wslulciuc](https://github.com/wslulciuc))
+Author: Willy Lulciuc ([@wslulciuc](https://github.com/wslulciuc)), Paweł Leszczyński ([@pawel-big-lebowski](https://github.com/pawel-big-lebowski))
 
 Created: 2022-08-18
 
@@ -115,3 +115,89 @@ The implementation requires:
 1. Schema changes to create the facet tables outlined above.
 2. Using the facet tables instead the `lineage_events` table to query for facets.
 3. Lazy migration, the facet tables will be queried, and if no facets are returned, then the `lineage_events` table; this approach avoids a backfill, but one will still be needed.
+
+## Migration procedure
+
+Following challenges need to be addressed to provide a successful migration procedure:
+* Rewriting existing `lineage_events` row to lineage datasets can be expensive DB operation for large Marquez instances.
+* Migration procedure should minimize downtime for processing new OL events.
+* Users need to be able to revert in case of migration failure.
+
+Based on that, a migration procedure will be split into two jumps. The first revertible step will:
+* create new tables: `dataset_facets`, `job_facets` and `run_facets`,
+* introduce code change that writes into two new tables,
+* provide procedure to migrate facets from `lineage_events` table into `dataset_facets`, `job_facets` and `run_facets`.
+
+The second irreversible step will perform the cleanup of `lineage_events` table.
+The second migration step will be published in a future release.
+
+We distinguish two migration modes:
+* `BASIC` when there is up to 100K rows in `lineage_events`.
+* `PRO` for Marquez instances with more than 100K records.
+
+Migration script will run `BASIC` version automatically if the condition is met.
+`PRO` mode will require extra manual steps.
+
+### BASIC MODE < 100K records
+
+A flyaway DB script to create tables and migrate data will be created. This will be recommended for users who
+have up to 100K records in `lineage_events` table assuming each event is ~20KB size.
+Performance test for such scenario should be run during implementation phase.
+Such users may experience a few minute long downtime and should be OK with that while being
+clearly informed on that in `CHANGELOG`.
+
+### PRO MODE > 100K records
+
+Flyway migration engine runs the migration in transactions.
+Updating whole `lineage_events` table in a single transaction could be dangerous.
+The upgrade procedure will look the same as `BASIC` mode except for data migration from `lineage_events` table to
+`dataset_facets`, `job_facets` and `run_facets` tables which will not be triggered automatically nor done
+in a single run. Migration procedure command will be introduced and require manual trigger.
+Migrating facets from `lineage_events` will be done in chunks and the chunk size will be configurable.
+API will be able to receive incoming OpenLineage events while the data migration script will be running.
+
+An extra `v55_migration_lock` table will be introduced:
+
+| **COLUMN** | **TYPE**      |
+|------------|---------------|
+| run_uuid   | `UUID`        |
+| created_at | `TIMESTAMPTZ` |
+
+Data migration will be run in chunks each chunk will 
+contain events older than rows in `v55_migration_lock` table.
+
+```
+WITH events_chunk AS (
+	SELECT * FROM lineage_events
+	JOIN migration_lock m
+	WHERE lineage_events.created_at < migration_lock.created_at 
+	OR (lineage_events.created_at = migration_lock.created_at AND lineage_events.run_uuid < migration_lock.run_uuid) 
+	ORDER BY created_at DESC, run_uuid DESC -- start with latest and move to older events
+	LIMIT :chunk_size
+),
+insert_datasets AS ( 
+	INSERT INTO dataset_facets 
+	SELECT ... FROM events_chunk
+),
+insert_runs AS (
+	INSERT INTO run_facets 
+	SELECT ... FROM events_chunk
+),
+insert_jobs AS (
+	INSERT INTO job_facets 
+	SELECT ... FROM events_chunk
+),
+INSERT INTO v55_migration_lock  -- insert lock for the oldest event migrated
+SELECT events_chunk.created_at, event_chunk_run_uuid
+FROM events_chunk
+ORDER BY created_at ASC , run_uuid ASC
+LIMIT 1
+``` 
+Such a query will be run until `created_at` and `run_uuid` in `v55_migration_lock` will equal:
+```
+SELECT run_uuid, created_at FROM lineage_events ORDER BY created_at ASC, run_uuid ASC LIMIT 1;
+```
+The second migration step will not start unless the condition is met.
+For users, who attempt to run two migration steps in a single run,
+the second step will fail and ask to manually run data migration command and retry migration after
+the command runs successfully. Table `migration_lock` will be dropped at the end of second migration step.
