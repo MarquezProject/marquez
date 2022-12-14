@@ -52,7 +52,7 @@ const styles = (theme: Theme) => {
       borderRadius: '50%'
     },
     table: {
-      marginBottom: '100px'
+      marginBottom: theme.spacing(2)
     },
     row: {
       cursor: 'pointer',
@@ -337,6 +337,27 @@ class Events extends React.Component<EventsProps, EventsState> {
                 </Table>
               </>
             )}
+            <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+              <Tooltip title={i18next.t('events_route.previous_page')}>
+                <IconButton
+                  className={classes.ml2}
+                  color='primary'
+                  disabled={page === 1}
+                  onClick={() => this.handleClickPage('prev')}
+                >
+                  <ChevronLeftRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={i18next.t('events_route.next_page')}>
+                <IconButton
+                  color='primary'
+                  disabled={pageIsLast}
+                  onClick={() => this.handleClickPage('next')}
+                >
+                  <ChevronRightRounded />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </>
         </MqScreenLoad>
       </Container>
