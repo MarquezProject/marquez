@@ -42,7 +42,7 @@ import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.LineageEvent.SourceCodeLocationJobFacet;
-import marquez.service.models.RunData;
+import marquez.service.models.Run;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.ObjectAssert;
 import org.jdbi.v3.core.Jdbi;
@@ -772,7 +772,7 @@ public class LineageDaoTest {
                 Stream.of(writeJob.getJob().getUuid()), newRows.stream().map(JobLineage::getId))
             .collect(Collectors.toSet());
 
-    List<RunData> currentRuns = lineageDao.getCurrentRuns(jobids);
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
 
     // assert the job does exist
     assertThat(currentRuns)
@@ -789,7 +789,7 @@ public class LineageDaoTest {
 
     Set<UUID> jobids = Collections.singleton(writeJob.getJob().getUuid());
 
-    List<RunData> currentRuns = lineageDao.getCurrentRuns(jobids);
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
 
     // assert the job does exist
     assertThat(currentRuns)
@@ -832,7 +832,7 @@ public class LineageDaoTest {
                 Stream.of(writeJob.getJob().getUuid()), newRows.stream().map(JobLineage::getId))
             .collect(Collectors.toSet());
 
-    List<RunData> currentRuns = lineageDao.getCurrentRunsWithFacets(jobids);
+    List<Run> currentRuns = lineageDao.getCurrentRunsWithFacets(jobids);
 
     // assert the job does exist
     assertThat(currentRuns)
@@ -841,10 +841,10 @@ public class LineageDaoTest {
         .containsAll(expectedRunIds);
 
     // assert that run_args, input/output versions, and run facets are fetched from the dao.
-    for (RunData run : currentRuns) {
+    for (Run run : currentRuns) {
       assertThat(run.getArgs()).hasSize(2);
       assertThat(run.getOutputVersions()).hasSize(1);
-      //      assertThat(run .getFacets()).hasSize(1); TODO: this call should not return facet
+      assertThat(run.getFacets()).hasSize(1);
     }
   }
 
@@ -882,7 +882,7 @@ public class LineageDaoTest {
                 Stream.of(writeJob.getJob().getUuid()), newRows.stream().map(JobLineage::getId))
             .collect(Collectors.toSet());
 
-    List<RunData> currentRuns = lineageDao.getCurrentRuns(jobids);
+    List<Run> currentRuns = lineageDao.getCurrentRuns(jobids);
 
     // assert the job does exist
     assertThat(currentRuns)

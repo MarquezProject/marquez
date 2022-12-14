@@ -2,6 +2,13 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.29.0...HEAD)
 
+### Added
+
+* Split `lineage_events` table to `dataset_facets`, `run_facets`, and `job_facets` tables. [`2152`](https://github.com/MarquezProject/marquez/pull/2152) 
+[@wslulciuc](https://github.com/wslulciuc,), [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+  * Performance improvement with migration procedure that requires manual steps if database has more than 100K lineage events.
+  * Please read [here](https://github.com/MarquezProject/marquez/blob/main/api/src/main/resources/marquez/db/migration/V55__readme.md) to get more database migration details.
+
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
 ### Added

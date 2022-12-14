@@ -36,6 +36,10 @@ public class JdbiUtils {
           handle.execute("DELETE FROM sources");
           handle.execute("DELETE FROM namespace_ownerships");
           handle.execute("DELETE FROM namespaces");
+          handle.execute("DELETE FROM dataset_facets");
+          handle.execute("DELETE FROM run_facets");
+          handle.execute("DELETE FROM job_facets");
+          handle.execute("DELETE FROM v55_facet_migration_lock");
           return null;
         });
   }

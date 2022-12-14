@@ -45,7 +45,7 @@ public class JobData implements NodeData {
   @Nullable URL location;
   @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
-  @Nullable @Setter RunData latestRun;
+  @Nullable @Setter Run latestRun;
 
   public Optional<URL> getLocation() {
     return Optional.ofNullable(location);
@@ -55,7 +55,7 @@ public class JobData implements NodeData {
     return Optional.ofNullable(description);
   }
 
-  public Optional<RunData> getLatestRun() {
+  public Optional<Run> getLatestRun() {
     return Optional.ofNullable(latestRun);
   }
 

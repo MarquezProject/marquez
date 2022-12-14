@@ -116,8 +116,8 @@ public interface RunFacetsDao {
       String name,
       PGobject facet);
 
-  @SqlQuery("SELECT EXISTS (SELECT 1 FROM run_facets WHERE name = :name)")
-  boolean runFacetExists(String name);
+  @SqlQuery("SELECT EXISTS (SELECT 1 FROM run_facets WHERE name = :name AND run_uuid = :runUuid)")
+  boolean runFacetExists(String name, UUID runUuid);
 
   /**
    * @param runUuid
@@ -173,7 +173,7 @@ public interface RunFacetsDao {
                                   return;
                                 }
                                 if (x.isSparkLogicalPlan()) {
-                                  if (runFacetExists(x.getName())) {
+                                  if (runFacetExists(x.getName(), runUuid)) {
                                     log.info(
                                         "Facet '{}' has already been linked to run '{}', skipping...",
                                         x.getName(),
@@ -203,4 +203,13 @@ public interface RunFacetsDao {
                               });
                     }));
   }
+
+  record RunFacetRow(
+      UUID uuid,
+      Instant createdAt,
+      UUID runUuid,
+      Instant lineageEventTime,
+      String lineageEventType,
+      String name,
+      PGobject facet) {}
 }

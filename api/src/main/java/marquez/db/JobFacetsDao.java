@@ -176,4 +176,14 @@ public interface JobFacetsDao {
                               });
                     }));
   }
+
+  record JobFacetRow(
+      UUID uuid,
+      Instant createdAt,
+      UUID jobUuid,
+      UUID runUuid,
+      Instant lineageEventTime,
+      String lineageEventType,
+      String name,
+      PGobject facet) {}
 }

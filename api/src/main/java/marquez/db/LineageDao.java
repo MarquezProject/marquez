@@ -13,18 +13,18 @@ import java.util.UUID;
 import marquez.db.mappers.DatasetDataMapper;
 import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobRowMapper;
-import marquez.db.mappers.RunDataMapper;
+import marquez.db.mappers.RunMapper;
 import marquez.service.models.DatasetData;
 import marquez.service.models.JobData;
-import marquez.service.models.RunData;
+import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(DatasetDataMapper.class)
 @RegisterRowMapper(JobDataMapper.class)
-@RegisterRowMapper(RunDataMapper.class)
 @RegisterRowMapper(JobRowMapper.class)
+@RegisterRowMapper(RunMapper.class)
 public interface LineageDao {
 
   /**
@@ -108,7 +108,7 @@ public interface LineageDao {
           + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
           + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"
           + ")\n"
-          + "SELECT r.*, ra.args, ctx.context,\n"
+          + "SELECT r.*, ra.args, ctx.context, f.facets,\n"
           + "  r.version AS job_version, ri.input_versions, ro.output_versions\n"
           + "  from latest_runs AS r\n"
           + "LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
@@ -124,6 +124,12 @@ public interface LineageDao {
           + "    GROUP BY im.run_uuid\n"
           + ") ri ON ri.run_uuid=r.uuid\n"
           + "LEFT JOIN LATERAL (\n"
+          + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
+          + "    FROM run_facets_view AS rf\n"
+          + "    WHERE rf.run_uuid=r.uuid\n"
+          + "    GROUP BY rf.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT JOIN LATERAL (\n"
           + "    SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
           + "                                                'name', dataset_name,\n"
           + "                                                'version', version)) AS output_versions\n"
@@ -131,7 +137,7 @@ public interface LineageDao {
           + "    WHERE run_uuid=r.uuid\n"
           + "    GROUP BY run_uuid\n"
           + ") ro ON ro.run_uuid=r.uuid")
-  List<RunData> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
+  List<Run> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
 
   @SqlQuery(
       """
@@ -141,5 +147,5 @@ public interface LineageDao {
       INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
       WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)
       ORDER BY r.job_name, r.namespace_name, created_at DESC""")
-  List<RunData> getCurrentRuns(@BindList Collection<UUID> jobUuid);
+  List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 }

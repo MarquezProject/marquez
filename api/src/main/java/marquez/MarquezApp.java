@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
+import marquez.cli.V55MigrationCommand;
 import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.logging.LoggingMdcFilter;
@@ -147,6 +148,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     for (final Object resource : context.getResources()) {
       env.jersey().register(resource);
     }
+  }
+
+  @Override
+  protected void addDefaultCommands(Bootstrap<MarquezConfig> bootstrap) {
+    bootstrap.addCommand(new V55MigrationCommand(this));
+    super.addDefaultCommands(bootstrap);
   }
 
   private MarquezContext buildMarquezContext(

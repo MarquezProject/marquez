@@ -66,7 +66,7 @@ public interface JobDao extends BaseDao {
       SELECT run_uuid, JSON_AGG(e.facet) AS facets
       FROM (
         SELECT jf.run_uuid, jf.facet
-        FROM job_facets AS jf
+        FROM job_facets_view AS jf
         INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=jf.run_uuid
         INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
         WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName
@@ -76,7 +76,7 @@ public interface JobDao extends BaseDao {
     ) f ON f.run_uuid=jv.latest_run_uuid
     WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
     AND j.symlink_target_uuid IS NULL
-  """)
+  """) // TODO: THIS SHOULD NOT MAKE USE OF lineage_event table
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
   @SqlUpdate(
@@ -138,7 +138,7 @@ public interface JobDao extends BaseDao {
       SELECT run_uuid, JSON_AGG(e.facet) AS facets
       FROM (
         SELECT jf.run_uuid, jf.facet
-        FROM job_facets AS jf
+        FROM job_facets_view AS jf
         INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=jf.run_uuid
         INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
         WHERE j2.namespace_name=:namespaceName

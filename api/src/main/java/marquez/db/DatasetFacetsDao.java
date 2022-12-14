@@ -42,6 +42,9 @@ public interface DatasetFacetsDao {
     DATA_QUALITY_ASSERTIONS(Type.INPUT, "dataQualityAssertions"),
     OUTPUT_STATISTICS(Type.OUTPUT, "outputStatistics");
 
+    // whenever adding new types, please mind migration script in
+    // marquez.db.migrations.V55_5__BackfillFacets
+
     final Type type;
     final String name;
 
@@ -61,7 +64,7 @@ public interface DatasetFacetsDao {
     /** ... */
     public static Facet fromName(@NonNull final String name) {
       for (final Facet facet : Facet.values()) {
-        if (facet.name().equalsIgnoreCase(name)) {
+        if (facet.getName().equalsIgnoreCase(name)) {
           return facet;
         }
       }
@@ -218,6 +221,21 @@ public interface DatasetFacetsDao {
                     Facet.LIFECYCLE_STATE_CHANGE.getName(),
                     toPgObject(Facet.LIFECYCLE_STATE_CHANGE.asJson(lifecycleStateChange))));
 
+    // Add ...
+    Optional.ofNullable(datasetFacets.getColumnLineage())
+        .ifPresent(
+            lifecycleStateChange ->
+                insertDatasetFacet(
+                    UUID.randomUUID(),
+                    now,
+                    datasetUuid,
+                    runUuid,
+                    lineageEventTime,
+                    lineageEventType,
+                    Facet.COLUMN_LINEAGE.getType(),
+                    Facet.COLUMN_LINEAGE.getName(),
+                    toPgObject(Facet.COLUMN_LINEAGE.asJson(lifecycleStateChange))));
+
     // Add ..
     Optional.ofNullable(datasetFacets.getAdditionalFacets())
         .ifPresent(
@@ -252,4 +270,15 @@ public interface DatasetFacetsDao {
                               });
                     }));
   }
+
+  record DatasetFacetRow(
+      UUID uuid,
+      Instant createdAt,
+      UUID datasetUuid,
+      UUID runUuid,
+      Instant lineageEventTime,
+      String lineageEventType,
+      DatasetFacetsDao.Type type,
+      String name,
+      PGobject facet) {}
 }

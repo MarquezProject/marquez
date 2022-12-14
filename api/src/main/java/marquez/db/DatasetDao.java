@@ -80,7 +80,7 @@ public interface DatasetDao extends BaseDao {
           FROM selected_datasets d
           INNER JOIN dataset_versions AS dv ON dv.uuid = d.current_version_uuid
           LEFT JOIN LATERAL (
-              SELECT run_uuid, lineage_event_time, facet FROM dataset_facets
+              SELECT run_uuid, lineage_event_time, facet FROM dataset_facets_view
               WHERE dataset_uuid = dv.dataset_uuid
           ) df ON df.run_uuid = dv.run_uuid
           UNION
@@ -89,7 +89,7 @@ public interface DatasetDao extends BaseDao {
           INNER JOIN dataset_versions dv ON dv.uuid = d.current_version_uuid
           LEFT JOIN runs_input_mapping rim ON dv.uuid = rim.dataset_version_uuid
           LEFT JOIN LATERAL (
-              SELECT dataset_uuid, run_uuid, lineage_event_time, facet FROM dataset_facets
+              SELECT dataset_uuid, run_uuid, lineage_event_time, facet FROM dataset_facets_view
               WHERE dataset_uuid = dv.dataset_uuid AND run_uuid = rim.run_uuid
           ) df ON df.run_uuid = rim.run_uuid
       )

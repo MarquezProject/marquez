@@ -37,7 +37,7 @@ import marquez.service.models.Lineage;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import marquez.service.models.NodeType;
-import marquez.service.models.RunData;
+import marquez.service.models.Run;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
@@ -74,7 +74,7 @@ public class LineageService extends DelegatingLineageDao {
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 
-    List<RunData> runs =
+    List<Run> runs =
         withRunFacets
             ? getCurrentRunsWithFacets(
                 jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()))
@@ -82,7 +82,7 @@ public class LineageService extends DelegatingLineageDao {
 
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
-        for (RunData run : runs) {
+        for (Run run : runs) {
           if (j.getName().getValue().equalsIgnoreCase(run.getJobName())
               && j.getNamespace().getValue().equalsIgnoreCase(run.getNamespaceName())) {
             j.setLatestRun(run);

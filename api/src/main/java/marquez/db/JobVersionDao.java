@@ -103,7 +103,7 @@ public interface JobVersionDao extends BaseDao {
       LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid
       LEFT JOIN LATERAL (
           SELECT jf.run_uuid, JSON_AGG(jf.facet ORDER BY jf.lineage_event_time ASC) AS facets
-          FROM job_facets AS jf
+          FROM job_facets_view AS jf
           WHERE jf.run_uuid=jv.latest_run_uuid AND jf.job_uuid = jv.job_uuid
           GROUP BY jf.run_uuid
       ) AS f ON r.uuid = f.run_uuid

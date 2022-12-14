@@ -81,7 +81,7 @@ public interface RunDao extends BaseDao {
           + "LEFT OUTER JOIN\n"
           + "(\n"
           + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
-          + "    FROM run_facets rf\n"
+          + "    FROM run_facets_view rf\n"
           + "    GROUP BY rf.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
@@ -130,7 +130,7 @@ public interface RunDao extends BaseDao {
           LEFT JOIN LATERAL
           (
             SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
-            FROM run_facets rf
+            FROM run_facets_view rf
             WHERE rf.run_uuid=r.uuid
             GROUP BY rf.run_uuid
           ) AS f ON r.uuid=f.run_uuid
