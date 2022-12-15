@@ -13,7 +13,7 @@ title() {
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--detach]"
+  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--args ARGS] [--build] [--seed] [--detach]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -36,7 +36,8 @@ usage() {
   echo "  -a, --api-port int          api port (default: 5000)"
   echo "  -m, --api-admin-port int    api admin port (default: 5001)"
   echo "  -w, --web-port int          web port (default: 3000)"
-  echo "  -t, --tag string            image tag (default: ${VERSION})"
+  echo "  -t, --tag string            docker image tag (default: ${VERSION})"
+  echo "  --args string               docker arguments"
   echo
   title "FLAGS:"
   echo "  -b, --build           build images from source"
@@ -51,12 +52,13 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
 compose_files="-f docker-compose.yml"
-args="-V --force-recreate --remove-orphans"
+
 
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
 TAG=${VERSION}
+ARGS="-V --force-recreate --remove-orphans"
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -74,6 +76,10 @@ while [ $# -gt 0 ]; do
     -t|'--tag')
        shift
        TAG="${1}"
+       ;;
+    --args)
+       shift
+       ARGS="${1}"
        ;;
     -b|'--build')
        BUILD='true'
@@ -96,12 +102,12 @@ while [ $# -gt 0 ]; do
 done
 
 if [[ "${DETACH}" = "true" ]]; then
-  args+=" -d"
+  ARGS+=" -d"
 fi
 
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
-  args+=" --build"
+  ARGS+=" --build"
 fi
 
 if [[ "${SEED}" = "true" ]]; then
@@ -110,4 +116,4 @@ fi
 
 ${DOCKER_DIR}/volumes.sh marquez
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $args
+API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $ARGS
