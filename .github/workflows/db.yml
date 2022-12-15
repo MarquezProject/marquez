@@ -21,7 +21,5 @@ jobs:
       uses: actions/checkout@v2
     - name: Run db.sh --backup on latest db schema
       run: ./.github/workflows/db.sh --backup
-    - name: Run db.sh --restore on latest db schema
-      run: ./.github/workflows/db.sh --restore
     - name: Run db.sh --migrate on latest db schema with latest migrations
       run: ./.github/workflows/db.sh --migrate
