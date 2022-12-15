@@ -61,7 +61,7 @@ fi
 if [[ "${MIGRATE}" = "true" ]]; then
   ./docker/up.sh \
     --args "--abort-on-container-exit --exit-code-from seed_marquez" \
-  --build
+    --build
 fi
 
 echo "DONE!"
