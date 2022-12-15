@@ -19,7 +19,5 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Run db.sh --backup on latest db schema
-      run: ./.github/workflows/db.sh --backup
-    - name: Run db.sh --migrate on latest db schema with latest migrations
-      run: ./.github/workflows/db.sh --migrate
+    - name: Run db-migration.sh on latest db schema with latest migrations
+      run: ./.github/workflows/db-migration.sh
