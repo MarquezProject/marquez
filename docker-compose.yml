@@ -44,6 +44,7 @@ services:
     volumes:
       - ./docker/postgresql.conf:/etc/postgresql/postgresql.conf
       - db-init:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/postgresql/data
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
@@ -51,3 +52,4 @@ services:
 volumes:
   utils:
   db-init:
+  db-data:
