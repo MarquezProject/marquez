@@ -4,6 +4,10 @@ services:
     image: "marquezproject/marquez:${TAG}"
     build: .
 
+  seed_api:
+    image: "marquezproject/marquez:${TAG}"
+    build: .
+
   web:
     build:
       context: ./web
