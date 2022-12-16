@@ -2,18 +2,20 @@
 #
 # Copyright 2018-2022 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
+#
+# Usage: $ ./build-and-push.sh [FLAGS] [ARG...]
 
 set -e
 
+# Version of Marquez
 VERSION=0.28.0
-DOCKER_DIR=$(dirname $0)
 
 title() {
   echo -e "\033[1m${1}\033[0m"
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--args ARGS] [--build] [--seed] [--detach]"
+  echo "usage: ./$(basename -- ${0}) [FLAGS] [ARG...]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -53,7 +55,6 @@ cd "${project_root}/"
 
 compose_files="-f docker-compose.yml"
 
-
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
@@ -83,6 +84,7 @@ while [ $# -gt 0 ]; do
        ;;
     -b|'--build')
        BUILD='true'
+       TAG="$(git log --pretty=format:'%h' -n 1)" # SHA1
        ;;
     -s|'--seed')
        SEED='true'
@@ -102,7 +104,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [[ "${DETACH}" = "true" ]]; then
-  ARGS+=" -d"
+  ARGS+=" --detach"
 fi
 
 if [[ "${BUILD}" = "true" ]]; then
@@ -114,6 +116,7 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-${DOCKER_DIR}/volumes.sh marquez
+# Create docker volumes for Marquez
+./docker/volumes.sh marquez
 
 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $ARGS
