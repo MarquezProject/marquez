@@ -10,6 +10,7 @@ import MqText from '../core/text/MqText'
 import NamespaceSelect from '../namespace-select/NamespaceSelect'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
+import marquez_logo from './marquez_logo.svg'
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -47,13 +48,7 @@ const Header = (props: HeaderProps): ReactElement => {
       <Toolbar>
         <Box className={classes.innerToolbar}>
           <Link to='/'>
-            <img
-              src={
-                'https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/marquez_logo.svg'
-              }
-              height={48}
-              alt='Marquez Logo'
-            />
+            <img src={marquez_logo} height={48} alt='Marquez Logo' />
           </Link>
           <Box display={'flex'} alignItems={'center'}>
             <Search />
