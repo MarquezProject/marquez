@@ -6,15 +6,15 @@
 
 ### Added
 
-* Add point-in-time requests support to column-lineage endpoints [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+* Add point-in-time requests support to column-lineage endpoints [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Enables requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
-* Add column lineage point-in-time Java client methods [`#2269`](https://github.com/MarquezProject/marquez/pull/2269) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+* Add column lineage point-in-time Java client methods [`#2269`](https://github.com/MarquezProject/marquez/pull/2269) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Java client methods to retrieve point-in-time `column-lineage`. Please note that the existing methods `getColumnLineageByDataset`, `getColumnLineageByDataset` and `getColumnLineageByDatasetField` are replaced by a single `getColumnLineage` method taking `NodeId` as a parameter.*
 * Add raw event viewer to UI [`#2249`](https://github.com/MarquezProject/marquez/pull/2249) [@tito12](https://github.com/tito12)  
     *A new events page enables filtering events by date and expanding the payload by clicking on each event.*
 * Update events page with styling synchronization [`#2324`](https://github.com/MarquezProject/marquez/pull/2324) [@phixMe](https://github.com/phixMe)  
     *Makes some updates to the new page to make it conform better to the overall design system.*
-* Update helm Ingress template to be cross-compatible with recent k8s versions [`#2275`](https://github.com/MarquezProject/marquez/pull/2275) [@jlukenoff](https://github.com/jlukenoff)
+* Update helm Ingress template to be cross-compatible with recent k8s versions [`#2275`](https://github.com/MarquezProject/marquez/pull/2275) [@jlukenoff](https://github.com/jlukenoff)  
     *Certain components of the Ingress schema have changed in recent versions of Kubernetes. This change updates the Ingress helm template to render based on the semantic Kubernetes version.*
 * Add delete namespace endpoint doc to OpenAPI docs [`#2295`](https://github.com/MarquezProject/marquez/pull/2295) [@mobuchowski](https://github.com/mobuchowski)  
     *Adds a doc about the delete namespace endpoint.*
@@ -29,7 +29,7 @@
     *The column-lineage endpoint was throwing an exception when no data type of the field was provided. Includes a test.*
 * Include error message for JSON processing exception [`#2271`](https://github.com/MarquezProject/marquez/pull/2271) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *In case of JSON processing exceptions, the Marquez API now returns an exception message to a client.*
-* Fix column lineage when multiple jobs write to same dataset [`#2289`](https://github.com/MarquezProject/marquez/pull/2289) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+* Fix column lineage when multiple jobs write to same dataset [`#2289`](https://github.com/MarquezProject/marquez/pull/2289) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *The fix deprecates the way the fields `transformationDescription` and `transformationType` are returned. The deprecated way of returning those fields will be removed in 0.30.0.*
 * Use raw link for `iconSearchArrow.svg` [`#2280`](https://github.com/MarquezProject/marquez/pull/2280) [@wslulciuc](https://github.com/wslulciuc)  
     *Using a direct link to the events viewer icon fixes a loading issue.*
