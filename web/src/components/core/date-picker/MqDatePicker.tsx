@@ -14,8 +14,9 @@ const styles = (theme: Theme) =>
       cursor: 'pointer',
       backgroundColor: 'transparent',
       border: `2px solid ${theme.palette.common.white}`,
-      padding: `${theme.spacing(1)}px ${theme.spacing(1)}px`,
+      padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       transition: theme.transitions.create(['border-color', 'box-shadow']),
+      borderRadius: theme.spacing(4),
       '& *': {
         cursor: 'pointer'
       },
