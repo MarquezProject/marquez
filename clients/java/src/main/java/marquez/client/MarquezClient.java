@@ -44,6 +44,7 @@ import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Node;
+import marquez.client.models.NodeId;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -115,50 +116,12 @@ public class MarquezClient {
     @Getter public final String value;
   }
 
-  public Lineage getColumnLineageByDataset(
-      @NonNull String namespaceName, @NonNull String datasetName) {
-    return getColumnLineageByDataset(
-        namespaceName, datasetName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  public Lineage getColumnLineage(NodeId nodeId) {
+    return getColumnLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
   }
 
-  public Lineage getColumnLineageByDataset(
-      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String field) {
-    return getColumnLineageByDatasetField(
-        namespaceName, datasetName, field, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
-  }
-
-  public Lineage getColumnLineageByDataset(
-      @NonNull String namespaceName,
-      @NonNull String datasetName,
-      int depth,
-      boolean withDownstream) {
-    final String bodyAsJson =
-        http.get(
-            url.toColumnLineageUrlByDataset(namespaceName, datasetName, depth, withDownstream));
-    return Lineage.fromJson(bodyAsJson);
-  }
-
-  public Lineage getColumnLineageByDatasetField(
-      @NonNull String namespaceName,
-      @NonNull String datasetName,
-      @NonNull String field,
-      int depth,
-      boolean withDownstream) {
-    final String bodyAsJson =
-        http.get(
-            url.toColumnLineageUrlByDatasetField(
-                namespaceName, datasetName, field, depth, withDownstream));
-    return Lineage.fromJson(bodyAsJson);
-  }
-
-  public Lineage getColumnLineageByJob(@NonNull String namespaceName, @NonNull String jobName) {
-    return getColumnLineageByJob(namespaceName, jobName, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
-  }
-
-  public Lineage getColumnLineageByJob(
-      @NonNull String namespaceName, @NonNull String jobName, int depth, boolean withDownstream) {
-    final String bodyAsJson =
-        http.get(url.toColumnLineageUrlByJob(namespaceName, jobName, depth, withDownstream));
+  public Lineage getColumnLineage(NodeId nodeId, int depth, boolean withDownstream) {
+    final String bodyAsJson = http.get(url.toColumnLineageUrl(nodeId, depth, withDownstream));
     return Lineage.fromJson(bodyAsJson);
   }
 

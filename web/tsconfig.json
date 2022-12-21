@@ -14,6 +14,9 @@
     "downlevelIteration": true,
     "resolveJsonModule": false
   },
-  "include": ["./src/**/*"],
+  "include": [
+    "./src/**/*",
+    "styles.d.ts"
+  ],
   "exclude": ["./src/__tests__/*"]
 }

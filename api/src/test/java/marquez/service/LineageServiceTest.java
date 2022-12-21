@@ -17,6 +17,7 @@ import java.util.Optional;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.db.DatasetDao;
@@ -391,6 +392,38 @@ public class LineageServiceTest {
         .first()
         .extracting(Edge::getDestination)
         .matches(n -> n.isJobType() && n.asJobId().getName().getValue().equals("writeJob"));
+  }
+
+  @Test
+  public void testLineageForOrphanedDataset() {
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+
+    NodeId datasetNodeId =
+        NodeId.of(new NamespaceName(dataset.getNamespace()), new DatasetName(dataset.getName()));
+    Lineage lineage = lineageService.lineage(datasetNodeId, 2, false);
+    assertThat(lineage.getGraph())
+        .hasSize(2)
+        .extracting(Node::getId)
+        .containsExactlyInAnyOrder(
+            NodeId.of(new JobId(new NamespaceName(NAMESPACE), new JobName("writeJob"))),
+            datasetNodeId);
+
+    UpdateLineageRow updatedWriteJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
+
+    lineage = lineageService.lineage(datasetNodeId, 2, false);
+    assertThat(lineage.getGraph())
+        .hasSize(1)
+        .extracting(Node::getId)
+        .containsExactlyInAnyOrder(datasetNodeId);
   }
 
   private boolean jobNameEquals(Node node, String writeJob) {

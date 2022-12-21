@@ -2,12 +2,13 @@ import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 
 const i18next = require('i18next')
+export const defaultNS = 'translation'
 
 const DETECTION_OPTIONS = {
   order: ['localStorage'],
   lookupLocalStorage: 'lng',
   caches: ['localStorage']
-};
+}
 
 i18next
   .use(LanguageDetector)
@@ -123,16 +124,16 @@ i18next
           },
           jobs: {
             latest_tab: 'DERNIÈRE COURSE',
-            history_tab: 'HISTORIQUE D\'EXECUTION',
+            history_tab: "HISTORIQUE D'EXECUTION",
             location: 'EMPLACEMENT',
             empty_title: 'Pas de Course les Informations Disponibles',
-            empty_body: 'Essayez d\'ajouter quelques exécutions pour ce travail.',
+            empty_body: "Essayez d'ajouter quelques exécutions pour ce travail.",
             runinfo_subhead: 'FACETTES',
             runs_subhead: 'FACETTES'
           },
           search: {
             search: 'Recherche',
-            jobs: 'd\'Emplois',
+            jobs: "d'Emplois",
             and: 'et',
             datasets: 'Jeux de Données'
           },
@@ -151,7 +152,7 @@ i18next
           },
           dataset_info: {
             empty_title: 'Aucun jeu de données trouvé',
-            empty_body: 'Essayez d\'ajouter des champs de jeu de données.',
+            empty_body: "Essayez d'ajouter des champs de jeu de données.",
             facets_subhead: 'FACETTES',
             run_subhead: 'Créé par Run',
             duration: 'Durée'
@@ -178,7 +179,7 @@ i18next
             name_col: 'NOM',
             namespace_col: 'ESPACE DE NOMS',
             updated_col: 'MISE À JOUR À',
-            latest_run_col: 'DERNIÈRE DURÉE D\'EXÉCUTION'
+            latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION"
           },
           runs_columns: {
             id: 'ID',
@@ -426,5 +427,6 @@ i18next
         }
       }
     },
+    defaultNS,
     detection: DETECTION_OPTIONS
   })

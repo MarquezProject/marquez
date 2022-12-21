@@ -4,11 +4,12 @@ import * as Effects from 'redux-saga/effects'
 import {
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
+  FETCH_EVENTS,
   FETCH_JOBS,
   FETCH_LINEAGE,
   FETCH_RUNS,
   FETCH_SEARCH,
-  FETCH_EVENTS, FETCH_DATASET
+  FETCH_DATASET
 } from "../actionCreators/actionTypes";
 import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'

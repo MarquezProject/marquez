@@ -19,7 +19,6 @@ import MqIconButton from '../core/icon-button/MqIconButton'
 import '../../i18n/config'
 import { FormControl, MenuItem, Select } from '@material-ui/core'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
-import resources from '../../types/i18next'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -44,11 +43,7 @@ const styles = (theme: Theme) =>
     }
   })
 
-interface CustomTypeOptions {
-  languages: typeof resources
-}
-
-type SidenavProps = WithStyles<typeof styles> & RouteComponentProps & CustomTypeOptions
+type SidenavProps = WithStyles<typeof styles> & RouteComponentProps
 
 class Sidenav extends React.Component<SidenavProps> {
   render() {
@@ -95,7 +90,10 @@ class Sidenav extends React.Component<SidenavProps> {
                 title={i18next.t('sidenav.events')}
                 active={this.props.location.pathname === '/events'}
               >
-                <SVG src='../../img/iconSearchArrow.svg' width={'30px'} />
+                <SVG 
+                  src="https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg" 
+                  width={'30px'} 
+                />
               </MqIconButton>
             </RouterLink>
 
