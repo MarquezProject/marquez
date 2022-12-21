@@ -83,6 +83,7 @@ jobs:
             - v1-web-{{ .Branch }}
       - run: npm install
       - run: npm run test
+      - run: npm run eslint-fix
       - run: npm run build
       - save_cache:
           paths:

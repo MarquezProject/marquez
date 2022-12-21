@@ -78,6 +78,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
   const { root } = classes
   const history = useHistory()
+  const i18next = require('i18next')
 
   useEffect(() => {
     fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
@@ -125,8 +126,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-              <Tab label='LATEST SCHEMA' {...a11yProps(0)} disableRipple={true} />
-              <Tab label='VERSION HISTORY' {...a11yProps(1)} disableRipple={true} />
+              <Tab
+                label={i18next.t('datasets.latest_tab')}
+                {...a11yProps(0)}
+                disableRipple={true}
+              />
+              <Tab
+                label={i18next.t('datasets.history_tab')}
+                {...a11yProps(1)}
+                disableRipple={true}
+              />
             </Tabs>
           </Box>
           <IconButton onClick={() => history.push('/datasets')}>

@@ -1,25 +1,37 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
 import * as Redux from 'redux'
-import moment from 'moment'
-import { Theme, Container, Table, TableBody, TableCell, TableHead, TableRow, Button } from '@material-ui/core'
+import {
+  Button,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Theme,
+  Tooltip
+} from '@material-ui/core'
+import { ChevronLeftRounded, ChevronRightRounded } from '@material-ui/icons'
 import { Event } from '../../types/api'
-import { formatDatePicker, formatDateAPIQuery } from '../../helpers/time'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { theme } from '../../helpers/theme'
 import { fetchEvents, resetEvents } from '../../store/actionCreators'
-import { formatUpdatedAt, fileSize } from '../../helpers'
+import { fileSize, formatUpdatedAt } from '../../helpers'
+import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
+import { theme } from '../../helpers/theme'
 import Box from '@material-ui/core/Box'
+import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
-import MqText from '../../components/core/text/MqText'
 import MqJson from '../../components/core/code/MqJson'
+import MqText from '../../components/core/text/MqText'
+import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
+import moment from 'moment'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
 const styles = (theme: Theme) => {
@@ -40,13 +52,16 @@ const styles = (theme: Theme) => {
       borderRadius: '50%'
     },
     table: {
-      marginBottom: '100px',
+      marginBottom: theme.spacing(2)
     },
     row: {
       cursor: 'pointer',
       '&:hover': {
-        backgroundColor: theme.palette.action.hover,
+        backgroundColor: theme.palette.action.hover
       }
+    },
+    ml2: {
+      marginLeft: theme.spacing(2)
     }
   })
 }
@@ -94,8 +109,16 @@ class Events extends React.Component<EventsProps, EventsState> {
       events: [],
       rowExpanded: null,
       pageIsLast: false,
-      dateFrom: formatDateAPIQuery(moment().startOf('day').toString()),
-      dateTo: formatDateAPIQuery(moment().endOf('day').toString())
+      dateFrom: formatDateAPIQuery(
+        moment()
+          .startOf('day')
+          .toString()
+      ),
+      dateTo: formatDateAPIQuery(
+        moment()
+          .endOf('day')
+          .toString()
+      )
     }
     this.pageSize = 20
   }
@@ -112,7 +135,7 @@ class Events extends React.Component<EventsProps, EventsState> {
     if (eventsProps !== eventsState) {
       this.setState({
         events: eventsProps,
-        pageIsLast: eventsProps.length < page * this.pageSize ? true : false
+        pageIsLast: eventsProps.length < page * this.pageSize
       })
     }
   }
@@ -123,12 +146,14 @@ class Events extends React.Component<EventsProps, EventsState> {
 
   getEvents() {
     const { events, page } = this.state
-    return events.slice(0 + ((page - 1) * this.pageSize), this.pageSize + ((page - 1) * this.pageSize))
+    return events.slice((page - 1) * this.pageSize, this.pageSize + (page - 1) * this.pageSize)
   }
 
   pageNavigation() {
     const { events, page } = this.state
-    const titlePos = events.length ? `${this.pageSize * page - this.pageSize} - ${events.length}` : `${events.length}`
+    const titlePos = events.length
+      ? `${this.pageSize * page - this.pageSize} - ${events.length}`
+      : `${events.length}`
     return `${page} (${titlePos})`
   }
 
@@ -150,62 +175,72 @@ class Events extends React.Component<EventsProps, EventsState> {
     const { dateFrom, dateTo, page } = this.state
     const directionPage = direction === 'next' ? page + 1 : page - 1
 
-    this.props.fetchEvents(formatDateAPIQuery(dateFrom), formatDateAPIQuery(dateTo), this.pageSize * directionPage)
+    this.props.fetchEvents(
+      formatDateAPIQuery(dateFrom),
+      formatDateAPIQuery(dateTo),
+      this.pageSize * directionPage
+    )
     this.setState({ page: directionPage, rowExpanded: null })
   }
 
   handleDownloadPayload(data: Event) {
-    let title = `${data.job.name}-${data.eventType}-${data.run.runId}`
-    let blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
+    const title = `${data.job.name}-${data.eventType}-${data.run.runId}`
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
     saveAs(blob, `${title}.json`)
   }
 
   render() {
     const { classes, isEventsLoading, isEventsInit } = this.props
     const { events, rowExpanded, page, dateFrom, dateTo, pageIsLast } = this.state
+    const i18next = require('i18next')
 
     return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
           <>
-            <Box p={2}>
-              <MqText heading>EVENTS</MqText>
-              Page: {this.pageNavigation()}
+            <Box p={2} display={'flex'} justifyContent={'space-between'}>
+              <Box>
+                <MqText heading>{i18next.t('events_route.title')}</MqText>
+                Page: {this.pageNavigation()}
+              </Box>
+              <Box>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <IconButton
+                    className={classes.ml2}
+                    color='primary'
+                    disabled={page === 1}
+                    onClick={() => this.handleClickPage('prev')}
+                  >
+                    <ChevronLeftRounded />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <IconButton
+                    color='primary'
+                    disabled={pageIsLast}
+                    onClick={() => this.handleClickPage('next')}
+                  >
+                    <ChevronRightRounded />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
             <Box p={2} className={classes.nav}>
               <MqDatePicker
-                label="From date"
+                label={i18next.t('events_route.from_date')}
                 value={formatDatePicker(dateFrom)}
                 onChange={(e: any) => this.handleChangeDatepicker(e, 'from')}
               />
               <MqDatePicker
-                label="To date"
+                label={i18next.t('events_route.to_date')}
                 value={formatDatePicker(dateTo)}
                 onChange={(e: any) => this.handleChangeDatepicker(e, 'to')}
               />
-              <Button
-                variant='outlined'
-                color='primary'
-                disabled={page === 1}
-                onClick={() => this.handleClickPage('prev')}
-              >
-                Previous page
-              </Button>
-              <Button
-                variant='outlined'
-                color='primary'
-                disabled={pageIsLast}
-                onClick={() => this.handleClickPage('next')}
-              >
-                Next page
-              </Button>
             </Box>
             {events.length === 0 ? (
               <Box p={2}>
-                <MqEmpty title={'No events found'}>
-                  <MqText subdued>
-                    Try changing dates or consulting our documentation to add events.
-                  </MqText>
+                <MqEmpty title={i18next.t('events_route.empty_title')}>
+                  <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
                 </MqEmpty>
               </Box>
             ) : (
@@ -213,13 +248,25 @@ class Events extends React.Component<EventsProps, EventsState> {
                 <Table className={classes.table} size='small'>
                   <TableHead>
                     <TableRow>
-                      {EVENTS_COLUMNS.map(field => {
-                        return (
-                          <TableCell key={field} align='left'>
-                            <MqText subheading>{field}</MqText>
-                          </TableCell>
-                        )
-                      })}
+                      {/* {EVENTS_COLUMNS.map(field => {
+                        return ( */}
+                      <TableCell align='left'>
+                        <MqText subheading>{i18next.t('events_columns.id')}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText subheading>{i18next.t('events_columns.state')}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText subheading>{i18next.t('events_columns.name')}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText subheading>{i18next.t('events_columns.namespace')}</MqText>
+                      </TableCell>
+                      <TableCell align='left'>
+                        <MqText subheading>{i18next.t('events_columns.time')}</MqText>
+                      </TableCell>
+                      {/* )
+                      })} */}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -244,9 +291,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                                 <MqText>{event.eventType}</MqText>
                               </Box>
                             </TableCell>
-                            <TableCell align='left'>
-                              {event.job.name}
-                            </TableCell>
+                            <TableCell align='left'>{event.job.name}</TableCell>
                             <TableCell align='left'>
                               <MqText> {event.job.namespace} </MqText>
                             </TableCell>
@@ -254,7 +299,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                               <MqText>{formatUpdatedAt(event.eventTime)}</MqText>
                             </TableCell>
                           </TableRow>
-                          {rowExpanded === key &&
+                          {rowExpanded === key && (
                             <TableRow>
                               <TableCell colSpan={EVENTS_COLUMNS.length}>
                                 {fileSize(JSON.stringify(event)).kiloBytes > 500 ? (
@@ -276,11 +321,15 @@ class Events extends React.Component<EventsProps, EventsState> {
                                     </MqEmpty>
                                   </Box>
                                 ) : (
-                                  <MqJson code={event} wrapLongLines={true} showLineNumbers={true} />
+                                  <MqJson
+                                    code={event}
+                                    wrapLongLines={true}
+                                    showLineNumbers={true}
+                                  />
                                 )}
                               </TableCell>
                             </TableRow>
-                          }
+                          )}
                         </React.Fragment>
                       )
                     })}
@@ -288,6 +337,27 @@ class Events extends React.Component<EventsProps, EventsState> {
                 </Table>
               </>
             )}
+            <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+              <Tooltip title={i18next.t('events_route.previous_page')}>
+                <IconButton
+                  className={classes.ml2}
+                  color='primary'
+                  disabled={page === 1}
+                  onClick={() => this.handleClickPage('prev')}
+                >
+                  <ChevronLeftRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={i18next.t('events_route.next_page')}>
+                <IconButton
+                  color='primary'
+                  disabled={pageIsLast}
+                  onClick={() => this.handleClickPage('next')}
+                >
+                  <ChevronRightRounded />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </>
         </MqScreenLoad>
       </Container>
