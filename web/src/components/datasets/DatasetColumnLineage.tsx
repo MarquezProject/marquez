@@ -1,21 +1,47 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import React, { FunctionComponent, useEffect } from 'react'
+import * as Redux from 'redux'
 import { Box, Button } from '@material-ui/core'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJson from '../core/code/MqJson'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { Dataset } from '../../types/api'
+import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { fileSize } from '../../helpers'
 import { LineageDataset } from '../lineage/types'
 import { saveAs } from 'file-saver'
+import { IState } from '../../store/reducers'
 
 interface DatasetColumnLineageProps {
-  columnLineage: object
   lineageDataset: LineageDataset
 }
 
-const DatasetColumnLineage: FunctionComponent<DatasetColumnLineageProps> = props => {
-  const { columnLineage, lineageDataset } = props
+interface StateProps {
+  dataset: Dataset
+}
+
+interface DispatchProps {
+  fetchDataset: typeof fetchDataset
+  resetDataset: typeof resetDataset
+}
+
+type IProps = DatasetColumnLineageProps & DispatchProps & StateProps
+
+const DatasetColumnLineage: FunctionComponent<IProps> = props => {
+  const { dataset, lineageDataset, fetchDataset, resetDataset } = props
+  const columnLineage = dataset.columnLineage
+
+  useEffect(() => {
+    fetchDataset(lineageDataset.namespace, lineageDataset.name)
+  }, [lineageDataset.name])
+
+  // unmounting
+  useEffect(() => () => {
+    resetDataset()
+  }, [])
 
   const handleDownloadPayload = (data: object) => {
     const title = `${lineageDataset.name}-${lineageDataset.namespace}-columnLineage`
@@ -63,4 +89,20 @@ const DatasetColumnLineage: FunctionComponent<DatasetColumnLineageProps> = props
   )
 }
 
-export default DatasetColumnLineage
+const mapStateToProps = (state: IState) => ({
+  dataset: state.dataset.result,
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchDataset: fetchDataset,
+      resetDataset: resetDataset
+    },
+    dispatch
+  )
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DatasetColumnLineage)
