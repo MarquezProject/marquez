@@ -168,7 +168,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
-      {tab === 2 && handleFetchDataset() && <DatasetColumnLineage columnLineage={props.dataset.columnLineage} />}
+      {tab === 2 && handleFetchDataset() && (
+        <DatasetColumnLineage lineageDataset={props.lineageDataset} columnLineage={props.dataset.columnLineage} />
+      )}
     </Box>
   )
 }
