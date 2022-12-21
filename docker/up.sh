@@ -116,7 +116,7 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-# Create docker volumes for Marquez
+# Create docker volume for Marquez
 ./docker/volumes.sh marquez
 
 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $ARGS
