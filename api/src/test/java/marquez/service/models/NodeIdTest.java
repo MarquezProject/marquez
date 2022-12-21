@@ -10,7 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.UUID;
 import marquez.common.models.DatasetFieldId;
+import marquez.common.models.DatasetFieldVersionId;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
@@ -150,12 +152,16 @@ class NodeIdTest {
         "gs://bucket$/path/to/data$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
       },
       delimiter = '$')
-  public void testDatasetFieldVersion(String namespace, String dataset, String field) {
+  public void testDatasetFieldVersion(String namespace, String dataset, String fieldWithVersion) {
+    String version = fieldWithVersion.split(VERSION_DELIM)[1];
+    String field = fieldWithVersion.split(VERSION_DELIM)[0];
+
     NamespaceName namespaceName = NamespaceName.of(namespace);
-    FieldName fieldName = FieldName.of(field);
+    FieldName fieldName = FieldName.of(field.split(VERSION_DELIM)[0]);
     DatasetName datasetName = DatasetName.of(dataset);
     DatasetId dsId = new DatasetId(namespaceName, datasetName);
-    DatasetFieldId dsfId = new DatasetFieldId(dsId, fieldName);
+    DatasetFieldVersionId dsfId =
+        new DatasetFieldVersionId(dsId, fieldName, UUID.fromString(version));
     NodeId nodeId = NodeId.of(dsfId);
     assertFalse(nodeId.isRunType());
     assertFalse(nodeId.isJobType());
@@ -163,12 +169,12 @@ class NodeIdTest {
     assertTrue(nodeId.hasVersion());
     assertTrue(nodeId.isDatasetFieldVersionType());
 
-    assertEquals(dsfId, nodeId.asDatasetFieldId());
+    assertEquals(dsfId, nodeId.asDatasetFieldVersionId());
     assertEquals(nodeId, NodeId.of(nodeId.getValue()));
-    assertEquals(namespace, nodeId.asDatasetFieldId().getDatasetId().getNamespace().getValue());
-    assertEquals(dataset, nodeId.asDatasetFieldId().getDatasetId().getName().getValue());
-    assertEquals(field, nodeId.asDatasetFieldId().getFieldName().getValue());
     assertEquals(
-        field.split(VERSION_DELIM)[1], nodeId.asDatasetFieldVersionId().getVersion().toString());
+        namespace, nodeId.asDatasetFieldVersionId().getDatasetId().getNamespace().getValue());
+    assertEquals(dataset, nodeId.asDatasetFieldVersionId().getDatasetId().getName().getValue());
+    assertEquals(field, nodeId.asDatasetFieldVersionId().getFieldName().getValue());
+    assertEquals(version, nodeId.asDatasetFieldVersionId().getVersion().toString());
   }
 }

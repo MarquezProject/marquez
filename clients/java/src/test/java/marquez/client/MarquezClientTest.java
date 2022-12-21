@@ -393,6 +393,34 @@ public class MarquezClientTest {
   private static final DatasetFieldId DATASET_FIELD_ID =
       new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
 
+  private static final DatasetFieldId DATASET_FIELD_VERSION_ID =
+      new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
+
+  private static final Node LINEAGE_NODE =
+      new Node(
+          NodeId.of(DATASET_FIELD_ID),
+          NodeType.DATASET_FIELD,
+          new ColumnLineageNodeData(
+              NAMESPACE_NAME,
+              DB_TABLE_NAME,
+              FIELD_NAME,
+              "String",
+              Collections.singletonList(
+                  new ColumnLineageInputField(
+                      "namespace",
+                      "inDataset",
+                      "some-col1",
+                      "transformationDescription",
+                      "transformationType"))),
+          ImmutableSet.of(
+              Edge.of(
+                  NodeId.of(DATASET_FIELD_ID),
+                  NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
+          ImmutableSet.of(
+              Edge.of(
+                  NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
+                  NodeId.of(DATASET_FIELD_ID))));
+
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
@@ -955,31 +983,7 @@ public class MarquezClientTest {
 
   @Test
   public void testGetColumnLineage() throws Exception {
-    Node node =
-        new Node(
-            NodeId.of(DATASET_FIELD_ID),
-            NodeType.DATASET_FIELD,
-            new ColumnLineageNodeData(
-                NAMESPACE_NAME,
-                DB_TABLE_NAME,
-                FIELD_NAME,
-                "String",
-                Collections.singletonList(
-                    new ColumnLineageInputField(
-                        "namespace",
-                        "inDataset",
-                        "some-col1",
-                        "transformationDescription",
-                        "transformationType"))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(DATASET_FIELD_ID),
-                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
-                    NodeId.of(DATASET_FIELD_ID))));
-    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(LINEAGE_NODE));
     String lineageJson = lineage.toJson();
     when(http.get(
             buildUrlFor(
@@ -987,88 +991,13 @@ public class MarquezClientTest {
         .thenReturn(lineageJson);
 
     Node retrievedNode =
-        client.getColumnLineageByDataset("namespace", "dataset").getGraph().stream()
+        client
+            .getColumnLineage(NodeId.of(new DatasetId("namespace", "dataset")))
+            .getGraph()
+            .stream()
             .findAny()
             .get();
-    assertThat(retrievedNode).isEqualTo(node);
-  }
-
-  @Test
-  public void testGetColumnLineageByField() throws Exception {
-    Node node =
-        new Node(
-            NodeId.of(DATASET_FIELD_ID),
-            NodeType.DATASET_FIELD,
-            new ColumnLineageNodeData(
-                NAMESPACE_NAME,
-                DB_TABLE_NAME,
-                FIELD_NAME,
-                "String",
-                Collections.singletonList(
-                    new ColumnLineageInputField(
-                        "namespace",
-                        "inDataset",
-                        "some-col1",
-                        "transformationDescription",
-                        "transformationType"))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(DATASET_FIELD_ID),
-                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
-                    NodeId.of(DATASET_FIELD_ID))));
-    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
-    String lineageJson = lineage.toJson();
-    when(http.get(
-            buildUrlFor(
-                "/column-lineage?nodeId=datasetField%3Anamespace%3Adataset%3Asome-col1&depth=20&withDownstream=false")))
-        .thenReturn(lineageJson);
-
-    Node retrievedNode =
-        client.getColumnLineageByDataset("namespace", "dataset", "some-col1").getGraph().stream()
-            .findAny()
-            .get();
-    assertThat(retrievedNode).isEqualTo(node);
-  }
-
-  @Test
-  public void testGetColumnLineageByJob() throws Exception {
-    Node node =
-        new Node(
-            NodeId.of(DATASET_FIELD_ID),
-            NodeType.DATASET_FIELD,
-            new ColumnLineageNodeData(
-                NAMESPACE_NAME,
-                DB_TABLE_NAME,
-                FIELD_NAME,
-                "String",
-                Collections.singletonList(
-                    new ColumnLineageInputField(
-                        "namespace",
-                        "inDataset",
-                        "some-col1",
-                        "transformationDescription",
-                        "transformationType"))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(DATASET_FIELD_ID),
-                    NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
-            ImmutableSet.of(
-                Edge.of(
-                    NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
-                    NodeId.of(DATASET_FIELD_ID))));
-    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(node));
-    String lineageJson = lineage.toJson();
-    when(http.get(
-            buildUrlFor(
-                "/column-lineage?nodeId=job%3Anamespace%3Ajob&depth=20&withDownstream=false")))
-        .thenReturn(lineageJson);
-
-    Node retrievedNode =
-        client.getColumnLineageByJob("namespace", "job").getGraph().stream().findAny().get();
-    assertThat(retrievedNode).isEqualTo(node);
+    assertThat(retrievedNode).isEqualTo(LINEAGE_NODE);
   }
 
   private URL buildUrlFor(String pathTemplate) throws Exception {

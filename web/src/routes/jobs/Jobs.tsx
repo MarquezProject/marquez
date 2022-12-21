@@ -31,8 +31,6 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const JOB_COLUMNS = ['NAME', 'NAMESPACE', 'UPDATED AT', 'LATEST RUN DURATION']
-
 class Jobs extends React.Component<JobsProps> {
   componentDidMount() {
     if (this.props.selectedNamespace) {
@@ -55,33 +53,37 @@ class Jobs extends React.Component<JobsProps> {
 
   render() {
     const { jobs, isJobsLoading, isJobsInit } = this.props
+    const i18next = require('i18next')
     return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isJobsLoading || !isJobsInit}>
           <>
             {jobs.length === 0 ? (
               <Box p={2}>
-                <MqEmpty title={'No jobs found'}>
-                  <MqText subdued>
-                    Try changing namespaces or consulting our documentation to add jobs.
-                  </MqText>
+                <MqEmpty title={i18next.t('jobs_route.empty_title')}>
+                  <MqText subdued>{i18next.t('jobs_route.empty_body')}</MqText>
                 </MqEmpty>
               </Box>
             ) : (
               <>
                 <Box p={2}>
-                  <MqText heading>JOBS</MqText>
+                  <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
                 </Box>
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
-                      {JOB_COLUMNS.map(field => {
-                        return (
-                          <TableCell key={field} align='left'>
-                            <MqText subheading>{field}</MqText>
-                          </TableCell>
-                        )
-                      })}
+                      <TableCell key={i18next.t('jobs_route.name_col')} align='left'>
+                        <MqText subheading>{i18next.t('datasets_route.name_col')}</MqText>
+                      </TableCell>
+                      <TableCell key={i18next.t('jobs_route.namespace_col')} align='left'>
+                        <MqText subheading>{i18next.t('datasets_route.namespace_col')}</MqText>
+                      </TableCell>
+                      <TableCell key={i18next.t('jobs_route.updated_col')} align='left'>
+                        <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
+                      </TableCell>
+                      <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
+                        <MqText subheading>{i18next.t('jobs_route.latest_run_col')}</MqText>
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

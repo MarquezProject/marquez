@@ -2,6 +2,7 @@
 
 import React from 'react'
 
+import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box } from '@material-ui/core'
 import { DAGRE_CONFIG, INITIAL_TRANSFORM, NODE_SIZE } from './config'
@@ -155,14 +156,13 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
   render() {
     const { classes } = this.props
+    const i18next = require('i18next')
     return (
       <Box className={classes.lineageContainer}>
         {this.props.selectedNode === null && (
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
-            <MqEmpty title={'No node selected'}>
-              <MqText subdued>
-                Try selecting a node through search or the jobs or datasets page.
-              </MqText>
+            <MqEmpty title={i18next.t('lineage.empty_title')}>
+              <MqText subdued>{i18next.t('lineage.empty_body')}</MqText>
             </MqEmpty>
           </Box>
         )}

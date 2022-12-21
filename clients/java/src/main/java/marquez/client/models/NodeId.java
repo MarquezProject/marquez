@@ -12,8 +12,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 import com.google.common.base.Joiner;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -74,6 +76,31 @@ public final class NodeId implements Comparable<NodeId> {
     return of(ID_JOINER.join(ID_PREFX_JOB, jobId.getNamespace(), jobId.getName()));
   }
 
+  public static NodeId of(@NonNull DatasetFieldVersionId datasetFieldVersionId) {
+    return of(
+        appendVersionTo(
+            ID_JOINER.join(
+                ID_PREFX_DATASET_FIELD,
+                datasetFieldVersionId.getNamespace(),
+                datasetFieldVersionId.getName(),
+                datasetFieldVersionId.getField()),
+            datasetFieldVersionId.getVersion()));
+  }
+
+  public static NodeId of(@NonNull JobVersionId jobVersionId) {
+    return NodeId.of(
+        new JobId(
+            jobVersionId.getNamespace(),
+            appendVersionTo(jobVersionId.getName(), jobVersionId.getVersion())));
+  }
+
+  public static NodeId of(@NonNull DatasetVersionId versionId) {
+    return NodeId.of(
+        new DatasetId(
+            versionId.getNamespace(),
+            appendVersionTo(versionId.getName(), versionId.getVersion())));
+  }
+
   @JsonIgnore
   public boolean isDatasetFieldType() {
     return value.startsWith(ID_PREFX_DATASET_FIELD);
@@ -87,6 +114,26 @@ public final class NodeId implements Comparable<NodeId> {
   @JsonIgnore
   public boolean isJobType() {
     return value.startsWith(ID_PREFX_JOB);
+  }
+
+  @JsonIgnore
+  public boolean isDatasetFieldVersionType() {
+    return value.startsWith(ID_PREFX_DATASET_FIELD) && hasVersion();
+  }
+
+  @JsonIgnore
+  public boolean isDatasetVersionType() {
+    return value.startsWith(ID_PREFX_DATASET) && hasVersion();
+  }
+
+  @JsonIgnore
+  public boolean isJobVersionType() {
+    return value.startsWith(ID_PREFX_JOB) && hasVersion();
+  }
+
+  @JsonIgnore
+  public boolean hasVersion() {
+    return value.contains(VERSION_DELIM);
   }
 
   @JsonIgnore
@@ -139,6 +186,28 @@ public final class NodeId implements Comparable<NodeId> {
     return new JobId(parts[1], parts[2]);
   }
 
+  @JsonIgnore
+  public DatasetFieldVersionId asDatasetFieldVersionId() {
+    String[] parts = parts(4, ID_PREFX_DATASET_FIELD);
+    String[] nameAndVersion = parts[3].split(VERSION_DELIM);
+    return new DatasetFieldVersionId(
+        parts[1], parts[2], nameAndVersion[0], UUID.fromString(nameAndVersion[1]));
+  }
+
+  @JsonIgnore
+  public JobVersionId asJobVersionId() {
+    String[] parts = parts(3, ID_PREFX_JOB);
+    String[] nameAndVersion = parts[2].split(VERSION_DELIM);
+    return new JobVersionId(parts[1], nameAndVersion[0], UUID.fromString(nameAndVersion[1]));
+  }
+
+  @JsonIgnore
+  public DatasetVersionId asDatasetVersionId() {
+    String[] parts = parts(3, ID_PREFX_DATASET);
+    String[] nameAndVersion = parts[2].split(VERSION_DELIM);
+    return new DatasetVersionId(parts[1], nameAndVersion[0], UUID.fromString(nameAndVersion[1]));
+  }
+
   public static class FromValue extends StdConverter<String, NodeId> {
     @Override
     public NodeId convert(@NonNull String value) {
@@ -156,5 +225,9 @@ public final class NodeId implements Comparable<NodeId> {
   @Override
   public int compareTo(NodeId o) {
     return value.compareTo(o.getValue());
+  }
+
+  private static String appendVersionTo(@NonNull final String value, @Nullable final UUID version) {
+    return (version == null) ? value : (value + VERSION_DELIM + version);
   }
 }

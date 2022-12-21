@@ -26,14 +26,6 @@ const styles = (theme: ITheme) => {
   })
 }
 
-const DATASET_VERSIONS_COLUMNS = [
-  'VERSION',
-  'CREATED AT',
-  'FIELDS',
-  'CREATED BY RUN',
-  'LIFECYCLE STATE'
-]
-
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
@@ -47,6 +39,7 @@ const DatasetVersions: FunctionComponent<
   const handleClick = (newValue: SetStateAction<DatasetVersion | null>) => {
     setInfoView(newValue)
   }
+  const i18next = require('i18next')
 
   if (versions.length === 0) {
     return null
@@ -72,15 +65,31 @@ const DatasetVersions: FunctionComponent<
     <Table size='small'>
       <TableHead>
         <TableRow>
-          {DATASET_VERSIONS_COLUMNS.map(column => {
-            return (
-              <TableCell key={column} align='left'>
-                <MqText subheading inline>
-                  {column}
-                </MqText>
-              </TableCell>
-            )
-          })}
+          <TableCell align='left'>
+            <MqText subheading inline>
+              {i18next.t('dataset_versions_columns.version')}
+            </MqText>
+          </TableCell>
+          <TableCell align='left'>
+            <MqText subheading inline>
+              {i18next.t('dataset_versions_columns.created_at')}
+            </MqText>
+          </TableCell>
+          <TableCell align='left'>
+            <MqText subheading inline>
+              {i18next.t('dataset_versions_columns.fields')}
+            </MqText>
+          </TableCell>
+          <TableCell align='left'>
+            <MqText subheading inline>
+              {i18next.t('dataset_versions_columns.created_by_run')}
+            </MqText>
+          </TableCell>
+          <TableCell align='left'>
+            <MqText subheading inline>
+              {i18next.t('dataset_versions_columns.lifecycle_state')}
+            </MqText>
+          </TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
