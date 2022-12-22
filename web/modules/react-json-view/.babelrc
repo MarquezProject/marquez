@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    'transform-class-properties',
+    'react-html-attrs',
+    'transform-function-bind'
+  ],
+  "presets": ["react", "es2015", "stage-0"]
+}

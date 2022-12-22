@@ -6,6 +6,7 @@
   "private": false,
   "license": "Apache-2.0",
   "scripts": {
+    "preinstall": "cd ./modules/react-json-view && npm i && npm run build",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "pretest": "eslint src/**/*[x]",
@@ -66,6 +67,7 @@
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.0.2",
+    "react-json-view": "file:modules/react-json-view",
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
