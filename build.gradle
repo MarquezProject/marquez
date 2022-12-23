@@ -59,8 +59,8 @@ subprojects {
         jacocoVersion = '0.8.8'
         junit5Version = '5.9.1'
         lombokVersion = '1.18.24'
-        mockitoVersion = '4.9.0'
-        openlineageVersion = '0.17.0'
+        mockitoVersion = '4.10.0'
+        openlineageVersion = '0.18.0'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.5.1'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
@@ -106,7 +106,7 @@ subprojects {
 
     pmd {
         consoleOutput = true
-        toolVersion = "6.46.0"
+        toolVersion = "6.52.0"
         rulesMinimumPriority = 5
         ruleSetFiles = rootProject.files("pmd-marquez.xml")
         ruleSets = []
