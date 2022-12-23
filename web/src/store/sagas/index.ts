@@ -2,15 +2,15 @@
 
 import * as Effects from 'redux-saga/effects'
 import {
+  FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
   FETCH_EVENTS,
   FETCH_JOBS,
   FETCH_LINEAGE,
   FETCH_RUNS,
-  FETCH_SEARCH,
-  FETCH_DATASET
-} from "../actionCreators/actionTypes";
+  FETCH_SEARCH
+} from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
@@ -18,6 +18,7 @@ const call: any = Effects.call
 
 import {
   applicationError,
+  fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
   fetchEventsSuccess,
@@ -25,9 +26,17 @@ import {
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
-  fetchSearchSuccess, fetchDatasetSuccess
-} from "../actionCreators";
-import { getDatasetVersions, getDatasets, getDataset, getEvents, getJobs, getNamespaces, getRuns } from '../requests'
+  fetchSearchSuccess
+} from '../actionCreators'
+import {
+  getDataset,
+  getDatasetVersions,
+  getDatasets,
+  getEvents,
+  getJobs,
+  getNamespaces,
+  getRuns
+} from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 

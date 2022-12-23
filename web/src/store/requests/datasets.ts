@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { Dataset, DatasetVersions, Datasets } from "../../types/api";
+import { Dataset, DatasetVersions, Datasets } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
 export const getDatasets = async (namespace: string, limit = 25, offset = 0) => {

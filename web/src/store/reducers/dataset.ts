@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Dataset } from '../../types/api'
-import {
-  FETCH_DATASET,
-  FETCH_DATASET_SUCCESS,
-  RESET_DATASET
-} from '../actionCreators/actionTypes'
-import { fetchDatasetSuccess } from '../actionCreators';
+import { FETCH_DATASET, FETCH_DATASET_SUCCESS, RESET_DATASET } from '../actionCreators/actionTypes'
+import { fetchDatasetSuccess } from '../actionCreators'
 
 export type IDatasetState = { isLoading: boolean; result: Dataset; init: boolean }
 
-export const initialState: IDatasetState = { isLoading: false, init: false, result: { } as Dataset }
+export const initialState: IDatasetState = { isLoading: false, init: false, result: {} as Dataset }
 
 type IDatasetAction = ReturnType<typeof fetchDatasetSuccess>
 

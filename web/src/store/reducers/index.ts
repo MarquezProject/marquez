@@ -3,7 +3,7 @@
 import { History } from 'history'
 import { Reducer, combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
-import dataset, { IDatasetState } from './dataset';
+import dataset, { IDatasetState } from './dataset'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'

@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { FunctionComponent, useEffect } from 'react'
 import * as Redux from 'redux'
 import { Box, Button } from '@material-ui/core'
+import { Dataset } from '../../types/api'
+import { IState } from '../../store/reducers'
+import { LineageDataset } from '../lineage/types'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { fetchDataset, resetDataset } from '../../store/actionCreators'
+import { fileSize } from '../../helpers'
+import { saveAs } from 'file-saver'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJson from '../core/code/MqJson'
 import MqText from '../core/text/MqText'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { Dataset } from '../../types/api'
-import { fetchDataset, resetDataset } from '../../store/actionCreators'
-import { fileSize } from '../../helpers'
-import { LineageDataset } from '../lineage/types'
-import { saveAs } from 'file-saver'
-import { IState } from '../../store/reducers'
+import React, { FunctionComponent, useEffect } from 'react'
 
 interface DatasetColumnLineageProps {
   lineageDataset: LineageDataset
@@ -39,9 +39,12 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
   }, [lineageDataset.name])
 
   // unmounting
-  useEffect(() => () => {
-    resetDataset()
-  }, [])
+  useEffect(
+    () => () => {
+      resetDataset()
+    },
+    []
+  )
 
   const handleDownloadPayload = (data: object) => {
     const title = `${lineageDataset.name}-${lineageDataset.namespace}-columnLineage`
@@ -51,46 +54,40 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
 
   return (
     <>
-      {columnLineage
-        ? (
-          <>
-            {fileSize(JSON.stringify(columnLineage)).kiloBytes > 500 ? (
-              <Box p={2}>
-                <MqEmpty title={'Payload is too big for render'}>
-                  <div>
-                    <MqText subdued>
-                      Please click on button and download payload as file
-                    </MqText>
-                    <br />
-                    <Button
-                      variant='outlined'
-                      color='primary'
-                      onClick={() => handleDownloadPayload(columnLineage)}
-                    >
-                      Download payload
-                    </Button>
-                  </div>
-                </MqEmpty>
-              </Box>
-            ) : (
-              <MqJson
-                code={columnLineage}
-                wrapLongLines={true}
-                showLineNumbers={true}
-              />
-            )}
-          </>
-        )
-        : (
-          <MqEmpty title={'No column lineage'} body={'Column lineage not available for the specified dataset.'} />
-        )
-      }
+      {columnLineage ? (
+        <>
+          {fileSize(JSON.stringify(columnLineage)).kiloBytes > 500 ? (
+            <Box p={2}>
+              <MqEmpty title={'Payload is too big for render'}>
+                <div>
+                  <MqText subdued>Please click on button and download payload as file</MqText>
+                  <br />
+                  <Button
+                    variant='outlined'
+                    color='primary'
+                    onClick={() => handleDownloadPayload(columnLineage)}
+                  >
+                    Download payload
+                  </Button>
+                </div>
+              </MqEmpty>
+            </Box>
+          ) : (
+            <MqJson code={columnLineage} wrapLongLines={true} showLineNumbers={true} />
+          )}
+        </>
+      ) : (
+        <MqEmpty
+          title={'No column lineage'}
+          body={'Column lineage not available for the specified dataset.'}
+        />
+      )}
     </>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  dataset: state.dataset.result,
+  dataset: state.dataset.result
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

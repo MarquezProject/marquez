@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 import * as Redux from 'redux'
 import { Box, Chip, Tab, Tabs } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
@@ -15,9 +14,8 @@ import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
-  fetchDataset,
-  resetDataset,
   fetchDatasetVersions,
+  resetDataset,
   resetDatasetVersions
 } from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
@@ -28,6 +26,7 @@ import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
+import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -57,7 +56,6 @@ interface StateProps {
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
-  fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
 }
@@ -72,7 +70,14 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, fetchDataset, resetDataset, resetDatasetVersions, versions, versionsLoading } = props
+  const {
+    classes,
+    fetchDatasetVersions,
+    resetDataset,
+    resetDatasetVersions,
+    versions,
+    versionsLoading
+  } = props
   const { root } = classes
   const history = useHistory()
   const i18next = require('i18next')
@@ -82,10 +87,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   }, [props.lineageDataset.name])
 
   // unmounting
-  useEffect(() => () => { 
-    resetDataset()
-    resetDatasetVersions()
-  }, [])
+  useEffect(
+    () => () => {
+      resetDataset()
+      resetDatasetVersions()
+    },
+    []
+  )
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -173,7 +181,6 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
-      fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset
     },
