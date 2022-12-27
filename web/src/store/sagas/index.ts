@@ -2,6 +2,7 @@
 
 import * as Effects from 'redux-saga/effects'
 import {
+  FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
   FETCH_EVENTS,
@@ -17,6 +18,7 @@ const call: any = Effects.call
 
 import {
   applicationError,
+  fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
   fetchEventsSuccess,
@@ -27,6 +29,7 @@ import {
   fetchSearchSuccess
 } from '../actionCreators'
 import {
+  getDataset,
   getDatasetVersions,
   getDatasets,
   getEvents,
@@ -119,6 +122,18 @@ export function* fetchEventsSaga() {
   }
 }
 
+export function* fetchDatasetSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_DATASET)
+      const datasets = yield call(getDataset, payload.namespace, payload.name)
+      yield put(fetchDatasetSuccess(datasets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching dataset'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -137,6 +152,7 @@ export default function* rootSaga(): Generator {
     fetchJobsSaga(),
     fetchRunsSaga(),
     fetchDatasetsSaga(),
+    fetchDatasetSaga(),
     fetchDatasetVersionsSaga(),
     fetchEventsSaga(),
     fetchLineage(),
