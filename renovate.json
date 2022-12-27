@@ -21,5 +21,6 @@
       "matchPackagePatterns": ["^org.apache.spark:", ".css$", "^gradle$"],
       "automerge": false
     }
-  ]
+  ],
+  "ignorePaths": ["**/chart/**"]
 }
