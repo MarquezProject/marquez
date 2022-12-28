@@ -87,22 +87,14 @@ while [ $# -gt 0 ]; do
        shift
        ARGS="${1}"
        ;;
-    --no-web)
-       NO_WEB='true'
-       ;;
-    --no-volumes)
-      NO_VOLUMES='true'
-      ;;
     -b|'--build')
        BUILD='true'
        TAG="${BUILD_VERSION}"
        ;;
-    -s|'--seed')
-       SEED='true'
-       ;;
-    -d|'--detach')
-       DETACH='true'
-       ;;
+    -s|'--seed') SEED='true' ;;
+    -d|'--detach') DETACH='true' ;;
+    --no-web) NO_WEB='true' ;;
+    --no-volumes) NO_VOLUMES='true' ;;
     -h|'--help')
        usage
        exit 0
@@ -125,7 +117,7 @@ if [[ "${BUILD}" = "true" ]]; then
   ARGS+=" --build"
 fi
 
-# Enable starting HTTP server with sample metadata
+# Enable starting HTTP API server with sample metadata
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
@@ -137,7 +129,7 @@ if [[ "${NO_WEB}" = "false" ]]; then
     || compose_files+=" -f docker-compose.web.yml"
 fi
 
-# Create docker volume for Marquez
+# Create docker volumes for Marquez
 if [[ "${NO_VOLUMES}" = "false" ]]; then
   ./docker/volumes.sh marquez
 fi

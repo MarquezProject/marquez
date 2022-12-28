@@ -20,4 +20,4 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Run db-migration.sh on latest db schema with latest migrations
-      run: ./.github/workflows/db-migration.sh
+      run: sudo ./.github/workflows/db-migration.sh
