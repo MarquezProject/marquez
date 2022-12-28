@@ -2,7 +2,16 @@
 
 import * as actionTypes from './actionTypes'
 
-import { Event, Dataset, DatasetVersion, Job, LineageGraph, Namespace, Run, Search } from '../../types/api'
+import {
+  Dataset,
+  DatasetVersion,
+  Event,
+  Job,
+  LineageGraph,
+  Namespace,
+  Run,
+  Search
+} from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
 export const fetchEvents = (after: string, before: string, limit: number) => ({
@@ -14,7 +23,7 @@ export const fetchEvents = (after: string, before: string, limit: number) => ({
   }
 })
 
-export const fetchEventsSuccess = (events: Event[]) => ({ 
+export const fetchEventsSuccess = (events: Event[]) => ({
   type: actionTypes.FETCH_EVENTS_SUCCESS,
   payload: {
     events
@@ -39,6 +48,21 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   }
 })
 
+export const fetchDataset = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_DATASET,
+  payload: {
+    namespace,
+    name
+  }
+})
+
+export const fetchDatasetSuccess = (dataset: Dataset) => ({
+  type: actionTypes.FETCH_DATASET_SUCCESS,
+  payload: {
+    dataset
+  }
+})
+
 export const fetchDatasetVersions = (namespace: string, name: string) => ({
   type: actionTypes.FETCH_DATASET_VERSIONS,
   payload: {
@@ -56,6 +80,10 @@ export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
 
 export const resetDatasetVersions = () => ({
   type: actionTypes.RESET_DATASET_VERSIONS
+})
+
+export const resetDataset = () => ({
+  type: actionTypes.RESET_DATASET
 })
 
 export const resetDatasets = () => ({

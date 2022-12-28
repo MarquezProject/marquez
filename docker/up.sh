@@ -8,7 +8,7 @@
 set -e
 
 # Version of Marquez
-VERSION=0.28.0
+VERSION=0.29.0
 
 title() {
   echo -e "\033[1m${1}\033[0m"

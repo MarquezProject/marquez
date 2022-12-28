@@ -18,6 +18,14 @@ export const MqInputBase = withStyles((theme: Theme) =>
         borderColor: theme.palette.primary.main,
         boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
         borderRadius: theme.spacing(4)
+      },
+      '&:hover': {
+        borderColor: theme.palette.primary.main,
+        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
+        '& > label': {
+          color: theme.palette.primary.main,
+          transition: theme.transitions.create(['color'])
+        }
       }
     }
   })
@@ -39,6 +47,14 @@ export const MqInputNoIcon = withStyles((theme: Theme) =>
         borderColor: theme.palette.primary.main,
         boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
         borderRadius: theme.spacing(4)
+      },
+      '&:hover': {
+        borderColor: theme.palette.primary.main,
+        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
+        '& > label': {
+          color: theme.palette.primary.main,
+          transition: theme.transitions.create(['color'])
+        }
       }
     }
   })

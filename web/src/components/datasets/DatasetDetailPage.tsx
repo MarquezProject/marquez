@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
-
 import * as Redux from 'redux'
 import { Box, Chip, Tab, Tabs } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
@@ -15,14 +13,20 @@ import {
 import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasetVersions, resetDatasetVersions } from '../../store/actionCreators'
+import {
+  fetchDatasetVersions,
+  resetDataset,
+  resetDatasetVersions
+} from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
+import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
+import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -40,22 +44,12 @@ const styles = ({ spacing }: ITheme) => {
       '&:not(:last-of-type)': {
         marginRight: spacing(1)
       }
-    },
-    noData: {
-      padding: '125px 0 0 0'
-    },
-    infoIcon: {
-      paddingLeft: '3px',
-      paddingTop: '3px'
-    },
-    updated: {
-      marginTop: '10px'
     }
   })
 }
 
 interface StateProps {
-  dataset: LineageDataset
+  lineageDataset: LineageDataset
   versions: DatasetVersion[]
   versionsLoading: boolean
 }
@@ -63,6 +57,7 @@ interface StateProps {
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
   resetDatasetVersions: typeof resetDatasetVersions
+  resetDataset: typeof resetDataset
 }
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
@@ -75,21 +70,30 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
+  const {
+    classes,
+    fetchDatasetVersions,
+    resetDataset,
+    resetDatasetVersions,
+    versions,
+    versionsLoading
+  } = props
   const { root } = classes
   const history = useHistory()
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
-  }, [props.dataset.name])
+    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
+  }, [props.lineageDataset.name])
 
   // unmounting
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
+      resetDataset()
       resetDatasetVersions()
-    }
-  }, [])
+    },
+    []
+  )
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -108,8 +112,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     return null
   }
 
-  const dataset = versions[0]
-  const { name, tags, description } = dataset
+  const firstVersion = versions[0]
+  const { name, tags, description } = firstVersion
 
   return (
     <Box my={2} className={root}>
@@ -136,6 +140,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 {...a11yProps(1)}
                 disableRipple={true}
               />
+              <Tab
+                label={i18next.t('datasets.column_lineage')}
+                {...a11yProps(1)}
+                disableRipple={true}
+              />
             </Tabs>
           </Box>
           <IconButton onClick={() => history.push('/datasets')}>
@@ -151,12 +160,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
       {tab === 0 && (
         <DatasetInfo
-          datasetFields={dataset.fields}
-          facets={dataset.facets}
-          run={dataset.createdByRun}
+          datasetFields={firstVersion.fields}
+          facets={firstVersion.facets}
+          run={firstVersion.createdByRun}
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
+      {tab === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }
@@ -171,7 +181,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
-      resetDatasetVersions: resetDatasetVersions
+      resetDatasetVersions: resetDatasetVersions,
+      resetDataset: resetDataset
     },
     dispatch
   )

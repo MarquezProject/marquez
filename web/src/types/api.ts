@@ -42,13 +42,13 @@ export interface Event {
     facets: object
   }
   inputs: {
-    name: string,
-    namespace: string,
+    name: string
+    namespace: string
     facets: object
   }[]
   outputs: {
-    name: string,
-    namespace: string,
+    name: string
+    namespace: string
     facets: object
   }[]
 }
@@ -72,6 +72,7 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
+  columnLineage: object
 }
 
 export interface DatasetVersions {

@@ -28,9 +28,9 @@ export function stopWatchDuration(durationMs: number) {
 }
 
 export function formatDatePicker(val: string) {
-  return moment(val).format("YYYY-MM-DDTHH:mm:ss")
+  return moment(val).format('YYYY-MM-DDTHH:mm:ss')
 }
 
 export function formatDateAPIQuery(val: string) {
-  return moment(val).format("YYYY-MM-DDTHH:mm:ss[.000Z]")
+  return moment(val).format('YYYY-MM-DDTHH:mm:ss[.000Z]')
 }
