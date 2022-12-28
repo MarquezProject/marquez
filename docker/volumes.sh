@@ -10,15 +10,15 @@ title() {
 }
 
 ls() {
-  docker run -it --rm -v "${1}:/vol" busybox ls /vol
+  docker run -it --rm -v "${1}:/tmp" busybox ls /tmp
 }
 
 usage() {
   echo "usage: ./$(basename -- ${0}) <volume-prefix>"
   echo "A script used to create persistent volumes for Marquez"
   echo
-  title "EXAMPLES:"
-  echo "  # Create volumes"
+  title "EXAMPLE:"
+  echo "  # Create volumes with prefix"
   echo "  $ ./volumes.sh my-volume-prefix"
   exit 1
 }
@@ -36,36 +36,38 @@ if [[ -z "${volume_prefix}" ]]; then
   usage
 fi
 
-# Volumes
+# Volumes with prefix
 data_volume="${volume_prefix}_data"
 db_conf_volume="${volume_prefix}_db-conf"
 db_init_volume="${volume_prefix}_db-init"
+db_backup_volume="${volume_prefix}_db-backup"
 
-echo "...creating volumes: ${data_volume}, ${db_conf_volume}, ${db_init_volume}"
+echo "...creating volumes: ${data_volume}, ${db_conf_volume}, ${db_init_volume}, ${db_backup_volume}"
 
 # Create persistent volumes for Marquez
 docker volume create "${data_volume}" > /dev/null
 docker volume create "${db_conf_volume}" > /dev/null
 docker volume create "${db_init_volume}" > /dev/null
+docker volume create "${db_backup_volume}" > /dev/null
 
 # Provision persistent volumes for Marquez
 docker create --name volumes-provisioner \
   -v "${data_volume}:/data" \
   -v "${db_conf_volume}:/db-conf" \
   -v "${db_init_volume}:/db-init" \
-  busybox > /dev/null
+  busybox > /dev/null 2>&1
 
 # Add startup configuration for Marquez
 docker cp ./docker/wait-for-it.sh volumes-provisioner:/data/wait-for-it.sh
-echo "Added: $(ls "${data_volume}")"
+echo "Added files to volume ${data_volume}: $(ls "${data_volume}")"
 
 # Add db configuration
 docker cp ./docker/postgresql.conf volumes-provisioner:/db-conf/postgresql.conf
-echo "Added: $(ls "${db_conf_volume}")"
+echo "Added files to volume ${db_conf_volume}: $(ls "${db_conf_volume}")"
 
 # Add db scripts
 docker cp ./docker/init-db.sh volumes-provisioner:/db-init/init-db.sh
-echo "Added: $(ls "${db_init_volume}")"
+echo "Added files to volume ${db_init_volume}: $(ls "${db_init_volume}")"
 
 # Delete volumes provisioner for Marquez
 docker rm volumes-provisioner > /dev/null
