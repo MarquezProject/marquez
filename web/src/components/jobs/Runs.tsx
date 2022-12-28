@@ -27,7 +27,6 @@ import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
 
-
 const styles = (theme: Theme) => {
   return createStyles({
     status: {

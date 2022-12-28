@@ -8,7 +8,7 @@
 set -e
 
 # Version of Marquez
-readonly VERSION=0.28.0
+readonly VERSION=0.29.0
 # Build version of Marquez
 readonly BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
