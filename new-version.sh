@@ -110,7 +110,7 @@ fi
 VERSIONS=($RELEASE_VERSION $NEXT_VERSION)
 for VERSION in "${VERSIONS[@]}"; do
   if [[ ! "${VERSION}" =~ ${SEMVER_REGEX} ]]; then
-    echo "Error: Version '${VERSION}' must match '${SEMVER_REGEX}'"
+    echo "error: Version '${VERSION}' must match '${SEMVER_REGEX}'"
     exit 1
   fi
 done
