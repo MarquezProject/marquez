@@ -45,6 +45,8 @@ usage() {
   echo "  -b, --build           build images from source"
   echo "  -s, --seed            seed HTTP API server with metadata"
   echo "  -d, --detach          run in the background"
+  echo "  --no-web              don't start the web UI"
+  echo "  --no-volumes          don't create volumes"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -82,6 +84,12 @@ while [ $# -gt 0 ]; do
        shift
        ARGS="${1}"
        ;;
+    --no-web)
+       NO_WEB='true'
+       ;;
+    --no-volumes)
+      NO_VOLUMES='true'
+      ;;
     -b|'--build')
        BUILD='true'
        TAG="$(git log --pretty=format:'%h' -n 1)" # SHA1
@@ -103,20 +111,38 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# ...
 if [[ "${DETACH}" = "true" ]]; then
   ARGS+=" --detach"
 fi
 
+# ...
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   ARGS+=" --build"
 fi
 
+# ...
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-# Create docker volume for Marquez
-./docker/volumes.sh marquez
+# ...
+if [[ "${NO_WEB}" = "false" ]]; then
+  # ...
+  if [[ "${BUILD}" = "true" ]]; then
+    # ...
+    compose_files+=" -f docker-compose.web-dev.yml"
+  else
+    compose_files+=" -f docker-compose.web.yml"
+  fi
+fi
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $ARGS
+# Create docker volume for Marquez
+if [[ "${NO_VOLUMES}" = "false" ]]; then
+  ./docker/volumes.sh marquez
+fi
+
+# Run docker compose cmd with overrides
+DOCKER_SCAN_SUGGEST=false API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
+  docker-compose --log-level ERROR $compose_files up $ARGS
