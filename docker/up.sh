@@ -8,7 +8,9 @@
 set -e
 
 # Version of Marquez
-VERSION=0.28.0
+readonly VERSION=0.28.0
+# Build version of Marquez
+readonly BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -55,6 +57,7 @@ usage() {
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
+# Base docker compose file
 compose_files="-f docker-compose.yml"
 
 API_PORT=5000
@@ -92,7 +95,7 @@ while [ $# -gt 0 ]; do
       ;;
     -b|'--build')
        BUILD='true'
-       TAG="$(git log --pretty=format:'%h' -n 1)" # SHA1
+       TAG="${BUILD_VERSION}"
        ;;
     -s|'--seed')
        SEED='true'
@@ -111,31 +114,27 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# ...
+# Enable detach mode to run containers in background
 if [[ "${DETACH}" = "true" ]]; then
   ARGS+=" --detach"
 fi
 
-# ...
+# Enable building from source
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   ARGS+=" --build"
 fi
 
-# ...
+# Enable starting HTTP server with sample metadata
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-# ...
+# Enable web UI
 if [[ "${NO_WEB}" = "false" ]]; then
-  # ...
-  if [[ "${BUILD}" = "true" ]]; then
-    # ...
-    compose_files+=" -f docker-compose.web-dev.yml"
-  else
-    compose_files+=" -f docker-compose.web.yml"
-  fi
+  # Enable building web UI from source; otherwise use 'latest' build
+  [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml" \
+    || compose_files+=" -f docker-compose.web.yml"
 fi
 
 # Create docker volume for Marquez
