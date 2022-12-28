@@ -2,6 +2,7 @@ version: "3.7"
 services:
   db:
     image: postgres:12.1
+    container_name: marquez-db
     ports:
       - "5432:5432"
     environment:

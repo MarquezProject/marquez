@@ -1,8 +1,8 @@
 version: "3.7"
 services:
-  seed_api:
+  seed_marquez:
     image: "marquezproject/marquez:${TAG}"
-    container_name: seed-api-with-metadata
+    container_name: seed-marquez-with-metadata
     environment:
       - MARQUEZ_URL=http://api:${API_PORT}
     volumes:

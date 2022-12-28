@@ -17,17 +17,6 @@ services:
       - db
     entrypoint: ["/opt/marquez/wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
-  web:
-    image: "marquezproject/marquez-web:${TAG}"
-    container_name: marquez-web
-    environment:
-      - MARQUEZ_HOST=api
-      - MARQUEZ_PORT=${API_PORT}
-    ports:
-      - "${WEB_PORT}:${WEB_PORT}"
-    depends_on:
-      - api
-
   db:
     image: postgres:12.1
     container_name: marquez-db
@@ -42,6 +31,7 @@ services:
     volumes:
       - db-conf:/etc/postgresql
       - db-init:/docker-entrypoint-initdb.d
+      - db-backup:/var/lib/postgresql/data
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
@@ -50,3 +40,4 @@ volumes:
   data:
   db-conf:
   db-init:
+  db-backup:

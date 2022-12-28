@@ -4,14 +4,9 @@ services:
     image: "marquezproject/marquez:${TAG}"
     build: .
 
-  seed_api:
+  seed_marquez:
     image: "marquezproject/marquez:${TAG}"
     build: .
-
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
 
   pghero:
     image: ankane/pghero
