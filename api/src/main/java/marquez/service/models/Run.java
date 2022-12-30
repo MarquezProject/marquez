@@ -60,7 +60,6 @@ public final class Run {
   private final String location;
   @Getter private final List<DatasetVersionId> inputVersions;
   @Getter private final List<DatasetVersionId> outputVersions;
-  @Getter private final Map<String, String> context;
   @Getter private final ImmutableMap<String, Object> facets;
 
   public Run(
@@ -80,7 +79,6 @@ public final class Run {
       String location,
       List<DatasetVersionId> inputVersions,
       List<DatasetVersionId> outputVersions,
-      Map<String, String> context,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.createdAt = createdAt;
@@ -98,7 +96,6 @@ public final class Run {
     this.location = location;
     this.inputVersions = inputVersions;
     this.outputVersions = outputVersions;
-    this.context = context;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
@@ -166,7 +163,6 @@ public final class Run {
     private String location;
     private List<DatasetVersionId> inputVersions;
     private List<DatasetVersionId> outputVersions;
-    private Map<String, String> context;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private ImmutableMap<String, Object> facets;
@@ -189,7 +185,6 @@ public final class Run {
           location,
           inputVersions,
           outputVersions,
-          context,
           facets);
     }
   }

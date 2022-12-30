@@ -5,9 +5,7 @@
 
 package marquez.db;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import java.time.Instant;
@@ -28,7 +26,6 @@ import marquez.db.mappers.ExtendedJobVersionRowMapper;
 import marquez.db.mappers.JobVersionMapper;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -70,10 +67,9 @@ public interface JobVersionDao extends BaseDao {
           GROUP BY io.job_version_uuid
       ), relevant_job_versions AS (
           SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version,\s
-          jv.location, jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid,\s
-          j.namespace_name, j.name AS job_name, jc.context
+          jv.location, jv.latest_run_uuid, j.namespace_uuid,\s
+          j.namespace_name, j.name AS job_name
           FROM job_versions jv
-          LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid
           INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
           WHERE j.name = :jobName AND j.namespace_name=:namespaceName
           ORDER BY jv.created_at DESC
@@ -94,7 +90,6 @@ public interface JobVersionDao extends BaseDao {
              jv.version           AS run_job_version,
              r.location           AS run_location,
              ra.args              AS run_args,
-             jv.context           AS run_context,
              f.facets             AS run_facets,
              ri.input_versions    AS run_input_versions,
              ro.output_versions   AS run_output_versions
@@ -141,7 +136,6 @@ public interface JobVersionDao extends BaseDao {
    * @param jobVersionUuid The unique ID of the job version.
    * @param now The last modified timestamp of the job version.
    * @param jobUuid The unique ID of the job associated with the version.
-   * @param jobContextUuid The unique ID of the job context associated with the version.
    * @param jobLocation The source code location for the job.
    * @param version The version of the job; for internal use only.
    * @param jobName The name of the job.
@@ -157,7 +151,6 @@ public interface JobVersionDao extends BaseDao {
       created_at,
       updated_at,
       job_uuid,
-      job_context_uuid,
       location,
       version,
       job_name,
@@ -168,7 +161,6 @@ public interface JobVersionDao extends BaseDao {
       :now,
       :now,
       :jobUuid,
-      :jobContextUuid,
       :jobLocation,
       :version,
       :jobName,
@@ -182,7 +174,6 @@ public interface JobVersionDao extends BaseDao {
       UUID jobVersionUuid,
       Instant now,
       UUID jobUuid,
-      UUID jobContextUuid,
       String jobLocation,
       UUID version,
       String jobName,
@@ -295,9 +286,9 @@ public interface JobVersionDao extends BaseDao {
   /**
    * Used to upsert an immutable {@link JobVersionRow} object when a {@link Run} has transitioned. A
    * {@link Version} is generated using {@link Utils#newJobVersionFor(NamespaceName, JobName,
-   * ImmutableSet, ImmutableSet, ImmutableMap, String)} based on the jobs inputs and inputs, source
-   * code location, and context. A version for a given job is created <i>only</i> when a {@link Run}
-   * transitions into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
+   * ImmutableSet, ImmutableSet, String)} based on the jobs inputs and inputs, source code location,
+   * and context. A version for a given job is created <i>only</i> when a {@link Run} transitions
+   * into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
    *
    * @param jobRow The job.
    * @param runUuid The unique ID of the run associated with the job version.
@@ -312,13 +303,6 @@ public interface JobVersionDao extends BaseDao {
       @NonNull Instant transitionedAt) {
     // Get the job.
     final JobDao jobDao = createJobDao();
-
-    // Get the job context.
-    final UUID jobContextUuid = jobRow.getJobContextUuid().get();
-    final JobContextRow jobContextRow =
-        createJobContextDao().findContextByUuid(jobContextUuid).get();
-    final ImmutableMap<String, String> jobContext =
-        Utils.fromJson(jobContextRow.getContext(), new TypeReference<>() {});
 
     // Get the inputs and outputs dataset versions for the run associated with the job version.
     final DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
@@ -341,7 +325,6 @@ public interface JobVersionDao extends BaseDao {
                     .orElse(jobRow.getName())),
             toDatasetIds(jobVersionInputs),
             toDatasetIds(jobVersionOutputs),
-            jobContext,
             jobRow.getLocation());
 
     // Add the job version.
@@ -351,7 +334,6 @@ public interface JobVersionDao extends BaseDao {
             UUID.randomUUID(),
             transitionedAt, // Use the timestamp of when the run state transitioned.
             jobRow.getUuid(),
-            jobContextUuid,
             jobRow.getLocation(),
             jobVersion.getValue(),
             jobRow.getName(),

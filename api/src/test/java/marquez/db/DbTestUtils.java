@@ -7,7 +7,6 @@ package marquez.db;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.Generator.newTimestamp;
-import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newExternalId;
@@ -41,7 +40,6 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -137,14 +135,7 @@ final class DbTestUtils {
         jdbi,
         namespace.getName(),
         jobName,
-        new JobMeta(
-            JobType.BATCH,
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            null,
-            ImmutableMap.of(),
-            description,
-            null));
+        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
   }
 
   public static JobRow createJobWithSymlinkTarget(
@@ -154,14 +145,7 @@ final class DbTestUtils {
         namespace.getName(),
         jobName,
         jobSymlinkId,
-        new JobMeta(
-            JobType.BATCH,
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            null,
-            ImmutableMap.of(),
-            description,
-            null));
+        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
   }
 
   /**
@@ -206,20 +190,10 @@ final class DbTestUtils {
         Utils.getMapper());
   }
 
-  /** Adds a new {@link JobContextRow} object to the {@code job_contexts} table. */
-  static JobContextRow newJobContext(final Jdbi jdbi) {
-    final JobContextDao jobContextDao = jdbi.onDemand(JobContextDao.class);
-    final ImmutableMap<String, String> context = newContext();
-    final String contextAsJson = Utils.toJson(newContext());
-    final String checksum = Utils.checksumFor(context);
-    return jobContextDao.upsert(newRowUuid(), newTimestamp(), contextAsJson, checksum);
-  }
-
   /** Adds a new {@link JobVersionRow} object to the {@code job_versions} table. */
   static ExtendedJobVersionRow newJobVersion(
       final Jdbi jdbi,
       final UUID jobUuid,
-      final UUID jobContextUuid,
       final UUID version,
       final String jobName,
       final UUID namespaceUuid,
@@ -229,7 +203,6 @@ final class DbTestUtils {
         newRowUuid(),
         newTimestamp(),
         jobUuid,
-        jobContextUuid,
         newLocation().toString(),
         version,
         jobName,
@@ -263,8 +236,7 @@ final class DbTestUtils {
       final UUID namespaceUuid,
       final String namespaceName,
       final String jobName,
-      final String jobLocation,
-      final UUID jobContextUuid) {
+      final String jobLocation) {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     return runDao.upsert(
         newRowUuid(),
@@ -279,8 +251,7 @@ final class DbTestUtils {
         namespaceUuid,
         namespaceName,
         jobName,
-        jobLocation,
-        jobContextUuid);
+        jobLocation);
   }
 
   /** Transition a {@link Run} to the provided {@link RunState}. */

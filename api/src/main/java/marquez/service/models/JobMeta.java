@@ -5,7 +5,6 @@
 
 package marquez.service.models;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.util.Optional;
@@ -25,7 +24,6 @@ public final class JobMeta {
   @Getter private final ImmutableSet<DatasetId> inputs;
   @Getter private final ImmutableSet<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable private final RunId runId;
 
@@ -34,14 +32,12 @@ public final class JobMeta {
       @NonNull final ImmutableSet<DatasetId> inputs,
       @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final URL location,
-      @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,
       @Nullable final RunId runId) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
-    this.context = (context == null) ? ImmutableMap.of() : context;
     this.description = description;
     this.runId = runId;
   }

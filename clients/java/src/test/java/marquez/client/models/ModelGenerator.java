@@ -179,7 +179,6 @@ public final class ModelGenerator {
         .outputs(newOutputs(4))
         .location(newLocation())
         .description(newDescription())
-        .context(newContext())
         .build();
   }
 
@@ -206,7 +205,6 @@ public final class ModelGenerator {
         newInputs(2),
         newOutputs(4),
         newLocation(),
-        newContext(),
         newDescription(),
         latestRun,
         null,
@@ -300,11 +298,6 @@ public final class ModelGenerator {
   public static URL newLocation() {
     return Utils.toUrl(
         String.format("https://github.com/test-org/test-repo/blob/%s/test.java", newId()));
-  }
-
-  public static Map<String, String> newContext() {
-    return ImmutableMap.of(
-        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
   public static URL newSchemaLocation() {

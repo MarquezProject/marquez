@@ -10,8 +10,10 @@ import {
   FETCH_DATASET_VERSIONS,
   FETCH_EVENTS,
   FETCH_JOBS,
+  FETCH_JOB_FACETS,
   FETCH_LINEAGE,
   FETCH_RUNS,
+  FETCH_RUN_FACETS,
   FETCH_SEARCH
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
@@ -27,6 +29,7 @@ import {
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
   fetchEventsSuccess,
+  fetchFacetsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
@@ -40,8 +43,10 @@ import {
   getDatasetVersions,
   getDatasets,
   getEvents,
+  getJobFacets,
   getJobs,
   getNamespaces,
+  getRunFacets,
   getRuns
 } from '../requests'
 import { getLineage } from '../requests/lineage'
@@ -177,6 +182,30 @@ export function* fetchDatasetVersionsSaga() {
   }
 }
 
+export function* fetchJobFacetsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOB_FACETS)
+      const jobFacets = yield call(getJobFacets, payload.runId)
+      yield put(fetchFacetsSuccess(jobFacets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching job facets'))
+    }
+  }
+}
+
+export function* fetchRunFacetsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_RUN_FACETS)
+      const runFacets = yield call(getRunFacets, payload.runId)
+      yield put(fetchFacetsSuccess(runFacets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching run facets'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces()]
   const sagasThatWatchForAction = [
@@ -186,6 +215,8 @@ export default function* rootSaga(): Generator {
     fetchDatasetSaga(),
     fetchDatasetVersionsSaga(),
     fetchEventsSaga(),
+    fetchJobFacetsSaga(),
+    fetchRunFacetsSaga(),
     fetchLineage(),
     fetchSearch(),
     deleteJobSaga(),

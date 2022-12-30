@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.postgresql.util.PGobject;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobFacetsDaoTest {
@@ -82,6 +83,36 @@ public class JobFacetsDaoTest {
             "{\"sourceCodeLocation\": {\"url\": \"git@github.com:OpenLineage/OpenLineage.git\", "
                 + "\"type\": \"git\", \"_producer\": \"http://test.producer/\", "
                 + "\"_schemaURL\": \"http://test.schema/\"}}");
+  }
+
+  @Test
+  public void testGetFacetsByRunUuid() {
+    LineageEvent.JobFacet jobFacet =
+        new LineageEvent.JobFacet(
+            new LineageEvent.DocumentationJobFacet(PRODUCER_URL, SCHEMA_URL, "some-documentation"),
+            new LineageEvent.SourceCodeLocationJobFacet(
+                PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
+            new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"),
+            null);
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "job_" + UUID.randomUUID(),
+            "COMPLETE",
+            jobFacet,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            new LineageEvent.ParentRunFacet(
+                PRODUCER_URL,
+                SCHEMA_URL,
+                new LineageEvent.RunLink(UUID.randomUUID().toString()),
+                new LineageEvent.JobLink("namespace", "name")),
+            ImmutableMap.of().of("custom-run-facet", "some-run-facet"));
+
+    assertThat(jobFacetsDao.findJobFacetsByRunUuid(lineageRow.getRun().getUuid()).getFacets())
+        .hasSize(3)
+        .extracting("sql.query")
+        .isEqualTo("some sql query");
   }
 
   private List<JobFacetsDao.JobFacetRow> getJobFacetRow() {

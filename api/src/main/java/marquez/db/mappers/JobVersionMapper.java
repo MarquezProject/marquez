@@ -5,7 +5,6 @@
 
 package marquez.db.mappers;
 
-import static marquez.db.Columns.mapOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
@@ -35,7 +34,7 @@ import org.jdbi.v3.core.statement.StatementContext;
  * Convert a database row to a {@link JobVersion}. For the {@link JobVersion#latestRun}, we delegate
  * to the {@link RunMapper} with a specified prefix of {@value #RUN_COLUMN_PREFIX}, meaning all
  * run-related columns should be prefixed in the SQL query. This avoids conflicts between common
- * column names, such as created_at, uuid, and context.
+ * column names, such as created_at and uuid.
  */
 @Slf4j
 public class JobVersionMapper implements RowMapper<JobVersion> {
@@ -60,7 +59,6 @@ public class JobVersionMapper implements RowMapper<JobVersion> {
         timestampOrThrow(results, Columns.CREATED_AT),
         Version.of(uuidOrThrow(results, Columns.VERSION)),
         urlOrNull(results, Columns.LOCATION),
-        mapOrNull(results, Columns.CONTEXT),
         toDatasetIdsList(results, Columns.INPUT_DATASETS),
         toDatasetIdsList(results, Columns.OUTPUT_DATASETS),
         latestRun);

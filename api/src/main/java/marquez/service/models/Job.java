@@ -37,7 +37,6 @@ public final class Job {
   @Getter @Setter private Set<DatasetId> inputs;
   @Getter @Setter private Set<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter private final ImmutableMap<String, String> context;
   @Nullable private final String description;
   @Nullable @Setter private Run latestRun;
   @Getter private final ImmutableMap<String, Object> facets;
@@ -54,7 +53,6 @@ public final class Job {
       @NonNull final Set<DatasetId> inputs,
       @NonNull final Set<DatasetId> outputs,
       @Nullable final URL location,
-      @Nullable final ImmutableMap<String, String> context,
       @Nullable final String description,
       @Nullable final Run latestRun,
       @Nullable final ImmutableMap<String, Object> facets,
@@ -70,7 +68,6 @@ public final class Job {
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
-    this.context = (context == null) ? ImmutableMap.of() : context;
     this.description = description;
     this.latestRun = latestRun;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;

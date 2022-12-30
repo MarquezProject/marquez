@@ -49,6 +49,7 @@ class RunDaoTest {
   private static RunDao runDao;
   private static Jdbi jdbi;
   private static JobVersionDao jobVersionDao;
+  private static OpenLineageDao openLineageDao;
 
   static NamespaceRow namespaceRow;
   static JobRow jobRow;
@@ -58,6 +59,7 @@ class RunDaoTest {
     RunDaoTest.jdbi = jdbi;
     runDao = jdbi.onDemand(RunDao.class);
     jobVersionDao = jdbi.onDemand(JobVersionDao.class);
+    openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     namespaceRow = DbTestUtils.newNamespace(jdbi);
     jobRow = DbTestUtils.newJob(jdbi, namespaceRow.getName(), newJobName().getValue());
   }
@@ -218,7 +220,6 @@ class RunDaoTest {
             namespaceRow.getUuid(),
             namespaceRow.getName(),
             jobRow.getName(),
-            null,
             null);
 
     assertThat(row.getUuid()).isEqualTo(updatedRow.getUuid());
@@ -251,7 +252,6 @@ class RunDaoTest {
         namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
-        null,
         null);
 
     runDao.upsert(
@@ -267,7 +267,6 @@ class RunDaoTest {
         namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
-        null,
         null);
 
     Optional<ExtendedRunRow> runRowOpt = runDao.findRunByUuidAsExtendedRow(row.getUuid());

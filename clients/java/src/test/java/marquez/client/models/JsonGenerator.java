@@ -245,14 +245,11 @@ public final class JsonGenerator {
     final ArrayNode inputs = MAPPER.valueToTree(meta.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(meta.getOutputs());
     final ObjectNode obj = MAPPER.createObjectNode();
-    final ObjectNode context = MAPPER.createObjectNode();
-    meta.getContext().forEach(context::put);
 
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", meta.getLocation().map(URL::toString).orElse(null));
-    obj.set("context", context);
     obj.put("description", meta.getDescription().orElse(null));
     obj.put("runId", meta.getRunId().orElse(null));
 
@@ -267,8 +264,6 @@ public final class JsonGenerator {
             .put("name", job.getId().getName());
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
-    final ObjectNode context = MAPPER.createObjectNode();
-    job.getContext().forEach(context::put);
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -281,7 +276,6 @@ public final class JsonGenerator {
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation().map(URL::toString).orElse(null));
-    obj.set("context", context);
     obj.put("description", job.getDescription().orElse(null));
     obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
     obj.put("currentVersion", job.getCurrentVersion().map(UUID::toString).orElse(null));

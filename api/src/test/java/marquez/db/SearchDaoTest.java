@@ -7,7 +7,6 @@ package marquez.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.sql.SQLException;
@@ -84,7 +83,6 @@ public class SearchDaoTest {
                             ImmutableSet.copyOf(j.getInputs()),
                             ImmutableSet.of(),
                             new URL(j.getLocation()),
-                            ImmutableMap.of(),
                             j.getDescription().orElse(null),
                             null));
                 PGobject inputs = new PGobject();
@@ -99,7 +97,6 @@ public class SearchDaoTest {
                         namespaceRow.getName(),
                         j.getName(),
                         j.getDescription().orElse(null),
-                        j.getJobContextUuid().orElse(null),
                         j.getLocation(),
                         symlinkTargetJob.getUuid(),
                         inputs);

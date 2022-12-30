@@ -181,7 +181,6 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
             .inputs(NAMESPACE_NAME, DATASET_NAME)
             .outputs(NAMESPACE_NAME, DATASET_NAME)
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(runId)
             .build();

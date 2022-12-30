@@ -9,7 +9,6 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
-import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetFacets;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
@@ -237,7 +236,6 @@ public class MarquezClientTest {
   private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
-  private static final Map<String, String> JOB_CONTEXT = newContext();
   private static final Job JOB =
       new Job(
           JOB_ID,
@@ -251,7 +249,6 @@ public class MarquezClientTest {
           INPUTS,
           OUTPUTS,
           LOCATION,
-          JOB_CONTEXT,
           JOB_DESCRIPTION,
           null,
           null,
@@ -344,7 +341,6 @@ public class MarquezClientTest {
           INPUTS,
           OUTPUTS,
           LOCATION,
-          JOB_CONTEXT,
           JOB_DESCRIPTION,
           new Run(
               RUN_ID,
@@ -787,7 +783,6 @@ public class MarquezClientTest {
             .outputs(OUTPUTS)
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
-            .context(JOB_CONTEXT)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
@@ -808,7 +803,6 @@ public class MarquezClientTest {
             .outputs(OUTPUTS)
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
-            .context(JOB_CONTEXT)
             .runId(RUN_ID)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);

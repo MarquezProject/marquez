@@ -17,7 +17,6 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 public class UpdateLineageRow {
   private NamespaceRow namespace;
   private JobRow job;
-  private JobContextRow jobContext;
   private RunArgsRow runArgs;
   private RunRow run;
   private RunStateRow runState;

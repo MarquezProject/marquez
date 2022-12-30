@@ -60,8 +60,6 @@ class JobMapperTest {
         .thenReturn(UUID.fromString("b1d626a2-6d3a-475e-9ecf-943176d4a8c6"));
     when(resultSet.getString("current_location")).thenReturn("https://github.com/");
     when(resultSet.getObject("current_location")).thenReturn("https://github.com/");
-    when(resultSet.getString(Columns.CONTEXT)).thenReturn("{ \"test\" : \"value\"}");
-    when(resultSet.getObject(Columns.CONTEXT)).thenReturn("{ \"test\" : \"value\"}");
     when(resultSet.getString(Columns.FACETS)).thenReturn(null);
     when(resultSet.getObject(Columns.FACETS)).thenReturn(null);
     PGobject inputs = new PGobject();

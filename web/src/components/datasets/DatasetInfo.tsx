@@ -8,18 +8,53 @@ import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 import RunStatus from '../jobs/RunStatus'
+import * as Redux from 'redux'
+import { IState } from '../../store/reducers'
+import { connect } from 'react-redux'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 
-interface DatasetInfoProps {
+export interface DispatchProps {
+  fetchJobFacets: typeof fetchJobFacets
+  resetFacets: typeof resetFacets
+}
+
+interface JobFacets {
+  [key: string]: object
+}
+
+export interface JobFacetsProps {
+  jobFacets: JobFacets
+}
+
+export interface SqlFacet {
+  query: string
+}
+
+
+type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
   run?: Run
-}
+} & JobFacetsProps &
+  DispatchProps
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
-  const { datasetFields, facets, run } = props
+  const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
+
+  useEffect(() => {
+    run && fetchJobFacets(run.id)
+  }, [])
+
+  // unmounting
+  useEffect(
+    () => () => {
+      resetFacets()
+    },
+    []
+  )
 
   return (
     <Box>
@@ -86,11 +121,27 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </Box>
             <MqText subdued>{run.jobVersion.name}</MqText>
           </Box>
-          <MqCode code={run.context.sql} language={'sql'} />
+          {jobFacets.sql && <MqCode code={(jobFacets.sql as SqlFacet).query} language={'sql'} />}
         </Box>
       )}
     </Box>
   )
 }
 
-export default DatasetInfo
+const mapStateToProps = (state: IState) => ({
+  jobFacets: state.facets.result
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  Redux.bindActionCreators(
+    {
+      fetchJobFacets: fetchJobFacets,
+      resetFacets: resetFacets
+    },
+    dispatch
+  )
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DatasetInfo)
