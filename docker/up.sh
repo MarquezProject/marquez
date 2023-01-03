@@ -60,6 +60,7 @@ cd "${project_root}/"
 # Base docker compose file
 compose_files="-f docker-compose.yml"
 
+# Default args
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
@@ -67,6 +68,7 @@ NO_WEB="false"
 NO_VOLUMES="false"
 TAG="${VERSION}"
 ARGS="-V --force-recreate --remove-orphans"
+# Parse args
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')

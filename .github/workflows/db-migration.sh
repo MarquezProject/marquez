@@ -20,7 +20,7 @@ log_db_migration() {
         postgres:12.1
   # ...
   log "latest migration applied to db:"
-  docker exec -it log-db-migration \
+  docker exec log-db-migration \
     psql -U marquez -c "${QUERY_DB_MIGRATION}"
 }
 
