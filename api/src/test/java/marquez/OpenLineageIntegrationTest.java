@@ -138,6 +138,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         "{\"eventTime\": \"2021-11-03T10:53:52.427343\", \"eventType\": \"COMPLETE\", \"inputs\": [{\"facets\": {}, \"name\": \"OPEN_LINEAGE_DEMO.DEMO.SOURCE_TABLE_1\", \"namespace\": \"testing_namespace_1\"}], "
             + "\"job\": {\"facets\": {}, \"name\": \"testing_name_1\", \"namespace\": \"testing_namespace_1\"}, "
             + "\"outputs\": [], \"producer\": \"me\", \"run\": {\"facets\": {}, \"runId\": null}}",
+
+        // parent run facet has an empty {} run section
+        "{\"eventTime\": \"2021-11-03T10:53:52.427343\", \"eventType\": \"COMPLETE\", \"inputs\": [{\"facets\": {}, \"name\": \"OPEN_LINEAGE_DEMO.DEMO.SOURCE_TABLE_1\", \"namespace\": \"testing_namespace_1\"}], "
+            + "\"job\": {\"facets\": {}, \"name\": \"testing_name_1\", \"namespace\": \"testing_namespace_1\"}, "
+            + "\"outputs\": [], \"producer\": \"me\", \"run\": {\"facets\": { \"parent\": "
+            + "{ \"_producer\": \"me\", \"_schemaURL\": \"https://me\", \"run\": {}, \"job\": { \"namespace\": \"my-scheduler-namespace\", \"name\": \"myjob.mytask\"} }},"
+            + "\"runId\": \"dae0d60a-6010-4c37-980e-c5270f5a6be4\"}}",
       })
   public void testSendOpenLineageEventFailsValidation(String eventBody) throws IOException {
     final CompletableFuture<Integer> resp =
