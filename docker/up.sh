@@ -118,15 +118,15 @@ if [[ "${DETACH}" = "true" ]]; then
   ARGS+=" --detach"
 fi
 
+# Enable starting HTTP API server with sample metadata
+if [[ "${SEED}" = "true" ]]; then
+  compose_files+=" -f docker-compose.seed.yml"
+fi
+
 # Enable building from source
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
   ARGS+=" --build"
-fi
-
-# Enable starting HTTP API server with sample metadata; otherwise use dev compose file in build mode
-if [[ "${SEED}" = "true" && "${BUILD}" = "false" ]]; then
-  compose_files+=" -f docker-compose.seed.yml"
 fi
 
 # Enable web UI
@@ -142,5 +142,5 @@ if [[ "${NO_VOLUMES}" = "false" ]]; then
 fi
 
 # Run docker compose cmd with overrides
-DOCKER_SCAN_SUGGEST=false API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
+DOCKER_SCAN_SUGGEST=false DOCKER_BUILDKIT=1 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
   docker-compose --log-level ERROR $compose_files up $ARGS
