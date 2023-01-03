@@ -1,11 +1,9 @@
 version: "3.7"
 services:
   api:
-    image: "marquezproject/marquez:${TAG}"
     build: .
 
   seed_marquez:
-    image: "marquezproject/marquez:${TAG}"
     build: .
 
   pghero:
