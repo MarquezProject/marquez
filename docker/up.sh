@@ -90,7 +90,7 @@ while [ $# -gt 0 ]; do
        ;;
     --args)
        shift
-       ARGS="${1}"
+       ARGS+=" ${1}"
        ;;
     -b|'--build')
        BUILD='true'
