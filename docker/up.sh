@@ -5,7 +5,7 @@
 #
 # Usage: $ ./build-and-push.sh [FLAGS] [ARG...]
 
-set -e
+set -ex
 
 # Version of Marquez
 readonly VERSION=0.29.0
@@ -67,6 +67,7 @@ WEB_PORT=3000
 NO_WEB="false"
 NO_VOLUMES="false"
 TAG="${VERSION}"
+BUILD="false"
 ARGS="-V --force-recreate --remove-orphans"
 # Parse args
 while [ $# -gt 0 ]; do
@@ -99,12 +100,8 @@ while [ $# -gt 0 ]; do
        SEED='true'
        ;;
     -d|'--detach') DETACH='true' ;;
-    --no-web)
-      NO_WEB='true'
-      ;;
-    --no-volumes)
-      NO_VOLUMES='true'
-      ;;
+    --no-web) NO_WEB='true' ;;
+    --no-volumes) NO_VOLUMES='true' ;;
     -h|'--help')
        usage
        exit 0
@@ -131,8 +128,6 @@ fi
 if [[ "${SEED}" = "true" && "${BUILD}" = "false" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
-
-echo "${NO_WEB}"
 
 # Enable web UI
 if [[ "${NO_WEB}" = "false" ]]; then
