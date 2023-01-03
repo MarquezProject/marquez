@@ -9,10 +9,12 @@ import {
   FETCH_JOBS,
   FETCH_LINEAGE,
   FETCH_RUNS,
-  FETCH_SEARCH
+  FETCH_SEARCH,
+  DELETE_JOB,
+  DELETE_DATASET
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
-import { all, put, take } from 'redux-saga/effects'
+import { all, put, take, takeEvery } from 'redux-saga/effects'
 
 const call: any = Effects.call
 
@@ -26,14 +28,18 @@ import {
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
-  fetchSearchSuccess
+  fetchSearchSuccess,
+  deleteJobSuccess,
+  deleteDatasetSuccess
 } from '../actionCreators'
 import {
   getDataset,
   getDatasetVersions,
   getDatasets,
+  deleteDataset,
   getEvents,
   getJobs,
+  deleteJob,
   getNamespaces,
   getRuns
 } from '../requests'
@@ -98,6 +104,18 @@ export function* fetchJobsSaga() {
   }
 }
 
+export function* deleteJobSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_JOB)
+      const job = yield call(deleteJob, payload.jobName, payload.namespace)
+      yield put(deleteJobSuccess(job.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing job'))
+    }
+  }
+}
+
 export function* fetchDatasetsSaga() {
   while (true) {
     try {
@@ -134,6 +152,18 @@ export function* fetchDatasetSaga() {
   }
 }
 
+export function* deleteDatasetSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET)
+      const dataset = yield call(deleteDataset, payload.datasetName, payload.namespace)
+      yield put(deleteDatasetSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing job'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -156,7 +186,9 @@ export default function* rootSaga(): Generator {
     fetchDatasetVersionsSaga(),
     fetchEventsSaga(),
     fetchLineage(),
-    fetchSearch()
+    fetchSearch(),
+    deleteJobSaga(),
+    deleteDatasetSaga()
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

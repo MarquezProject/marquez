@@ -4,6 +4,7 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import '../../i18n/config'
 import * as Redux from 'redux'
+import { alpha } from '@material-ui/core/styles'
 import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
 import { IState } from '../../store/reducers'
 import {
@@ -12,13 +13,15 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
+import { theme } from '../../helpers/theme'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchRuns, resetRuns } from '../../store/actionCreators'
+import { fetchRuns, resetRuns, resetJobs, deleteJob, dialogToggle } from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
+import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
@@ -30,6 +33,13 @@ const styles = ({ spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: spacing(2)
+    },
+    buttonDelete: {
+      backgroundColor: theme.palette.error.main,
+      color: 'white',
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.error.main, 0.9)
+      },
     }
   })
 }
@@ -37,16 +47,21 @@ const styles = ({ spacing }: ITheme) => {
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
   resetRuns: typeof resetRuns
+  resetJobs: typeof resetJobs
+  deleteJob: typeof deleteJob
+  dialogToggle: typeof dialogToggle
 }
 
 type IProps = IWithStyles<typeof styles> & {
   job: LineageJob
+  jobs: IState['jobs']
   runs: Run[]
   runsLoading: boolean
+  display: IState['display']
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes, fetchRuns, resetRuns, runs, runsLoading } = props
+  const { job, jobs, classes, fetchRuns, resetRuns, deleteJob, dialogToggle, runs, display, runsLoading } = props
   const history = useHistory()
 
   const [tab, setTab] = React.useState(0)
@@ -59,10 +74,17 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     fetchRuns(job.name, job.namespace)
   }, [job.name])
 
+  useEffect(() => {
+    if (jobs.deletedJobName) {
+      history.push('/')
+    }
+  }, [jobs.deletedJobName])
+
   // unmounting
   useEffect(() => {
     return () => {
       resetRuns()
+      resetJobs()
     }
   }, [])
 
@@ -88,6 +110,26 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
+          <Box mr={1}>
+            <Button
+              color='primary'
+              className={classes.buttonDelete}
+              onClick={() => {
+                props.dialogToggle('')
+              }}
+            >
+              {i18next.t('jobs.delete')}
+            </Button>
+            <Dialog
+              dialogIsOpen={display.dialogIsOpen}
+              dialogToggle={dialogToggle}
+              title={'Are you sure?'} // i18next.t('jobs.dialogTitleConfirm')
+              ignoreWarning={() => {
+                deleteJob(job.name, job.namespace)
+                props.dialogToggle('')
+              }}
+            />
+          </Box>
           <Box mr={1}>
             <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
               {i18next.t('jobs.location')}
@@ -128,14 +170,19 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   runs: state.runs.result,
-  runsLoading: state.runs.isLoading
+  runsLoading: state.runs.isLoading,
+  display: state.display,
+  jobs: state.jobs
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchRuns: fetchRuns,
-      resetRuns: resetRuns
+      resetRuns: resetRuns,
+      resetJobs: resetJobs,
+      deleteJob: deleteJob,
+      dialogToggle: dialogToggle
     },
     dispatch
   )

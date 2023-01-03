@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Chip, Tab, Tabs } from '@material-ui/core'
+import { alpha } from '@material-ui/core/styles'
+import { Box, Chip, Tab, Tabs, Button } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import {
@@ -10,13 +11,16 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
+import { theme } from '../../helpers/theme'
 import { LineageDataset } from '../lineage/types'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
   fetchDatasetVersions,
   resetDataset,
-  resetDatasetVersions
+  resetDatasetVersions,
+  deleteDataset,
+  dialogToggle
 } from '../../store/actionCreators'
 import { useHistory } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
@@ -24,6 +28,7 @@ import CloseIcon from '@material-ui/icons/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
+import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
@@ -44,6 +49,13 @@ const styles = ({ spacing }: ITheme) => {
       '&:not(:last-of-type)': {
         marginRight: spacing(1)
       }
+    },
+    buttonDelete: {
+      backgroundColor: theme.palette.error.main,
+      color: 'white',
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.error.main, 0.9)
+      },
     }
   })
 }
@@ -52,12 +64,16 @@ interface StateProps {
   lineageDataset: LineageDataset
   versions: DatasetVersion[]
   versionsLoading: boolean
+  datasets: IState['datasets']
+  display: IState['display']
 }
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
+  deleteDataset: typeof deleteDataset
+  dialogToggle: typeof dialogToggle
 }
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
@@ -72,11 +88,15 @@ function a11yProps(index: number) {
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const {
     classes,
+    datasets,
+    display,
     fetchDatasetVersions,
     resetDataset,
     resetDatasetVersions,
+    deleteDataset,
     versions,
-    versionsLoading
+    versionsLoading,
+    lineageDataset
   } = props
   const { root } = classes
   const history = useHistory()
@@ -86,14 +106,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
   }, [props.lineageDataset.name])
 
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      history.push('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
+
   // unmounting
-  useEffect(
-    () => () => {
-      resetDataset()
-      resetDatasetVersions()
-    },
-    []
-  )
+  useEffect(() => () => {
+    resetDataset()
+    resetDatasetVersions()
+  }, [])
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -147,9 +170,31 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
               />
             </Tabs>
           </Box>
-          <IconButton onClick={() => history.push('/datasets')}>
-            <CloseIcon />
-          </IconButton>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                color='primary'
+                className={classes.buttonDelete}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
+              >
+                {i18next.t('jobs.delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={'Are you sure?'} // i18next.t('jobs.dialogTitleConfirm')
+                ignoreWarning={() => {
+                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
+                  props.dialogToggle('')
+                }}
+              />
+            </Box>
+            <IconButton onClick={() => history.push('/datasets')}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
         <MqText heading font={'mono'}>
           {name}
@@ -172,7 +217,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets.result,
+  datasets: state.datasets,
+  display: state.display,
   versions: state.datasetVersions.result.versions,
   versionsLoading: state.datasetVersions.isLoading
 })
@@ -182,7 +228,9 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       fetchDatasetVersions: fetchDatasetVersions,
       resetDatasetVersions: resetDatasetVersions,
-      resetDataset: resetDataset
+      resetDataset: resetDataset,
+      deleteDataset: deleteDataset,
+      dialogToggle: dialogToggle
     },
     dispatch
   )

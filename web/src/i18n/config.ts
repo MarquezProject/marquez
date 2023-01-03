@@ -29,7 +29,8 @@ i18next
             empty_title: 'No Run Information Available',
             empty_body: 'Try adding some runs for this job.',
             runinfo_subhead: 'FACETS',
-            runs_subhead: 'FACETS'
+            runs_subhead: 'FACETS',
+            delete: "DELETE"
           },
           search: {
             search: 'Search',
