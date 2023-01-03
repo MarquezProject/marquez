@@ -48,7 +48,7 @@ log "start db using backup:"
   --no-web \
   --no-volumes \
   --build \
-  --seed > /dev/null && log_db_migration
+  --seed && log_db_migration
 
 cleanup
 
