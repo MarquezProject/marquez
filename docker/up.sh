@@ -127,8 +127,8 @@ if [[ "${BUILD}" = "true" ]]; then
   ARGS+=" --build"
 fi
 
-# Enable starting HTTP API server with sample metadata
-if [[ "${SEED}" = "true" ]]; then
+# Enable starting HTTP API server with sample metadata; otherwise use dev compose file in build mode
+if [[ "${SEED}" = "true" && "${BUILD}" = "false" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
