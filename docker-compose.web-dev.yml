@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   web:
+    image: "marquezproject/marquez-web:${TAG}"
     build:
       context: ./web
       dockerfile: Dockerfile
