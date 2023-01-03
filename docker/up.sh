@@ -63,7 +63,9 @@ compose_files="-f docker-compose.yml"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=${VERSION}
+NO_WEB="false"
+NO_VOLUMES="false"
+TAG="${VERSION}"
 ARGS="-V --force-recreate --remove-orphans"
 while [ $# -gt 0 ]; do
   case $1 in
@@ -91,10 +93,16 @@ while [ $# -gt 0 ]; do
        BUILD='true'
        TAG="${BUILD_VERSION}"
        ;;
-    -s|'--seed') SEED='true' ;;
+    -s|'--seed')
+       SEED='true'
+       ;;
     -d|'--detach') DETACH='true' ;;
-    --no-web) NO_WEB='true' ;;
-    --no-volumes) NO_VOLUMES='true' ;;
+    --no-web)
+      NO_WEB='true'
+      ;;
+    --no-volumes)
+      NO_VOLUMES='true'
+      ;;
     -h|'--help')
        usage
        exit 0
@@ -122,15 +130,17 @@ if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
+echo "${NO_WEB}"
+
 # Enable web UI
-if [[ "${NO_WEB}" = "true" ]]; then
+if [[ "${NO_WEB}" = "false" ]]; then
   # Enable building web UI from source; otherwise use 'latest' build
   [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml" \
     || compose_files+=" -f docker-compose.web.yml"
 fi
 
 # Create docker volumes for Marquez
-if [[ "${NO_VOLUMES}" = "true" ]]; then
+if [[ "${NO_VOLUMES}" = "false" ]]; then
   ./docker/volumes.sh marquez
 fi
 
