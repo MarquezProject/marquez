@@ -6,51 +6,57 @@
 # Usage: $ ./db-migration.sh
 
 readonly DB_MIGRATION="log-db-migration"
-readonly QUERY_DB_MIGRATION="SELECT version,installed_on FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_on DESC LIMIT 1;"
+readonly DB_MIGRATION_QUERY=$(cat <<-END
+  SELECT version,installed_on,checksum
+    FROM flyway_schema_history
+   WHERE version IS NOT NULL
+   ORDER BY version DESC LIMIT 1;
+END
+)
 
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
 }
 
-log_db_migration() {
-  # ...
+query_db_migration() {
+  # Start db using backup
   [[ $(docker ps -f "name=${DB_MIGRATION}" --format '{{.Names}}') == "${DB_MIGRATION}" ]] || \
     docker run -d --name "${DB_MIGRATION}"  \
         -v marquez_db-backup:/var/lib/postgresql/data \
         postgres:12.1
-  # ...
+  # Query applied db migrations
   log "latest migration applied to db:"
   docker exec log-db-migration \
-    psql -U marquez -c "${QUERY_DB_MIGRATION}"
-    sleep 2
-}
-
-cleanup() {
-  log "running db migration cleanup..."
-  docker rm -f "${DB_MIGRATION}" > /dev/null
+    psql -U marquez -c "${DB_MIGRATION_QUERY}"
 }
 
 # Change working directory to project root
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
-# (1) ...
+# (1) Apply db migrations on latest Marquez release
 log "start db with latest migrations:"
-./docker/up.sh \
+if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --tag "latest" \
   --no-web \
-  --seed > /dev/null && log_db_migration
+  --seed > /dev/null; then
+  exit 1
+fi
 
-# (2) ...
+query_db_migration
+
+# (2) Apply db migrations on latest Marquez build
 log "start db using backup:"
-./docker/up.sh \
+if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --no-web \
   --no-volumes \
   --build \
-  --seed > /dev/null && log_db_migration
+  --seed > /dev/null; then
+  exit 1
+fi
 
-cleanup
+query_db_migration
 
 log "DONE!"
