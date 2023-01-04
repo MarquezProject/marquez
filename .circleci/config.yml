@@ -154,6 +154,7 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
+      - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/db-migration.sh
 
   release-java:

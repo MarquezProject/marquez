@@ -6,7 +6,7 @@
 # Usage: $ ./db-migration.sh
 
 readonly DB_MIGRATION="log-db-migration"
-readonly QUERY_DB_MIGRATION="SELECT * FROM flyway_schema_history ORDER BY installed_on DESC LIMIT 1;"
+readonly QUERY_DB_MIGRATION="SELECT version,installed_on FROM flyway_schema_history WHERE version IS NOT NULL ORDER BY installed_on DESC LIMIT 1;"
 
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
