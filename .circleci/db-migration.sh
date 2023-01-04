@@ -5,7 +5,7 @@
 #
 # Usage: $ ./db-migration.sh
 
-readonly DB_MIGRATION="log-db-migration"
+readonly DB_MIGRATION_BACKUP="db-migration-backup"
 readonly DB_MIGRATION_QUERY=$(cat <<-END
   SELECT version,installed_on,checksum
     FROM flyway_schema_history
@@ -20,13 +20,13 @@ log() {
 
 query_db_migration() {
   # Start db using backup
-  [[ $(docker ps -f "name=${DB_MIGRATION}" --format '{{.Names}}') == "${DB_MIGRATION}" ]] || \
-    docker run -d --name "${DB_MIGRATION}"  \
+  [[ $(docker ps -f "name=${DB_MIGRATION_BACKUP}" --format '{{.Names}}') == "${DB_MIGRATION_BACKUP}" ]] || \
+    docker run -d --name "${DB_MIGRATION_BACKUP}" \
         -v marquez_db-backup:/var/lib/postgresql/data \
         postgres:12.1
   # Query applied db migrations
   log "latest migration applied to db:"
-  docker exec log-db-migration \
+  docker exec "${DB_MIGRATION_BACKUP}" \
     psql -U marquez -c "${DB_MIGRATION_QUERY}"
 }
 
