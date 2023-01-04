@@ -154,7 +154,7 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
-      - run: ./.github/workflows/db-migration.sh
+      - run: ./.circleci/db-migration.sh
 
   release-java:
     working_directory: ~/marquez
