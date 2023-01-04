@@ -40,7 +40,7 @@ log "start db with latest migrations:"
   --args "--exit-code-from seed_marquez" \
   --tag "latest" \
   --no-web \
-  --seed && log_db_migration
+  --seed > /dev/null && log_db_migration
 
 # (2) ...
 log "start db using backup:"
@@ -49,7 +49,7 @@ log "start db using backup:"
   --no-web \
   --no-volumes \
   --build \
-  --seed && log_db_migration
+  --seed > /dev/null && log_db_migration
 
 cleanup
 
