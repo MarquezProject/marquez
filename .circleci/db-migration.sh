@@ -46,7 +46,7 @@ fi
 
 query_db_migration
 
-# (2) Apply db migrations on latest Marquez build
+# (2) Apply db migrations on latest Marquez build using backup
 log "start db using backup:"
 if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
