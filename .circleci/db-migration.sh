@@ -10,7 +10,7 @@ readonly DB_MIGRATION_QUERY=$(cat <<-END
   SELECT version,installed_on,checksum
     FROM flyway_schema_history
    WHERE version IS NOT NULL
-   ORDER BY version DESC LIMIT 1;
+   ORDER BY installed_on DESC LIMIT 1;
 END
 )
 
