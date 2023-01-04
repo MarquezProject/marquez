@@ -22,6 +22,7 @@ log_db_migration() {
   log "latest migration applied to db:"
   docker exec log-db-migration \
     psql -U marquez -c "${QUERY_DB_MIGRATION}"
+    sleep 2
 }
 
 cleanup() {

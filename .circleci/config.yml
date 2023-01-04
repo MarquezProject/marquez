@@ -195,6 +195,7 @@ workflows:
       - build-api:
           requires:
             - lint-spec-api
+            - build-client-java
       - build-image-api:
           requires:
             - build-api

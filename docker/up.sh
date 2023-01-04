@@ -5,7 +5,7 @@
 #
 # Usage: $ ./build-and-push.sh [FLAGS] [ARG...]
 
-set -ex
+set -e
 
 # Version of Marquez
 readonly VERSION=0.29.0
@@ -142,5 +142,5 @@ if [[ "${NO_VOLUMES}" = "false" ]]; then
 fi
 
 # Run docker compose cmd with overrides
-DOCKER_SCAN_SUGGEST=false DOCKER_BUILDKIT=1 API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
+DOCKER_SCAN_SUGGEST=false API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
   docker-compose --log-level ERROR $compose_files up $ARGS
