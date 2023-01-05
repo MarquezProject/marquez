@@ -26,8 +26,8 @@ query_db_migration() {
   # Start db using backup
   [[ $(docker ps -f "name=${DB_MIGRATION_BACKUP}" --format '{{.Names}}') == "${DB_MIGRATION_BACKUP}" ]] || \
     docker run -d --name "${DB_MIGRATION_BACKUP}" \
-        -v "${DB_MIGRATION_VOLUME}:/var/lib/postgresql/data" \
-        "postgres:${POSTGRES_VERSION}"
+      -v "${DB_MIGRATION_VOLUME}:/var/lib/postgresql/data" \
+      "postgres:${POSTGRES_VERSION}"
   # Query applied db migrations
   log "latest migration applied to db:"
   docker exec "${DB_MIGRATION_BACKUP}" \
