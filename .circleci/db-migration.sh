@@ -62,7 +62,7 @@ if ! ./docker/up.sh \
   exit 1
 fi
 
-# Query, then display any additional schema migration applied using backup
+# Query, then display any additional schema migration applied on backup
 query_db_migration
 
 log "DONE!"
