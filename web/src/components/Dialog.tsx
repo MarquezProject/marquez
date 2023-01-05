@@ -27,11 +27,11 @@ export default function AlertDialog(props: IProps) {
     <div>
       <Dialog open={props.dialogIsOpen}>
         <DialogTitle>{props.title}</DialogTitle>
-        {props.editWarningField &&
+        {props.editWarningField && (
           <DialogContent>
             <DialogContentText>{props.editWarningField}</DialogContentText>
           </DialogContent>
-        }
+        )}
         <DialogContent>
           <DialogContentText>{props.editWarningField}</DialogContentText>
         </DialogContent>

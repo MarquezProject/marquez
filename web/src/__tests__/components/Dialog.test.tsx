@@ -31,5 +31,4 @@ describe('Dialog Component', () => {
   it('renders a snapshot that matches previous', () => {
     expect(wrapper).toMatchSnapshot()
   })
-
 })
