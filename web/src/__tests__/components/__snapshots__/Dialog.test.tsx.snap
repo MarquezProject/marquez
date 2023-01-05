@@ -7,21 +7,35 @@ exports[`Dialog Component renders a snapshot that matches previous 1`] = `
   >
     <WithStyles(ForwardRef(DialogTitle)) />
     <WithStyles(ForwardRef(DialogContent))>
-      <WithStyles(ForwardRef(DialogContentText)) />
+      <WithStyles(ForwardRef(DialogContentText))>
+        Description of dialog...
+      </WithStyles(ForwardRef(DialogContentText))>
+    </WithStyles(ForwardRef(DialogContent))>
+    <WithStyles(ForwardRef(DialogContent))>
+      <WithStyles(ForwardRef(DialogContentText))>
+        Description of dialog...
+      </WithStyles(ForwardRef(DialogContentText))>
     </WithStyles(ForwardRef(DialogContent))>
     <WithStyles(ForwardRef(DialogActions))>
       <WithStyles(ForwardRef(Button))
         className="dialogButton"
-        color="secondary"
+        color="primary"
+        onClick={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ee7b7b",
+            "color": "white",
+          }
+        }
       >
-        Continue
+        Cancel
       </WithStyles(ForwardRef(Button))>
       <WithStyles(ForwardRef(Button))
         className="dialogButton"
         color="primary"
-        onClick={[Function]}
+        variant="outlined"
       >
-        Cancel
+        Continue
       </WithStyles(ForwardRef(Button))>
     </WithStyles(ForwardRef(DialogActions))>
   </WithStyles(ForwardRef(Dialog))>

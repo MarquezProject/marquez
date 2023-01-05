@@ -10,7 +10,8 @@ describe('Dialog Component', () => {
   const mockProps = {
     dialogIsOpen: true,
     dialogToggle: dialogToggle,
-    ignoreWarning: ignoreWarning
+    ignoreWarning: ignoreWarning,
+    editWarningField: 'Description of dialog...'
   }
 
   const ignoreWarning = () => {

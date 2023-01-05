@@ -32,6 +32,9 @@ export default function AlertDialog(props: IProps) {
             <DialogContentText>{props.editWarningField}</DialogContentText>
           </DialogContent>
         }
+        <DialogContent>
+          <DialogContentText>{props.editWarningField}</DialogContentText>
+        </DialogContent>
         <DialogActions>
           <Button
             className='dialogButton'
