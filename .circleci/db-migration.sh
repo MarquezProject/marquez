@@ -5,7 +5,11 @@
 #
 # Usage: $ ./db-migration.sh
 
+readonly POSTGRES_VERSION="12.1"
+readonly MARQUEZ_VERSION="latest"
+
 readonly DB_MIGRATION_BACKUP="db-migration-backup"
+readonly DB_MIGRATION_VOLUME="marquez_db-backup"
 readonly DB_MIGRATION_QUERY=$(cat <<-END
   SELECT version,installed_on,checksum
     FROM flyway_schema_history
@@ -22,8 +26,8 @@ query_db_migration() {
   # Start db using backup
   [[ $(docker ps -f "name=${DB_MIGRATION_BACKUP}" --format '{{.Names}}') == "${DB_MIGRATION_BACKUP}" ]] || \
     docker run -d --name "${DB_MIGRATION_BACKUP}" \
-        -v marquez_db-backup:/var/lib/postgresql/data \
-        postgres:12.1
+        -v "${DB_MIGRATION_VOLUME}:/var/lib/postgresql/data" \
+        "postgres:${POSTGRES_VERSION}"
   # Query applied db migrations
   log "latest migration applied to db:"
   docker exec "${DB_MIGRATION_BACKUP}" \
@@ -38,12 +42,13 @@ cd "${project_root}/"
 log "start db with latest migrations:"
 if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
-  --tag "latest" \
+  --tag "${MARQUEZ_VERSION}" \
   --no-web \
   --seed > /dev/null; then
   exit 1
 fi
 
+# Query, then display latest schema migration applied
 query_db_migration
 
 # (2) Apply db migrations on latest Marquez build using backup
@@ -57,6 +62,7 @@ if ! ./docker/up.sh \
   exit 1
 fi
 
+# Query, then display any additional schema migrations applied using backup
 query_db_migration
 
 log "DONE!"
