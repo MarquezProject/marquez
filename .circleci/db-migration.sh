@@ -48,7 +48,7 @@ if ! ./docker/up.sh \
   exit 1
 fi
 
-# Query, then display latest schema migration applied
+# Query, then display schema migration applied
 query_db_migration
 
 # (2) Apply db migrations on latest Marquez build using backup
@@ -62,7 +62,7 @@ if ! ./docker/up.sh \
   exit 1
 fi
 
-# Query, then display any additional schema migrations applied using backup
+# Query, then display any additional schema migration applied using backup
 query_db_migration
 
 log "DONE!"
