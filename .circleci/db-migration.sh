@@ -44,7 +44,7 @@ if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --tag "${MARQUEZ_VERSION}" \
   --no-web \
-  --seed > /dev/null; then
+  --seed; then
   exit 1
 fi
 
@@ -58,7 +58,7 @@ if ! ./docker/up.sh \
   --no-web \
   --no-volumes \
   --build \
-  --seed > /dev/null; then
+  --seed; then
   exit 1
 fi
 
