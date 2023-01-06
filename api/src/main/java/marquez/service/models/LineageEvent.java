@@ -153,8 +153,8 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class ParentRunFacet extends BaseFacet {
 
-    @NotNull private RunLink run;
-    @NotNull private JobLink job;
+    @Valid @NotNull private RunLink run;
+    @Valid @NotNull private JobLink job;
 
     @Builder
     public ParentRunFacet(
