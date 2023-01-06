@@ -26,6 +26,16 @@ log() {
   echo -e "\033[1m>>\033[0m ${1}"
 }
 
+error() {
+  echo -e "\033[0;31merror: ${1}\033[0m"
+}
+
+exit_with_cause() {
+  log "please view container logs for more details:"
+  docker-compose logs
+  exit 1
+}
+
 query_db_migration() {
   # Start db using backup
   [[ $(docker ps -f "name=${DB_MIGRATION_BACKUP}" --format '{{.Names}}') == "${DB_MIGRATION_BACKUP}" ]] || \
@@ -35,7 +45,7 @@ query_db_migration() {
   # Query applied db migrations
   log "latest migration applied to db:"
   docker exec "${DB_MIGRATION_BACKUP}" \
-    psql -U marquez -tc "${DB_MIGRATION_QUERY}"
+    psql -U marquez -c "${DB_MIGRATION_QUERY}"
 }
 
 # Change working directory to project root
@@ -48,9 +58,9 @@ if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --tag "${MARQUEZ_VERSION}" \
   --no-web \
-  --seed; then
-  log "error: Failed to start db with latest migrations! Please view docker container logs."
-  exit 1
+  --seed > /dev/null; then
+  error "failed to start db using backup!"
+  exit_with_cause
 fi
 
 # Query, then display schema migration applied
@@ -63,9 +73,9 @@ if ! ./docker/up.sh \
   --no-web \
   --no-volumes \
   --build \
-  --seed; then
-  log "error: Failed to start db using backup! Please view docker container logs."
-  exit 1
+  --seed > /dev/null; then
+  error "failed to start db using backup!"
+  exit_with_cause
 fi
 
 # Query, then display additional schema migration applied on backup (if any)
