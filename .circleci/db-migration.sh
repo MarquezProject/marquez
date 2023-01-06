@@ -6,7 +6,7 @@
 # Usage: $ ./db-migration.sh
 
 readonly POSTGRES_VERSION="12.1"
-readonly MARQUEZ_VERSION="latest"
+readonly MARQUEZ_VERSION="0.29.0"
 
 readonly DB_MIGRATION_BACKUP="db-migration-backup"
 readonly DB_MIGRATION_VOLUME="marquez_db-backup"
