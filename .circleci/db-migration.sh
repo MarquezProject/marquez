@@ -5,8 +5,12 @@
 #
 # Usage: $ ./db-migration.sh
 
+# Version of PostgreSQL
 readonly POSTGRES_VERSION="12.1"
+# Version of Marquez
 readonly MARQUEZ_VERSION="0.29.0"
+# Build version of Marquez
+readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
 readonly DB_MIGRATION_BACKUP="db-migration-backup"
 readonly DB_MIGRATION_VOLUME="marquez_db-backup"
@@ -31,7 +35,7 @@ query_db_migration() {
   # Query applied db migrations
   log "latest migration applied to db:"
   docker exec "${DB_MIGRATION_BACKUP}" \
-    psql -U marquez -c "${DB_MIGRATION_QUERY}"
+    psql -U marquez -tc "${DB_MIGRATION_QUERY}"
 }
 
 # Change working directory to project root
@@ -39,12 +43,13 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
 # (1) Apply db migrations on latest Marquez release
-log "start db with latest migrations:"
+log "start db with latest migrations (marquez=${MARQUEZ_VERSION}):"
 if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --tag "${MARQUEZ_VERSION}" \
   --no-web \
   --seed; then
+  log "error: Failed to start db with latest migrations! Please view docker container logs."
   exit 1
 fi
 
@@ -52,13 +57,14 @@ fi
 query_db_migration
 
 # (2) Apply db migrations on latest Marquez build using backup
-log "start db using backup:"
+log "start db using backup (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --no-web \
   --no-volumes \
   --build \
   --seed; then
+  log "error: Failed to start db using backup! Please view docker container logs."
   exit 1
 fi
 
