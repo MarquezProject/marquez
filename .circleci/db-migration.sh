@@ -31,7 +31,7 @@ error() {
 }
 
 exit_with_cause() {
-  log "please view container logs for more details:"
+  log "please view container logs for more details on cause:"
   docker-compose logs
   exit 1
 }
