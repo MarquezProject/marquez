@@ -14,7 +14,7 @@ import {
   DELETE_DATASET
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
-import { all, put, take, takeEvery } from 'redux-saga/effects'
+import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
 
