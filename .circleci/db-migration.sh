@@ -3,6 +3,11 @@
 # Copyright 2018-2022 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 #
+# A script used in CI to test database migrations by:
+#   (1) Applying db migrations on latest Marquez release
+#   (2) Take a backup of db from Step 1
+#   (3) Applying db migrations on latest Marquez build using backup
+#
 # Usage: $ ./db-migration.sh
 
 # Version of PostgreSQL
@@ -12,8 +17,8 @@ readonly MARQUEZ_VERSION="0.29.0"
 # Build version of Marquez
 readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
-readonly DB_MIGRATION_BACKUP="db-migration-backup"
 readonly DB_MIGRATION_VOLUME="marquez_db-backup"
+readonly DB_MIGRATION_BACKUP="db-migration-backup"
 readonly DB_MIGRATION_QUERY=$(cat <<-END
   SELECT version,installed_on,checksum
     FROM flyway_schema_history
