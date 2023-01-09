@@ -15,11 +15,13 @@
   "packageRules": [
     {
       "matchPackageNames": ["com.graphql-java:graphql-java"],
-      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
+      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/",
+      "addLabels": ["dependencies", "renovate"]
     },
     {
       "matchPackagePatterns": ["^org.apache.spark:", ".css$", "^gradle$"],
-      "automerge": false
+      "automerge": false,
+      "addLabels": ["dependencies", "renovate"]
     }
   ],
   "ignorePaths": ["**/chart/**"]
