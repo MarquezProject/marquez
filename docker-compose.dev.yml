@@ -1,13 +1,10 @@
 version: "3.7"
 services:
   api:
-    image: "marquezproject/marquez:${TAG}"
     build: .
 
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
+  seed_marquez:
+    build: .
 
   pghero:
     image: ankane/pghero

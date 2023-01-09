@@ -2,18 +2,22 @@
 #
 # Copyright 2018-2022 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
+#
+# Usage: $ ./build-and-push.sh [FLAGS] [ARG...]
 
 set -e
 
-VERSION=0.29.0
-DOCKER_DIR=$(dirname $0)
+# Version of Marquez
+readonly VERSION=0.29.0
+# Build version of Marquez
+readonly BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
 title() {
   echo -e "\033[1m${1}\033[0m"
 }
 
 usage() {
-  echo "usage: ./$(basename -- ${0}) [--api-port PORT] [--web-port PORT] [--tag TAG] [--build] [--seed] [--detach]"
+  echo "usage: ./$(basename -- ${0}) [FLAGS] [ARG...]"
   echo "A script used to run Marquez via Docker"
   echo
   title "EXAMPLES:"
@@ -36,12 +40,15 @@ usage() {
   echo "  -a, --api-port int          api port (default: 5000)"
   echo "  -m, --api-admin-port int    api admin port (default: 5001)"
   echo "  -w, --web-port int          web port (default: 3000)"
-  echo "  -t, --tag string            image tag (default: ${VERSION})"
+  echo "  -t, --tag string            docker image tag (default: ${VERSION})"
+  echo "  --args string               docker arguments"
   echo
   title "FLAGS:"
   echo "  -b, --build           build images from source"
   echo "  -s, --seed            seed HTTP API server with metadata"
   echo "  -d, --detach          run in the background"
+  echo "  --no-web              don't start the web UI"
+  echo "  --no-volumes          don't create volumes"
   echo "  -h, --help            show help for script"
   exit 1
 }
@@ -50,13 +57,19 @@ usage() {
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
+# Base docker compose file
 compose_files="-f docker-compose.yml"
-args="-V --force-recreate --remove-orphans"
 
+# Default args
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
-TAG=${VERSION}
+NO_WEB="false"
+NO_VOLUMES="false"
+TAG="${VERSION}"
+BUILD="false"
+ARGS="-V --force-recreate --remove-orphans"
+# Parse args
 while [ $# -gt 0 ]; do
   case $1 in
     -a|'--api-port')
@@ -75,15 +88,20 @@ while [ $# -gt 0 ]; do
        shift
        TAG="${1}"
        ;;
+    --args)
+       shift
+       ARGS+=" ${1}"
+       ;;
     -b|'--build')
        BUILD='true'
+       TAG="${BUILD_VERSION}"
        ;;
     -s|'--seed')
        SEED='true'
        ;;
-    -d|'--detach')
-       DETACH='true'
-       ;;
+    -d|'--detach') DETACH='true' ;;
+    --no-web) NO_WEB='true' ;;
+    --no-volumes) NO_VOLUMES='true' ;;
     -h|'--help')
        usage
        exit 0
@@ -95,19 +113,34 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# Enable detach mode to run containers in background
 if [[ "${DETACH}" = "true" ]]; then
-  args+=" -d"
+  ARGS+=" --detach"
 fi
 
-if [[ "${BUILD}" = "true" ]]; then
-  compose_files+=" -f docker-compose.dev.yml"
-  args+=" --build"
-fi
-
+# Enable starting HTTP API server with sample metadata
 if [[ "${SEED}" = "true" ]]; then
   compose_files+=" -f docker-compose.seed.yml"
 fi
 
-${DOCKER_DIR}/volumes.sh marquez
+# Enable building from source
+if [[ "${BUILD}" = "true" ]]; then
+  compose_files+=" -f docker-compose.dev.yml"
+  ARGS+=" --build"
+fi
 
-API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} docker-compose $compose_files up $args
+# Enable web UI
+if [[ "${NO_WEB}" = "false" ]]; then
+  # Enable building web UI from source; otherwise use 'latest' build
+  [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml" \
+    || compose_files+=" -f docker-compose.web.yml"
+fi
+
+# Create docker volumes for Marquez
+if [[ "${NO_VOLUMES}" = "false" ]]; then
+  ./docker/volumes.sh marquez
+fi
+
+# Run docker compose cmd with overrides
+DOCKER_SCAN_SUGGEST=false API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
+  docker-compose --log-level ERROR $compose_files up $ARGS
