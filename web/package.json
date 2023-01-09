@@ -6,7 +6,7 @@
   "private": false,
   "license": "Apache-2.0",
   "scripts": {
-    "preinstall": "cd ./modules/react-json-view && npm i && npm run build",
+    "postinstall": "patch-package",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "pretest": "eslint src/**/*[x]",
@@ -67,7 +67,7 @@
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.0.2",
-    "react-json-view": "file:modules/react-json-view",
+    "react-json-view": "1.19.1",
     "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
@@ -110,6 +110,7 @@
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "27.3.1",
+    "patch-package": "^6.5.1",
     "prettier": "1.18.2",
     "redux-devtools-extension": "^2.13.8",
     "redux-saga-test-plan": "^4.0.0-beta.3",
