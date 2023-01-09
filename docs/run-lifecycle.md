@@ -89,3 +89,7 @@ If the job can not be introspected statically, we will have to capture the infor
  Now that we have updated all the dependencies of the job we can update the job itself, we **must refer to the runId** that this is for.
 - POST /namespaces/{namespace}/jobs/{name}/runs/{id}/complete
  We mark the run as successful (similarly 'fail' for a failed job)
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
