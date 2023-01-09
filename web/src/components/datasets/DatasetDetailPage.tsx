@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { alpha } from '@material-ui/core/styles'
-import { Box, Chip, Tab, Tabs, Button } from '@material-ui/core'
+import { Box, Button, Chip, Tab, Tabs } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import {
@@ -11,17 +10,18 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-import { theme } from '../../helpers/theme'
 import { LineageDataset } from '../lineage/types'
+import { alpha } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
+  deleteDataset,
+  dialogToggle,
   fetchDatasetVersions,
   resetDataset,
-  resetDatasetVersions,
-  deleteDataset,
-  dialogToggle
+  resetDatasetVersions
 } from '../../store/actionCreators'
+import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
@@ -55,7 +55,7 @@ const styles = ({ spacing }: ITheme) => {
       color: 'white',
       '&:hover': {
         backgroundColor: alpha(theme.palette.error.main, 0.9)
-      },
+      }
     }
   })
 }
@@ -113,10 +113,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   }, [datasets.deletedDatasetName])
 
   // unmounting
-  useEffect(() => () => {
-    resetDataset()
-    resetDatasetVersions()
-  }, [])
+  useEffect(
+    () => () => {
+      resetDataset()
+      resetDatasetVersions()
+    },
+    []
+  )
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {

@@ -4,7 +4,6 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { alpha } from '@material-ui/core/styles'
 import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
 import { IState } from '../../store/reducers'
 import {
@@ -13,12 +12,19 @@ import {
   createStyles,
   withStyles
 } from '@material-ui/core/styles'
-import { theme } from '../../helpers/theme'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
+import { alpha } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchRuns, resetRuns, resetJobs, deleteJob, dialogToggle } from '../../store/actionCreators'
+import {
+  deleteJob,
+  dialogToggle,
+  fetchRuns,
+  resetJobs,
+  resetRuns
+} from '../../store/actionCreators'
+import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import Dialog from '../Dialog'
@@ -39,7 +45,7 @@ const styles = ({ spacing }: ITheme) => {
       color: 'white',
       '&:hover': {
         backgroundColor: alpha(theme.palette.error.main, 0.9)
-      },
+      }
     }
   })
 }
@@ -61,7 +67,18 @@ type IProps = IWithStyles<typeof styles> & {
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, jobs, classes, fetchRuns, resetRuns, deleteJob, dialogToggle, runs, display, runsLoading } = props
+  const {
+    job,
+    jobs,
+    classes,
+    fetchRuns,
+    resetRuns,
+    deleteJob,
+    dialogToggle,
+    runs,
+    display,
+    runsLoading
+  } = props
   const history = useHistory()
 
   const [tab, setTab] = React.useState(0)

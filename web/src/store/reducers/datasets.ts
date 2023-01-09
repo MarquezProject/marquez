@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dataset } from '../../types/api'
 import {
+  DELETE_DATASET,
+  DELETE_DATASET_SUCCESS,
   FETCH_DATASETS,
   FETCH_DATASETS_SUCCESS,
-  RESET_DATASETS,
-  DELETE_DATASET,
-  DELETE_DATASET_SUCCESS
+  RESET_DATASETS
 } from '../actionCreators/actionTypes'
-import { fetchDatasetsSuccess, deleteDataset } from '../actionCreators'
+import { Dataset } from '../../types/api'
+import { deleteDataset, fetchDatasetsSuccess } from '../actionCreators'
 
-export type IDatasetsState = { isLoading: boolean; result: Dataset[]; init: boolean, deletedDatasetName: string}
+export type IDatasetsState = {
+  isLoading: boolean
+  result: Dataset[]
+  init: boolean
+  deletedDatasetName: string
+}
 
-export const initialState: IDatasetsState = { isLoading: false, init: false, result: [], deletedDatasetName: ''}
+export const initialState: IDatasetsState = {
+  isLoading: false,
+  init: false,
+  result: [],
+  deletedDatasetName: ''
+}
 
 type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> & ReturnType<typeof deleteDataset>
 

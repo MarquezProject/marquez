@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { 
-  FETCH_JOBS, 
-  FETCH_JOBS_SUCCESS, 
-  RESET_JOBS, 
-  DELETE_JOB, 
-  DELETE_JOB_SUCCESS 
+import {
+  DELETE_JOB,
+  DELETE_JOB_SUCCESS,
+  FETCH_JOBS,
+  FETCH_JOBS_SUCCESS,
+  RESET_JOBS
 } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
-import { fetchJobsSuccess, deleteJob } from '../actionCreators'
+import { deleteJob, fetchJobsSuccess } from '../actionCreators'
 
-export type IJobsState = { isLoading: boolean; result: IJob[]; init: boolean, deletedJobName: string }
+export type IJobsState = {
+  isLoading: boolean
+  result: IJob[]
+  init: boolean
+  deletedJobName: string
+}
 
-export const initialState: IJobsState = { isLoading: false, result: [], init: false, deletedJobName: '' }
+export const initialState: IJobsState = {
+  isLoading: false,
+  result: [],
+  init: false,
+  deletedJobName: ''
+}
 
 type IJobsAction = ReturnType<typeof fetchJobsSuccess> & ReturnType<typeof deleteJob>
 

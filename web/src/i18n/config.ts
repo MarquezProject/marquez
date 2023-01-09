@@ -30,7 +30,7 @@ i18next
             empty_body: 'Try adding some runs for this job.',
             runinfo_subhead: 'FACETS',
             runs_subhead: 'FACETS',
-            delete: "DELETE"
+            delete: 'DELETE'
           },
           search: {
             search: 'Search',

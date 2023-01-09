@@ -2,6 +2,8 @@
 
 import * as Effects from 'redux-saga/effects'
 import {
+  DELETE_DATASET,
+  DELETE_JOB,
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
@@ -9,9 +11,7 @@ import {
   FETCH_JOBS,
   FETCH_LINEAGE,
   FETCH_RUNS,
-  FETCH_SEARCH,
-  DELETE_JOB,
-  DELETE_DATASET
+  FETCH_SEARCH
 } from '../actionCreators/actionTypes'
 import { Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
@@ -20,6 +20,8 @@ const call: any = Effects.call
 
 import {
   applicationError,
+  deleteDatasetSuccess,
+  deleteJobSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
@@ -28,18 +30,16 @@ import {
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
-  fetchSearchSuccess,
-  deleteJobSuccess,
-  deleteDatasetSuccess
+  fetchSearchSuccess
 } from '../actionCreators'
 import {
+  deleteDataset,
+  deleteJob,
   getDataset,
   getDatasetVersions,
   getDatasets,
-  deleteDataset,
   getEvents,
   getJobs,
-  deleteJob,
   getNamespaces,
   getRuns
 } from '../requests'
