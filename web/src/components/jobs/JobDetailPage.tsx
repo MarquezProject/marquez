@@ -41,10 +41,11 @@ const styles = ({ spacing }: ITheme) => {
       padding: spacing(2)
     },
     buttonDelete: {
-      backgroundColor: theme.palette.error.main,
-      color: 'white',
+      borderColor: theme.palette.error.main,
+      color: theme.palette.error.main,
       '&:hover': {
-        backgroundColor: alpha(theme.palette.error.main, 0.9)
+        borderColor: alpha(theme.palette.error.main, 0.3),
+        backgroundColor: alpha(theme.palette.error.main, 0.3)
       }
     }
   })
@@ -129,18 +130,18 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
             <Button
-              color='primary'
+              variant='outlined'
               className={classes.buttonDelete}
               onClick={() => {
                 props.dialogToggle('')
               }}
             >
-              {i18next.t('jobs.delete')}
+              {i18next.t('jobs.dialog_delete')}
             </Button>
             <Dialog
               dialogIsOpen={display.dialogIsOpen}
               dialogToggle={dialogToggle}
-              title={'Are you sure?'} // i18next.t('jobs.dialogTitleConfirm')
+              title={i18next.t('jobs.dialog_confirmation_title')}
               ignoreWarning={() => {
                 deleteJob(job.name, job.namespace)
                 props.dialogToggle('')

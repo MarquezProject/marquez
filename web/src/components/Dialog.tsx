@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { dialogToggle } from '../store/actionCreators'
 import { theme } from '../helpers/theme'
 import Button from '@material-ui/core/Button'
@@ -18,42 +18,42 @@ interface IProps {
   title?: string
 }
 
-export default function AlertDialog(props: IProps) {
-  function handleClose() {
+const AlertDialog: FunctionComponent<IProps> = props => {
+  const handleClose = () => {
     props.dialogToggle('')
   }
 
   return (
-    <div>
-      <Dialog open={props.dialogIsOpen}>
-        <DialogTitle>{props.title}</DialogTitle>
-        {props.editWarningField && (
-          <DialogContent>
-            <DialogContentText>{props.editWarningField}</DialogContentText>
-          </DialogContent>
-        )}
+    <Dialog open={props.dialogIsOpen}>
+      <DialogTitle>{props.title}</DialogTitle>
+      {props.editWarningField && (
         <DialogContent>
           <DialogContentText>{props.editWarningField}</DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button
-            className='dialogButton'
-            color='primary'
-            onClick={handleClose}
-            style={{ backgroundColor: theme.palette.error.main, color: 'white' }}
-          >
-            Cancel
-          </Button>
-          <Button
-            className='dialogButton'
-            color='primary'
-            variant='outlined'
-            onClick={props.ignoreWarning}
-          >
-            Continue
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+      )}
+      <DialogContent>
+        <DialogContentText>{props.editWarningField}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          className='dialogButton'
+          color='primary'
+          onClick={handleClose}
+          style={{ backgroundColor: theme.palette.error.main, color: theme.palette.common.white }}
+        >
+          Cancel
+        </Button>
+        <Button
+          className='dialogButton'
+          color='primary'
+          variant='outlined'
+          onClick={props.ignoreWarning}
+        >
+          Continue
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
+
+export default AlertDialog
