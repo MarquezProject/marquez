@@ -10,3 +10,7 @@
 | `marquez_job_versions_total`     | _count_ | `namespace_name`, <br> `job_type`, <br> `job_name`         | Total number of job versions.       |
 | `marquez_job_runs_active`        | _gauge_ |                                                            | Total number of active job runs.    |
 | `marquez_job_runs_completed`     | _gauge_ |                                                            | Total number of completed job runs. |
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
