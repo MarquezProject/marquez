@@ -50,10 +50,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.json'],
-    symlinks: false,
-    alias: {
-      'react-json-view': path.resolve(__dirname, "./modules/react-json-view")
-    }
+    symlinks: false
   },
   output: {
     filename: 'bundle.js',
