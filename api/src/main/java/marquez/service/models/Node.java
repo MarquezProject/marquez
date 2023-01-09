@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import marquez.db.models.NodeData;
 
 @EqualsAndHashCode
 @ToString

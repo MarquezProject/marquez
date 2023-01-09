@@ -25,7 +25,7 @@ import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.db.Columns;
-import marquez.db.models.JobData;
+import marquez.service.models.JobData;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
