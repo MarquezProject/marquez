@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { FunctionComponent } from 'react'
 import { dialogToggle } from '../store/actionCreators'
 import { theme } from '../helpers/theme'
 import Button from '@material-ui/core/Button'
@@ -9,6 +8,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import React, { FunctionComponent } from 'react'
 
 interface IProps {
   dialogIsOpen: boolean

@@ -188,7 +188,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
               </Button>
               <Dialog
                 dialogIsOpen={display.dialogIsOpen}
-                dialogToggle={dialogToggle} 
+                dialogToggle={dialogToggle}
                 title={i18next.t('jobs.dialog_confirmation_title')}
                 ignoreWarning={() => {
                   deleteDataset(lineageDataset.name, lineageDataset.namespace)
