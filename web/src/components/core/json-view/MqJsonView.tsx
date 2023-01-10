@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { MqInputBase } from '../input-base/MqInputBase'
+import { Theme } from '@material-ui/core'
 import React from 'react'
 import ReactJson from 'react-json-view'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-import { Theme } from '@material-ui/core'
-import { MqInputBase } from '../input-base/MqInputBase'
 
 const styles = (theme: Theme) =>
   createStyles({
     input: {
-      marginBottom: `${theme.spacing(2)}px`,
+      marginBottom: `${theme.spacing(2)}px`
     }
   })
 
@@ -28,7 +28,7 @@ type JsonViewProps = WithStyles<typeof styles> & OwnProps
 const InputSearchJsonView = withStyles((theme: Theme) =>
   createStyles({
     input: {
-      padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+      padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`
     }
   })
 )(MqInputBase)
@@ -37,7 +37,7 @@ class MqJsonView extends React.Component<JsonViewProps, StateProps> {
   constructor(props: JsonViewProps) {
     super(props)
     this.state = {
-      search: '',
+      search: ''
     }
   }
 
@@ -61,7 +61,7 @@ class MqJsonView extends React.Component<JsonViewProps, StateProps> {
         />
         <ReactJson
           src={data}
-          theme={"rjv_white"}
+          theme={'rjv_white'}
           collapsed={2}
           displayDataTypes={false}
           enableClipboard={false}

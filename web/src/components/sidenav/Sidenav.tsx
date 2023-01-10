@@ -90,9 +90,9 @@ class Sidenav extends React.Component<SidenavProps> {
                 title={i18next.t('sidenav.events')}
                 active={this.props.location.pathname === '/events'}
               >
-                <SVG 
-                  src="https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg" 
-                  width={'30px'} 
+                <SVG
+                  src='https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg'
+                  width={'30px'}
                 />
               </MqIconButton>
             </RouterLink>

@@ -4,8 +4,8 @@ import { Box } from '@material-ui/core'
 import { Run } from '../../types/api'
 import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
-import MqText from '../core/text/MqText'
 import MqJsonView from '../core/json-view/MqJsonView'
+import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 
 interface RunInfoProps {
@@ -29,7 +29,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
           </Box>
-          <MqJsonView data={run.facets} placeholder="Search" />
+          <MqJsonView data={run.facets} placeholder='Search' />
         </Box>
       )}
     </Box>
