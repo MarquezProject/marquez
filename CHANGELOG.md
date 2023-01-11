@@ -1,6 +1,19 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.29.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
+
+## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-18
+
+### Added
+
+* Add proposal for OL facet tables [`#2076`](https://github.com/MarquezProject/marquez/pull/2076) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds the proposal `Optimize query performance for OpenLineage facets`.*
+* Display column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds a JSON preview of column-level lineage of a selected dataset to the UI.*
+
+### Fixed
+* Validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Fixes validation of the `ParentRunFacet` to avoid `NullPointerException`s in the case of empty run sections.*
 
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
