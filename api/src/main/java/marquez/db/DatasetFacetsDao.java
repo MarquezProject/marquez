@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,7 +70,6 @@ public interface DatasetFacetsDao {
   }
 
   /**
-   * @param uuid
    * @param createdAt
    * @param datasetUuid
    * @param runUuid
@@ -83,7 +82,6 @@ public interface DatasetFacetsDao {
   @SqlUpdate(
       """
           INSERT INTO dataset_facets (
-             uuid,
              created_at,
              dataset_uuid,
              run_uuid,
@@ -93,7 +91,6 @@ public interface DatasetFacetsDao {
              name,
              facet
           ) VALUES (
-             :uuid,
              :createdAt,
              :datasetUuid,
              :runUuid,
@@ -105,7 +102,6 @@ public interface DatasetFacetsDao {
           )
       """)
   void insertDatasetFacet(
-      UUID uuid,
       Instant createdAt,
       UUID datasetUuid,
       UUID runUuid,
@@ -137,7 +133,6 @@ public interface DatasetFacetsDao {
         .forEach(
             fieldName ->
                 insertDatasetFacet(
-                    UUID.randomUUID(),
                     now,
                     datasetUuid,
                     runUuid,
@@ -149,7 +144,6 @@ public interface DatasetFacetsDao {
   }
 
   record DatasetFacetRow(
-      UUID uuid,
       Instant createdAt,
       UUID datasetUuid,
       UUID runUuid,

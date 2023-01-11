@@ -1,5 +1,4 @@
 CREATE TABLE dataset_facets (
-  uuid                 UUID PRIMARY KEY,
   created_at           TIMESTAMPTZ NOT NULL,
   dataset_uuid         UUID REFERENCES datasets(uuid),
   run_uuid             UUID REFERENCES runs(uuid),

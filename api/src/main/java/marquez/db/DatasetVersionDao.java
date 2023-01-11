@@ -168,10 +168,10 @@ public interface DatasetVersionDao extends BaseDao {
           FROM selected_dataset_versions dv
           LEFT JOIN runs_input_mapping rim
                ON rim.dataset_version_uuid = dv.uuid
-      ), selected_dataset_version_events AS (
-          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, le.event_time, le.event
+      ), selected_dataset_version_facets AS (
+          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, df.lineage_event_time, df.facet
           FROM selected_dataset_version_runs dv
-          LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid
+          LEFT JOIN dataset_facets_view df ON df.dataset_uuid = dv.dataset_uuid AND df.run_uuid = dv.run_uuid
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
@@ -186,14 +186,10 @@ public interface DatasetVersionDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = dv.dataset_uuid
       LEFT JOIN (
-          SELECT dve.uuid AS dataset_uuid, JSONB_AGG(ds->'facets' ORDER BY event_time ASC) AS facets
-          FROM selected_dataset_version_events dve,
-               jsonb_array_elements(coalesce(dve.event -> 'inputs', '[]'::jsonb) || coalesce(dve.event -> 'outputs', '[]'::jsonb)) AS ds
-          WHERE dve.run_uuid = dve.run_uuid
-            AND ds -> 'facets' IS NOT NULL
-            AND ds ->> 'name' = dve.dataset_name
-            AND ds ->> 'namespace' = dve.namespace_name
-          GROUP BY dve.uuid
+          SELECT dvf.uuid AS dataset_uuid, JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
+          FROM selected_dataset_version_facets dvf
+          WHERE dvf.run_uuid = dvf.run_uuid
+          GROUP BY dvf.uuid
       ) f ON f.dataset_uuid = dv.uuid""")
   Optional<DatasetVersion> findBy(UUID version);
 
@@ -211,10 +207,10 @@ public interface DatasetVersionDao extends BaseDao {
           FROM selected_dataset_versions dv
           LEFT JOIN runs_input_mapping rim
                ON rim.dataset_version_uuid = dv.uuid
-      ), selected_dataset_version_events AS (
-          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, le.event_time, le.event
+      ), selected_dataset_version_facets AS (
+          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, df.lineage_event_time, df.facet
           FROM selected_dataset_version_runs dv
-          LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid
+          LEFT JOIN dataset_facets_view df ON df.dataset_uuid = dv.dataset_uuid AND df.run_uuid = dv.run_uuid
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
@@ -229,14 +225,10 @@ public interface DatasetVersionDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = dv.dataset_uuid
       LEFT JOIN (
-          SELECT dve.uuid AS dataset_uuid, JSONB_AGG(ds->'facets' ORDER BY event_time ASC) AS facets
-          FROM selected_dataset_version_events dve,
-               jsonb_array_elements(coalesce(dve.event -> 'inputs', '[]'::jsonb) || coalesce(dve.event -> 'outputs', '[]'::jsonb)) AS ds
-          WHERE dve.run_uuid = dve.run_uuid
-            AND ds -> 'facets' IS NOT NULL
-            AND ds ->> 'name' = dve.dataset_name
-            AND ds ->> 'namespace' = dve.namespace_name
-          GROUP BY dve.uuid
+          SELECT dvf.uuid AS dataset_uuid, JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
+          FROM selected_dataset_version_facets dvf
+          WHERE dvf.run_uuid = dvf.run_uuid
+          GROUP BY dvf.uuid
       ) f ON f.dataset_uuid = dv.uuid""")
   Optional<DatasetVersion> findByUuid(UUID uuid);
 
@@ -283,10 +275,10 @@ public interface DatasetVersionDao extends BaseDao {
           FROM selected_dataset_versions dv
           LEFT JOIN runs_input_mapping rim
                ON rim.dataset_version_uuid = dv.uuid
-      ), selected_dataset_version_events AS (
-          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, le.event_time, le.event
+      ), selected_dataset_version_facets AS (
+          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, dv.run_uuid, df.lineage_event_time, df.facet
           FROM selected_dataset_version_runs dv
-          LEFT JOIN lineage_events le ON le.run_uuid = dv.run_uuid
+          LEFT JOIN dataset_facets_view df ON df.dataset_uuid = dv.dataset_uuid AND df.run_uuid = dv.run_uuid
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
@@ -301,14 +293,10 @@ public interface DatasetVersionDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = dv.dataset_uuid
       LEFT JOIN (
-          SELECT dve.uuid AS dataset_uuid, JSONB_AGG(ds->'facets' ORDER BY event_time ASC) AS facets
-          FROM selected_dataset_version_events dve,
-               jsonb_array_elements(coalesce(dve.event -> 'inputs', '[]'::jsonb) || coalesce(dve.event -> 'outputs', '[]'::jsonb)) AS ds
-          WHERE dve.run_uuid = dve.run_uuid
-            AND ds -> 'facets' IS NOT NULL
-            AND ds ->> 'name' = dve.dataset_name
-            AND ds ->> 'namespace' = dve.namespace_name
-          GROUP BY dve.uuid
+          SELECT dvf.uuid AS dataset_uuid, JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
+          FROM selected_dataset_version_facets dvf
+          WHERE dvf.run_uuid = dvf.run_uuid
+          GROUP BY dvf.uuid
       ) f ON f.dataset_uuid = dv.uuid
       ORDER BY dv.created_at DESC""")
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);

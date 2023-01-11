@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -344,7 +344,6 @@ public class DatasetFacetsDaoTest {
                 .map(
                     rv ->
                         new DatasetFacetsDao.DatasetFacetRow(
-                            rv.getColumn("uuid", UUID.class),
                             rv.getColumn("created_at", Instant.class),
                             rv.getColumn("dataset_uuid", UUID.class),
                             rv.getColumn("run_uuid", UUID.class),

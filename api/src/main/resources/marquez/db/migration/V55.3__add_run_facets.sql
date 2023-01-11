@@ -1,5 +1,4 @@
 CREATE TABLE run_facets (
-  uuid               UUID PRIMARY KEY,
   created_at         TIMESTAMPTZ NOT NULL,
   run_uuid           UUID REFERENCES runs(uuid),
   lineage_event_time TIMESTAMPTZ NOT NULL,
