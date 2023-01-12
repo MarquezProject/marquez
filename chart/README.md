@@ -137,7 +137,7 @@ Contents of the ```./../docker-compose-postgres..yml``` file can be customized
 to better represent your desired setup.
 
 ```bash
-docker-compose -f ./../docker-compose.postgres.yml -p marquez-postgres up
+docker-compose -f ./../docker-compose.db.yml -p marquez-postgres up
 ```
 
 Once the Postgres instance has been created, run the following command to locate the IP
