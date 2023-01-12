@@ -1,3 +1,6 @@
+// Copyright 2018-2023 contributors to the Marquez project
+// SPDX-License-Identifier: Apache-2.0
+
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 

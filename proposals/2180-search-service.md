@@ -121,3 +121,7 @@ interface SearchService {
 
 Current implementation of `SearchDao` should be renamed into `SimpleSearchDao` and used by a `SimpleSearchService` 
 with empty `index` methods. 
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
