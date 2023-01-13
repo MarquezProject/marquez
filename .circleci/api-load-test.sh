@@ -10,6 +10,9 @@
 #
 # Usage: $ ./api-load-test.sh
 
+# Build version of Marquez
+readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
+
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
 }
@@ -25,10 +28,10 @@ exit_with_cause() {
 }
 
 # (1) Start HTTP API server
-log "start marquez (marquez=${MARQUEZ_BUILD_VERSION}):"
+log "start HTTP API server (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \
   --no-web \
-  --build > /dev/null; then
+  --build; then
   error "failed to start db using backup!"
   exit_with_cause
 fi
