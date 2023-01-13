@@ -13,7 +13,7 @@
 set -e
 
 # Marquez.jar
-readonly MARQUEZ="api/build/libs/marquez-api-*.jar"
+readonly MARQUEZ="api/build/libs/marquez-api-*-SNAPSHOT.jar"
 
 # Build version of Marquez
 readonly METADATA_FILE="api/load-testing/metadata.json"
@@ -36,7 +36,7 @@ docker-compose -f docker-compose.db.yml up --detach
 # (2) Build HTTP API server
 ./gradlew --no-daemon :api:build -x test
 
-ls
+ls api/build/libs
 
 # (3) Start HTTP API server
 java -jar "${MARQUEZ}" server marquez.dev.yml
