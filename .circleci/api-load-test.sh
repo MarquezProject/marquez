@@ -12,8 +12,8 @@
 
 set -e
 
-# Marquez.jar
-readonly MARQUEZ="api/build/libs/marquez-api-*-SNAPSHOT.jar"
+# Version of Marquez
+readonly MARQUEZ_VERSION="0.30.0-SNAPSHOT"
 
 # Build version of Marquez
 readonly METADATA_FILE="api/load-testing/metadata.json"
@@ -36,14 +36,12 @@ docker-compose -f docker-compose.db.yml up --detach
 # (2) Build HTTP API server
 ./gradlew --no-daemon :api:build -x test
 
-ls api/build/libs
-
 # (3) Start HTTP API server
-java -jar "${MARQUEZ}" server marquez.dev.yml
+java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" server marquez.dev.yml
 
 # (4) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
-java -jar "${MARQUEZ}" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
+java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
 
 # (5) Run load test
 log "star load test:"
