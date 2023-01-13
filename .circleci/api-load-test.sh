@@ -44,8 +44,9 @@ log "generate load test metadata (${METADATA_FILE}):"
 java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
 
 # (5) Run load test
-log "star load test:"
-k6 run --vus 25 --duration 30s api/load-testing/http.js \
-  --out json=./k6/full.json --summary-export=./k6/summary.json
+log "start load test:"
+mkdir -p k6/results && \
+  k6 run --vus 25 --duration 30s api/load-testing/http.js \
+    --out json=k6/results/full.json --summary-export=k6/results/summary.json
 
 echo "DONE!"
