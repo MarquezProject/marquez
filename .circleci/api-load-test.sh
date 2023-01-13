@@ -30,11 +30,11 @@ error() {
 project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
-# (1) Start db only
+# (1) Start db
 docker-compose -f docker-compose.db.yml up --detach
 
 # (2) Build HTTP API server
-./gradlew build -x test
+./gradlew --no-daemon build -x test
 
 # (3) Start HTTP API server
 java -jar "${MARQUEZ}" server marquez.dev.yml

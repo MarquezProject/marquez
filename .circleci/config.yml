@@ -154,6 +154,7 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/get-docker-compose.sh
+      - run: ./.circleci/get-jdk17.sh
       - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
       - store_artifacts:
