@@ -160,7 +160,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: ./.circleci/get-docker-compose.sh
-      - run: ./.circleci/load-test.sh
+      - run: ./.circleci/api-load-test.sh
 
   migrate-db:
     working_directory: ~/marquez
