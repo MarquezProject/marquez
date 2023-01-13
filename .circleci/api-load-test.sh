@@ -23,20 +23,13 @@ error() {
   echo -e "\033[0;31merror: ${1}\033[0m"
 }
 
-exit_with_cause() {
-  log "please view container logs for more details on cause:"
-  docker-compose logs
-  exit 1
-}
-
 # (1) Start HTTP API server
 log "start HTTP API server (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \
   --no-web \
   --detach \
-  --build > /dev/null;  then
+  --build; then
   error "failed to HTTP API server!"
-  exit_with_cause
 fi
 
 # (2) Use metadata command to generate random dataset, job, and run metadata
