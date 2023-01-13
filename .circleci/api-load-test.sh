@@ -23,6 +23,8 @@ error() {
   echo -e "\033[0;31merror: ${1}\033[0m"
 }
 
+ls api/build
+
 # (1) Start HTTP API server
 log "start HTTP API server (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \

@@ -48,7 +48,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - build
+            - api/build
 
   build-image-api:
     working_directory: ~/marquez
