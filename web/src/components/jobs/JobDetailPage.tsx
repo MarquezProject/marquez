@@ -15,11 +15,20 @@ import {
 } from '@material-ui/core/styles'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
+import { alpha } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchRuns, resetRuns } from '../../store/actionCreators'
+import {
+  deleteJob,
+  dialogToggle,
+  fetchRuns,
+  resetJobs,
+  resetRuns
+} from '../../store/actionCreators'
+import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
+import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
@@ -31,6 +40,14 @@ const styles = ({ spacing }: ITheme) => {
   return createStyles({
     root: {
       padding: spacing(2)
+    },
+    buttonDelete: {
+      borderColor: theme.palette.error.main,
+      color: theme.palette.error.main,
+      '&:hover': {
+        borderColor: alpha(theme.palette.error.main, 0.3),
+        backgroundColor: alpha(theme.palette.error.main, 0.3)
+      }
     }
   })
 }
@@ -38,16 +55,32 @@ const styles = ({ spacing }: ITheme) => {
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
   resetRuns: typeof resetRuns
+  resetJobs: typeof resetJobs
+  deleteJob: typeof deleteJob
+  dialogToggle: typeof dialogToggle
 }
 
 type IProps = IWithStyles<typeof styles> & {
   job: LineageJob
+  jobs: IState['jobs']
   runs: Run[]
   runsLoading: boolean
+  display: IState['display']
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = props => {
-  const { job, classes, fetchRuns, resetRuns, runs, runsLoading } = props
+  const {
+    job,
+    jobs,
+    classes,
+    fetchRuns,
+    resetRuns,
+    deleteJob,
+    dialogToggle,
+    runs,
+    display,
+    runsLoading
+  } = props
   const history = useHistory()
 
   const [tab, setTab] = React.useState(0)
@@ -60,10 +93,17 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
     fetchRuns(job.name, job.namespace)
   }, [job.name])
 
+  useEffect(() => {
+    if (jobs.deletedJobName) {
+      history.push('/')
+    }
+  }, [jobs.deletedJobName])
+
   // unmounting
   useEffect(() => {
     return () => {
       resetRuns()
+      resetJobs()
     }
   }, [])
 
@@ -89,6 +129,26 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
+          <Box mr={1}>
+            <Button
+              variant='outlined'
+              className={classes.buttonDelete}
+              onClick={() => {
+                props.dialogToggle('')
+              }}
+            >
+              {i18next.t('jobs.dialog_delete')}
+            </Button>
+            <Dialog
+              dialogIsOpen={display.dialogIsOpen}
+              dialogToggle={dialogToggle}
+              title={i18next.t('jobs.dialog_confirmation_title')}
+              ignoreWarning={() => {
+                deleteJob(job.name, job.namespace)
+                props.dialogToggle('')
+              }}
+            />
+          </Box>
           <Box mr={1}>
             <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
               {i18next.t('jobs.location')}
@@ -129,14 +189,19 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 
 const mapStateToProps = (state: IState) => ({
   runs: state.runs.result,
-  runsLoading: state.runs.isLoading
+  runsLoading: state.runs.isLoading,
+  display: state.display,
+  jobs: state.jobs
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchRuns: fetchRuns,
-      resetRuns: resetRuns
+      resetRuns: resetRuns,
+      resetJobs: resetJobs,
+      deleteJob: deleteJob,
+      dialogToggle: dialogToggle
     },
     dispatch
   )
