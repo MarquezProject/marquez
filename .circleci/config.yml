@@ -160,6 +160,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: ./.circleci/get-docker-compose.sh
+      - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
 
   migrate-db:
