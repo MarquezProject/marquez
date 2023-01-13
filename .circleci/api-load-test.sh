@@ -12,6 +12,8 @@
 
 # Build version of Marquez
 readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
+# Build version of Marquez
+readonly METADATA_FILE="api/load-testing/metadata.json"
 
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
@@ -21,20 +23,28 @@ error() {
   echo -e "\033[0;31merror: ${1}\033[0m"
 }
 
+exit_with_cause() {
+  log "please view container logs for more details on cause:"
+  docker-compose logs
+  exit 1
+}
+
 # (1) Start HTTP API server
 log "start HTTP API server (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \
   --no-web \
   --detach \
-  --build; then
+  --build > /dev/null;  then
   error "failed to HTTP API server!"
-  exit 1
+  exit_with_cause
 fi
 
 # (2) Use metadata command to generate random dataset, job, and run metadata
-java -jar api/build/libs/marquez-api-*.jar metadata --runs 10 --bytes-per-event 16384
+log "generate load test metadata (${METADATA_FILE}):"
+java -jar api/build/libs/marquez-api-*.jar metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
 
 # (3) Run load test
+log "star load test:"
 k6 run --vus 25 --duration 30s api/load-testing/http.js \
   --out json=./k6/full.json --summary-export=./k6/summary.json
 
