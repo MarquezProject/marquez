@@ -45,7 +45,7 @@ java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" metadata --runs 10
 
 # (5) Run load test
 log "star load test:"
-k6 run --vus 25 --duration 30s ../load-testing/http.js \
+k6 run --vus 25 --duration 30s api/load-testing/http.js \
   --out json=./k6/full.json --summary-export=./k6/summary.json
 
 echo "DONE!"
