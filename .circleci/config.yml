@@ -45,10 +45,6 @@ jobs:
           key: v1-api-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/.gradle
-      - persist_to_workspace:
-          root: .
-          paths:
-            - api/build
 
   build-image-api:
     working_directory: ~/marquez
@@ -157,8 +153,6 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
-      - attach_workspace:
-          at: .
       - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
