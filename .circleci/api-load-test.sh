@@ -12,8 +12,8 @@
 
 set -e
 
-
-readonly MARQUEZ="api/build/libs/marquez-api-*.jar "
+# Marquez.jar
+readonly MARQUEZ="api/build/libs/marquez-api-*.jar"
 
 # Build version of Marquez
 readonly METADATA_FILE="api/load-testing/metadata.json"
@@ -34,7 +34,7 @@ cd "${project_root}"
 docker-compose -f docker-compose.db.yml up --detach
 
 # (2) Build HTTP API server
-./gradlew --no-daemon build -x test
+./gradlew --no-daemon :api:build -x test
 
 # (3) Start HTTP API server
 java -jar "${MARQUEZ}" server marquez.dev.yml
@@ -45,7 +45,7 @@ java -jar "${MARQUEZ}" metadata --runs 10 --bytes-per-event 16384 --output "${ME
 
 # (5) Run load test
 log "star load test:"
-k6 run --vus 25 --duration 30s api/load-testing/http.js \
+k6 run --vus 25 --duration 30s ../load-testing/http.js \
   --out json=./k6/full.json --summary-export=./k6/summary.json
 
 echo "DONE!"
