@@ -37,7 +37,7 @@ docker-compose -f docker-compose.db.yml up --detach
 ./gradlew --no-daemon :api:build -x test
 
 # (3) Start HTTP API server
-java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" server marquez.dev.yml
+java -jar "api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar" server marquez.dev.yml &
 
 # (4) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
