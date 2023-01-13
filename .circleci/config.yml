@@ -148,6 +148,15 @@ jobs:
       - run: npm install --prefix=${HOME}/.local --global redoc-cli
       - run: redoc-cli bundle spec/openapi.yml
 
+  migrate-db:
+    working_directory: ~/marquez
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run: ./.circleci/get-docker-compose.sh
+      - run: ./.circleci/db-migration.sh
+
   release-java:
     working_directory: ~/marquez
     machine:
@@ -195,6 +204,9 @@ workflows:
       - unit-test-web
       - unit-test-client-python
       - lint-spec-api
+      - migrate-db:
+          requires:
+            - build-api
   release:
     jobs:
       - build-client-python:

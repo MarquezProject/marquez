@@ -1,24 +1,18 @@
 #!/bin/bash
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright 2018-2022 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
 #
 # Usage: $ ./get-docker-compose.sh
 
 set -e
 
-curl -L https://github.com/docker/compose/releases/download/1.25.3/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-chmod +x ~/docker-compose
-sudo mv ~/docker-compose /usr/local/bin/docker-compose
-docker-compose --version
+# Download docker compose
+curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+
+# Change permissions, relocate docker compose, then verify
+chmod +x ~/docker-compose && \
+  sudo mv ~/docker-compose /usr/local/bin/docker-compose && \
+  docker-compose --version
 
 echo "DONE!"

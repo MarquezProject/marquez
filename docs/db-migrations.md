@@ -37,3 +37,7 @@ $ flyway migrate \
     -password=*** \
     -locations=filesystem:path/to/marquez/db/migration
 ```
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
