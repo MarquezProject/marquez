@@ -5,7 +5,7 @@
 #
 # A script used in CI to test database migrations by:
 #   (1) Applying db migrations on latest Marquez release
-#   (2) Take a backup of db from Step 1
+#   (2) Taking a backup of db from Step 1
 #   (3) Applying db migrations on latest Marquez build using backup
 #
 # Usage: $ ./db-migration.sh

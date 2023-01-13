@@ -162,6 +162,8 @@ jobs:
       - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
+      - store_artifacts:
+          path: k6
 
   migrate-db:
     working_directory: ~/marquez
