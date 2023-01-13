@@ -31,9 +31,11 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}"
 
 # (1) Start db
+log "start db:"
 docker-compose -f docker-compose.db.yml up --detach
 
 # (2) Build HTTP API server
+log "build http server:"
 ./gradlew --no-daemon :api:build -x test
 
 # (3) Start HTTP API server
