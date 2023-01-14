@@ -131,9 +131,9 @@ fi
 
 # Enable web UI
 if [[ "${NO_WEB}" = "false" ]]; then
-  # Enable building web UI from source; otherwise use 'latest' build
-  [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml" \
-    || compose_files+=" -f docker-compose.web.yml"
+  compose_files+=" -f docker-compose.web.yml"
+  # Enable building web UI from source
+  [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml"
 fi
 
 # Create docker volumes for Marquez
