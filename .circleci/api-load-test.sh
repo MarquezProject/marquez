@@ -13,7 +13,7 @@
 
 set -e
 
-# Version of Marquez
+# Build version of Marquez
 readonly MARQUEZ_VERSION="0.30.0-SNAPSHOT"
 # Fully qualified path to marquez.jar
 readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
@@ -22,15 +22,13 @@ readonly MARQUEZ_HOST="localhost"
 readonly MARQUEZ_ADMIN_PORT=5001 # Use default 'dev' admin port
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 
-readonly OL_EVENTS_STATS_QUERY=$(cat <<-END
+readonly METADATA_FILE="api/load-testing/metadata.json"
+readonly METADATA_STATS_QUERY=$(cat <<-END
   SELECT run_uuid,COUNT(*)
     FROM lineage_events
    GROUP BY run_uuid;
 END
 )
-
-# Build version of Marquez
-readonly METADATA_FILE="api/load-testing/metadata.json"
 
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
@@ -51,7 +49,7 @@ ol_events_stats() {
   log "load test metadata stats:"
   # Query db for OL events stats
   docker exec "marquez-db" \
-    psql -U marquez -c "${OL_EVENTS_STATS_QUERY}"
+    psql -U marquez -c "${METADATA_STATS_QUERY}"
 }
 
 # Change working directory to project root
