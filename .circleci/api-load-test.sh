@@ -22,6 +22,13 @@ readonly MARQUEZ_HOST="localhost"
 readonly MARQUEZ_ADMIN_PORT=5001 # Use default 'dev' admin port
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 
+readonly OL_EVENTS_STATS_QUERY=$(cat <<-END
+  SELECT run_uuid,COUNT(*)
+    FROM lineage_events
+   GROUP BY run_uuid;
+END
+)
+
 # Build version of Marquez
 readonly METADATA_FILE="api/load-testing/metadata.json"
 
@@ -38,6 +45,13 @@ cpu_and_mem_info() {
   cat /proc/cpuinfo
   log "MEM info:"
   cat /proc/meminfo
+}
+
+ol_events_stats() {
+  log "load test metadata stats:"
+  # Query db for OL events stats
+  docker exec "marquez-db" \
+    psql -U marquez -c "${OL_EVENTS_STATS_QUERY}"
 }
 
 # Change working directory to project root
@@ -77,5 +91,8 @@ log "start load test:"
 mkdir -p k6/results && \
   k6 run --vus 25 --duration 30s api/load-testing/http.js \
     --out json=k6/results/full.json --summary-export=k6/results/summary.json
+
+# Display OL event stats
+ol_events_stats
 
 echo "DONE!"
