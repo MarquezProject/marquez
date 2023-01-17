@@ -19,7 +19,7 @@ readonly MARQUEZ_VERSION="0.30.0-SNAPSHOT"
 readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
 
 readonly MARQUEZ_HOST="localhost"
-readonly MARQUEZ_ADMIN_PORT=8081
+readonly MARQUEZ_ADMIN_PORT=5001 # Use default 'dev' admin port
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 
 # Build version of Marquez
@@ -47,11 +47,10 @@ log "build http API server..."
 
 # (3) Start HTTP API server
 log "start http API server..."
-MARQUEZ_ADMIN_PORT=${MARQUEZ_ADMIN_PORT} \
-  java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > /dev/null 2>&1 &
+java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > /dev/null 2>&1 &
 
 # (4) Wait for HTTP API server
-log "waiting for http API server..."
+log "waiting for http API server (${MARQUEZ_URL})..."
 until curl --output /dev/null --silent --head --fail "${MARQUEZ_URL}/ping"; do
     printf '.'
     sleep 5
