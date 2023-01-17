@@ -158,7 +158,7 @@ jobs:
       - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
       - store_artifacts:
-          path: marquez
+          path: marquez/logs
       - store_artifacts:
           path: k6
 
