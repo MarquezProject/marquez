@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.23.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
 
 ## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-18
 
@@ -10,10 +10,20 @@
     *Adds the proposal `Optimize query performance for OpenLineage facets`.*
 * Display column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Adds a JSON preview of column-level lineage of a selected dataset to the UI.*
+* Add soft delete option to UI [`#2343`](https://github.com/MarquezProject/marquez/pull/2343) [@tito12](https://github.com/tito12)  
+    *Adds option to soft delete a data record with a dialog component and double confirmation.*
+* OL facets PR #1: create and write new events to new tables while not reading them [`#2350`](https://github.com/MarquezProject/marquez/pull/2350) [@wslulciuc](https://github.com/wslulciuc) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Creates `job_facets`, `run_facets` and `dataset_facets` tables and inserts data into the new tables for new events. The first of three PRs in response to [`#2152`](https://github.com/MarquezProject/marquez/pull/2152).* 
+
+### Changed
+* Update copyright headers [`#2353`](https://github.com/MarquezProject/marquez/pull/2353) [@merobi-hub](https://github.com/merobi-hub) 
+    *Updates the headers with the current year.*
 
 ### Fixed
 * Validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Fixes validation of the `ParentRunFacet` to avoid `NullPointerException`s in the case of empty run sections.*
+* Use `docker-compose.web.yml` as base compose file [`#2360`](https://github.com/MarquezProject/marquez/pull/2360) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fixes the Marquez HTTP server set in `docker/up.sh` so the script uses `docker-compose.web.yml` with overrides for `dev` set via `docker-compose.web-dev.yml`.* 
 
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
