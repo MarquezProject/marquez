@@ -21,6 +21,7 @@ readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
 readonly MARQUEZ_HOST="localhost"
 readonly MARQUEZ_ADMIN_PORT=5001 # Use default 'dev' admin port
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
+readonly MARQUEZ_DB="marquez-db"
 
 readonly METADATA_FILE="api/load-testing/metadata.json"
 readonly METADATA_STATS_QUERY=$(cat <<-END
@@ -34,10 +35,6 @@ log() {
   echo -e "\033[1m>>\033[0m ${1}"
 }
 
-error() {
-  echo -e "\033[0;31merror: ${1}\033[0m"
-}
-
 cpu_and_mem_info() {
   log "CPU info:"
   cat /proc/cpuinfo
@@ -46,9 +43,9 @@ cpu_and_mem_info() {
 }
 
 ol_events_stats() {
+    # Query db for OL events stats
   log "load test metadata stats:"
-  # Query db for OL events stats
-  docker exec "marquez-db" \
+  docker exec "${MARQUEZ_DB}" \
     psql -U marquez -c "${METADATA_STATS_QUERY}"
 }
 
