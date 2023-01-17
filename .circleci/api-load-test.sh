@@ -7,7 +7,7 @@
 #   (1) Starting HTTP API server
 #   (2) Generating random dataset, job, and run metadata
 #   (3) Running load test using k6
-#   (4) Write load test results to 'k6/results' for analysis
+#   (4) Writing load test results to 'k6/results' for analysis
 #
 # Usage: $ ./api-load-test.sh
 
@@ -31,6 +31,13 @@ log() {
 
 error() {
   echo -e "\033[0;31merror: ${1}\033[0m"
+}
+
+cpu_and_mem_info() {
+  log "CPU info:"
+  cat /proc/cpuinfo
+  log "MEM info:"
+  cat /proc/meminfo
 }
 
 # Change working directory to project root
@@ -61,6 +68,9 @@ log "http API server is ready!"
 # (5) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
 java -jar "${MARQUEZ_JAR}" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
+
+# Display CPU/MEM
+cpu_and_mem_info
 
 # (6) Run load test
 log "start load test:"
