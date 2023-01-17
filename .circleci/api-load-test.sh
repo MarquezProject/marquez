@@ -47,8 +47,8 @@ log "build http API server..."
 
 # (3) Start HTTP API server
 log "start http API server..."
-mkdir -p marquez/logs && \
-  java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > http.log 2>&1 &
+mkdir marquez && \
+  java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > marquez/http.log 2>&1 &
 
 # (4) Wait for HTTP API server
 log "waiting for http API server (${MARQUEZ_URL})..."
