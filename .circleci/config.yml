@@ -15,7 +15,6 @@ only-on-release: &only-on-release
       ignore: /.*/
 
 orbs:
-  # https://circleci.com/orbs/registry/orb/codecov/codecov
   codecov: codecov/codecov@3.2.3
 
 jobs:
@@ -148,6 +147,21 @@ jobs:
       - run: npm install --prefix=${HOME}/.local --global redoc-cli
       - run: redoc-cli bundle spec/openapi.yml
 
+  load-test-api:
+    working_directory: ~/marquez
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run: ./.circleci/get-docker-compose.sh
+      - run: ./.circleci/get-jdk17.sh
+      - run: ./.circleci/get-k6.sh
+      - run: ./.circleci/api-load-test.sh
+      - store_artifacts:
+          path: marquez
+      - store_artifacts:
+          path: k6
+
   migrate-db:
     working_directory: ~/marquez
     machine:
@@ -204,6 +218,9 @@ workflows:
       - unit-test-web
       - unit-test-client-python
       - lint-spec-api
+      - load-test-api:
+          requires:
+            - build-api
       - migrate-db:
           requires:
             - build-api

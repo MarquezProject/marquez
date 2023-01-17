@@ -90,5 +90,5 @@ export default function () {
    > **Note:** To learn how to run tests locally with `k6`, see [_Running k6_](https://k6.io/docs/getting-started/running-k6).
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

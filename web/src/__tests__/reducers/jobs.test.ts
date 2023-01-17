@@ -16,7 +16,7 @@ describe('jobs reducer', () => {
         jobs: jobs
       }
     }
-    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true })
+    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true, deletedJobName: '' })
   })
 })
 
