@@ -47,22 +47,22 @@ log "build http API server..."
 
 # (3) Start HTTP API server
 log "start http API server..."
-java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > /dev/null 2>&1 &
+mkdir -p marquez/logs && \
+  java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > http.log 2>&1 &
 
 # (4) Wait for HTTP API server
 log "waiting for http API server (${MARQUEZ_URL})..."
 until curl --output /dev/null --silent --head --fail "${MARQUEZ_URL}/ping"; do
-    printf '.'
     sleep 5
 done
 # When available, print status
 log "http API server is ready!"
 
-# (4) Use metadata command to generate random dataset, job, and run metadata
+# (5) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
 java -jar "${MARQUEZ_JAR}" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
 
-# (5) Run load test
+# (6) Run load test
 log "start load test:"
 mkdir -p k6/results && \
   k6 run --vus 25 --duration 30s api/load-testing/http.js \

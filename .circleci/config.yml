@@ -158,6 +158,8 @@ jobs:
       - run: ./.circleci/get-k6.sh
       - run: ./.circleci/api-load-test.sh
       - store_artifacts:
+          path: marquez
+      - store_artifacts:
           path: k6
 
   migrate-db:
