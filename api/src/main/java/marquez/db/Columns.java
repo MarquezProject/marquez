@@ -25,6 +25,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import org.postgresql.util.PGInterval;
+import org.postgresql.util.PGobject;
 
 @Slf4j
 public final class Columns {
@@ -298,5 +299,18 @@ public final class Columns {
     }
     final String mapAsString = results.getString(column);
     return Utils.fromJson(mapAsString, new TypeReference<>() {});
+  }
+
+  public static PGobject toPgObject(@NonNull final Object object) {
+    final PGobject jsonObject = new PGobject();
+    jsonObject.setType("jsonb");
+    final String json = Utils.toJson(object);
+    try {
+      jsonObject.setValue(json);
+    } catch (SQLException e) {
+      log.error("Error when ...", e);
+      return null;
+    }
+    return jsonObject;
   }
 }

@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import marquez.service.models.ColumnLineageInputField;
+import marquez.service.models.NodeData;
 
 @Getter
 public class ColumnLineageNodeData implements NodeData {

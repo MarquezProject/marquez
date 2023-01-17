@@ -133,12 +133,15 @@ public interface OpenLineageDao extends BaseDao {
     SourceDao sourceDao = createSourceDao();
     JobDao jobDao = createJobDao();
     JobContextDao jobContextDao = createJobContextDao();
+    JobFacetsDao jobFacetsDao = createJobFacetsDao();
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
+    DatasetFacetsDao datasetFacetsDao = createDatasetFacetsDao();
     RunDao runDao = createRunDao();
     RunArgsDao runArgsDao = createRunArgsDao();
     RunStateDao runStateDao = createRunStateDao();
     ColumnLineageDao columnLineageDao = createColumnLineageDao();
+    RunFacetsDao runFacetsDao = createRunFacetsDao();
 
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
@@ -198,7 +201,7 @@ public interface OpenLineageDao extends BaseDao {
             UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
     bag.setRunArgs(runArgs);
 
-    UUID runUuid = runToUuid(event.getRun().getRunId());
+    final UUID runUuid = runToUuid(event.getRun().getRunId());
 
     RunRow run;
     if (event.getEventType() != null) {
@@ -220,6 +223,12 @@ public interface OpenLineageDao extends BaseDao {
               job.getName(),
               job.getLocation(),
               jobContext.getUuid());
+      // Add ...
+      Optional.ofNullable(event.getRun().getFacets())
+          .ifPresent(
+              runFacet ->
+                  runFacetsDao.insertRunFacetsFor(
+                      runUuid, now, event.getEventType(), event.getRun().getFacets()));
     } else {
       run =
           runDao.upsert(
@@ -253,14 +262,21 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
+    // Add ...
+    Optional.ofNullable(event.getJob().getFacets())
+        .ifPresent(
+            jobFacet ->
+                jobFacetsDao.insertJobFacetsFor(
+                    job.getUuid(), runUuid, now, event.getEventType(), event.getJob().getFacets()));
+
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetInputs = null;
     if (event.getInputs() != null) {
       datasetInputs = new ArrayList<>();
-      for (Dataset ds : event.getInputs()) {
+      for (Dataset dataset : event.getInputs()) {
         DatasetRecord record =
             upsertLineageDataset(
-                ds,
+                dataset,
                 now,
                 runUuid,
                 true,
@@ -273,6 +289,17 @@ public interface OpenLineageDao extends BaseDao {
                 runDao,
                 columnLineageDao);
         datasetInputs.add(record);
+
+        // Facets ...
+        Optional.ofNullable(dataset.getFacets())
+            .ifPresent(
+                facets ->
+                    datasetFacetsDao.insertDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        runUuid,
+                        now,
+                        event.getEventType(),
+                        facets));
       }
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
@@ -280,10 +307,10 @@ public interface OpenLineageDao extends BaseDao {
     List<DatasetRecord> datasetOutputs = null;
     if (event.getOutputs() != null) {
       datasetOutputs = new ArrayList<>();
-      for (Dataset ds : event.getOutputs()) {
+      for (Dataset dataset : event.getOutputs()) {
         DatasetRecord record =
             upsertLineageDataset(
-                ds,
+                dataset,
                 now,
                 runUuid,
                 false,
@@ -296,6 +323,17 @@ public interface OpenLineageDao extends BaseDao {
                 runDao,
                 columnLineageDao);
         datasetOutputs.add(record);
+
+        // Facets ...
+        Optional.ofNullable(dataset.getFacets())
+            .ifPresent(
+                facets ->
+                    datasetFacetsDao.insertDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        runUuid,
+                        now,
+                        event.getEventType(),
+                        facets));
       }
     }
 
