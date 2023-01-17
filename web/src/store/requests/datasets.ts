@@ -34,3 +34,8 @@ export const getDataset = async (namespace: string, dataset: string) => {
   )}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchDataset').then((d: Dataset) => d)
 }
+
+export const deleteDataset = async (datasetName: string, namespace: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/datasets/${datasetName}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteDataset')
+}

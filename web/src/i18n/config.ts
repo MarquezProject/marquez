@@ -32,7 +32,9 @@ i18next
             empty_title: 'No Run Information Available',
             empty_body: 'Try adding some runs for this job.',
             runinfo_subhead: 'FACETS',
-            runs_subhead: 'FACETS'
+            runs_subhead: 'FACETS',
+            dialog_delete: 'DELETE',
+            dialog_confirmation_title: 'Are you sure?'
           },
           search: {
             search: 'Search',
@@ -62,7 +64,9 @@ i18next
           datasets: {
             latest_tab: 'LATEST SCHEMA',
             history_tab: 'VERSION HISTORY',
-            column_lineage: 'COLUMN LINEAGE'
+            column_lineage: 'COLUMN LINEAGE',
+            dialog_delete: 'DELETE',
+            dialog_confirmation_title: 'Are you sure?'
           },
           datasets_route: {
             empty_title: 'No datasets found',
@@ -132,7 +136,9 @@ i18next
             empty_title: 'Pas de Course les Informations Disponibles',
             empty_body: "Essayez d'ajouter quelques exécutions pour ce travail.",
             runinfo_subhead: 'FACETTES',
-            runs_subhead: 'FACETTES'
+            runs_subhead: 'FACETTES',
+            dialog_delete: 'EFFACER',
+            dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           search: {
             search: 'Recherche',
@@ -162,7 +168,9 @@ i18next
           },
           datasets: {
             latest_tab: 'DERNIER SCHEMA',
-            history_tab: 'HISTORIQUE DES VERSIONS'
+            history_tab: 'HISTORIQUE DES VERSIONS',
+            dialog_delete: 'EFFACER',
+            dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           datasets_route: {
             empty_title: 'Aucun jeu de données trouvé',
@@ -235,7 +243,9 @@ i18next
             empty_title: 'No hay Información de Ejecución Disponible',
             empty_body: 'Intente agregar algunas ejecuciones para este trabajo.',
             runinfo_subhead: 'FACETAS',
-            runs_subhead: 'FACETAS'
+            runs_subhead: 'FACETAS',
+            dialog_delete: 'ELIMINAR',
+            dialog_confirmation_title: 'Estás seguro?'
           },
           search: {
             search: 'Buscar',
@@ -265,7 +275,9 @@ i18next
           },
           datasets: {
             latest_tab: 'ESQUEMA ÚLTIMO',
-            history_tab: 'HISTORIAL DE VERSIONES'
+            history_tab: 'HISTORIAL DE VERSIONES',
+            dialog_delete: 'ELIMINAR',
+            dialog_confirmation_title: 'Estás seguro?'
           },
           datasets_route: {
             empty_title: 'No se encontraron conjuntos de datos',
@@ -338,7 +350,9 @@ i18next
             empty_title: 'Brak dostępnych informacji o wykonaniu',
             empty_body: 'Spróbuj dodać kilka przebiegów dla tego zadania.',
             runinfo_subhead: 'ASPECTY',
-            runs_subhead: 'ASPECTY'
+            runs_subhead: 'ASPECTY',
+            dialog_delete: 'USUNĄĆ',
+            dialog_confirmation_title: 'Jesteś pewny?'
           },
           search: {
             search: 'Wyszukiwanie',
@@ -368,7 +382,9 @@ i18next
           },
           datasets: {
             latest_tab: 'NAJNOWSZY SCHEMAT',
-            history_tab: 'HISTORIA WERSJI'
+            history_tab: 'HISTORIA WERSJI',
+            dialog_delete: 'USUNĄĆ',
+            dialog_confirmation_title: 'Jesteś pewny?'
           },
           datasets_route: {
             empty_title: 'Nie znaleziono zbiorów danych',
