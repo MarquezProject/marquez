@@ -9,7 +9,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - MARQUEZ_DB=marquez
-      - MARQUEZ_USER=buendia
-      - MARQUEZ_PASSWORD=macondo
+      - MARQUEZ_USER=marquez
+      - MARQUEZ_PASSWORD=marquez
     volumes:
       - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
