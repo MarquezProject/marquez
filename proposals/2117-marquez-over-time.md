@@ -37,3 +37,7 @@ Future steps
  
  * Implementing Run-Level Lineage may require database model changes in Marquez and this deserves a separate proposal or design document which is out of scope of this doc. 
  * Run-Level column lineage can be implemented within issue #2262.
+
+ ----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

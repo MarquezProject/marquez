@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from './actionTypes'
@@ -86,6 +87,21 @@ export const resetDataset = () => ({
   type: actionTypes.RESET_DATASET
 })
 
+export const deleteDataset = (datasetName: string, namespace: string) => ({
+  type: actionTypes.DELETE_DATASET,
+  payload: {
+    datasetName,
+    namespace
+  }
+})
+
+export const deleteDatasetSuccess = (datasetName: string) => ({
+  type: actionTypes.DELETE_DATASET_SUCCESS,
+  payload: {
+    datasetName
+  }
+})
+
 export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS
 })
@@ -106,6 +122,21 @@ export const fetchJobsSuccess = (jobs: Job[]) => ({
 
 export const resetJobs = () => ({
   type: actionTypes.RESET_JOBS
+})
+
+export const deleteJob = (jobName: string, namespace: string) => ({
+  type: actionTypes.DELETE_JOB,
+  payload: {
+    jobName,
+    namespace
+  }
+})
+
+export const deleteJobSuccess = (jobName: string) => ({
+  type: actionTypes.DELETE_JOB_SUCCESS,
+  payload: {
+    jobName
+  }
 })
 
 export const fetchRuns = (jobName: string, namespace: string) => ({

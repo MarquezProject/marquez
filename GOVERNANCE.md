@@ -142,5 +142,5 @@ be resolved by voting. The voting process is a simple majority in which each com
 
 
 ----
-License: Apache-2.0, 
-Copyright 2018-2022 contributors to the Marquez project.
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

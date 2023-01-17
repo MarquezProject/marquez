@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,12 +27,12 @@ import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
-import marquez.db.models.DatasetData;
-import marquez.db.models.JobData;
 import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
+import marquez.service.models.DatasetData;
 import marquez.service.models.Edge;
 import marquez.service.models.Graph;
+import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;

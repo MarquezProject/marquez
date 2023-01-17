@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
@@ -32,4 +33,9 @@ export const getDataset = async (namespace: string, dataset: string) => {
     dataset
   )}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchDataset').then((d: Dataset) => d)
+}
+
+export const deleteDataset = async (datasetName: string, namespace: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/datasets/${datasetName}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteDataset')
 }

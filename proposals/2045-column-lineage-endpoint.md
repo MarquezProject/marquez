@@ -148,3 +148,7 @@ Dataset version -> run that produced it -> consumed Dataset Versions.
 ## Next Steps
 
 Review of this proposal and production of detailed design for the implementation.:
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

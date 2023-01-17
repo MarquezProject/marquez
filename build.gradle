@@ -54,7 +54,7 @@ subprojects {
     }
 
     ext {
-        assertjVersion = '3.23.1'
+        assertjVersion = '3.24.1'
         dropwizardVersion = '2.1.4'
         jacocoVersion = '0.8.8'
         junit5Version = '5.9.1'
@@ -73,6 +73,7 @@ subprojects {
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"

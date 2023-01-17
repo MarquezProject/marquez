@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react'
@@ -10,7 +11,8 @@ describe('Dialog Component', () => {
   const mockProps = {
     dialogIsOpen: true,
     dialogToggle: dialogToggle,
-    ignoreWarning: ignoreWarning
+    ignoreWarning: ignoreWarning,
+    editWarningField: 'Description of dialog...'
   }
 
   const ignoreWarning = () => {
@@ -30,5 +32,4 @@ describe('Dialog Component', () => {
   it('renders a snapshot that matches previous', () => {
     expect(wrapper).toMatchSnapshot()
   })
-
 })
