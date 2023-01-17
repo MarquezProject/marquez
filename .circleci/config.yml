@@ -218,9 +218,9 @@ workflows:
       - unit-test-web
       - unit-test-client-python
       - lint-spec-api
-      - load-test-api
-      #    requires:
-      #      - build-api
+      - load-test-api:
+          requires:
+            - build-api
       - migrate-db:
           requires:
             - build-api
