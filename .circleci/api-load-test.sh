@@ -20,7 +20,7 @@ readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
 
 readonly MARQUEZ_HOST="localhost"
 readonly MARQUEZ_ADMIN_PORT=8081
-readonly MARQUEZ_URL="http://localhost:${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
+readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 
 # Build version of Marquez
 readonly METADATA_FILE="api/load-testing/metadata.json"
@@ -39,24 +39,24 @@ cd "${project_root}"
 
 # (1) Start db
 log "start db:"
-docker-compose -f docker-compose.db.yml up --detach > /dev/null
+docker-compose -f docker-compose.db.yml up --detach
 
 # (2) Build HTTP API server
 log "build http API server..."
-./gradlew --no-daemon :api:build -x test > /dev/null
+./gradlew --no-daemon :api:build -x test > /dev/null 2>&1
 
 # (3) Start HTTP API server
-log "start http API server:"
+log "start http API server..."
 java -jar "${MARQUEZ_JAR}" server marquez.dev.yml &
 
 # (4) Wait for HTTP API server
-log "waiting for http API server"
+log "waiting for http API server..."
 until curl --output /dev/null --silent --head --fail "${MARQUEZ_URL}/ping"; do
     printf '.'
     sleep 5
 done
 # When available, print status
-log "http API server (${MARQUEZ_URL}) is ready!"
+log "http API server is ready!"
 
 # (4) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
