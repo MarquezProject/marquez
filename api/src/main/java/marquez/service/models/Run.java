@@ -1,11 +1,12 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -166,6 +167,8 @@ public final class Run {
     private List<DatasetVersionId> inputVersions;
     private List<DatasetVersionId> outputVersions;
     private Map<String, String> context;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ImmutableMap<String, Object> facets;
 
     public Run build() {

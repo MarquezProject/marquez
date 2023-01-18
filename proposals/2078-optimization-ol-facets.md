@@ -201,3 +201,7 @@ The second migration step will not start unless the condition is met.
 For users, who attempt to run two migration steps in a single run,
 the second step will fail and ask to manually run data migration command and retry migration after
 the command runs successfully. Table `migration_lock` will be dropped at the end of second migration step.
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
