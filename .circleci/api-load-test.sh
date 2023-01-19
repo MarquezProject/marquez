@@ -47,6 +47,8 @@ db:
   url: jdbc:postgresql://localhost:5432/marquez
   user: marquez
   password: marquez
+
+migrateOnStartup: true
 EOF
 
 log() {
