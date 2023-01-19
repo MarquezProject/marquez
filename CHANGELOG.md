@@ -2,18 +2,22 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
 
-## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-18
+## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-23
 
 ### Added
 
-* Add proposal for OL facet tables [`#2076`](https://github.com/MarquezProject/marquez/pull/2076) [@wslulciuc](https://github.com/wslulciuc)  
+* Proposals: add proposal for OL facet tables [`#2076`](https://github.com/MarquezProject/marquez/pull/2076) [@wslulciuc](https://github.com/wslulciuc)  
     *Adds the proposal `Optimize query performance for OpenLineage facets`.*
-* Display column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+* UI: Display column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Adds a JSON preview of column-level lineage of a selected dataset to the UI.*
-* Add soft delete option to UI [`#2343`](https://github.com/MarquezProject/marquez/pull/2343) [@tito12](https://github.com/tito12)  
+* UI: Add soft delete option to UI [`#2343`](https://github.com/MarquezProject/marquez/pull/2343) [@tito12](https://github.com/tito12)  
     *Adds option to soft delete a data record with a dialog component and double confirmation.*
-* OL facets PR #1: create and write new events to new tables while not reading them [`#2350`](https://github.com/MarquezProject/marquez/pull/2350) [@wslulciuc](https://github.com/wslulciuc) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+* API: OL facets PR #1: create and write new events to new tables while not reading them [`#2350`](https://github.com/MarquezProject/marquez/pull/2350) [@wslulciuc](https://github.com/wslulciuc) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Creates `job_facets`, `run_facets` and `dataset_facets` tables and inserts data into the new tables for new events. The first of three PRs in response to [`#2152`](https://github.com/MarquezProject/marquez/pull/2152).* 
+* API: OL facets PR #2: read facets from views based on `lineage_events` table [`#2355`](https://github.com/MarquezProject/marquez/pull/2355) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Creates `job_facets_view`, `dataset_facets_view` and `run_facets_view` tables on top of the existing `lineage_events` table for reading facets prior to migration to new facets' tables.*
+* API: OL facets PR #3: migrate data to facet tables [`#2359`](https://github.com/MarquezProject/marquez/pull/2359) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *A Java migration script for backfilling newly created facets' tables with data contained within `lineage_events` tables. The migration has to be done manually for users with more than 100K `lineage_events` stored in Marquez.*
 
 ### Fixed
 * Validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
