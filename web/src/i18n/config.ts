@@ -279,8 +279,7 @@ i18next
             history_tab: 'HISTORIAL DE VERSIONES',
             column_lineage_tab: 'LINAJE DE COLUMNA',
             dialog_delete: 'ELIMINAR',
-            dialog_confirmation_title: 'Estás seguro?',
-            column_lineage: ''
+            dialog_confirmation_title: 'Estás seguro?'
           },
           datasets_route: {
             empty_title: 'No se encontraron conjuntos de datos',
