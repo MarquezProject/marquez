@@ -10,7 +10,7 @@ const metadata = new SharedArray('metadata', function () {
 });
 
 export default function () {
-  const url = 'http://localhost:5000/api/v1/lineage';
+  const url = 'http://localhost:8080/api/v1/lineage';
   const params = {
     headers: {
       'Content-Type': 'application/json',
