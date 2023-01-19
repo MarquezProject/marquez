@@ -77,6 +77,10 @@ i18next
             source_col: 'SOURCE',
             updated_col: 'UPDATED AT'
           },
+          datasets_column_lineage: {
+            empty_title: 'No column lineage',
+            empty_body: 'Column lineage not available for the specified dataset.'
+          },
           jobs_route: {
             empty_title: 'No jobs found',
             empty_body: 'Try changing namespaces or consulting our documentation to add jobs.',
@@ -182,6 +186,10 @@ i18next
             namespace_col: 'ESPACE DE NOMS',
             source_col: 'SOURCE',
             updated_col: 'MISE À JOUR À'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Aucune lignée de colonne',
+            empty_body: "Lignage de colonne non disponible pour l'ensemble de données spécifié."
           },
           jobs_route: {
             empty_title: 'Aucun emploi trouvé',
@@ -291,6 +299,10 @@ i18next
             source_col: 'FUENTE',
             updated_col: 'ACTUALIZADO EN'
           },
+          datasets_column_lineage: {
+            empty_title: 'Sin linaje de columna',
+            empty_body: 'Linaje de columna no disponible para el conjunto de datos especificado.'
+          },
           jobs_route: {
             empty_title: 'No se encontraron trabajos',
             empty_body:
@@ -398,6 +410,10 @@ i18next
             namespace_col: 'PRZESTRZEŃ NAZW',
             source_col: 'ŹRÓDŁO',
             updated_col: 'ZAKTUALIZOWANO'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Brak rodowodu kolumny',
+            empty_body: 'Pochodzenie kolumny jest niedostępne dla określonego zbioru danych.'
           },
           jobs_route: {
             empty_title: 'Nie znaleziono ofert pracy',
