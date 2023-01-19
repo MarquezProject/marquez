@@ -170,7 +170,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 disableRipple={true}
               />
               <Tab
-                label={i18next.t('datasets.column_lineage')}
+                label={i18next.t('datasets.column_lineage_tab')}
                 {...a11yProps(1)}
                 disableRipple={true}
               />

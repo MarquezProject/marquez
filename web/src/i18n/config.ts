@@ -64,7 +64,7 @@ i18next
           datasets: {
             latest_tab: 'LATEST SCHEMA',
             history_tab: 'VERSION HISTORY',
-            column_lineage: 'COLUMN LINEAGE',
+            column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?'
           },
@@ -169,6 +169,7 @@ i18next
           datasets: {
             latest_tab: 'DERNIER SCHEMA',
             history_tab: 'HISTORIQUE DES VERSIONS',
+            column_lineage_tab: 'LIGNÉE DE COLONNE',
             dialog_delete: 'EFFACER',
             dialog_confirmation_title: 'Êtes-vous sûr?'
           },
@@ -276,8 +277,10 @@ i18next
           datasets: {
             latest_tab: 'ESQUEMA ÚLTIMO',
             history_tab: 'HISTORIAL DE VERSIONES',
+            column_lineage_tab: 'LINAJE DE COLUMNA',
             dialog_delete: 'ELIMINAR',
-            dialog_confirmation_title: 'Estás seguro?'
+            dialog_confirmation_title: 'Estás seguro?',
+            column_lineage: ''
           },
           datasets_route: {
             empty_title: 'No se encontraron conjuntos de datos',
@@ -383,6 +386,7 @@ i18next
           datasets: {
             latest_tab: 'NAJNOWSZY SCHEMAT',
             history_tab: 'HISTORIA WERSJI',
+            column_lineage_tab: 'RODOWÓD KOLUMNOWY',
             dialog_delete: 'USUNĄĆ',
             dialog_confirmation_title: 'Jesteś pewny?'
           },
