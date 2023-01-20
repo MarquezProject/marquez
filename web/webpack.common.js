@@ -45,10 +45,6 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: "awesome-typescript-loader"
-      },
-      {
-        test: /\.ico$/,
-        loader: 'file-loader'
       }
     ]
   },

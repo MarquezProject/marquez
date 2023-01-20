@@ -14,8 +14,7 @@ const webpackProd = {
       hash: true,
       minify: true,
       inject: false,
-      template: 'src/index.prod.html',
-      favicon: 'src/img/favicon.png'
+      template: 'src/index.prod.html'
     }),
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(false),
