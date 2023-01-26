@@ -427,6 +427,30 @@
         "namespace": "food_delivery",
         "name": "public.orders_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menus",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "file",
+                    "name": "input_dataset",
+                    "field": "c"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
