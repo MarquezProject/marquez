@@ -431,11 +431,38 @@
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
             "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "id"
+                  }
+                ]
+              },
+              "placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "discount_id"
+                  }
+                ]
+              },
               "restaurant_id": {
                 "inputFields": [
                   {
                     "namespace": "food_delivery",
-                    "name": "public.menus",
+                    "name": "public.menu",
                     "field": "restaurant_id"
                   }
                 ]
@@ -443,9 +470,27 @@
               "menu_id": {
                 "inputFields": [
                   {
-                    "namespace": "file",
-                    "name": "input_dataset",
-                    "field": "c"
+                    "namespace": "food_delivery",
+                    "name": "public.menu",
+                    "field": "id"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_items",
+                    "field": "id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.categories",
+                    "field": "id"
                   }
                 ]
               }
@@ -1059,6 +1104,129 @@
         "namespace": "food_delivery",
         "name": "public.delivery_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "order_id"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "order_dispatched_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "order_delivered_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "email"
+                  }
+                ]
+              },
+              "customer_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "address"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "discount_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "menu_id"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "restaurant_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "address"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "menu_item_id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_item_id",
+                    "field": "category_id"
+                  }
+                ]
+              },
+              "driver_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.drivers",
+                    "field": "id"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
