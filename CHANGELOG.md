@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.29.0...HEAD)
 
+* Added new `docker/down.sh` script that makes it easier to stop local deployment when run detached [`#2380`](https://github.com/MarquezProject/marquez/pull/2380)
+
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
 ### Added
