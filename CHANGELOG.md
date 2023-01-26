@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.29.0...HEAD)
 
+* Additions to seed data for column-lineage [`#2381`](https://github.com/MarquezProject/marquez/pull/2381) [@rossturk](https://github.com/rossturk)
+
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
 ### Added
