@@ -19,7 +19,7 @@ readonly MARQUEZ_VERSION="0.30.0-SNAPSHOT"
 readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
 
 readonly MARQUEZ_HOST="localhost"
-readonly MARQUEZ_ADMIN_PORT=5001 # Use default 'dev' admin port
+readonly MARQUEZ_ADMIN_PORT=8081
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 readonly MARQUEZ_DB="marquez-db"
 
@@ -30,6 +30,26 @@ readonly METADATA_STATS_QUERY=$(cat <<-END
    GROUP BY run_uuid;
 END
 )
+
+# marquez.yml
+cat > marquez.yml <<EOF
+server:
+  applicationConnectors:
+  - type: http
+    port: 8080
+    httpCompliance: RFC7230_LEGACY
+  adminConnectors:
+  - type: http
+    port: 8081
+
+db:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost:5432/marquez
+  user: marquez
+  password: marquez
+
+migrateOnStartup: true
+EOF
 
 log() {
   echo -e "\033[1m>>\033[0m ${1}"
@@ -42,8 +62,8 @@ cpu_and_mem_info() {
   cat /proc/meminfo
 }
 
-ol_events_stats() {
-    # Query db for OL events stats
+metadata_stats() {
+  # Query db for metadata stats
   log "load test metadata stats:"
   docker exec "${MARQUEZ_DB}" \
     psql -U marquez -c "${METADATA_STATS_QUERY}"
@@ -64,7 +84,7 @@ log "build http API server..."
 # (3) Start HTTP API server
 log "start http API server..."
 mkdir marquez && \
-  java -jar "${MARQUEZ_JAR}" server marquez.dev.yml > marquez/http.log 2>&1 &
+  java -jar "${MARQUEZ_JAR}" server marquez.yml > marquez/http.log 2>&1 &
 
 # (4) Wait for HTTP API server
 log "waiting for http API server (${MARQUEZ_URL})..."
@@ -87,7 +107,7 @@ mkdir -p k6/results && \
   k6 run --vus 25 --duration 30s api/load-testing/http.js \
     --out json=k6/results/full.json --summary-export=k6/results/summary.json
 
-# Display OL event stats
-ol_events_stats
+# Display metadata stats
+metadata_stats
 
 echo "DONE!"
