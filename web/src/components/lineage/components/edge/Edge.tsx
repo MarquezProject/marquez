@@ -1,6 +1,8 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GraphEdge } from 'dagre'
 import { LinePath } from '@visx/shape'
 import { curveMonotoneX } from '@visx/curve'
@@ -11,9 +13,29 @@ type EdgeProps = {
   edgePoints: GraphEdge[]
 }
 
+const RADIUS = 14
+const OUTER_RADIUS = RADIUS + 8
+const ICON_SIZE = 16
+
 class Edge extends React.Component<EdgeProps> {
+  getPoints = (edge: any) => (
+    edge.points[edge.points.length - 1]
+  )
+
   render() {
     const { edgePoints } = this.props
+    const edgeEnds = edgePoints.map(edge => {
+      let isSelected = edgePoints.find(o =>
+        this.getPoints(o).x == this.getPoints(edge).x &&
+        this.getPoints(o).y == this.getPoints(edge).y &&
+        o.isSelected === true
+      )
+      return Object.assign(
+        edge.points[edge.points.length - 1],
+        { isSelected: typeof isSelected !== "undefined" }
+      )
+    })
+
     return (
       <>
         {edgePoints.map((edge, i) => (
@@ -23,10 +45,21 @@ class Edge extends React.Component<EdgeProps> {
             data={edge.points}
             x={(d, index) => (index === 0 ? d.x + 20 : d.x - 25)}
             y={d => d.y}
-            stroke={theme.palette.secondary.main}
+            stroke={edge.isSelected ? theme.palette.common.white : theme.palette.secondary.main}
             strokeWidth={1}
             opacity={1}
             shapeRendering='geometricPrecision'
+          />
+        ))}
+        {edgeEnds.map((edge, i) => (
+          <FontAwesomeIcon
+            key={i}
+            icon={faCaretRight}
+            x={edge.x - OUTER_RADIUS - ICON_SIZE / 2}
+            y={edge.y - ICON_SIZE / 2}
+            width={ICON_SIZE}
+            height={ICON_SIZE}
+            color={edge.isSelected ? theme.palette.common.white : theme.palette.secondary.main}
           />
         ))}
       </>

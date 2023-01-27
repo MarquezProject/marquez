@@ -14,6 +14,7 @@ import {
   Tooltip
 } from '@material-ui/core'
 import { ChevronLeftRounded, ChevronRightRounded } from '@material-ui/icons'
+import { stateTypeColor } from '../../helpers/nodes'
 import { Event } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -23,17 +24,19 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
-import { theme } from '../../helpers/theme'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqJson from '../../components/core/code/MqJson'
+import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import moment from 'moment'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
+
+
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -41,16 +44,6 @@ const styles = (theme: Theme) => {
       display: 'flex',
       alignItems: 'center',
       gap: theme.spacing(2)
-    },
-    type: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(1)
-    },
-    status: {
-      width: theme.spacing(2),
-      height: theme.spacing(2),
-      borderRadius: '50%'
     },
     table: {
       marginBottom: theme.spacing(2)
@@ -90,15 +83,6 @@ interface DispatchProps {
 type EventsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
-
-function eventTypeColor(type: string) {
-  switch (type) {
-    case 'START':
-      return theme.palette.info.main
-    case 'COMPLETE':
-      return theme.palette.primary.main
-  }
-}
 
 class Events extends React.Component<EventsProps, EventsState> {
   pageSize: number
@@ -284,13 +268,10 @@ class Events extends React.Component<EventsProps, EventsState> {
                               <MqText>{event.run.runId}</MqText>
                             </TableCell>
                             <TableCell align='left'>
-                              <Box className={classes.type}>
-                                <Box
-                                  className={classes.status}
-                                  style={{ backgroundColor: eventTypeColor(event.eventType) }}
-                                />
-                                <MqText>{event.eventType}</MqText>
-                              </Box>
+                              <MqStatus
+                                color={stateTypeColor(event.eventType)}
+                                label={event.eventType}
+                              />
                             </TableCell>
                             <TableCell align='left'>{event.job.name}</TableCell>
                             <TableCell align='left'>

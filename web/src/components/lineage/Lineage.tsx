@@ -85,6 +85,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const nodeName = this.props.match.params.nodeName
     const namespace = this.props.match.params.namespace
     const nodeType = this.props.match.params.nodeType
+
     if (nodeName && namespace && nodeType) {
       const nodeId = generateNodeId(
         this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
@@ -114,6 +115,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
         this.props.match.params.namespace,
         this.props.match.params.nodeName
       )
+      this.getEdges()
     }
   }
 
@@ -127,6 +129,48 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     g.setDefaultEdgeLabel(() => {
       return {}
     })
+  }
+
+  getEdges = () => {
+    const selectedPaths = this.getSelectedPaths()
+
+    return g?.edges().map(e => {
+      const isSelected = selectedPaths.some((r: any) => e.v === r[0] && e.w === r[1])
+      return Object.assign(g.edge(e), { isSelected: isSelected })
+    })
+  }
+
+  getSelectedPaths = () => {
+    const paths = [] as Array<[MqNode, MqNode]>
+
+    const getSuccessors = (node: any) => {
+      const successors = g?.successors(node)
+      if (successors?.length) {
+        for (var i = 0, count = node.length; i < count; i++) {
+          if (successors[i]) {
+            paths.push([node, successors[i]])
+            getSuccessors(successors[i])
+          }
+        }
+      }
+    }
+
+    const getPredecessors = (node: any) => {
+      const predecessors = g?.predecessors(node)
+      if (predecessors?.length) {
+        for (var i = 0, count = node.length; i < count; i++) {
+          if (predecessors[i]) {
+            paths.push([predecessors[i], node])
+            getPredecessors(predecessors[i])
+          }
+        }
+      }
+    }
+
+    getSuccessors(this.props.selectedNode)
+    getPredecessors(this.props.selectedNode)
+
+    return paths
   }
 
   buildGraphAll = (graph: LineageNode[]) => {
@@ -150,7 +194,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
     this.setState({
       graph: g,
-      edges: g.edges().map(e => g.edge(e)),
+      edges: this.getEdges(),
       nodes: g.nodes().map(v => g.node(v))
     })
   }
@@ -158,6 +202,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   render() {
     const { classes } = this.props
     const i18next = require('i18next')
+
     return (
       <Box className={classes.lineageContainer}>
         {this.props.selectedNode === null && (
@@ -227,9 +272,6 @@ class Lineage extends React.Component<LineageProps, LineageState> {
                             <Node
                               key={node.data.name}
                               node={node}
-                              edgeEnds={this.state.edges.map(
-                                edge => edge.points[edge.points.length - 1]
-                              )}
                               selectedNode={this.props.selectedNode}
                             />
                           ))}
@@ -249,7 +291,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
-  selectedNode: state.lineage.selectedNode
+  selectedNode: state.lineage.selectedNode,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

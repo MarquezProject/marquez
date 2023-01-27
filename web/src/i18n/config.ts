@@ -75,7 +75,8 @@ i18next
             name_col: 'NAME',
             namespace_col: 'NAMESPACE',
             source_col: 'SOURCE',
-            updated_col: 'UPDATED AT'
+            updated_col: 'UPDATED AT',
+            status_col: 'STATUS',
           },
           jobs_route: {
             empty_title: 'No jobs found',
@@ -84,7 +85,8 @@ i18next
             name_col: 'NAME',
             namespace_col: 'NAMESPACE',
             updated_col: 'UPDATED AT',
-            latest_run_col: 'LATEST RUN DURATION'
+            latest_run_col: 'LATEST RUN DURATION',
+            latest_run_state_col: 'LATEST RUN STATE',
           },
           runs_columns: {
             id: 'ID',
@@ -180,7 +182,8 @@ i18next
             name_col: 'NOM',
             namespace_col: 'ESPACE DE NOMS',
             source_col: 'SOURCE',
-            updated_col: 'MISE À JOUR À'
+            updated_col: 'MISE À JOUR À',
+            status_col: 'STATUT',
           },
           jobs_route: {
             empty_title: 'Aucun emploi trouvé',
@@ -190,7 +193,8 @@ i18next
             name_col: 'NOM',
             namespace_col: 'ESPACE DE NOMS',
             updated_col: 'MISE À JOUR À',
-            latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION"
+            latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION",
+            latest_run_state_col: "DERNIER ÉTAT D'EXÉCUTIONE",
           },
           runs_columns: {
             id: 'ID',
@@ -287,7 +291,8 @@ i18next
             name_col: 'NOMBRE',
             namespace_col: 'ESPACIO DE NOMBRES',
             source_col: 'FUENTE',
-            updated_col: 'ACTUALIZADO EN'
+            updated_col: 'ACTUALIZADO EN',
+            status_col: 'ESTADO',
           },
           jobs_route: {
             empty_title: 'No se encontraron trabajos',
@@ -297,7 +302,8 @@ i18next
             name_col: 'NOMBRE',
             namespace_col: 'ESPACIO DE NOMBRES',
             updated_col: 'ACTUALIZADO EN',
-            latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN'
+            latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN',
+            latest_run_state_col: 'ESTADO DE LA ÚLTIMA EJECUCIÓN',
           },
           runs_columns: {
             id: 'ID',
@@ -394,7 +400,8 @@ i18next
             name_col: 'NAZWA',
             namespace_col: 'PRZESTRZEŃ NAZW',
             source_col: 'ŹRÓDŁO',
-            updated_col: 'ZAKTUALIZOWANO'
+            updated_col: 'ZAKTUALIZOWANO',
+            status_col: 'STATUS',
           },
           jobs_route: {
             empty_title: 'Nie znaleziono ofert pracy',
@@ -404,7 +411,8 @@ i18next
             name_col: 'NAZWA',
             namespace_col: 'PRZESTRZEŃ NAZW',
             updated_col: 'ZAKTUALIZOWANO',
-            latest_run_col: 'NAJNOWSZY CZAS TRWANIA'
+            latest_run_col: 'NAJNOWSZY CZAS TRWANIA',
+            latest_run_state_col: 'NAJNOWSZY STAN URUCHOMIENIA',
           },
           runs_columns: {
             id: 'ID',

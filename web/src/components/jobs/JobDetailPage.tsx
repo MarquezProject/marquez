@@ -26,15 +26,17 @@ import {
   resetRuns
 } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
+import { jobRunsStatus } from '../../helpers/nodes'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
+import MqStatus from '../core/status/MqStatus'
 import RunInfo from './RunInfo'
-import RunStatus from './RunStatus'
 import Runs from './Runs'
+
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -160,9 +162,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
-        {job.latestRun && (
+        {runs.length && (
           <Box mr={1}>
-            <RunStatus run={job.latestRun} />
+           <MqStatus color={jobRunsStatus(runs)} />
           </Box>
         )}
         <MqText font={'mono'} heading>

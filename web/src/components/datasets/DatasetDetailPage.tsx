@@ -24,6 +24,7 @@ import {
 } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
+import { datasetFacetsStatus } from '../../helpers/nodes'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
@@ -32,6 +33,8 @@ import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
+import MqStatus from '../core/status/MqStatus'
+
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 const styles = ({ spacing }: ITheme) => {
@@ -143,6 +146,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 
   const firstVersion = versions[0]
   const { name, tags, description } = firstVersion
+  const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   return (
     <Box my={2} className={root}>
@@ -202,9 +206,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             </IconButton>
           </Box>
         </Box>
-        <MqText heading font={'mono'}>
-          {name}
-        </MqText>
+        <Box display={'flex'} alignItems={'center'}>
+          {facetsStatus && (
+            <Box mr={1}>
+              <MqStatus color={facetsStatus} />
+            </Box>
+          )}
+          <MqText heading font={'mono'}>
+            {name}
+          </MqText>
+        </Box>
         <Box mb={2}>
           <MqText subdued>{description}</MqText>
         </Box>

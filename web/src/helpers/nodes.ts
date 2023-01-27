@@ -1,6 +1,8 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import { theme } from './theme'
+import { Facets, EventType, RunState, Run } from '../types/api'
 import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 
@@ -55,4 +57,63 @@ type SearchDelimiterMap = typeof searchDelimiterMap
 
 export function parseSearchGroup(nodeId: string, field: keyof SearchDelimiterMap) {
   return nodeId.split(':')[searchDelimiterMap[field]] || ''
+}
+
+export function stateTypeColor(state: RunState | EventType) {
+  switch (state) {
+    case 'NEW':
+      return theme.palette.secondary.main
+    case 'START':
+      return theme.palette.info.main
+    case 'RUNNING':
+      return theme.palette.info.main
+    case 'COMPLETE':
+      return theme.palette.primary.main
+    case 'COMPLETED':
+      return theme.palette.primary.main
+    case 'FAIL':
+      return theme.palette.error.main
+    case 'FAILED':
+      return theme.palette.error.main
+    case 'ABORT':
+      return theme.palette.warning.main
+    case 'ABORTED':
+      return theme.palette.warning.main
+    default:
+      return theme.palette.secondary.main
+  }
+}
+
+export function jobRunsStatus(runs: Run[], limit = -14) {
+  runs = runs.slice(limit)
+
+  const isAllFailed = runs.every((e: any) => e.state === 'FAILED')
+  const isSomeFailed = runs.some((e: any) => e.state === 'FAILED')
+
+  if (isAllFailed) {
+    return theme.palette.error.main as string
+  } else if (isSomeFailed) {
+    return theme.palette.info.main as string
+  } else {
+    return theme.palette.primary.main as string
+  }
+}
+
+export function datasetFacetsStatus(facets: Facets, limit = -14) {
+  const assertions = facets?.dataQualityAssertions?.assertions?.slice(limit)
+
+  if (!assertions?.length) {
+    return null
+  }
+
+  const isAllFalse = assertions.every((e: any) => e.success === false)
+  const isSomeFalse = assertions.some((e: any) => e.success === false)
+
+  if (isAllFalse) {
+    return theme.palette.error.main as string
+  } else if (isSomeFalse) {
+    return theme.palette.info.main as string
+  } else {
+    return theme.palette.primary.main as string
+  }
 }
