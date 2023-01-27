@@ -72,6 +72,7 @@ public interface DatasetFacetsDao {
   /**
    * @param createdAt
    * @param datasetUuid
+   * @param datasetVersionUuid
    * @param runUuid
    * @param lineageEventTime
    * @param lineageEventType
@@ -84,6 +85,7 @@ public interface DatasetFacetsDao {
           INSERT INTO dataset_facets (
              created_at,
              dataset_uuid,
+             dataset_version_uuid,
              run_uuid,
              lineage_event_time,
              lineage_event_type,
@@ -93,6 +95,7 @@ public interface DatasetFacetsDao {
           ) VALUES (
              :createdAt,
              :datasetUuid,
+             :datasetVersionUuid,
              :runUuid,
              :lineageEventTime,
              :lineageEventType,
@@ -104,6 +107,7 @@ public interface DatasetFacetsDao {
   void insertDatasetFacet(
       Instant createdAt,
       UUID datasetUuid,
+      UUID datasetVersionUuid,
       UUID runUuid,
       Instant lineageEventTime,
       String lineageEventType,
@@ -121,6 +125,7 @@ public interface DatasetFacetsDao {
   @Transaction
   default void insertDatasetFacetsFor(
       @NonNull UUID datasetUuid,
+      @NonNull UUID datasetVersionUuid,
       @NonNull UUID runUuid,
       @NonNull Instant lineageEventTime,
       @NonNull String lineageEventType,
@@ -135,6 +140,7 @@ public interface DatasetFacetsDao {
                 insertDatasetFacet(
                     now,
                     datasetUuid,
+                    datasetVersionUuid,
                     runUuid,
                     lineageEventTime,
                     lineageEventType,
@@ -146,6 +152,7 @@ public interface DatasetFacetsDao {
   record DatasetFacetRow(
       Instant createdAt,
       UUID datasetUuid,
+      UUID datasetVersionUuid,
       UUID runUuid,
       Instant lineageEventTime,
       String lineageEventType,

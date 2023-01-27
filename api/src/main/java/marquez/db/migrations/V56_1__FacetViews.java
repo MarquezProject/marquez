@@ -22,7 +22,17 @@ public class V56_1__FacetViews implements JavaMigration {
         """
             WITH lineage_datasets AS (
                 SELECT
-                    jsonb_array_elements(coalesce(le.event -> 'inputs', '[]'::jsonb) || coalesce(le.event -> 'outputs', '[]'::jsonb)) AS dataset,
+                    jsonb_array_elements(coalesce(le.event -> 'inputs', '[]'::jsonb)) AS dataset,
+                    'input' as dataset_type,
+                    le.run_uuid,
+                    le.event_time,
+                    le.event_type,
+                    le.created_at
+                FROM %s le
+                UNION ALL
+                SELECT
+                    jsonb_array_elements(coalesce(le.event -> 'outputs', '[]'::jsonb)) AS dataset,
+                    'output' as dataset_type,
                     le.run_uuid,
                     le.event_time,
                     le.event_type,
@@ -41,6 +51,12 @@ public class V56_1__FacetViews implements JavaMigration {
             SELECT
                 COALESCE(df.created_at, df.event_time) AS created_at,
                 dataset_symlinks.dataset_uuid AS dataset_uuid,
+                (
+                   CASE
+                   WHEN df.dataset_type = 'output' THEN output_version.uuid
+                   WHEN df.dataset_type = 'input' THEN rim.dataset_version_uuid
+                   END
+                ) AS dataset_version_uuid,
                 df.run_uuid AS run_uuid,
                 df.event_time AS lineage_event_time,
                 df.event_type::VARCHAR(64) AS lineage_event_type,
@@ -55,11 +71,13 @@ public class V56_1__FacetViews implements JavaMigration {
                 df.facet_name::VARCHAR(255) AS name,
                 df.facet AS facet
             FROM dataset_facets df
-            JOIN dataset_symlinks ON dataset_symlinks.name = dataset_name
-            INNER JOIN namespaces ON dataset_symlinks.namespace_uuid = namespaces.uuid
-            WHERE namespaces.name = dataset_namespace
+            INNER JOIN namespaces ON namespaces.name = dataset_namespace
+            INNER JOIN dataset_symlinks ON dataset_symlinks.name = dataset_name AND dataset_symlinks.namespace_uuid = namespaces.uuid
+            LEFT JOIN dataset_versions output_version ON dataset_symlinks.dataset_uuid = output_version.dataset_uuid AND output_version.run_uuid = df.run_uuid
+            LEFT JOIN runs_input_mapping rim ON rim.run_uuid = df.run_uuid
+            LEFT JOIN dataset_versions input_version ON input_version.uuid = rim.dataset_version_uuid AND input_version.dataset_uuid = dataset_symlinks.dataset_uuid
             """,
-        sourceTable);
+        sourceTable, sourceTable);
   }
 
   public static String getRunFacetsDefinitionSQL(String sourceTable) {
