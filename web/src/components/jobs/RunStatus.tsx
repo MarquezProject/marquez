@@ -25,7 +25,11 @@ const RunStatus: FunctionComponent<RunStatusProps & WithStyles<typeof styles>> =
   const { run, classes } = props
   return (
     <Tooltip title={run.state}>
-      <Box mr={1} className={classes.status} style={{ backgroundColor: stateTypeColor(run.state) }} />
+      <Box
+        mr={1}
+        className={classes.status}
+        style={{ backgroundColor: stateTypeColor(run.state) }}
+      />
     </Tooltip>
   )
 }

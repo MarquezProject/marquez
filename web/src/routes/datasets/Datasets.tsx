@@ -14,8 +14,8 @@ import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
 import MqEmpty from '../../components/core/empty/MqEmpty'
-import MqText from '../../components/core/text/MqText'
 import MqStatus from '../../components/core/status/MqStatus'
+import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
@@ -130,7 +130,6 @@ class Datasets extends React.Component<DatasetsProps> {
                                 <MqText>N/A</MqText>
                               )}
                             </TableCell>
-
                           </TableRow>
                         )
                       })}
@@ -161,7 +160,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Datasets))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Datasets))

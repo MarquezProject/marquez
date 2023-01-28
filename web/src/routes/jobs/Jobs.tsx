@@ -152,7 +152,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Jobs)
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs)

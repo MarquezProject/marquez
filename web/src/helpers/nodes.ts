@@ -1,10 +1,10 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { theme } from './theme'
-import { Facets, EventType, RunState, Run } from '../types/api'
+import { EventType, Facets, Run, RunState } from '../types/api'
 import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
+import { theme } from './theme'
 
 export function isJob(node: MqNode): Undefinable<LineageJob> {
   if (node.data.type === 'BATCH') {

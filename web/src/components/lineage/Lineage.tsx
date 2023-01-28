@@ -146,7 +146,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const getSuccessors = (node: any) => {
       const successors = g?.successors(node)
       if (successors?.length) {
-        for (var i = 0, count = node.length; i < count; i++) {
+        for (let i = 0, count = node.length; i < count; i++) {
           if (successors[i]) {
             paths.push([node, successors[i]])
             getSuccessors(successors[i])
@@ -158,7 +158,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const getPredecessors = (node: any) => {
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
-        for (var i = 0, count = node.length; i < count; i++) {
+        for (let i = 0, count = node.length; i < count; i++) {
           if (predecessors[i]) {
             paths.push([predecessors[i], node])
             getPredecessors(predecessors[i])
@@ -291,7 +291,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
-  selectedNode: state.lineage.selectedNode,
+  selectedNode: state.lineage.selectedNode
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -304,9 +304,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default withStyles(styles)(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withRouter(Lineage))
-)
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Lineage)))

@@ -82,7 +82,6 @@ export interface DatasetVersions {
   versions: DatasetVersion[]
 }
 
-
 export interface Facets {
   dataQualityAssertions?: {
     assertions?: {

@@ -14,7 +14,6 @@ import {
   Tooltip
 } from '@material-ui/core'
 import { ChevronLeftRounded, ChevronRightRounded } from '@material-ui/icons'
-import { stateTypeColor } from '../../helpers/nodes'
 import { Event } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -24,6 +23,7 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
+import { stateTypeColor } from '../../helpers/nodes'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
@@ -35,8 +35,6 @@ import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import moment from 'moment'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-
 
 const styles = (theme: Theme) => {
   return createStyles({
@@ -362,7 +360,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Events))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Events))

@@ -100,7 +100,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DatasetColumnLineage)
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetColumnLineage)

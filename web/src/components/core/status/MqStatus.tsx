@@ -26,11 +26,7 @@ interface OwnProps {
   label?: string
 }
 
-const MqStatus: React.FC<OwnProps & WithStyles<typeof styles>> = ({
-  label,
-  color,
-  classes
-}) => {
+const MqStatus: React.FC<OwnProps & WithStyles<typeof styles>> = ({ label, color, classes }) => {
   if (!color) {
     return null
   }

@@ -31,9 +31,8 @@ interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
 
-const DatasetVersions: FunctionComponent<
-  DatasetVersionsProps & IWithStyles<typeof styles>
-> = props => {
+const DatasetVersions: FunctionComponent<DatasetVersionsProps &
+  IWithStyles<typeof styles>> = props => {
   const { versions, classes } = props
 
   const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)

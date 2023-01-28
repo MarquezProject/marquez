@@ -114,16 +114,12 @@ class Node extends React.Component<NodeProps> {
   }
 }
 
-
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setSelectedNode: setSelectedNode,
+      setSelectedNode: setSelectedNode
     },
     dispatch
   )
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(Node)
+export default connect(null, mapDispatchToProps)(Node)

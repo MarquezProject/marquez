@@ -1,11 +1,11 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GraphEdge } from 'dagre'
 import { LinePath } from '@visx/shape'
 import { curveMonotoneX } from '@visx/curve'
+import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { theme } from '../../../../helpers/theme'
 import React from 'react'
 
@@ -18,22 +18,20 @@ const OUTER_RADIUS = RADIUS + 8
 const ICON_SIZE = 16
 
 class Edge extends React.Component<EdgeProps> {
-  getPoints = (edge: any) => (
-    edge.points[edge.points.length - 1]
-  )
+  getPoints = (edge: any) => edge.points[edge.points.length - 1]
 
   render() {
     const { edgePoints } = this.props
     const edgeEnds = edgePoints.map(edge => {
-      let isSelected = edgePoints.find(o =>
-        this.getPoints(o).x == this.getPoints(edge).x &&
-        this.getPoints(o).y == this.getPoints(edge).y &&
-        o.isSelected === true
+      const isSelected = edgePoints.find(
+        o =>
+          this.getPoints(o).x == this.getPoints(edge).x &&
+          this.getPoints(o).y == this.getPoints(edge).y &&
+          o.isSelected === true
       )
-      return Object.assign(
-        edge.points[edge.points.length - 1],
-        { isSelected: typeof isSelected !== "undefined" }
-      )
+      return Object.assign(edge.points[edge.points.length - 1], {
+        isSelected: typeof isSelected !== 'undefined'
+      })
     })
 
     return (

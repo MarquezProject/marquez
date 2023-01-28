@@ -15,6 +15,7 @@ import { LineageDataset } from '../lineage/types'
 import { alpha } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
@@ -24,7 +25,6 @@ import {
 } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
-import { datasetFacetsStatus } from '../../helpers/nodes'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
@@ -32,8 +32,8 @@ import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
-import MqText from '../core/text/MqText'
 import MqStatus from '../core/status/MqStatus'
+import MqText from '../core/text/MqText'
 
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
@@ -252,7 +252,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(DatasetDetailPage))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(DatasetDetailPage))
