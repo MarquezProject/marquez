@@ -102,7 +102,7 @@ class Node extends React.Component<NodeProps> {
             />
             <FontAwesomeIcon
               title={ariaJobLabel}
-              aria-hidden='true'
+              aria-hidden={'true'}
               style={{ transformOrigin: `${node.x}px ${node.y}px` }}
               icon={faCog}
               width={ICON_SIZE}
