@@ -18,6 +18,10 @@
     *Creates `job_facets_view`, `dataset_facets_view` and `run_facets_view` tables on top of the existing `lineage_events` table for reading facets prior to migration to new facets' tables.*
 * API: OL facets PR #3: migrate data to facet tables [`#2359`](https://github.com/MarquezProject/marquez/pull/2359) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *A Java migration script for backfilling newly created facets' tables with data contained within `lineage_events` tables. The migration has to be done manually for users with more than 100K `lineage_events` stored in Marquez.*
+* Docker: add new script for stopping Docker [`#2380`](https://github.com/MarquezProject/marquez/pull/2380) [@rossturk](https://github.com/rossturk)  
+    *Provides a clean way to stop a deployment via `docker-compose down`.*
+* Docker: seed data for column lineage [`#2381`](https://github.com/MarquezProject/marquez/pull/2381) [@rossturk](https://github.com/rossturk)  
+    *Adds some `ColumnLineageDatasetFacet` JSON snippets to `docker/metadata.json` to seed data for column-level lineage facets.*
 
 ### Fixed
 * Validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
@@ -26,6 +30,8 @@
     *Fixes the Marquez HTTP server set in `docker/up.sh` so the script uses `docker-compose.web.yml` with overrides for `dev` set via `docker-compose.web-dev.yml`.* 
 * Update copyright headers [`#2353`](https://github.com/MarquezProject/marquez/pull/2353) [@merobi-hub](https://github.com/merobi-hub) 
     *Updates the headers with the current year.*
+* Fix Helm chart [`#2374`](https://github.com/MarquezProject/marquez/pull/2374) [@perttus](https://github.com/perttus)  
+    *Fixes minor issues with the Helm chart.*
 
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
