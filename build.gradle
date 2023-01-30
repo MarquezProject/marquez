@@ -107,7 +107,7 @@ subprojects {
 
     pmd {
         consoleOutput = true
-        toolVersion = "6.53.0"
+        toolVersion = "6.54.0"
         rulesMinimumPriority = 5
         ruleSetFiles = rootProject.files("pmd-marquez.xml")
         ruleSets = []
