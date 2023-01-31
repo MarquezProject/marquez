@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -93,7 +93,6 @@ public class JobFacetsDaoTest {
                 .map(
                     rv ->
                         new JobFacetsDao.JobFacetRow(
-                            rv.getColumn("uuid", UUID.class),
                             rv.getColumn("created_at", Instant.class),
                             rv.getColumn("job_uuid", UUID.class),
                             rv.getColumn("run_uuid", UUID.class),
