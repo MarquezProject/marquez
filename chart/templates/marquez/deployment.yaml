@@ -34,12 +34,14 @@ spec:
             - /bin/bash
           args:
             - -ec
-            - until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}; do echo waiting for database; sleep 2; done;
+            - until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER}; do echo waiting for database; sleep 2; done;
           env:
             - name: POSTGRES_HOST
               value: {{ include "marquez.database.host" . | quote }}
             - name: POSTGRES_PORT
               value: {{ include "marquez.database.port" . | quote }}
+            - name: POSTGRES_USER
+              value: {{ include "marquez.database.user" . | quote }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}

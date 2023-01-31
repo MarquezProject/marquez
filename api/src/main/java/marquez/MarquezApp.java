@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
+import marquez.cli.DbMigrationCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
@@ -147,6 +148,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     for (final Object resource : context.getResources()) {
       env.jersey().register(resource);
     }
+  }
+
+  @Override
+  protected void addDefaultCommands(Bootstrap<MarquezConfig> bootstrap) {
+    bootstrap.addCommand(new DbMigrationCommand<>(this));
+    super.addDefaultCommands(bootstrap);
   }
 
   private MarquezContext buildMarquezContext(

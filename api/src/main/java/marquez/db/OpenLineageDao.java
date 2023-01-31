@@ -296,6 +296,7 @@ public interface OpenLineageDao extends BaseDao {
                 facets ->
                     datasetFacetsDao.insertDatasetFacetsFor(
                         record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
                         runUuid,
                         now,
                         event.getEventType(),
@@ -330,6 +331,7 @@ public interface OpenLineageDao extends BaseDao {
                 facets ->
                     datasetFacetsDao.insertDatasetFacetsFor(
                         record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
                         runUuid,
                         now,
                         event.getEventType(),
