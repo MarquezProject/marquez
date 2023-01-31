@@ -395,7 +395,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, restaurant_id, menu_id, menu_item_id, category_id)\n SELECT o.id AS order_id, o.placed_on, o.discount_id, m.restaurant_id, m.id AS menu_id, mi.id AS menu_item_id, c.id AS category_id\n   FROM orders AS o\n  INNER JOIN menu_items AS mi\n     ON menu_items.id = o.menu_item_id\n  INNER JOIN categories AS c\n     ON c.id = mi.category_id\n  INNER JOIN menu AS m\n     ON m.id = c.menu_id\n  WHERE o.placed_on >= NOW() - interval '7 days';"
+          "query": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, restaurant_id, menu_id, menu_item_id, category_id)\n SELECT o.id AS order_id, o.placed_on, o.discount_id, m.restaurant_id, m.id AS menu_id, mi.id AS menu_item_id, c.id AS category_id\n   FROM orders AS o\n  INNER JOIN menu_items AS mi\n     ON menu_items.id = o.menu_item_id\n  INNER JOIN categories AS c\n     ON c.id = mi.category_id\n  INNER JOIN menus AS m\n     ON m.id = c.menu_id\n  WHERE o.placed_on >= NOW() - interval '7 days';"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -427,6 +427,90 @@
         "namespace": "food_delivery",
         "name": "public.orders_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "id"
+                  }
+                ]
+              },
+              "placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "discount_id"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menus",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menus",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.categories",
+                    "field": "menu_id"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_items",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "menu_item_id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.categories",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_items",
+                    "field": "category_id"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
@@ -1035,6 +1119,144 @@
         "namespace": "food_delivery",
         "name": "public.delivery_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "order_id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "order_id"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "order_dispatched_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "order_delivered_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "email"
+                  }
+                ]
+              },
+              "customer_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "address"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "discount_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "menu_id"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "restaurant_id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "id"
+                  }
+                ]
+              },
+              "restaurant_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "address"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "menu_item_id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_item_id",
+                    "field": "category_id"
+                  }
+                ]
+              },
+              "driver_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.drivers",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "driver_id"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
@@ -1075,10 +1297,29 @@
                 "description": "The email address of the customer."
               },
               {
+                "name": "customer_address",
+                "type": "VARCHAR",
+                "tags": [],
+                "description": "The physical address of the customer."
+              },
+
+              {
                 "name": "menu_id",
                 "type": "INTEGER",
                 "tags": [],
                 "description": "The ID of the menu related to the order."
+              },
+              {
+                "name": "restaurant_id",
+                "type": "INTEGER",
+                "tags": [],
+                "description": "The ID of the restaurant."
+              },
+              {
+                "name": "restaurant_address",
+                "type": "VARCHAR",
+                "tags": [],
+                "description": "The physical address of the restaurant."
               },
               {
                 "name": "menu_item_id",
@@ -1156,7 +1397,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "INSERT INTO top_delivery_times (order_id, order_placed_on, order_dispatched_on, order_delivered_on, order_delivery_time,\n      customer_email, restaurant_id, driver_id)\n  SELECT order_id, order_placed_on, order_delivered_on, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    customer_email, restaurant_id, driver_id\n    FROM delivery_7_days\n   GROUP BY restaurant_id\n   ORDER BY order_delivery_time DESC\n   LIMIT 1;\nINSERT INTO discounts (amount_off, customer_email, starts_on, ends_on)\n  SELECT customer_email, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    CASE WHEN order_delivery_time >= 60 THEN 15\n      ELSE 5\n    END AS amount_off,\n    NOW() AS starts_on,\n    NOW() + interval '7 days' AS ends_on\n   FROM top_delivery_times\n  WHERE order_delivery_time >= 45;"
+          "query": "INSERT INTO top_delivery_times (order_id, order_placed_on, order_delivered_on, order_delivery_time,\n      customer_email, restaurant_id, driver_id)\n  SELECT order_id, order_placed_on, order_delivered_on, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    customer_email, restaurant_id, driver_id\n    FROM delivery_7_days\n   GROUP BY restaurant_id\n   ORDER BY order_delivery_time DESC\n   LIMIT 1;\nINSERT INTO discounts (amount_off, customer_email, starts_on, ends_on)\n  SELECT customer_email, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    CASE WHEN order_delivery_time >= 60 THEN 15\n      ELSE 5\n    END AS amount_off,\n    NOW() AS starts_on,\n    NOW() + interval '7 days' AS ends_on\n   FROM top_delivery_times\n  WHERE order_delivery_time >= 45;"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -1176,6 +1417,80 @@
         "namespace": "food_delivery",
         "name": "public.top_delivery_times",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_id"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  }
+                ]
+              },
+              "order_delivered_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "order_delivery_time": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "customer_email"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "driver_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "driver_id"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
@@ -1198,19 +1513,13 @@
                 "description": "An ISO-8601 timestamp representing the date/time the order was placed."
               },
               {
-                "name": "order_dispatched_on",
-                "type": "TIMESTAMP",
-                "tags": [],
-                "description": "An ISO-8601 timestamp representing the date/time the order was dispatched."
-              },
-              {
                 "name": "order_delivered_on",
                 "type": "TIMESTAMP",
                 "tags": [],
                 "description": "An ISO-8601 timestamp representing the date/time the order was delivered."
               },
               {
-                "name": "order_delivered_time",
+                "name": "order_delivery_time",
                 "type": "TIMESTAMP",
                 "tags": [],
                 "description": "An ISO-8601 timestamp representing the total time of delivery."
@@ -1247,6 +1556,35 @@
         "namespace": "food_delivery",
         "name": "public.discounts",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "amount_off": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "customer_email"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
@@ -1356,6 +1694,30 @@
         "namespace": "food_delivery",
         "name": "public.popular_orders_day_of_week",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_day_of_week": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.top_delivery_times",
+                    "field": "order_placed_on"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.top_delivery_times",
+                    "field": "order_placed_on"
+                  }
+                ]
+              }
+            }
+          },
           "documentation": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +28,6 @@ public interface RunFacetsDao {
   String SPARK_LOGICAL_PLAN = "spark.logicalPlan";
 
   /**
-   * @param uuid
    * @param createdAt
    * @param runUuid
    * @param lineageEventTime
@@ -39,7 +38,6 @@ public interface RunFacetsDao {
   @SqlUpdate(
       """
       INSERT INTO run_facets (
-         uuid,
          created_at,
          run_uuid,
          lineage_event_time,
@@ -47,7 +45,6 @@ public interface RunFacetsDao {
          name,
          facet
       ) VALUES (
-         :uuid,
          :createdAt,
          :runUuid,
          :lineageEventTime,
@@ -57,7 +54,6 @@ public interface RunFacetsDao {
       )
       """)
   void insertRunFacet(
-      UUID uuid,
       Instant createdAt,
       UUID runUuid,
       Instant lineageEventTime,
@@ -103,7 +99,6 @@ public interface RunFacetsDao {
         .forEach(
             fieldName ->
                 insertRunFacet(
-                    UUID.randomUUID(),
                     now,
                     runUuid,
                     lineageEventTime,
@@ -113,7 +108,6 @@ public interface RunFacetsDao {
   }
 
   record RunFacetRow(
-      UUID uuid,
       Instant createdAt,
       UUID runUuid,
       Instant lineageEventTime,

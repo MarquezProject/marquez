@@ -166,6 +166,7 @@ jobs:
     working_directory: ~/marquez
     machine:
       image: ubuntu-2004:current
+    resource_class: large
     steps:
       - checkout
       - run: ./.circleci/get-docker-compose.sh
