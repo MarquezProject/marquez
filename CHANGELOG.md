@@ -23,14 +23,16 @@
     *Adds some `ColumnLineageDatasetFacet` JSON snippets to `docker/metadata.json` to seed data for column-level lineage facets.*
 
 ### Fixed
-* Validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+* API: validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Fixes validation of the `ParentRunFacet` to avoid `NullPointerException`s in the case of empty run sections.*
-* Use `docker-compose.web.yml` as base compose file [`#2360`](https://github.com/MarquezProject/marquez/pull/2360) [@wslulciuc](https://github.com/wslulciuc)  
+* Docker: use `docker-compose.web.yml` as base compose file [`#2360`](https://github.com/MarquezProject/marquez/pull/2360) [@wslulciuc](https://github.com/wslulciuc)  
     *Fixes the Marquez HTTP server set in `docker/up.sh` so the script uses `docker-compose.web.yml` with overrides for `dev` set via `docker-compose.web-dev.yml`.* 
-* Update copyright headers [`#2353`](https://github.com/MarquezProject/marquez/pull/2353) [@merobi-hub](https://github.com/merobi-hub) 
+* Docs: update copyright headers [`#2353`](https://github.com/MarquezProject/marquez/pull/2353) [@merobi-hub](https://github.com/merobi-hub) 
     *Updates the headers with the current year.*
-* Fix Helm chart [`#2374`](https://github.com/MarquezProject/marquez/pull/2374) [@perttus](https://github.com/perttus)  
+* Chart: fix Helm chart [`#2374`](https://github.com/MarquezProject/marquez/pull/2374) [@perttus](https://github.com/perttus)  
     *Fixes minor issues with the Helm chart.*
+* Spec: update dataset version API spec [`#2389`](https://github.com/MarquezProject/marquez/pull/2389) [@phixme](https://github.com/phixMe)  
+    *Adds `limit` and `offset` to the openapi.yml spec file as query parameters.*
 
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
