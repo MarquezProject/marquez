@@ -17,6 +17,7 @@ public class JdbiUtils {
           handle.execute("DELETE FROM dataset_versions_field_mapping");
           handle.execute("DELETE FROM stream_versions");
           handle.execute("DELETE FROM column_lineage");
+          handle.execute("DELETE FROM dataset_facets");
           handle.execute("DELETE FROM dataset_versions");
           handle.execute("DELETE FROM dataset_symlinks");
           handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
@@ -36,9 +37,9 @@ public class JdbiUtils {
           handle.execute("DELETE FROM sources");
           handle.execute("DELETE FROM namespace_ownerships");
           handle.execute("DELETE FROM namespaces");
-          handle.execute("DELETE FROM dataset_facets");
           handle.execute("DELETE FROM run_facets");
           handle.execute("DELETE FROM job_facets");
+          handle.execute("DELETE FROM facet_migration_lock");
           return null;
         });
   }
