@@ -1,5 +1,4 @@
 CREATE TABLE job_facets (
-  uuid               UUID PRIMARY KEY,
   created_at         TIMESTAMPTZ NOT NULL,
   job_uuid           UUID REFERENCES jobs(uuid),
   run_uuid           UUID REFERENCES runs(uuid),
