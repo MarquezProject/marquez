@@ -247,3 +247,7 @@ We use [SPDX](https://spdx.dev) for copyright and license information. The follo
 * [Keeping a Changelog](https://keepachangelog.com)
 * [Code Review Developer Guide](https://google.github.io/eng-practices/review)
 * [Signing Commits](https://docs.github.com/en/github/authenticating-to-github/signing-commits)
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

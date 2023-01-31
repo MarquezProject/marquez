@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { ArrowBackIosRounded } from '@material-ui/icons'
@@ -26,7 +27,6 @@ import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
 import RunStatus from './RunStatus'
 import transitions from '@material-ui/core/styles/transitions'
-
 
 const styles = (theme: Theme) => {
   return createStyles({

@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+  web:
+    image: "marquezproject/marquez-web:${TAG}"
+    container_name: marquez-web
+    environment:
+      - MARQUEZ_HOST=api
+      - MARQUEZ_PORT=${API_PORT}
+    ports:
+      - "${WEB_PORT}:${WEB_PORT}"
+    depends_on:
+      - api

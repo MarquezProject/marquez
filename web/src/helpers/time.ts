@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import moment from 'moment'
@@ -28,9 +29,9 @@ export function stopWatchDuration(durationMs: number) {
 }
 
 export function formatDatePicker(val: string) {
-  return moment(val).format("YYYY-MM-DDTHH:mm:ss")
+  return moment(val).format('YYYY-MM-DDTHH:mm:ss')
 }
 
 export function formatDateAPIQuery(val: string) {
-  return moment(val).format("YYYY-MM-DDTHH:mm:ss[.000Z]")
+  return moment(val).format('YYYY-MM-DDTHH:mm:ss[.000Z]')
 }

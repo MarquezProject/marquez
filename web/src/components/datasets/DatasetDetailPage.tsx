@@ -1,9 +1,8 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
-
 import * as Redux from 'redux'
-import { Box, Chip, Tab, Tabs } from '@material-ui/core'
+import { Box, Button, Chip, Tab, Tabs } from '@material-ui/core'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import {
@@ -13,16 +12,27 @@ import {
   withStyles
 } from '@material-ui/core/styles'
 import { LineageDataset } from '../lineage/types'
+import { alpha } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchDatasetVersions, resetDatasetVersions } from '../../store/actionCreators'
+import {
+  deleteDataset,
+  dialogToggle,
+  fetchDatasetVersions,
+  resetDataset,
+  resetDatasetVersions
+} from '../../store/actionCreators'
+import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
 import CloseIcon from '@material-ui/icons/Close'
+import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
+import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqText from '../core/text/MqText'
+import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 const styles = ({ spacing }: ITheme) => {
   return createStyles({
@@ -41,28 +51,31 @@ const styles = ({ spacing }: ITheme) => {
         marginRight: spacing(1)
       }
     },
-    noData: {
-      padding: '125px 0 0 0'
-    },
-    infoIcon: {
-      paddingLeft: '3px',
-      paddingTop: '3px'
-    },
-    updated: {
-      marginTop: '10px'
+    buttonDelete: {
+      borderColor: theme.palette.error.main,
+      color: theme.palette.error.main,
+      '&:hover': {
+        borderColor: alpha(theme.palette.error.main, 0.3),
+        backgroundColor: alpha(theme.palette.error.main, 0.3)
+      }
     }
   })
 }
 
 interface StateProps {
-  dataset: LineageDataset
+  lineageDataset: LineageDataset
   versions: DatasetVersion[]
   versionsLoading: boolean
+  datasets: IState['datasets']
+  display: IState['display']
 }
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
   resetDatasetVersions: typeof resetDatasetVersions
+  resetDataset: typeof resetDataset
+  deleteDataset: typeof deleteDataset
+  dialogToggle: typeof dialogToggle
 }
 
 type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
@@ -75,21 +88,41 @@ function a11yProps(index: number) {
 }
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
+  const {
+    classes,
+    datasets,
+    display,
+    fetchDatasetVersions,
+    resetDataset,
+    resetDatasetVersions,
+    deleteDataset,
+    dialogToggle,
+    versions,
+    versionsLoading,
+    lineageDataset
+  } = props
   const { root } = classes
   const history = useHistory()
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
-  }, [props.dataset.name])
+    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
+  }, [props.lineageDataset.name])
+
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      history.push('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   // unmounting
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
+      resetDataset()
       resetDatasetVersions()
-    }
-  }, [])
+    },
+    []
+  )
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -108,8 +141,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     return null
   }
 
-  const dataset = versions[0]
-  const { name, tags, description } = dataset
+  const firstVersion = versions[0]
+  const { name, tags, description } = firstVersion
 
   return (
     <Box my={2} className={root}>
@@ -136,11 +169,38 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 {...a11yProps(1)}
                 disableRipple={true}
               />
+              <Tab
+                label={i18next.t('datasets.column_lineage_tab')}
+                {...a11yProps(1)}
+                disableRipple={true}
+              />
             </Tabs>
           </Box>
-          <IconButton onClick={() => history.push('/datasets')}>
-            <CloseIcon />
-          </IconButton>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                variant='outlined'
+                className={classes.buttonDelete}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
+              >
+                {i18next.t('datasets.dialog_delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={i18next.t('jobs.dialog_confirmation_title')}
+                ignoreWarning={() => {
+                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
+                  props.dialogToggle('')
+                }}
+              />
+            </Box>
+            <IconButton onClick={() => history.push('/datasets')}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
         <MqText heading font={'mono'}>
           {name}
@@ -151,18 +211,20 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
       </Box>
       {tab === 0 && (
         <DatasetInfo
-          datasetFields={dataset.fields}
-          facets={dataset.facets}
-          run={dataset.createdByRun}
+          datasetFields={firstVersion.fields}
+          facets={firstVersion.facets}
+          run={firstVersion.createdByRun}
         />
       )}
       {tab === 1 && <DatasetVersions versions={props.versions} />}
+      {tab === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets.result,
+  datasets: state.datasets,
+  display: state.display,
   versions: state.datasetVersions.result.versions,
   versionsLoading: state.datasetVersions.isLoading
 })
@@ -171,7 +233,10 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
-      resetDatasetVersions: resetDatasetVersions
+      resetDatasetVersions: resetDatasetVersions,
+      resetDataset: resetDataset,
+      deleteDataset: deleteDataset,
+      dialogToggle: dialogToggle
     },
     dispatch
   )

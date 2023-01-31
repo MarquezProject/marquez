@@ -1,12 +1,14 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { History } from 'history'
 import { Reducer, combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
+import dataset, { IDatasetState } from './dataset'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
-import events, { IEventsState } from './events'
 import display, { IDisplayState } from './display'
+import events, { IEventsState } from './events'
 import jobs, { IJobsState } from './jobs'
 import lineage, { ILineageState } from './lineage'
 import namespaces, { INamespacesState } from './namespaces'
@@ -15,6 +17,7 @@ import search, { ISearchState } from './search'
 
 export interface IState {
   datasets: IDatasetsState
+  dataset: IDatasetState
   datasetVersions: IDatasetVersionsState
   events: IEventsState
   jobs: IJobsState
@@ -29,6 +32,7 @@ export interface IState {
 export default (history: History): Reducer =>
   combineReducers({
     router: connectRouter(history),
+    dataset,
     datasets,
     datasetVersions,
     events,

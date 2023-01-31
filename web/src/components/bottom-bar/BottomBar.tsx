@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
@@ -54,7 +55,7 @@ class BottomBar extends React.Component<BottomBarProps> {
         <Box className={classes.overflow} height={bottomBarHeight}>
           <Container maxWidth={'lg'} disableGutters={true}>
             {lineageJob && <JobDetailPage job={lineageJob} />}
-            {lineageDataset && <DatasetDetailPage dataset={lineageDataset} />}
+            {lineageDataset && <DatasetDetailPage lineageDataset={lineageDataset} />}
           </Container>
         </Box>
       </Box>

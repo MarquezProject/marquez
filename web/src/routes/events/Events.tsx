@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
@@ -9,8 +10,10 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Theme
+  Theme,
+  Tooltip
 } from '@material-ui/core'
+import { ChevronLeftRounded, ChevronRightRounded } from '@material-ui/icons'
 import { Event } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -22,6 +25,7 @@ import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
 import { theme } from '../../helpers/theme'
 import Box from '@material-ui/core/Box'
+import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqJson from '../../components/core/code/MqJson'
@@ -49,13 +53,16 @@ const styles = (theme: Theme) => {
       borderRadius: '50%'
     },
     table: {
-      marginBottom: '100px'
+      marginBottom: theme.spacing(2)
     },
     row: {
       cursor: 'pointer',
       '&:hover': {
         backgroundColor: theme.palette.action.hover
       }
+    },
+    ml2: {
+      marginLeft: theme.spacing(2)
     }
   })
 }
@@ -129,7 +136,7 @@ class Events extends React.Component<EventsProps, EventsState> {
     if (eventsProps !== eventsState) {
       this.setState({
         events: eventsProps,
-        pageIsLast: eventsProps.length < page * this.pageSize ? true : false
+        pageIsLast: eventsProps.length < page * this.pageSize
       })
     }
   }
@@ -140,7 +147,7 @@ class Events extends React.Component<EventsProps, EventsState> {
 
   getEvents() {
     const { events, page } = this.state
-    return events.slice(0 + (page - 1) * this.pageSize, this.pageSize + (page - 1) * this.pageSize)
+    return events.slice((page - 1) * this.pageSize, this.pageSize + (page - 1) * this.pageSize)
   }
 
   pageNavigation() {
@@ -192,9 +199,32 @@ class Events extends React.Component<EventsProps, EventsState> {
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
           <>
-            <Box p={2}>
-              <MqText heading>{i18next.t('events_route.title')}</MqText>
-              Page: {this.pageNavigation()}
+            <Box p={2} display={'flex'} justifyContent={'space-between'}>
+              <Box>
+                <MqText heading>{i18next.t('events_route.title')}</MqText>
+                Page: {this.pageNavigation()}
+              </Box>
+              <Box>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <IconButton
+                    className={classes.ml2}
+                    color='primary'
+                    disabled={page === 1}
+                    onClick={() => this.handleClickPage('prev')}
+                  >
+                    <ChevronLeftRounded />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <IconButton
+                    color='primary'
+                    disabled={pageIsLast}
+                    onClick={() => this.handleClickPage('next')}
+                  >
+                    <ChevronRightRounded />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
             <Box p={2} className={classes.nav}>
               <MqDatePicker
@@ -207,22 +237,6 @@ class Events extends React.Component<EventsProps, EventsState> {
                 value={formatDatePicker(dateTo)}
                 onChange={(e: any) => this.handleChangeDatepicker(e, 'to')}
               />
-              <Button
-                variant='outlined'
-                color='primary'
-                disabled={page === 1}
-                onClick={() => this.handleClickPage('prev')}
-              >
-                {i18next.t('events_route.previous_page')}
-              </Button>
-              <Button
-                variant='outlined'
-                color='primary'
-                disabled={pageIsLast}
-                onClick={() => this.handleClickPage('next')}
-              >
-                {i18next.t('events_route.next_page')}
-              </Button>
             </Box>
             {events.length === 0 ? (
               <Box p={2}>
@@ -324,6 +338,27 @@ class Events extends React.Component<EventsProps, EventsState> {
                 </Table>
               </>
             )}
+            <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+              <Tooltip title={i18next.t('events_route.previous_page')}>
+                <IconButton
+                  className={classes.ml2}
+                  color='primary'
+                  disabled={page === 1}
+                  onClick={() => this.handleClickPage('prev')}
+                >
+                  <ChevronLeftRounded />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={i18next.t('events_route.next_page')}>
+                <IconButton
+                  color='primary'
+                  disabled={pageIsLast}
+                  onClick={() => this.handleClickPage('next')}
+                >
+                  <ChevronRightRounded />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </>
         </MqScreenLoad>
       </Container>

@@ -1,11 +1,8 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { Event } from '../../types/api'
-import {
-  FETCH_EVENTS,
-  FETCH_EVENTS_SUCCESS,
-  RESET_EVENTS
-} from '../actionCreators/actionTypes'
+import { FETCH_EVENTS, FETCH_EVENTS_SUCCESS, RESET_EVENTS } from '../actionCreators/actionTypes'
 import { fetchEventsSuccess } from '../actionCreators'
 
 export type IEventsState = { isLoading: boolean; result: Event[]; init: boolean }

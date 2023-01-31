@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from '../../store/actionCreators/actionTypes'
@@ -13,7 +14,12 @@ describe('datasets reducer', () => {
         datasets: datasets
       }
     }
-    expect(datasetsReducer(initialState, action)).toStrictEqual({init: true, isLoading: false, result: datasets})
+    expect(datasetsReducer(initialState, action)).toStrictEqual({
+      init: true, 
+      isLoading: false, 
+      result: datasets, 
+      deletedDatasetName: ''
+    })
   })
 
 })

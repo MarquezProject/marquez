@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { JobOrDataset, LineageNode } from '../components/lineage/types'
@@ -42,13 +43,13 @@ export interface Event {
     facets: object
   }
   inputs: {
-    name: string,
-    namespace: string,
+    name: string
+    namespace: string
     facets: object
   }[]
   outputs: {
-    name: string,
-    namespace: string,
+    name: string
+    namespace: string
     facets: object
   }[]
 }
@@ -72,6 +73,7 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
+  columnLineage: object
 }
 
 export interface DatasetVersions {

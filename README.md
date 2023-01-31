@@ -156,3 +156,7 @@ See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/main/CONTRI
 ## Reporting a Vulnerability
 
 If you discover a vulnerability in the project, please open an issue and attach the "security" label.
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.
