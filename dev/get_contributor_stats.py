@@ -1,5 +1,7 @@
 # Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
+#
+#!/usr/bin/env python3
 
 import rich_click as click
 import pendulum
