@@ -23,7 +23,7 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
-import { stateTypeColor } from '../../helpers/nodes'
+import { eventTypeColor } from '../../helpers/nodes'
 import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
@@ -267,7 +267,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                             </TableCell>
                             <TableCell align='left'>
                               <MqStatus
-                                color={stateTypeColor(event.eventType)}
+                                color={eventTypeColor(event.eventType)}
                                 label={event.eventType}
                               />
                             </TableCell>

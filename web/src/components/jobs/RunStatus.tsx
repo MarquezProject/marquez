@@ -3,7 +3,7 @@
 
 import { Box, Theme, Tooltip, WithStyles, createStyles, withStyles } from '@material-ui/core'
 import { Run } from '../../types/api'
-import { stateTypeColor } from '../../helpers/nodes'
+import { runStateColor } from '../../helpers/nodes'
 
 import React, { FunctionComponent } from 'react'
 
@@ -28,7 +28,7 @@ const RunStatus: FunctionComponent<RunStatusProps & WithStyles<typeof styles>> =
       <Box
         mr={1}
         className={classes.status}
-        style={{ backgroundColor: stateTypeColor(run.state) }}
+        style={{ backgroundColor: runStateColor(run.state) }}
       />
     </Tooltip>
   )

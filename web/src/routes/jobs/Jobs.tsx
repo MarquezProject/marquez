@@ -9,7 +9,7 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode, stateTypeColor } from '../../helpers/nodes'
+import { encodeNode, runStateColor } from '../../helpers/nodes'
 import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
@@ -118,7 +118,7 @@ class Jobs extends React.Component<JobsProps> {
                           </TableCell>
                           <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
                             <MqStatus
-                              color={stateTypeColor(job.latestRun.state)}
+                              color={runStateColor(job.latestRun.state)}
                               label={job.latestRun.state}
                             />
                           </TableCell>

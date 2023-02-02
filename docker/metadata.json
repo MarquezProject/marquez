@@ -1119,18 +1119,18 @@
             "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           },
           "dataQualityAssertions": {
-            "_producer": "https://some.producer.com/version/1.0",
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DataQualityAssertionsDatasetFacet.json",
             "assertions": [
               {
                 "assertion": "not_null",
-                "success": true,
-                "column": "user_name"
+                "success": false,
+                "column": "driver_id"
               },
               {
                 "assertion": "is_string",
-                "success": false,
-                "column": "user_name"
+                "success": true,
+                "column": "customer_address"
               }
             ]
           }

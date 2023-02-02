@@ -141,27 +141,27 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   }
 
   getSelectedPaths = () => {
-    const paths = [] as Array<[MqNode, MqNode]>
+    const paths = [] as Array<[string, string]>
 
-    const getSuccessors = (node: any) => {
+    const getSuccessors = (node: string) => {
       const successors = g?.successors(node)
       if (successors?.length) {
-        for (let i = 0, count = node.length; i < count; i++) {
+        for (let i = 0; i < node.length - 1; i++) {
           if (successors[i]) {
-            paths.push([node, successors[i]])
-            getSuccessors(successors[i])
+            paths.push([node, successors[i] as unknown as string])
+            getSuccessors(successors[i] as unknown as string)
           }
         }
       }
     }
 
-    const getPredecessors = (node: any) => {
+    const getPredecessors = (node: string) => {
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
-        for (let i = 0, count = node.length; i < count; i++) {
+        for (let i = 0; i < node.length - 1; i++) {
           if (predecessors[i]) {
-            paths.push([predecessors[i], node])
-            getPredecessors(predecessors[i])
+            paths.push([predecessors[i] as unknown as string, node])
+            getPredecessors(predecessors[i] as unknown as string)
           }
         }
       }

@@ -59,24 +59,33 @@ export function parseSearchGroup(nodeId: string, field: keyof SearchDelimiterMap
   return nodeId.split(':')[searchDelimiterMap[field]] || ''
 }
 
-export function stateTypeColor(state: RunState | EventType) {
+export function eventTypeColor(state: EventType) {
   switch (state) {
-    case 'NEW':
-      return theme.palette.secondary.main
     case 'START':
       return theme.palette.info.main
     case 'RUNNING':
       return theme.palette.info.main
     case 'COMPLETE':
       return theme.palette.primary.main
-    case 'COMPLETED':
-      return theme.palette.primary.main
     case 'FAIL':
-      return theme.palette.error.main
-    case 'FAILED':
       return theme.palette.error.main
     case 'ABORT':
       return theme.palette.warning.main
+    default:
+      return theme.palette.secondary.main
+  }
+}
+
+export function runStateColor(state: RunState) {
+  switch (state) {
+    case 'NEW':
+      return theme.palette.secondary.main
+    case 'RUNNING':
+      return theme.palette.info.main
+    case 'COMPLETED':
+      return theme.palette.primary.main
+    case 'FAILED':
+      return theme.palette.error.main
     case 'ABORTED':
       return theme.palette.warning.main
     default:
@@ -84,8 +93,8 @@ export function stateTypeColor(state: RunState | EventType) {
   }
 }
 
-export function jobRunsStatus(runs: Run[], limit = -14) {
-  runs = runs.slice(limit)
+export function jobRunsStatus(runs: Run[], limit = 14) {
+  runs = runs.slice(-limit)
 
   const isAllFailed = runs.every((e: any) => e.state === 'FAILED')
   const isSomeFailed = runs.some((e: any) => e.state === 'FAILED')
@@ -99,8 +108,8 @@ export function jobRunsStatus(runs: Run[], limit = -14) {
   }
 }
 
-export function datasetFacetsStatus(facets: Facets, limit = -14) {
-  const assertions = facets?.dataQualityAssertions?.assertions?.slice(limit)
+export function datasetFacetsStatus(facets: Facets, limit = 14) {
+  const assertions = facets?.dataQualityAssertions?.assertions?.slice(-limit)
 
   if (!assertions?.length) {
     return null

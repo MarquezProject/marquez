@@ -13,25 +13,34 @@ type EdgeProps = {
   edgePoints: GraphEdge[]
 }
 
+type EdgePoint = {
+  isSelected: boolean
+  points: {
+    x: number
+    y: number
+  }[]
+}
+
 const RADIUS = 14
 const OUTER_RADIUS = RADIUS + 8
 const ICON_SIZE = 16
 
 class Edge extends React.Component<EdgeProps> {
-  getPoints = (edge: any) => edge.points[edge.points.length - 1]
+  getPoints = (edge: EdgePoint) => edge.points[edge.points.length - 1]
 
   render() {
     const { edgePoints } = this.props
     const edgeEnds = edgePoints.map(edge => {
       const isSelected = edgePoints.find(
         o =>
-          this.getPoints(o).x == this.getPoints(edge).x &&
-          this.getPoints(o).y == this.getPoints(edge).y &&
+          this.getPoints(o as EdgePoint).x == this.getPoints(edge as EdgePoint).x &&
+          this.getPoints(o as EdgePoint).y == this.getPoints(edge as EdgePoint).y &&
           o.isSelected === true
       )
-      return Object.assign(edge.points[edge.points.length - 1], {
-        isSelected: typeof isSelected !== 'undefined'
-      })
+      return {
+        ...edge.points[edge.points.length - 1],
+        ...{ isSelected: typeof isSelected !== 'undefined' }
+      }
     })
 
     return (
