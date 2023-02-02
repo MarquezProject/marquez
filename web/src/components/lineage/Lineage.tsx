@@ -148,8 +148,8 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       if (successors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
           if (successors[i]) {
-            paths.push([node, successors[i] as unknown as string])
-            getSuccessors(successors[i] as unknown as string)
+            paths.push([node, (successors[i] as unknown) as string])
+            getSuccessors((successors[i] as unknown) as string)
           }
         }
       }
@@ -160,8 +160,8 @@ class Lineage extends React.Component<LineageProps, LineageState> {
       if (predecessors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
           if (predecessors[i]) {
-            paths.push([predecessors[i] as unknown as string, node])
-            getPredecessors(predecessors[i] as unknown as string)
+            paths.push([(predecessors[i] as unknown) as string, node])
+            getPredecessors((predecessors[i] as unknown) as string)
           }
         }
       }
