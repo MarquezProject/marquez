@@ -150,11 +150,15 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
             />
           </Box>
           <Box mr={1}>
-            {job.location && (
-              <Button variant='outlined' color='primary' target={'_blank'} href={job.location}>
-                {i18next.t('jobs.location')}
-              </Button>
-            )}
+            <Button
+              variant='outlined'
+              color='primary'
+              target={'_blank'}
+              href={job.location}
+              disabled={!job.location}
+            >
+              {i18next.t('jobs.location')}
+            </Button>
           </Box>
           <IconButton onClick={() => history.push('/')}>
             <CloseIcon />
