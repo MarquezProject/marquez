@@ -8,9 +8,9 @@
 set -e
 
 # Version of Marquez
-readonly VERSION=0.29.0
+readonly VERSION=0.30.0
 # Build version of Marquez
-readonly BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
+readonly BUILD_VERSION=0.30.0
 
 title() {
   echo -e "\033[1m${1}\033[0m"
