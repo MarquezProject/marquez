@@ -96,8 +96,8 @@ export function runStateColor(state: RunState) {
 export function jobRunsStatus(runs: Run[], limit = 14) {
   runs = runs.slice(-limit)
 
-  const isAllFailed = runs.every((e: any) => e.state === 'FAILED')
-  const isSomeFailed = runs.some((e: any) => e.state === 'FAILED')
+  const isAllFailed = runs.every(e => e.state === 'FAILED')
+  const isSomeFailed = runs.some(e => e.state === 'FAILED')
 
   if (isAllFailed) {
     return theme.palette.error.main as string
