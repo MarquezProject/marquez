@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,8 +14,8 @@ import marquez.db.mappers.DatasetDataMapper;
 import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.mappers.RunMapper;
-import marquez.db.models.DatasetData;
-import marquez.db.models.JobData;
+import marquez.service.models.DatasetData;
+import marquez.service.models.JobData;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindList;
@@ -114,12 +114,6 @@ public interface LineageDao {
           + "LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
           + "LEFT JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
           + "LEFT JOIN LATERAL (\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.run_uuid=r.uuid\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
-          + "LEFT JOIN LATERAL (\n"
           + "    SELECT im.run_uuid,\n"
           + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
           + "                                      'name', dv.dataset_name,\n"
@@ -129,6 +123,12 @@ public interface LineageDao {
           + "    WHERE im.run_uuid=r.uuid\n"
           + "    GROUP BY im.run_uuid\n"
           + ") ri ON ri.run_uuid=r.uuid\n"
+          + "LEFT JOIN LATERAL (\n"
+          + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
+          + "    FROM run_facets_view AS rf\n"
+          + "    WHERE rf.run_uuid=r.uuid\n"
+          + "    GROUP BY rf.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT JOIN LATERAL (\n"
           + "    SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
           + "                                                'name', dataset_name,\n"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import marquez.service.models.ColumnLineageInputField;
+import marquez.service.models.NodeData;
 
 @Getter
 public class ColumnLineageNodeData implements NodeData {

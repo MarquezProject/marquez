@@ -10,14 +10,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-java</artifactId>
-    <version>0.28.0</version>
+    <version>0.30.0</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-java:0.28.0
+implementation 'io.github.marquezproject:marquez-java:0.30.0
 ```
 
 ## Usage
@@ -56,3 +56,7 @@ MarquezClient client = MarquezClient.builder()
   .baseUrl("https://localhost:5000")
   .build();
 ```
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

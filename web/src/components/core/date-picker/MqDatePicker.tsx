@@ -1,11 +1,12 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
+import { DateTimePicker } from '@material-ui/pickers'
 import { Theme } from '@material-ui/core'
+import { alpha } from '@material-ui/core/styles'
+import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-import { DateTimePicker } from '@material-ui/pickers'
-import { alpha } from '@material-ui/core/styles'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -14,8 +15,9 @@ const styles = (theme: Theme) =>
       cursor: 'pointer',
       backgroundColor: 'transparent',
       border: `2px solid ${theme.palette.common.white}`,
-      padding: `${theme.spacing(1)}px ${theme.spacing(1)}px`,
+      padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       transition: theme.transitions.create(['border-color', 'box-shadow']),
+      borderRadius: theme.spacing(4),
       '& *': {
         cursor: 'pointer'
       },
@@ -57,7 +59,7 @@ type DatePickerProps = WithStyles<typeof styles> & OwnProps
 
 class MqDatePicker extends React.Component<DatePickerProps> {
   render() {
-    const { classes, value, onChange, label = '', format = "MMM DD yyyy hh:mm a" } = this.props
+    const { classes, value, onChange, label = '', format = 'MMM DD yyyy hh:mm a' } = this.props
     return (
       <DateTimePicker
         label={label}

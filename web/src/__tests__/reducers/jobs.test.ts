@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from '../../store/actionCreators/actionTypes'
@@ -15,7 +16,7 @@ describe('jobs reducer', () => {
         jobs: jobs
       }
     }
-    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true })
+    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true, deletedJobName: '' })
   })
 })
 

@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Theme, createStyles } from '@material-ui/core'
@@ -21,9 +22,7 @@ const styles = (theme: Theme) =>
 
 const importI18next = () => {
   const i18next = require('i18next')
-  return (
-    i18next
-  )
+  return i18next
 }
 
 const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {

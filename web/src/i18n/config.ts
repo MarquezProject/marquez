@@ -1,3 +1,6 @@
+// Copyright 2018-2023 contributors to the Marquez project
+// SPDX-License-Identifier: Apache-2.0
+
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 
@@ -29,7 +32,9 @@ i18next
             empty_title: 'No Run Information Available',
             empty_body: 'Try adding some runs for this job.',
             runinfo_subhead: 'FACETS',
-            runs_subhead: 'FACETS'
+            runs_subhead: 'FACETS',
+            dialog_delete: 'DELETE',
+            dialog_confirmation_title: 'Are you sure?'
           },
           search: {
             search: 'Search',
@@ -58,7 +63,10 @@ i18next
           },
           datasets: {
             latest_tab: 'LATEST SCHEMA',
-            history_tab: 'VERSION HISTORY'
+            history_tab: 'VERSION HISTORY',
+            column_lineage_tab: 'COLUMN LINEAGE',
+            dialog_delete: 'DELETE',
+            dialog_confirmation_title: 'Are you sure?'
           },
           datasets_route: {
             empty_title: 'No datasets found',
@@ -68,6 +76,10 @@ i18next
             namespace_col: 'NAMESPACE',
             source_col: 'SOURCE',
             updated_col: 'UPDATED AT'
+          },
+          datasets_column_lineage: {
+            empty_title: 'No column lineage',
+            empty_body: 'Column lineage not available for the specified dataset.'
           },
           jobs_route: {
             empty_title: 'No jobs found',
@@ -128,7 +140,9 @@ i18next
             empty_title: 'Pas de Course les Informations Disponibles',
             empty_body: "Essayez d'ajouter quelques exécutions pour ce travail.",
             runinfo_subhead: 'FACETTES',
-            runs_subhead: 'FACETTES'
+            runs_subhead: 'FACETTES',
+            dialog_delete: 'EFFACER',
+            dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           search: {
             search: 'Recherche',
@@ -158,7 +172,10 @@ i18next
           },
           datasets: {
             latest_tab: 'DERNIER SCHEMA',
-            history_tab: 'HISTORIQUE DES VERSIONS'
+            history_tab: 'HISTORIQUE DES VERSIONS',
+            column_lineage_tab: 'LIGNÉE DE COLONNE',
+            dialog_delete: 'EFFACER',
+            dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           datasets_route: {
             empty_title: 'Aucun jeu de données trouvé',
@@ -169,6 +186,10 @@ i18next
             namespace_col: 'ESPACE DE NOMS',
             source_col: 'SOURCE',
             updated_col: 'MISE À JOUR À'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Aucune lignée de colonne',
+            empty_body: "Lignage de colonne non disponible pour l'ensemble de données spécifié."
           },
           jobs_route: {
             empty_title: 'Aucun emploi trouvé',
@@ -231,7 +252,9 @@ i18next
             empty_title: 'No hay Información de Ejecución Disponible',
             empty_body: 'Intente agregar algunas ejecuciones para este trabajo.',
             runinfo_subhead: 'FACETAS',
-            runs_subhead: 'FACETAS'
+            runs_subhead: 'FACETAS',
+            dialog_delete: 'ELIMINAR',
+            dialog_confirmation_title: 'Estás seguro?'
           },
           search: {
             search: 'Buscar',
@@ -261,7 +284,10 @@ i18next
           },
           datasets: {
             latest_tab: 'ESQUEMA ÚLTIMO',
-            history_tab: 'HISTORIAL DE VERSIONES'
+            history_tab: 'HISTORIAL DE VERSIONES',
+            column_lineage_tab: 'LINAJE DE COLUMNA',
+            dialog_delete: 'ELIMINAR',
+            dialog_confirmation_title: 'Estás seguro?'
           },
           datasets_route: {
             empty_title: 'No se encontraron conjuntos de datos',
@@ -272,6 +298,10 @@ i18next
             namespace_col: 'ESPACIO DE NOMBRES',
             source_col: 'FUENTE',
             updated_col: 'ACTUALIZADO EN'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Sin linaje de columna',
+            empty_body: 'Linaje de columna no disponible para el conjunto de datos especificado.'
           },
           jobs_route: {
             empty_title: 'No se encontraron trabajos',
@@ -334,7 +364,9 @@ i18next
             empty_title: 'Brak dostępnych informacji o wykonaniu',
             empty_body: 'Spróbuj dodać kilka przebiegów dla tego zadania.',
             runinfo_subhead: 'ASPECTY',
-            runs_subhead: 'ASPECTY'
+            runs_subhead: 'ASPECTY',
+            dialog_delete: 'USUNĄĆ',
+            dialog_confirmation_title: 'Jesteś pewny?'
           },
           search: {
             search: 'Wyszukiwanie',
@@ -364,7 +396,10 @@ i18next
           },
           datasets: {
             latest_tab: 'NAJNOWSZY SCHEMAT',
-            history_tab: 'HISTORIA WERSJI'
+            history_tab: 'HISTORIA WERSJI',
+            column_lineage_tab: 'RODOWÓD KOLUMNOWY',
+            dialog_delete: 'USUNĄĆ',
+            dialog_confirmation_title: 'Jesteś pewny?'
           },
           datasets_route: {
             empty_title: 'Nie znaleziono zbiorów danych',
@@ -375,6 +410,10 @@ i18next
             namespace_col: 'PRZESTRZEŃ NAZW',
             source_col: 'ŹRÓDŁO',
             updated_col: 'ZAKTUALIZOWANO'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Brak rodowodu kolumny',
+            empty_body: 'Pochodzenie kolumny jest niedostępne dla określonego zbioru danych.'
           },
           jobs_route: {
             empty_title: 'Nie znaleziono ofert pracy',
