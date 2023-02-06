@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
 
+* Improve dataset facets access [`#2407`](https://github.com/MarquezProject/marquez/pull/2407) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+  * Improves database query performance for accessing datasets and datasets' versions.*
+
 ## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-31
 
 ### Added
