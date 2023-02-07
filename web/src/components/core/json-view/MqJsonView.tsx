@@ -3,7 +3,7 @@
 import { MqInputBase } from '../input-base/MqInputBase'
 import { Theme } from '@material-ui/core'
 import React from 'react'
-import ReactJson from 'react-json-view'
+import ReactJson from 'searchable-react-json-view'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
