@@ -80,9 +80,9 @@ public interface RunDao extends BaseDao {
           + "FROM runs_view AS r\n"
           + "LEFT OUTER JOIN\n"
           + "(\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    GROUP BY le.run_uuid\n"
+          + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
+          + "    FROM run_facets_view rf\n"
+          + "    GROUP BY rf.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
           + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
@@ -129,10 +129,10 @@ public interface RunDao extends BaseDao {
           INNER JOIN jobs_view j ON r.job_uuid=j.uuid
           LEFT JOIN LATERAL
           (
-            SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets
-            FROM lineage_events le
-            WHERE le.run_uuid=r.uuid
-            GROUP BY le.run_uuid
+            SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
+            FROM run_facets_view rf
+            WHERE rf.run_uuid=r.uuid
+            GROUP BY rf.run_uuid
           ) AS f ON r.uuid=f.run_uuid
           LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
           LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid

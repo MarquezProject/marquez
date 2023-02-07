@@ -102,10 +102,10 @@ public interface JobVersionDao extends BaseDao {
       LEFT JOIN job_version_io dsio ON dsio.job_version_uuid = jv.uuid
       LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid
       LEFT JOIN LATERAL (
-          SELECT le.run_uuid, JSON_AGG(event -> 'run' -> 'facets') AS facets
-          FROM lineage_events le
-          WHERE le.run_uuid=jv.latest_run_uuid
-          GROUP BY le.run_uuid
+          SELECT jf.run_uuid, JSON_AGG(jf.facet ORDER BY jf.lineage_event_time ASC) AS facets
+          FROM job_facets_view AS jf
+          WHERE jf.run_uuid=jv.latest_run_uuid AND jf.job_uuid = jv.job_uuid
+          GROUP BY jf.run_uuid
       ) AS f ON r.uuid = f.run_uuid
       LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
       LEFT JOIN LATERAL (

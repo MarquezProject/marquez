@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -171,7 +171,6 @@ public class RunFacetsDaoTest {
                 .map(
                     rv ->
                         new RunFacetsDao.RunFacetRow(
-                            rv.getColumn("uuid", UUID.class),
                             rv.getColumn("created_at", Instant.class),
                             rv.getColumn("run_uuid", UUID.class),
                             rv.getColumn("lineage_event_time", Instant.class),

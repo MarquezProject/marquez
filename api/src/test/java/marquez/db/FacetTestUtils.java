@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 public class FacetTestUtils {
