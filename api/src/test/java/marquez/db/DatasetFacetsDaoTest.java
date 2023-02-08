@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -67,6 +67,9 @@ public class DatasetFacetsDaoTest {
     assertThat(facet)
         .hasFieldOrPropertyWithValue(
             "datasetUuid", lineageRow.getInputs().get().get(0).getDatasetRow().getUuid())
+        .hasFieldOrPropertyWithValue(
+            "datasetVersionUuid",
+            lineageRow.getInputs().get().get(0).getDatasetVersionRow().getUuid())
         .hasFieldOrPropertyWithValue("runUuid", lineageRow.getRun().getUuid())
         .hasFieldOrPropertyWithValue("lineageEventTime", lineageRow.getRun().getCreatedAt())
         .hasFieldOrPropertyWithValue("lineageEventType", "COMPLETE")
@@ -344,9 +347,9 @@ public class DatasetFacetsDaoTest {
                 .map(
                     rv ->
                         new DatasetFacetsDao.DatasetFacetRow(
-                            rv.getColumn("uuid", UUID.class),
                             rv.getColumn("created_at", Instant.class),
                             rv.getColumn("dataset_uuid", UUID.class),
+                            rv.getColumn("dataset_version_uuid", UUID.class),
                             rv.getColumn("run_uuid", UUID.class),
                             rv.getColumn("lineage_event_time", Instant.class),
                             rv.getColumn("lineage_event_type", String.class),

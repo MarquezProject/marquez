@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -70,9 +70,9 @@ public interface DatasetFacetsDao {
   }
 
   /**
-   * @param uuid
    * @param createdAt
    * @param datasetUuid
+   * @param datasetVersionUuid
    * @param runUuid
    * @param lineageEventTime
    * @param lineageEventType
@@ -83,9 +83,9 @@ public interface DatasetFacetsDao {
   @SqlUpdate(
       """
           INSERT INTO dataset_facets (
-             uuid,
              created_at,
              dataset_uuid,
+             dataset_version_uuid,
              run_uuid,
              lineage_event_time,
              lineage_event_type,
@@ -93,9 +93,9 @@ public interface DatasetFacetsDao {
              name,
              facet
           ) VALUES (
-             :uuid,
              :createdAt,
              :datasetUuid,
+             :datasetVersionUuid,
              :runUuid,
              :lineageEventTime,
              :lineageEventType,
@@ -105,9 +105,9 @@ public interface DatasetFacetsDao {
           )
       """)
   void insertDatasetFacet(
-      UUID uuid,
       Instant createdAt,
       UUID datasetUuid,
+      UUID datasetVersionUuid,
       UUID runUuid,
       Instant lineageEventTime,
       String lineageEventType,
@@ -125,6 +125,7 @@ public interface DatasetFacetsDao {
   @Transaction
   default void insertDatasetFacetsFor(
       @NonNull UUID datasetUuid,
+      @NonNull UUID datasetVersionUuid,
       @NonNull UUID runUuid,
       @NonNull Instant lineageEventTime,
       @NonNull String lineageEventType,
@@ -137,9 +138,9 @@ public interface DatasetFacetsDao {
         .forEach(
             fieldName ->
                 insertDatasetFacet(
-                    UUID.randomUUID(),
                     now,
                     datasetUuid,
+                    datasetVersionUuid,
                     runUuid,
                     lineageEventTime,
                     lineageEventType,
@@ -149,9 +150,9 @@ public interface DatasetFacetsDao {
   }
 
   record DatasetFacetRow(
-      UUID uuid,
       Instant createdAt,
       UUID datasetUuid,
+      UUID datasetVersionUuid,
       UUID runUuid,
       Instant lineageEventTime,
       String lineageEventType,
