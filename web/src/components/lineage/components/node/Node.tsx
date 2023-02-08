@@ -73,6 +73,8 @@ class Node extends React.Component<NodeProps> {
     const { node, edgeEnds, selectedNode } = this.props
     const job = isJob(node)
     const isSelected = selectedNode === node.label
+    const ariaJobLabel = 'Job'
+    const ariaDatasetLabel = 'Dataset'
     return (
       <Link
         to={this.determineLink(node)}
@@ -99,6 +101,8 @@ class Node extends React.Component<NodeProps> {
               cy={node.y}
             />
             <FontAwesomeIcon
+              title={ariaJobLabel}
+              aria-hidden={'true'}
               style={{ transformOrigin: `${node.x}px ${node.y}px` }}
               icon={faCog}
               width={ICON_SIZE}
@@ -133,6 +137,8 @@ class Node extends React.Component<NodeProps> {
               rx={4}
             />
             <FontAwesomeIcon
+              title={ariaDatasetLabel}
+              aria-hidden={'true'}
               icon={faDatabase}
               width={ICON_SIZE}
               height={ICON_SIZE}
