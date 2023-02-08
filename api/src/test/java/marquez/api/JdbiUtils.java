@@ -30,6 +30,7 @@ public class JdbiUtils {
           handle.execute("DELETE FROM run_args");
           handle.execute("DELETE FROM job_versions_io_mapping");
           handle.execute("DELETE FROM job_versions");
+          handle.execute("DELETE FROM jobs_fqn");
           handle.execute("DELETE FROM jobs");
           handle.execute("DELETE FROM dataset_fields_tag_mapping");
           handle.execute("DELETE FROM dataset_fields");

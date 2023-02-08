@@ -170,19 +170,8 @@ public interface OpenLineageDao extends BaseDao {
     Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
 
     JobRow job =
-        runDao
-            .findJobRowByRunUuid(runToUuid(event.getRun().getRunId()))
-            .orElseGet(
-                () ->
-                    buildJobFromEvent(
-                        event,
-                        mapper,
-                        jobDao,
-                        now,
-                        namespace,
-                        nominalStartTime,
-                        nominalEndTime,
-                        parentRun));
+        buildJobFromEvent(
+            event, mapper, jobDao, now, namespace, nominalStartTime, nominalEndTime, parentRun);
 
     bag.setJob(job);
 
@@ -812,7 +801,7 @@ public interface OpenLineageDao extends BaseDao {
                 log.error(
                     "Cannot produce column lineage for missing output field in output dataset: {}",
                     columnName);
-                return Stream.<ColumnLineageRow>empty();
+                return Stream.empty();
               }
 
               // get field uuids of input columns related to this run

@@ -1,28 +1,26 @@
 CREATE OR REPLACE VIEW jobs_view
 AS
-SELECT f.uuid,
-       f.job_fqn AS name,
-       f.namespace_name,
-       j.name    AS simple_name,
+SELECT j.uuid,
+       j.name,
+       j.namespace_name,
+       j.simple_name    AS simple_name,
        j.parent_job_uuid,
-       f.parent_job_name::text,
+       p.name::text AS parent_job_name,
        j.type,
        j.created_at,
        j.updated_at,
-       f.namespace_uuid,
+       j.namespace_uuid,
        j.description,
        j.current_version_uuid,
        j.current_job_context_uuid,
        j.current_location,
        j.current_inputs,
        j.symlink_target_uuid,
-       j.parent_job_uuid_string,
-       f.aliases
-FROM jobs_fqn f,
-     jobs j
-WHERE j.uuid = f.uuid
-  AND j.is_hidden IS FALSE;
-
+       j.parent_job_uuid::char(36) AS parent_job_uuid_string,
+       j.aliases
+FROM jobs j
+LEFT JOIN jobs p ON j.parent_job_uuid=p.uuid
+WHERE j.is_hidden IS FALSE AND j.symlink_target_uuid IS NULL;
 
 CREATE OR REPLACE FUNCTION rewrite_jobs_fqn_table() RETURNS TRIGGER AS
 $$
@@ -32,16 +30,24 @@ DECLARE
     new_symlink_target_uuid uuid;
     old_symlink_target_uuid uuid;
     inserted_job jobs_view%rowtype;
+    full_name varchar;
 BEGIN
-    INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, description,
+    full_name = NEW.name;
+    IF NEW.parent_job_uuid IS NOT NULL THEN
+        SELECT p.name || '.' || NEW.name INTO full_name
+        FROM jobs p
+        WHERE p.uuid=NEW.parent_job_uuid;
+    END IF;
+    INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, simple_name, description,
                       current_version_uuid, namespace_name, current_job_context_uuid,
                       current_location, current_inputs, symlink_target_uuid, parent_job_uuid,
-                      parent_job_uuid_string, is_hidden)
+                      is_hidden)
     SELECT NEW.uuid,
            NEW.type,
            NEW.created_at,
            NEW.updated_at,
            NEW.namespace_uuid,
+           full_name,
            NEW.name,
            NEW.description,
            NEW.current_version_uuid,
@@ -51,10 +57,14 @@ BEGIN
            NEW.current_inputs,
            NEW.symlink_target_uuid,
            NEW.parent_job_uuid,
-           COALESCE(NEW.parent_job_uuid::char(36), ''),
            false
-    ON CONFLICT (name, namespace_uuid, parent_job_uuid_string)
+    ON CONFLICT (namespace_uuid, name)
         DO UPDATE SET updated_at               = now(),
+                      parent_job_uuid = COALESCE(jobs.parent_job_uuid, EXCLUDED.parent_job_uuid),
+                      simple_name = CASE
+                            WHEN EXCLUDED.parent_job_uuid IS NOT NULL THEN EXCLUDED.name
+                            ELSE jobs.name
+                            END,
                       type                     = EXCLUDED.type,
                       description              = EXCLUDED.description,
                       current_job_context_uuid = EXCLUDED.current_job_context_uuid,
@@ -73,94 +83,38 @@ BEGIN
         INTO job_uuid, job_updated_at, new_symlink_target_uuid, old_symlink_target_uuid;
 
 
-    -- update the jobs_fqn table when inserting a new record
-    -- (NEW.uuid will equal the job_uuid when inserting a new record)
-    -- AND if the symlink target is null
-    -- Avoid constructing the symlinks and aliases, as that is expensive
-    IF TG_OP='INSERT'
-        AND NEW.uuid = job_uuid
-        AND NEW.symlink_target_uuid IS NULL
-        AND NEW.updated_at=job_updated_at THEN
-        RAISE DEBUG 'Inserting into jobs_fqn for new job % (%)', NEW.name, job_uuid;
-        WITH fqn AS (SELECT j.uuid,
-                            CASE
-                                WHEN j.parent_job_uuid IS NULL THEN j.name
-                                ELSE jf.job_fqn || '.' || j.name
-                                END AS name,
-                            j.namespace_uuid,
-                            j.namespace_name,
-                            jf.job_fqn AS parent_job_name,
-                            j.parent_job_uuid
-                     FROM jobs j
-                              LEFT JOIN jobs_fqn jf ON jf.uuid=j.parent_job_uuid
-                     WHERE j.uuid=job_uuid)
-        INSERT
-        INTO jobs_fqn
-        SELECT j.uuid,
-               jf.namespace_uuid,
-               jf.namespace_name,
-               jf.parent_job_name,
-               ARRAY[jf.name]::text[],
-               jf.name AS job_fqn
-        FROM jobs j
-                 INNER JOIN fqn jf ON jf.uuid = j.uuid;
-        --  or when the symlink_target_uuid is being updated.
-    ELSIF (new_symlink_target_uuid IS NOT NULL AND new_symlink_target_uuid IS DISTINCT FROM old_symlink_target_uuid) THEN
-        RAISE DEBUG 'Updating jobs_fqn due to % to job % (%)', TG_OP, NEW.name, job_uuid;
+    -- update the jobs table when updating a job's symlink target
+    IF (new_symlink_target_uuid IS NOT NULL AND new_symlink_target_uuid IS DISTINCT FROM old_symlink_target_uuid) THEN
+        RAISE INFO 'Updating jobs aliases and symlinks due to % to job % (%)', TG_OP, NEW.name, job_uuid;
         WITH RECURSIVE
             jobs_symlink AS (SELECT j.uuid, j.uuid AS link_target_uuid, j.symlink_target_uuid
                              FROM jobs j
-                                      -- include only jobs that have symlinks pointing to them to keep this table small
-                                      INNER JOIN jobs js ON js.symlink_target_uuid=j.uuid
+                             -- include only jobs that have symlinks pointing to them to keep this table small
+                             INNER JOIN jobs js ON js.symlink_target_uuid=j.uuid
                              WHERE j.symlink_target_uuid IS NULL
                              UNION
                              SELECT j.uuid, jn.link_target_uuid, j.symlink_target_uuid
                              FROM jobs j
-                                      INNER JOIN jobs_symlink jn ON j.symlink_target_uuid = jn.uuid),
-            fqn AS (SELECT j.uuid,
-                           CASE
-                               WHEN j.parent_job_uuid IS NULL THEN j.name
-                               ELSE jf.job_fqn || '.' || j.name
-                               END AS name,
-                           j.namespace_uuid,
-                           j.namespace_name,
-                           jf.job_fqn AS parent_job_name,
-                           j.parent_job_uuid
-                    FROM jobs j
-                             LEFT JOIN jobs_fqn jf ON jf.uuid=j.parent_job_uuid
-                             LEFT JOIN jobs_symlink js ON js.link_target_uuid=j.uuid
-                    WHERE j.uuid=job_uuid OR j.symlink_target_uuid=job_uuid OR js.uuid=job_uuid
-                    UNION
-                    SELECT j1.uuid,
-                           f.name || '.' || j1.name AS name,
-                           f.namespace_uuid         AS namespace_uuid,
-                           f.namespace_name         AS namespace_name,
-                           f.name                   AS parent_job_name,
-                           j1.parent_job_uuid
-                    FROM jobs j1
-                             INNER JOIN fqn f ON f.uuid = j1.parent_job_uuid),
+                             INNER JOIN jobs_symlink jn ON j.symlink_target_uuid = jn.uuid),
             aliases AS (SELECT s.link_target_uuid,
-                               ARRAY_AGG(DISTINCT f.job_fqn) FILTER (WHERE f.job_fqn IS NOT NULL) AS aliases
+                               ARRAY_AGG(DISTINCT f.name) AS aliases
                         FROM jobs_symlink s
-                                 INNER JOIN jobs_fqn f ON f.uuid = s.uuid
+                        INNER JOIN jobs f ON f.uuid = s.uuid
                         GROUP BY s.link_target_uuid)
-        INSERT
-        INTO jobs_fqn
-        SELECT j.uuid,
-               jf.namespace_uuid,
-               jf.namespace_name,
-               jf.parent_job_name,
-               a.aliases,
-               jf.name AS job_fqn
-        FROM jobs j
-                 LEFT JOIN jobs_symlink js ON j.uuid = js.uuid
-                 LEFT JOIN aliases a ON a.link_target_uuid = js.link_target_uuid
-                 INNER JOIN fqn jf ON jf.uuid = COALESCE(js.link_target_uuid, j.uuid)
-        ON CONFLICT (uuid) DO UPDATE
-            SET job_fqn=EXCLUDED.job_fqn,
-                aliases = (SELECT array_agg(DISTINCT a) FROM (SELECT unnest(jobs_fqn.aliases) AS a UNION SELECT unnest(EXCLUDED.aliases) AS a) al);
+        UPDATE jobs
+        SET aliases = j.aliases, symlink_target_uuid=j.link_target_uuid
+        FROM (
+                 SELECT j.uuid,
+                        CASE WHEN j.uuid=s.link_target_uuid THEN NULL ELSE s.link_target_uuid END AS link_target_uuid,
+                        a.aliases
+                 FROM jobs j
+                 LEFT JOIN jobs_symlink s ON s.uuid=j.uuid
+                 LEFT JOIN aliases a ON a.link_target_uuid = j.uuid
+             ) j
+        WHERE jobs.uuid=j.uuid;
     END IF;
-    SELECT * INTO inserted_job FROM jobs_view WHERE uuid=job_uuid;
+    SELECT * INTO inserted_job FROM jobs_view
+    WHERE uuid=job_uuid OR (new_symlink_target_uuid IS NOT NULL AND uuid=new_symlink_target_uuid);
     return inserted_job;
 END;
 $$ LANGUAGE plpgsql;
