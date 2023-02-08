@@ -1288,10 +1288,15 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: string
+                type: array
+                items:
+                  type: string
               description:
                 description: The description of the field.
                 type: string
+            required:
+              - name
+              - type
         tags:
           description: List of tags.
           type: string
