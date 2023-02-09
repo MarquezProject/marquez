@@ -309,6 +309,22 @@ public class LineageEvent extends BaseJsonModel {
     @NotNull private String namespace;
     @NotNull private String name;
     @Valid private DatasetFacets facets;
+    @Valid private InputDatasetFacets inputFacets;
+    @Valid private OutputDatasetFacets outputFacets;
+
+    /**
+     * Constructor with three args added manually to support dozens of existing usages created
+     * before adding inputFacets and outputFacets, as Lombok does not provide SomeArgsConstructor.
+     *
+     * @param namespace
+     * @param name
+     * @param facets
+     */
+    public Dataset(String namespace, String name, DatasetFacets facets) {
+      this.namespace = namespace;
+      this.name = name;
+      this.facets = facets;
+    }
   }
 
   @Builder
@@ -560,5 +576,49 @@ public class LineageEvent extends BaseJsonModel {
     @NotNull private String namespace;
     @NotNull private String name;
     @NotNull private String field;
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class InputDatasetFacets {
+
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void setInputFacet(String key, Object value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalFacets() {
+      return additional;
+    }
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class OutputDatasetFacets {
+
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void setOutputFacet(String key, Object value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalFacets() {
+      return additional;
+    }
   }
 }

@@ -310,12 +310,17 @@ public final class JsonGenerator {
             .put("id", run.getId())
             .put("createdAt", ISO_INSTANT.format(run.getCreatedAt()))
             .put("updatedAt", ISO_INSTANT.format(run.getUpdatedAt()));
+    final ArrayNode inputDatasetVersions = MAPPER.valueToTree(run.getInputDatasetVersions());
+    final ArrayNode outputDatasetVersions = MAPPER.valueToTree(run.getOutputDatasetVersions());
+
     obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("state", run.getState().name());
     obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("durationMs", run.getDurationMs().orElse(null));
+    obj.putArray("inputDatasetVersions").addAll(inputDatasetVersions);
+    obj.putArray("outputDatasetVersions").addAll(outputDatasetVersions);
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     run.getArgs().forEach(runArgs::put);
