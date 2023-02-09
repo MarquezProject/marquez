@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from './actionTypes'
@@ -48,6 +49,21 @@ export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
   }
 })
 
+export const fetchDataset = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_DATASET,
+  payload: {
+    namespace,
+    name
+  }
+})
+
+export const fetchDatasetSuccess = (dataset: Dataset) => ({
+  type: actionTypes.FETCH_DATASET_SUCCESS,
+  payload: {
+    dataset
+  }
+})
+
 export const fetchDatasetVersions = (namespace: string, name: string) => ({
   type: actionTypes.FETCH_DATASET_VERSIONS,
   payload: {
@@ -65,6 +81,25 @@ export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
 
 export const resetDatasetVersions = () => ({
   type: actionTypes.RESET_DATASET_VERSIONS
+})
+
+export const resetDataset = () => ({
+  type: actionTypes.RESET_DATASET
+})
+
+export const deleteDataset = (datasetName: string, namespace: string) => ({
+  type: actionTypes.DELETE_DATASET,
+  payload: {
+    datasetName,
+    namespace
+  }
+})
+
+export const deleteDatasetSuccess = (datasetName: string) => ({
+  type: actionTypes.DELETE_DATASET_SUCCESS,
+  payload: {
+    datasetName
+  }
 })
 
 export const resetDatasets = () => ({
@@ -87,6 +122,21 @@ export const fetchJobsSuccess = (jobs: Job[]) => ({
 
 export const resetJobs = () => ({
   type: actionTypes.RESET_JOBS
+})
+
+export const deleteJob = (jobName: string, namespace: string) => ({
+  type: actionTypes.DELETE_JOB,
+  payload: {
+    jobName,
+    namespace
+  }
+})
+
+export const deleteJobSuccess = (jobName: string) => ({
+  type: actionTypes.DELETE_JOB_SUCCESS,
+  payload: {
+    jobName
+  }
 })
 
 export const fetchRuns = (jobName: string, namespace: string) => ({

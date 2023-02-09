@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -153,8 +153,8 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class ParentRunFacet extends BaseFacet {
 
-    @NotNull private RunLink run;
-    @NotNull private JobLink job;
+    @Valid @NotNull private RunLink run;
+    @Valid @NotNull private JobLink job;
 
     @Builder
     public ParentRunFacet(

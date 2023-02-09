@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -182,7 +182,6 @@ public class LineageTestUtils {
         .dataSource(
             new DatasourceDatasetFacet(
                 PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
-        .description("the dataset description")
         .additional(facets)
         .build();
   }

@@ -1,11 +1,49 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.29.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
+
+## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-31
+
+### Added
+
+* Proposals: add proposal for OL facet tables [`#2076`](https://github.com/MarquezProject/marquez/pull/2076) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds the proposal `Optimize query performance for OpenLineage facets`.*
+* UI: display column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Adds a JSON preview of column-level lineage of a selected dataset to the UI.*
+* UI: Add soft delete option to UI [`#2343`](https://github.com/MarquezProject/marquez/pull/2343) [@tito12](https://github.com/tito12)  
+    *Adds option to soft delete a data record with a dialog component and double confirmation.*
+* API: split `lineage_events` table to `dataset_facets`, `run_facets`, and `job_facets` tables. [`2350`](https://github.com/MarquezProject/marquez/pull/2350), [`2355`](https://github.com/MarquezProject/marquez/pull/2355), [`2359`](https://github.com/MarquezProject/marquez/pull/2359)
+  [@wslulciuc](https://github.com/wslulciuc,), [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
+    *Performance improvement storing and querying facets.*
+    *Migration procedure requires manual steps if database has more than 100K lineage events.*
+    *We highly encourage users to review our [migration plan](https://github.com/MarquezProject/marquez/blob/main/api/src/main/resources/marquez/db/migration/V57__readme.md).*
+* Docker: add new script for stopping Docker [`#2380`](https://github.com/MarquezProject/marquez/pull/2380) [@rossturk](https://github.com/rossturk)  
+    *Provides a clean way to stop a deployment via `docker-compose down`.*
+* Docker: seed data for column lineage [`#2381`](https://github.com/MarquezProject/marquez/pull/2381) [@rossturk](https://github.com/rossturk)  
+    *Adds some `ColumnLineageDatasetFacet` JSON snippets to `docker/metadata.json` to seed data for column-level lineage facets.*
+
+### Fixed
+
+* API: validate `RunLink` and `JobLink` [`#2342`](https://github.com/MarquezProject/marquez/pull/2342) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Fixes validation of the `ParentRunFacet` to avoid `NullPointerException`s in the case of empty run sections.*
+* Docker: use `docker-compose.web.yml` as base compose file [`#2360`](https://github.com/MarquezProject/marquez/pull/2360) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fixes the Marquez HTTP server set in `docker/up.sh` so the script uses `docker-compose.web.yml` with overrides for `dev` set via `docker-compose.web-dev.yml`.* 
+* Docs: update copyright headers [`#2353`](https://github.com/MarquezProject/marquez/pull/2353) [@merobi-hub](https://github.com/merobi-hub) 
+    *Updates the headers with the current year.*
+* Chart: fix Helm chart [`#2374`](https://github.com/MarquezProject/marquez/pull/2374) [@perttus](https://github.com/perttus)  
+    *Fixes minor issues with the Helm chart.*
+* Spec: update dataset version API spec [`#2389`](https://github.com/MarquezProject/marquez/pull/2389) [@phixme](https://github.com/phixMe)  
+    *Adds `limit` and `offset` to the openapi.yml spec file as query parameters.*
 
 ## [0.29.0](https://github.com/MarquezProject/marquez/compare/0.28.0...0.29.0) - 2022-12-19
 
 ### Added
 
+* Column-lineage endpoints supports point-in-time requests [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+    *Enable requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
+* Present column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
+    *Column lineage of a dataset with a single level of depth can
+    be displayed in datase details tab.*
 * Add point-in-time requests support to column-lineage endpoints [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Enables requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
 * Add column lineage point-in-time Java client methods [`#2269`](https://github.com/MarquezProject/marquez/pull/2269) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
@@ -889,3 +927,7 @@
 ## [0.1.0](https://github.com/MarquezProject/marquez/releases/tag/0.1.0) - 2018-12-18
 
 * Marquez initial public release.
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

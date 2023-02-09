@@ -28,3 +28,7 @@ For more information about our approach to quality and security, feel free to re
 
 - Slack: [Marquezproject.slack.com](http://bit.ly/MarquezSlack)
 - Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

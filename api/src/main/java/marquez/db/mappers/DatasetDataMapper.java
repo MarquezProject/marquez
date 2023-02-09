@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -28,7 +28,7 @@ import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
 import marquez.db.Columns;
-import marquez.db.models.DatasetData;
+import marquez.service.models.DatasetData;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.postgresql.util.PGobject;
