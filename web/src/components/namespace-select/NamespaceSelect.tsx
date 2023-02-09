@@ -84,7 +84,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(NamespaceSelect))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(NamespaceSelect))

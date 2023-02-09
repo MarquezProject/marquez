@@ -9,24 +9,16 @@ import { Node as GraphNode } from 'dagre'
 import { Link } from 'react-router-dom'
 import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
-import { Nullable } from '../../../../types/util/Nullable'
-import { Run } from '../../../../types/api'
 import { bindActionCreators } from 'redux'
+
 import { connect } from 'react-redux'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
-import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
 
-export type Vertex = {
-  x: number
-  y: number
-}
-
 const RADIUS = 14
-const OUTER_RADIUS = RADIUS + 8
 const ICON_SIZE = 16
 const BORDER = 4
 
@@ -36,28 +28,10 @@ interface DispatchProps {
 
 interface OwnProps {
   node: GraphNode<MqNode>
-  edgeEnds: Vertex[]
   selectedNode: string
 }
 
 type NodeProps = DispatchProps & OwnProps
-
-function runStateToNodeColor(run: Nullable<Run>) {
-  switch (run && run.state) {
-    case 'NEW':
-      return theme.palette.secondary.main
-    case 'RUNNING':
-      return theme.palette.info.main
-    case 'COMPLETED':
-      return theme.palette.secondary.main
-    case 'FAILED':
-      return theme.palette.error.main
-    case 'ABORTED':
-      return theme.palette.warning.main
-    default:
-      return theme.palette.secondary.main
-  }
-}
 
 class Node extends React.Component<NodeProps> {
   determineLink = (node: GraphNode<MqNode>) => {
@@ -70,7 +44,7 @@ class Node extends React.Component<NodeProps> {
   }
 
   render() {
-    const { node, edgeEnds, selectedNode } = this.props
+    const { node, selectedNode } = this.props
     const job = isJob(node)
     const isSelected = selectedNode === node.label
     const ariaJobLabel = 'Job'
@@ -82,21 +56,14 @@ class Node extends React.Component<NodeProps> {
       >
         {job ? (
           <g>
+            {/* { console.log(job.latestRun)} */}
+            {/* {console.log(runStateToNodeColor(job.latestRun))} */}
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
-              fill={runStateToNodeColor(job.latestRun)}
-              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-              strokeWidth={BORDER}
-              cx={node.x}
-              cy={node.y}
-            />
-            <circle
-              style={{ cursor: 'pointer' }}
-              r={RADIUS - 2}
-              fill={theme.palette.common.white}
-              stroke={theme.palette.common.white}
-              strokeWidth={2}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
               cx={node.x}
               cy={node.y}
             />
@@ -109,7 +76,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={runStateToNodeColor(job.latestRun)}
+              color={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
             />
           </g>
         ) : (
@@ -118,9 +85,9 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               x={node.x - RADIUS}
               y={node.y - RADIUS}
-              fill={theme.palette.common.white}
-              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-              strokeWidth={BORDER}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
               width={RADIUS * 2}
               height={RADIUS * 2}
               rx={4}
@@ -129,9 +96,7 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               x={node.x - (RADIUS - 2)}
               y={node.y - (RADIUS - 2)}
-              fill={theme.palette.common.white}
-              stroke={theme.palette.common.white}
-              strokeWidth={BORDER}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
               width={(RADIUS - 2) * 2}
               height={(RADIUS - 2) * 2}
               rx={4}
@@ -144,19 +109,9 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={theme.palette.secondary.main}
+              color={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
             />
           </g>
-        )}
-        {edgeEnds.find(edge => edge.x === node.x && edge.y === node.y) && (
-          <FontAwesomeIcon
-            icon={faCaretRight}
-            x={node.x - OUTER_RADIUS - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            color={theme.palette.secondary.main}
-          />
         )}
         <NodeText node={node} />
       </Link>
@@ -172,7 +127,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(Node)
+export default connect(null, mapDispatchToProps)(Node)
