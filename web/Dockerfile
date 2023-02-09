@@ -1,3 +1,6 @@
+RUN apk add --no-cache git
+RUN git --version
+
 FROM node:12-alpine
 WORKDIR /usr/src/app
 RUN apk update && apk add --virtual bash coreutils
