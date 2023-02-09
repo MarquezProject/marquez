@@ -225,3 +225,7 @@ Parent job failure does not impact the status of the datasets created by child j
   * JobC@Run1 produces DatasetZ@V2
   
 ![Parent has failed child jobs](./assets/dot/parent_job_failed_dataset_creation.dot.png)
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

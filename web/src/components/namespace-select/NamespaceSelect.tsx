@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
@@ -83,7 +84,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(NamespaceSelect))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(NamespaceSelect))

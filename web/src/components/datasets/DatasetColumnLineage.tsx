@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
@@ -52,6 +53,8 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
     saveAs(blob, `${title}.json`)
   }
 
+  const i18next = require('i18next')
+
   return (
     <>
       {columnLineage ? (
@@ -78,8 +81,8 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
         </>
       ) : (
         <MqEmpty
-          title={'No column lineage'}
-          body={'Column lineage not available for the specified dataset.'}
+          title={i18next.t('datasets_column_lineage.empty_title')}
+          body={i18next.t('datasets_column_lineage.empty_body')}
         />
       )}
     </>
@@ -99,7 +102,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DatasetColumnLineage)
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetColumnLineage)

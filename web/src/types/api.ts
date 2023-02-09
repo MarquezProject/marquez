@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { JobOrDataset, LineageNode } from '../components/lineage/types'
@@ -27,8 +28,10 @@ export interface Events {
   events: Event[]
 }
 
+export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'
+
 export interface Event {
-  eventType: string
+  eventType: EventType
   eventTime: string
   producer: string
   schemaURL: string
@@ -77,6 +80,16 @@ export interface Dataset {
 
 export interface DatasetVersions {
   versions: DatasetVersion[]
+}
+
+export interface Facets {
+  dataQualityAssertions?: {
+    assertions?: {
+      assertion: string
+      column: string
+      success: boolean
+    }[]
+  }
 }
 
 export interface DatasetVersion {

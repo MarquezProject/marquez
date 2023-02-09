@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
@@ -106,7 +107,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     },
     dispatch
   )
-export default connect(
-  null,
-  mapDispatchToProps
-)(withStyles(styles)(DragBar))
+export default connect(null, mapDispatchToProps)(withStyles(styles)(DragBar))

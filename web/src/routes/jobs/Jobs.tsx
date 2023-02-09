@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
@@ -8,12 +9,13 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode } from '../../helpers/nodes'
+import { encodeNode, runStateColor } from '../../helpers/nodes'
 import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import Box from '@material-ui/core/Box'
 import MqEmpty from '../../components/core/empty/MqEmpty'
+import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
@@ -84,6 +86,9 @@ class Jobs extends React.Component<JobsProps> {
                       <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
                         <MqText subheading>{i18next.t('jobs_route.latest_run_col')}</MqText>
                       </TableCell>
+                      <TableCell key={i18next.t('jobs_route.latest_run_state_col')} align='left'>
+                        <MqText subheading>{i18next.t('jobs_route.latest_run_state_col')}</MqText>
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -110,6 +115,12 @@ class Jobs extends React.Component<JobsProps> {
                                 ? stopWatchDuration(job.latestRun.durationMs)
                                 : 'N/A'}
                             </MqText>
+                          </TableCell>
+                          <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
+                            <MqStatus
+                              color={runStateColor(job.latestRun.state)}
+                              label={job.latestRun.state}
+                            />
                           </TableCell>
                         </TableRow>
                       )
@@ -141,7 +152,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Jobs)
+export default connect(mapStateToProps, mapDispatchToProps)(Jobs)

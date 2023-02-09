@@ -23,3 +23,11 @@ Dicussion: [_Link to issue with dicussion on the change being proposed._]
 ## Next Steps
 
 [_A discussion of related issue(s) for this proposal, who will be assigned to work on them, timeline for when the change being proposed will be worked on, etc. **You may omit this section if there are none.**_]
+
+## License Footer
+
+[_Include an Apache 2.0 license footer. Feel free to copy and paste the footer below._]
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

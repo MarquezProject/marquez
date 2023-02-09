@@ -1,7 +1,10 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Effects from 'redux-saga/effects'
 import {
+  DELETE_DATASET,
+  DELETE_JOB,
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
@@ -18,6 +21,8 @@ const call: any = Effects.call
 
 import {
   applicationError,
+  deleteDatasetSuccess,
+  deleteJobSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
@@ -29,6 +34,8 @@ import {
   fetchSearchSuccess
 } from '../actionCreators'
 import {
+  deleteDataset,
+  deleteJob,
   getDataset,
   getDatasetVersions,
   getDatasets,
@@ -98,6 +105,18 @@ export function* fetchJobsSaga() {
   }
 }
 
+export function* deleteJobSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_JOB)
+      const job = yield call(deleteJob, payload.jobName, payload.namespace)
+      yield put(deleteJobSuccess(job.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing job'))
+    }
+  }
+}
+
 export function* fetchDatasetsSaga() {
   while (true) {
     try {
@@ -134,6 +153,18 @@ export function* fetchDatasetSaga() {
   }
 }
 
+export function* deleteDatasetSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET)
+      const dataset = yield call(deleteDataset, payload.datasetName, payload.namespace)
+      yield put(deleteDatasetSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing job'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -156,7 +187,9 @@ export default function* rootSaga(): Generator {
     fetchDatasetVersionsSaga(),
     fetchEventsSaga(),
     fetchLineage(),
-    fetchSearch()
+    fetchSearch(),
+    deleteJobSaga(),
+    deleteDatasetSaga()
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

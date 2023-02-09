@@ -1,4 +1,4 @@
-# Copyright 2018-2022 contributors to the Marquez project
+# Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 
 DEFAULT_TIMEOUT_MS = 10000

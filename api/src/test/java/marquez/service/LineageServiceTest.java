@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,10 +27,10 @@ import marquez.db.LineageTestUtils;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
-import marquez.db.models.JobData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.Edge;
+import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;

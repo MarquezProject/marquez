@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 export function groupBy<T, K extends keyof T>(list: T[], key: K) {
@@ -5,7 +6,10 @@ export function groupBy<T, K extends keyof T>(list: T[], key: K) {
   list.forEach(item => {
     const itemKey = item[key]
     if (!map.has(itemKey)) {
-      map.set(itemKey, list.filter(i => i[key] === item[key]))
+      map.set(
+        itemKey,
+        list.filter(i => i[key] === item[key])
+      )
     }
   })
   return map

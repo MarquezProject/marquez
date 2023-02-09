@@ -59,3 +59,7 @@ Our [clients](https://github.com/MarquezProject/marquez/tree/main/clients) suppo
 The following guides will help you and your team effectively deploy and manage Marquez in a cloud environment:
 
 * [Running Marquez on AWS](running-on-aws.html)
+
+----
+SPDX-License-Identifier: Apache-2.0 
+Copyright 2018-2023 contributors to the Marquez project.

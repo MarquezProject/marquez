@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { ArrowBackIosRounded } from '@material-ui/icons'
@@ -30,9 +31,8 @@ interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
 
-const DatasetVersions: FunctionComponent<
-  DatasetVersionsProps & IWithStyles<typeof styles>
-> = props => {
+const DatasetVersions: FunctionComponent<DatasetVersionsProps &
+  IWithStyles<typeof styles>> = props => {
   const { versions, classes } = props
 
   const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)

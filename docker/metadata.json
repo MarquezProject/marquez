@@ -3,7 +3,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "d46e465b-d358-4d32-83d4-df660ff614dd"
+      "runId": "d46e465b-d358-4d32-83d4-df660ff614dd",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -26,6 +34,11 @@
         "namespace": "food_delivery",
         "name": "public.menus",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for menus."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -55,6 +68,12 @@
                 "description": "The description of the menu."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -77,7 +96,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "6f0c13a5-f29b-46a5-90c1-0ffbebbbd1aa"
+      "runId": "6f0c13a5-f29b-46a5-90c1-0ffbebbbd1aa",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -100,6 +127,11 @@
         "namespace": "food_delivery",
         "name": "public.categories",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for categories."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -125,6 +157,12 @@
                 "description": "The description of the category."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -147,7 +185,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "e05901b1-3a06-4b98-8d9c-aaf188c9a28c"
+      "runId": "e05901b1-3a06-4b98-8d9c-aaf188c9a28c",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -170,6 +216,11 @@
         "namespace": "food_delivery",
         "name": "public.menu_items",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for menu items."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -200,6 +251,12 @@
                 "description": "The description of the menu item."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -222,7 +279,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "a43a8523-349f-4296-807f-3354ac491990"
+      "runId": "a43a8523-349f-4296-807f-3354ac491990",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -245,6 +310,11 @@
         "namespace": "food_delivery",
         "name": "public.orders",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for orders."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -280,6 +350,12 @@
                 "description": "The comment of the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -302,7 +378,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "ffba2c14-4170-48da-bec3-ab5fd4ec9a3f"
+      "runId": "ffba2c14-4170-48da-bec3-ab5fd4ec9a3f",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -311,7 +395,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, restaurant_id, menu_id, menu_item_id, category_id)\n SELECT o.id AS order_id, o.placed_on, o.discount_id, m.restaurant_id, m.id AS menu_id, mi.id AS menu_item_id, c.id AS category_id\n   FROM orders AS o\n  INNER JOIN menu_items AS mi\n     ON menu_items.id = o.menu_item_id\n  INNER JOIN categories AS c\n     ON c.id = mi.category_id\n  INNER JOIN menu AS m\n     ON m.id = c.menu_id\n  WHERE o.placed_on >= NOW() - interval '7 days';"
+          "query": "INSERT INTO orders_7_days (order_id, placed_on, discount_id, restaurant_id, menu_id, menu_item_id, category_id)\n SELECT o.id AS order_id, o.placed_on, o.discount_id, m.restaurant_id, m.id AS menu_id, mi.id AS menu_item_id, c.id AS category_id\n   FROM orders AS o\n  INNER JOIN menu_items AS mi\n     ON menu_items.id = o.menu_item_id\n  INNER JOIN categories AS c\n     ON c.id = mi.category_id\n  INNER JOIN menus AS m\n     ON m.id = c.menu_id\n  WHERE o.placed_on >= NOW() - interval '7 days';"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -343,6 +427,95 @@
         "namespace": "food_delivery",
         "name": "public.orders_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "id"
+                  }
+                ]
+              },
+              "placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "discount_id"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menus",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menus",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.categories",
+                    "field": "menu_id"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_items",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders",
+                    "field": "menu_item_id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.categories",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_items",
+                    "field": "category_id"
+                  }
+                ]
+              }
+            }
+          },
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for weekly orders."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -383,6 +556,12 @@
                 "description": "The ID of category related to the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -405,7 +584,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "182a9eaf-881a-4d49-860c-f7e260b8bf60"
+      "runId": "182a9eaf-881a-4d49-860c-f7e260b8bf60",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -428,6 +615,11 @@
         "namespace": "food_delivery",
         "name": "public.customers",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for customers."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -473,6 +665,12 @@
                 "description": "The ID of the city related to the customer."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -495,7 +693,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "b7098939-87f0-4207-878f-dfd8e8804d8a"
+      "runId": "b7098939-87f0-4207-878f-dfd8e8804d8a",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -517,7 +723,17 @@
       {
         "namespace": "food_delivery",
         "name": "public.order_status",
+        "documentation": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+          "description": "Loads order statues updates daily."
+        },
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for order status."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -558,6 +774,12 @@
                 "description": "The ID of the driver related to the order status."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -580,7 +802,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "9f3db1c5-5e9a-4280-8184-18aca4592c77"
+      "runId": "9f3db1c5-5e9a-4280-8184-18aca4592c77",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -603,6 +833,11 @@
         "namespace": "food_delivery",
         "name": "public.drivers",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for drivers."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -674,6 +909,12 @@
                 "description": "The license plate number of the car."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -696,7 +937,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "8ddfb1d9-415f-4850-bcd6-01d02f011abe"
+      "runId": "8ddfb1d9-415f-4850-bcd6-01d02f011abe",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -719,6 +968,11 @@
         "namespace": "food_delivery",
         "name": "public.restaurants",
         "facets": {
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for restaurants."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -784,6 +1038,12 @@
                 "description": "The description of the restaurant."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -806,7 +1066,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "d5a2a4c4-fc78-428d-ae85-08c942ed8371"
+      "runId": "d5a2a4c4-fc78-428d-ae85-08c942ed8371",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -851,6 +1119,149 @@
         "namespace": "food_delivery",
         "name": "public.delivery_7_days",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "order_id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "order_id"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "placed_on"
+                  }
+                ]
+              },
+              "order_dispatched_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "order_delivered_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "transitioned_at"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "email"
+                  }
+                ]
+              },
+              "customer_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.customers",
+                    "field": "address"
+                  }
+                ]
+              },
+              "discount_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "discount_id"
+                  }
+                ]
+              },
+              "menu_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "menu_id"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.orders_7_days",
+                    "field": "restaurant_id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "id"
+                  }
+                ]
+              },
+              "restaurant_address": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "address"
+                  }
+                ]
+              },
+              "menu_item_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.restaurants",
+                    "field": "menu_item_id"
+                  }
+                ]
+              },
+              "category_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.menu_item_id",
+                    "field": "category_id"
+                  }
+                ]
+              },
+              "driver_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.drivers",
+                    "field": "id"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.order_status",
+                    "field": "driver_id"
+                  }
+                ]
+              }
+            }
+          },
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for weekly deliveries."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -886,10 +1297,29 @@
                 "description": "The email address of the customer."
               },
               {
+                "name": "customer_address",
+                "type": "VARCHAR",
+                "tags": [],
+                "description": "The physical address of the customer."
+              },
+
+              {
                 "name": "menu_id",
                 "type": "INTEGER",
                 "tags": [],
                 "description": "The ID of the menu related to the order."
+              },
+              {
+                "name": "restaurant_id",
+                "type": "INTEGER",
+                "tags": [],
+                "description": "The ID of the restaurant."
+              },
+              {
+                "name": "restaurant_address",
+                "type": "VARCHAR",
+                "tags": [],
+                "description": "The physical address of the restaurant."
               },
               {
                 "name": "menu_item_id",
@@ -922,6 +1352,28 @@
                 "description": "The ID of the driver related to the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
+          },
+          "dataQualityAssertions": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DataQualityAssertionsDatasetFacet.json",
+            "assertions": [
+              {
+                "assertion": "not_null",
+                "success": false,
+                "column": "driver_id"
+              },
+              {
+                "assertion": "is_string",
+                "success": true,
+                "column": "customer_address"
+              }
+            ]
           }
         }
       }
@@ -944,7 +1396,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "bd41a42a-bf18-4b74-9bb7-cd62637823d8"
+      "runId": "bd41a42a-bf18-4b74-9bb7-cd62637823d8",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -953,7 +1413,7 @@
         "sql": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
           "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json",
-          "query": "INSERT INTO top_delivery_times (order_id, order_placed_on, order_dispatched_on, order_delivered_on, order_delivery_time,\n      customer_email, restaurant_id, driver_id)\n  SELECT order_id, order_placed_on, order_delivered_on, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    customer_email, restaurant_id, driver_id\n    FROM delivery_7_days\n   GROUP BY restaurant_id\n   ORDER BY order_delivery_time DESC\n   LIMIT 1;\nINSERT INTO discounts (amount_off, customer_email, starts_on, ends_on)\n  SELECT customer_email, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    CASE WHEN order_delivery_time >= 60 THEN 15\n      ELSE 5\n    END AS amount_off,\n    NOW() AS starts_on,\n    NOW() + interval '7 days' AS ends_on\n   FROM top_delivery_times\n  WHERE order_delivery_time >= 45;"
+          "query": "INSERT INTO top_delivery_times (order_id, order_placed_on, order_delivered_on, order_delivery_time,\n      customer_email, restaurant_id, driver_id)\n  SELECT order_id, order_placed_on, order_delivered_on, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    customer_email, restaurant_id, driver_id\n    FROM delivery_7_days\n   GROUP BY restaurant_id\n   ORDER BY order_delivery_time DESC\n   LIMIT 1;\nINSERT INTO discounts (amount_off, customer_email, starts_on, ends_on)\n  SELECT customer_email, DATEDIFF(minute, order_placed_on, order_delivered_on) AS order_delivery_time,\n    CASE WHEN order_delivery_time >= 60 THEN 15\n      ELSE 5\n    END AS amount_off,\n    NOW() AS starts_on,\n    NOW() + interval '7 days' AS ends_on\n   FROM top_delivery_times\n  WHERE order_delivery_time >= 45;"
         },
         "documentation": {
           "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
@@ -973,6 +1433,85 @@
         "namespace": "food_delivery",
         "name": "public.top_delivery_times",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_id"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  }
+                ]
+              },
+              "order_delivered_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "order_delivery_time": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "customer_email"
+                  }
+                ]
+              },
+              "restaurant_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "restaurant_id"
+                  }
+                ]
+              },
+              "driver_id": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "driver_id"
+                  }
+                ]
+              }
+            }
+          },
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for top delivery times."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -990,19 +1529,13 @@
                 "description": "An ISO-8601 timestamp representing the date/time the order was placed."
               },
               {
-                "name": "order_dispatched_on",
-                "type": "TIMESTAMP",
-                "tags": [],
-                "description": "An ISO-8601 timestamp representing the date/time the order was dispatched."
-              },
-              {
                 "name": "order_delivered_on",
                 "type": "TIMESTAMP",
                 "tags": [],
                 "description": "An ISO-8601 timestamp representing the date/time the order was delivered."
               },
               {
-                "name": "order_delivered_time",
+                "name": "order_delivery_time",
                 "type": "TIMESTAMP",
                 "tags": [],
                 "description": "An ISO-8601 timestamp representing the total time of delivery."
@@ -1026,6 +1559,12 @@
                 "description": "The ID of the driver related to the order."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       },
@@ -1033,6 +1572,40 @@
         "namespace": "food_delivery",
         "name": "public.discounts",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "amount_off": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_placed_on"
+                  },
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "order_delivered_on"
+                  }
+                ]
+              },
+              "customer_email": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.delivery_7_days",
+                    "field": "customer_email"
+                  }
+                ]
+              }
+            }
+          },
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for discounts."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -1068,6 +1641,12 @@
                 "description": "An ISO-8601 timestamp representing the date/time the discount ends."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -1090,7 +1669,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "adc8507c-595e-4d76-9dac-be2bf0ffe1ee"
+      "runId": "adc8507c-595e-4d76-9dac-be2bf0ffe1ee",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
@@ -1123,6 +1710,35 @@
         "namespace": "food_delivery",
         "name": "public.popular_orders_day_of_week",
         "facets": {
+          "columnLineage": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
+            "fields": {
+              "order_day_of_week": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.top_delivery_times",
+                    "field": "order_placed_on"
+                  }
+                ]
+              },
+              "order_placed_on": {
+                "inputFields": [
+                  {
+                    "namespace": "food_delivery",
+                    "name": "public.top_delivery_times",
+                    "field": "order_placed_on"
+                  }
+                ]
+              }
+            }
+          },
+          "documentation": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
+            "description": "A table for popular orders by day of week."
+          },
           "schema": {
             "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
             "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
@@ -1146,6 +1762,12 @@
                 "description": "The number of orders placed on day of week."
               }
             ]
+          },
+          "dataSource": {
+            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
+            "name": "food_delivery_db",
+            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
           }
         }
       }
@@ -1168,7 +1790,15 @@
     "eventType": "START",
     "eventTime": "2020-02-22T22:42:42.000Z",
     "run": {
-      "runId": "3ab25429-cf9c-4d1d-9166-1e1946f9d3c3"
+      "runId": "3ab25429-cf9c-4d1d-9166-1e1946f9d3c3",
+      "facets": {
+        "nominalTime": {
+          "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+          "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+          "nominalStartTime": "2020-02-22T22:00:00.000Z",
+          "nominalEndTime": "2020-02-22T22:00:00.000Z"
+        }
+      }
     },
     "job": {
       "namespace": "food_delivery",
