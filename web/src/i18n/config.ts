@@ -64,7 +64,7 @@ i18next
           datasets: {
             latest_tab: 'LATEST SCHEMA',
             history_tab: 'VERSION HISTORY',
-            column_lineage: 'COLUMN LINEAGE',
+            column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?'
           },
@@ -77,6 +77,10 @@ i18next
             source_col: 'SOURCE',
             updated_col: 'UPDATED AT',
             status_col: 'STATUS'
+          },
+          datasets_column_lineage: {
+            empty_title: 'No column lineage',
+            empty_body: 'Column lineage not available for the specified dataset.'
           },
           jobs_route: {
             empty_title: 'No jobs found',
@@ -171,6 +175,7 @@ i18next
           datasets: {
             latest_tab: 'DERNIER SCHEMA',
             history_tab: 'HISTORIQUE DES VERSIONS',
+            column_lineage_tab: 'LIGNÉE DE COLONNE',
             dialog_delete: 'EFFACER',
             dialog_confirmation_title: 'Êtes-vous sûr?'
           },
@@ -184,6 +189,10 @@ i18next
             source_col: 'SOURCE',
             updated_col: 'MISE À JOUR À',
             status_col: 'STATUT'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Aucune lignée de colonne',
+            empty_body: "Lignage de colonne non disponible pour l'ensemble de données spécifié."
           },
           jobs_route: {
             empty_title: 'Aucun emploi trouvé',
@@ -280,6 +289,7 @@ i18next
           datasets: {
             latest_tab: 'ESQUEMA ÚLTIMO',
             history_tab: 'HISTORIAL DE VERSIONES',
+            column_lineage_tab: 'LINAJE DE COLUMNA',
             dialog_delete: 'ELIMINAR',
             dialog_confirmation_title: 'Estás seguro?'
           },
@@ -293,6 +303,10 @@ i18next
             source_col: 'FUENTE',
             updated_col: 'ACTUALIZADO EN',
             status_col: 'ESTADO'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Sin linaje de columna',
+            empty_body: 'Linaje de columna no disponible para el conjunto de datos especificado.'
           },
           jobs_route: {
             empty_title: 'No se encontraron trabajos',
@@ -389,6 +403,7 @@ i18next
           datasets: {
             latest_tab: 'NAJNOWSZY SCHEMAT',
             history_tab: 'HISTORIA WERSJI',
+            column_lineage_tab: 'RODOWÓD KOLUMNOWY',
             dialog_delete: 'USUNĄĆ',
             dialog_confirmation_title: 'Jesteś pewny?'
           },
@@ -402,6 +417,10 @@ i18next
             source_col: 'ŹRÓDŁO',
             updated_col: 'ZAKTUALIZOWANO',
             status_col: 'STATUS'
+          },
+          datasets_column_lineage: {
+            empty_title: 'Brak rodowodu kolumny',
+            empty_body: 'Pochodzenie kolumny jest niedostępne dla określonego zbioru danych.'
           },
           jobs_route: {
             empty_title: 'Nie znaleziono ofert pracy',

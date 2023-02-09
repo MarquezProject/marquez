@@ -53,6 +53,8 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
     saveAs(blob, `${title}.json`)
   }
 
+  const i18next = require('i18next')
+
   return (
     <>
       {columnLineage ? (
@@ -79,8 +81,8 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
         </>
       ) : (
         <MqEmpty
-          title={'No column lineage'}
-          body={'Column lineage not available for the specified dataset.'}
+          title={i18next.t('datasets_column_lineage.empty_title')}
+          body={i18next.t('datasets_column_lineage.empty_body')}
         />
       )}
     </>

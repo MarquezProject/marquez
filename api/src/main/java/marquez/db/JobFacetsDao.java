@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,7 +24,6 @@ public interface JobFacetsDao {
   @SqlUpdate(
       """
       INSERT INTO job_facets (
-         uuid,
          created_at,
          job_uuid,
          run_uuid,
@@ -33,7 +32,6 @@ public interface JobFacetsDao {
          name,
          facet
       ) VALUES (
-         :uuid,
          :createdAt,
          :jobUuid,
          :runUuid,
@@ -44,7 +42,6 @@ public interface JobFacetsDao {
       )
       """)
   void insertJobFacet(
-      UUID uuid,
       Instant createdAt,
       UUID jobUuid,
       UUID runUuid,
@@ -68,7 +65,6 @@ public interface JobFacetsDao {
         .forEach(
             fieldName ->
                 insertJobFacet(
-                    UUID.randomUUID(),
                     now,
                     jobUuid,
                     runUuid,
@@ -79,7 +75,6 @@ public interface JobFacetsDao {
   }
 
   record JobFacetRow(
-      UUID uuid,
       Instant createdAt,
       UUID jobUuid,
       UUID runUuid,
