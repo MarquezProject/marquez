@@ -1,5 +1,5 @@
 {
-  "bumpVersion": "patch",
+  "bumpVersion": "minor",
   "extends": [
     "config:base",
     "docker:disable",
