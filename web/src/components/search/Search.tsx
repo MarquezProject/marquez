@@ -362,9 +362,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default withStyles(styles)(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(withRouter(Search))
-)
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Search)))

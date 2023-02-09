@@ -6,7 +6,10 @@ export function groupBy<T, K extends keyof T>(list: T[], key: K) {
   list.forEach(item => {
     const itemKey = item[key]
     if (!map.has(itemKey)) {
-      map.set(itemKey, list.filter(i => i[key] === item[key]))
+      map.set(
+        itemKey,
+        list.filter(i => i[key] === item[key])
+      )
     }
   })
   return map

@@ -9,11 +9,12 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { encodeNode } from '../../helpers/nodes'
+import { datasetFacetsStatus, encodeNode } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import Box from '@material-ui/core/Box'
 import MqEmpty from '../../components/core/empty/MqEmpty'
+import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
@@ -88,6 +89,9 @@ class Datasets extends React.Component<DatasetsProps> {
                       <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
                         <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                       </TableCell>
+                      <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
+                        <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -116,6 +120,15 @@ class Datasets extends React.Component<DatasetsProps> {
                             </TableCell>
                             <TableCell align='left'>
                               <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
+                            </TableCell>
+                            <TableCell align='left'>
+                              {datasetFacetsStatus(dataset.facets) ? (
+                                <>
+                                  <MqStatus color={datasetFacetsStatus(dataset.facets)} />
+                                </>
+                              ) : (
+                                <MqText>N/A</MqText>
+                              )}
                             </TableCell>
                           </TableRow>
                         )
@@ -147,7 +160,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Datasets))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Datasets))

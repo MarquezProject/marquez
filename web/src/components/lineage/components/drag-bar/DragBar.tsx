@@ -107,7 +107,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     },
     dispatch
   )
-export default connect(
-  null,
-  mapDispatchToProps
-)(withStyles(styles)(DragBar))
+export default connect(null, mapDispatchToProps)(withStyles(styles)(DragBar))
