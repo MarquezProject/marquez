@@ -25,15 +25,16 @@ import {
   resetJobs,
   resetRuns
 } from '../../store/actionCreators'
+import { jobRunsStatus } from '../../helpers/nodes'
 import { theme } from '../../helpers/theme'
 import { useHistory } from 'react-router-dom'
 import CloseIcon from '@material-ui/icons/Close'
 import Dialog from '../Dialog'
 import IconButton from '@material-ui/core/IconButton'
 import MqEmpty from '../core/empty/MqEmpty'
+import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
-import RunStatus from './RunStatus'
 import Runs from './Runs'
 
 const styles = ({ spacing }: ITheme) => {
@@ -166,9 +167,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
-        {job.latestRun && (
+        {runs.length && (
           <Box mr={1}>
-            <RunStatus run={job.latestRun} />
+            <MqStatus color={jobRunsStatus(runs)} />
           </Box>
         )}
         <MqText font={'mono'} heading>
@@ -212,7 +213,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(JobDetailPage))
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(JobDetailPage))

@@ -28,8 +28,10 @@ export interface Events {
   events: Event[]
 }
 
+export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'
+
 export interface Event {
-  eventType: string
+  eventType: EventType
   eventTime: string
   producer: string
   schemaURL: string
@@ -78,6 +80,16 @@ export interface Dataset {
 
 export interface DatasetVersions {
   versions: DatasetVersion[]
+}
+
+export interface Facets {
+  dataQualityAssertions?: {
+    assertions?: {
+      assertion: string
+      column: string
+      success: boolean
+    }[]
+  }
 }
 
 export interface DatasetVersion {
