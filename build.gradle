@@ -59,7 +59,7 @@ subprojects {
         jacocoVersion = '0.8.8'
         junit5Version = '5.9.2'
         lombokVersion = '1.18.24'
-        mockitoVersion = '5.1.0'
+        mockitoVersion = '5.1.1'
         openlineageVersion = '0.19.2'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.5.3'
