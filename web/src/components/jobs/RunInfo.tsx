@@ -30,7 +30,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
           </Box>
-          <MqJsonView data={run.facets} placeholder='Search' />
+          <MqJsonView data={run.facets} searchable={true} placeholder='Search' />
         </Box>
       )}
     </Box>

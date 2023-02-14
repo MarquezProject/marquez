@@ -12,7 +12,7 @@ import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { fileSize } from '../../helpers'
 import { saveAs } from 'file-saver'
 import MqEmpty from '../core/empty/MqEmpty'
-import MqJson from '../core/code/MqJson'
+import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 
@@ -76,7 +76,7 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
               </MqEmpty>
             </Box>
           ) : (
-            <MqJson code={columnLineage} wrapLongLines={true} showLineNumbers={true} />
+            <MqJsonView data={columnLineage} />
           )}
         </>
       ) : (

@@ -28,8 +28,8 @@ import Box from '@material-ui/core/Box'
 import IconButton from '@material-ui/core/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
-import MqJson from '../../components/core/code/MqJson'
 import MqText from '../../components/core/text/MqText'
+import MqJsonView from '../../components/core/json-view/MqJsonView'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import moment from 'moment'
@@ -322,11 +322,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                                     </MqEmpty>
                                   </Box>
                                 ) : (
-                                  <MqJson
-                                    code={event}
-                                    wrapLongLines={true}
-                                    showLineNumbers={true}
-                                  />
+                                  <MqJsonView data={event} />
                                 )}
                               </TableCell>
                             </TableRow>

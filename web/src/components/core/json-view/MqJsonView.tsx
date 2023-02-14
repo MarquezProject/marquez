@@ -16,6 +16,7 @@ const styles = (theme: Theme) =>
 
 interface OwnProps {
   data: object
+  searchable?: boolean
   placeholder?: string
 }
 
@@ -46,19 +47,21 @@ class MqJsonView extends React.Component<JsonViewProps, StateProps> {
   }
 
   render() {
-    const { data, placeholder = '', classes } = this.props
+    const { data, searchable = false, placeholder = 'Search', classes } = this.props
     const { search } = this.state
 
     return (
       <>
-        <InputSearchJsonView
-          className={classes.input}
-          onChange={event => this.onSearch(event)}
-          value={search}
-          autoComplete={'off'}
-          id={'json-view'}
-          placeholder={placeholder}
-        />
+        {searchable &&
+          <InputSearchJsonView
+            className={classes.input}
+            onChange={event => this.onSearch(event)}
+            value={search}
+            autoComplete={'off'}
+            id={'json-view'}
+            placeholder={placeholder}
+          />
+        }
         <ReactJson
           src={data}
           theme={'rjv_white'}

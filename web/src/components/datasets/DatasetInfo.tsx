@@ -68,7 +68,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJsonView data={facets} placeholder='Search' />
+          <MqJsonView data={facets} searchable={true} placeholder='Search' />
         </Box>
       )}
       {run && (
