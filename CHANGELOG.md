@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
 
+### Fixed
+
+* Add missing database indexes [`#2419`](https://github.com/MarquezProject/marquez/pull/2419) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+  *Create missing indexes on reference columns.*
+
+
 ## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-31
 
 ### Added
