@@ -6,7 +6,7 @@ import { Field, Run } from '../../types/api'
 import { stopWatchDuration } from '../../helpers/time'
 import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
-import MqJson from '../core/code/MqJson'
+import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 import RunStatus from '../jobs/RunStatus'
@@ -68,7 +68,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJson code={facets} />
+          <MqJsonView data={facets} searchable={true} placeholder='Search' />
         </Box>
       )}
       {run && (
