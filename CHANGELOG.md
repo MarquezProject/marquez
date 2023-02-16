@@ -1,11 +1,28 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.30.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.31.0...HEAD)
+
+## [0.31.0](https://github.com/MarquezProject/marquez/compare/0.30.0...0.31.0) - 2023-02-16
+
+### Added
+
+* UI: add facet view enhancements [`#2336`](https://github.com/MarquezProject/marquez/pull/2336) [@tito12](https://github.com/tito12)  
+    *Creates a dynamic component with the ability to navigate and search the JSON, expand sections and click on links.*
+* UI: highlight selected path on graph and display status of jobs and datasets based on last 14 runs or latest quality facets [`#2384`](https://github.com/MarquezProject/marquez/pull/2384) [@tito12](https://github.com/tito12)  
+    *Adds highlighting of the visual graph based on upstream and downstream dependencies of selected nodes, makes displayed status reflect last 14 runs the case of jobs and latest quality facets in the case of datasets.*
+* UI: enable auto-accessibility feature on graph nodes [`#2388`](https://github.com/MarquezProject/marquez/pull/2400) [@merobi-hub](https://github.com/merobi-hub)  
+    *Adds attributes to the `FontAwesomeIcon`s to enable a built-in accessibility feature.*
 
 ### Fixed
 
-* Add missing database indexes [`#2419`](https://github.com/MarquezProject/marquez/pull/2419) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
-  *Create missing indexes on reference columns.*
+* API: add index to `jobs_fqn` table using `namespace_name` and `job_fqn` columns [`#2357`](https://github.com/MarquezProject/marquez/pull/2357) [@collado-mike](https://github.com/collado-mike)  
+    *Optimizes read queries by adding an index to this table.*  
+* API: add missing indices to `column_lineage`, `dataset_facets`, `job_facets` tables [`#2419`](https://github.com/MarquezProject/marquez/pull/2419) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Creates missing indices on reference columns in a number of database tables.*
+* Spec: make data version and dataset types the same [`#2400`](https://github.com/MarquezProject/marquez/pull/2400) [@phixme](https://github.com/phixMe)  
+    *Makes the `fields` property the same for datasets and dataset versions, allowing type-denerating systems to treat them the same way.*
+* UI: show location button only when link to code exists [`#2409`](https://github.com/MarquezProject/marquez/pull/2409) [@tito12](https://github.com/tito12)  
+    *Makes the button visible only if the link is not empty.*
 
 
 ## [0.30.0](https://github.com/MarquezProject/marquez/compare/0.29.0...0.30.0) - 2023-01-31
