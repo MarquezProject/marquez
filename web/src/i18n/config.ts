@@ -75,7 +75,8 @@ i18next
             name_col: 'NAME',
             namespace_col: 'NAMESPACE',
             source_col: 'SOURCE',
-            updated_col: 'UPDATED AT'
+            updated_col: 'UPDATED AT',
+            status_col: 'STATUS'
           },
           datasets_column_lineage: {
             empty_title: 'No column lineage',
@@ -88,7 +89,8 @@ i18next
             name_col: 'NAME',
             namespace_col: 'NAMESPACE',
             updated_col: 'UPDATED AT',
-            latest_run_col: 'LATEST RUN DURATION'
+            latest_run_col: 'LATEST RUN DURATION',
+            latest_run_state_col: 'LATEST RUN STATE'
           },
           runs_columns: {
             id: 'ID',
@@ -185,7 +187,8 @@ i18next
             name_col: 'NOM',
             namespace_col: 'ESPACE DE NOMS',
             source_col: 'SOURCE',
-            updated_col: 'MISE À JOUR À'
+            updated_col: 'MISE À JOUR À',
+            status_col: 'STATUT'
           },
           datasets_column_lineage: {
             empty_title: 'Aucune lignée de colonne',
@@ -199,7 +202,8 @@ i18next
             name_col: 'NOM',
             namespace_col: 'ESPACE DE NOMS',
             updated_col: 'MISE À JOUR À',
-            latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION"
+            latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION",
+            latest_run_state_col: "DERNIER ÉTAT D'EXÉCUTIONE"
           },
           runs_columns: {
             id: 'ID',
@@ -297,7 +301,8 @@ i18next
             name_col: 'NOMBRE',
             namespace_col: 'ESPACIO DE NOMBRES',
             source_col: 'FUENTE',
-            updated_col: 'ACTUALIZADO EN'
+            updated_col: 'ACTUALIZADO EN',
+            status_col: 'ESTADO'
           },
           datasets_column_lineage: {
             empty_title: 'Sin linaje de columna',
@@ -311,7 +316,8 @@ i18next
             name_col: 'NOMBRE',
             namespace_col: 'ESPACIO DE NOMBRES',
             updated_col: 'ACTUALIZADO EN',
-            latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN'
+            latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN',
+            latest_run_state_col: 'ESTADO DE LA ÚLTIMA EJECUCIÓN'
           },
           runs_columns: {
             id: 'ID',
@@ -409,7 +415,8 @@ i18next
             name_col: 'NAZWA',
             namespace_col: 'PRZESTRZEŃ NAZW',
             source_col: 'ŹRÓDŁO',
-            updated_col: 'ZAKTUALIZOWANO'
+            updated_col: 'ZAKTUALIZOWANO',
+            status_col: 'STATUS'
           },
           datasets_column_lineage: {
             empty_title: 'Brak rodowodu kolumny',
@@ -423,7 +430,8 @@ i18next
             name_col: 'NAZWA',
             namespace_col: 'PRZESTRZEŃ NAZW',
             updated_col: 'ZAKTUALIZOWANO',
-            latest_run_col: 'NAJNOWSZY CZAS TRWANIA'
+            latest_run_col: 'NAJNOWSZY CZAS TRWANIA',
+            latest_run_state_col: 'NAJNOWSZY STAN URUCHOMIENIA'
           },
           runs_columns: {
             id: 'ID',
