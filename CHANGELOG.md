@@ -20,7 +20,7 @@
 * API: add missing indices to `column_lineage`, `dataset_facets`, `job_facets` tables [`#2419`](https://github.com/MarquezProject/marquez/pull/2419) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Creates missing indices on reference columns in a number of database tables.*
 * Spec: make data version and dataset types the same [`#2400`](https://github.com/MarquezProject/marquez/pull/2400) [@phixme](https://github.com/phixMe)  
-    *Makes the `fields` property the same for datasets and dataset versions, allowing type-denerating systems to treat them the same way.*
+    *Makes the `fields` property the same for datasets and dataset versions, allowing type-generating systems to treat them the same way.*
 * UI: show location button only when link to code exists [`#2409`](https://github.com/MarquezProject/marquez/pull/2409) [@tito12](https://github.com/tito12)  
     *Makes the button visible only if the link is not empty.*
 
