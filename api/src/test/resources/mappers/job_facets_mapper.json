@@ -1,0 +1,11 @@
+{
+  "runId": "a32f2800-7782-3ce3-b77e-eeeeaded3cf3",
+  "facets": {
+    "documentation": {
+      "description": "This is test description"
+    },
+    "sql": {
+      "query": "SELECT 1 AS test"
+    }
+  }
+}

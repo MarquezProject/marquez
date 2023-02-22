@@ -103,12 +103,8 @@ public final class Columns {
 
   /* JOB VERSION ROW COLUMNS */
   public static final String JOB_UUID = "job_uuid";
-  public static final String JOB_CONTEXT_UUID = "job_context_uuid";
   public static final String LOCATION = "location";
   public static final String LATEST_RUN_UUID = "latest_run_uuid";
-
-  /* JOB CONTEXT ROW COLUMNS */
-  public static final String CONTEXT = "context";
 
   /* RUN ROW COLUMNS */
   public static final String EXTERNAL_ID = "external_id";

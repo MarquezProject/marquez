@@ -147,6 +147,37 @@ class NodeIdTest {
   @ParameterizedTest(name = "testDatasetField-{index} {argumentsWithNames}")
   @CsvSource(
       value = {
+        "my-namespace$my-dataset$colA$my-namespace$my-dataset$colB",
+        "gs://bucket$/path/to/data$colA$gs://bucket$/path/to/data$colB",
+        "gs://bucket$/path/to/data$col_A$gs://bucket$/path/to/data$col_B"
+      },
+      delimiter = '$')
+  public void testSameTypeAs(
+      String namespaceFirst,
+      String datasetFirst,
+      String fieldFirst,
+      String namespaceSecond,
+      String datasetSecond,
+      String fieldSecond) {
+    NamespaceName namespaceFirstName = NamespaceName.of(namespaceFirst);
+    FieldName fielFirstdName = FieldName.of(fieldFirst);
+    DatasetName datasetFirstName = DatasetName.of(datasetFirst);
+    DatasetId dsFirstId = new DatasetId(namespaceFirstName, datasetFirstName);
+    DatasetFieldId dsFirstfId = new DatasetFieldId(dsFirstId, fielFirstdName);
+    NodeId nodeFirstId = NodeId.of(dsFirstfId);
+
+    NamespaceName namespaceSecondName = NamespaceName.of(namespaceSecond);
+    FieldName fielSeconddName = FieldName.of(fieldSecond);
+    DatasetName datasetSecondName = DatasetName.of(datasetSecond);
+    DatasetId dsSecondId = new DatasetId(namespaceSecondName, datasetSecondName);
+    DatasetFieldId dsSecondfId = new DatasetFieldId(dsSecondId, fielSeconddName);
+    NodeId nodeSecondId = NodeId.of(dsSecondfId);
+    assertTrue(nodeFirstId.sameTypeAs(nodeSecondId));
+  }
+
+  @ParameterizedTest(name = "testDatasetField-{index} {argumentsWithNames}")
+  @CsvSource(
+      value = {
         "my-namespace$my-dataset$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "gs://bucket$/path/to/data$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "gs://bucket$/path/to/data$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"

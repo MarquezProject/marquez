@@ -66,7 +66,6 @@ public class BackfillTestUtils {
             namespace.getUuid(),
             namespace.getName(),
             jobName,
-            null,
             null);
 
     NominalTimeRunFacet nominalTimeRunFacet = new NominalTimeRunFacet();
@@ -119,23 +118,10 @@ public class BackfillTestUtils {
     pgInputs.setValue("[]");
     return jdbi.withHandle(
         h -> {
-          UUID jobContextUuid =
-              h.createQuery(
-                      """
-INSERT INTO job_contexts (uuid, created_at, context, checksum) VALUES (:uuid, :now, :context, :checksum)
-ON CONFLICT (checksum) DO UPDATE SET created_at=EXCLUDED.created_at
-RETURNING uuid
-""")
-                  .bind("uuid", UUID.randomUUID())
-                  .bind("now", now)
-                  .bind("context", "")
-                  .bind("checksum", "")
-                  .mapTo(UUID.class)
-                  .first();
           return h.createQuery(
                   """
                   INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_job_context_uuid, current_inputs)
-                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentJobContextUuid, :currentInputs)
+                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, null, :currentInputs)
                   RETURNING uuid
                   """)
               .bind("uuid", UUID.randomUUID())
@@ -144,7 +130,6 @@ RETURNING uuid
               .bind("namespaceUuid", namespace.getUuid())
               .bind("name", jobName)
               .bind("namespaceName", namespace.getName())
-              .bind("currentJobContextUuid", jobContextUuid)
               .bind("currentInputs", pgInputs)
               .mapTo(UUID.class)
               .first();

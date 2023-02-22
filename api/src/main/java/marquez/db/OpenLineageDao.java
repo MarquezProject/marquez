@@ -40,7 +40,6 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetSymlinkRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.InputFieldData;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
@@ -132,7 +131,6 @@ public interface OpenLineageDao extends BaseDao {
     DatasetDao datasetDao = createDatasetDao();
     SourceDao sourceDao = createSourceDao();
     JobDao jobDao = createJobDao();
-    JobContextDao jobContextDao = createJobContextDao();
     JobFacetsDao jobFacetsDao = createJobFacetsDao();
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
@@ -153,12 +151,6 @@ public interface OpenLineageDao extends BaseDao {
             formatNamespaceName(event.getJob().getNamespace()),
             DEFAULT_NAMESPACE_OWNER);
     bag.setNamespace(namespace);
-
-    Map<String, String> context = buildJobContext(event);
-    JobContextRow jobContext =
-        jobContextDao.upsert(
-            UUID.randomUUID(), now, Utils.toJson(context), Utils.checksumFor(context));
-    bag.setJobContext(jobContext);
 
     Instant nominalStartTime =
         Optional.ofNullable(event.getRun().getFacets())
@@ -188,7 +180,6 @@ public interface OpenLineageDao extends BaseDao {
                         jobDao,
                         now,
                         namespace,
-                        jobContext,
                         nominalStartTime,
                         nominalEndTime,
                         parentRun));
@@ -221,8 +212,7 @@ public interface OpenLineageDao extends BaseDao {
               now,
               namespace.getName(),
               job.getName(),
-              job.getLocation(),
-              jobContext.getUuid());
+              job.getLocation());
       // Add ...
       Optional.ofNullable(event.getRun().getFacets())
           .ifPresent(
@@ -244,8 +234,7 @@ public interface OpenLineageDao extends BaseDao {
               namespace.getUuid(),
               namespace.getName(),
               job.getName(),
-              job.getLocation(),
-              jobContext.getUuid());
+              job.getLocation());
     }
     bag.setRun(run);
 
@@ -349,7 +338,6 @@ public interface OpenLineageDao extends BaseDao {
       JobDao jobDao,
       Instant now,
       NamespaceRow namespace,
-      JobContextRow jobContext,
       Instant nominalStartTime,
       Instant nominalEndTime,
       Optional<ParentRunFacet> parentRun) {
@@ -373,7 +361,6 @@ public interface OpenLineageDao extends BaseDao {
                 findParentJobRow(
                     event,
                     namespace,
-                    jobContext,
                     location,
                     nominalStartTime,
                     nominalEndTime,
@@ -410,7 +397,6 @@ public interface OpenLineageDao extends BaseDao {
                     namespace.getName(),
                     jobName,
                     description,
-                    jobContext.getUuid(),
                     location,
                     null,
                     jobDao.toJson(toDatasetId(event.getInputs()), mapper)))
@@ -424,7 +410,6 @@ public interface OpenLineageDao extends BaseDao {
                     namespace.getName(),
                     jobName,
                     description,
-                    jobContext.getUuid(),
                     location,
                     null,
                     jobDao.toJson(toDatasetId(event.getInputs()), mapper)));
@@ -433,7 +418,6 @@ public interface OpenLineageDao extends BaseDao {
   private JobRow findParentJobRow(
       LineageEvent event,
       NamespaceRow namespace,
-      JobContextRow jobContext,
       String location,
       Instant nominalStartTime,
       Instant nominalEndTime,
@@ -475,7 +459,6 @@ public interface OpenLineageDao extends BaseDao {
                       return createParentJobRunRecord(
                           event,
                           namespace,
-                          jobContext,
                           location,
                           nominalStartTime,
                           nominalEndTime,
@@ -489,7 +472,6 @@ public interface OpenLineageDao extends BaseDao {
                       createParentJobRunRecord(
                           event,
                           namespace,
-                          jobContext,
                           location,
                           nominalStartTime,
                           nominalEndTime,
@@ -506,7 +488,6 @@ public interface OpenLineageDao extends BaseDao {
   private JobRow createParentJobRunRecord(
       LineageEvent event,
       NamespaceRow namespace,
-      JobContextRow jobContext,
       String location,
       Instant nominalStartTime,
       Instant nominalEndTime,
@@ -529,7 +510,6 @@ public interface OpenLineageDao extends BaseDao {
                 namespace.getName(),
                 parentJobName,
                 null,
-                jobContext.getUuid(),
                 location,
                 null,
                 inputs);
@@ -556,8 +536,7 @@ public interface OpenLineageDao extends BaseDao {
             now,
             namespace.getName(),
             newParentJobRow.getName(),
-            newParentJobRow.getLocation(),
-            newParentJobRow.getJobContextUuid().orElse(null));
+            newParentJobRow.getLocation());
     log.info("Created new parent run record {}", newRow);
 
     runState
@@ -918,29 +897,6 @@ public interface OpenLineageDao extends BaseDao {
         args.put("namespace", event.getRun().getFacets().getParent().getJob().getNamespace());
       }
     }
-    return args;
-  }
-
-  default Map<String, String> buildJobContext(LineageEvent event) {
-    Map<String, String> args = new LinkedHashMap<>();
-    if (event.getJob().getFacets() != null) {
-      if (event.getJob().getFacets().getSourceCodeLocation() != null) {
-        if (event.getJob().getFacets().getSourceCodeLocation().getType() != null) {
-          args.put(
-              "job.facets.sourceCodeLocation.type",
-              event.getJob().getFacets().getSourceCodeLocation().getType());
-        }
-        if (event.getJob().getFacets().getSourceCodeLocation().getUrl() != null) {
-          args.put(
-              "job.facets.sourceCodeLocation.url",
-              event.getJob().getFacets().getSourceCodeLocation().getUrl());
-        }
-      }
-      if (event.getJob().getFacets().getSql() != null) {
-        args.put("sql", event.getJob().getFacets().getSql().getQuery());
-      }
-    }
-
     return args;
   }
 

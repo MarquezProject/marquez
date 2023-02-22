@@ -92,7 +92,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
@@ -106,7 +105,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(runId)
             .build();
@@ -123,7 +121,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
@@ -139,7 +136,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(NAMESPACE_NAME, "does-not-exist")
             .outputs(NAMESPACE_NAME, "does-not-exist")
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     Assertions.assertThrows(
@@ -174,7 +170,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(CommonModelGenerator.newLocation())
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(newRunId)
             .build();
@@ -253,7 +248,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of(STREAM_ID))
             .outputs(ImmutableSet.of(DB_TABLE_ID))
             .location(CommonModelGenerator.newLocation())
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, jobName, newVersionMeta);

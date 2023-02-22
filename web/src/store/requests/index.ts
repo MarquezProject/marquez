@@ -42,5 +42,6 @@ export const genericFetchWrapper = async (url: string, params: IParams, function
 
 export * from './datasets'
 export * from './events'
+export * from './facets'
 export * from './namespaces'
 export * from './jobs'

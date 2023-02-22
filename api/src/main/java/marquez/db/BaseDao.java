@@ -19,9 +19,6 @@ public interface BaseDao extends SqlObject {
   DatasetVersionDao createDatasetVersionDao();
 
   @CreateSqlObject
-  JobContextDao createJobContextDao();
-
-  @CreateSqlObject
   JobDao createJobDao();
 
   @CreateSqlObject

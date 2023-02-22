@@ -101,7 +101,6 @@ public class GraphqlSchemaBuilder {
                 .dataFetcher("datasets", dataFetchers.getDatasetsByNamespace()))
         .type(
             newTypeWiring("JobVersion")
-                .dataFetcher("jobContext", dataFetchers.getJobContextByJobVersion())
                 .dataFetcher("latestRun", dataFetchers.getLatestRunByJobVersion())
                 .dataFetcher("job", dataFetchers.getJobByJobVersion())
                 .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())

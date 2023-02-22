@@ -208,7 +208,6 @@ public class LineageDaoTest {
                 writeJob.getJob().getNamespaceName(),
                 symlinkTargetJobName,
                 writeJob.getJob().getDescription().orElse(null),
-                writeJob.getJob().getJobContextUuid().orElse(null),
                 writeJob.getJob().getLocation(),
                 null,
                 inputs);
@@ -221,7 +220,6 @@ public class LineageDaoTest {
             writeJob.getJob().getNamespaceName(),
             writeJob.getJob().getName(),
             writeJob.getJob().getDescription().orElse(null),
-            writeJob.getJob().getJobContextUuid().orElse(null),
             writeJob.getJob().getLocation(),
             targetJob.getUuid(),
             inputs);

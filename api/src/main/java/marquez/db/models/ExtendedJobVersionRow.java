@@ -16,7 +16,6 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class ExtendedJobVersionRow extends JobVersionRow {
-  @Getter private final String context;
   @Getter private @NonNull String namespaceName;
   @Getter private @NonNull String name;
 
@@ -25,13 +24,11 @@ public class ExtendedJobVersionRow extends JobVersionRow {
       final Instant createdAt,
       final Instant updatedAt,
       final UUID jobUuid,
-      final UUID jobContextUuid,
       final List<UUID> inputUuids,
       final List<UUID> outputUuids,
       final String location,
       final UUID version,
       final UUID latestRunUuid,
-      @NonNull final String context,
       @NonNull final String namespaceName,
       @NonNull final String name,
       @NonNull final UUID namespaceUuid) {
@@ -41,7 +38,6 @@ public class ExtendedJobVersionRow extends JobVersionRow {
         updatedAt,
         jobUuid,
         name,
-        jobContextUuid,
         inputUuids,
         outputUuids,
         location,
@@ -49,7 +45,6 @@ public class ExtendedJobVersionRow extends JobVersionRow {
         latestRunUuid,
         namespaceUuid,
         namespaceName);
-    this.context = context;
     this.namespaceName = namespaceName;
     this.name = name;
   }

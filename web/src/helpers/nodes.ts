@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { EventType, Facets, Run, RunState } from '../types/api'
+import { EventType, DataQualityFacets, Run, RunState } from '../types/api'
 import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
 import { Undefinable } from '../types/util/Nullable'
 import { theme } from './theme'
@@ -108,7 +108,7 @@ export function jobRunsStatus(runs: Run[], limit = 14) {
   }
 }
 
-export function datasetFacetsStatus(facets: Facets, limit = 14) {
+export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
   const assertions = facets?.dataQualityAssertions?.assertions?.slice(-limit)
 
   if (!assertions?.length) {

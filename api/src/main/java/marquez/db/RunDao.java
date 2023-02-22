@@ -74,7 +74,7 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String BASE_FIND_RUN_SQL =
-      "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+      "SELECT r.*, ra.args, f.facets,\n"
           + "jv.version AS job_version,\n"
           + "ri.input_versions, ro.output_versions\n"
           + "FROM runs_view AS r\n"
@@ -85,7 +85,6 @@ public interface RunDao extends BaseDao {
           + "    GROUP BY rf.run_uuid\n"
           + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
           + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
           + "LEFT OUTER JOIN (\n"
           + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
@@ -122,7 +121,7 @@ public interface RunDao extends BaseDao {
 
   @SqlQuery(
       """
-          SELECT r.*, ra.args, ctx.context, f.facets,
+          SELECT r.*, ra.args, f.facets,
           j.namespace_name, j.name, jv.version AS job_version,
           ri.input_versions, ro.output_versions
           FROM runs_view AS r
@@ -135,7 +134,6 @@ public interface RunDao extends BaseDao {
             GROUP BY rf.run_uuid
           ) AS f ON r.uuid=f.run_uuid
           LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
-          LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid
           LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
           LEFT OUTER JOIN (
            SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,
@@ -192,7 +190,7 @@ public interface RunDao extends BaseDao {
           + ":namespaceName, "
           + ":jobName, "
           + ":location, "
-          + ":jobContextUuid "
+          + "null "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "external_id = EXCLUDED.external_id, "
@@ -217,8 +215,7 @@ public interface RunDao extends BaseDao {
       Instant runStateTime,
       String namespaceName,
       String jobName,
-      String location,
-      UUID jobContextUuid);
+      String location);
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -250,7 +247,7 @@ public interface RunDao extends BaseDao {
           + ":namespaceName, "
           + ":jobName, "
           + ":location, "
-          + ":jobContextUuid "
+          + "null"
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "external_id = EXCLUDED.external_id, "
@@ -272,8 +269,7 @@ public interface RunDao extends BaseDao {
       UUID namespaceUuid,
       String namespaceName,
       String jobName,
-      String location,
-      UUID jobContextUuid);
+      String location);
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -402,8 +398,7 @@ public interface RunDao extends BaseDao {
             now,
             namespaceRow.getName(),
             jobRow.getName(),
-            jobRow.getLocation(),
-            jobRow.getJobContextUuid().orElse(null));
+            jobRow.getLocation());
 
     updateInputDatasetMapping(jobRow.getInputs(), uuid);
 

@@ -9,6 +9,7 @@ import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'
 import events, { IEventsState } from './events'
+import facets, { IFacetsState } from './facets'
 import jobs, { IJobsState } from './jobs'
 import lineage, { ILineageState } from './lineage'
 import namespaces, { INamespacesState } from './namespaces'
@@ -27,6 +28,7 @@ export interface IState {
   router: any
   lineage: ILineageState
   search: ISearchState
+  facets: IFacetsState
 }
 
 export default (history: History): Reducer =>
@@ -41,5 +43,6 @@ export default (history: History): Reducer =>
     namespaces,
     display,
     lineage,
-    search
+    search,
+    facets
   })

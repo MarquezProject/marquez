@@ -15,7 +15,6 @@ import static marquez.db.mappers.MapperUtils.toFacetsOrNull;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -54,21 +53,12 @@ public final class JobMapper implements RowMapper<Job> {
         getDatasetFromJsonOrNull(results, "current_inputs"),
         new HashSet<>(),
         urlOrNull(results, "current_location"),
-        toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),
         // Latest Run is resolved in the JobDao. This can be brought in via a join and
         //  and a jsonb but custom deserializers will need to be introduced
         null,
         toFacetsOrNull(results, Columns.FACETS),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID));
-  }
-
-  public static ImmutableMap<String, String> toContext(ResultSet results, String column)
-      throws SQLException {
-    if (results.getString(column) == null) {
-      return null;
-    }
-    return Utils.fromJson(results.getString(column), new TypeReference<>() {});
   }
 
   Set<DatasetId> getDatasetFromJsonOrNull(@NonNull ResultSet results, String column)

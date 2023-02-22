@@ -477,6 +477,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/IncompleteRun'
 
+  /jobs/runs/{id}/facets:
+    parameters:
+      - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/type'
+    get:
+      operationId: getFacets
+      summary: Retrieve run or job facets for a run.
+      description: Retrieve run or job facets for a run.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacetsResult'
+
   /jobs/runs/{id}/start:
     parameters:
       - $ref: '#/components/parameters/runId'
@@ -857,6 +875,17 @@ components:
         type: string
         format: date-time
         example: 2022-09-15T07:47:19Z
+    
+    type:
+      name: type
+      in: query
+      description: Indicates if should return job or run facets.
+      required: true
+      schema:
+        type: string
+        enum:
+          - run
+          - job
 
   schemas:
     CreatedNamespace:
@@ -1918,3 +1947,12 @@ components:
       enum: [DATASET, JOB]
       description: The type of search result.
       example: DATASET
+
+    FacetsResult:
+      type: object
+      properties:
+        runId:
+          description: The ID associated with the run modifying the table.
+          type: string
+        facets:
+          $ref: '#/components/schemas/CustomFacet'

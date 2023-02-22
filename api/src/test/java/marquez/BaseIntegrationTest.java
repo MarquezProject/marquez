@@ -8,7 +8,6 @@ package marquez;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrlFor;
-import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
@@ -22,7 +21,6 @@ import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
@@ -108,7 +106,6 @@ public abstract class BaseIntegrationTest {
   protected static JobId JOB_ID;
   protected static JobType JOB_TYPE;
   protected static URL JOB_LOCATION;
-  protected static ImmutableMap<String, String> JOB_CONTEXT;
   protected static String JOB_DESCRIPTION;
   protected static JobMeta JOB_META;
 
@@ -169,7 +166,6 @@ public abstract class BaseIntegrationTest {
     JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
     JOB_TYPE = JobType.BATCH;
     JOB_LOCATION = newLocation();
-    JOB_CONTEXT = newContext();
     JOB_DESCRIPTION = newDescription();
     JOB_META =
         JobMeta.builder()
@@ -177,7 +173,6 @@ public abstract class BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
 

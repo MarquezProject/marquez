@@ -46,7 +46,6 @@ public final class JobRowMapper implements RowMapper<JobRow> {
         stringOrNull(results, Columns.PARENT_JOB_NAME),
         stringOrNull(results, Columns.DESCRIPTION),
         uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
-        uuidOrNull(results, "current_job_context_uuid"),
         stringOrNull(results, "current_location"),
         getDatasetFromJsonOrNull(results, "current_inputs"),
         uuidOrNull(results, Columns.SYMLINK_TARGET_UUID));

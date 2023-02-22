@@ -249,7 +249,6 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(NAMESPACE_NAME, "table1")
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
 

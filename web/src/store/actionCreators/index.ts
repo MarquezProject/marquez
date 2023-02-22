@@ -7,6 +7,7 @@ import {
   Dataset,
   DatasetVersion,
   Event,
+  Facets,
   Job,
   LineageGraph,
   Namespace,
@@ -153,6 +154,31 @@ export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
     jobName,
     runs: jobRuns
   }
+})
+
+export const fetchRunFacets = (runId: string) => ({
+  type: actionTypes.FETCH_RUN_FACETS,
+  payload: {
+    runId
+  }
+})
+
+export const fetchJobFacets = (runId: string) => ({
+  type: actionTypes.FETCH_JOB_FACETS,
+  payload: {
+    runId
+  }
+})
+
+export const fetchFacetsSuccess = (facets: Facets) => ({
+  type: actionTypes.FETCH_FACETS_SUCCESS,
+  payload: {
+    facets: facets.facets
+  }
+})
+
+export const resetFacets = () => ({
+  type: actionTypes.RESET_FACETS
 })
 
 export const resetRuns = () => ({

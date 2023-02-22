@@ -161,6 +161,36 @@ public class RunFacetsDaoTest {
     assertThat(row.facet().toString()).startsWith("{\"custom-run-facet\": \"some-run-facet\"}");
   }
 
+  @Test
+  public void testGetFacetsByRunUuid() {
+    LineageEvent.JobFacet jobFacet =
+        new LineageEvent.JobFacet(
+            new LineageEvent.DocumentationJobFacet(PRODUCER_URL, SCHEMA_URL, "some-documentation"),
+            new LineageEvent.SourceCodeLocationJobFacet(
+                PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
+            new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"),
+            null);
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "job_" + UUID.randomUUID(),
+            "COMPLETE",
+            jobFacet,
+            Collections.emptyList(),
+            Collections.emptyList(),
+            new LineageEvent.ParentRunFacet(
+                PRODUCER_URL,
+                SCHEMA_URL,
+                new LineageEvent.RunLink(UUID.randomUUID().toString()),
+                new LineageEvent.JobLink("namespace", "name")),
+            ImmutableMap.of().of("custom-run-facet", "some-run-facet"));
+
+    assertThat(runFacetsDao.findRunFacetsByRunUuid(lineageRow.getRun().getUuid()).getFacets())
+        .hasSize(3)
+        .extracting("custom-run-facet")
+        .isEqualTo("some-run-facet");
+  }
+
   private List<RunFacetsDao.RunFacetRow> getRunFacetRow(String name) {
     return jdbi.withHandle(
         h ->

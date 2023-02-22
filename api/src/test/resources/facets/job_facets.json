@@ -1,0 +1,12 @@
+{
+  "documentation": {
+    "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationJobFacet.json",
+    "description": "Loads newly added restaurant menu items daily."
+  },
+  "sql": {
+    "query": "INSERT INTO menu_items (id, name, price, category_id, description)\n SELECT id, name, price, category_id, description\n   FROM tmp_menu_items;",
+    "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SQLJobFacet.json"
+  }
+}
