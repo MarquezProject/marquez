@@ -71,30 +71,8 @@ public interface DatasetDao extends BaseDao {
 
   @SqlQuery(
       """
-      WITH selected_datasets AS (
-          SELECT d.*
-          FROM datasets_view d
-          WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
-      ), dataset_runs AS (
-          SELECT d.uuid, d.name, d.namespace_name, dv.run_uuid, dv.lifecycle_state, lineage_event_time, facet
-          FROM selected_datasets d
-          INNER JOIN dataset_versions AS dv ON dv.uuid = d.current_version_uuid
-          LEFT JOIN LATERAL (
-              SELECT run_uuid, lineage_event_time, facet FROM dataset_facets_view
-              WHERE dataset_uuid = dv.dataset_uuid
-          ) df ON df.run_uuid = dv.run_uuid
-          UNION
-          SELECT d.uuid, d.name, d.namespace_name, rim.run_uuid, lifecycle_state, lineage_event_time, facet
-          FROM selected_datasets d
-          INNER JOIN dataset_versions dv ON dv.uuid = d.current_version_uuid
-          LEFT JOIN runs_input_mapping rim ON dv.uuid = rim.dataset_version_uuid
-          LEFT JOIN LATERAL (
-              SELECT dataset_uuid, run_uuid, lineage_event_time, facet FROM dataset_facets_view
-              WHERE dataset_uuid = dv.dataset_uuid AND run_uuid = rim.run_uuid
-         ) df ON df.run_uuid = rim.run_uuid
-      )
       SELECT d.*, dv.fields, dv.lifecycle_state, sv.schema_location, t.tags, facets
-      FROM selected_datasets d
+      FROM datasets_view d
       LEFT JOIN dataset_versions dv ON d.current_version_uuid = dv.uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
       LEFT JOIN (
@@ -104,11 +82,15 @@ public interface DatasetDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = d.uuid
       LEFT JOIN (
-          SELECT d2.uuid AS dataset_uuid, JSONB_AGG(d2.facet ORDER BY d2.lineage_event_time ASC) AS facets
-          FROM dataset_runs AS d2
-          WHERE d2.run_uuid = d2.run_uuid AND d2.facet IS NOT NULL
-          GROUP BY d2.uuid
-      ) f ON f.dataset_uuid = d.uuid""")
+          SELECT
+              df.dataset_version_uuid,
+              JSONB_AGG(df.facet ORDER BY df.lineage_event_time ASC) AS facets
+          FROM dataset_facets_view AS df
+          WHERE df.facet IS NOT NULL
+          GROUP BY df.dataset_version_uuid
+      ) f ON f.dataset_version_uuid = d.current_version_uuid
+      WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
+  """)
   Optional<Dataset> findDatasetByName(String namespaceName, String datasetName);
 
   default Optional<Dataset> findWithTags(String namespaceName, String datasetName) {
@@ -137,32 +119,8 @@ public interface DatasetDao extends BaseDao {
 
   @SqlQuery(
       """
-      WITH selected_datasets AS (
-          SELECT d.*
-          FROM datasets_view d
-          WHERE d.namespace_name = :namespaceName
-          ORDER BY d.name
-          LIMIT :limit OFFSET :offset
-      ), dataset_runs AS (
-          SELECT d.uuid, d.name, d.namespace_name, dv.run_uuid, dv.lifecycle_state, lineage_event_time, facet
-          FROM selected_datasets d
-          INNER JOIN dataset_versions dv ON dv.uuid = d.current_version_uuid
-          LEFT JOIN LATERAL (
-              SELECT run_uuid, lineage_event_time, facet FROM dataset_facets_view
-              WHERE dataset_uuid = dv.dataset_uuid
-          ) df ON df.run_uuid = dv.run_uuid
-          UNION
-          SELECT d.uuid, d.name, d.namespace_name, rim.run_uuid, lifecycle_state, lineage_event_time, facet
-          FROM selected_datasets d
-          INNER JOIN dataset_versions dv ON dv.uuid = d.current_version_uuid
-          LEFT JOIN runs_input_mapping rim ON dv.uuid = rim.dataset_version_uuid
-          LEFT JOIN LATERAL (
-              SELECT run_uuid, lineage_event_time, facet FROM dataset_facets_view
-              WHERE dataset_uuid = dv.dataset_uuid
-          ) df ON df.run_uuid = rim.run_uuid
-      )
       SELECT d.*, dv.fields, dv.lifecycle_state, sv.schema_location, t.tags, facets
-      FROM selected_datasets d
+      FROM datasets_view d
       LEFT JOIN dataset_versions dv ON d.current_version_uuid = dv.uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
       LEFT JOIN (
@@ -172,13 +130,17 @@ public interface DatasetDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = d.uuid
       LEFT JOIN (
-          SELECT d2.uuid AS dataset_uuid, JSONB_AGG(d2.facet ORDER BY d2.lineage_event_time ASC) AS facets
-          FROM dataset_runs AS d2
-          WHERE d2.run_uuid = d2.run_uuid
-          AND d2.facet IS NOT NULL
-          GROUP BY d2.uuid
-      ) f ON f.dataset_uuid = d.uuid
-      ORDER BY d.name""")
+          SELECT
+              df.dataset_version_uuid,
+              JSONB_AGG(df.facet ORDER BY df.lineage_event_time ASC) AS facets
+          FROM dataset_facets_view AS df
+          WHERE df.facet IS NOT NULL
+          GROUP BY df.dataset_version_uuid
+      ) f ON f.dataset_version_uuid = d.current_version_uuid
+      WHERE d.namespace_name = :namespaceName
+      ORDER BY d.name
+      LIMIT :limit OFFSET :offset
+      """)
   List<Dataset> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery("SELECT count(*) FROM datasets_view")
