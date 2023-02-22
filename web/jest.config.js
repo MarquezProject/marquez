@@ -10,6 +10,7 @@ module.exports = {
   setupTestFrameworkScriptFile: '<rootDir>/setupEnzyme.ts',
   globalSetup: '<rootDir>globalSetup.ts',
   setupFiles: ['<rootDir>setupJest.ts'],
+  testEnvironment: 'jsdom',
   globals: {
     'ts-jest': {
       isolatedModules: 'true'
