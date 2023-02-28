@@ -62,7 +62,7 @@ subprojects {
         mockitoVersion = '5.1.1'
         openlineageVersion = '0.20.6'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.5.3'
+        postgresqlVersion = '42.5.4'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 
