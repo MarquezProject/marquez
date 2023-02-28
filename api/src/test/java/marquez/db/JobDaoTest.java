@@ -15,16 +15,13 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import marquez.common.Utils;
 import marquez.common.models.JobType;
 import marquez.db.models.DbModelGenerator;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -191,9 +188,6 @@ public class JobDaoTest {
     JobRow parentJob =
         createJobWithoutSymlinkTarget(jdbi, namespace, parentJobName, "the original parent job");
     Instant now = Instant.now();
-    JobContextRow jobContext =
-        jdbi.onDemand(JobContextDao.class)
-            .upsert(UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
     PGobject inputs = new PGobject();
     inputs.setValue("[]");
     inputs.setType("JSON");
@@ -208,7 +202,6 @@ public class JobDaoTest {
             namespace.getName(),
             childJob1Name,
             null,
-            jobContext.getUuid(),
             null,
             null,
             inputs);
@@ -224,7 +217,6 @@ public class JobDaoTest {
             namespace.getName(),
             childJob2Name,
             null,
-            jobContext.getUuid(),
             null,
             null,
             inputs);

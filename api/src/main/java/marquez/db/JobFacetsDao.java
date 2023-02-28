@@ -13,34 +13,39 @@ import java.util.UUID;
 import java.util.stream.StreamSupport;
 import lombok.NonNull;
 import marquez.common.Utils;
+import marquez.db.mappers.JobFacetsMapper;
+import marquez.service.models.JobFacets;
 import marquez.service.models.LineageEvent;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.postgresql.util.PGobject;
 
+@RegisterRowMapper(JobFacetsMapper.class)
 /** The DAO for {@code job} facets. */
 public interface JobFacetsDao {
 
   @SqlUpdate(
       """
-      INSERT INTO job_facets (
-         created_at,
-         job_uuid,
-         run_uuid,
-         lineage_event_time,
-         lineage_event_type,
-         name,
-         facet
-      ) VALUES (
-         :createdAt,
-         :jobUuid,
-         :runUuid,
-         :lineageEventTime,
-         :lineageEventType,
-         :name,
-         :facet
-      )
-      """)
+            INSERT INTO job_facets (
+               created_at,
+               job_uuid,
+               run_uuid,
+               lineage_event_time,
+               lineage_event_type,
+               name,
+               facet
+            ) VALUES (
+               :createdAt,
+               :jobUuid,
+               :runUuid,
+               :lineageEventTime,
+               :lineageEventType,
+               :name,
+               :facet
+            )
+            """)
   void insertJobFacet(
       Instant createdAt,
       UUID jobUuid,
@@ -49,6 +54,20 @@ public interface JobFacetsDao {
       String lineageEventType,
       String name,
       PGobject facet);
+
+  @SqlQuery(
+      """
+            SELECT
+                run_uuid,
+                JSON_AGG(facet ORDER BY lineage_event_time) AS facets
+            FROM
+            job_facets_view
+            WHERE
+                run_uuid = :runUuid
+            GROUP BY
+                run_uuid
+            """)
+  JobFacets findJobFacetsByRunUuid(UUID runUuid);
 
   @Transaction
   default void insertJobFacetsFor(

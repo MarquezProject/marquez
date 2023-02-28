@@ -15,7 +15,6 @@ import static marquez.common.models.CommonModelGenerator.newSchemaLocation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -388,7 +387,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(inputs)
             .outputs(outputs)
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
 
@@ -401,7 +399,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(job.getInputs()).isEqualTo(inputs);
     assertThat(job.getOutputs()).isEmpty();
     assertThat(job.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
-    assertThat(job.getContext()).isEqualTo(JOB_CONTEXT);
     assertThat(job.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
     assertThat(job.getLatestRun()).isEmpty();
 
@@ -435,18 +432,12 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
 
     // (8) Modify context in job metadata to create new job version; the version
     //     will be linked to the provided run ID
-    final ImmutableMap<String, String> modifiedJobContext =
-        new ImmutableMap.Builder<String, String>()
-            .putAll(JOB_CONTEXT)
-            .put("key0", "value0")
-            .build();
     final JobMeta jobMetaWithRunId =
         JobMeta.builder()
             .type(JOB_TYPE)
             .inputs(inputs)
             .outputs(outputs)
             .location(JOB_LOCATION)
-            .context(modifiedJobContext)
             .description(JOB_DESCRIPTION)
             .runId(runStarted.getId())
             .build();
@@ -459,7 +450,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     assertThat(jobWithNewVersion.getInputs()).isEqualTo(inputs);
     assertThat(jobWithNewVersion.getOutputs()).isEqualTo(outputs);
     assertThat(jobWithNewVersion.getLocation()).isEqualTo(Optional.of(JOB_LOCATION));
-    assertThat(jobWithNewVersion.getContext()).isEqualTo(modifiedJobContext);
     assertThat(jobWithNewVersion.getDescription()).isEqualTo(Optional.of(JOB_DESCRIPTION));
     assertThat(jobWithNewVersion.getLatestRun().get().getId()).isEqualTo(runStarted.getId());
 
@@ -508,7 +498,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
 
@@ -562,7 +551,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .outputs(outputs)
             .runId(run.getId())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, jobName, jobUpdateMeta);
@@ -594,7 +582,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     final Job job = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
@@ -657,7 +644,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     final Job originalJob = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
@@ -669,7 +655,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     final Job targetJob = client.createJob(NAMESPACE_NAME, targetJobName, targetJobMeta);
@@ -692,7 +677,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
               NAMESPACE_NAME,
               jobName,
               JOB_DESCRIPTION,
-              j.getJobContextUuid().orElse(null),
               JOB_LOCATION.toString(),
               targetJobRow.get().getUuid(),
               inputs);
@@ -721,7 +705,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     final Job originalJob = client.createJob(NAMESPACE_NAME, jobName, jobMeta);
@@ -733,7 +716,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     final Job parentJob = client.createJob(NAMESPACE_NAME, parentJobName, parentJobMeta);
@@ -766,7 +748,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             namespaceRow.get().getName(),
             jobRow.getName(),
             jobRow.getDescription().orElse(null),
-            jobRow.getJobContextUuid().orElse(null),
             jobRow.getLocation(),
             null,
             inputs);
@@ -779,7 +760,6 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
         NAMESPACE_NAME,
         jobName,
         JOB_DESCRIPTION,
-        jobRow.getJobContextUuid().orElse(null),
         JOB_LOCATION.toString(),
         targetJobRow.getUuid(),
         inputs);

@@ -6,7 +6,6 @@
 package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
@@ -43,7 +42,6 @@ public class JobData implements NodeData {
   @Setter ImmutableSet<DatasetId> outputs = ImmutableSet.of();
   @Setter ImmutableSet<UUID> outputUuids = ImmutableSet.of();
   @Nullable URL location;
-  @NonNull ImmutableMap<String, String> context;
   @Nullable String description;
   @Nullable @Setter Run latestRun;
 

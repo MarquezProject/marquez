@@ -36,9 +36,6 @@ export interface LineageJob {
   inputs: { namespace: string; name: string }[]
   outputs: { namespace: string; name: string }[]
   location: string
-  context: {
-    [key: string]: string
-  }
   description: string
   latestRun: Nullable<Run>
 }

@@ -15,6 +15,7 @@ import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -37,11 +38,14 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.JobVersionNotFoundException;
 import marquez.api.models.JobVersion;
 import marquez.api.models.ResultsPage;
+import marquez.common.models.FacetType;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.Version;
+import marquez.db.JobFacetsDao;
 import marquez.db.JobVersionDao;
+import marquez.db.RunFacetsDao;
 import marquez.db.models.JobRow;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Job;
@@ -52,11 +56,18 @@ import marquez.service.models.RunMeta;
 @Path("/api/v1")
 public class JobResource extends BaseResource {
   private final JobVersionDao jobVersionDao;
+  private final JobFacetsDao jobFacetsDao;
+  private final RunFacetsDao runFacetsDao;
 
   public JobResource(
-      @NonNull final ServiceFactory serviceFactory, @NonNull final JobVersionDao jobVersionDao) {
+      @NonNull final ServiceFactory serviceFactory,
+      @NonNull final JobVersionDao jobVersionDao,
+      @NonNull JobFacetsDao jobFacetsDao,
+      @NonNull RunFacetsDao runFacetsDao) {
     super(serviceFactory);
     this.jobVersionDao = jobVersionDao;
+    this.jobFacetsDao = jobFacetsDao;
+    this.runFacetsDao = runFacetsDao;
   }
 
   /**
@@ -234,6 +245,33 @@ public class JobResource extends BaseResource {
   public RunResource runResourceRoot(@PathParam("id") RunId runId) {
     throwIfNotExists(runId);
     return new RunResource(runId, runService);
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/jobs/runs/{id}/facets")
+  public Response getRunFacets(
+      @PathParam("id") RunId runId, @QueryParam("type") @NotNull FacetType type) {
+    throwIfNotExists(runId);
+    Object facets = null;
+    switch (type) {
+      case JOB:
+        facets = jobFacetsDao.findJobFacetsByRunUuid(runId.getValue());
+        break;
+      case RUN:
+        facets = runFacetsDao.findRunFacetsByRunUuid(runId.getValue());
+        break;
+      case DATASET:
+        // for future case if there's a need to add dataset facets to the endpoint
+        break;
+      default:
+        break;
+    }
+
+    return Response.ok(facets).build();
   }
 
   @Value

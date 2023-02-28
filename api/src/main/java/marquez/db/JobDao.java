@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -23,7 +22,6 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Job;
@@ -58,10 +56,9 @@ public interface JobDao extends BaseDao {
 
   @SqlQuery(
       """
-    SELECT j.*, jc.context, f.facets
+    SELECT j.*, f.facets
     FROM jobs_view j
     LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
-    LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid
     LEFT OUTER JOIN (
       SELECT run_uuid, JSON_AGG(e.facet) AS facets
       FROM (
@@ -130,10 +127,9 @@ public interface JobDao extends BaseDao {
 
   @SqlQuery(
       """
-    SELECT j.*, jc.context, f.facets
+    SELECT j.*, f.facets
       FROM jobs_view AS j
       LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
-      LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid
     LEFT OUTER JOIN (
       SELECT run_uuid, JSON_AGG(e.facet) AS facets
       FROM (
@@ -208,13 +204,6 @@ public interface JobDao extends BaseDao {
         createNamespaceDao()
             .upsertNamespaceRow(
                 UUID.randomUUID(), createdAt, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
-    JobContextRow contextRow =
-        createJobContextDao()
-            .upsert(
-                UUID.randomUUID(),
-                createdAt,
-                Utils.toJson(jobMeta.getContext()),
-                Utils.checksumFor(jobMeta.getContext()));
     return upsertJob(
         UUID.randomUUID(),
         jobMeta.getType(),
@@ -223,7 +212,6 @@ public interface JobDao extends BaseDao {
         namespace.getName(),
         jobName.getValue(),
         jobMeta.getDescription().orElse(null),
-        contextRow.getUuid(),
         toUrlString(jobMeta.getLocation().orElse(null)),
         symlinkTargetUuid,
         toJson(jobMeta.getInputs(), mapper));
@@ -276,7 +264,7 @@ public interface JobDao extends BaseDao {
       :namespaceName,
       :name,
       :description,
-      :jobContextUuid,
+      null,
       :location,
       :inputs,
       :symlinkTargetId,
@@ -291,7 +279,6 @@ public interface JobDao extends BaseDao {
       String namespaceName,
       String name,
       String description,
-      UUID jobContextUuid,
       String location,
       UUID symlinkTargetId,
       PGobject inputs);
@@ -328,7 +315,7 @@ public interface JobDao extends BaseDao {
       :namespaceName,
       :name,
       :description,
-      :jobContextUuid,
+      null,
       :location,
       :inputs,
       :symlinkTargetId
@@ -344,7 +331,6 @@ public interface JobDao extends BaseDao {
       String namespaceName,
       String name,
       String description,
-      UUID jobContextUuid,
       String location,
       UUID symlinkTargetId,
       PGobject inputs);

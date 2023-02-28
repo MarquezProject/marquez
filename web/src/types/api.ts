@@ -82,7 +82,7 @@ export interface DatasetVersions {
   versions: DatasetVersion[]
 }
 
-export interface Facets {
+export interface DataQualityFacets {
   dataQualityAssertions?: {
     assertions?: {
       assertion: string
@@ -144,9 +144,6 @@ export interface Job {
   outputs: DatasetId[]
   namespace: string
   location: string
-  context: {
-    [key: string]: string
-  }
   description: string
   latestRun: Run
 }
@@ -164,9 +161,6 @@ export interface Runs {
 
 export interface Run {
   id: string
-  context: {
-    sql?: string
-  }
   createdAt: string
   updatedAt: string
   nominalStartTime: string
@@ -210,4 +204,11 @@ export interface Search {
 export interface GroupedSearchResult {
   results: Map<string, GroupedSearch[]>
   rawResults: GroupedSearch[]
+}
+
+export interface Facets {
+  runId: string
+  facets: {
+    [key: string]: object
+  }
 }

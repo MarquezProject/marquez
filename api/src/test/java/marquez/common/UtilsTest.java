@@ -158,7 +158,6 @@ public class UtilsTest {
             jobName,
             jobMeta.getInputs(),
             jobMeta.getOutputs(),
-            jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
     final Version version1 =
         Utils.newJobVersionFor(
@@ -166,7 +165,6 @@ public class UtilsTest {
             jobName,
             jobMeta.getInputs(),
             jobMeta.getOutputs(),
-            jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
     assertThat(version0).isEqualTo(version1);
   }
@@ -184,7 +182,6 @@ public class UtilsTest {
             jobName,
             jobMeta.getInputs(),
             jobMeta.getOutputs(),
-            jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
     // Unsort the job inputs and outputs for version1.
     final ImmutableSet<DatasetId> unsortedJobInputIds =
@@ -197,7 +194,6 @@ public class UtilsTest {
             jobName,
             unsortedJobInputIds,
             unsortedJobOutputIds,
-            jobMeta.getContext(),
             jobMeta.getLocation().map(URL::toString).orElse(null));
     assertThat(version0).isEqualTo(version1);
   }
@@ -216,7 +212,6 @@ public class UtilsTest {
             jobName,
             jobMeta0.getInputs(),
             jobMeta0.getOutputs(),
-            jobMeta0.getContext(),
             jobMeta0.getLocation().map(URL::toString).orElse(null));
     final Version version1 =
         Utils.newJobVersionFor(
@@ -224,7 +219,6 @@ public class UtilsTest {
             jobName,
             jobMeta1.getInputs(),
             jobMeta1.getOutputs(),
-            jobMeta1.getContext(),
             jobMeta1.getLocation().map(URL::toString).orElse(null));
     assertThat(version0).isNotEqualTo(version1);
   }

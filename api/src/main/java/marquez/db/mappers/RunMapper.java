@@ -83,9 +83,6 @@ public final class RunMapper implements RowMapper<Run> {
         columnNames.contains(columnPrefix + Columns.OUTPUT_VERSIONS)
             ? toDatasetVersion(results, columnPrefix + Columns.OUTPUT_VERSIONS)
             : ImmutableList.of(),
-        columnNames.contains(columnPrefix + Columns.CONTEXT)
-            ? JobMapper.toContext(results, columnPrefix + Columns.CONTEXT)
-            : null,
         toFacetsOrNull(results, columnPrefix + Columns.FACETS));
   }
 

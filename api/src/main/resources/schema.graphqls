@@ -99,7 +99,6 @@ type JobVersion {
   updatedAt: DateTime
   location: String
   version: UUID
-  jobContext: Json
   latestRun: Run
   job: Job
   inputs: [Dataset]

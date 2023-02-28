@@ -12,13 +12,10 @@ import static marquez.db.Columns.urlOrNull;
 import static marquez.db.Columns.uuidArrayOrEmpty;
 import static marquez.db.Columns.uuidOrThrow;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import lombok.NonNull;
-import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
@@ -50,17 +47,7 @@ public class JobDataMapper implements RowMapper<JobData> {
         ImmutableSet.<DatasetId>of(),
         ImmutableSet.copyOf(uuidArrayOrEmpty(results, Columns.OUTPUT_UUIDS)),
         urlOrNull(results, "current_location"),
-        toContext(results, Columns.CONTEXT),
         stringOrNull(results, Columns.DESCRIPTION),
         null);
-  }
-
-  public static ImmutableMap<String, String> toContext(ResultSet results, String column)
-      throws SQLException {
-    if (results.getString(column) == null) {
-      return null;
-    }
-    return Utils.fromJson(
-        results.getString(column), new TypeReference<ImmutableMap<String, String>>() {});
   }
 }

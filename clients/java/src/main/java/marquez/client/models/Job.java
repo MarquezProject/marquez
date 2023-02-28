@@ -46,12 +46,11 @@ public final class Job extends JobMeta {
       final Set<DatasetId> inputs,
       final Set<DatasetId> outputs,
       @Nullable final URL location,
-      final Map<String, String> context,
       final String description,
       @Nullable final Run latestRun,
       @Nullable final Map<String, Object> facets,
       @Nullable UUID currentVersion) {
-    super(type, inputs, outputs, location, context, description, null);
+    super(type, inputs, outputs, location, description, null);
     this.id = id;
     this.name = name;
     this.simpleName = simpleName;

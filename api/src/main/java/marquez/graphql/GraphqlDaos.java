@@ -105,9 +105,6 @@ public interface GraphqlDaos extends SqlObject {
   @SqlQuery("SELECT * from owners where name = :ownerName")
   RowMap<String, Object> getCurrentOwnerByNamespace(String ownerName);
 
-  @SqlQuery("SELECT * from job_contexts where uuid = :uuid")
-  RowMap<String, Object> getJobContext(UUID uuid);
-
   @SqlQuery("SELECT * from datasets_view where namespace_uuid = :namespaceUuid")
   List<RowMap<String, Object>> getDatasetsByNamespace(UUID namespaceUuid);
 
@@ -117,7 +114,7 @@ public interface GraphqlDaos extends SqlObject {
 
   @SqlQuery(
       "SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version, jv.location, "
-          + " jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid, j.namespace_name, "
+          + " jv.latest_run_uuid, j.namespace_uuid, j.namespace_name, "
           + " j.name AS job_name "
           + " FROM job_versions_io_mapping m "
           + " inner join job_versions jv "
@@ -128,7 +125,7 @@ public interface GraphqlDaos extends SqlObject {
 
   @SqlQuery(
       "SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version, jv.location, "
-          + " jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid, j.namespace_name, "
+          + " jv.latest_run_uuid, j.namespace_uuid, j.namespace_name, "
           + " j.name AS job_name "
           + " from job_versions jv "
           + " inner join jobs_view j ON j.uuid=jv.job_uuid "
@@ -137,7 +134,7 @@ public interface GraphqlDaos extends SqlObject {
 
   @SqlQuery(
       "SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version, jv.location, "
-          + " jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid, j.namespace_name, "
+          + " jv.latest_run_uuid, j.namespace_uuid, j.namespace_name, "
           + " j.name AS job_name "
           + " from job_versions jv "
           + " inner join jobs_view j ON j.uuid=jv.job_uuid "

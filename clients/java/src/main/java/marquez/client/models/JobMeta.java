@@ -5,10 +5,8 @@
 
 package marquez.client.models;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -25,7 +23,6 @@ public class JobMeta {
   @Getter private final Set<DatasetId> inputs;
   @Getter private final Set<DatasetId> outputs;
   @Nullable private final URL location;
-  @Getter private final Map<String, String> context;
   @Nullable String description;
   @Nullable String runId;
 
@@ -34,14 +31,12 @@ public class JobMeta {
       @NonNull final Set<DatasetId> inputs,
       @NonNull final Set<DatasetId> outputs,
       @Nullable final URL location,
-      @Nullable final Map<String, String> context,
       @Nullable final String description,
       @Nullable String runId) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
-    this.context = (context == null) ? ImmutableMap.of() : ImmutableMap.copyOf(context);
     this.description = description;
     this.runId = runId;
   }
@@ -72,7 +67,6 @@ public class JobMeta {
     private Set<DatasetId> outputs;
     @Nullable private URL location;
     @Nullable private String description;
-    @Nullable Map<String, String> context;
     @Nullable String runId;
 
     private Builder() {
@@ -126,11 +120,6 @@ public class JobMeta {
       return this;
     }
 
-    public Builder context(@Nullable Map<String, String> context) {
-      this.context = context;
-      return this;
-    }
-
     public Builder description(@Nullable String description) {
       this.description = description;
       return this;
@@ -142,7 +131,7 @@ public class JobMeta {
     }
 
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, context, description, runId);
+      return new JobMeta(type, inputs, outputs, location, description, runId);
     }
   }
 }

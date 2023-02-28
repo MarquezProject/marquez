@@ -166,7 +166,6 @@ public class OpenLineageServiceIntegrationTest {
             "description",
             null,
             null,
-            null,
             null);
     Map<String, String> runArgsMap = new HashMap<>();
     RunArgsRow argsRow =
@@ -191,7 +190,6 @@ public class OpenLineageServiceIntegrationTest {
             Instant.now(),
             NAMESPACE,
             job.getName(),
-            null,
             null);
   }
 

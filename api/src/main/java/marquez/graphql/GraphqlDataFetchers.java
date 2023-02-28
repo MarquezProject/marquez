@@ -231,19 +231,6 @@ public class GraphqlDataFetchers {
     };
   }
 
-  public DataFetcher getJobContextByJobVersion() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> map = dataFetchingEnvironment.getSource();
-
-      Map jobContext = dao.getJobContext((UUID) map.get("jobContextUuid"));
-      if (jobContext == null) {
-        return null;
-      }
-      return Utils.fromJson(
-          (String) jobContext.get("context"), new TypeReference<ImmutableMap<String, String>>() {});
-    };
-  }
-
   public DataFetcher getLatestRunByJobVersion() {
     return dataFetchingEnvironment -> {
       Map<String, Object> map = dataFetchingEnvironment.getSource();

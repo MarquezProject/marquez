@@ -1,0 +1,8 @@
+{
+  "nominalTime": {
+    "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/NominalTimeRunFacet.json",
+    "nominalEndTime": "2020-01-01T00:00:00Z",
+    "nominalStartTime": "2020-01-01T00:00:00Z"
+  }
+}

@@ -7,7 +7,6 @@ package marquez.common.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -16,8 +15,8 @@ import marquez.common.Utils;
 
 /**
  * ID for {@code Dataset}. The class implements {@link Comparable} to ensure job versions generated
- * with {@link Utils#newJobVersionFor(NamespaceName, JobName, ImmutableSet, ImmutableSet,
- * ImmutableMap, String)} are consistent as jobs may contain inputs and outputs out of order.
+ * with {@link Utils#newJobVersionFor(NamespaceName, JobName, ImmutableSet, ImmutableSet, String)}
+ * are consistent as jobs may contain inputs and outputs out of order.
  */
 @EqualsAndHashCode
 @ToString

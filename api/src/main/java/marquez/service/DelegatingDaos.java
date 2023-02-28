@@ -11,7 +11,6 @@ import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.LineageDao;
@@ -38,11 +37,6 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingDatasetVersionDao implements DatasetVersionDao {
     @Delegate private final DatasetVersionDao delegate;
-  }
-
-  @RequiredArgsConstructor
-  public static class DelegatingJobContextDao implements JobContextDao {
-    @Delegate private final JobContextDao delegate;
   }
 
   @RequiredArgsConstructor

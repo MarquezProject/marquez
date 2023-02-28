@@ -9,7 +9,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
@@ -149,11 +148,6 @@ public final class CommonModelGenerator extends Generator {
 
   public static URL newLocation() {
     return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
-  }
-
-  public static ImmutableMap<String, String> newContext() {
-    return ImmutableMap.of(
-        "sql", String.format("SELECT * FROM test_table WHERE test_column = '%dH';", newId()));
   }
 
   public static RunId newRunId() {

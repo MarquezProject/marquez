@@ -78,7 +78,6 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
         newRowUuid(),
         newTimestamp(),
         jobRow.getUuid(),
-        jobRow.getJobContextUuid().get(),
         newLocation().toString(),
         version.getValue(),
         jobRow.getName(),
@@ -94,7 +93,6 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
         newRowUuid(),
         newTimestamp(),
         jobRow.getUuid(),
-        jobRow.getJobContextUuid().get(),
         newLocation().toString(),
         version.getValue(),
         jobRow.getName(),
@@ -117,7 +115,6 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             newRowUuid(),
             newTimestamp(),
             jobRow.getUuid(),
-            jobRow.getJobContextUuid().get(),
             newLocation().toString(),
             newVersion().getValue(),
             jobRow.getName(),
@@ -136,8 +133,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             namespaceRow.getUuid(),
             namespaceRow.getName(),
             jobVersionRow.getJobName(),
-            jobVersionRow.getLocation().orElse(null),
-            jobVersionRow.getJobContextUuid());
+            jobVersionRow.getLocation().orElse(null));
 
     // Ensure the latest run is not associated with the job version.
     final Optional<UUID> noLatestRunUuid = jobVersionDao.findLatestRunFor(jobVersionRow.getUuid());
@@ -163,7 +159,6 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             newRowUuid(),
             newTimestamp(),
             jobRow.getUuid(),
-            jobRow.getJobContextUuid().get(),
             newLocation().toString(),
             version.getValue(),
             jobRow.getName(),
