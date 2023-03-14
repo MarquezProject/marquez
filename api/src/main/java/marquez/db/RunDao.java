@@ -411,22 +411,12 @@ public interface RunDao extends BaseDao {
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
-      """
-      WITH RECURSIVE job_names AS (
-        SELECT uuid, namespace_name, name, symlink_target_uuid
-        FROM jobs_view j
-        WHERE j.namespace_name=:namespace AND j.name=:jobName
-        UNION
-        SELECT j.uuid, j.namespace_name, j.name, j.symlink_target_uuid
-        FROM jobs_view j
-        INNER JOIN job_names jn ON j.uuid=jn.symlink_target_uuid OR j.symlink_target_uuid=jn.uuid
-      )
-      """
-          + BASE_FIND_RUN_SQL
+      BASE_FIND_RUN_SQL
           + """
       WHERE r.uuid=(
         SELECT r.uuid FROM runs_view r
-        INNER JOIN job_names j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
+        INNER JOIN jobs_view j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
+        WHERE j.namespace_name=:namespace AND (j.name=:jobName OR j.name=ANY(j.aliases))
         ORDER BY transitioned_at DESC
         LIMIT 1
       )

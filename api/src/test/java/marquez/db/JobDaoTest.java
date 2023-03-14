@@ -57,6 +57,7 @@ public class JobDaoTest {
 
   @AfterEach
   public void cleanUp(Jdbi jdbi) {
+    jdbi.inTransaction(h -> h.execute("DELETE FROM jobs_fqn"));
     jdbi.inTransaction(h -> h.execute("DELETE FROM jobs"));
   }
 

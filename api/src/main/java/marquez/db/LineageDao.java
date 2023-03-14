@@ -41,13 +41,13 @@ public interface LineageDao {
     WITH RECURSIVE
         job_io AS (
             SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
+            ARRAY_AGG(DISTINCT j.uuid) AS ids,
             ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
             ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
-            FROM job_versions_io_mapping io
-            INNER JOIN job_versions v ON io.job_version_uuid=v.uuid
-            INNER JOIN jobs_view j on j.current_version_uuid = v.uuid
-            LEFT JOIN jobs_view s ON s.uuid=j.symlink_target_uuid
-            WHERE s.current_version_uuid IS NULL
+            FROM jobs j
+            LEFT JOIN jobs_view s On s.uuid=j.symlink_target_uuid
+            LEFT JOIN job_versions v on v.uuid=COALESCE(s.current_version_uuid, j.current_version_uuid)
+            LEFT JOIN job_versions_io_mapping io ON io.job_version_uuid=v.uuid
             GROUP BY COALESCE(j.symlink_target_uuid, j.uuid)
         ),
         lineage(job_uuid, inputs, outputs) AS (
@@ -56,8 +56,8 @@ public interface LineageDao {
                    COALESCE(outputs, Array[]::uuid[]) AS outputs,
                    0 AS depth
             FROM jobs_view j
-            LEFT JOIN job_io io ON io.job_uuid=j.uuid OR j.symlink_target_uuid=io.job_uuid
-            WHERE j.uuid IN (<jobIds>)
+            INNER JOIN job_io io ON j.uuid=ANY(io.ids)
+            WHERE io.ids && ARRAY[<jobIds>]::uuid[]
             UNION
             SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1
             FROM job_io io,
