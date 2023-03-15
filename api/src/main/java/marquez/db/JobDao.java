@@ -72,7 +72,6 @@ public interface JobDao extends BaseDao {
       GROUP BY e.run_uuid
     ) f ON f.run_uuid=jv.latest_run_uuid
     WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
-    AND j.symlink_target_uuid IS NULL
   """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
@@ -121,7 +120,6 @@ public interface JobDao extends BaseDao {
     INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
     WHERE j.namespace_name=:namespaceName AND
       (j.name=:jobName OR :jobName = ANY(j.aliases))
-    AND j.symlink_target_uuid IS NULL
   """)
   Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
 
@@ -143,7 +141,6 @@ public interface JobDao extends BaseDao {
       GROUP BY e.run_uuid
     ) f ON f.run_uuid=jv.latest_run_uuid
     WHERE j.namespace_name = :namespaceName
-    AND j.symlink_target_uuid IS NULL
     ORDER BY j.name LIMIT :limit OFFSET :offset
   """)
   List<Job> findAll(String namespaceName, int limit, int offset);
@@ -292,7 +289,6 @@ public interface JobDao extends BaseDao {
     INSERT INTO jobs_view AS j (
       uuid,
       parent_job_uuid,
-      parent_job_uuid_string,
       type,
       created_at,
       updated_at,
@@ -307,7 +303,6 @@ public interface JobDao extends BaseDao {
     ) VALUES (
       :uuid,
       :parentJobUuid,
-      COALESCE(:parentJobUuid::text, ''),
       :type,
       :now,
       :now,

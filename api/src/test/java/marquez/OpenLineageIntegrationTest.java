@@ -438,6 +438,193 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  public void testOpenLineageJobHierarchyAirflowMissingParentForExistingJob()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+
+    RunEvent event2 =
+        createAirflowRunEvent(
+            ol,
+            endOfHour,
+            endOfHour.plusHours(1),
+            null,
+            null,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(2)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(
+            event1.getRun().getRunId().toString(), event2.getRun().getRunId().toString());
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowAddParentForExistingJob()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol, startOfHour, endOfHour, null, null, dagName + "." + task1Name, NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+
+    RunEvent event2 =
+        createAirflowRunEvent(
+            ol,
+            endOfHour,
+            endOfHour.plusHours(1),
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(2)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(
+            event1.getRun().getRunId().toString(), event2.getRun().getRunId().toString());
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowHandlesParentForEventsOutOfOrder()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    ObjectMapper mapper = Utils.newObjectMapper();
+    RunEvent event =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+
+    // first event is the COMPLETE event and is missing the parent facet
+    JsonNode event1 = mapper.valueToTree(event);
+    ((ObjectNode) event1.get("run").get("facets")).remove("parent");
+
+    // the second event is the start
+    JsonNode event2 =
+        ((ObjectNode) mapper.valueToTree(event)).set("eventType", new TextNode("START"));
+
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(1)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(event1.get("run").get("runId").asText());
+  }
+
+  @Test
   public void testOpenLineageJobHierarchyAirflowIntegrationWithDagNameWithDot()
       throws ExecutionException, InterruptedException, TimeoutException {
     OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
@@ -1052,18 +1239,19 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     // a plain old RunFact, but using the "parent" key name. To Marquez, this will look just the
     // same as a python client using the official ParentRunFacet.
     RunFacet parentRunFacet = ol.newRunFacet();
-    parentRunFacet
-        .getAdditionalProperties()
-        .putAll(
-            ImmutableMap.of(
-                "run",
-                ImmutableMap.of("runId", airflowParentRunId),
-                "job",
-                ImmutableMap.of("namespace", namespace, "name", dagName)));
     RunFacetsBuilder runFacetBuilder =
-        ol.newRunFacetsBuilder()
-            .nominalTime(ol.newNominalTimeRunFacet(startOfHour, endOfHour))
-            .put("parent", parentRunFacet);
+        ol.newRunFacetsBuilder().nominalTime(ol.newNominalTimeRunFacet(startOfHour, endOfHour));
+    if (airflowParentRunId != null) {
+      parentRunFacet
+          .getAdditionalProperties()
+          .putAll(
+              ImmutableMap.of(
+                  "run",
+                  ImmutableMap.of("runId", airflowParentRunId),
+                  "job",
+                  ImmutableMap.of("namespace", namespace, "name", dagName)));
+      runFacetBuilder.put("parent", parentRunFacet);
+    }
     airflowVersionFacet.ifPresent(facet -> runFacetBuilder.put("airflow_version", facet));
     return ol.newRunEventBuilder()
         .eventType(EventType.COMPLETE)
