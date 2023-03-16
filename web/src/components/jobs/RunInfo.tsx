@@ -53,7 +53,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
 
   return (
     <Box mt={2}>
-      {jobFacets.sql && <MqCode code={(jobFacets.sql as SqlFacet).query} />}
+      {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
         <Box ml={1}>
           <MqText subdued>{formatUpdatedAt(run.updatedAt)}</MqText>
