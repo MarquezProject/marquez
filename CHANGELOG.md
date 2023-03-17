@@ -9,7 +9,9 @@
 * API: improve dataset facets access [`#2407`](https://github.com/MarquezProject/marquez/pull/2407) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Improves database query performance for accessing datasets and datasets' versions.*
 * Chart: fix communication between the UI and the API [`#2430`](https://github.com/MarquezProject/marquez/pull/2430) [@thomas-delrue](https://github.com/thomas-delrue)  
-    *Reassigns `MARQUEZ_PORT` from 5000 to 80 so the UI can communicate with the API.* 
+    *Reassigns `MARQUEZ_PORT` from 5000 to 80 so the UI can communicate with the API.*
+* UI: always render `MqCode` [#2454](https://github.com/MarquezProject/marquez/pull/2454) [@JDarDagran](https://github.com/JDarDagran)  
+    *Fixes rendering of Dataset and Jobs pages when no `SqlJobFacet` exists.*
 
 ### Removed
 
