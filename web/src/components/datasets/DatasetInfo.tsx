@@ -121,7 +121,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </Box>
             <MqText subdued>{run.jobVersion.name}</MqText>
           </Box>
-          {jobFacets.sql && <MqCode code={(jobFacets.sql as SqlFacet).query} language={'sql'} />}
+          {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
         </Box>
       )}
     </Box>
