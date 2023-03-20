@@ -13,7 +13,7 @@
 # Version of PostgreSQL
 readonly POSTGRES_VERSION="12.1"
 # Version of Marquez
-readonly MARQUEZ_VERSION=0.31.0
+readonly MARQUEZ_VERSION=0.32.0
 # Build version of Marquez
 readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 
