@@ -2,21 +2,21 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.32.0...HEAD)
 
-## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-15
+## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
 ### Fixed
 
 * API: improve dataset facets access [`#2407`](https://github.com/MarquezProject/marquez/pull/2407) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
-    *Improves database query performance for accessing datasets and datasets' versions.*
+    *Improves database query performance when accessing dataset facets by rewriting SQL queries in `DatasetDao` and `DatasetVersionDao`.*
 * Chart: fix communication between the UI and the API [`#2430`](https://github.com/MarquezProject/marquez/pull/2430) [@thomas-delrue](https://github.com/thomas-delrue)  
-    *Reassigns `MARQUEZ_PORT` from 5000 to 80 so the UI can communicate with the API.*
+    *Defines the value for `MARQUEZ_PORT` as .Values.marquez.port (80) in the Helm Chart so the Marquez Web component can communicate with the API.*
 * UI: always render `MqCode` [#2454](https://github.com/MarquezProject/marquez/pull/2454) [@JDarDagran](https://github.com/JDarDagran)  
-    *Fixes rendering of Dataset and Jobs pages when no `SqlJobFacet` exists.*
+    *Fixes rendering of `DatasetInfo` and `RunInfo` pages when no `SqlJobFacet` exists.*
 
 ### Removed
 
 * API: remove job context [`#2373`](https://github.com/MarquezProject/marquez/pull/2373) [@JDarDagran](https://github.com/JDarDagran)  
-    *Removes the use of job context and adds two endpoints for job/run facets per run, which are called from web components to replace the job context with `SQLJobFacet`.*
+    *Removes the use of job context and adds two endpoints for job/run facets per run. These are called from web components to replace the job context with `SQLJobFacet`.*
 * API: remove `jobs_fqn` table and move FQN into jobs directly [`#2448`](https://github.com/MarquezProject/marquez/pull/2448) [@collado-mike](https://github.com/collado-mike)  
     *Fixes loading of certain jobs caused by the inability to enforce uniqueness constraints on fully qualified job names.*
 
