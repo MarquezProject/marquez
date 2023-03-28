@@ -62,7 +62,7 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               r={RADIUS}
               fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-              stroke={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
               strokeWidth={BORDER / 2}
               cx={node.x}
               cy={node.y}
@@ -76,7 +76,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
             />
           </g>
         ) : (
@@ -86,7 +86,7 @@ class Node extends React.Component<NodeProps> {
               x={node.x - RADIUS}
               y={node.y - RADIUS}
               fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-              stroke={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              stroke={isSelected ? theme.palette.primary.main: theme.palette.secondary.main}
               strokeWidth={BORDER / 2}
               width={RADIUS * 2}
               height={RADIUS * 2}
@@ -109,7 +109,7 @@ class Node extends React.Component<NodeProps> {
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={isSelected ? theme.palette.common.white : theme.palette.secondary.main}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
             />
           </g>
         )}
