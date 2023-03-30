@@ -1,10 +1,45 @@
+WITH fqn AS (
+  SELECT f.uuid,
+         f.job_fqn AS name,
+         f.namespace_name,
+         j.name    AS simple_name,
+         j.parent_job_uuid,
+         f.parent_job_name::text,
+         j.symlink_target_uuid
+  FROM jobs_fqn f,
+       jobs j
+  WHERE j.uuid = f.uuid
+)
 UPDATE jobs SET symlink_target_uuid=q.target_uuid
 FROM (
          SELECT j.uuid, j.namespace_name, j.name, j.simple_name, jv.uuid AS target_uuid, jv.simple_name
-         FROM jobs_view j INNER JOIN jobs_view jv ON j.namespace_name=jv.namespace_name AND j.name=jv.name AND j.simple_name != jv.simple_name
+         FROM fqn j
+         INNER JOIN fqn jv ON j.namespace_name=jv.namespace_name AND j.name=jv.name AND j.simple_name != jv.simple_name
          WHERE j.symlink_target_uuid IS NULL
-           AND jv.symlink_target_uuid IS NULL
-           AND j.parent_job_uuid IS NULL) q
+         AND jv.symlink_target_uuid IS NULL
+         AND j.parent_job_uuid IS NULL) q
+WHERE jobs.uuid=q.uuid;
+
+WITH fqn AS (
+  SELECT f.uuid,
+         f.job_fqn AS name,
+         f.namespace_name,
+         j.name    AS simple_name,
+         j.parent_job_uuid,
+         f.parent_job_name::text,
+         j.symlink_target_uuid,
+         j.created_at
+  FROM jobs_fqn f,
+       jobs j
+  WHERE j.uuid = f.uuid
+)
+UPDATE jobs SET name=(q.simple_name || '_' || q.row)
+FROM (
+  SELECT j.uuid, j.namespace_name, j.name, j.simple_name, jv.uuid AS target_uuid,
+         row_number() over (PARTITION BY j.namespace_name, j.name ORDER BY j.created_at) AS row
+  FROM fqn j
+  INNER JOIN fqn jv ON j.namespace_name=jv.namespace_name AND j.name=jv.name AND j.symlink_target_uuid=jv.uuid
+) q
 WHERE jobs.uuid=q.uuid;
 
 ALTER TABLE jobs RENAME COLUMN name TO simple_name;
