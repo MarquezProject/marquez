@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.32.0...HEAD)
 
+### Fixed
+* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
 ### Fixed
