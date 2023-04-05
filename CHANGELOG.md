@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.32.0...HEAD)
 
+### Fixed
+
+* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
+
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
 ### Fixed
