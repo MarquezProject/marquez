@@ -62,7 +62,7 @@ BEGIN
         DO UPDATE SET updated_at               = now(),
                       parent_job_uuid = COALESCE(jobs.parent_job_uuid, EXCLUDED.parent_job_uuid),
                       simple_name = CASE
-                            WHEN EXCLUDED.parent_job_uuid IS NOT NULL THEN EXCLUDED.name
+                            WHEN EXCLUDED.parent_job_uuid IS NOT NULL THEN EXCLUDED.simple_name
                             ELSE jobs.name
                             END,
                       type                     = EXCLUDED.type,

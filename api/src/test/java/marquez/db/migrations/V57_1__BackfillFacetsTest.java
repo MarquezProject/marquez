@@ -166,44 +166,6 @@ public class V57_1__BackfillFacetsTest {
   }
 
   @Test
-  public void testWhenCurrentLockIsAvailable() throws Exception {
-    FacetTestUtils.createLineageWithFacets(openLineageDao);
-    FacetTestUtils.createLineageWithFacets(openLineageDao);
-    lineageRow =
-        FacetTestUtils.createLineageWithFacets(
-            openLineageDao); // point migration_lock to only match the latest lineage event
-
-    jdbi.withHandle(
-        h ->
-            h.execute(
-                """
-              INSERT INTO facet_migration_lock
-              SELECT created_at, run_uuid FROM lineage_events
-              ORDER by created_at DESC LIMIT 1
-              """)); // last lineage row should be skipped
-
-    jdbi.withHandle(
-        h ->
-            h.execute(
-                """
-              INSERT INTO facet_migration_lock
-              SELECT created_at, run_uuid FROM lineage_events
-              ORDER by created_at DESC LIMIT 1 OFFSET 1
-              """)); // middle lineage row should be skipped
-
-    try (MockedStatic<Jdbi> jdbiMockedStatic = Mockito.mockStatic(Jdbi.class)) {
-      when(Jdbi.create(connection)).thenReturn(jdbi);
-      subject.setChunkSize(1);
-
-      // clear migration lock and dataset_facets table
-      jdbi.inTransaction(handle -> handle.execute("DELETE FROM dataset_facets"));
-      subject.migrate(flywayContext);
-
-      assertThat(countDatasetFacets(jdbi)).isEqualTo(15);
-    }
-  }
-
-  @Test
   public void testMigrateForLineageWithNoDatasets() throws Exception {
     LineageEvent.JobFacet jobFacet =
         new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);

@@ -545,7 +545,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(job)
         .isNotNull()
         .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
-        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+        .hasFieldOrPropertyWithValue("parentJobName", dagName)
+        .hasFieldOrPropertyWithValue("simpleName", task1Name);
 
     Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
     assertThat(parentJob)
