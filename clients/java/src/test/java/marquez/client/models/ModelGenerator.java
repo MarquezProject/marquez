@@ -238,7 +238,19 @@ public final class ModelGenerator {
   public static Run newRun() {
     final Instant now = newTimestamp();
     return new Run(
-        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
+        newRunId(),
+        now,
+        now,
+        now,
+        now,
+        RunState.NEW,
+        null,
+        null,
+        null,
+        newRunArgs(),
+        null,
+        null,
+        null);
   }
 
   public static String newOwnerName() {
@@ -393,5 +405,17 @@ public final class ModelGenerator {
 
   public static Map.Entry<String, String> newFacetSchemaURL() {
     return new AbstractMap.SimpleImmutableEntry<>("_schemaURL", "test_schemaURL" + newId());
+  }
+
+  public static InputDatasetVersion newInputDatasetVersion() {
+    return new InputDatasetVersion(
+        new DatasetVersionId(newNamespaceName(), newDatasetName(), UUID.randomUUID()),
+        ImmutableMap.of("datasetFacet", "{some-facet1}"));
+  }
+
+  public static OutputDatasetVersion newOutputDatasetVersion() {
+    return new OutputDatasetVersion(
+        new DatasetVersionId(newNamespaceName(), newDatasetName(), UUID.randomUUID()),
+        ImmutableMap.of("datasetFacet", "{some-facet1}"));
   }
 }

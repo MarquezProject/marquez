@@ -156,10 +156,19 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(
       """
+      WITH selected_dataset_versions AS (
+          SELECT dv.*
+          FROM dataset_versions dv
+          WHERE dv.version = :version
+      ), selected_dataset_version_facets AS (
+          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, df.run_uuid, df.lineage_event_time, df.facet
+          FROM selected_dataset_versions dv
+          LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid
+      )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
           t.tags, f.facets
-      FROM dataset_versions dv
+      FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
       LEFT JOIN (
@@ -169,21 +178,28 @@ public interface DatasetVersionDao extends BaseDao {
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = dv.dataset_uuid
       LEFT JOIN (
-          SELECT dvf.dataset_version_uuid,
-          JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
-          FROM dataset_facets_view dvf
-          GROUP BY dataset_version_uuid
-      ) f ON f.dataset_version_uuid = dv.uuid
-      WHERE dv.version = :version
-   """)
+          SELECT dvf.uuid AS dataset_uuid, JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
+          FROM selected_dataset_version_facets dvf
+          WHERE dvf.run_uuid = dvf.run_uuid
+          GROUP BY dvf.uuid
+      ) f ON f.dataset_uuid = dv.uuid""")
   Optional<DatasetVersion> findBy(UUID version);
 
   @SqlQuery(
       """
+      WITH selected_dataset_versions AS (
+          SELECT dv.*
+          FROM dataset_versions dv
+          WHERE dv.uuid = :uuid
+      ), selected_dataset_version_facets AS (
+          SELECT dv.uuid, dv.dataset_name, dv.namespace_name, df.run_uuid, df.lineage_event_time, df.facet
+          FROM selected_dataset_versions dv
+          LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid  AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown')
+      )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
           t.tags, f.facets
-      FROM dataset_versions dv
+      FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
       LEFT JOIN (
@@ -192,14 +208,12 @@ public interface DatasetVersionDao extends BaseDao {
                    INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid
           GROUP BY m.dataset_uuid
       ) t ON t.dataset_uuid = dv.dataset_uuid
-     LEFT JOIN (
-          SELECT dvf.dataset_version_uuid,
-          JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
-          FROM dataset_facets_view dvf
-          GROUP BY dataset_version_uuid
-      ) f ON f.dataset_version_uuid = dv.uuid
-      WHERE dv.uuid = :uuid
-   """)
+      LEFT JOIN (
+          SELECT dvf.uuid AS dataset_uuid, JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
+          FROM selected_dataset_version_facets dvf
+          WHERE dvf.run_uuid = dvf.run_uuid
+          GROUP BY dvf.uuid
+      ) f ON f.dataset_uuid = dv.uuid""")
   Optional<DatasetVersion> findByUuid(UUID uuid);
 
   default Optional<DatasetVersion> findByWithRun(UUID version) {
@@ -246,6 +260,7 @@ public interface DatasetVersionDao extends BaseDao {
           SELECT dvf.dataset_version_uuid,
           JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
           FROM dataset_facets_view dvf
+          WHERE  (type ILIKE 'dataset' OR type ILIKE 'unknown')
           GROUP BY dataset_version_uuid
       ) f ON f.dataset_version_uuid = dv.uuid
       WHERE dv.namespace_name = :namespaceName

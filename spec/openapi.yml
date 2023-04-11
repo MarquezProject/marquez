@@ -475,7 +475,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IncompleteRun'
+                $ref: '#/components/schemas/Run'
 
   /jobs/runs/{id}/facets:
     parameters:
@@ -1734,20 +1734,20 @@ components:
 
     Run:
       type: object
-      allOf:
+      anyOf:
         - $ref: '#/components/schemas/IncompleteRun'
         - type: object
           properties:
             jobVersion:
               $ref: '#/components/schemas/JobVersionId'
-            inputVersions:
+            inputDatasetVersions:
               type: array
               items:
-                $ref: '#/components/schemas/DatasetVersionId'
-            outputVersions:
+                $ref: '#/components/schemas/InputDatasetVersion'
+            outputDatasetVersions:
               type: array
               items:
-                $ref: '#/components/schemas/DatasetVersionId'
+                $ref: '#/components/schemas/OutputDatasetVersion'
             context:
               description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
               type: object
@@ -1956,3 +1956,31 @@ components:
           type: string
         facets:
           $ref: '#/components/schemas/CustomFacet'
+
+    InputDatasetVersion:
+      type: object
+      properties:
+        datasetVersionId:
+          $ref: '#/components/schemas/DatasetVersionId'
+        facets:
+          type: object
+          additionalProperties:
+            type: string
+          description: Dataset facets in run context, like `inputFacets`.
+      required:
+        - datasetVersionId
+        - facets
+
+    OutputDatasetVersion:
+      type: object
+      properties:
+        datasetVersionId:
+          $ref: '#/components/schemas/DatasetVersionId'
+        facets:
+          type: object
+          additionalProperties:
+            type: string
+          description: Dataset facets in run context, like `outputFacets`.
+      required:
+        - datasetVersionId
+        - facets
