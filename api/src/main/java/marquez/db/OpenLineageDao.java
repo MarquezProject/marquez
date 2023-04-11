@@ -279,6 +279,18 @@ public interface OpenLineageDao extends BaseDao {
                         now,
                         event.getEventType(),
                         facets));
+
+        // InputFacets ...
+        Optional.ofNullable(dataset.getInputFacets())
+            .ifPresent(
+                facets ->
+                    datasetFacetsDao.insertInputDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        event.getEventType(),
+                        facets));
       }
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
@@ -308,6 +320,18 @@ public interface OpenLineageDao extends BaseDao {
             .ifPresent(
                 facets ->
                     datasetFacetsDao.insertDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        event.getEventType(),
+                        facets));
+
+        // OutputFacets ...
+        Optional.ofNullable(dataset.getOutputFacets())
+            .ifPresent(
+                facets ->
+                    datasetFacetsDao.insertOutputDatasetFacetsFor(
                         record.getDatasetRow().getUuid(),
                         record.getDatasetVersionRow().getUuid(),
                         runUuid,

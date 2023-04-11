@@ -149,6 +149,58 @@ public interface DatasetFacetsDao {
                     FacetUtils.toPgObject(fieldName, jsonNode.get(fieldName))));
   }
 
+  default void insertInputDatasetFacetsFor(
+      @NonNull UUID datasetUuid,
+      @NonNull UUID datasetVersionUuid,
+      @NonNull UUID runUuid,
+      @NonNull Instant lineageEventTime,
+      @NonNull String lineageEventType,
+      @NonNull LineageEvent.InputDatasetFacets inputFacets) {
+    final Instant now = Instant.now();
+
+    JsonNode jsonNode = Utils.getMapper().valueToTree(inputFacets);
+    StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(jsonNode.fieldNames(), Spliterator.DISTINCT), false)
+        .forEach(
+            fieldName ->
+                insertDatasetFacet(
+                    now,
+                    datasetUuid,
+                    datasetVersionUuid,
+                    runUuid,
+                    lineageEventTime,
+                    lineageEventType,
+                    Type.INPUT,
+                    fieldName,
+                    FacetUtils.toPgObject(fieldName, jsonNode.get(fieldName))));
+  }
+
+  default void insertOutputDatasetFacetsFor(
+      @NonNull UUID datasetUuid,
+      @NonNull UUID datasetVersionUuid,
+      @NonNull UUID runUuid,
+      @NonNull Instant lineageEventTime,
+      @NonNull String lineageEventType,
+      @NonNull LineageEvent.OutputDatasetFacets outputFacets) {
+    final Instant now = Instant.now();
+
+    JsonNode jsonNode = Utils.getMapper().valueToTree(outputFacets);
+    StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(jsonNode.fieldNames(), Spliterator.DISTINCT), false)
+        .forEach(
+            fieldName ->
+                insertDatasetFacet(
+                    now,
+                    datasetUuid,
+                    datasetVersionUuid,
+                    runUuid,
+                    lineageEventTime,
+                    lineageEventType,
+                    Type.OUTPUT,
+                    fieldName,
+                    FacetUtils.toPgObject(fieldName, jsonNode.get(fieldName))));
+  }
+
   record DatasetFacetRow(
       Instant createdAt,
       UUID datasetUuid,

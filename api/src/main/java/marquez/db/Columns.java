@@ -55,6 +55,7 @@ public final class Columns {
   public static final String NAMESPACE_NAME = "namespace_name";
   public static final String DATASET_NAME = "dataset_name";
   public static final String FACETS = "facets";
+  public static final String DATASET_FACETS = "dataset_facets";
   public static final String TAGS = "tags";
   public static final String IS_HIDDEN = "is_hidden";
 

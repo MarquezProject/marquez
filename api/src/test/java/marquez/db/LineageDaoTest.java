@@ -841,7 +841,7 @@ public class LineageDaoTest {
     // assert that run_args, input/output versions, and run facets are fetched from the dao.
     for (Run run : currentRuns) {
       assertThat(run.getArgs()).hasSize(2);
-      assertThat(run.getOutputVersions()).hasSize(1);
+      assertThat(run.getOutputDatasetVersions()).hasSize(1);
       assertThat(run.getFacets()).hasSize(1);
     }
   }

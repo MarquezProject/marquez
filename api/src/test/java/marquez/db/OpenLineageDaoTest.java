@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetVersionId;
+import marquez.common.models.NamespaceName;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
@@ -23,12 +26,14 @@ import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
+import marquez.service.models.Run;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.groups.Tuple;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 class OpenLineageDaoTest {
@@ -48,6 +53,7 @@ class OpenLineageDaoTest {
   private static DatasetSymlinkDao symlinkDao;
   private static NamespaceDao namespaceDao;
   private static DatasetFieldDao datasetFieldDao;
+  private static RunDao runDao;
   private final DatasetFacets datasetFacets =
       LineageTestUtils.newDatasetFacet(
           new SchemaField("name", "STRING", "my name"), new SchemaField("age", "INT", "my age"));
@@ -58,6 +64,7 @@ class OpenLineageDaoTest {
     symlinkDao = jdbi.onDemand(DatasetSymlinkDao.class);
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
     datasetFieldDao = jdbi.onDemand(DatasetFieldDao.class);
+    runDao = jdbi.onDemand(RunDao.class);
   }
 
   /** When reading a dataset, the version is assumed to be the version last written */
@@ -506,6 +513,69 @@ class OpenLineageDaoTest {
     assertThat(job)
         .extracting("namespace", "name")
         .contains(LineageTestUtils.NAMESPACE, WRITE_JOB_NAME);
+  }
+
+  @Test
+  void testInputOutputDatasetFacets() {
+    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(
+                new Dataset(
+                    "namespace",
+                    "dataset_input",
+                    null,
+                    LineageEvent.InputDatasetFacets.builder()
+                        .additional(
+                            ImmutableMap.of(
+                                "inputFacet1", "{some-facet1}",
+                                "inputFacet2", "{some-facet2}"))
+                        .build(),
+                    null)),
+            Arrays.asList(
+                new Dataset(
+                    "namespace",
+                    "dataset_output",
+                    null,
+                    null,
+                    LineageEvent.OutputDatasetFacets.builder()
+                        .additional(
+                            ImmutableMap.of(
+                                "outputFacet1", "{some-facet1}",
+                                "outputFacet2", "{some-facet2}"))
+                        .build())));
+
+    Run run = runDao.findRunByUuid(lineageRow.getRun().getUuid()).get();
+
+    assertThat(run.getInputDatasetVersions()).hasSize(1);
+    assertThat(run.getInputDatasetVersions().get(0).getDatasetVersionId())
+        .isEqualTo(
+            new DatasetVersionId(
+                NamespaceName.of("namespace"),
+                DatasetName.of("dataset_input"),
+                lineageRow.getInputs().get().get(0).getDatasetVersionRow().getVersion()));
+    assertThat(run.getInputDatasetVersions().get(0).getFacets())
+        .containsAllEntriesOf(
+            ImmutableMap.of(
+                "inputFacet1", "{some-facet1}",
+                "inputFacet2", "{some-facet2}"));
+
+    assertThat(run.getOutputDatasetVersions()).hasSize(1);
+    assertThat(run.getOutputDatasetVersions().get(0).getDatasetVersionId())
+        .isEqualTo(
+            new DatasetVersionId(
+                NamespaceName.of("namespace"),
+                DatasetName.of("dataset_output"),
+                lineageRow.getOutputs().get().get(0).getDatasetVersionRow().getVersion()));
+    assertThat(run.getOutputDatasetVersions().get(0).getFacets())
+        .containsAllEntriesOf(
+            ImmutableMap.of(
+                "outputFacet1", "{some-facet1}",
+                "outputFacet2", "{some-facet2}"));
   }
 
   private Dataset getInputDataset() {
