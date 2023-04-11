@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.33.0...HEAD)
 
-## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-17
+## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-19
 
 ### Added
 
@@ -21,10 +21,10 @@
     *Dramatically lessens the lineage query performance regression caused by removal of the `jobs_fqn` table in [`#2448`](https://github.com/MarquezProject/marquez/pull/2448).*
 * UI: change color for selected node and edges on graph [`#2458`](https://github.com/MarquezProject/marquez/pull/2458) by [tito12](https://github.com/tito12)  
     *Improves the visibility of the selected node and edges by increasing the contrast with the background.*
-* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
-    *In some cases Marquez UI fails to render DatasetInfo, this addresses that issue.*
-* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
-    *Fixes a bug where Jobs view fails to load where some jobs don't have latestRun.* 
+* UI: handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues [#2471](https://github.com/MarquezProject/marquez/pull/2471) [@perttus](https://github.com/perttus)  
+    *Fixes an issue causing the UI to fail to render `DatasetInfo`.*
+* UI: better handling of null `latestRun` for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)  
+    *Fixes a bug causing the Jobs view to fail when `latestRun` is null.* 
 
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
