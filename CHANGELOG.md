@@ -1,17 +1,30 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.32.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.33.0...HEAD)
 
-### Fixed
-
-* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
-* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
+## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-17
 
 ### Added
 
-* Support `inputFacets` and `outputFacets` from Openlineage specificatio [`#2417`](https://github.com/MarquezProject/marquez/pull/2417) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
-  *Adds the ability to store `inputFacets` / `outputFacets` which are sent within datasets.*
-  *Expose them through Marquez API as a member of `Run` resource.*
+* API: support `inputFacets` and `outputFacets` from Openlineage specification [`#2417`](https://github.com/MarquezProject/marquez/pull/2417) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Adds the ability to store `inputFacets` / `outputFacets` sent within datasets, exposing them through the Marquez API as part of the `Run` resource.*
+
+### Fixed
+
+* API: fix job update SQL to correctly use `simple_name` for job updates [`#2457`](https://github.com/MarquezProject/marquez/pull/2457) by [collado-mike](https://github.com/collado-mike)  
+    *Fixes a bug in the job update logic stemming from use of the FQN rather than the `simple_name` and updates the relevant test.*
+* API: update SQL in backfill script for facet tables to improve performance [`#2461`](https://github.com/MarquezProject/marquez/pull/2461) by [collado-mike](https://github.com/collado-mike)  
+    *Dramatically improves migration performance by making the backfill script fetch events by `run_uuid` via a new temp table for tracking and sorting runs.*
+* API: update v61 migration to handle duplicate job names before unique constraint [`#2464`](https://github.com/MarquezProject/marquez/pull/2464) by [collado-mike](https://github.com/collado-mike)  
+    *To fix a bug in the case of duplicate job FQNs, this renames jobs that have been symlinked to point to newer versions of themselves so that the job FQN doesn't conflict and the unique constraint (without regard to parent job) can be applied. Note: Any installations that have already applied this migration will not see any new operations on their data, but installations that have duplicates will need this fix for the migration to complete successfully.*
+* API: make improvements to lineage query performance [`#2472`](https://github.com/MarquezProject/marquez/pull/2472) by [collado-mike](https://github.com/collado-mike)  
+    *Dramatically lessens the lineage query performance regression caused by removal of the `jobs_fqn` table in [`#2448`](https://github.com/MarquezProject/marquez/pull/2448).*
+* UI: change color for selected node and edges on graph [`#2458`](https://github.com/MarquezProject/marquez/pull/2458) by [tito12](https://github.com/tito12)  
+    *Improves the visibility of the selected node and edges by increasing the contrast with the background.*
+* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
+    *In some cases Marquez UI fails to render DatasetInfo, this addresses that issue.*
+* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
+    *Fixes a bug where Jobs view fails to load where some jobs don't have latestRun.* 
 
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
@@ -21,7 +34,7 @@
     *Improves database query performance when accessing dataset facets by rewriting SQL queries in `DatasetDao` and `DatasetVersionDao`.*
 * Chart: fix communication between the UI and the API [`#2430`](https://github.com/MarquezProject/marquez/pull/2430) [@thomas-delrue](https://github.com/thomas-delrue)  
     *Defines the value for `MARQUEZ_PORT` as .Values.marquez.port (80) in the Helm Chart so the Marquez Web component can communicate with the API.*
-* UI: always render `MqCode` [#2454](https://github.com/MarquezProject/marquez/pull/2454) [@JDarDagran](https://github.com/JDarDagran)  
+* UI: always render `MqCode` [`#2454`](https://github.com/MarquezProject/marquez/pull/2454) [@JDarDagran](https://github.com/JDarDagran)  
     *Fixes rendering of `DatasetInfo` and `RunInfo` pages when no `SqlJobFacet` exists.*
 
 ### Removed
@@ -63,7 +76,7 @@
     *Adds a JSON preview of column-level lineage of a selected dataset to the UI.*
 * UI: Add soft delete option to UI [`#2343`](https://github.com/MarquezProject/marquez/pull/2343) [@tito12](https://github.com/tito12)  
     *Adds option to soft delete a data record with a dialog component and double confirmation.*
-* API: split `lineage_events` table to `dataset_facets`, `run_facets`, and `job_facets` tables. [`2350`](https://github.com/MarquezProject/marquez/pull/2350), [`2355`](https://github.com/MarquezProject/marquez/pull/2355), [`2359`](https://github.com/MarquezProject/marquez/pull/2359)
+* API: split `lineage_events` table to `dataset_facets`, `run_facets`, and `job_facets` tables. [`#2350`](https://github.com/MarquezProject/marquez/pull/2350), [`2355`](https://github.com/MarquezProject/marquez/pull/2355), [`2359`](https://github.com/MarquezProject/marquez/pull/2359)
   [@wslulciuc](https://github.com/wslulciuc,), [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
     *Performance improvement storing and querying facets.*
     *Migration procedure requires manual steps if database has more than 100K lineage events.*
