@@ -24,7 +24,7 @@ They take responsibility for guiding new pull requests into the main branch.
 | Michael Robinson   | [@merobi-hub](https://github.com/merobi-hub)         |
 | Ross Turk          | [@rossturk](https://github.com/rossturk)             |
 | Minkyu Park        | [@fm100](https://github.com/fm100)                   |
-| Pawel Leszczynski  | [@pawel-big-lebowski](https://github.com/pawel-big-lebowski) |
+| Paweł Leszczyński  | [@pawel-big-lebowski](https://github.com/pawel-big-lebowski) |
      
 ## Emeritus
 

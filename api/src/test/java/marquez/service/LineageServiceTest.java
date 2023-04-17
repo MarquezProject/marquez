@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetVersionId;
+import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.OutputDatasetVersion;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
@@ -158,10 +159,13 @@ public class LineageServiceTest {
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getOutputDatasetVersions,
+            InstanceOfAssertFactories.list(OutputDatasetVersion.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node
@@ -267,10 +271,13 @@ public class LineageServiceTest {
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getOutputDatasetVersions,
+            InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node

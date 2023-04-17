@@ -86,7 +86,7 @@ public interface DatasetDao extends BaseDao {
               df.dataset_version_uuid,
               JSONB_AGG(df.facet ORDER BY df.lineage_event_time ASC) AS facets
           FROM dataset_facets_view AS df
-          WHERE df.facet IS NOT NULL
+          WHERE df.facet IS NOT NULL AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown')
           GROUP BY df.dataset_version_uuid
       ) f ON f.dataset_version_uuid = d.current_version_uuid
       WHERE CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)
@@ -134,7 +134,7 @@ public interface DatasetDao extends BaseDao {
               df.dataset_version_uuid,
               JSONB_AGG(df.facet ORDER BY df.lineage_event_time ASC) AS facets
           FROM dataset_facets_view AS df
-          WHERE df.facet IS NOT NULL
+          WHERE df.facet IS NOT NULL AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown')
           GROUP BY df.dataset_version_uuid
       ) f ON f.dataset_version_uuid = d.current_version_uuid
       WHERE d.namespace_name = :namespaceName

@@ -14,11 +14,13 @@ import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newFields;
+import static marquez.client.models.ModelGenerator.newInputDatasetVersion;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobIdWith;
 import static marquez.client.models.ModelGenerator.newJobType;
 import static marquez.client.models.ModelGenerator.newLocation;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
+import static marquez.client.models.ModelGenerator.newOutputDatasetVersion;
 import static marquez.client.models.ModelGenerator.newOutputs;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
@@ -78,6 +80,7 @@ import marquez.client.models.DbTableMeta;
 import marquez.client.models.DbTableVersion;
 import marquez.client.models.Edge;
 import marquez.client.models.Field;
+import marquez.client.models.InputDatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
@@ -89,6 +92,7 @@ import marquez.client.models.NamespaceMeta;
 import marquez.client.models.Node;
 import marquez.client.models.NodeId;
 import marquez.client.models.NodeType;
+import marquez.client.models.OutputDatasetVersion;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -261,6 +265,13 @@ public class MarquezClientTest {
   private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
   private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
+
+  private static final List<InputDatasetVersion> INPUT_RUN_DATASET_FACETS =
+      Collections.singletonList(newInputDatasetVersion());
+
+  private static final List<OutputDatasetVersion> OUTPUT_RUN_DATASET_FACETS =
+      Collections.singletonList(newOutputDatasetVersion());
+
   private static final Run NEW =
       new Run(
           newRunId(),
@@ -273,7 +284,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run RUNNING =
       new Run(
           newRunId(),
@@ -286,7 +299,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -299,7 +314,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run ABORTED =
       new Run(
           newRunId(),
@@ -312,7 +329,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run FAILED =
       new Run(
           newRunId(),
@@ -325,7 +344,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -353,7 +374,9 @@ public class MarquezClientTest {
               ENDED_AT,
               DURATION,
               RUN_ARGS,
-              null),
+              null,
+              INPUT_RUN_DATASET_FACETS,
+              OUTPUT_RUN_DATASET_FACETS),
           null,
           null);
 

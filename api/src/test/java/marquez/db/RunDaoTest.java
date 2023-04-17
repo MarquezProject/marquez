@@ -25,7 +25,9 @@ import java.util.stream.Stream;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetVersionId;
+import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.OutputDatasetVersion;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.models.ExtendedRunRow;
@@ -87,16 +89,21 @@ class RunDaoTest {
     assertThat(run)
         .isPresent()
         .get()
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(jobMeta.getInputs().size())
+        .map(InputDatasetVersion::getDatasetVersionId)
         .map(DatasetVersionId::getName)
         .containsAll(
             jobMeta.getInputs().stream().map(DatasetId::getName).collect(Collectors.toSet()));
 
     assertThat(run)
         .get()
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getOutputDatasetVersions,
+            InstanceOfAssertFactories.list(OutputDatasetVersion.class))
         .hasSize(jobMeta.getOutputs().size())
+        .map(OutputDatasetVersion::getDatasetVersionId)
         .map(DatasetVersionId::getName)
         .containsAll(
             jobMeta.getOutputs().stream().map(DatasetId::getName).collect(Collectors.toSet()));
