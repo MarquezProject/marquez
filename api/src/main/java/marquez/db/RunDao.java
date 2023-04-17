@@ -74,33 +74,51 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String BASE_FIND_RUN_SQL =
-      "SELECT r.*, ra.args, f.facets,\n"
-          + "jv.version AS job_version,\n"
-          + "ri.input_versions, ro.output_versions\n"
-          + "FROM runs_view AS r\n"
-          + "LEFT OUTER JOIN\n"
-          + "(\n"
-          + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
-          + "    FROM run_facets_view rf\n"
-          + "    GROUP BY rf.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
-          + "        'name', dv.dataset_name,\n"
-          + "        'version', dv.version)) AS input_versions\n"
-          + " FROM runs_input_mapping im\n"
-          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
-          + " GROUP BY im.run_uuid\n"
-          + ") ri ON ri.run_uuid=r.uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
-          + "                                              'name', dataset_name,\n"
-          + "                                              'version', version)) AS output_versions\n"
-          + "  FROM dataset_versions\n"
-          + "  GROUP BY run_uuid\n"
-          + ") ro ON ro.run_uuid=r.uuid\n";
+      """
+      SELECT r.*, ra.args, f.facets,
+      jv.version AS job_version,
+      ri.input_versions, ro.output_versions, df.dataset_facets
+      FROM runs_view AS r
+      LEFT OUTER JOIN
+      (
+          SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
+          FROM run_facets_view rf
+          GROUP BY rf.run_uuid
+      ) AS f ON r.uuid=f.run_uuid
+      LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
+      LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
+      LEFT OUTER JOIN (
+          SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,
+              'name', dv.dataset_name,
+              'version', dv.version,
+              'dataset_version_uuid', uuid)) AS input_versions
+          FROM runs_input_mapping im
+          INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
+          GROUP BY im.run_uuid
+      ) ri ON ri.run_uuid=r.uuid
+      LEFT OUTER JOIN (
+          SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
+                                                      'name', dataset_name,
+                                                      'version', version,
+                                                      'dataset_version_uuid', uuid
+                                                      )) AS output_versions
+          FROM dataset_versions
+          GROUP BY run_uuid
+      ) ro ON ro.run_uuid=r.uuid
+      LEFT OUTER JOIN (
+          SELECT
+              run_uuid,
+              JSON_AGG(json_build_object(
+                  'dataset_version_uuid', dataset_version_uuid,
+                  'name', name,
+                  'type', type,
+                  'facet', facet
+              ) ORDER BY created_at ASC) as dataset_facets
+          FROM dataset_facets_view
+          WHERE (type ILIKE 'output' OR type ILIKE 'input')
+          GROUP BY run_uuid
+      ) AS df ON r.uuid = df.run_uuid
+      """;
 
   @SqlQuery(BASE_FIND_RUN_SQL + "WHERE r.uuid = :runUuid")
   Optional<Run> findRunByUuid(UUID runUuid);
@@ -123,7 +141,7 @@ public interface RunDao extends BaseDao {
       """
           SELECT r.*, ra.args, f.facets,
           j.namespace_name, j.name, jv.version AS job_version,
-          ri.input_versions, ro.output_versions
+          ri.input_versions, ro.output_versions, df.dataset_facets
           FROM runs_view AS r
           INNER JOIN jobs_view j ON r.job_uuid=j.uuid
           LEFT JOIN LATERAL
@@ -138,7 +156,9 @@ public interface RunDao extends BaseDao {
           LEFT OUTER JOIN (
            SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,
                   'name', dv.dataset_name,
-                  'version', dv.version)) AS input_versions
+                  'version', dv.version,
+                  'dataset_version_uuid', uuid
+                  )) AS input_versions
            FROM runs_input_mapping im
            INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
            GROUP BY im.run_uuid
@@ -146,10 +166,25 @@ public interface RunDao extends BaseDao {
           LEFT OUTER JOIN (
             SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
                                                         'name', dataset_name,
-                                                        'version', version)) AS output_versions
+                                                        'version', version,
+                                                        'dataset_version_uuid', uuid
+                                                        )) AS output_versions
             FROM dataset_versions
             GROUP BY run_uuid
           ) ro ON ro.run_uuid=r.uuid
+          LEFT OUTER JOIN (
+          SELECT
+              run_uuid,
+              JSON_AGG(json_build_object(
+                  'dataset_version_uuid', dataset_version_uuid,
+                  'name', name,
+                  'type', type,
+                  'facet', facet
+              ) ORDER BY created_at ASC) as dataset_facets
+          FROM dataset_facets_view
+          WHERE (type ILIKE 'output' OR type ILIKE 'input')
+          GROUP BY run_uuid
+          ) AS df ON r.uuid = df.run_uuid
           WHERE j.namespace_name=:namespace AND (j.name=:jobName OR :jobName = ANY(j.aliases))
           ORDER BY STARTED_AT DESC NULLS LAST
           LIMIT :limit OFFSET :offset

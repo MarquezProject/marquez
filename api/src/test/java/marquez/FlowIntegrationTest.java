@@ -109,29 +109,41 @@ public class FlowIntegrationTest extends BaseIntegrationTest {
     client.markRunAs(createdRun.getId(), RunState.COMPLETED);
 
     Map<String, Object> body = getRunResponse(createdRun);
-    assertThat(((List<Map<String, String>>) body.get("outputVersions"))).size().isEqualTo(1);
+    assertThat(((List<Map<String, String>>) body.get("outputDatasetVersions"))).size().isEqualTo(1);
     assertInputDatasetVersionDiffersFromOutput(body);
   }
 
   private void assertInputDatasetVersionDiffersFromOutput(Map<String, Object> body)
       throws IOException {
 
-    List<Map<String, String>> inputDatasetVersionIds =
-        ((List<Map<String, String>>) body.get("inputVersions"));
-    assertThat(inputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
+    List<Map<String, Map<String, String>>> inputDatasetVersionIds =
+        ((List<Map<String, Map<String, String>>>) body.get("inputDatasetVersions"));
+    assertThat(
+            inputDatasetVersionIds.stream()
+                .map(e -> e.get("datasetVersionId"))
+                .map(Map::entrySet)
+                .collect(Collectors.toList()))
         .allMatch(e -> e.contains(entry("namespace", NAMESPACE_NAME)))
         .allMatch(e -> e.contains(entry("name", DATASET_NAME)));
 
-    List<Map<String, String>> outputDatasetVersionIds =
-        ((List<Map<String, String>>) body.get("outputVersions"));
-    assertThat(outputDatasetVersionIds.stream().map(Map::entrySet).collect(Collectors.toList()))
+    List<Map<String, Map<String, String>>> outputDatasetVersionIds =
+        ((List<Map<String, Map<String, String>>>) body.get("outputDatasetVersions"));
+    assertThat(
+            outputDatasetVersionIds.stream()
+                .map(e -> e.get("datasetVersionId"))
+                .map(Map::entrySet)
+                .collect(Collectors.toList()))
         .allMatch(e -> e.contains(entry("namespace", NAMESPACE_NAME)))
         .allMatch(e -> e.contains(entry("name", DATASET_NAME)));
 
     List<String> inputVersions =
-        inputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
+        inputDatasetVersionIds.stream()
+            .map(it -> it.get("datasetVersionId").get("version"))
+            .collect(Collectors.toList());
     List<String> outputVersions =
-        outputDatasetVersionIds.stream().map(it -> it.get("version")).collect(Collectors.toList());
+        outputDatasetVersionIds.stream()
+            .map(it -> it.get("datasetVersionId").get("version"))
+            .collect(Collectors.toList());
 
     assertThat(Collections.disjoint(inputVersions, outputVersions)).isTrue();
   }

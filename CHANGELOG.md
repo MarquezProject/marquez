@@ -6,6 +6,12 @@
 
 * UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
 
+### Added
+
+* Support `inputFacets` and `outputFacets` from Openlineage specificatio [`#2417`](https://github.com/MarquezProject/marquez/pull/2417) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+  *Adds the ability to store `inputFacets` / `outputFacets` which are sent within datasets.*
+  *Expose them through Marquez API as a member of `Run` resource.*
+
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
 ### Fixed
