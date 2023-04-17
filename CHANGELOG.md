@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.32.0...HEAD)
 
+### Fixed
+
+* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
+
 ### Added
 
 * Support `inputFacets` and `outputFacets` from Openlineage specificatio [`#2417`](https://github.com/MarquezProject/marquez/pull/2417) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
