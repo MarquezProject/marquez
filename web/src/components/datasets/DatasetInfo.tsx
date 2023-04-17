@@ -119,7 +119,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
                 <MqText subdued>{stopWatchDuration(run.durationMs)}</MqText>
               </Box>
             </Box>
-            <MqText subdued>{run.jobVersion.name}</MqText>
+            <MqText subdued>{run.jobVersion && run.jobVersion.name}</MqText>
           </Box>
           {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
         </Box>

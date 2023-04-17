@@ -4,6 +4,7 @@
 
 ### Fixed
 
+* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
 * UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
 
 ### Added
