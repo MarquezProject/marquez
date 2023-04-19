@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.33.0...HEAD)
 
-## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-17
+## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-19
 
 ### Added
 
@@ -11,20 +11,20 @@
 
 ### Fixed
 
-* API: fix job update SQL to correctly use `simple_name` for job updates [`#2457`](https://github.com/MarquezProject/marquez/pull/2457) by [collado-mike](https://github.com/collado-mike)  
+* API: fix job update SQL to correctly use `simple_name` for job updates [`#2457`](https://github.com/MarquezProject/marquez/pull/2457) [collado-mike](https://github.com/collado-mike)  
     *Fixes a bug in the job update logic stemming from use of the FQN rather than the `simple_name` and updates the relevant test.*
-* API: update SQL in backfill script for facet tables to improve performance [`#2461`](https://github.com/MarquezProject/marquez/pull/2461) by [collado-mike](https://github.com/collado-mike)  
+* API: update SQL in backfill script for facet tables to improve performance [`#2461`](https://github.com/MarquezProject/marquez/pull/2461) [collado-mike](https://github.com/collado-mike)  
     *Dramatically improves migration performance by making the backfill script fetch events by `run_uuid` via a new temp table for tracking and sorting runs.*
-* API: update v61 migration to handle duplicate job names before unique constraint [`#2464`](https://github.com/MarquezProject/marquez/pull/2464) by [collado-mike](https://github.com/collado-mike)  
+* API: update v61 migration to handle duplicate job names before unique constraint [`#2464`](https://github.com/MarquezProject/marquez/pull/2464) [collado-mike](https://github.com/collado-mike)  
     *To fix a bug in the case of duplicate job FQNs, this renames jobs that have been symlinked to point to newer versions of themselves so that the job FQN doesn't conflict and the unique constraint (without regard to parent job) can be applied. Note: Any installations that have already applied this migration will not see any new operations on their data, but installations that have duplicates will need this fix for the migration to complete successfully.*
-* API: make improvements to lineage query performance [`#2472`](https://github.com/MarquezProject/marquez/pull/2472) by [collado-mike](https://github.com/collado-mike)  
+* API: make improvements to lineage query performance [`#2472`](https://github.com/MarquezProject/marquez/pull/2472) [collado-mike](https://github.com/collado-mike)  
     *Dramatically lessens the lineage query performance regression caused by removal of the `jobs_fqn` table in [`#2448`](https://github.com/MarquezProject/marquez/pull/2448).*
-* UI: change color for selected node and edges on graph [`#2458`](https://github.com/MarquezProject/marquez/pull/2458) by [tito12](https://github.com/tito12)  
+* UI: change color for selected node and edges on graph [`#2458`](https://github.com/MarquezProject/marquez/pull/2458) [tito12](https://github.com/tito12)  
     *Improves the visibility of the selected node and edges by increasing the contrast with the background.*
-* UI: Handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues.
-    *In some cases Marquez UI fails to render DatasetInfo, this addresses that issue.*
-* UI: better handling of null job latestRun for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)
-    *Fixes a bug where Jobs view fails to load where some jobs don't have latestRun.* 
+* UI: handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues [#2471](https://github.com/MarquezProject/marquez/pull/2471) [@perttus](https://github.com/perttus)  
+    *Fixes an issue causing the UI to fail to render `DatasetInfo`.*
+* UI: better handling of null `latestRun` for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)  
+    *Fixes a bug causing the Jobs view to fail when `latestRun` is null.* 
 
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
 
