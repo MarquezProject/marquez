@@ -35,6 +35,9 @@ db:
 # Enables database migration on startup (default: true)
 migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
 
+# Maximum data retention (in days) for metadata (default: 7)
+dataRetentionInDays: ${DATA_RETENTION_IN_DAYS:-7}
+
 # Enabled the Graphql endpoint
 graphql:
   enabled: ${GRAPHQL_ENABLED:-true}
