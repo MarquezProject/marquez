@@ -800,8 +800,11 @@ public interface OpenLineageDao extends BaseDao {
       ColumnLineageDao columnLineageDao,
       DatasetFieldDao datasetFieldDao,
       DatasetVersionRow datasetVersionRow) {
+    Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
+
     // get all the fields related to this particular run
     List<InputFieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
+    log.info("Found input datasets fields for run '{}': {}", runUuid, runFields);
 
     return Optional.ofNullable(ds.getFacets())
         .map(DatasetFacets::getColumnLineage)
@@ -821,7 +824,6 @@ public interface OpenLineageDao extends BaseDao {
                   datasetFields.stream().filter(dfr -> dfr.getName().equals(columnName)).findAny();
 
               if (outputField.isEmpty()) {
-                Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
                 log.error(
                     "Cannot produce column lineage for missing output field in output dataset: {}",
                     columnName);
@@ -848,6 +850,11 @@ public interface OpenLineageDao extends BaseDao {
                                   fieldData.getDatasetFieldUuid()))
                       .collect(Collectors.toList());
 
+              log.info(
+                  "Adding column lineage on output field '{}' for dataset version '{}' with input fields: {}",
+                  outputField.get().getName(),
+                  datasetVersionRow.getUuid(),
+                  inputFields);
               return columnLineageDao
                   .upsertColumnLineageRow(
                       datasetVersionRow.getUuid(),

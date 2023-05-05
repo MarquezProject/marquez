@@ -20,9 +20,11 @@ import marquez.tracing.SentryConfig;
 @NoArgsConstructor
 public class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
+  private static final int DATA_RETENTION_IN_DAYS = 7;
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
+  @Getter private int dataRetentionInDays = DATA_RETENTION_IN_DAYS;
   @Getter private ImmutableSet<Tag> tags = DEFAULT_TAGS;
 
   @Getter
