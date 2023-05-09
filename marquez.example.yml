@@ -27,6 +27,13 @@ db:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 
+# ...
+dbRetention:
+  # Enables data retention (default: false)
+  enabled: ${DB_RETENTION_ENABLED:false}
+  # Maximum data retention (in days) for metadata (default: 7)
+  retentionInDays: ${DB_RETENTION_IN_DAYS:-7}
+
 # Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
 # flyway:
 #   connectRetries: 3
@@ -34,9 +41,6 @@ db:
 
 # Enables database migration on startup (default: true)
 migrateOnStartup: ${MIGRATE_ON_STARTUP:-true}
-
-# Maximum data retention (in days) for metadata (default: 7)
-dataRetentionInDays: ${DATA_RETENTION_IN_DAYS:-7}
 
 # Enabled the Graphql endpoint
 graphql:

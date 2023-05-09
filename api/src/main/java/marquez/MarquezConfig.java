@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
+import marquez.jobs.DbRetentionConfig;
 import marquez.service.models.Tag;
 import marquez.tracing.SentryConfig;
 
@@ -24,12 +25,15 @@ public class MarquezConfig extends Configuration {
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
 
   @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
-  @Getter private int dataRetentionInDays = DATA_RETENTION_IN_DAYS;
   @Getter private ImmutableSet<Tag> tags = DEFAULT_TAGS;
 
   @Getter
   @JsonProperty("db")
   private final DataSourceFactory dataSourceFactory = new DataSourceFactory();
+
+  @Getter
+  @JsonProperty("dbRetention")
+  private final DbRetentionConfig dbRetention = new DbRetentionConfig();
 
   @Getter
   @JsonProperty("flyway")

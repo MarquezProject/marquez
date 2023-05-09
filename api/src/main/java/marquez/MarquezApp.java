@@ -30,8 +30,8 @@ import marquez.cli.DbMigrationCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
-import marquez.db.DbDataRetention;
 import marquez.db.DbMigration;
+import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
@@ -132,8 +132,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     registerServlets(env);
     registerFilters(env, marquezContext);
 
-    // Add scheduled tasks in lifecycle
-    env.lifecycle().manage(new DbDataRetention(config.getDataRetentionInDays(), jdbi));
+    // Add scheduled jobs to lifecycle.
+    if (config.getDbRetention().isEnabled()) {
+      // Enable db retention job.
+      env.lifecycle()
+          .manage(new DbRetentionJob(jdbi, config.getDbRetention().getRetentionInDays()));
+    }
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
