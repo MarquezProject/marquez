@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
 import marquez.cli.DbMigrationCommand;
+import marquez.cli.DbRetentionCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
@@ -79,6 +80,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
     // Add CLI commands
+    bootstrap.addCommand(new DbRetentionCommand());
     bootstrap.addCommand(new MetadataCommand());
     bootstrap.addCommand(new SeedCommand());
 
