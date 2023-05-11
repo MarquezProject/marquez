@@ -138,7 +138,11 @@ public final class MarquezApp extends Application<MarquezConfig> {
     if (config.getDbRetention().isEnabled()) {
       // Enable db retention job.
       env.lifecycle()
-          .manage(new DbRetentionJob(jdbi, config.getDbRetention().getRetentionInDays()));
+          .manage(
+              new DbRetentionJob(
+                  jdbi,
+                  config.getDbRetention().getFrequencyMins(),
+                  config.getDbRetention().getRetentionDays()));
     }
   }
 

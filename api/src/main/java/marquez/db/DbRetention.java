@@ -32,11 +32,11 @@ public final class DbRetention {
   private static final Set<String> DB_TABLES = Set.of(DATASETS, JOBS, LINEAGE_EVENTS);
 
   /** ... */
-  public static void retentionOnDbOrError(@NonNull Jdbi jdbi, final int dbRetentionInDays)
+  public static void retentionOnDbOrError(@NonNull Jdbi jdbi, final int dbRetentionDays)
       throws DbRetentionException {
     for (final String dbTable : DB_TABLES) {
       log.info(
-          "Applying db retention policy of '{}' days to '{}' table...", dbRetentionInDays, dbTable);
+          "Applying db retention policy of '{}' days to '{}' table...", dbRetentionDays, dbTable);
       final int totalNumOfRowsDeleted =
           executeDbRetentionQuery(
               jdbi,
@@ -49,9 +49,9 @@ public final class DbRetention {
                        LIMIT %d
                    ) RETURNING %s;
                   """,
-                  dbTable, dbRetentionInDays));
+                  dbTable, dbRetentionDays));
       if (totalNumOfRowsDeleted == 0) {
-        log.info("No rows older than '{}' days in '{}' table.", dbRetentionInDays, dbTable);
+        log.info("No rows older than '{}' days in '{}' table.", dbRetentionDays, dbTable);
         continue;
       }
       log.info("Successfully deleted '{}' rows from '{}' table.", totalNumOfRowsDeleted, dbTable);

@@ -20,19 +20,21 @@ import org.jdbi.v3.core.Jdbi;
 @Slf4j
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
-  private static final Duration PERIOD_IN_MINUTES = Duration.ofMinutes(1);
+  private static final Duration PERIOD_IN_MINUTES = Duration.ofMinutes(60);
 
   // ...
-  private final int dbRetentionInDays;
+  private final int dbRetentionDays;
 
   // ...
   private final Scheduler fixedRateScheduler;
   private final Jdbi jdbi;
 
   /** ... */
-  public DbRetentionJob(@NonNull final Jdbi jdbi, final int dbRetentionInDays) {
-    checkArgument(dbRetentionInDays > 0, "'dbRetentionInDays' must be > 0");
-    this.dbRetentionInDays = dbRetentionInDays;
+  public DbRetentionJob(
+      @NonNull final Jdbi jdbi, final int frequencyMins, final int dbRetentionDays) {
+    checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
+    checkArgument(dbRetentionDays > 0, "'dbRetentionDays' must be > 0");
+    this.dbRetentionDays = dbRetentionDays;
     this.jdbi = jdbi;
 
     // ...
@@ -53,7 +55,7 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   @Override
   protected void runOneIteration() {
     try {
-      DbRetention.retentionOnDbOrError(jdbi, dbRetentionInDays);
+      DbRetention.retentionOnDbOrError(jdbi, dbRetentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error("Failed to apply retention to database.", errorOnDbRetention);
     }
