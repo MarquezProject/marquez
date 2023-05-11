@@ -51,13 +51,14 @@ public final class DbRetention {
                   """,
                   dbTable, dbRetentionInDays));
       if (totalNumOfRowsDeleted == 0) {
-        log.info("No rows older than '{}' days in '{}' table!", dbRetentionInDays, dbTable);
+        log.info("No rows older than '{}' days in '{}' table.", dbRetentionInDays, dbTable);
         continue;
       }
       log.info("Successfully deleted '{}' rows from '{}' table.", totalNumOfRowsDeleted, dbTable);
     }
   }
 
+  /** ... */
   private static int executeDbRetentionQuery(
       @NonNull Jdbi jdbi, @NonNull final String dbRetentionQuery) throws DbRetentionException {
     try {

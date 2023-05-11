@@ -20,7 +20,7 @@ import org.jdbi.v3.core.Jdbi;
 @Slf4j
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
-  private static final Duration PERIOD_IN_MINUTES = Duration.ofMinutes(15);
+  private static final Duration PERIOD_IN_MINUTES = Duration.ofMinutes(1);
 
   // ...
   private final int dbRetentionInDays;
