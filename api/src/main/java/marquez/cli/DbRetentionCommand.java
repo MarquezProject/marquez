@@ -79,7 +79,10 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
       // policy attempts requiring we handle the throwable and log the error.
       DbRetention.retentionOnDbOrError(jdbi, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
-      log.error("Failed to apply database retention policy!", errorOnDbRetention);
+      log.error(
+          "Failed to apply retention policy of '{}' days to database!",
+          retentionDays,
+          errorOnDbRetention);
     }
   }
 }

@@ -85,11 +85,7 @@ public final class DbRetention {
             return totalNumOfRowsDeleted;
           });
     } catch (StatementException errorOnDbRetentionQuery) {
-      log.error(
-          "Failed to apply retention policy to database: {}",
-          retentionQuery,
-          errorOnDbRetentionQuery);
-
+      log.error("Failed to apply retention query: {}", retentionQuery);
       // Propagate throwable up the stack.
       throw errorOnDbRetentionQuery;
     }
