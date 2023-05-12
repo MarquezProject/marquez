@@ -9,9 +9,11 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class InputFieldData {
   @NonNull String namespace;
   @NonNull String datasetName;

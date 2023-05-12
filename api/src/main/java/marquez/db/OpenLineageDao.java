@@ -804,7 +804,7 @@ public interface OpenLineageDao extends BaseDao {
 
     // get all the fields related to this particular run
     List<InputFieldData> runFields = datasetFieldDao.findInputFieldsDataAssociatedWithRun(runUuid);
-    log.info("Found input datasets fields for run '{}': {}", runUuid, runFields);
+    log.debug("Found input datasets fields for run '{}': {}", runUuid, runFields);
 
     return Optional.ofNullable(ds.getFacets())
         .map(DatasetFacets::getColumnLineage)
@@ -850,7 +850,7 @@ public interface OpenLineageDao extends BaseDao {
                                   fieldData.getDatasetFieldUuid()))
                       .collect(Collectors.toList());
 
-              log.info(
+              log.debug(
                   "Adding column lineage on output field '{}' for dataset version '{}' with input fields: {}",
                   outputField.get().getName(),
                   datasetVersionRow.getUuid(),
