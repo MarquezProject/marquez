@@ -16,29 +16,38 @@ import marquez.db.DbRetention;
 import marquez.db.exceptions.DbRetentionException;
 import org.jdbi.v3.core.Jdbi;
 
-/** ... */
+/**
+ * A job that applies a data retention policy on a fixed schedule to source, dataset, and job
+ * metadata. Use {@code frequencyMins} in {@link DbRetentionConfig} to override the default job run
+ * frequency interval of {@code 15} mins. You can also use {@code retentionDays} to override the
+ * default retention policy of {@code 7} days; metadata with a collection date {@code >
+ * retentionDays} will be deleted.
+ */
 @Slf4j
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
-  private static final Duration PERIOD_IN_MINUTES = Duration.ofMinutes(60);
 
-  // ...
-  private final int dbRetentionDays;
+  // The retention policy (in days).
+  private final int retentionDays;
 
-  // ...
+  // The fixed schedule and db connection.
   private final Scheduler fixedRateScheduler;
   private final Jdbi jdbi;
 
-  /** ... */
+  /**
+   * Constructs a {@code DbRetentionJob} with a run frequency {@code frequencyMins} and retention
+   * policy of {@code retentionDays}.
+   */
   public DbRetentionJob(
-      @NonNull final Jdbi jdbi, final int frequencyMins, final int dbRetentionDays) {
+      @NonNull final Jdbi jdbi, final int frequencyMins, final int retentionDays) {
     checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
-    checkArgument(dbRetentionDays > 0, "'dbRetentionDays' must be > 0");
-    this.dbRetentionDays = dbRetentionDays;
+    checkArgument(retentionDays > 0, "'retentionDays' must be > 0");
+    this.retentionDays = retentionDays;
     this.jdbi = jdbi;
 
-    // ...
-    this.fixedRateScheduler = Scheduler.newFixedRateSchedule(NO_DELAY, PERIOD_IN_MINUTES);
+    // Define fixed schedule with no delay.
+    this.fixedRateScheduler =
+        Scheduler.newFixedRateSchedule(NO_DELAY, Duration.ofMinutes(frequencyMins));
   }
 
   @Override
@@ -55,9 +64,11 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   @Override
   protected void runOneIteration() {
     try {
-      DbRetention.retentionOnDbOrError(jdbi, dbRetentionDays);
+      // Attempt to apply a database retention policy. An exception is thrown on failed retention
+      // policy attempts requiring we handle the throwable and logging the error.
+      DbRetention.retentionOnDbOrError(jdbi, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
-      log.error("Failed to apply retention to database.", errorOnDbRetention);
+      log.error("Failed to apply db retention policy!", errorOnDbRetention);
     }
   }
 

@@ -31,7 +31,7 @@ db:
 dbRetention:
   # Enables data retention (default: false)
   enabled: ${DB_RETENTION_ENABLED:false}
-  # Data retention run frequency (default: 15)
+  # Apply data retention at a frequency of every 'X' minutes (default: 15)
   frequencyMins: ${DB_FREQUENCY_MINS:-15}
   # Maximum data retention for metadata (default: 7)
   retentionDays: ${DB_RETENTION_DAYS:-7}

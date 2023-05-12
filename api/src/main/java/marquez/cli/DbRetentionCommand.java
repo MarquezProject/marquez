@@ -38,6 +38,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   /* Args for db-retention command. */
   private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
 
+  /* Define db-retention command. */
   public DbRetentionCommand() {
     super("db-retention", "apply retention policy to source, dataset, and job metadata");
   }
