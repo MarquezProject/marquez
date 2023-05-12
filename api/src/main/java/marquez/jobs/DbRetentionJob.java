@@ -27,7 +27,7 @@ import org.jdbi.v3.core.Jdbi;
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
 
-  // The retention policy (in days).
+  /* The retention policy (in days). */
   private final int retentionDays;
 
   private final Scheduler fixedRateScheduler;

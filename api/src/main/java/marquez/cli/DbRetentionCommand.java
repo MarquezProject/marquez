@@ -64,6 +64,8 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
       @NonNull Namespace namespace,
       @NonNull MarquezConfig config)
       throws Exception {
+    final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
+
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
     final ManagedDataSource source =
         sourceFactory.build(bootstrap.getMetricRegistry(), DB_SOURCE_NAME);
@@ -71,8 +73,6 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     // Configure connection.
     final Jdbi jdbi = Jdbi.create(source);
     jdbi.installPlugin(new PostgresPlugin());
-
-    final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
