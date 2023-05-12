@@ -30,7 +30,6 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   // The retention policy (in days).
   private final int retentionDays;
 
-  // The fixed schedule and db connection.
   private final Scheduler fixedRateScheduler;
   private final Jdbi jdbi;
 
@@ -65,7 +64,7 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   protected void runOneIteration() {
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
-      // policy attempts requiring we handle the throwable and logging the error.
+      // policy attempts requiring we handle the throwable and log the error.
       DbRetention.retentionOnDbOrError(jdbi, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error("Failed to apply db retention policy!", errorOnDbRetention);

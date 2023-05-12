@@ -10,8 +10,10 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.setup.Bootstrap;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezConfig;
 import marquez.db.DbRetention;
+import marquez.db.exceptions.DbRetentionException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -29,6 +31,7 @@ import org.jdbi.v3.postgres.PostgresPlugin;
  *
  * <p><b>Note:</b> The {@code db-retention} command requires a running instance of Marquez.
  */
+@Slf4j
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "db-retention-source";
 
@@ -69,8 +72,14 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     final Jdbi jdbi = Jdbi.create(source);
     jdbi.installPlugin(new PostgresPlugin());
 
-    // Apply db retention.
     final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
-    DbRetention.retentionOnDbOrError(jdbi, retentionDays);
+
+    try {
+      // Attempt to apply a database retention policy. An exception is thrown on failed retention
+      // policy attempts requiring we handle the throwable and log the error.
+      DbRetention.retentionOnDbOrError(jdbi, retentionDays);
+    } catch (DbRetentionException errorOnDbRetention) {
+      log.error("Failed to apply database retention policy!", errorOnDbRetention);
+    }
   }
 }
