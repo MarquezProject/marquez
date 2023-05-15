@@ -27,14 +27,12 @@ db:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 
-# Enables data retention configuration overrides
-dbRetention:
-  # Enables data retention (default: false)
-  enabled: ${DB_RETENTION_ENABLED:false}
+# Enables data retention
+# dbRetention:
   # Apply data retention at a frequency of every 'X' minutes (default: 15)
-  frequencyMins: ${DB_FREQUENCY_MINS:-15}
-  # Maximum data retention for metadata (default: 7)
-  retentionDays: ${DB_RETENTION_DAYS:-7}
+  # frequencyMins: ${DB_RETENTION_FREQUENCY_MINS:-15}
+  # Maximum retention for metadata (default: 7)
+  # retentionDays: ${DB_RETENTION_DAYS:-7}
 
 # Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
 # flyway:
