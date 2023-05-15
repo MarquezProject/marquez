@@ -19,7 +19,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 
 /**
- * A command to apply retention policy to source, dataset, and job metadata.
+ * A command to apply retention policy to source, dataset, and job metadata collected by Marquez.
  *
  * <h2>Usage</h2>
  *
@@ -28,8 +28,6 @@ import org.jdbi.v3.postgres.PostgresPlugin;
  * <pre>{@code
  * java -jar marquez-api.jar db-retention --retention-days 14
  * }</pre>
- *
- * <p><b>Note:</b> The {@code db-retention} command requires a running instance of Marquez.
  */
 @Slf4j
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {

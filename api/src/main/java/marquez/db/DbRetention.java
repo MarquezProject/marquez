@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.db.exceptions.DbRetentionException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.StatementException;
-// TODO: dry run, how many will be deleted
-// how many rows were there intially ... around 10% were deleted
 
 @Slf4j
 public final class DbRetention {

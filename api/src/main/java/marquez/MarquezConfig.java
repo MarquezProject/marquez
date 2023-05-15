@@ -47,7 +47,7 @@ public class MarquezConfig extends Configuration {
   @Getter
   @Setter
   @JsonProperty("dbRetention")
-  private DbRetentionConfig dbRetention;
+  private DbRetentionConfig dbRetention; // OPTIONAL
 
   /** Returns {@code true} if a data retention policy has been configured. */
   public boolean hasDbRetentionPolicy() {
