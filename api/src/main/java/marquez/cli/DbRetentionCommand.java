@@ -43,7 +43,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
 
   /* Define db-retention command. */
   public DbRetentionCommand() {
-    super("db-retention", "apply retention policy to source, dataset, and job metadata");
+    super("db-retention", "apply retention policy to database");
   }
 
   @Override

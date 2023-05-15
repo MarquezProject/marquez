@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.db.exceptions.DbRetentionException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.StatementException;
+// TODO: dry run, how many will be deleted
+// how many rows were there intially ... around 10% were deleted
 
 @Slf4j
 public final class DbRetention {
@@ -26,7 +28,7 @@ public final class DbRetention {
   private static final String JOBS = "jobs";
   private static final String LINEAGE_EVENTS = "lineage_events";
 
-  /* Tables to apply retention policy on. */
+  /* Tables to apply retention policy on (with cascade delete constraint). */
   private static final Set<String> TABLES = Set.of(DATASETS, JOBS, LINEAGE_EVENTS);
 
   public static void retentionOnDbOrError(@NonNull Jdbi jdbi, final int retentionDays)
@@ -66,8 +68,8 @@ public final class DbRetention {
             int totalNumOfRowsDeleted = 0; // Keep count of rows deleted.
             boolean hasMoreRows = true;
             while (hasMoreRows) {
-              // Apply batch deletes (for improved performance) on rows with a creation time > date
-              // allowed in retention query.
+              // Apply batch deletes (for improved performance) on rows in table with a creation
+              // time > date allowed in retention query.
               final List<UUID> rowsDeleted =
                   handle.createQuery(retentionQuery).mapTo(UUID.class).stream().toList();
               final int numOfRowsDeleted = rowsDeleted.size();
@@ -87,7 +89,7 @@ public final class DbRetention {
     } catch (StatementException errorOnDbRetentionQuery) {
       log.error("Failed to apply retention query: {}", retentionQuery);
       // Propagate throwable up the stack.
-      throw errorOnDbRetentionQuery;
+      throw new DbRetentionException(errorOnDbRetentionQuery.getCause());
     }
   }
 
