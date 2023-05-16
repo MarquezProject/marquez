@@ -18,5 +18,5 @@ dbRetention:
 To run an _ad-hoc_ retention policy on your metadata, use the `db-retention` command:
 
 ```bash
-java -jar marquez-api.jar --retention-days 7 marquez.yml
+java -jar marquez-api.jar db-retention --retention-days 7 marquez.yml
 ```
