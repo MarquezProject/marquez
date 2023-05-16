@@ -28,7 +28,7 @@
     *Dramatically lessens the lineage query performance regression caused by removal of the `jobs_fqn` table in [`#2448`](https://github.com/MarquezProject/marquez/pull/2448).*
 * UI: change color for selected node and edges on graph [`#2458`](https://github.com/MarquezProject/marquez/pull/2458) [@tito12](https://github.com/tito12)  
     *Improves the visibility of the selected node and edges by increasing the contrast with the background.*
-* UI: handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues [#2471](https://github.com/MarquezProject/marquez/pull/2471) [@perttus](https://github.com/perttus)  
+* UI: handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues [`#2471`](https://github.com/MarquezProject/marquez/pull/2471) [@perttus](https://github.com/perttus)  
     *Fixes an issue causing the UI to fail to render `DatasetInfo`.*
 * UI: better handling of null `latestRun` for Jobs page [`#2467`](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)  
     *Fixes a bug causing the Jobs view to fail when `latestRun` is null.* 
