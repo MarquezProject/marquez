@@ -34,7 +34,7 @@
     *Improves the visibility of the selected node and edges by increasing the contrast with the background.*
 * UI: handle null `run.jobVersion` in `DatasetInfo.tsx` to fix rendering issues [#2471](https://github.com/MarquezProject/marquez/pull/2471) [@perttus](https://github.com/perttus)  
     *Fixes an issue causing the UI to fail to render `DatasetInfo`.*
-* UI: better handling of null `latestRun` for Jobs page [#2467](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)  
+* UI: better handling of null `latestRun` for Jobs page [`#2467`](https://github.com/MarquezProject/marquez/pull/2467) [@perttus](https://github.com/perttus)  
     *Fixes a bug causing the Jobs view to fail when `latestRun` is null.* 
 
 ## [0.32.0](https://github.com/MarquezProject/marquez/compare/0.31.0...0.32.0) - 2023-03-20
