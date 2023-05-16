@@ -11,9 +11,9 @@ To adjust the retention period, add a **`dbRetention`** section in your [`marque
 ```yaml
 # Adjusts retention policy
 dbRetention:
-  # Apply data retention at a frequency of every '15' minutes
+  # Apply retention policy at a frequency of every '15' minutes
   frequencyMins: 15
-  # Maximum data chunk size that can be deleted per retention execution
+  # Maximum chunk size that can be deleted per retention execution
   chunkSize: 1000
   # Maximum retention days
   retentionDays: 7

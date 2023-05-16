@@ -19,4 +19,12 @@ public final class DbRetentionException extends DbException {
   public DbRetentionException(@Nullable final Throwable cause) {
     super(cause);
   }
+
+  /**
+   * Constructs a {@code DbRetentionException} with the provided {@code message} and the {@code
+   * cause}.
+   */
+  public DbRetentionException(@Nullable final String message, @Nullable final Throwable cause) {
+    super(message, cause);
+  }
 }
