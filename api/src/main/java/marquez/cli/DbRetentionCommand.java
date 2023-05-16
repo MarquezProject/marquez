@@ -5,6 +5,7 @@
 
 package marquez.cli;
 
+import static marquez.db.DbRetention.DEFAULT_CHUNK_SIZE;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
 import io.dropwizard.cli.ConfiguredCommand;
@@ -21,7 +22,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 
 /**
- * A command to apply retention policy to source, dataset, and job metadata collected by Marquez.
+ * A command to apply a one-off ad-hoc retention policy directly to source, dataset, and job
+ * metadata collected by Marquez.
  *
  * <h2>Usage</h2>
  *
@@ -33,19 +35,29 @@ import org.jdbi.v3.postgres.PostgresPlugin;
  */
 @Slf4j
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
-  private static final String DB_SOURCE_NAME = "db-retention-source";
+  private static final String DB_SOURCE_NAME = "ad-hoc-db-retention-source";
 
-  /* Args for db-retention command. */
+  /* Args for 'db-retention' command. */
+  private static final String CMD_ARG_CHUNK_SIZE = "chunkSize";
   private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
 
-  /* Define db-retention command. */
+  /* Define 'db-retention' command. */
   public DbRetentionCommand() {
-    super("db-retention", "apply retention policy to database");
+    super("db-retention", "apply one-off ad-hoc retention policy directly to database");
   }
 
   @Override
-  public void configure(@NonNull final net.sourceforge.argparse4j.inf.Subparser subparser) {
+  public void configure(@NonNull net.sourceforge.argparse4j.inf.Subparser subparser) {
     super.configure(subparser);
+    // Arg '--chunk-size'
+    subparser
+        .addArgument("--chunk-size")
+        .dest(CMD_ARG_CHUNK_SIZE)
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_CHUNK_SIZE)
+        .help("the chunk size deleted per retention execution");
+    // Arg '--retention-days'
     subparser
         .addArgument("--retention-days")
         .dest(CMD_ARG_RETENTION_DAYS)
@@ -62,6 +74,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
       @NonNull MarquezConfig config)
       throws Exception {
     final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
+    final int chunkSize = namespace.getInt(CMD_ARG_CHUNK_SIZE);
 
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
     final ManagedDataSource source =
@@ -74,7 +87,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, retentionDays);
+      DbRetention.retentionOnDbOrError(jdbi, chunkSize, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",

@@ -142,6 +142,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
               new DbRetentionJob(
                   jdbi,
                   config.getDbRetention().getFrequencyMins(),
+                  config.getDbRetention().getChunkSize(),
                   config.getDbRetention().getRetentionDays()));
     }
   }

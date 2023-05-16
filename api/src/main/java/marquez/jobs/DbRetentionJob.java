@@ -17,30 +17,40 @@ import marquez.db.exceptions.DbRetentionException;
 import org.jdbi.v3.core.Jdbi;
 
 /**
- * A job that applies a data retention policy on a fixed schedule to source, dataset, and job
- * metadata. Use {@code frequencyMins} in {@link DbRetentionConfig} to override the default job run
+ * A job that applies a retention policy on a fixed schedule to source, dataset, and job metadata in
+ * Marquez. Use {@code frequencyMins} in {@link DbRetentionConfig} to override the default job run
  * frequency interval of {@code 15} mins. You can also use {@code retentionDays} to override the
  * default retention policy of {@code 7} days; metadata with a collection date {@code >
- * retentionDays} will be deleted.
+ * retentionDays} will be deleted. To limit the number of metadata purged per retention execution
+ * and reduce impact on the database, we recommend adjusting {@code chunkSize}.
  */
 @Slf4j
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
 
-  /* The retention policy (in days). */
+  /* The chunk size. */
+  private final int chunkSize;
+
+  /* The retention days. */
   private final int retentionDays;
 
   private final Scheduler fixedRateScheduler;
   private final Jdbi jdbi;
 
   /**
-   * Constructs a {@code DbRetentionJob} with a run frequency {@code frequencyMins} and retention
-   * policy of {@code retentionDays}.
+   * Constructs a {@code DbRetentionJob} with a run frequency {@code frequencyMins}, chunk size of
+   * {@code chunkSize} that can be deleted per retention job execution and retention days of {@code
+   * retentionDays}.
    */
   public DbRetentionJob(
-      @NonNull final Jdbi jdbi, final int frequencyMins, final int retentionDays) {
+      @NonNull final Jdbi jdbi,
+      final int frequencyMins,
+      final int chunkSize,
+      final int retentionDays) {
     checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
+    checkArgument(chunkSize > 0, "'chunkSize' must be > 0");
     checkArgument(retentionDays > 0, "'retentionDays' must be > 0");
+    this.chunkSize = chunkSize;
     this.retentionDays = retentionDays;
     this.jdbi = jdbi;
 
@@ -65,7 +75,7 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, retentionDays);
+      DbRetention.retentionOnDbOrError(jdbi, chunkSize, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",

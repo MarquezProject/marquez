@@ -22,8 +22,8 @@ public final class DbRetention {
   /* Default retention days. */
   public static final int DEFAULT_RETENTION_DAYS = 7;
 
-  /* Bulk delete batch size. */
-  private static final int BULK_DELETE_BATCH_SIZE = 1000;
+  /* Default chunk size. */
+  public static final int DEFAULT_CHUNK_SIZE = 1000;
 
   private static final String DATASETS = "datasets";
   private static final String JOBS = "jobs";
@@ -32,7 +32,8 @@ public final class DbRetention {
   /* Tables to apply retention policy on (with cascade delete constraint). */
   private static final Set<String> TABLES = Set.of(DATASETS, JOBS, LINEAGE_EVENTS);
 
-  public static void retentionOnDbOrError(@NonNull Jdbi jdbi, final int retentionDays)
+  public static void retentionOnDbOrError(
+      @NonNull Jdbi jdbi, final int chunkSize, final int retentionDays)
       throws DbRetentionException {
     for (final String table : TABLES) {
       log.info("Applying retention policy of '{}' days to '{}' table...", retentionDays, table);
@@ -49,7 +50,7 @@ public final class DbRetention {
                        LIMIT %d
                    ) RETURNING %s;
                   """,
-                  table, retentionDays));
+                  table, chunkSize, retentionDays));
       // Determine whether any rows met the retention policy.
       if (totalNumOfRowsDeleted == 0) {
         log.info("No rows older than '{}' days in '{}' table.", retentionDays, table);
@@ -96,11 +97,13 @@ public final class DbRetention {
 
   /** Build retention {@code query} for the provided {@code table} and {@code retentionDays}. */
   private static String buildQuery(
-      @NonNull String queryTemplate, @NonNull String table, final int retentionDays) {
+      @NonNull String queryTemplate,
+      @NonNull String table,
+      final int chunkSize,
+      final int retentionDays) {
     final String pk = pkInQueryFor(table);
     final String timestamp = timestampInQueryFor(table);
-    return queryTemplate.formatted(
-        table, pk, pk, table, timestamp, retentionDays, BULK_DELETE_BATCH_SIZE, pk);
+    return queryTemplate.formatted(table, pk, pk, table, timestamp, retentionDays, chunkSize, pk);
   }
 
   /** Returns {@code pk} for the provided {@code table}. */
