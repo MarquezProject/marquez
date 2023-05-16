@@ -27,12 +27,14 @@ db:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 
-# Enables data retention
-# dbRetention:
-  # Apply data retention at a frequency of every 'X' minutes (default: 15)
-  # frequencyMins: ${DB_RETENTION_FREQUENCY_MINS:-15}
-  # Maximum retention for metadata (default: 7)
-  # retentionDays: ${DB_RETENTION_DAYS:-7}
+# Enables database retention
+dbRetention:
+  # Apply retention policy at a frequency of every 'X' minutes (default: 15)
+  frequencyMins: ${DB_RETENTION_FREQUENCY_MINS:-15}
+  # Maximum data chunk size that can be deleted per retention execution (default: 1000)
+  chunkSize:  ${DB_RETENTION_CHUNK_SIZE:-1000}
+  # Maximum retention days (default: 7)
+  retentionDays: ${DB_RETENTION_DAYS:-7}
 
 # Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
 # flyway:

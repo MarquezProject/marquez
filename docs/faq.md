@@ -13,14 +13,16 @@ To adjust the retention period, add a **`dbRetention`** section in your [`marque
 dbRetention:
   # Apply data retention at a frequency of every '15' minutes
   frequencyMins: 15
-  # Maximum retention for metadata
+  # Maximum data chunk size that can be deleted per retention execution
+  chunkSize: 1000
+  # Maximum retention days
   retentionDays: 7
 ```
 
 **`CLI`**
 
-To run an _ad-hoc_ retention policy on your metadata, use the [`db-retention`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/DbRetentionCommand.java) command:
+To run a  _one-off_ _ad-hoc_ retention policy on your metadata, use the [`db-retention`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/DbRetentionCommand.java) command:
 
 ```bash
-java -jar marquez-api.jar db-retention --retention-days 7 marquez.yml
+java -jar marquez-api.jar db-retention --chunk-size 1000 --retention-days 7 marquez.yml
 ```
