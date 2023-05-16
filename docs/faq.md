@@ -1,12 +1,12 @@
 # FAQ
 
-### How do I configure a metadata retention policy?
+### How do I configure a retention policy for metadata?
 
-By default, Marquez does not apply a retention policy on collected metadata. However, you can adjust the maximum retention days for metadata in Marquez. This allows you to better manage your storage space and comply with your organizational retention policies. BBelow, you'll find examples of how to change retention days in YAML and via the CLI:
+By default, Marquez does not apply a retention policy on collected metadata. However, you can adjust the maximum retention days for metadata in Marquez. This allows you to better manage your storage space and comply with your organizational retention policies. Below, you'll find examples of how to change retention days in YAML and via the CLI:
 
 **`YAML`**
 
-To adjust the retention period, add a `dbRetention` section in your [`marquez.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.example.yml):
+To adjust the retention period, add a **`dbRetention`** section in your [`marquez.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.example.yml):
 
 ```yaml
 # Adjusts retention policy

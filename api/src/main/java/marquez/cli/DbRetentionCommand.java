@@ -26,7 +26,7 @@ import org.jdbi.v3.postgres.PostgresPlugin;
  * For example, to override the {@code retention-days}:
  *
  * <pre>{@code
- * java -jar marquez-api.jar db-retention --retention-days 14
+ * java -jar marquez-api.jar db-retention --retention-days 14 marquez.yml
  * }</pre>
  */
 @Slf4j
