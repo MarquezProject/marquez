@@ -5,6 +5,8 @@
 
 package marquez.cli;
 
+import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
+
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
@@ -32,9 +34,6 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 @Slf4j
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "db-retention-source";
-
-  /* Default retain for metadata. */
-  private static final int DEFAULT_RETENTION_DAYS = 7;
 
   /* Args for db-retention command. */
   private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
@@ -70,7 +69,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
 
     // Configure connection.
     final Jdbi jdbi = Jdbi.create(source);
-    jdbi.installPlugin(new PostgresPlugin());
+    jdbi.installPlugin(new PostgresPlugin()); // Add postgres support.
 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention

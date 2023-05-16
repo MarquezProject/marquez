@@ -19,6 +19,9 @@ import org.jdbi.v3.core.statement.StatementException;
 public final class DbRetention {
   private DbRetention() {}
 
+  /* Default retention days. */
+  public static final int DEFAULT_RETENTION_DAYS = 7;
+
   /* Bulk delete batch size. */
   private static final int BULK_DELETE_BATCH_SIZE = 1000;
 
