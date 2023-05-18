@@ -1,6 +1,13 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.33.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.34.0...HEAD)
+
+## [0.34.0](https://github.com/MarquezProject/marquez/compare/0.33.0...0.34.0) - 2023-05-18
+
+### Fixed
+
+* Chart: skip regex after postgresql in chart/values.yaml [`#2488`](https://github.com/MarquezProject/marquez/pull/2488) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fixes regex for version bump of chart/values.yaml in new-version.sh.*
 
 ## [0.33.0](https://github.com/MarquezProject/marquez/compare/0.32.0...0.33.0) - 2023-04-19
 
