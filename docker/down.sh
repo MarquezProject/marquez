@@ -24,8 +24,8 @@ cd "${project_root}/"
 compose_files="-f docker-compose.yml"
 args="--remove-orphans"
 
-# We can ignore the tag and ports when stopping
-# running containers and deleting old volumes
+# We can ignore the tag and port(s) when cleaning up running
+# containers and volumes
 TAG=any
 
 API_PORT=${RANDOM} API_ADMIN_PORT=${RANDOM} WEB_PORT=${RANDOM} TAG=${RANDOM} docker-compose $compose_files down $args && \
