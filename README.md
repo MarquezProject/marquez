@@ -72,6 +72,14 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 > **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
 
+## Versions and OpenLineage Compatibility
+
+| **Marquez**                                                                                      | **OpenLineage**                                                                                     | **Status**    |
+|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------|
+| [`UNRELEASED`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#unreleased)     | [`>= 0.26.+`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#0260---2023-05-18)  | `CURRENT`     |
+| [`0.34.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0330---2023-04-19) | [`>= 0.20.+`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#0204---2023-02-07)  | `RECOMMENDED` |
+| [`0.33.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0330---2023-04-19) | [`<= 0.20.+`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#0204---2023-02-07)  | `MAINTENANCE` |
+
 ## Modules
 
 Marquez uses a _multi_-project structure and contains the following modules:
@@ -158,5 +166,5 @@ See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/main/CONTRI
 If you discover a vulnerability in the project, please open an issue and attach the "security" label.
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.
