@@ -365,14 +365,17 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     String namespace = "namespace";
     String name = "table";
     LineageEvent event =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job("namespace", "job_name", null),
-            List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job("namespace", "job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
@@ -388,14 +391,17 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     String namespace = "namespace";
     String name = "anotherTable";
     LineageEvent event =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job("namespace", "job_name", null),
-            List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job("namespace", "job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
@@ -414,14 +420,15 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_getDatasetContainsColumnLineage() {
     LineageEvent event =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job("namespace", "job_name", null),
-            List.of(getDatasetA()),
-            List.of(getDatasetB()),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job("namespace", "job_name", null))
+            .inputs(List.of(getDatasetA()))
+            .outputs(List.of(getDatasetB()))
+            .producer("the_producer")
+            .build();
 
     CompletableFuture<Integer> resp =
         this.sendLineage(Utils.toJson(event))
@@ -457,14 +464,17 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     String namespace = "namespace";
     String name = "table";
     LineageEvent event =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job("namespace", "job_name", null),
-            List.of(new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job("namespace", "job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(namespace, name, LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(201);
@@ -481,27 +491,32 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     String name = "table";
 
     LineageEvent firstEvent =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job(namespaceName, "job_name", null),
-            List.of(
-                new LineageEvent.Dataset(namespaceName, name, LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job(namespaceName, "job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(
+                        namespaceName, name, LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     LineageEvent secondEvent =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job(namespaceName, "second_job_name", null),
-            List.of(
-                new LineageEvent.Dataset(
-                    namespaceName, name + "2", LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job(namespaceName, "second_job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(
+                        namespaceName, name + "2", LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
@@ -529,15 +544,18 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     assertThat(jobs).hasSize(0);
 
     LineageEvent eventThatWillUndeleteNamespace =
-        new LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new LineageEvent.Job(namespaceName, "job_name", null),
-            List.of(
-                new LineageEvent.Dataset(namespaceName, name, LineageTestUtils.newDatasetFacet())),
-            Collections.emptyList(),
-            "the_producer");
+        LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new LineageEvent.Job(namespaceName, "job_name", null))
+            .inputs(
+                List.of(
+                    new LineageEvent.Dataset(
+                        namespaceName, name, LineageTestUtils.newDatasetFacet())))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     resp = sendEvent(eventThatWillUndeleteNamespace);
     assertThat(resp.join()).isEqualTo(201);

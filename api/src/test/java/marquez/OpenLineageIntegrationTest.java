@@ -43,6 +43,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
 import marquez.client.models.Dataset;
@@ -53,6 +55,8 @@ import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
+import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +69,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
+@Slf4j
 public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   public static String EVENT_REQUIRED = "open_lineage/event_required_only.json";
@@ -74,11 +79,18 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public static String EVENT_LARGE = "open_lineage/event_large.json";
   public static String NULL_NOMINAL_END_TIME = "open_lineage/null_nominal_end_time.json";
   public static String EVENT_NAMESPACE_NAMING = "open_lineage/event_namespace_naming.json";
+  public static String EVENT_DATASET_EVENT = "open_lineage/event_dataset_event.json";
+  public static String EVENT_JOB_EVENT = "open_lineage/event_job_event.json";
+  public static String EVENT_WITHOUT_SCHEMA_URL = "open_lineage/event_without_schema_url.json";
+
+  public static String RUN_EVENT_SCHEMA_URL =
+      "https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent";
 
   public static List<String> data() {
     return Arrays.asList(
         EVENT_FULL,
         EVENT_SIMPLE,
+        EVENT_WITHOUT_SCHEMA_URL,
         EVENT_REQUIRED,
         EVENT_UNICODE,
         // FIXME: A very large event fails the test.
@@ -99,15 +111,18 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     String badNamespace =
         "sqlserver://myhost:3342;user=auser;password=\uD83D\uDE02\uD83D\uDE02\uD83D\uDE02;database=TheDatabase";
     marquez.service.models.LineageEvent event =
-        new marquez.service.models.LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new marquez.service.models.LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new marquez.service.models.LineageEvent.Job("namespace", "job_name", null),
-            List.of(
-                new marquez.service.models.LineageEvent.Dataset(badNamespace, "the_table", null)),
-            Collections.emptyList(),
-            "the_producer");
+        marquez.service.models.LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new marquez.service.models.LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new marquez.service.models.LineageEvent.Job("namespace", "job_name", null))
+            .inputs(
+                List.of(
+                    new marquez.service.models.LineageEvent.Dataset(
+                        badNamespace, "the_table", null)))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
     final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(400);
@@ -911,6 +926,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testSendEventAndGetItBack() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -939,6 +955,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .eventTime(time)
             .inputs(Collections.emptyList())
             .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
@@ -954,6 +971,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventIsSortedByTime() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -978,16 +996,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
-        builder.eventTime(time).eventType("START").build();
+        builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(time.plusSeconds(10))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .eventType("COMPLETE")
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
@@ -1003,6 +1026,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventIsSortedByTimeAsc() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -1027,16 +1051,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
-        builder.eventTime(time).eventType("START").build();
+        builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(time.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
@@ -1052,6 +1081,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventBeforeAfterTime() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -1078,7 +1108,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
         builder.eventTime(after.minus(1, ChronoUnit.YEARS)).eventType("START").build();
@@ -1087,13 +1118,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(after.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(after.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent thirdEvent =
-        builder.eventTime(before.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(before.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     List<LineageEvent> rawEvents =
         client.listLineageEvents(MarquezClient.SortDirection.ASC, before, after, 10);
@@ -1334,6 +1373,72 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     } else {
       assertThat(run.getFacets()).isEmpty();
     }
+  }
+
+  @Test
+  public void testSendDatasetEventIsDecoded() throws IOException {
+    final String openLineageEventAsString =
+        Resources.toString(Resources.getResource(EVENT_DATASET_EVENT), Charset.defaultCharset());
+
+    // (2) Send OpenLineage event.
+    final CompletableFuture<Map<Integer, String>> resp =
+        this.sendLineage(openLineageEventAsString)
+            .thenApply(r -> Collections.singletonMap(r.statusCode(), r.body()))
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+
+    // Ensure the event was received.
+    Map<Integer, String> respMap = resp.join();
+
+    assertThat(respMap.containsKey(200)).isTrue(); // Status should be 200 instead of 201
+
+    // (3) Convert the OpenLineage event to Json.
+    DatasetEvent datasetEvent =
+        marquez.client.Utils.fromJson(respMap.get(200), new TypeReference<DatasetEvent>() {});
+    assertThat(datasetEvent.getDataset().getName()).isEqualTo("my-dataset-name");
+    assertThat(datasetEvent.getDataset().getFacets().getSchema().getFields()).hasSize(1);
+    assertThat(datasetEvent.getDataset().getFacets().getSchema().getFields().get(0).getName())
+        .isEqualTo("col_a");
+    assertThat(datasetEvent.getEventTime().toString()).startsWith("2020-12-28T09:52:00.001");
+  }
+
+  @Test
+  public void testSendJobEventIsDecoded() throws IOException {
+    final String openLineageEventAsString =
+        Resources.toString(Resources.getResource(EVENT_JOB_EVENT), Charset.defaultCharset());
+
+    // (2) Send OpenLineage event.
+    final CompletableFuture<Map<Integer, String>> resp =
+        this.sendLineage(openLineageEventAsString)
+            .thenApply(r -> Collections.singletonMap(r.statusCode(), r.body()))
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+
+    // Ensure the event was received.
+    Map<Integer, String> respMap = resp.join();
+
+    assertThat(respMap.containsKey(200)).isTrue(); // Status should be 200 instead of 201
+
+    // (3) Convert the OpenLineage event to Json.
+    JobEvent jobEvent =
+        marquez.client.Utils.fromJson(respMap.get(200), new TypeReference<JobEvent>() {});
+    assertThat(jobEvent.getJob().getNamespace()).isEqualTo("my-scheduler-namespace");
+    assertThat(jobEvent.getJob().getName()).isEqualTo("myjob");
+
+    assertThat(jobEvent.getInputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
+    assertThat(jobEvent.getInputs().get(0).getName()).isEqualTo("instance.schema.input-1");
+
+    assertThat(jobEvent.getOutputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
+    assertThat(jobEvent.getOutputs().get(0).getName()).isEqualTo("instance.schema.output-1");
+    assertThat(jobEvent.getEventTime().toString()).startsWith("2020-12-28T09:52:00.001");
   }
 
   private void validateDatasetFacets(JsonNode json) {
