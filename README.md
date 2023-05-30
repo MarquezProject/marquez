@@ -58,7 +58,7 @@ You can open [http://localhost:3000](http://localhost:3000) to begin exploring t
 
 **`HTTP API`**
 
-The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/integration).
+The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/docs/integrations/about).
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -74,7 +74,7 @@ We invite everyone to help us improve and keep documentation up to date. Documen
 
 ## Versions and OpenLineage Compatibility
 
-Versions of Marquez are compatible with OpenLineage unless noted otherwise. We ensure backward compatibility with a newer version of Marquez by recording events with an older OpenLineage specification version. We strongly recommend understanding how the OpenLineage specification is [versioned](https://github.com/OpenLineage/OpenLineage/blob/main/spec/Versioning.md) and published.
+Versions of Marquez are compatible with OpenLineage unless noted otherwise. We ensure backward compatibility with a newer version of Marquez by recording events with an older OpenLineage specification version. **We strongly recommend understanding how the OpenLineage specification is** [versioned](https://github.com/OpenLineage/OpenLineage/blob/main/spec/Versioning.md) **and published**.
 
 | **Marquez**                                                                                      | **OpenLineage**                                                   | **Status**    |
 |--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|---------------|
@@ -83,6 +83,8 @@ Versions of Marquez are compatible with OpenLineage unless noted otherwise. We e
 | [`0.33.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0330---2023-04-19) | [`<= 1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `MAINTENANCE` |
 
 > **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
+
+We currently maintain three categories of compatibility: `CURRENT`, `RECOMMENDED`, and `MAINTENANCE`. When a new version of Marquez is released, it's marked as `RECOMMENDED`, while the previous version enters `MAINTENANCE` mode (which gets bug fixes whenever possible). The unrelease version of Marquez is marked `CURRENT` and does not come with any guarantees, but is assumed to remain compatible with OpenLineage, although surprises happen and there maybe rare exceptions.
 
 ## Modules
 
