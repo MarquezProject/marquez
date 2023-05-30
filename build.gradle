@@ -20,7 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
-        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:8.0.0'
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.15.0'
     }
 }
