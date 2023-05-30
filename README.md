@@ -78,9 +78,9 @@ Versions of Marquez are compatible with OpenLineage unless noted otherwise. We e
 
 | **Marquez**                                                                                      | **OpenLineage**                                                   | **Status**    |
 |--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|---------------|
-| [`UNRELEASED`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#unreleased)     | [`>= 1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `CURRENT`     |
-| [`0.34.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0340---2023-05-18) | [`>= 1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `RECOMMENDED` |
-| [`0.33.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0330---2023-04-19) | [`<= 1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `MAINTENANCE` |
+| [`UNRELEASED`](https://github.com/OpenLineage/OpenLineage/blob/main/CHANGELOG.md#unreleased)     | [`>=1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `CURRENT`     |
+| [`0.34.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0340---2023-05-18) | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `RECOMMENDED` |
+| [`0.33.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0330---2023-04-19) | [`<=1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json)  | `MAINTENANCE` |
 
 > **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
 
