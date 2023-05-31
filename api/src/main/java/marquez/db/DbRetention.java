@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.db.exceptions.DbRetentionException;
 import org.jdbi.v3.core.Jdbi;
 
+/** */
 @Slf4j
 public final class DbRetention {
   private DbRetention() {}
@@ -17,8 +18,8 @@ public final class DbRetention {
   /* Default retention days. */
   public static final int DEFAULT_RETENTION_DAYS = 7;
 
-  /* Default chunk size. */
-  public static final int DEFAULT_CHUNK_SIZE = 1000;
+  /* Default number of rows deleted per batch. */
+  public static final int DEFAULT_NUMBER_OF_ROWS_PER_BATCH = 1000;
 
   /** ... */
   public static void retentionOnDbOrError(

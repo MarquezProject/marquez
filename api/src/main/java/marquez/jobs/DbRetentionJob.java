@@ -22,14 +22,14 @@ import org.jdbi.v3.core.Jdbi;
  * frequency interval of {@code 15} mins. You can also use {@code retentionDays} to override the
  * default retention policy of {@code 7} days; metadata with a collection date {@code >
  * retentionDays} will be deleted. To limit the number of metadata purged per retention execution
- * and reduce impact on the database, we recommend adjusting {@code chunkSize}.
+ * and reduce impact on the database, we recommend adjusting {@code numberOfRowsPerBatch}.
  */
 @Slf4j
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
 
-  /* The chunk size. */
-  private final int chunkSize;
+  /* The number of rows deleted per batch. */
+  private final int numberOfRowsPerBatch;
 
   /* The retention days. */
   private final int retentionDays;
@@ -39,18 +39,18 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
 
   /**
    * Constructs a {@code DbRetentionJob} with a run frequency {@code frequencyMins}, chunk size of
-   * {@code chunkSize} that can be deleted per retention job execution and retention days of {@code
-   * retentionDays}.
+   * {@code numberOfRowsPerBatch} that can be deleted per retention job execution and retention days
+   * of {@code retentionDays}.
    */
   public DbRetentionJob(
       @NonNull final Jdbi jdbi,
       final int frequencyMins,
-      final int chunkSize,
+      final int numberOfRowsPerBatch,
       final int retentionDays) {
     checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
-    checkArgument(chunkSize > 0, "'chunkSize' must be > 0");
+    checkArgument(numberOfRowsPerBatch > 0, "'numberOfRowsPerBatch' must be > 0");
     checkArgument(retentionDays > 0, "'retentionDays' must be > 0");
-    this.chunkSize = chunkSize;
+    this.numberOfRowsPerBatch = numberOfRowsPerBatch;
     this.retentionDays = retentionDays;
     this.jdbi = jdbi;
 
@@ -75,7 +75,7 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, chunkSize, retentionDays);
+      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",

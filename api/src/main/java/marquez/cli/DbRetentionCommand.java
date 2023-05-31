@@ -5,7 +5,7 @@
 
 package marquez.cli;
 
-import static marquez.db.DbRetention.DEFAULT_CHUNK_SIZE;
+import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
 import io.dropwizard.cli.ConfiguredCommand;
@@ -38,8 +38,8 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "ad-hoc-db-retention-source";
 
   /* Args for 'db-retention' command. */
-  private static final String CMD_ARG_CHUNK_SIZE = "chunkSize";
   private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
+  private static final String CMD_ARG_NUMBER_OF_ROWS_PER_BATCH = "numberOfRowsPerBatch";
 
   /* Define 'db-retention' command. */
   public DbRetentionCommand() {
@@ -49,14 +49,14 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   @Override
   public void configure(@NonNull net.sourceforge.argparse4j.inf.Subparser subparser) {
     super.configure(subparser);
-    // Arg '--chunk-size'
+    // Arg '--rows-per-batch'
     subparser
-        .addArgument("--chunk-size")
-        .dest(CMD_ARG_CHUNK_SIZE)
+        .addArgument("--rows-per-batch")
+        .dest(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH)
         .type(Integer.class)
         .required(false)
-        .setDefault(DEFAULT_CHUNK_SIZE)
-        .help("the chunk size deleted per retention execution");
+        .setDefault(DEFAULT_NUMBER_OF_ROWS_PER_BATCH)
+        .help("the number of rows deleted per batch");
     // Arg '--retention-days'
     subparser
         .addArgument("--retention-days")
@@ -73,21 +73,22 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
       @NonNull Namespace namespace,
       @NonNull MarquezConfig config)
       throws Exception {
+    final int numberOfRowsPerBatch = namespace.getInt(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH);
     final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
-    final int chunkSize = namespace.getInt(CMD_ARG_CHUNK_SIZE);
 
+    // Configure connection.
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
     final ManagedDataSource source =
         sourceFactory.build(bootstrap.getMetricRegistry(), DB_SOURCE_NAME);
 
-    // Configure connection.
+    // Open connection.
     final Jdbi jdbi = Jdbi.create(source);
     jdbi.installPlugin(new PostgresPlugin()); // Add postgres support.
 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, chunkSize, retentionDays);
+      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",
