@@ -7,7 +7,6 @@ package marquez.db;
 
 import com.google.common.base.Stopwatch;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -25,40 +24,128 @@ public final class DbRetention {
   /* Default chunk size. */
   public static final int DEFAULT_CHUNK_SIZE = 1000;
 
-  private static final String DATASETS = "datasets";
-  private static final String JOBS = "jobs";
-  private static final String LINEAGE_EVENTS = "lineage_events";
-
-  /* Tables to apply retention policy on (with cascade delete constraint). */
-  private static final Set<String> TABLES = Set.of(DATASETS, JOBS, LINEAGE_EVENTS);
-
+  /** ... */
   public static void retentionOnDbOrError(
       @NonNull Jdbi jdbi, final int chunkSize, final int retentionDays)
       throws DbRetentionException {
-    for (final String table : TABLES) {
-      log.info("Applying retention policy of '{}' days to '{}' table...", retentionDays, table);
-      // Build, then execute retention policy.
-      final int totalNumOfRowsDeleted =
+    // (1) ...
+    retentionOnDatasets(jdbi, chunkSize, retentionDays);
+    // (2) ...
+    retentionOnJobs(jdbi, chunkSize, retentionDays);
+    // (3) ...
+    retentionOnLineageEvents(jdbi, chunkSize, retentionDays);
+  }
+
+  /** ... */
+  private static void retentionOnDatasets(
+      @NonNull Jdbi jdbi, final int chunkSize, final int retentionDays)
+      throws DbRetentionException {
+    // (1) ...
+    jdbi.useHandle(
+        handle ->
+            handle.execute(
+                """
+                DO $$
+                DECLARE
+                  chunk_size INT := %d;
+                  rows_deleted INT;
+                BEGIN
+                  CREATE TEMPORARY TABLE used_input_datasets_in_x_days AS (
+                    SELECT dataset_uuid
+                      FROM job_versions_io_mapping AS jvio INNER JOIN job_versions AS jv
+                        ON jvio.job_version_uuid = jv.uuid
+                     WHERE jv.created_at >= CURRENT_TIMESTAMP - INTERVAL '%d days'
+                       AND jvio.io_type = 'INPUT'
+                  );
+                  LOOP
+                    WITH deleted_rows AS (
+                      DELETE FROM datasets AS d
+                        WHERE d.updated_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                          AND NOT EXISTS (
+                            SELECT 1
+                              FROM used_input_datasets_in_x_days AS uid
+                             WHERE d.uuid = uid.dataset_uuid
+                          )
+                          RETURNING uuid
+                    )
+                    SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
+                    EXIT WHEN rows_deleted = 0;
+                  END LOOP;
+                  DROP TABLE used_input_datasets_in_x_days;
+                END $$;
+                """
+                    .formatted(chunkSize, retentionDays, retentionDays)));
+    // (2) ...
+    jdbi.useHandle(
+        handle ->
+            handle.execute(
+                """
+                DO $$
+                DECLARE
+                  chunk_size INT := %d;
+                  rows_deleted INT;
+                BEGIN
+                  CREATE TEMPORARY TABLE used_input_dataset_versions_in_x_days AS (
+                    SELECT dataset_version_uuid
+                      FROM runs_input_mapping AS ri INNER JOIN runs AS r
+                        ON ri.run_uuid = r.uuid
+                     WHERE r.created_at >= CURRENT_TIMESTAMP - INTERVAL '%d days'
+                  );
+                  LOOP
+                    WITH deleted_rows AS (
+                      DELETE FROM dataset_versions AS dv
+                        WHERE dv.created_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                          AND NOT EXISTS (
+                            SELECT 1
+                              FROM used_input_dataset_versions_in_x_days AS uidv
+                             WHERE dv.uuid = uidv.dataset_version_uuid
+                          )
+                          RETURNING uuid
+                    )
+                    SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
+                    EXIT WHEN rows_deleted = 0;
+                  END LOOP;
+                  DROP TABLE used_input_dataset_versions_in_x_days;
+                END $$;"""
+                    .formatted(chunkSize, retentionDays, retentionDays)));
+  }
+
+  /** ... */
+  private static void retentionOnJobs(
+      @NonNull Jdbi jdbi, final int chunkSize, final int retentionDays)
+      throws DbRetentionException {
+    final int totalNumOfJobRowsDeleted =
+        executeDbRetentionQuery(
+            jdbi,
+            """
+            DELETE FROM jobs
+              WHERE uuid IN (
+                SELECT uuid FROM jobs
+                 WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                 LIMIT %d
+            ) RETURNING uuid;
+            """
+                .formatted(retentionDays, chunkSize));
+    // ..
+    if (totalNumOfJobRowsDeleted == 0) {
+      final int totalNumOfVersionRowsDeleted =
           executeDbRetentionQuery(
               jdbi,
-              buildQuery(
-                  """
-                  DELETE FROM %s
-                    WHERE %s IN (
-                      SELECT %s FROM %s
-                       WHERE %s < CURRENT_TIMESTAMP - INTERVAL '%d days'
-                       LIMIT %d
-                   ) RETURNING %s;
-                  """,
-                  table, chunkSize, retentionDays));
-      // Determine whether any rows met the retention policy.
-      if (totalNumOfRowsDeleted == 0) {
-        log.info("No rows older than '{}' days in '{}' table.", retentionDays, table);
-        continue;
-      }
-      log.info("Successfully deleted '{}' rows from '{}' table.", totalNumOfRowsDeleted, table);
+              """
+              DELETE FROM job_versions
+                WHERE uuid IN (
+                  SELECT uuid FROM job_versions
+                   WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                   LIMIT %d
+              ) RETURNING uuid;
+              """
+                  .formatted(retentionDays, chunkSize));
     }
   }
+
+  private static void retentionOnLineageEvents(
+      @NonNull Jdbi jdbi, final int chunkSize, final int retentionDays)
+      throws DbRetentionException {}
 
   /** Returns the number of {@code row}s deleted by the provided retention {@code query}. */
   private static int executeDbRetentionQuery(
@@ -93,26 +180,5 @@ public final class DbRetention {
       throw new DbRetentionException(
           "Failed to apply retention query: " + retentionQuery, errorOnDbRetentionQuery.getCause());
     }
-  }
-
-  /** Build retention {@code query} for the provided {@code table} and {@code retentionDays}. */
-  private static String buildQuery(
-      @NonNull String queryTemplate,
-      @NonNull String table,
-      final int chunkSize,
-      final int retentionDays) {
-    final String pk = pkInQueryFor(table);
-    final String timestamp = timestampInQueryFor(table);
-    return queryTemplate.formatted(table, pk, pk, table, timestamp, retentionDays, chunkSize, pk);
-  }
-
-  /** Returns {@code pk} for the provided {@code table}. */
-  private static String pkInQueryFor(@NonNull final String table) {
-    return LINEAGE_EVENTS.equals(table) ? Columns.RUN_UUID : Columns.ROW_UUID;
-  }
-
-  /** Returns {@code timestamp} for the provided {@code table}. */
-  private static String timestampInQueryFor(@NonNull final String table) {
-    return LINEAGE_EVENTS.equals(table) ? Columns.EVENT_TIME : Columns.CREATED_AT;
   }
 }

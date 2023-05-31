@@ -152,6 +152,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
         && !config.getSentry().getDsn().equals(SentryConfig.DEFAULT_DSN);
   }
 
+  /** Returns a new {@link Jdbi} object. */
   private Jdbi newJdbi(
       @NonNull MarquezConfig config, @NonNull Environment env, @NonNull ManagedDataSource source) {
     final JdbiFactory factory = new JdbiFactory();
