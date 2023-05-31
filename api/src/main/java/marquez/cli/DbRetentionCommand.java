@@ -38,8 +38,8 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "ad-hoc-db-retention-source";
 
   /* Args for 'db-retention' command. */
-  private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
   private static final String CMD_ARG_NUMBER_OF_ROWS_PER_BATCH = "numberOfRowsPerBatch";
+  private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
 
   /* Define 'db-retention' command. */
   public DbRetentionCommand() {
@@ -49,9 +49,9 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   @Override
   public void configure(@NonNull net.sourceforge.argparse4j.inf.Subparser subparser) {
     super.configure(subparser);
-    // Arg '--rows-per-batch'
+    // Arg '--number-of-rows-per-batch'
     subparser
-        .addArgument("--rows-per-batch")
+        .addArgument("--number-of-rows-per-batch")
         .dest(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH)
         .type(Integer.class)
         .required(false)
