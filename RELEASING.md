@@ -1,8 +1,9 @@
 # Releasing
 
 1. Update [`CHANGELOG.md`](CHANGELOG.md)
-2. Make sure you've installed the required dependencies (see [`new-version.sh`](new-version.sh)).
-3. Tag the release and prepare for the next version with:
+2. Update [_Versions and OpenLineage Compatibility_](https://github.com/MarquezProject/marquez/blob/main/README.md#versions-and-openlineage-compatibility) following compatibility guidelines
+3. Make sure you've installed the required dependencies (see [`new-version.sh`](new-version.sh)).
+4. Tag the release and prepare for the next version with:
 
    ```bash
    $ ./new-version.sh --release-version X.Y.Z --next-version X.Y.Z --no-push
@@ -10,10 +11,10 @@
 
    > **Tip:** Use `--help` to see script usage
 
-4. Push the tag with the command supplied by the script.
-5. Visit [CI](https://app.circleci.com/pipelines/github/MarquezProject/marquez?branch=main) to see the progress of the release! :rocket:
-6. Visit [sonatype](https://oss.sonatype.org) to promote _java_ artifacts
-7. Draft a [new release](https://github.com/MarquezProject/marquez/releases/new) using the release notes for `X.Y.Z` in **step 1** as the release description:
+5. Push the tag with the command supplied by the script.
+6. Visit [CI](https://app.circleci.com/pipelines/github/MarquezProject/marquez?branch=main) to see the progress of the release! :rocket:
+7. Visit [sonatype](https://oss.sonatype.org) to promote _java_ artifacts
+8. Draft a [new release](https://github.com/MarquezProject/marquez/releases/new) using the release notes for `X.Y.Z` in **step 1** as the release description:
 
    ![](./docs/assets/images/new-release.png)
 
@@ -36,5 +37,5 @@ If the proposed release receives no +1s in two days, it is not authorized and th
 Once a release is authorized, it will be initiated within two business days. Releases will not be made on a Friday unless doing so will address an important defect, an issue with project infrastructure, or a security vulnerability.
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.
