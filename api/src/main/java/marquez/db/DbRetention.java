@@ -69,6 +69,7 @@ public final class DbRetention {
                     )
                     SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                     EXIT WHEN rows_deleted = 0;
+                    PERFORM pg_sleep(0.1);
                   END LOOP;
                   DROP TABLE used_datasets_as_input_in_x_days;
                 END $$;
@@ -106,6 +107,7 @@ public final class DbRetention {
                     )
                     SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                     EXIT WHEN rows_deleted = 0;
+                    PERFORM pg_sleep(0.1);
                   END LOOP;
                   DROP TABLE used_dataset_versions_as_input_in_x_days;
                 END $$;"""
@@ -137,6 +139,7 @@ public final class DbRetention {
                     )
                     SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                     EXIT WHEN rows_deleted = 0;
+                    PERFORM pg_sleep(0.1);
                   END LOOP;
                 END $$;"""
                     .formatted(numberOfRowsPerBatch, retentionDays)));
@@ -162,6 +165,7 @@ public final class DbRetention {
                     )
                     SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                     EXIT WHEN rows_deleted = 0;
+                    PERFORM pg_sleep(0.1);
                   END LOOP;
                 END $$;"""
                     .formatted(numberOfRowsPerBatch, retentionDays)));
@@ -191,6 +195,7 @@ public final class DbRetention {
                      )
                      SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                      EXIT WHEN rows_deleted = 0;
+                     PERFORM pg_sleep(0.1);
                    END LOOP;
                  END $$;"""
                     .formatted(numberOfRowsPerBatch, retentionDays)));
