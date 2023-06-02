@@ -60,6 +60,7 @@ public final class DbRetention {
                           SELECT uuid
                             FROM datasets
                            WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                             FOR UPDATE SKIP LOCKED
                            LIMIT number_of_rows_per_batch
                         ) AND NOT EXISTS (
                             SELECT 1
@@ -98,6 +99,7 @@ public final class DbRetention {
                           SELECT uuid
                             FROM dataset_versions
                            WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                             FOR UPDATE SKIP LOCKED
                            LIMIT number_of_rows_per_batch
                         ) AND NOT EXISTS (
                             SELECT 1
@@ -134,6 +136,7 @@ public final class DbRetention {
                           SELECT uuid
                             FROM jobs
                            WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                             FOR UPDATE SKIP LOCKED
                            LIMIT number_of_rows_per_batch
                         ) RETURNING uuid
                     )
@@ -160,6 +163,7 @@ public final class DbRetention {
                          SELECT uuid
                            FROM job_versions
                           WHERE created_at < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                            FOR UPDATE SKIP LOCKED
                           LIMIT number_of_rows_per_batch
                        ) RETURNING uuid
                     )
@@ -190,6 +194,7 @@ public final class DbRetention {
                           SELECT run_uuid
                             FROM lineage_events
                            WHERE event_time < CURRENT_TIMESTAMP - INTERVAL '%d days'
+                             FOR UPDATE SKIP LOCKED
                            LIMIT number_of_rows_per_batch
                         ) RETURNING uuid
                      )
