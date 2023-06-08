@@ -96,20 +96,25 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
               </Box>
             ) : (
               <>
-                <Box paddingTop={2} paddingLeft={2}>
-                  <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
-                </Box>
-                <Box className={classes.searchIcon}>
-                  <FontAwesomeIcon icon={faFilter} color={THEME_EXTRA.typography.disabled} />
-                </Box>
-                <Box>
-                  <MqInputBase 
-                    type='text' 
-                    value={this.state.searchTerm}
-                    placeholder='Filter by name' 
-                    id={'filterBar'} 
-                    onChange={string => this.handleSearch(string)}
-                  />
+                
+                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                  <Box paddingLeft={2}>
+                    <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                  </Box>
+                  <Box paddingRight={2} paddingBottom={1}>
+                    <Box className={classes.searchIcon}>
+                      <FontAwesomeIcon icon={faFilter} color={THEME_EXTRA.typography.disabled} />
+                    </Box>
+                    <Box>
+                      <MqInputBase 
+                        type='text' 
+                        value={this.state.searchTerm}
+                        placeholder='Filter by name' 
+                        id={'filterBar'} 
+                        onChange={string => this.handleSearch(string)}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
                 <Table size='small'>
                   <TableHead>
