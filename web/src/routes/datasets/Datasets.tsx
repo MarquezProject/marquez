@@ -123,13 +123,9 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
                     {datasets
                       .filter((dataset) => {
                         if (!dataset.deleted && !this.state.searchTerm) {
-                          console.log(this.state.searchTerm) 
-                          console.log(dataset)
                           return dataset }
                         else if (!dataset.deleted && dataset.name.toLowerCase().includes(
-                          this.state.searchTerm as string)) {
-                          console.log(this.state.searchTerm)
-                          console.log(dataset)
+                          this.state.searchTerm.toLowerCase() as string)) {
                           return dataset }
                       })                    
                       .map(dataset => {
