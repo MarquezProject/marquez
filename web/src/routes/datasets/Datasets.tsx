@@ -19,6 +19,7 @@ import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
+import { MqInputBase } from '../../components/core/input-base/MqInputBase'
 
 const styles = () => createStyles({})
 
@@ -34,9 +35,24 @@ interface DispatchProps {
   resetDatasets: typeof resetDatasets
 }
 
+interface SearchState {
+  searchTerm: string
+}
+
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
-class Datasets extends React.Component<DatasetsProps> {
+class Datasets extends React.Component<DatasetsProps, SearchState> {
+  constructor(props: DatasetsProps) {
+    super(props)
+    this.state = {
+      searchTerm: ''
+    }
+  }
+  
+  handleSearch(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, ) {
+    this.setState({ searchTerm: event.target.value });
+  }
+
   componentDidMount() {
     if (this.props.selectedNamespace) {
       this.props.fetchDatasets(this.props.selectedNamespace)
@@ -59,7 +75,7 @@ class Datasets extends React.Component<DatasetsProps> {
   render() {
     const { datasets, isDatasetsLoading, isDatasetsInit } = this.props
     const i18next = require('i18next')
-    return (
+      return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isDatasetsLoading || !isDatasetsInit}>
           <>
@@ -73,6 +89,15 @@ class Datasets extends React.Component<DatasetsProps> {
               <>
                 <Box p={2}>
                   <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                </Box>
+                <Box>
+                  <MqInputBase 
+                    type='text' 
+                    value={this.state.searchTerm}
+                    placeholder='Filter by name' 
+                    id={'searchBar'} 
+                    onChange={string => this.handleSearch(string)}
+                  />
                 </Box>
                 <Table size='small'>
                   <TableHead>
@@ -96,7 +121,17 @@ class Datasets extends React.Component<DatasetsProps> {
                   </TableHead>
                   <TableBody>
                     {datasets
-                      .filter(dataset => !dataset.deleted)
+                      .filter((dataset) => {
+                        if (!dataset.deleted && !this.state.searchTerm) {
+                          console.log(this.state.searchTerm) 
+                          console.log(dataset)
+                          return dataset }
+                        else if (!dataset.deleted && dataset.name.toLowerCase().includes(
+                          this.state.searchTerm as string)) {
+                          console.log(this.state.searchTerm)
+                          console.log(dataset)
+                          return dataset }
+                      })                    
                       .map(dataset => {
                         return (
                           <TableRow key={dataset.name}>
