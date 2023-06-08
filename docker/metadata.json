@@ -610,147 +610,6 @@
         }
       }
     },
-    "inputs": [
-      {
-        "namespace": "food_delivery",
-        "name": "public.top_delivery_times",
-        "facets": {
-          "columnLineage": {
-            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
-            "_schemaURL": "https://openlineage.io/spec/facets/1-0-1/ColumnLineageDatasetFacet.json",
-            "fields": {
-              "order_id": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "order_id"
-                  }
-                ]
-              },
-              "order_placed_on": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "order_placed_on"
-                  }
-                ]
-              },
-              "order_delivered_on": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "order_delivered_on"
-                  }
-                ]
-              },
-              "order_delivery_time": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "order_placed_on"
-                  },
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "order_delivered_on"
-                  }
-                ]
-              },
-              "customer_email": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "customer_email"
-                  }
-                ]
-              },
-              "restaurant_id": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "restaurant_id"
-                  }
-                ]
-              },
-              "driver_id": {
-                "inputFields": [
-                  {
-                    "namespace": "food_delivery",
-                    "name": "public.delivery_7_days",
-                    "field": "driver_id"
-                  }
-                ]
-              }
-            }
-          },
-          "documentation": {
-            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
-            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DocumentationDatasetFacet.json",
-            "description": "A table for top delivery times."
-          },
-          "schema": {
-            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
-            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
-            "fields": [
-              {
-                "name": "order_id",
-                "type": "INTEGER",
-                "tags": [],
-                "description": "The ID of the order."
-              },
-              {
-                "name": "order_placed_on",
-                "type": "TIMESTAMP",
-                "tags": [],
-                "description": "An ISO-8601 timestamp representing the date/time the order was placed."
-              },
-              {
-                "name": "order_delivered_on",
-                "type": "TIMESTAMP",
-                "tags": [],
-                "description": "An ISO-8601 timestamp representing the date/time the order was delivered."
-              },
-              {
-                "name": "order_delivery_time",
-                "type": "TIMESTAMP",
-                "tags": [],
-                "description": "An ISO-8601 timestamp representing the total time of delivery."
-              },
-              {
-                "name": "customer_email",
-                "type": "VARCHAR",
-                "tags": [],
-                "description": "The email address of the customer."
-              },
-              {
-                "name": "restaurant_id",
-                "type": "INTEGER",
-                "tags": [],
-                "description": "The ID of the restaurant related to the order."
-              },
-              {
-                "name": "driver_id",
-                "type": "INTEGER",
-                "tags": [],
-                "description": "The ID of the driver related to the order."
-              }
-            ]
-          },
-          "dataSource": {
-            "_producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
-            "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/DatasourceDatasetFacet.json",
-            "name": "food_delivery_db",
-            "uri": "postgres://food_delivery:food_delivery@postgres:5432/food_delivery"
-          }
-        }
-      }
-    ],
     "outputs": [
       {
         "namespace": "food_delivery",
@@ -1104,6 +963,12 @@
         }
       }
     },
+    "inputs": [
+      {
+        "namespace": "food_delivery",
+        "name": "public.restaurants"
+      }
+    ],
     "outputs": [
       {
         "namespace": "food_delivery",
