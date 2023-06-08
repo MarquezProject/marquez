@@ -23,7 +23,10 @@ public final class DbRetention {
 
   /** ... */
   public static void retentionOnDbOrError(
-      @NonNull Jdbi jdbi, final int numberOfRowsPerBatch, final int retentionDays)
+      @NonNull Jdbi jdbi,
+      final int numberOfRowsPerBatch,
+      final int retentionDays,
+      final boolean explainPlanOnly)
       throws DbRetentionException {
     // (1) ...
     retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays);
@@ -119,6 +122,14 @@ public final class DbRetention {
                     END $$;""",
                     numberOfRowsPerBatch,
                     retentionDays)));
+  }
+
+  abstract class A {
+    abstract void d();
+  }
+
+  abstract class B extends A {
+    abstract void x();
   }
 
   /** ... */
