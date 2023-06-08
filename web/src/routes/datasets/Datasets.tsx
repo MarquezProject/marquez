@@ -20,8 +20,17 @@ import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 import { MqInputBase } from '../../components/core/input-base/MqInputBase'
+import { THEME_EXTRA, theme } from '../../helpers/theme'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFilter } from '@fortawesome/free-solid-svg-icons'
 
-const styles = () => createStyles({})
+const styles = () => createStyles({
+  searchIcon: {
+    position: 'relative',
+    left: theme.spacing(2),
+    top: 30
+  }
+})
 
 interface StateProps {
   datasets: Dataset[]
@@ -50,7 +59,7 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
   }
   
   handleSearch(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> ) {
-    this.setState({ searchTerm: event.target.value });
+    this.setState({ searchTerm: event.target.value })
   }
 
   componentDidMount() {
@@ -73,9 +82,9 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
   }
 
   render() {
-    const { datasets, isDatasetsLoading, isDatasetsInit } = this.props
+    const { datasets, isDatasetsLoading, isDatasetsInit, classes } = this.props
     const i18next = require('i18next')
-      return (
+    return (
       <Container maxWidth={'lg'} disableGutters>
         <MqScreenLoad loading={isDatasetsLoading || !isDatasetsInit}>
           <>
@@ -87,15 +96,18 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
               </Box>
             ) : (
               <>
-                <Box p={2}>
+                <Box paddingTop={2} paddingLeft={2}>
                   <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                </Box>
+                <Box className={classes.searchIcon}>
+                  <FontAwesomeIcon icon={faFilter} color={THEME_EXTRA.typography.disabled} />
                 </Box>
                 <Box>
                   <MqInputBase 
                     type='text' 
                     value={this.state.searchTerm}
                     placeholder='Filter by name' 
-                    id={'searchBar'} 
+                    id={'filterBar'} 
                     onChange={string => this.handleSearch(string)}
                   />
                 </Box>
