@@ -40,7 +40,7 @@ public interface DatasetFacetsDao {
     COLUMN_LINEAGE(Type.DATASET, "columnLineage"),
     OWNERSHIP(Type.DATASET, "ownership"),
     DATA_QUALITY_METRICS(Type.INPUT, "dataQualityMetrics"),
-    DATA_QUALITY_ASSERTIONS(Type.INPUT, "dataQualityAssertions"),
+    DATA_QUALITY_ASSERTIONS(Type.DATASET, "dataQualityAssertions"),
     OUTPUT_STATISTICS(Type.OUTPUT, "outputStatistics");
 
     final Type type;

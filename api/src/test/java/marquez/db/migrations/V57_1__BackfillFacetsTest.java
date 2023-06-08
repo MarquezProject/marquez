@@ -108,7 +108,7 @@ public class V57_1__BackfillFacetsTest {
       assertThat(getDatasetFacetType(inputDatasetFacets, "version")).isEqualTo(DATASET);
       assertThat(getDatasetFacetType(inputDatasetFacets, "ownership")).isEqualTo(DATASET);
       assertThat(getDatasetFacetType(inputDatasetFacets, "dataQualityMetrics")).isEqualTo(INPUT);
-      assertThat(getDatasetFacetType(inputDatasetFacets, "dataQualityAssertions")).isEqualTo(INPUT);
+      assertThat(getDatasetFacetType(inputDatasetFacets, "dataQualityAssertions")).isEqualTo(DATASET);
       assertThat(getDatasetFacetType(inputDatasetFacets, "custom-input")).isEqualTo(UNKNOWN);
 
       assertThat(

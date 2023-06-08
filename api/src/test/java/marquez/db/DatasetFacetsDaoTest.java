@@ -263,7 +263,7 @@ public class DatasetFacetsDaoTest {
         .hasFieldOrPropertyWithValue("runUuid", lineageRow.getRun().getUuid())
         .hasFieldOrPropertyWithValue("lineageEventTime", lineageRow.getRun().getCreatedAt())
         .hasFieldOrPropertyWithValue("lineageEventType", "COMPLETE")
-        .hasFieldOrPropertyWithValue("type", DatasetFacetsDao.Type.INPUT);
+        .hasFieldOrPropertyWithValue("type", DatasetFacetsDao.Type.DATASET);
 
     assertThat(facet.facet().toString()).isEqualTo("{\"dataQualityAssertions\": \"m2\"}");
   }

@@ -62,8 +62,8 @@ public class V56_1__FacetViews implements JavaMigration {
                 df.event_type::VARCHAR(64) AS lineage_event_type,
                 (
                     CASE
-                    WHEN lower(facet_name) IN ('documentation', 'schema', 'datasource', 'description', 'lifecyclestatechange', 'version', 'columnlineage', 'ownership') then 'DATASET'
-                    WHEN lower(facet_name) IN ('dataqualitymetrics', 'dataqualityassertions') then 'INPUT'
+                    WHEN lower(facet_name) IN ('documentation', 'schema', 'datasource', 'description', 'lifecyclestatechange', 'version', 'columnlineage', 'ownership', 'dataqualityassertions') then 'DATASET'
+                    WHEN lower(facet_name) IN ('dataqualitymetrics') then 'INPUT'
                     WHEN lower(facet_name) = 'outputstatistics' then 'OUTPUT'
                     ELSE 'UNKNOWN'
                     END
