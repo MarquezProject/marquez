@@ -144,12 +144,14 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const paths = [] as Array<[string, string]>
 
     // Sets used to detect cycles and break out of the recursive loop
-    const visitedSuccessorNodes = new Set()
-    const visitedPredecessorNodes = new Set()
+    const visitedNodes = {
+      successors: new Set(),
+      predecessors: new Set()
+    }
 
     const getSuccessors = (node: string) => {
-      if (visitedSuccessorNodes.has(node)) return
-      visitedSuccessorNodes.add(node)
+      if (visitedNodes.successors.has(node)) return
+      visitedNodes.successors.add(node)
 
       const successors = g?.successors(node)
       if (successors?.length) {
@@ -163,8 +165,8 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     }
 
     const getPredecessors = (node: string) => {
-      if (visitedPredecessorNodes.has(node)) return
-      visitedPredecessorNodes.add(node)
+      if (visitedNodes.predecessors.has(node)) return
+      visitedNodes.predecessors.add(node)
 
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
