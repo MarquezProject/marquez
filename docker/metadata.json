@@ -963,12 +963,6 @@
         }
       }
     },
-    "inputs": [
-      {
-        "namespace": "food_delivery",
-        "name": "public.restaurants"
-      }
-    ],
     "outputs": [
       {
         "namespace": "food_delivery",
