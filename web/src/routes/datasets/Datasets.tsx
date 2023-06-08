@@ -49,7 +49,7 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
     }
   }
   
-  handleSearch(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, ) {
+  handleSearch(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> ) {
     this.setState({ searchTerm: event.target.value });
   }
 
@@ -125,7 +125,7 @@ class Datasets extends React.Component<DatasetsProps, SearchState> {
                         if (!dataset.deleted && !this.state.searchTerm) {
                           return dataset }
                         else if (!dataset.deleted && dataset.name.toLowerCase().includes(
-                          this.state.searchTerm.toLowerCase() as string)) {
+                          this.state.searchTerm.toLowerCase())) {
                           return dataset }
                       })                    
                       .map(dataset => {
