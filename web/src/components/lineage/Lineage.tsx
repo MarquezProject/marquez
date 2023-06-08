@@ -150,6 +150,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const getSuccessors = (node: string) => {
       if (visitedSuccessorNodes.has(node)) return
       visitedSuccessorNodes.add(node)
+
       const successors = g?.successors(node)
       if (successors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
@@ -164,6 +165,7 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     const getPredecessors = (node: string) => {
       if (visitedPredecessorNodes.has(node)) return
       visitedPredecessorNodes.add(node)
+
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
