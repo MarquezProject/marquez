@@ -73,7 +73,11 @@ const mockGraphWithCycle = [
 ]
 
 describe('Lineage Component', () => {
-  const mockProps = {}
+  const mockProps = {
+    setLineage: str => null
+    // TODO: do we really need to stub all of these?
+  }
+
   it("doesn't follow cycles in the lineage graph", () => {
     const wrapper = shallow(
       <Lineage
@@ -86,6 +90,8 @@ describe('Lineage Component', () => {
 
     const instance = wrapper.instance()
     // TODO: fix type errors, the above stub interface will probably fix this
-    instance.getSelectedPaths()
+    const paths = instance.getSelectedPaths()
+
+    // TODO: validate that we never have duplicate paths
   })
 })
