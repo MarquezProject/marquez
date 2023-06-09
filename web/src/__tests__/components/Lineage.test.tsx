@@ -92,4 +92,9 @@ describe('Lineage Component', () => {
 
     expect(Object.values(pathCounts).some(c => c > 2)).toBe(false)
   })
+
+  it('renders a valid cycle', () => {
+    const paths = instance.getSelectedPaths()
+    expect(JSON.stringify(paths[0])).toEqual(JSON.stringify(paths[paths.length - 1]))
+  })
 })
