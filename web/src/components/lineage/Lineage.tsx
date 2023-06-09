@@ -71,7 +71,7 @@ type LineageProps = WithStyles<typeof styles> &
 
 let g: graphlib.Graph<MqNode>
 
-class Lineage extends React.Component<LineageProps, LineageState> {
+export class Lineage extends React.Component<LineageProps, LineageState> {
   constructor(props: LineageProps) {
     super(props)
     this.state = {

@@ -111,6 +111,7 @@
     "jest": "27.3.1",
     "prettier": "^1.19.1",
     "redux-devtools-extension": "^2.13.8",
+    "redux-mock-store": "^1.5.4",
     "redux-saga-test-plan": "^4.0.0-beta.3",
     "source-map-loader": "^0.2.4",
     "style-loader": "^0.23.1",
