@@ -94,7 +94,19 @@ describe('Lineage Component', () => {
   })
 
   it('renders a valid cycle', () => {
-    const paths = instance.getSelectedPaths()
-    expect(JSON.stringify(paths[0])).toEqual(JSON.stringify(paths[paths.length - 1]))
+    const actualPaths = instance.getSelectedPaths()
+
+    const expectedPaths = [
+      ['job_foo', 'dataset_bar'],
+      ['dataset_bar', 'job_bar'],
+      ['job_bar', 'dataset_foo'],
+      ['dataset_foo', 'job_foo'],
+      ['dataset_foo', 'job_foo'],
+      ['job_bar', 'dataset_foo'],
+      ['dataset_bar', 'job_bar'],
+      ['job_foo', 'dataset_bar']
+    ]
+
+    expect(actualPaths).toEqual(expectedPaths)
   })
 })
