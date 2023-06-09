@@ -86,7 +86,7 @@ describe('Lineage Component', () => {
 
     const pathCounts = paths.reduce((acc, p) => {
       const pathId = p.join(':')
-      acc[pathId] = acc[pathId] ? 1 : acc[pathId]
+      acc[pathId] = acc[pathId] ? 1 : acc[pathId] + 1
       return acc
     }, {} as Record<string, number>)
 
