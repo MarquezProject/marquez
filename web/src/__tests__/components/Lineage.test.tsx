@@ -3,7 +3,6 @@
 
 import { Lineage, LineageProps } from '../../components/lineage/Lineage'
 import { LineageNode } from '../../components/lineage/types'
-import { LineageGraph } from '../../types/api'
 
 const mockGraphWithCycle = [
   {
