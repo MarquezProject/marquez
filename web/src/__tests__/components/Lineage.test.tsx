@@ -1,34 +1,13 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import * as React from 'react'
-import { mount } from 'enzyme'
-import { Lineage as BaseLineageComponent } from '../../components/lineage/Lineage'
+import { Lineage, LineageProps } from '../../components/lineage/Lineage'
+import { LineageNode } from '../../components/lineage/types'
 import { LineageGraph } from '../../types/api'
-import configureStore from 'redux-mock-store'
-import { Provider } from 'react-redux'
-import { MemoryRouter, Route, withRouter } from 'react-router-dom'
 
-const Lineage = withRouter(BaseLineageComponent)
-
-const mockGraphWithCycle: LineageGraph = {
-  graph: [
+const mockGraphWithCycle = [
     {
       id: 'job_foo',
-      type: 'JOB',
-      data: {
-        id: { namespace: 'test', name: 'test' },
-        type: 'BATCH',
-        name: 'job_foo',
-        createdAt: '2023-01-01',
-        updatedAt: '2023-01-01',
-        namespace: 'test',
-        inputs: [],
-        outputs: [],
-        location: '',
-        description: '',
-        latestRun: null
-      },
       inEdges: [
         {
           origin: 'dataset_foo',
@@ -44,22 +23,6 @@ const mockGraphWithCycle: LineageGraph = {
     },
     {
       id: 'dataset_bar',
-      type: 'DATASET',
-      data: {
-        id: { namespace: 'test', name: 'dataset_bar' },
-        type: 'DB_TABLE',
-        name: 'dataset_bar',
-        physicalName: 'dataset_bar',
-        createdAt: '2023-01-01',
-        updatedAt: '2023-01-01',
-        namespace: 'test',
-        sourceName: 'source',
-        fields: [],
-        facets: {},
-        tags: [],
-        lastModifiedAt: '2023-01-01',
-        description: 'Test dataset'
-      },
       inEdges: [
         {
           origin: 'job_foo',
@@ -75,20 +38,6 @@ const mockGraphWithCycle: LineageGraph = {
     },
     {
       id: 'job_bar',
-      type: 'JOB',
-      data: {
-        id: { namespace: 'test', name: 'test' },
-        type: 'BATCH',
-        name: 'job_bar',
-        createdAt: '2023-01-01',
-        updatedAt: '2023-01-01',
-        namespace: 'test',
-        inputs: [],
-        outputs: [],
-        location: '',
-        description: '',
-        latestRun: null
-      },
       inEdges: [
         {
           origin: 'dataset_bar',
@@ -104,22 +53,6 @@ const mockGraphWithCycle: LineageGraph = {
     },
     {
       id: 'dataset_foo',
-      type: 'DATASET',
-      data: {
-        id: { namespace: 'test', name: 'dataset_foo' },
-        type: 'DB_TABLE',
-        name: 'dataset_foo',
-        physicalName: 'dataset_foo',
-        createdAt: '2023-01-01',
-        updatedAt: '2023-01-01',
-        namespace: 'test',
-        sourceName: 'source',
-        fields: [],
-        facets: {},
-        tags: [],
-        lastModifiedAt: '2023-01-01',
-        description: 'Test dataset'
-      },
       inEdges: [
         {
           origin: 'job_bar',
@@ -134,41 +67,30 @@ const mockGraphWithCycle: LineageGraph = {
       ]
     }
   ]
+
+function mockSetState(newState: any) {
+    this.state = {...this.state, ...newState}
 }
 
 describe('Lineage Component', () => {
-  let instance
+ let instance: Lineage
 
   beforeEach(() => {
-    const mockStore = configureStore()
-    const store = mockStore({
-      lineage: {
-        lineage: mockGraphWithCycle,
-        selectedNode: mockGraphWithCycle.graph[0].id
-      }
-    })
-
-    const mockProps = {
-      classes: {
-        lineageContainer: ''
-      }
-    }
-
-    instance = mount(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Route path='/lineage/:nodeType/:namespace/:nodeName'>
-            <Lineage {...(mockProps as any)} />
-          </Route>
-        </MemoryRouter>
-      </Provider>
-    ).find(Lineage)
+      instance = new Lineage({selectedNode: "job_foo"} as unknown as LineageProps)
+      instance.setState = mockSetState
+      instance.initGraph()
+      instance.buildGraphAll(mockGraphWithCycle as unknown as LineageNode[])
   })
 
   it("doesn't follow cycles in the lineage graph", () => {
-    console.log(instance.debug())
     const paths = instance.getSelectedPaths()
 
-    console.log(JSON.stringify(paths))
+      const pathCounts = paths.reduce((acc, p) => {
+        const pathId = p.join(":")
+          acc[pathId] = acc[pathId] ? 1 : acc[pathId];
+          return acc;
+      }, {} as Record<string, number>)
+
+      expect(Object.values(pathCounts).some(c => c > 2)).toBe(false);
   })
 })

@@ -64,7 +64,7 @@ export interface JobOrDatasetMatchParams {
   nodeType: string
 }
 
-type LineageProps = WithStyles<typeof styles> &
+export type LineageProps = WithStyles<typeof styles> &
   StateProps &
   DispatchProps &
   RouteComponentProps<JobOrDatasetMatchParams>
