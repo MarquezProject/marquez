@@ -64,14 +64,14 @@ export interface JobOrDatasetMatchParams {
   nodeType: string
 }
 
-type LineageProps = WithStyles<typeof styles> &
+export type LineageProps = WithStyles<typeof styles> &
   StateProps &
   DispatchProps &
   RouteComponentProps<JobOrDatasetMatchParams>
 
 let g: graphlib.Graph<MqNode>
 
-class Lineage extends React.Component<LineageProps, LineageState> {
+export class Lineage extends React.Component<LineageProps, LineageState> {
   constructor(props: LineageProps) {
     super(props)
     this.state = {
@@ -143,7 +143,16 @@ class Lineage extends React.Component<LineageProps, LineageState> {
   getSelectedPaths = () => {
     const paths = [] as Array<[string, string]>
 
+    // Sets used to detect cycles and break out of the recursive loop
+    const visitedNodes = {
+      successors: new Set(),
+      predecessors: new Set()
+    }
+
     const getSuccessors = (node: string) => {
+      if (visitedNodes.successors.has(node)) return
+      visitedNodes.successors.add(node)
+
       const successors = g?.successors(node)
       if (successors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
@@ -156,6 +165,9 @@ class Lineage extends React.Component<LineageProps, LineageState> {
     }
 
     const getPredecessors = (node: string) => {
+      if (visitedNodes.predecessors.has(node)) return
+      visitedNodes.predecessors.add(node)
+
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
