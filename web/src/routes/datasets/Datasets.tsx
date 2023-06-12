@@ -51,7 +51,6 @@ interface DatasetsState {
 type DatasetsProps = WithStyles<typeof styles> & StateProps & DispatchProps
 
 class Datasets extends React.Component<DatasetsProps, DatasetsState> {
-  pageSize: number
 
   constructor(props: DatasetsProps) {
     super(props)
@@ -64,7 +63,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
 
   componentDidMount() {
     if (this.props.selectedNamespace) {
-      this.props.fetchDatasets(this.props.selectedNamespace, this.pageSize)
+      this.props.fetchDatasets(this.props.selectedNamespace, PAGE_SIZE)
     }
   }
 
