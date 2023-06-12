@@ -60,7 +60,6 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
       page: 1,
       pageIsLast: false
     }
-    // this.pageSize = 20
   }
 
   componentDidMount() {
@@ -162,8 +161,6 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
                     </Tooltip>
                   </Box>
                 </Box>
-                
-              
                 <Table size='small'>
                   <TableHead>
                     <TableRow>
