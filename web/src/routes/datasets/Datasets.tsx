@@ -22,6 +22,8 @@ import React from 'react'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
+const PAGE_SIZE = 20
+
 const styles = (theme: Theme) => createStyles({
   ml2: {
     marginLeft: theme.spacing(2)
@@ -58,7 +60,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
       page: 1,
       pageIsLast: false
     }
-    this.pageSize = 20
+    // this.pageSize = 20
   }
 
   componentDidMount() {
@@ -75,13 +77,13 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
       prevProps.selectedNamespace !== this.props.selectedNamespace &&
       this.props.selectedNamespace
     ) {
-      this.props.fetchDatasets(this.props.selectedNamespace, this.pageSize)
+      this.props.fetchDatasets(this.props.selectedNamespace, PAGE_SIZE)
     }
 
     if (datasetsProps !== datasetsState) {
       this.setState({
         datasets: datasetsProps,
-        pageIsLast: datasetsProps.length < page * this.pageSize
+        pageIsLast: datasetsProps.length < page * PAGE_SIZE
       })
     }
   }
@@ -92,13 +94,13 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
 
   getDatasets() {
     const { datasets, page } = this.state
-    return datasets.slice((page - 1) * this.pageSize, this.pageSize + (page - 1) * this.pageSize)
+    return datasets.slice((page - 1) * PAGE_SIZE, PAGE_SIZE + (page - 1) * PAGE_SIZE)
   }
 
   pageNavigation() {
     const { datasets, page } = this.state
     const titlePos = datasets.length
-      ? `${this.pageSize * page - this.pageSize} - ${datasets.length}`
+      ? `${PAGE_SIZE * page - PAGE_SIZE} - ${datasets.length}`
       : `${datasets.length}`
     return `${page} (${titlePos})`
   }
@@ -110,7 +112,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
     if (this.props.selectedNamespace) {
       this.props.fetchDatasets(
         this.props.selectedNamespace,
-        this.pageSize * directionPage
+        PAGE_SIZE * directionPage
       )
     }
     this.setState({ page: directionPage })
