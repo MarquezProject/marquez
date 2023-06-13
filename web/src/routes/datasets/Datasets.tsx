@@ -96,9 +96,15 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
   }
 
   pageNavigation() {
-    const { datasets, page } = this.state
-    const titlePos = datasets.length
-      ? `${PAGE_SIZE * page - PAGE_SIZE} - ${datasets.length}`
+    const { datasets, page, pageIsLast } = this.state
+    const titlePos = datasets.length < PAGE_SIZE && page === 1
+      ? `1 - ${datasets.length}` 
+      : datasets.length > PAGE_SIZE && page === 1
+      ? `1 - ${PAGE_SIZE}`
+      : datasets.length && page > 1 && pageIsLast === false
+      ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${PAGE_SIZE * page}`
+      : datasets.length && page > 1 && pageIsLast
+      ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${datasets.length}`
       : `${datasets.length}`
     return `${page} (${titlePos})`
   }
