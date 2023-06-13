@@ -12,7 +12,7 @@ test.skip('DatasetsPagination Component', () => {
         expect(wrapper.exists()).toBe(true)
     })
 
-    it('should find Tooltip elements continaing IconButton elements', () => {
+    it('should find Tooltip elements containing IconButton elements', () => {
         expect(
           wrapper
             .find(Tooltip)
