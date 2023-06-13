@@ -2,8 +2,12 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.34.0...HEAD)
 
+### Added
+* Web: add pagination to datasets [`#2512`](https://github.com/MarquezProject/marquez/pull/2512) [@merobi-hub](https://github.com/merobi-hub)  
+    *Adds pagination to the datasets route using the same approach employed for events.*
+
 ### Fixed
-* Web: Handle lineage graph cycles on the client [`#2506`](https://github.com/MarquezProject/marquez/pull/2506) [@jlukenoff](https://github.com/jlukenoff)
+* Web: handle lineage graph cycles on the client [`#2506`](https://github.com/MarquezProject/marquez/pull/2506) [@jlukenoff](https://github.com/jlukenoff)
     *Fixes a bug where we blow the stack on the client-side if the user selects a node that is part of a cycle in the graph*
 
 ## [0.34.0](https://github.com/MarquezProject/marquez/compare/0.33.0...0.34.0) - 2023-05-18
