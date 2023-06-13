@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.34.0...HEAD)
 
+### Fixed
+* Web: Handle lineage graph cycles on the client [`#2506`](https://github.com/MarquezProject/marquez/pull/2506) [@jlukenoff](https://github.com/jlukenoff)
+    *Fixes a bug where we blow the stack on the client-side if the user selects a node that is part of a cycle in the graph*
+
 ## [0.34.0](https://github.com/MarquezProject/marquez/compare/0.33.0...0.34.0) - 2023-05-18
 
 ### Fixed
