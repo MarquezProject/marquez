@@ -19,10 +19,23 @@ dbRetention:
   retentionDays: 7
 ```
 
+### How do I run a _one-off_ _ad-hoc_ retention policy to metadata?
+
 **`CLI`**
 
 To run a  _one-off_ _ad-hoc_ retention policy on your metadata, use the [`db-retention`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/DbRetentionCommand.java) command:
 
 ```bash
 java -jar marquez-api.jar db-retention --number-of-rows-per-batch 500 --retention-days 7 marquez.yml
+```
+
+or, you can .. admin task [`DbRetentionTask`]():
+
+```bash
+curl -X POST http://localhost:8081/admin/tasks/db-retention \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "numberOfRowsPerBatch": 100,
+        "retentionDays": 30
+      }'
 ```

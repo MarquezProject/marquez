@@ -23,10 +23,7 @@ public final class DbRetention {
 
   /** ... */
   public static void retentionOnDbOrError(
-      @NonNull Jdbi jdbi,
-      final int numberOfRowsPerBatch,
-      final int retentionDays,
-      final boolean explainPlanOnly)
+      @NonNull Jdbi jdbi, final int numberOfRowsPerBatch, final int retentionDays)
       throws DbRetentionException {
     // (1) ...
     retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays);

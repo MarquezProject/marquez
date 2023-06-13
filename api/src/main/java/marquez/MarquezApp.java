@@ -25,6 +25,8 @@ import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.admin.tasks.DbClearTask;
+import marquez.api.admin.tasks.DbRetentionTask;
 import marquez.api.filter.JobRedirectFilter;
 import marquez.cli.DbMigrationCommand;
 import marquez.cli.DbRetentionCommand;
@@ -145,6 +147,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
                   config.getDbRetention().getNumberOfRowsPerBatch(),
                   config.getDbRetention().getRetentionDays()));
     }
+
+    // TODO
+    env.admin().addTask(new DbClearTask());
+    env.admin().addTask(new DbRetentionTask(jdbi));
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
