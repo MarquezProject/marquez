@@ -10,7 +10,6 @@ FROM base AS build
 WORKDIR /usr/src/app
 COPY build.gradle build.gradle
 COPY api ./api
-COPY api/build.gradle ./api/build.gradle
 COPY clients/java ./clients/java
 RUN ./gradlew --no-daemon clean :api:shadowJar
 
