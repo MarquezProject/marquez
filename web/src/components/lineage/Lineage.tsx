@@ -5,21 +5,20 @@ import React from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box } from '@material-ui/core'
+import { Box } from '@mui/material'
 import { DAGRE_CONFIG, INITIAL_TRANSFORM, NODE_SIZE } from './config'
 import { GraphEdge, Node as GraphNode, graphlib, layout } from 'dagre'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { JobOrDataset, LineageNode, MqNode } from './types'
 import { LineageGraph } from '../../types/api'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
-import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchLineage, resetLineage, setSelectedNode } from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
+import { useParams } from 'react-router-dom'
 import Edge from './components/edge/Edge'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
@@ -27,16 +26,6 @@ import Node from './components/node/Node'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 
 const BOTTOM_OFFSET = 8
-
-const styles = () => {
-  return createStyles({
-    lineageContainer: {
-      marginTop: HEADER_HEIGHT,
-      height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
-    }
-  })
-}
-
 const MIN_ZOOM = 1 / 4
 const MAX_ZOOM = 4
 const DOUBLE_CLICK_MAGNIFICATION = 1.1
@@ -64,66 +53,74 @@ export interface JobOrDatasetMatchParams {
   nodeType: string
 }
 
-export type LineageProps = WithStyles<typeof styles> &
-  StateProps &
-  DispatchProps &
-  RouteComponentProps<JobOrDatasetMatchParams>
+type LineageProps = StateProps &
+  DispatchProps 
 
 let g: graphlib.Graph<MqNode>
 
-export class Lineage extends React.Component<LineageProps, LineageState> {
-  constructor(props: LineageProps) {
-    super(props)
-    this.state = {
-      graph: g,
-      edges: [],
-      nodes: []
+const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
+  const [state, setState] = React.useState<LineageState>({
+    graph: g,
+    edges: [],
+    nodes: []
+  })
+  const { nodeName, namespace, nodeType } = useParams()
+  const mounted = React.useRef<boolean>(false)
+
+  const prevLineage = React.useRef<LineageGraph>()
+  const prevSelectedNode = React.useRef<string>()
+
+  React.useEffect(() => {
+    if (!mounted.current) {
+      console.log('mount TODO remove')
+      // on mount
+      if (nodeName && namespace && nodeType) {
+        const nodeId = generateNodeId(
+          nodeType.toUpperCase() as JobOrDataset,
+          namespace,
+          nodeName
+        )
+        props.setSelectedNode(nodeId)
+        props.fetchLineage(
+          nodeType.toUpperCase() as JobOrDataset,
+          namespace,
+          nodeName
+        )
+      }
+      mounted.current = true
+    } else {
+      // on update
+      // TODO BUG HERE
+      if (
+        JSON.stringify(props.lineage) !== JSON.stringify(prevLineage.current) &&
+        props.selectedNode
+      ) {
+        initGraph()
+        buildGraphAll(props.lineage.graph)
+      }
+      if (props.selectedNode !== prevSelectedNode.current) {
+        props.fetchLineage(
+          nodeType?.toUpperCase() as JobOrDataset,
+          namespace || '',
+          nodeName || ''
+        )
+        getEdges()
+      }
+
+      prevLineage.current = props.lineage
+      prevSelectedNode.current = props.selectedNode
     }
-  }
+  })
 
-  componentDidMount() {
-    const nodeName = this.props.match.params.nodeName
-    const namespace = this.props.match.params.namespace
-    const nodeType = this.props.match.params.nodeType
-
-    if (nodeName && namespace && nodeType) {
-      const nodeId = generateNodeId(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
-      this.props.setSelectedNode(nodeId)
-      this.props.fetchLineage(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
+  React.useEffect(() => {
+    // on unmount
+    return () => {
+      console.log('unmount TODO remove')
+      props.resetLineage()
     }
-  }
+  }, [])
 
-  componentDidUpdate(prevProps: Readonly<LineageProps>) {
-    if (
-      JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) &&
-      this.props.selectedNode
-    ) {
-      this.initGraph()
-      this.buildGraphAll(this.props.lineage.graph)
-    }
-    if (this.props.selectedNode !== prevProps.selectedNode) {
-      this.props.fetchLineage(
-        this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
-        this.props.match.params.namespace,
-        this.props.match.params.nodeName
-      )
-      this.getEdges()
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.resetLineage()
-  }
-
-  initGraph = () => {
+  const initGraph = () => {
     g = new graphlib.Graph<MqNode>({ directed: true })
     g.setGraph(DAGRE_CONFIG)
     g.setDefaultEdgeLabel(() => {
@@ -131,8 +128,8 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
     })
   }
 
-  getEdges = () => {
-    const selectedPaths = this.getSelectedPaths()
+  const getEdges = () => {
+    const selectedPaths = getSelectedPaths()
 
     return g?.edges().map(e => {
       const isSelected = selectedPaths.some((r: any) => e.v === r[0] && e.w === r[1])
@@ -140,19 +137,10 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
     })
   }
 
-  getSelectedPaths = () => {
+  const getSelectedPaths = () => {
     const paths = [] as Array<[string, string]>
 
-    // Sets used to detect cycles and break out of the recursive loop
-    const visitedNodes = {
-      successors: new Set(),
-      predecessors: new Set()
-    }
-
     const getSuccessors = (node: string) => {
-      if (visitedNodes.successors.has(node)) return
-      visitedNodes.successors.add(node)
-
       const successors = g?.successors(node)
       if (successors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
@@ -165,9 +153,6 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
     }
 
     const getPredecessors = (node: string) => {
-      if (visitedNodes.predecessors.has(node)) return
-      visitedNodes.predecessors.add(node)
-
       const predecessors = g?.predecessors(node)
       if (predecessors?.length) {
         for (let i = 0; i < node.length - 1; i++) {
@@ -179,13 +164,13 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
       }
     }
 
-    getSuccessors(this.props.selectedNode)
-    getPredecessors(this.props.selectedNode)
+    getSuccessors(props.selectedNode)
+    getPredecessors(props.selectedNode)
 
     return paths
   }
 
-  buildGraphAll = (graph: LineageNode[]) => {
+  const buildGraphAll = (graph: LineageNode[]) => {
     // nodes
     for (let i = 0; i < graph.length; i++) {
       g.setNode(graph[i].id, {
@@ -204,27 +189,28 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
     }
     layout(g)
 
-    this.setState({
+    setState({
       graph: g,
-      edges: this.getEdges(),
+      edges: getEdges(),
       nodes: g.nodes().map(v => g.node(v))
     })
   }
 
-  render() {
-    const { classes } = this.props
-    const i18next = require('i18next')
+  const i18next = require('i18next')
 
     return (
-      <Box className={classes.lineageContainer}>
-        {this.props.selectedNode === null && (
+      <Box sx={{
+        marginTop: `${HEADER_HEIGHT}px`,
+        height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
+      }}>
+        {props.selectedNode === null && (
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
             <MqEmpty title={i18next.t('lineage.empty_title')}>
               <MqText subdued>{i18next.t('lineage.empty_body')}</MqText>
             </MqEmpty>
           </Box>
         )}
-        {this.state.graph && (
+        {state?.graph && (
           <ParentSize>
             {parent => (
               <Zoom
@@ -234,7 +220,7 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
                 scaleXMax={MAX_ZOOM}
                 scaleYMin={MIN_ZOOM}
                 scaleYMax={MAX_ZOOM}
-                transformMatrix={INITIAL_TRANSFORM}
+                initialTransformMatrix={INITIAL_TRANSFORM}
               >
                 {zoom => {
                   return (
@@ -249,7 +235,7 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
                       >
                         {/* background */}
                         <g transform={zoom.toString()}>
-                          <Edge edgePoints={this.state.edges} />
+                          <Edge edgePoints={state?.edges} />
                         </g>
                         <rect
                           width={parent.width}
@@ -280,11 +266,11 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
                         />
                         {/* foreground */}
                         <g transform={zoom.toString()}>
-                          {this.state.nodes.map(node => (
+                          {state?.nodes.map(node => (
                             <Node
                               key={node.data.name}
                               node={node}
-                              selectedNode={this.props.selectedNode}
+                              selectedNode={props.selectedNode}
                             />
                           ))}
                         </g>
@@ -298,7 +284,6 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
         )}
       </Box>
     )
-  }
 }
 
 const mapStateToProps = (state: IState) => ({
@@ -316,4 +301,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Lineage)))
+export default connect(mapStateToProps, mapDispatchToProps)(Lineage)

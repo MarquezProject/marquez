@@ -7,7 +7,7 @@ module.exports = {
   module: {
     rules: [{
         test: /\.css$/,
-        use: [{
+      use: [{
             loader: 'style-loader',
           },
           {
@@ -19,12 +19,12 @@ module.exports = {
               },
             }
           },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: [postCssModulesValues, autoprefixer],
-            },
-          }
+          // {
+          //   loader: 'postcss-loader',
+          //   options: {
+          //     plugins: [postCssModulesValues, autoprefixer],
+          //   },
+          // }
         ]
       },
       {
@@ -41,10 +41,10 @@ module.exports = {
           }
         }]
       },
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
       {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader"
+        loader: "ts-loader"
       },
       {
         test: /\.ico$/,
