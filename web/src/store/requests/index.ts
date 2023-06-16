@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { APIError, HttpMethod } from '../../types'
+import { mockCall } from './lineage'
 
 export const genericErrorMessageConstructor = (functionName: string, error: APIError): string => {
   const { code, message, details } = error
@@ -36,6 +37,11 @@ export const parseResponse = async (response: Response, functionName: string) =>
 }
 
 export const genericFetchWrapper = async (url: string, params: IParams, functionName: string) => {
+  // TODO remove this and fix the CORS issue
+  // if (functionName === 'fetchLineage') {
+  //   return mockCall;
+  // }
+
   const response = await fetch(url, params)
   return parseResponse(response, functionName)
 }
