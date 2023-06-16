@@ -22,9 +22,9 @@ import { useParams } from 'react-router-dom'
 
 test.skip('JobDetailPage Component', () => {
   describe('when there is no match for the jobName in url params', () => {
-    useParams.mockImplementation(() => ({
-      jobName: 'job.nomatch'
-    }))
+    // useParams.mockImplementation(() => ({
+    //   jobName: 'job.nomatch'
+    // }))
 
     render(<JobDetailPage />)
 
@@ -199,9 +199,9 @@ test.skip('JobDetailPage Component', () => {
 
     const job = { ...jobs[0], latestRuns: tempJobRuns }
 
-    useParams.mockImplementation(() => ({
-      jobName: job.name
-    }))
+    // useParams.mockImplementation(() => ({
+    //   jobName: job.name
+    // }))
 
     render(<JobDetailPage />)
 
@@ -253,9 +253,9 @@ test.skip('JobDetailPage Component', () => {
     it('if there is no SQL, should render text saying so', () => {
       const job = { ...jobs[0], context: {} }
 
-      useParams.mockImplementation(() => ({
-        jobName: job.name
-      }))
+      // useParams.mockImplementation(() => ({
+      //   jobName: job.name
+      // }))
 
       render(<JobDetailPage />)
 
