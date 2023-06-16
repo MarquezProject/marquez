@@ -160,7 +160,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [https://marquezproject.slack.com](http://bit.ly/MarquezSlack)
+* Chat: [https://marquezproject.slack.com](https://bit.ly/MqzSlack)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
