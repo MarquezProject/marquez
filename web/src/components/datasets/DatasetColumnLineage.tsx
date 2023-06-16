@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button } from '@material-ui/core'
+import { Box, Button } from '@mui/material'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, FormControl, MenuItem, Select, WithStyles, createStyles } from '@material-ui/core'
+import { Box, FormControl, MenuItem, Select } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
 import { Namespace } from '../../types/api'
@@ -13,14 +13,6 @@ import { selectNamespace } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import MqText from '../core/text/MqText'
 import React from 'react'
-import withStyles from '@material-ui/core/styles/withStyles'
-
-const styles = () =>
-  createStyles({
-    formControl: {
-      minWidth: '140px'
-    }
-  })
 
 interface OwnProps {}
 
@@ -33,42 +25,42 @@ interface DispatchProps {
   selectNamespace: typeof selectNamespace
 }
 
-type NamespaceSelectProps = WithStyles<typeof styles> & OwnProps & StateProps & DispatchProps
+type NamespaceSelectProps = OwnProps & StateProps & DispatchProps
 
-class NamespaceSelect extends React.Component<NamespaceSelectProps, StateProps> {
-  render() {
-    const { classes, namespaces, selectedNamespace } = this.props
-    const i18next = require('i18next')
-    if (selectedNamespace) {
-      return (
-        <FormControl variant='outlined' className={classes.formControl}>
-          <Box position={'relative'}>
-            <Box position={'absolute'} left={12} top={9}>
-              <MqText color={theme.palette.primary.main} font={'mono'}>
-                {i18next.t('namespace_select.prompt')}
-              </MqText>
-            </Box>
+const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedNamespace, selectNamespace }) => {
+
+  const i18next = require('i18next')
+  if (selectedNamespace) {
+    return (
+      <FormControl variant='outlined' sx={{
+        minWidth: '140px'
+      }}>
+        <Box position={'relative'}>
+          <Box position={'absolute'} left={12} top={9}>
+            <MqText color={theme.palette.primary.main} font={'mono'}>
+              {i18next.t('namespace_select.prompt')}
+            </MqText>
           </Box>
-          <Select
-            labelId='namespace-label'
-            id='namespace-select'
-            value={selectedNamespace}
-            onChange={event => {
-              this.props.selectNamespace(event.target.value as string)
-            }}
-            label='Namespace'
-            input={<MqInputBase />}
-          >
-            {namespaces.map(namespace => (
-              <MenuItem key={namespace.name} value={namespace.name}>
-                {namespace.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )
-    } else return null
-  }
+        </Box>
+        <Select
+          labelId='namespace-label'
+          id='namespace-select'
+          value={selectedNamespace}
+          onChange={event => {
+            selectNamespace(event.target.value as string)
+          }}
+          label='Namespace'
+          input={<MqInputBase />}
+        >
+          {namespaces.map(namespace => (
+            <MenuItem key={namespace.name} value={namespace.name}>
+              {namespace.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    )
+  } else return null
 }
 
 const mapStateToProps = (state: IState) => ({
@@ -84,4 +76,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(NamespaceSelect))
+export default connect(mapStateToProps, mapDispatchToProps)(NamespaceSelect)

@@ -1,14 +1,16 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { createTheme } from '@material-ui/core'
+import { createTheme } from '@mui/material'
 
 export const theme = createTheme({
-  overrides: {
+  components: {
     MuiCssBaseline: {
-      '@global': {
-        body: {
-          color: '#fff'
+      styleOverrides: {
+        '@global': {
+          body: {
+            color: '#fff'
+          }
         }
       }
     }
@@ -26,7 +28,7 @@ export const theme = createTheme({
     fontSize: 14
   },
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
       main: '#71ddbf'
     },

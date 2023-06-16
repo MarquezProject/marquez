@@ -2,17 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Chip, Tab, Tabs } from '@material-ui/core'
+import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
 import { LineageDataset } from '../lineage/types'
-import { alpha } from '@material-ui/core/styles'
+import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { datasetFacetsStatus } from '../../helpers/nodes'
@@ -23,47 +18,18 @@ import {
   resetDataset,
   resetDatasetVersions
 } from '../../store/actionCreators'
-import { theme } from '../../helpers/theme'
-import { useHistory } from 'react-router-dom'
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
-import CloseIcon from '@material-ui/icons/Close'
+import { useNavigate } from 'react-router-dom'
+import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
-import IconButton from '@material-ui/core/IconButton'
+import IconButton from '@mui/material/IconButton'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 
+import { useTheme } from '@emotion/react'
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
-
-const styles = ({ spacing }: ITheme) => {
-  return createStyles({
-    root: {
-      padding: `0 ${spacing(2)}px`
-    },
-    tagList: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      listStyle: 'none',
-      margin: 0,
-      padding: 0
-    },
-    tag: {
-      '&:not(:last-of-type)': {
-        marginRight: spacing(1)
-      }
-    },
-    buttonDelete: {
-      borderColor: theme.palette.error.main,
-      color: theme.palette.error.main,
-      '&:hover': {
-        borderColor: alpha(theme.palette.error.main, 0.3),
-        backgroundColor: alpha(theme.palette.error.main, 0.3)
-      }
-    }
-  })
-}
 
 interface StateProps {
   lineageDataset: LineageDataset
@@ -81,7 +47,7 @@ interface DispatchProps {
   dialogToggle: typeof dialogToggle
 }
 
-type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
+type IProps = StateProps & DispatchProps
 
 function a11yProps(index: number) {
   return {
@@ -92,7 +58,6 @@ function a11yProps(index: number) {
 
 const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const {
-    classes,
     datasets,
     display,
     fetchDatasetVersions,
@@ -104,9 +69,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     versionsLoading,
     lineageDataset
   } = props
-  const { root } = classes
-  const history = useHistory()
+  const navigate = useNavigate()
   const i18next = require('i18next')
+  const theme = createTheme(useTheme())
 
   useEffect(() => {
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
@@ -114,7 +79,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
 
   useEffect(() => {
     if (datasets.deletedDatasetName) {
-      history.push('/datasets')
+      navigate('/datasets')
     }
   }, [datasets.deletedDatasetName])
 
@@ -149,12 +114,22 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   return (
-    <Box my={2} className={root}>
+    <Box my={2} sx={{
+      padding: `0 ${theme.spacing(2)}px`
+    }}>
       <Box>
         {tags.length > 0 && (
-          <ul className={classes.tagList}>
-            {tags.map(tag => (
-              <li key={tag} className={classes.tag}>
+          <ul style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            listStyle: 'none',
+            margin: 0,
+            padding: 0
+          }}>
+            {tags.map((tag, index) => (
+              <li key={tag} style={index < tags.length - 1 ? {
+                marginRight: theme.spacing(1)
+              } : {}}>
                 <Chip size='small' label={tag} />
               </li>
             ))}
@@ -184,7 +159,14 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
             <Box mr={1}>
               <Button
                 variant='outlined'
-                className={classes.buttonDelete}
+                sx={{
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.3),
+                    backgroundColor: alpha(theme.palette.error.main, 0.3)
+                  }
+                }}
                 onClick={() => {
                   props.dialogToggle('')
                 }}
@@ -201,7 +183,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                 }}
               />
             </Box>
-            <IconButton onClick={() => history.push('/datasets')}>
+            <IconButton onClick={() => navigate('/datasets')}>
               <CloseIcon />
             </IconButton>
           </Box>
@@ -252,4 +234,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(DatasetDetailPage))
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetDetailPage)

@@ -1,16 +1,16 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
-import { Box } from '@material-ui/core'
+import * as Redux from 'redux'
+import { Box } from '@mui/material'
+import { IState } from '../../store/reducers'
 import { Run } from '../../types/api'
+import { connect } from 'react-redux'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
-import * as Redux from 'redux'
-import { IState } from '../../store/reducers'
-import { connect } from 'react-redux'
-import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets

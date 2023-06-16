@@ -1,20 +1,20 @@
 module.exports = {
   roots: ['<rootDir>/src'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        isolatedModules: 'true'
+      }
+    ]
   },
   testRegex: '__tests__/(.+).(test|spec).tsx?',
   testPathIgnorePatterns: ['<rootDir>/src/__tests__(.+)__snapshots__'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupTestFrameworkScriptFile: '<rootDir>/setupEnzyme.ts',
   globalSetup: '<rootDir>globalSetup.ts',
   setupFiles: ['<rootDir>setupJest.ts'],
   testEnvironment: 'jsdom',
   globals: {
-    'ts-jest': {
-      isolatedModules: 'true'
-    },
     __API_URL__: '/api/v1',
     __FEEDBACK_FORM_URL__: 'https://forms.gle/f3tTSrZ8wPj3sHTA7',
     __API_DOCS_URL__: 'https://marquezproject.github.io/marquez/openapi.html',

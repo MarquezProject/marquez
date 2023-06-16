@@ -1,15 +1,22 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Theme, createStyles } from '@material-ui/core'
+import { Box } from '@mui/material'
 import { theme } from '../../helpers/theme'
 import MqText from '../core/text/MqText'
 import React from 'react'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
+const importI18next = () => {
+  const i18next = require('i18next')
+  return i18next
+}
+
+interface SearchPlaceholderProps { }
+
+const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
+  const i18next = importI18next()
+  return (
+    <Box sx={{
       zIndex: theme.zIndex.appBar + 3,
       position: 'absolute',
       top: 8,
@@ -17,18 +24,7 @@ const styles = (theme: Theme) =>
       height: 0,
       overflow: 'visible',
       pointerEvents: 'none'
-    }
-  })
-
-const importI18next = () => {
-  const i18next = require('i18next')
-  return i18next
-}
-
-const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => {
-  const i18next = importI18next()
-  return (
-    <Box className={classes.root}>
+    }}>
       <Box display={'inline'}>
         <MqText disabled inline>
           {' '}
@@ -51,4 +47,4 @@ const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => 
   )
 }
 
-export default withStyles(styles)(SearchPlaceholder)
+export default SearchPlaceholder
