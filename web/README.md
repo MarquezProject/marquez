@@ -2,7 +2,7 @@
 
 ### Requirements
 
-To develop on this project, you need to have Node version 12.22.7 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
+To develop on this project, you need to have Node version 18 installed. In order to easily switch between node versions, we recommend using node version manager like [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md)
 
 ### Development
 
@@ -37,11 +37,10 @@ To develop on this project, you need to have Node version 12.22.7 installed. In 
 ### Testing Setup
 
 - [Jest](https://jestjs.io/en/) is our testing framework. It is the test runner; it provides testing language (describe, it, beforeEach), mocking, snapshot, code coverage.
-- [Enzyme](https://github.com/airbnb/enzyme) - testing utility for testing React components. Provides methods for (mock) rendering components & DOM traversal.
-- run tests by doing `yarn run test`
+- [test-labrary](https://testing-library.com/)
+- run tests by doing `npm run test`
 - config files:
   - jest.config.js
-  - setupEnzyme.ts
 - For testing Redux Sagas, we are using `Redux Saga Test Plan`. This library gives us both unit testing and integration test functionality. Check out the [docs](http://redux-saga-test-plan.jeremyfairbank.com/).
 
 ### Typescript
