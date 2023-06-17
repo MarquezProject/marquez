@@ -13,20 +13,21 @@ metadata:
     {{- end }}
 data:
   ### HTTP SERVER CONFIG ###
-  
+
   config.yml: |-
-    # Enables HTTP server configuration overrides (see: https://www.dropwizard.io/en/stable/manual/configuration.html#servers)      
+    # Enables HTTP server configuration overrides (see: https://www.dropwizard.io/en/stable/manual/configuration.html#servers)
     server:
       applicationConnectors:
       - type: http
         port: ${MARQUEZ_PORT}
+        httpCompliance: RFC7230_LEGACY
       adminConnectors:
       - type: http
         port: ${MARQUEZ_ADMIN_PORT}
-  
+
     ### DATABASE CONFIG ###
 
-    # Enables database configuration overrides (see: https://www.dropwizard.io/en/stable/manual/configuration.html#database)    
+    # Enables database configuration overrides (see: https://www.dropwizard.io/en/stable/manual/configuration.html#database)
     db:
       driverClass: org.postgresql.Driver
       url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
