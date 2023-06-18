@@ -210,7 +210,7 @@ To view the Airflow UI and verify it's running, open [http://localhost:8080](htt
 
 To ensure that Airflow is executing `counter` and `sum`, navigate to the DAGs tab in Airflow and verify that they are both enabled and are in a _running_ state:
 
-![](airflow-view-dag.png)
+![](./docs/airflow-view-dag.png)
 
 To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI by visiting [http://localhost:3000](http://localhost:3000). Then, use the _search_ bar in the upper right-side of the page and search for the `counter.inc` job. To view lineage metadata for `counter.inc`, click on the job from the drop-down list:
 
@@ -222,7 +222,7 @@ To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI
 
 If you take a quick look at the lineage graph for `counter.if_not_exists`, you should see `example.public.counts` as an output dataset and `sum.total` as a downstream job!
 
-![](current-lineage-view-job.png)
+![](./docs/current-lineage-view-job.png)
 
 # Step 5: Troubleshoot a Failing DAG with Marquez
 
@@ -273,7 +273,7 @@ t2 = PostgresOperator(
 
 Team `B`, unaware of the schema change, owns DAG `sum` and begins to see DAG run metadata with _failed_ run states:
 
-![](job_failure.png)
+![](./docs/job_failure.png)
 
 But, team `B` isn't sure what might have caused the DAG failure as no recent code changes have been made to DAG `sum`. So, team `B` decides to check the schema of the input dataset:
 
