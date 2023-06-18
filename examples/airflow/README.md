@@ -273,7 +273,7 @@ t2 = PostgresOperator(
 
 Team `B`, unaware of the schema change, owns DAG `sum` and begins to see DAG run metadata with _failed_ run states:
 
-![](./docs/job_failure.png)
+![](./docs/search-job-failure.png)
 
 But, team `B` isn't sure what might have caused the DAG failure as no recent code changes have been made to DAG `sum`. So, team `B` decides to check the schema of the input dataset:
 
