@@ -217,7 +217,7 @@ To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI
 > **Note:** If the `counter.inc` job is not in the drop-down list, check to see if Airflow has successfully executed the DAG.
 
 <p align="center">
-  <img src={require("./current-search-count.png").default} />
+  <img src={require("./docs/current-search-count.png").default} />
 </p>
 
 If you take a quick look at the lineage graph for `counter.if_not_exists`, you should see `example.public.counts` as an output dataset and `sum.total` as a downstream job!
