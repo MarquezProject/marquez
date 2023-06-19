@@ -214,12 +214,10 @@ To ensure that Airflow is executing `counter` and `sum`, navigate to the DAGs ta
 
 To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI by visiting [http://localhost:3000](http://localhost:3000). Then, use the _search_ bar in the upper right-side of the page and search for the `counter.inc` job. To view lineage metadata for `counter.inc`, click on the job from the drop-down list:
 
-![](docs/current-search-count.png)
-
 > **Note:** If the `counter.inc` job is not in the drop-down list, check to see if Airflow has successfully executed the DAG.
 
 <p align="center">
-  <img src={require("./search.png").default} />
+  <img src={require("./current-search-count.png").default} />
 </p>
 
 If you take a quick look at the lineage graph for `counter.if_not_exists`, you should see `example.public.counts` as an output dataset and `sum.total` as a downstream job!
