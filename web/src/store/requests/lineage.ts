@@ -6,7 +6,16 @@ import { JobOrDataset } from '../../components/lineage/types'
 import { generateNodeId } from '../../helpers/nodes'
 import { genericFetchWrapper } from './index'
 
-export const getLineage = async (nodeType: JobOrDataset, namespace: string, name: string) => {
-  const url = `${API_URL}/lineage/?nodeId=${generateNodeId(nodeType, namespace, name)}`
+export const getLineage = async (
+  nodeType: JobOrDataset,
+  namespace: string,
+  name: string,
+  depth: number
+) => {
+  const params = new URLSearchParams({
+    nodeId: generateNodeId(nodeType, namespace, name),
+    depth: depth.toString()
+  })
+  const url = `${API_URL}/lineage/?${params.toString()}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchLineage')
 }
