@@ -24,7 +24,7 @@ const initialState: ILineageState = {
   lineage: { graph: [] },
   selectedNode: null,
   bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3,
-  depth: 1
+  depth: 5
 }
 
 type ILineageActions = ReturnType<typeof setSelectedNode> &
