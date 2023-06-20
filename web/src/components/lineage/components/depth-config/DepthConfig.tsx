@@ -1,11 +1,14 @@
-import { bindActionCreators } from 'redux'
+// Copyright 2018-2023 contributors to the Marquez project
+// SPDX-License-Identifier: Apache-2.0
+
+import * as Redux from 'redux'
+import { Box, Typography } from '@material-ui/core'
 import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { setLineageGraphDepth } from '../../../../store/actionCreators'
 import React from 'react'
-import * as Redux from 'redux'
 import TextField from '@material-ui/core/TextField'
-import { connect } from 'react-redux'
-import { Box, Typography } from '@material-ui/core'
 
 const styles = createStyles({
   root: {
@@ -41,13 +44,12 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ classes, setDepth, depth }) =
       <TextField
         type='number'
         value={depth}
-        onChange={e => setDepth(parseInt(e.target.value))}
+        onChange={e => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
         variant='outlined'
         size='small'
         aria-label={GRAPH_TITLE}
         className={classes.textField}
         inputProps={{
-          min: 2,
           max: 100
         }}
       />

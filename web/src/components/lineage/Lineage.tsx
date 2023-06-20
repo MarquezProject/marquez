@@ -111,13 +111,17 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
     if (
-      JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) &&
+      (JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) ||
+        this.props.depth !== prevProps.depth) &&
       this.props.selectedNode
     ) {
       this.initGraph()
       this.buildGraphAll(this.props.lineage.graph)
     }
-    if (this.props.selectedNode !== prevProps.selectedNode) {
+    if (
+      this.props.selectedNode !== prevProps.selectedNode ||
+      this.props.depth !== prevProps.depth
+    ) {
       this.props.fetchLineage(
         this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
         this.props.match.params.namespace,
