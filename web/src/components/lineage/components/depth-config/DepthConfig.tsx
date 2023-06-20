@@ -51,6 +51,7 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ classes, setDepth, depth }) =
         aria-label={GRAPH_TITLE}
         className={classes.textField}
         inputProps={{
+          min: 0,
           max: 100
         }}
       />
