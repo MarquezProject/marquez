@@ -31,8 +31,6 @@ const styles = (theme: Theme) =>
     }
   })
 
-hmm
-
 interface DepthConfigProps extends WithStyles<typeof styles> {
   depth: number
   setDepth: (depth: number) => void
