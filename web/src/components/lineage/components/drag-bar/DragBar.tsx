@@ -26,8 +26,7 @@ const styles = (theme: Theme) =>
       transition: theme.transitions.create(['background-color']),
       '&:hover': {
         backgroundColor: theme.palette.primary.main
-      },
-      zIndex: 2
+      }
     },
     resizing: {
       backgroundColor: theme.palette.primary.main

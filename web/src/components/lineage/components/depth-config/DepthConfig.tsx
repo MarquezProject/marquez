@@ -3,32 +3,33 @@
 
 import * as Redux from 'redux'
 import { Box, Typography } from '@material-ui/core'
-import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
+import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setLineageGraphDepth } from '../../../../store/actionCreators'
 import React from 'react'
 import TextField from '@material-ui/core/TextField'
 
-const styles = createStyles({
-  root: {
-    position: 'absolute',
-    display: 'flex',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    right: 0,
-    marginRight: '3rem',
-    padding: '1rem',
-    zIndex: 1
-  },
-  title: {
-    textAlign: 'center'
-  },
-  textField: {
-    width: '4rem',
-    marginLeft: '0.5rem'
-  }
-})
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      position: 'absolute',
+      display: 'flex',
+      justifyContent: 'space-evenly',
+      alignItems: 'center',
+      right: 0,
+      marginRight: '3rem',
+      padding: '1rem',
+      zIndex: theme.zIndex.appBar
+    },
+    title: {
+      textAlign: 'center'
+    },
+    textField: {
+      width: '4rem',
+      marginLeft: '0.5rem'
+    }
+  })
 
 interface DepthConfigProps extends WithStyles<typeof styles> {
   depth: number
