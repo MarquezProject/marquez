@@ -5,26 +5,31 @@ import {
   FETCH_LINEAGE_SUCCESS,
   RESET_LINEAGE,
   SET_BOTTOM_BAR_HEIGHT,
+  SET_LINEAGE_GRAPH_DEPTH,
   SET_SELECTED_NODE
 } from '../actionCreators/actionTypes'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { LineageGraph } from '../../types/api'
 import { Nullable } from '../../types/util/Nullable'
-import { setBottomBarHeight, setSelectedNode } from '../actionCreators'
+import { setBottomBarHeight, setLineageGraphDepth, setSelectedNode } from '../actionCreators'
 
 export interface ILineageState {
   lineage: LineageGraph
   selectedNode: Nullable<string>
   bottomBarHeight: number
+  depth: number
 }
 
 const initialState: ILineageState = {
   lineage: { graph: [] },
   selectedNode: null,
-  bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3
+  bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3,
+  depth: 5
 }
 
-type ILineageActions = ReturnType<typeof setSelectedNode> & ReturnType<typeof setBottomBarHeight>
+type ILineageActions = ReturnType<typeof setSelectedNode> &
+  ReturnType<typeof setBottomBarHeight> &
+  ReturnType<typeof setLineageGraphDepth>
 
 const DRAG_BAR_HEIGHT = 8
 
@@ -41,6 +46,11 @@ export default (state = initialState, action: ILineageActions) => {
           window.innerHeight - HEADER_HEIGHT - DRAG_BAR_HEIGHT,
           Math.max(2, action.payload)
         )
+      }
+    case SET_LINEAGE_GRAPH_DEPTH:
+      return {
+        ...state,
+        depth: action.payload
       }
     case RESET_LINEAGE: {
       return { ...state, lineage: { graph: [] } }
