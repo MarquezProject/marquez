@@ -15,10 +15,16 @@ import { LineageGraph } from '../../types/api'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchLineage, resetLineage, setSelectedNode } from '../../store/actionCreators'
+import {
+  fetchLineage,
+  resetLineage,
+  setLineageGraphDepth,
+  setSelectedNode
+} from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
 import { useParams } from 'react-router-dom'
+import DepthConfig from './components/depth-config/DepthConfig'
 import Edge from './components/edge/Edge'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
@@ -33,6 +39,7 @@ const DOUBLE_CLICK_MAGNIFICATION = 1.1
 interface StateProps {
   lineage: LineageGraph
   selectedNode: string
+  depth: number
 }
 
 interface LineageState {
@@ -84,7 +91,6 @@ export function buildGraphAll(g: graphlib.Graph<MqNode>, graph: LineageNode[], c
 
   callBack(g)
 }
-
 
 export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string) {
   const paths = [] as Array<[string, string]>
@@ -165,7 +171,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
         props.fetchLineage(
           nodeType.toUpperCase() as JobOrDataset,
           namespace,
-          nodeName
+          nodeName,
+          props.depth
         )
       }
       mounted.current = true
@@ -188,7 +195,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
         props.fetchLineage(
           nodeType?.toUpperCase() as JobOrDataset,
           namespace || '',
-          nodeName || ''
+          nodeName || '',
+          props.depth
         )
         getEdges()
       }
@@ -228,6 +236,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
             </MqEmpty>
           </Box>
         )}
+        <DepthConfig depth={props.depth} />
         {state?.graph && (
           <ParentSize>
             {parent => (
@@ -306,7 +315,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
-  selectedNode: state.lineage.selectedNode
+  selectedNode: state.lineage.selectedNode,
+  depth: state.lineage.depth
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -314,7 +324,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       setSelectedNode: setSelectedNode,
       fetchLineage: fetchLineage,
-      resetLineage: resetLineage
+      resetLineage: resetLineage,
+      setDepth: setLineageGraphDepth
     },
     dispatch
   )

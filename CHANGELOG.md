@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.35.0...HEAD)
+### Added
+* UI: add an option for configuring the depth of the lineage graph [`#2525`](https://github.com/MarquezProject/marquez/pull/2525) [@jlukenoff](https://github.com/jlukenoff)  
+    *Makes the lineage UI a bit easier to navigate especially for larger lineage graphs*
 
 ## [0.35.0](https://github.com/MarquezProject/marquez/compare/0.34.0...0.35.0) - 2023-06-13
 ### Added
