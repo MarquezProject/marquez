@@ -1,5 +1,7 @@
 # Getting Started with Airflow and OpenLineage+Marquez
 
+> **Note:** For a modified version of this guide that uses [Astro](https://www.astronomer.io/try-astro/?referral=docs-what-astro-banner) instead of vanilla Airflow, visit the OpenLineage docs site.
+
 In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to [Marquez](https://marquezproject.ai/) using OpenLineage. 
 
 ### You’ll learn how to:
