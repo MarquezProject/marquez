@@ -17,9 +17,15 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { Zoom } from '@visx/zoom'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchLineage, resetLineage, setSelectedNode } from '../../store/actionCreators'
+import {
+  fetchLineage,
+  resetLineage,
+  setLineageGraphDepth,
+  setSelectedNode
+} from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
+import DepthConfig from './components/depth-config/DepthConfig'
 import Edge from './components/edge/Edge'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
@@ -44,6 +50,7 @@ const DOUBLE_CLICK_MAGNIFICATION = 1.1
 interface StateProps {
   lineage: LineageGraph
   selectedNode: string
+  depth: number
 }
 
 interface LineageState {
@@ -96,24 +103,30 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
       this.props.fetchLineage(
         this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
         this.props.match.params.namespace,
-        this.props.match.params.nodeName
+        this.props.match.params.nodeName,
+        this.props.depth
       )
     }
   }
 
   componentDidUpdate(prevProps: Readonly<LineageProps>) {
     if (
-      JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) &&
+      (JSON.stringify(this.props.lineage) !== JSON.stringify(prevProps.lineage) ||
+        this.props.depth !== prevProps.depth) &&
       this.props.selectedNode
     ) {
       this.initGraph()
       this.buildGraphAll(this.props.lineage.graph)
     }
-    if (this.props.selectedNode !== prevProps.selectedNode) {
+    if (
+      this.props.selectedNode !== prevProps.selectedNode ||
+      this.props.depth !== prevProps.depth
+    ) {
       this.props.fetchLineage(
         this.props.match.params.nodeType.toUpperCase() as JobOrDataset,
         this.props.match.params.namespace,
-        this.props.match.params.nodeName
+        this.props.match.params.nodeName,
+        this.props.depth
       )
       this.getEdges()
     }
@@ -224,6 +237,7 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
             </MqEmpty>
           </Box>
         )}
+        <DepthConfig depth={this.props.depth} />
         {this.state.graph && (
           <ParentSize>
             {parent => (
@@ -303,7 +317,8 @@ export class Lineage extends React.Component<LineageProps, LineageState> {
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
-  selectedNode: state.lineage.selectedNode
+  selectedNode: state.lineage.selectedNode,
+  depth: state.lineage.depth
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -311,7 +326,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       setSelectedNode: setSelectedNode,
       fetchLineage: fetchLineage,
-      resetLineage: resetLineage
+      resetLineage: resetLineage,
+      setDepth: setLineageGraphDepth
     },
     dispatch
   )

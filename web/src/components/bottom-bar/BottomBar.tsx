@@ -26,7 +26,8 @@ const styles = (theme: Theme) => {
       right: 0,
       width: `calc(100% - ${DRAWER_WIDTH}px)`,
       bottom: 0,
-      position: 'fixed'
+      position: 'fixed',
+      zIndex: theme.zIndex.appBar + 1
     }
   })
 }
