@@ -18,14 +18,7 @@ module.exports = {
                 localIdentName: '[name]__[local]__[hash:base64:5]',
               },
             }
-          },
-          // {
-          //   loader: 'postcss-loader',
-          //   options: {
-          //     plugins: [postCssModulesValues, autoprefixer],
-          //   },
-          // }
-        ]
+        }]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
