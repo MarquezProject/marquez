@@ -1,9 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.35.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.36.0...HEAD)
+
+## [0.36.0](https://github.com/MarquezProject/marquez/compare/0.35.0...0.36.0) - 2023-06-27
 ### Added
 * UI: add an option for configuring the depth of the lineage graph [`#2525`](https://github.com/MarquezProject/marquez/pull/2525) [@jlukenoff](https://github.com/jlukenoff)  
-    *Makes the lineage UI a bit easier to navigate especially for larger lineage graphs*
+    *Makes the lineage UI a bit easier to navigate, especially for larger lineage graphs.*
+
+### Fixed
+* Docker: generate new `uuid` for `etl_menus` in seed data [`#2519`](https://github.com/MarquezProject/marquez/pull/2519) [@wslulciuc](https://github.com/wslulciuc)  
+    *Fixes a `runID` collision creating an invalid lineage graph when the seed command is used.*
+* Docker: remove unnecessary copy command from Dockerfile [`#2516`](https://github.com/MarquezProject/marquez/pull/2516) [@Nisarg-Chokshi](https://github.com/MarquezProject/marquez/pull/2516)  
+    *Deletes redundant copy command.*
+* Chart: enable RFC7230_LEGACY http compliance on application connectors by default [`#2524`](https://github.com/MarquezProject/marquez/pull/2524) [@jlukenoff](https://github.com/jlukenoff)  
+    *Adds this configuration to the helm chart by default to fix basic chart installation and ensure that the fix in [`#1419`](https://github.com/MarquezProject/marquez/pull/1419) does not revert.*
+
 
 ## [0.35.0](https://github.com/MarquezProject/marquez/compare/0.34.0...0.35.0) - 2023-06-13
 ### Added
@@ -125,8 +136,7 @@
 * Column-lineage endpoints supports point-in-time requests [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
     *Enable requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
 * Present column lineage of a dataset [`#2293`](https://github.com/MarquezProject/marquez/pull/2293) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-    *Column lineage of a dataset with a single level of depth can
-    be displayed in datase details tab.*
+    *Column lineage of a dataset with a single level of depth can be displayed in datase details tab.*
 * Add point-in-time requests support to column-lineage endpoints [`#2265`](https://github.com/MarquezProject/marquez/pull/2265) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
     *Enables requesting `column-lineage` endpoint by a dataset version, job version or dataset field of a specific dataset version.*
 * Add column lineage point-in-time Java client methods [`#2269`](https://github.com/MarquezProject/marquez/pull/2269) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
