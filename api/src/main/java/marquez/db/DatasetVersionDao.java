@@ -194,7 +194,7 @@ public interface DatasetVersionDao extends BaseDao {
       ), selected_dataset_version_facets AS (
           SELECT dv.uuid, dv.dataset_name, dv.namespace_name, df.run_uuid, df.lineage_event_time, df.facet
           FROM selected_dataset_versions dv
-          LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid  AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown')
+          LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid  AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown' OR df.type ILIKE 'input')
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
           dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
@@ -260,7 +260,7 @@ public interface DatasetVersionDao extends BaseDao {
           SELECT dvf.dataset_version_uuid,
           JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
           FROM dataset_facets_view dvf
-          WHERE  (type ILIKE 'dataset' OR type ILIKE 'unknown')
+          WHERE  (type ILIKE 'dataset' OR type ILIKE 'unknown' OR type ILIKE 'input')
           GROUP BY dataset_version_uuid
       ) f ON f.dataset_version_uuid = dv.uuid
       WHERE dv.namespace_name = :namespaceName
