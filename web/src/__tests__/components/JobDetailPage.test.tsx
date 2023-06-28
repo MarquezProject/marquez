@@ -22,11 +22,11 @@ import { useParams } from 'react-router-dom'
 
 test.skip('JobDetailPage Component', () => {
   describe('when there is no match for the jobName in url params', () => {
-    // useParams.mockImplementation(() => ({
-    //   jobName: 'job.nomatch'
-    // }))
+    useParams.mockImplementation(() => ({
+      jobName: 'job.nomatch'
+    }))
 
-    // render(<JobDetailPage />)
+    render(<JobDetailPage />)
 
     it('should render', () => {
       expect(screen).toBeInTheDocument()
@@ -199,16 +199,16 @@ test.skip('JobDetailPage Component', () => {
 
     const job = { ...jobs[0], latestRuns: tempJobRuns }
 
-    // useParams.mockImplementation(() => ({
-    //   jobName: job.name
-    // }))
+    useParams.mockImplementation(() => ({
+      jobName: job.name
+    }))
 
-    // render(<JobDetailPage />)
+    render(<JobDetailPage />)
 
-    // screen.setProps({
-    //   jobs: jobs.map(j => (j.name === job.name ? job : j)),
-    //   fetchJobRuns: () => {}
-    // })
+    screen.setProps({
+      jobs: jobs.map(j => (j.name === job.name ? job : j)),
+      fetchJobRuns: () => {}
+    })
 
     it('should render', () => {
       expect(screen).toBeInTheDocument()
@@ -253,16 +253,16 @@ test.skip('JobDetailPage Component', () => {
     it('if there is no SQL, should render text saying so', () => {
       const job = { ...jobs[0], context: {} }
 
-      // useParams.mockImplementation(() => ({
-      //   jobName: job.name
-      // }))
+      useParams.mockImplementation(() => ({
+        jobName: job.name
+      }))
 
-      // render(<JobDetailPage />)
+      render(<JobDetailPage />)
 
-      // screen.setProps({
-      //   jobs: jobs.map(j => (j.name === job.name ? job : j)),
-      //   fetchJobRuns: () => {}
-      // })
+      screen.setProps({
+        jobs: jobs.map(j => (j.name === job.name ? job : j)),
+        fetchJobRuns: () => {}
+      })
 
       expect(
         within(screen.getAllByRole('Box')[1]).getByRole('Typography').innerText
