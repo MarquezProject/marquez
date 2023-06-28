@@ -23,12 +23,12 @@ import { useParams } from 'react-router-dom'
 test.skip('DatasetDetailPage Component', () => {
 
   describe('when there is no match for the datasetName in url params', () => {
-    // useParams.mockImplementation(() => ({
-    //   datasetName: 'test.dataset'
-    // }))
+    useParams.mockImplementation(() => ({
+      datasetName: 'test.dataset'
+    }))
 
-    // render(<DatasetDetailPage />)
-    // screen.setProps({ datasets })
+    render(<DatasetDetailPage />)
+    screen.setProps({ datasets })
 
     it('should render', () => {
       expect(screen).toBeInTheDocument()
@@ -44,11 +44,11 @@ test.skip('DatasetDetailPage Component', () => {
   })
 
   describe('when there is a match for the datasetName in url params', () => {
-    // useParams.mockImplementation(() => ({
-    //   datasetName: dataset.name
-    // }))
-    // render(<DatasetDetailPage />)
-    // screen.setProps({ datasets })
+    useParams.mockImplementation(() => ({
+      datasetName: dataset.name
+    }))
+    render(<DatasetDetailPage />)
+    screen.setProps({ datasets })
 
     it('should render', () => {
       expect(screen).toBeInTheDocument()
