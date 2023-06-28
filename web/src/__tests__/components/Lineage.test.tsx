@@ -89,10 +89,8 @@ describe('Lineage Component', () => {
 
   beforeEach(() => {
     g = initGraph()
-    console.log('>>>>initial graph', g)
     buildGraphAll(g, mockGraphWithCycle, (gResult: graphlib.Graph<MqNode>) => {
       g = gResult
-      console.log('>>>>updated graph', g)
     })
   })
 
