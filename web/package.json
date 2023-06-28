@@ -9,7 +9,7 @@
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "pretest": "eslint src/**/*[x]",
-    "test": "react-scripts test -- --config=jest.config.js",
+    "test": "jest",
     "eject": "react-scripts eject",
     "eslint-fix": "eslint . --ext .ts,.tsx --ignore-pattern \"src/__tests__/*\" --fix"
   },
@@ -108,7 +108,9 @@
     "html-webpack-plugin": "^5.5.1",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
     "prettier": "^2.8.8",
+    "react-test-renderer": "^18.2.0",
     "redux-saga-test-plan": "^4.0.6",
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.3",
