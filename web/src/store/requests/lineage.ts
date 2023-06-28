@@ -12,10 +12,8 @@ export const getLineage = async (
   name: string,
   depth: number
 ) => {
-  const params = new URLSearchParams({
-    nodeId: generateNodeId(nodeType, namespace, name),
-    depth: depth.toString()
-  })
-  const url = `${API_URL}/lineage/?${params.toString()}`
+  const nodeId = generateNodeId(nodeType, namespace, name)
+  // Node ID cannot be URL encoded
+  const url = `${API_URL}/lineage/?nodeId=${nodeId}&depth=${depth}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchLineage')
 }
