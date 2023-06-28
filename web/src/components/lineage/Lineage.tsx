@@ -53,12 +53,94 @@ export interface JobOrDatasetMatchParams {
   nodeType: string
 }
 
-type LineageProps = StateProps &
-  DispatchProps 
+export function initGraph() {
+  const g = new graphlib.Graph<MqNode>({ directed: true })
+  g.setGraph(DAGRE_CONFIG)
+  g.setDefaultEdgeLabel(() => {
+    return {}
+  })
+
+  return g;
+}
+
+export function buildGraphAll(g: graphlib.Graph<MqNode>, graph: LineageNode[], callBack: (g: graphlib.Graph<MqNode>) => void) {
+  // nodes
+  for (let i = 0; i < graph.length; i++) {
+    g.setNode(graph[i].id, {
+      label: graph[i].id,
+      data: graph[i].data,
+      width: NODE_SIZE,
+      height: NODE_SIZE
+    })
+  }
+
+  // edges
+  for (let i = 0; i < graph.length; i++) {
+    for (let j = 0; j < graph[i].inEdges.length; j++) {
+      g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
+    }
+  }
+  layout(g)
+
+  callBack(g)
+}
+
+
+export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string) {
+  const paths = [] as Array<[string, string]>
+
+  // Sets used to detect cycles and break out of the recursive loop
+  const visitedNodes = {
+    successors: new Set(),
+    predecessors: new Set()
+  }
+
+  const getSuccessors = (node: string) => {
+    if (visitedNodes.successors.has(node)) return
+    visitedNodes.successors.add(node)
+
+    const successors = g?.successors(node)
+    console.log('successors', successors)
+    if (successors?.length) {
+      for (let i = 0; i < node.length - 1; i++) {
+        if (successors[i]) {
+          paths.push([node, (successors[i] as unknown) as string])
+          getSuccessors((successors[i] as unknown) as string)
+        }
+      }
+    }
+  }
+
+  const getPredecessors = (node: string) => {
+    if (visitedNodes.predecessors.has(node)) return
+    visitedNodes.predecessors.add(node)
+
+    const predecessors = g?.predecessors(node)
+    if (predecessors?.length) {
+      for (let i = 0; i < node.length - 1; i++) {
+        if (predecessors[i]) {
+          paths.push([(predecessors[i] as unknown) as string, node])
+          getPredecessors((predecessors[i] as unknown) as string)
+        }
+      }
+    }
+  }
+
+  getSuccessors(selectedNode)
+  getPredecessors(selectedNode)
+
+  return paths
+}
+
+export interface LineageProps extends StateProps, DispatchProps {}
 
 let g: graphlib.Graph<MqNode>
 
 const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
+  React.useEffect(() => {
+    console.log('props.lineage', props.lineage)
+  }, [props.lineage])
+
   const [state, setState] = React.useState<LineageState>({
     graph: g,
     edges: [],
@@ -72,7 +154,6 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
 
   React.useEffect(() => {
     if (!mounted.current) {
-      console.log('mount TODO remove')
       // on mount
       if (nodeName && namespace && nodeType) {
         const nodeId = generateNodeId(
@@ -90,13 +171,18 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
       mounted.current = true
     } else {
       // on update
-      // TODO BUG HERE
       if (
         JSON.stringify(props.lineage) !== JSON.stringify(prevLineage.current) &&
         props.selectedNode
       ) {
-        initGraph()
-        buildGraphAll(props.lineage.graph)
+        g = initGraph()
+        buildGraphAll(g, props.lineage.graph, (gResult: graphlib.Graph<MqNode>) => {
+          setState({
+            graph: gResult,
+            edges: getEdges(),
+            nodes: gResult.nodes().map(v => gResult.node(v))
+          })
+        })
       }
       if (props.selectedNode !== prevSelectedNode.current) {
         props.fetchLineage(
@@ -115,21 +201,20 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   React.useEffect(() => {
     // on unmount
     return () => {
-      console.log('unmount TODO remove')
       props.resetLineage()
     }
   }, [])
 
-  const initGraph = () => {
-    g = new graphlib.Graph<MqNode>({ directed: true })
-    g.setGraph(DAGRE_CONFIG)
-    g.setDefaultEdgeLabel(() => {
-      return {}
-    })
-  }
+  // const initGraph = () => {
+  //   g = new graphlib.Graph<MqNode>({ directed: true })
+  //   g.setGraph(DAGRE_CONFIG)
+  //   g.setDefaultEdgeLabel(() => {
+  //     return {}
+  //   })
+  // }
 
   const getEdges = () => {
-    const selectedPaths = getSelectedPaths()
+    const selectedPaths = getSelectedPaths(g, props.selectedNode)
 
     return g?.edges().map(e => {
       const isSelected = selectedPaths.some((r: any) => e.v === r[0] && e.w === r[1])
@@ -137,64 +222,31 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
     })
   }
 
-  const getSelectedPaths = () => {
-    const paths = [] as Array<[string, string]>
+  // const buildGraphAll = (graph: LineageNode[]) => {
+  //   // nodes
+  //   for (let i = 0; i < graph.length; i++) {
+  //     g.setNode(graph[i].id, {
+  //       label: graph[i].id,
+  //       data: graph[i].data,
+  //       width: NODE_SIZE,
+  //       height: NODE_SIZE
+  //     })
+  //   }
 
-    const getSuccessors = (node: string) => {
-      const successors = g?.successors(node)
-      if (successors?.length) {
-        for (let i = 0; i < node.length - 1; i++) {
-          if (successors[i]) {
-            paths.push([node, (successors[i] as unknown) as string])
-            getSuccessors((successors[i] as unknown) as string)
-          }
-        }
-      }
-    }
+  //   // edges
+  //   for (let i = 0; i < graph.length; i++) {
+  //     for (let j = 0; j < graph[i].inEdges.length; j++) {
+  //       g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
+  //     }
+  //   }
+  //   layout(g)
 
-    const getPredecessors = (node: string) => {
-      const predecessors = g?.predecessors(node)
-      if (predecessors?.length) {
-        for (let i = 0; i < node.length - 1; i++) {
-          if (predecessors[i]) {
-            paths.push([(predecessors[i] as unknown) as string, node])
-            getPredecessors((predecessors[i] as unknown) as string)
-          }
-        }
-      }
-    }
-
-    getSuccessors(props.selectedNode)
-    getPredecessors(props.selectedNode)
-
-    return paths
-  }
-
-  const buildGraphAll = (graph: LineageNode[]) => {
-    // nodes
-    for (let i = 0; i < graph.length; i++) {
-      g.setNode(graph[i].id, {
-        label: graph[i].id,
-        data: graph[i].data,
-        width: NODE_SIZE,
-        height: NODE_SIZE
-      })
-    }
-
-    // edges
-    for (let i = 0; i < graph.length; i++) {
-      for (let j = 0; j < graph[i].inEdges.length; j++) {
-        g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
-      }
-    }
-    layout(g)
-
-    setState({
-      graph: g,
-      edges: getEdges(),
-      nodes: g.nodes().map(v => g.node(v))
-    })
-  }
+  //   setState({
+  //     graph: g,
+  //     edges: getEdges(),
+  //     nodes: g.nodes().map(v => g.node(v))
+  //   })
+  // }
 
   const i18next = require('i18next')
 
