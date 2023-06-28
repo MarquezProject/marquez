@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import Lineage, { LineageProps, initGraph, buildGraphAll, getSelectedPaths, initGraph, buildGraphAll } from '../../components/lineage/Lineage'
+import Lineage, { LineageProps, getSelectedPaths, initGraph, buildGraphAll } from '../../components/lineage/Lineage'
 import { LineageNode } from '../../components/lineage/types'
 import { render } from '@testing-library/react'
 import { createBrowserHistory } from 'history'
