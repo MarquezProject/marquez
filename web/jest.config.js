@@ -8,8 +8,7 @@ module.exports = {
       }
     ]
   },
-  //testRegex: '__tests__/(.+).(test|spec).tsx?',// TODO REACTIVE THIS
-  testRegex: '__tests__/components/DatasetDetailPage.test.tsx?',
+  testRegex: '__tests__/(.+).(test|spec).tsx?',
   testPathIgnorePatterns: ['<rootDir>/src/__tests__(.+)__snapshots__'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   globalSetup: '<rootDir>globalSetup.ts',
