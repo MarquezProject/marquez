@@ -1,11 +1,11 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import SVG from 'react-inlinesvg'
 
 
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
 import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme'
@@ -29,6 +29,8 @@ const Sidenav: React.FC<SidenavProps> = () => {
     i18next.changeLanguage(lng)
   }
   const theme = createTheme(useTheme())
+
+  const location = useLocation();
 
   return (
     <Drawer sx={{
@@ -60,7 +62,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             <MqIconButton
               id={'homeDrawerButton'}
               title={i18next.t('sidenav.jobs')}
-              active={window.location.pathname === '/'}
+              active={location.pathname === '/'}
             >
               <FontAwesomeIcon icon={faCogs} size={'2x'} />
             </MqIconButton>
@@ -71,7 +73,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             <MqIconButton
               id={'datasetsDrawerButton'}
               title={i18next.t('sidenav.datasets')}
-              active={window.location.pathname === '/datasets'}
+              active={location.pathname === '/datasets'}
             >
               <FontAwesomeIcon icon={faDatabase} size={'2x'} />
             </MqIconButton>
@@ -82,7 +84,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             <MqIconButton
               id={'eventsButton'}
               title={i18next.t('sidenav.events')}
-              active={window.location.pathname === '/events'}
+              active={location.pathname === '/events'}
             >
               <SVG
                 src='https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg'
