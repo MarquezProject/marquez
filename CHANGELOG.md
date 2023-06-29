@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.36.0...HEAD)
+### Fixed
+* API: remove unnecessary DB updates [`#2531`](https://github.com/MarquezProject/marquez/pull/2531)[@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+  *Prevent updates that are not needed and are deadlock prone.*
 
 ## [0.36.0](https://github.com/MarquezProject/marquez/compare/0.35.0...0.36.0) - 2023-06-27
 ### Added
