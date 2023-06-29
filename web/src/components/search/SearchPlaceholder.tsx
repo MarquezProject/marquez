@@ -19,9 +19,10 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
     <Box sx={{
       zIndex: theme.zIndex.appBar + 3,
       position: 'absolute',
-      top: 8,
       left: 122,
-      height: 0,
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
       overflow: 'visible',
       pointerEvents: 'none'
     }}>
