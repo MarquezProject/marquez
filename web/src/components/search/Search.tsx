@@ -155,7 +155,9 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
         zIndex: theme.zIndex.appBar + 3,
         position: 'absolute',
         left: theme.spacing(12),
-        top: 11
+        display: 'flex',
+        alignItems: 'center',
+        height: '100%',
       }}>
         <FontAwesomeIcon icon={faSearch} color={THEME_EXTRA.typography.disabled} />
       </Box>
@@ -165,7 +167,9 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
           position: 'absolute',
           zIndex: theme.zIndex.appBar + 3,
           right: theme.spacing(12),
-          top: 11,
+          display: 'flex',
+          alignItems: 'center',
+          height: '100%',
           cursor: 'pointer'
         }}>
           <FontAwesomeIcon
