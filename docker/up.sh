@@ -3,14 +3,14 @@
 # Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 #
-# Usage: $ ./build-and-push.sh [FLAGS] [ARG...]
+# Usage: $ ./up.sh [FLAGS] [ARG...]
 
 set -e
 
 # Version of Marquez
-readonly VERSION=0.33.0
+readonly VERSION=0.36.0
 # Build version of Marquez
-readonly BUILD_VERSION=0.33.0
+readonly BUILD_VERSION=0.36.0
 
 title() {
   echo -e "\033[1m${1}\033[0m"

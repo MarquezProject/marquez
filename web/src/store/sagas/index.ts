@@ -66,7 +66,13 @@ export function* fetchLineage() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_LINEAGE)
-      const result = yield call(getLineage, payload.nodeType, payload.namespace, payload.name)
+      const result = yield call(
+        getLineage,
+        payload.nodeType,
+        payload.namespace,
+        payload.name,
+        payload.depth
+      )
       yield put(fetchLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
