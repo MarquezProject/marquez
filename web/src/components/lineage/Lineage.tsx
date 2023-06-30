@@ -205,14 +205,6 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
     }
   }, [])
 
-  // const initGraph = () => {
-  //   g = new graphlib.Graph<MqNode>({ directed: true })
-  //   g.setGraph(DAGRE_CONFIG)
-  //   g.setDefaultEdgeLabel(() => {
-  //     return {}
-  //   })
-  // }
-
   const getEdges = () => {
     const selectedPaths = getSelectedPaths(g, props.selectedNode)
 
@@ -221,32 +213,6 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
       return Object.assign(g.edge(e), { isSelected: isSelected })
     })
   }
-
-  // const buildGraphAll = (graph: LineageNode[]) => {
-  //   // nodes
-  //   for (let i = 0; i < graph.length; i++) {
-  //     g.setNode(graph[i].id, {
-  //       label: graph[i].id,
-  //       data: graph[i].data,
-  //       width: NODE_SIZE,
-  //       height: NODE_SIZE
-  //     })
-  //   }
-
-  //   // edges
-  //   for (let i = 0; i < graph.length; i++) {
-  //     for (let j = 0; j < graph[i].inEdges.length; j++) {
-  //       g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
-  //     }
-  //   }
-  //   layout(g)
-
-  //   setState({
-  //     graph: g,
-  //     edges: getEdges(),
-  //     nodes: g.nodes().map(v => g.node(v))
-  //   })
-  // }
 
   const i18next = require('i18next')
 
