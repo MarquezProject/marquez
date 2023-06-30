@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezConfig;
 import marquez.db.DbRetention;
 import marquez.db.exceptions.DbRetentionException;
+import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -37,9 +38,13 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "ad-hoc-db-retention-source";
 
+  /* Disable retention dry run by default. */
+  public static final boolean DEFAULT_DRY_RUN = false;
+
   /* Args for 'db-retention' command. */
   private static final String CMD_ARG_NUMBER_OF_ROWS_PER_BATCH = "numberOfRowsPerBatch";
   private static final String CMD_ARG_RETENTION_DAYS = "retentionDays";
+  private static final String CMD_ARG_DRY_RUN = "dryRun";
 
   /* Define 'db-retention' command. */
   public DbRetentionCommand() {
@@ -51,7 +56,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     super.configure(subparser);
     // Arg '--number-of-rows-per-batch'
     subparser
-        .addArgument("--number-of-rows-per-batch")
+        .addArgument("-n", "--number-of-rows-per-batch")
         .dest(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH)
         .type(Integer.class)
         .required(false)
@@ -59,12 +64,23 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
         .help("the number of rows deleted per batch");
     // Arg '--retention-days'
     subparser
-        .addArgument("--retention-days")
+        .addArgument("-r", "--retention-days")
         .dest(CMD_ARG_RETENTION_DAYS)
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RETENTION_DAYS)
         .help("the number of days to retain metadata");
+    // Arg '--dry-run'
+    subparser
+        .addArgument("--dry-run")
+        .dest(CMD_ARG_DRY_RUN)
+        .type(Boolean.class)
+        .required(false)
+        .setDefault(DEFAULT_DRY_RUN)
+        .action(Arguments.storeTrue())
+        .help(
+            "only output an estimate of metadata deleted by the retention policy, "
+                + "without applying the policy on database");
   }
 
   @Override
@@ -75,6 +91,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
       throws Exception {
     final int numberOfRowsPerBatch = namespace.getInt(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH);
     final int retentionDays = namespace.getInt(CMD_ARG_RETENTION_DAYS);
+    final boolean dryRun = namespace.getBoolean(CMD_ARG_DRY_RUN);
 
     // Configure connection.
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
@@ -88,7 +105,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays);
+      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",

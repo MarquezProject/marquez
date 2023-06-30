@@ -5,6 +5,7 @@
 
 package marquez.jobs;
 
+import static marquez.db.DbRetention.DEFAULT_DRY_RUN;
 import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
@@ -18,4 +19,5 @@ public final class DbRetentionConfig {
   @Getter @Setter private int frequencyMins = DEFAULT_FREQUENCY_MINS;
   @Getter @Setter private int numberOfRowsPerBatch = DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
   @Getter @Setter private int retentionDays = DEFAULT_RETENTION_DAYS;
+  @Getter @Setter private boolean dryRun = DEFAULT_DRY_RUN;
 }
