@@ -36,10 +36,11 @@ export const resetEvents = () => ({
   type: actionTypes.RESET_EVENTS
 })
 
-export const fetchDatasets = (namespace: string) => ({
+export const fetchDatasets = (namespace: string, limit: number) => ({
   type: actionTypes.FETCH_DATASETS,
   payload: {
-    namespace
+    namespace,
+    limit
   }
 })
 
@@ -216,12 +217,18 @@ export const setBottomBarHeight = (height: number) => ({
   payload: height
 })
 
-export const fetchLineage = (nodeType: JobOrDataset, namespace: string, name: string) => ({
+export const fetchLineage = (
+  nodeType: JobOrDataset,
+  namespace: string,
+  name: string,
+  depth: number
+) => ({
   type: actionTypes.FETCH_LINEAGE,
   payload: {
     nodeType,
     namespace,
-    name
+    name,
+    depth
   }
 })
 
@@ -232,6 +239,11 @@ export const fetchLineageSuccess = (lineage: LineageGraph) => ({
 
 export const resetLineage = () => ({
   type: actionTypes.RESET_LINEAGE
+})
+
+export const setLineageGraphDepth = (depth: number) => ({
+  type: actionTypes.SET_LINEAGE_GRAPH_DEPTH,
+  payload: depth
 })
 
 export const selectNamespace = (namespace: string) => ({

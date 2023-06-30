@@ -12,7 +12,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-active-brightgreen.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](http://bit.ly/MarquezSlack)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](http://bit.ly/MqzSlack)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez-api.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
@@ -58,7 +58,7 @@ You can open [http://localhost:3000](http://localhost:3000) to begin exploring t
 
 **`HTTP API`**
 
-The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/integration).
+The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/docs/integrations/about).
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -71,6 +71,20 @@ To explore metadata via graphql, browse to [http://localhost:5000/graphql-playgr
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
 
 > **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
+
+## Versions and OpenLineage Compatibility
+
+Versions of Marquez are compatible with OpenLineage unless noted otherwise. We ensure backward compatibility with a newer version of Marquez by recording events with an older OpenLineage specification version. **We strongly recommend understanding how the OpenLineage specification is** [versioned](https://github.com/OpenLineage/OpenLineage/blob/main/spec/Versioning.md) **and published**.
+
+| **Marquez**                                                                                      | **OpenLineage**                                               | **Status**    |
+|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------|---------------|
+| [`UNRELEASED`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased)      | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `CURRENT`     |
+| [`0.35.0`](https://github.com/MarquezProject/marquez/blob/0.35.0/CHANGELOG.md#0350---2023-06-13) | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `RECOMMENDED` |
+| [`0.34.0`](https://github.com/MarquezProject/marquez/blob/0.34.0/CHANGELOG.md#0340---2023-05-18) | [`1-0-5`](https://openlineage.io/spec/1-0-0/OpenLineage.json) | `MAINTENANCE` |
+
+> **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
+
+We currently maintain three categories of compatibility: `CURRENT`, `RECOMMENDED`, and `MAINTENANCE`. When a new version of Marquez is released, it's marked as `RECOMMENDED`, while the previous version enters `MAINTENANCE` mode (which gets bug fixes whenever possible). The unreleased version of Marquez is marked `CURRENT` and does not come with any guarantees, but is assumed to remain compatible with OpenLineage, although surprises happen and there maybe rare exceptions.
 
 ## Modules
 
@@ -146,7 +160,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [https://marquezproject.slack.com](http://bit.ly/MarquezSlack)
+* Chat: [https://marquezproject.slack.com](https://bit.ly/MqzSlack)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
@@ -158,5 +172,5 @@ See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez/blob/main/CONTRI
 If you discover a vulnerability in the project, please open an issue and attach the "security" label.
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

@@ -50,7 +50,6 @@ public interface SourceDao {
           + ") ON CONFLICT(name) DO UPDATE SET "
           + "type = EXCLUDED.type, "
           + "updated_at = EXCLUDED.updated_at, "
-          + "name = EXCLUDED.name, "
           + "connection_url = EXCLUDED.connection_url "
           + "RETURNING *")
   SourceRow upsert(UUID uuid, String type, Instant now, String name, String connectionUrl);
@@ -75,7 +74,6 @@ public interface SourceDao {
           + ") ON CONFLICT(name) DO UPDATE SET "
           + "type = EXCLUDED.type, "
           + "updated_at = EXCLUDED.updated_at, "
-          + "name = EXCLUDED.name, "
           + "connection_url = EXCLUDED.connection_url, "
           + "description = EXCLUDED.description "
           + "RETURNING *")
