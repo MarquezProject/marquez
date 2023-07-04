@@ -5,6 +5,7 @@
 
 package marquez.cli;
 
+import static marquez.db.DbRetention.DEFAULT_DRY_RUN;
 import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
@@ -31,15 +32,12 @@ import org.jdbi.v3.postgres.PostgresPlugin;
  * For example, to override the {@code retention-days}:
  *
  * <pre>{@code
- * java -jar marquez-api.jar db-retention --retention-days 14 marquez.yml
+ * java -jar marquez-api.jar db-retention --retention-days 30 marquez.yml
  * }</pre>
  */
 @Slf4j
 public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
   private static final String DB_SOURCE_NAME = "ad-hoc-db-retention-source";
-
-  /* Disable retention dry run by default. */
-  public static final boolean DEFAULT_DRY_RUN = false;
 
   /* Args for 'db-retention' command. */
   private static final String CMD_ARG_NUMBER_OF_ROWS_PER_BATCH = "numberOfRowsPerBatch";
