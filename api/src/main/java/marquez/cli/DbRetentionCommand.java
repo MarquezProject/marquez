@@ -56,7 +56,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
     super.configure(subparser);
     // Arg '--number-of-rows-per-batch'
     subparser
-        .addArgument("-n", "--number-of-rows-per-batch")
+        .addArgument("--number-of-rows-per-batch")
         .dest(CMD_ARG_NUMBER_OF_ROWS_PER_BATCH)
         .type(Integer.class)
         .required(false)
@@ -64,7 +64,7 @@ public class DbRetentionCommand extends ConfiguredCommand<MarquezConfig> {
         .help("the number of rows deleted per batch");
     // Arg '--retention-days'
     subparser
-        .addArgument("-r", "--retention-days")
+        .addArgument("--retention-days")
         .dest(CMD_ARG_RETENTION_DAYS)
         .type(Integer.class)
         .required(false)
