@@ -28,7 +28,7 @@ public final class DbRetention {
   /* Default number of rows deleted per batch. */
   public static final int DEFAULT_NUMBER_OF_ROWS_PER_BATCH = 1000;
 
-  /* Default retention days. */
+  /* Disable retention dry run by default. */
   public static final boolean DEFAULT_DRY_RUN = false;
 
   /** ... */
@@ -52,6 +52,7 @@ public final class DbRetention {
     retentionOnDatasetVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobs(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
   }
 
@@ -377,6 +378,66 @@ public final class DbRetention {
         "Deleted '{}' job versions in '{}' ms!", rowsDeleted, rowsDeleteTime.elapsed().toMillis());
   }
 
+  private static void retentionOnRuns(
+      @NonNull final Jdbi jdbi,
+      final int numberOfRowsPerBatch,
+      final int retentionDays,
+      final boolean dryRun) {
+    if (dryRun) {
+      // ...
+      final int rowsOlderThanXDaysEstimated =
+          estimateOfRowsOlderThanXDays(
+              jdbi, sql(DRY_RUN_DELETE_FROM_RUNS_OLDER_THAN_X_DAYS, retentionDays));
+      // ...
+      log.info(
+          "A retention policy of '{}' days will delete (estimated): '{}' runs",
+          retentionDays,
+          rowsOlderThanXDaysEstimated);
+      return;
+    }
+    // ...
+    log.info("Applying retention policy of '{}' days to runs...", retentionDays);
+    final Stopwatch rowsDeleteTime = Stopwatch.createStarted();
+    final int rowsDeleted =
+        jdbi.withHandle(
+            handle -> {
+              handle.execute(
+                  sql(
+                      """
+                      CREATE OR REPLACE FUNCTION delete_runs_older_than_x_days()
+                        RETURNS INT AS $$
+                      DECLARE
+                        rows_per_batch INT := ${numberOfRowsPerBatch};
+                        rows_deleted INT;
+                        rows_deleted_total INT := 0;
+                      BEGIN
+                        LOOP
+                          WITH deleted_rows AS (
+                            DELETE FROM runs
+                              WHERE uuid IN (
+                                SELECT uuid
+                                  FROM runs
+                                 WHERE ended_at < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+                                   FOR UPDATE SKIP LOCKED
+                                 LIMIT rows_per_batch
+                              ) RETURNING uuid
+                          )
+                          SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
+                          rows_deleted_total := rows_deleted_total + rows_deleted;
+                          EXIT WHEN rows_deleted = 0;
+                          PERFORM pg_sleep(0.1);
+                        END LOOP;
+                        RETURN rows_deleted_total;
+                      END;
+                      $$ LANGUAGE plpgsql;""",
+                      numberOfRowsPerBatch,
+                      retentionDays));
+              return callWith(handle, "delete_runs_older_than_x_days()");
+            });
+    rowsDeleteTime.stop();
+    log.info("Deleted '{}' runs in '{}' ms!", rowsDeleted, rowsDeleteTime.elapsed().toMillis());
+  }
+
   private static void retentionOnLineageEvents(
       @NonNull final Jdbi jdbi,
       final int numberOfRowsPerBatch,
@@ -384,14 +445,14 @@ public final class DbRetention {
       final boolean dryRun) {
     if (dryRun) {
       // ...
-      final int olEventsOlderThanXDaysEstimated =
+      final int rowsOlderThanXDaysEstimated =
           estimateOfRowsOlderThanXDays(
-              jdbi, sql(DRY_RUN_DELETE_FROM_OL_EVENTS_OLDER_THAN_X_DAYS, retentionDays));
+              jdbi, sql(DRY_RUN_DELETE_FROM_LINEAGE_EVENTS_OLDER_THAN_X_DAYS, retentionDays));
       // ...
       log.info(
           "A retention policy of '{}' days will delete (estimated): '{}' lineage events",
           retentionDays,
-          olEventsOlderThanXDaysEstimated);
+          rowsOlderThanXDaysEstimated);
       return;
     }
     // ...
@@ -419,7 +480,7 @@ public final class DbRetention {
                                 WHERE event_time < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
                                   FOR UPDATE SKIP LOCKED
                                 LIMIT rows_per_batch
-                            ) RETURNING run_uuid
+                              ) RETURNING run_uuid
                           )
                           SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
                           rows_deleted_total := rows_deleted_total + rows_deleted;
@@ -504,6 +565,18 @@ public final class DbRetention {
       """;
 
   /** ... */
+  private static final String DRY_RUN_CREATE_TEMP_TABLES_FOR_DATASETS =
+      """
+      CREATE TEMPORARY TABLE used_datasets_as_input_in_x_days AS (
+        SELECT dataset_uuid
+          FROM job_versions_io_mapping AS jvio INNER JOIN job_versions AS jv
+            ON jvio.job_version_uuid = jv.uuid
+         WHERE jv.created_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+           AND jvio.io_type = 'INPUT'
+      );
+      """;
+
+  /** ... */
   private static final String DRY_RUN_DELETE_FROM_DATASETS_OLDER_THAN_X_DAYS =
       """
       DELETE FROM datasets AS d
@@ -519,6 +592,28 @@ public final class DbRetention {
       """;
 
   /** ... */
+  private static final String DRY_RUN_DROP_TEMP_TABLES_FOR_DATASETS =
+      """
+      DROP TABLE used_datasets_as_input_in_x_days;
+      """;
+
+  /** ... */
+  private static final String DRY_RUN_CREATE_TEMP_TABLES_FOR_DATASET_VERSIONS =
+      """
+      CREATE TEMPORARY TABLE used_dataset_versions_as_input_in_x_days AS (
+        SELECT dataset_version_uuid
+          FROM runs_input_mapping AS ri INNER JOIN runs AS r
+            ON ri.run_uuid = r.uuid
+         WHERE r.created_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+      );
+      CREATE TEMPORARY TABLE used_dataset_versions_as_current_in_x_days AS (
+        SELECT current_version_uuid
+          FROM datasets
+         WHERE updated_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+      );
+      """;
+
+  /** ... */
   private static final String DRY_RUN_DELETE_FROM_DATASET_VERSIONS_OLDER_THAN_X_DAYS =
       """
       DELETE FROM dataset_versions AS dv
@@ -530,7 +625,18 @@ public final class DbRetention {
           SELECT 1
             FROM used_dataset_versions_as_input_in_x_days AS udvi
            WHERE dv.uuid = udvi.dataset_version_uuid
-        )
+        ) OR NOT EXISTS (
+          SELECT 1
+            FROM used_dataset_versions_as_current_in_x_days AS udvc
+           WHERE dv.uuid = udvc.current_version_uuid
+        ) RETURNING uuid
+      """;
+
+  /** ... */
+  private static final String DRY_RUN_DROP_TEMP_TABLES_FOR_DATASET_VERSIONS =
+      """
+      DROP TABLE used_dataset_versions_as_input_in_x_days;
+      DROP TABLE used_dataset_versions_as_current_in_x_days;
       """;
 
   /** ... */
@@ -548,44 +654,16 @@ public final class DbRetention {
       """;
 
   /** ... */
-  private static final String DRY_RUN_DELETE_FROM_OL_EVENTS_OLDER_THAN_X_DAYS =
+  private static final String DRY_RUN_DELETE_FROM_RUNS_OLDER_THAN_X_DAYS =
+      """
+      DELETE FROM runs
+        WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+      """;
+
+  /** ... */
+  private static final String DRY_RUN_DELETE_FROM_LINEAGE_EVENTS_OLDER_THAN_X_DAYS =
       """
       DELETE FROM lineage_events
         WHERE event_time < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
       """;
-
-  /** ... */
-  private static final String DRY_RUN_CREATE_TEMP_TABLES_FOR_DATASETS =
-      """
-      CREATE TEMPORARY TABLE used_datasets_as_input_in_x_days AS (
-        SELECT dataset_uuid
-          FROM job_versions_io_mapping AS jvio INNER JOIN job_versions AS jv
-            ON jvio.job_version_uuid = jv.uuid
-         WHERE jv.created_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
-           AND jvio.io_type = 'INPUT'
-      );
-      """;
-
-  /** ... */
-  private static final String DRY_RUN_DROP_TEMP_TABLES_FOR_DATASETS =
-      """
-            DROP TABLE used_datasets_as_input_in_x_days;
-            """;
-
-  /** ... */
-  private static final String DRY_RUN_CREATE_TEMP_TABLES_FOR_DATASET_VERSIONS =
-      """
-            CREATE TEMPORARY TABLE used_dataset_versions_as_input_in_x_days AS (
-              SELECT dataset_version_uuid
-                FROM runs_input_mapping AS ri INNER JOIN runs AS r
-                  ON ri.run_uuid = r.uuid
-               WHERE r.created_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
-            );
-            """;
-
-  /** ... */
-  private static final String DRY_RUN_DROP_TEMP_TABLES_FOR_DATASET_VERSIONS =
-      """
-            DROP TABLE used_dataset_versions_as_input_in_x_days;
-            """;
 }
