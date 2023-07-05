@@ -25,16 +25,16 @@ To run a  _one-off_ _ad-hoc_ retention policy on your metadata, use the [`db-ret
 
 ```bash
 java -jar marquez-api.jar db-retention \
-  --number-of-rows-per-batch 500 \
+  --number-of-rows-per-batch 1000 \
   --retention-days 7 \
   marquez.yml
 ```
 
-Use `--dry-run` to output an estimate of metadata deleted by the retention policy:
+Use the `--dry-run` flag to output an estimate of metadata deleted by the retention policy:
 
 ```bash
 java -jar marquez-api.jar db-retention \
-  --number-of-rows-per-batch 500 \
+  --number-of-rows-per-batch 1000 \
   --retention-days 7 \
   --dry-run \
   marquez.yml

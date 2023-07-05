@@ -21,8 +21,9 @@ import org.testcontainers.utility.DockerImageName;
  *
  * <p>After the underlying {@code postgres} container starts, but before a given test suite is
  * executed, the latest {@code flyway} migrations for Marquez will be applied to the database using
- * {@link DbMigration#migrateDbOrError(DataSource)}. When querying the test database, use the {@code
- * DB} instance.
+ * {@link DbMigration#migrateDbOrError(DataSource)}. When querying the test database, we recommend
+ * using the {@code DB} wrapper, but you can also obtain a {@code jdbi} instance directly via {@link
+ * JdbiExtension#getJdbi()}}.
  */
 @Tag("DataAccessTests")
 @Testcontainers
@@ -33,6 +34,7 @@ class DbTest {
   private static final PostgreSQLContainer<?> DB_CONTAINER =
       new PostgreSQLContainer<>(POSTGRES_12_1);
 
+  // Defined statically to significantly improve overall test execution.
   @RegisterExtension
   static final JdbiExtension jdbiExtension =
       JdbiTestcontainersExtension.instance(DB_CONTAINER)
