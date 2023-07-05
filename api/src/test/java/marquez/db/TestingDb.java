@@ -28,7 +28,7 @@ final class TestingDb {
     return new TestingDb(delegate);
   }
 
-  /** Execute {@code UPSERT} for the specified {@link NamespaceRow}. */
+  /** Execute {@code UPSERT} for the specified {@link NamespaceRow} object. */
   NamespaceRow upsert(@NonNull NamespaceRow row) {
     return delegate
         .onDemand(NamespaceDao.class)
@@ -40,7 +40,7 @@ final class TestingDb {
             row.getDescription().orElse(null));
   }
 
-  /** Execute {@code UPSERT} for the specified {@link SourceRow}. */
+  /** Execute {@code UPSERT} for the specified {@link SourceRow} object. */
   SourceRow upsert(@NonNull SourceRow row) {
     return delegate
         .onDemand(SourceDao.class)
@@ -52,7 +52,7 @@ final class TestingDb {
             row.getConnectionUrl());
   }
 
-  /** Execute {@code UPSERT} for all {@link SourceRow}s. */
+  /** Execute {@code UPSERT} for the specified {@link DatasetRow} objects. */
   Set<DatasetRow> upsertAll(@NonNull Set<DatasetRow> rows) {
     final DatasetDao dao = delegate.onDemand(DatasetDao.class);
     final ImmutableSet.Builder<DatasetRow> rowsAdded = ImmutableSet.builder();
