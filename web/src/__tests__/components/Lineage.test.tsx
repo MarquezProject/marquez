@@ -79,10 +79,6 @@ const mockGraphWithCycle = [
   }
 ]
 
-// function mockSetState(newState: any) {
-//   this.state = { ...this.state, ...newState }
-// }
-
 describe('Lineage Component', () => {
   const selectedNode = 'job_foo'
   let g: graphlib.Graph<MqNode>
