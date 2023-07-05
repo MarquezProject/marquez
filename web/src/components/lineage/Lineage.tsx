@@ -143,6 +143,8 @@ export interface LineageProps extends StateProps, DispatchProps {}
 let g: graphlib.Graph<MqNode>
 
 const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
+  console.log('Lineage props', props.depth)
+
   React.useEffect(() => {
     console.log('props.lineage', props.lineage)
   }, [props.lineage])
@@ -156,6 +158,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const mounted = React.useRef<boolean>(false)
 
   const prevLineage = React.useRef<LineageGraph>()
+  const prevDepth = React.useRef<number>()
   const prevSelectedNode = React.useRef<string>()
 
   React.useEffect(() => {
@@ -168,6 +171,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           nodeName
         )
         props.setSelectedNode(nodeId)
+        console.log('depth in init', props.depth)
         props.fetchLineage(
           nodeType.toUpperCase() as JobOrDataset,
           namespace,
@@ -179,7 +183,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
     } else {
       // on update
       if (
-        JSON.stringify(props.lineage) !== JSON.stringify(prevLineage.current) &&
+        (JSON.stringify(props.lineage) !== JSON.stringify(prevLineage.current) ||
+          props.depth !== prevDepth.current) &&
         props.selectedNode
       ) {
         g = initGraph()
@@ -191,7 +196,11 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           })
         })
       }
-      if (props.selectedNode !== prevSelectedNode.current) {
+      if (
+        props.selectedNode !== prevSelectedNode.current
+        || props.depth !== prevDepth.current
+      ) {
+        console.log('depth in update', props.depth)
         props.fetchLineage(
           nodeType?.toUpperCase() as JobOrDataset,
           namespace || '',
@@ -202,6 +211,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
       }
 
       prevLineage.current = props.lineage
+      prevDepth.current = props.depth
       prevSelectedNode.current = props.selectedNode
     }
   })
