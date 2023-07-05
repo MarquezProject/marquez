@@ -33,6 +33,13 @@ public final class DbRetention {
 
   /** ... */
   public static void retentionOnDbOrError(
+      @NonNull final Jdbi jdbi, final int numberOfRowsPerBatch, final int retentionDays)
+      throws DbRetentionException {
+    retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays, DEFAULT_DRY_RUN);
+  }
+
+  /** Applies the retention policy to database */
+  public static void retentionOnDbOrError(
       @NonNull final Jdbi jdbi,
       final int numberOfRowsPerBatch,
       final int retentionDays,

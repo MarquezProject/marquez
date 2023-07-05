@@ -6,14 +6,23 @@
 package marquez.db.models;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static graphql.com.google.common.collect.ImmutableSet.toImmutableSet;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newDatasetType;
+import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
+import static marquez.common.models.CommonModelGenerator.newPhysicalDatasetName;
+import static marquez.common.models.CommonModelGenerator.newSourceName;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+import lombok.NonNull;
 import marquez.Generator;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
@@ -41,6 +50,55 @@ public final class DbModelGenerator extends Generator {
         newNamespaceName().getValue(),
         newDescription(),
         newOwnerName().getValue(),
+        false);
+  }
+
+  /** Returns a new {@link SourceRow} object. */
+  public static SourceRow newSourceRow() {
+    final Instant now = newTimestamp();
+    return new SourceRow(
+        newRowUuid(),
+        newDbSourceType().getValue(),
+        now,
+        now,
+        newSourceName().getValue(),
+        newConnectionUrl().toASCIIString(),
+        newDescription());
+  }
+
+  public static Set<DatasetRow> newDatasetRowsWith(
+      @NotNull final Instant now,
+      @NonNull final UUID namespaceUuid,
+      @NonNull String namespaceName,
+      @NonNull final UUID sourceUuid,
+      @NonNull String sourceName,
+      final int limit) {
+    return Stream.generate(
+            () -> newDatasetRowWith(now, namespaceUuid, namespaceName, sourceUuid, sourceName))
+        .limit(limit)
+        .collect(toImmutableSet());
+  }
+
+  public static DatasetRow newDatasetRowWith(
+      @NotNull final Instant now,
+      @NonNull final UUID namespaceUuid,
+      @NonNull String namespaceName,
+      @NonNull final UUID sourceUuid,
+      @NonNull String sourceName) {
+    return new DatasetRow(
+        newRowUuid(),
+        newDatasetType().name(),
+        now,
+        now,
+        namespaceUuid,
+        namespaceName,
+        sourceUuid,
+        sourceName,
+        newDatasetName().getValue(),
+        newPhysicalDatasetName().getValue(),
+        null,
+        newDescription(),
+        null,
         false);
   }
 
