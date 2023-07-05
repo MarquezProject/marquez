@@ -34,9 +34,6 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   /* The retention days. */
   private final int retentionDays;
 
-  /* Skip applying retention policy. */
-  private final boolean dryRun;
-
   private final Scheduler fixedRateScheduler;
   private final Jdbi jdbi;
 
@@ -49,14 +46,12 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
       @NonNull final Jdbi jdbi,
       final int frequencyMins,
       final int numberOfRowsPerBatch,
-      final int retentionDays,
-      final boolean dryRun) {
+      final int retentionDays) {
     checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
     checkArgument(numberOfRowsPerBatch > 0, "'numberOfRowsPerBatch' must be > 0");
     checkArgument(retentionDays > 0, "'retentionDays' must be > 0");
     this.numberOfRowsPerBatch = numberOfRowsPerBatch;
     this.retentionDays = retentionDays;
-    this.dryRun = dryRun;
 
     this.jdbi = jdbi;
 
@@ -81,7 +76,7 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
     try {
       // Attempt to apply a database retention policy. An exception is thrown on failed retention
       // policy attempts requiring we handle the throwable and log the error.
-      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+      DbRetention.retentionOnDbOrError(jdbi, numberOfRowsPerBatch, retentionDays);
     } catch (DbRetentionException errorOnDbRetention) {
       log.error(
           "Failed to apply retention policy of '{}' days to database!",

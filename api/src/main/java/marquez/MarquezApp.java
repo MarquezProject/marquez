@@ -143,8 +143,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
                   jdbi,
                   config.getDbRetention().getFrequencyMins(),
                   config.getDbRetention().getNumberOfRowsPerBatch(),
-                  config.getDbRetention().getRetentionDays(),
-                  config.getDbRetention().isDryRun()));
+                  config.getDbRetention().getRetentionDays()));
     }
   }
 

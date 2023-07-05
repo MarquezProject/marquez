@@ -15,13 +15,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * The base class for tests needing to interact with database. A {@code postgres} container is
- * managed automatically and started only once for a given test suite. Note, the container will be
- * shared between test methods. When querying the test database, use the {@code DB} instance.
+ * The base class for interactions with test database. A {@code postgres} container is managed
+ * automatically and started only once for a given test suite. The {@code postgres} container will
+ * be shared between test methods.
  *
  * <p>After the underlying {@code postgres} container starts, but before a given test suite is
  * executed, the latest {@code flyway} migrations for Marquez will be applied to the database using
- * {@link DbMigration#migrateDbOrError(DataSource)}
+ * {@link DbMigration#migrateDbOrError(DataSource)}. When querying the test database, use the {@code
+ * DB} instance.
  */
 @Tag("DataAccessTests")
 @Testcontainers
@@ -44,11 +45,11 @@ class DbTest {
                 DbMigration.migrateDbOrError(source);
               });
 
-  // An open connection to test database.
   static TestingDb DB;
 
   @BeforeAll
   public static void setUpOnce() {
+    // Wrap jdbi configured for running container.
     DB = TestingDb.newInstance(jdbiExtension.getJdbi());
   }
 }
