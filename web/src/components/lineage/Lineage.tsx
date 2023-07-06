@@ -67,7 +67,7 @@ export function initGraph() {
     return {}
   })
 
-  return g;
+  return g
 }
 
 export function buildGraphAll(g: graphlib.Graph<MqNode>, graph: LineageNode[], callBack: (g: graphlib.Graph<MqNode>) => void) {

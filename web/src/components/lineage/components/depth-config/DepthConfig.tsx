@@ -1,13 +1,13 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
 import * as Redux from 'redux'
+import { Box, TextField, Typography, createTheme } from '@mui/material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setLineageGraphDepth } from '../../../../store/actionCreators'
-import { Box, Typography, createTheme, TextField } from '@mui/material'
 import { useTheme } from '@emotion/react'
+import React from 'react'
 
 
 interface DepthConfigProps {
