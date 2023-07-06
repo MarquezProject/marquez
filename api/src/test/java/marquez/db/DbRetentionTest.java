@@ -27,20 +27,18 @@ import org.junit.jupiter.api.Test;
 /** The test suite for {@link DbRetention}. */
 @Tag("IntegrationTests")
 public class DbRetentionTest extends DbTest {
-  private static final int numberOfRowsPerBatch = 10;
-  private static final int retentionDays = 30;
+  private static final int NUMBER_OF_ROWS_PER_BATCH = 10;
+  private static final int RETENTION_DAYS = 30;
+  private static final int OLDER_THAN_X_DAYS = 31;
 
   @Test
   public void testRetentionOnDbOrError_withDatasetsOlderThanXDays() {
-    // 1. Add datasets older than X days
-    // 2. Add datasets recent within the past X days
-    // 3. Verify only datasets older than X days have been deleted (using primary key)
-
+    // (1) Add namespace and source.
     final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
     final SourceRow sourceRow = DB.upsert(newSourceRow());
 
-    // ...
-    final Instant olderThan30Days = Instant.now().minus(31, DAYS);
+    // (2) Add datasets older than X days.
+    final Instant olderThan30Days = Instant.now().minus(OLDER_THAN_X_DAYS, DAYS);
     final Set<DatasetRow> rowsOlderThan30Days =
         newDatasetRowsWith(
             olderThan30Days,
@@ -49,10 +47,9 @@ public class DbRetentionTest extends DbTest {
             sourceRow.getUuid(),
             sourceRow.getName(),
             4);
-    // ...
     DB.upsertAll(rowsOlderThan30Days);
 
-    // ...
+    // (3) Add datasets with tha X days.
     final Instant last30Days = Instant.now();
     final Set<DatasetRow> rowsLast30Days =
         DB.upsertAll(
@@ -64,17 +61,17 @@ public class DbRetentionTest extends DbTest {
                 sourceRow.getName(),
                 2));
 
-    // ...
+    // (4) Apply retention policy.
     try {
       DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), numberOfRowsPerBatch, retentionDays);
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
     } catch (DbRetentionException e) {
       fail("failed to apply retention policy", e);
     }
 
-    // ...
+    // (5) Query 'datasets' table for rows deleted.
     try (final Handle handle = DB.open()) {
-      // ...
+      // Ensure rows older than X days have been deleted.
       final Set<UUID> uuidsForRowsOlderThan30Days =
           rowsOlderThan30Days.stream().map(DatasetRow::getUuid).collect(toImmutableSet());
       final boolean rowsOlderThan30DaysExist =
@@ -85,7 +82,7 @@ public class DbRetentionTest extends DbTest {
               .mapTo(Boolean.class)
               .one();
       assertThat(rowsOlderThan30DaysExist).isFalse();
-      // ...
+      // Ensure rows within last X days have not been deleted.
       final Set<UUID> uuidsForRowsLast30Days =
           rowsLast30Days.stream().map(DatasetRow::getUuid).collect(toImmutableSet());
       final boolean rowsLast30DaysExist =

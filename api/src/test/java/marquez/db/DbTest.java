@@ -47,6 +47,7 @@ class DbTest {
                 DbMigration.migrateDbOrError(source);
               });
 
+  // Wraps test database.
   static TestingDb DB;
 
   @BeforeAll
