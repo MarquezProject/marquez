@@ -1,7 +1,6 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
 import * as Redux from 'redux'
 import { Box, TextField, Typography, createTheme } from '@mui/material'
 import { bindActionCreators } from 'redux'
