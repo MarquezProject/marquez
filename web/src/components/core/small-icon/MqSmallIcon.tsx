@@ -24,7 +24,7 @@ const MqSmallIcon: React.FC<OwnProps> = ({
       width={16}
       height={16}
       bgcolor={backgroundColor}
-      borderRadius="undefinedpx"
+      borderRadius={shape === 'circle' ? '50%' : '4px'}
       display={'flex'}
       justifyContent={'center'}
       alignItems={'center'}
