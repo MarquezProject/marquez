@@ -8,7 +8,7 @@ export const genericErrorMessageConstructor = (functionName: string, error: APIE
   throw `${functionName} responded with error code ${code}: ${message}.  Here are the details: ${details}`
 }
 
-interface IParams {
+export interface IParams {
   method: HttpMethod
   body?: string
 }
