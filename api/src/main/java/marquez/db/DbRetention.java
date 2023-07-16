@@ -55,12 +55,12 @@ public final class DbRetention {
     // (1)
     // (2)
     // (3)
-    retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
-    retentionOnDatasetVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobs(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
-    retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
-    retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun); // delete lineage event
+    // not needed: retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnDatasetVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
   }
 
   /** ... */
@@ -112,12 +112,11 @@ public final class DbRetention {
                         rows_deleted INT;
                         rows_deleted_total INT := 0;
                       BEGIN
-                        CREATE TEMPORARY TABLE used_datasets_as_input_in_x_days AS (
+                        CREATE TEMPORARY TABLE used_datasets_as_io_in_x_days AS (
                           SELECT dataset_uuid
                             FROM job_versions_io_mapping AS jvio INNER JOIN job_versions AS jv
                               ON jvio.job_version_uuid = jv.uuid
                            WHERE jv.created_at >= CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
-                             AND jvio.io_type = 'INPUT'
                         );
                         LOOP
                           WITH deleted_rows AS (
@@ -130,8 +129,8 @@ public final class DbRetention {
                                  LIMIT rows_per_batch
                               ) AND NOT EXISTS (
                                   SELECT 1
-                                    FROM used_datasets_as_input_in_x_days AS udai
-                                   WHERE d.uuid = udai.dataset_uuid
+                                    FROM used_datasets_as_io_in_x_days AS udaio
+                                   WHERE d.uuid = udaio.dataset_uuid
                               ) RETURNING uuid
                           )
                           SELECT COUNT(*) INTO rows_deleted FROM deleted_rows;
@@ -139,7 +138,7 @@ public final class DbRetention {
                           EXIT WHEN rows_deleted = 0;
                           PERFORM pg_sleep(0.1);
                         END LOOP;
-                        DROP TABLE used_datasets_as_input_in_x_days;
+                        DROP TABLE used_datasets_as_io_in_x_days;
                         RETURN rows_deleted_total;
                       END;
                       $$ LANGUAGE plpgsql;""",
@@ -225,7 +224,7 @@ public final class DbRetention {
                                 SELECT 1
                                   FROM used_dataset_versions_as_input_in_x_days AS udvi
                                  WHERE dv.uuid = udvi.dataset_version_uuid
-                              ) OR NOT EXISTS (
+                              ) AND NOT EXISTS (
                                 SELECT 1
                                   FROM used_dataset_versions_as_current_in_x_days AS udvc
                                  WHERE dv.uuid = udvc.current_version_uuid
