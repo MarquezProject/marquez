@@ -1,10 +1,22 @@
+/*
+ * Copyright 2018-2023 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.db;
 
+import static marquez.common.models.CommonModelGenerator.newFields;
+
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.Set;
 import lombok.NonNull;
 import marquez.common.models.DatasetType;
+import marquez.common.models.JobType;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.JobRow;
+import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Handle;
@@ -18,6 +30,8 @@ import org.jdbi.v3.core.Jdbi;
  */
 final class TestingDb {
   private final Jdbi delegate;
+
+  private static final Instant NOW = Instant.now();
 
   private TestingDb(@NonNull final Jdbi delegate) {
     this.delegate = delegate;
@@ -52,27 +66,112 @@ final class TestingDb {
             row.getConnectionUrl());
   }
 
-  /** Execute {@code UPSERT} for the specified {@link DatasetRow} objects. */
-  Set<DatasetRow> upsertAll(@NonNull Set<DatasetRow> rows) {
-    final DatasetDao dao = delegate.onDemand(DatasetDao.class);
-    final ImmutableSet.Builder<DatasetRow> rowsAdded = ImmutableSet.builder();
-    for (final DatasetRow row : rows) {
-      final DatasetRow upserted =
-          dao.upsert(
-              row.getUuid(),
-              DatasetType.valueOf(row.getType()),
-              row.getCreatedAt(),
-              row.getNamespaceUuid(),
-              row.getNamespaceName(),
-              row.getSourceUuid(),
-              row.getSourceName(),
-              row.getName(),
-              row.getPhysicalName(),
-              row.getDescription().orElse(null),
-              row.isDeleted());
-      rowsAdded.add(upserted);
+  <T> Set<T> upsertAll(@NonNull Object... rows) {
+    return upsertAll(rows);
+  }
+
+  /** ... */
+  <T> Set<T> upsertAll(@NonNull Set<?> rows) {
+    ImmutableSet.Builder<T> upserted = new ImmutableSet.Builder<>();
+    rows.forEach(
+        row -> {
+          upserted.add((T) upsert(row));
+        });
+    return upserted.build();
+  }
+
+  private Object upsert(Object row) {
+    if (row instanceof DatasetRow) {
+      return upsert((DatasetRow) row);
+    } else if (row instanceof DatasetVersionRow) {
+      return upsert((DatasetVersionRow) row);
     }
-    return rowsAdded.build();
+    throw new IllegalArgumentException();
+  }
+
+  /** Execute {@code UPSERT} for the specified {@link DatasetRow} object. */
+  DatasetRow upsert(@NonNull DatasetRow row) {
+    return delegate
+        .onDemand(DatasetDao.class)
+        .upsert(
+            row.getUuid(),
+            DatasetType.valueOf(row.getType()),
+            row.getCreatedAt(),
+            row.getNamespaceUuid(),
+            row.getNamespaceName(),
+            row.getSourceUuid(),
+            row.getSourceName(),
+            row.getName(),
+            row.getPhysicalName(),
+            row.getDescription().orElse(null),
+            row.isDeleted());
+  }
+
+  /** Execute {@code UPSERT} for the specified {@link DatasetRow} object. */
+  DatasetVersionRow upsert(@NonNull DatasetVersionRow row) {
+    return upsert(row, false);
+  }
+
+  /** Execute {@code UPSERT} for the specified {@link DatasetRow} object. */
+  DatasetVersionRow upsert(@NonNull DatasetVersionRow row, boolean isCurrentVersion) {
+    final DatasetVersionRow upserted =
+        delegate
+            .onDemand(DatasetVersionDao.class)
+            .upsert(
+                row.getUuid(),
+                row.getCreatedAt(),
+                row.getDatasetUuid(),
+                row.getVersion(),
+                row.getRunUuid().orElseThrow(),
+                Columns.toPgObject(newFields(4)),
+                row.getNamespaceName(),
+                row.getDatasetName(),
+                row.getLifecycleState());
+
+    // ...
+    if (isCurrentVersion) {
+      delegate
+          .onDemand(DatasetDao.class)
+          .updateVersion(row.getDatasetUuid(), row.getCreatedAt(), row.getVersion());
+    }
+    return upserted;
+  }
+
+  /** Execute {@code UPSERT} for the specified {@link JobRow} object. */
+  JobRow upsert(@NonNull JobRow row) {
+    return delegate
+        .onDemand(JobDao.class)
+        .upsertJob(
+            row.getUuid(),
+            JobType.valueOf(row.getType()),
+            row.getCreatedAt(),
+            row.getNamespaceUuid(),
+            row.getNamespaceName(),
+            row.getName(),
+            row.getDescription().orElse(null),
+            row.getLocation(),
+            null,
+            null);
+  }
+
+  /** Execute {@code UPSERT} for the specified {@link JobVersionRow} object. */
+  JobVersionRow upsert(@NonNull JobVersionRow row) {
+    final JobVersionDao dao = delegate.onDemand(JobVersionDao.class);
+    final JobVersionRow upserted =
+        dao.upsertJobVersion(
+            row.getUuid(),
+            row.getCreatedAt(),
+            row.getJobUuid(),
+            row.getLocation().orElse(null),
+            row.getVersion(),
+            row.getJobName(),
+            row.getNamespaceUuid(),
+            row.getNamespaceName());
+    row.getInputUuids().forEach(in -> dao.upsertInputDatasetFor(row.getUuid(), in));
+    row.getInputUuids().forEach(out -> dao.upsertInputDatasetFor(row.getUuid(), out));
+    // ...
+    delegate.onDemand(JobDao.class).updateVersionFor(row.getJobUuid(), NOW, upserted.getUuid());
+    return upserted;
   }
 
   /** Obtain a new {@link Handle} by delegating to underlying {@code jdbi}. */

@@ -27,10 +27,12 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -39,6 +41,7 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
@@ -52,6 +55,7 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import marquez.service.models.ServiceModelGenerator;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
 /** Static utility methods for inserting and interacting with rows in the database. */
@@ -325,5 +329,42 @@ final class DbTestUtils {
               }
             })
         .takeWhile(Predicates.notNull());
+  }
+
+  /** Returns {@code true} ... */
+  public static boolean rowsExist(
+      @NonNull final Handle handle, final @NonNull Set<?> rowsToVerify) {
+    // TODO (wslulciuc): ...
+    return (rowsToVerify.stream().anyMatch(DatasetRow.class::isInstance)
+        ? rowsArePresentIn(
+            handle,
+            "datasets",
+            rowsToVerify.stream()
+                .map(DatasetRow.class::cast)
+                .map(DatasetRow::getUuid)
+                .collect(toImmutableSet()))
+        : (rowsToVerify.stream().anyMatch(DatasetVersionRow.class::isInstance)
+            && rowsArePresentIn(
+                handle,
+                "dataset_versions",
+                rowsToVerify.stream()
+                    .map(DatasetVersionRow.class::cast)
+                    .map(DatasetVersionRow::getUuid)
+                    .collect(toImmutableSet()))));
+  }
+
+  /** Returns {@code true} ... */
+  private static boolean rowsArePresentIn(
+      @NonNull final Handle handle,
+      @NonNull final String uuidsForRowsExistsInTable,
+      @NonNull final Set<UUID> uuidsForRowsToVerify) {
+    return handle
+        .createQuery(
+            "SELECT EXISTS (SELECT 1 FROM "
+                + uuidsForRowsExistsInTable
+                + " WHERE uuid IN (<uuidsForRowsToVerify>))")
+        .bindList("uuidsForRowsToVerify", uuidsForRowsToVerify)
+        .mapTo(Boolean.class)
+        .one();
   }
 }
