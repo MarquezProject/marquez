@@ -220,7 +220,6 @@ public interface OpenLineageDao extends BaseDao {
               runArgs.getUuid(),
               nominalStartTime,
               nominalEndTime,
-              namespace.getUuid(),
               namespace.getName(),
               job.getName(),
               job.getLocation());

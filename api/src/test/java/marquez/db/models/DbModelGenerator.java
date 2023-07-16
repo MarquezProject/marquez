@@ -22,13 +22,16 @@ import static marquez.common.models.CommonModelGenerator.newPhysicalDatasetName;
 import static marquez.common.models.CommonModelGenerator.newRunId;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
 import static marquez.common.models.CommonModelGenerator.newVersion;
+import static marquez.service.models.ServiceModelGenerator.newRunArgs;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import marquez.Generator;
+import marquez.common.Utils;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -89,6 +92,18 @@ public final class DbModelGenerator extends Generator {
         newDescription(),
         null,
         false);
+  }
+
+  public static Set<DatasetRow> newDatasetRowsWith(
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName,
+      @NonNull final UUID sourceUuid,
+      @NonNull final String sourceName,
+      final int limit) {
+    return Stream.generate(
+            () -> newDatasetRowWith(NOW, namespaceUuid, namespaceName, sourceUuid, sourceName))
+        .limit(limit)
+        .collect(toImmutableSet());
   }
 
   public static Set<DatasetRow> newDatasetRowsWith(
@@ -153,13 +168,24 @@ public final class DbModelGenerator extends Generator {
       @NonNull final UUID datasetUuid,
       @NonNull final String datasetName,
       @NonNull final String namespaceName) {
+    // the run row ...
+    return newDatasetVersionRowWith(
+        now, datasetUuid, datasetName, namespaceName, newRunId().getValue());
+  }
+
+  public static DatasetVersionRow newDatasetVersionRowWith(
+      @NotNull final Instant now,
+      @NonNull final UUID datasetUuid,
+      @NonNull final String datasetName,
+      @NonNull final String namespaceName,
+      @NonNull final UUID runUuid) {
     return new DatasetVersionRow(
         newRowUuid(),
         now,
         datasetUuid,
         newVersion().getValue(),
         newLifecycleState(),
-        newRunId().getValue(),
+        runUuid,
         datasetName,
         namespaceName);
   }
@@ -206,6 +232,36 @@ public final class DbModelGenerator extends Generator {
         newRunId().getValue(),
         namespaceUuid,
         namespaceName);
+  }
+
+  public static RunArgsRow newRunArgRow() {
+    final Map<String, String> runArgs = newRunArgs();
+    final String runArgsAsJson = Utils.toJson(newRunArgs());
+    final String checksum = Utils.checksumFor(runArgs);
+    return new RunArgsRow(newRowUuid(), NOW, runArgsAsJson, checksum);
+  }
+
+  public static RunRow newRunRow(
+      @NonNull final UUID jobUuid,
+      @NonNull final UUID jobVersionUuid,
+      @NonNull final UUID runArgUuid) {
+    return new RunRow(
+        newRowUuid(),
+        NOW,
+        NOW,
+        jobUuid,
+        jobVersionUuid,
+        null,
+        runArgUuid,
+        NOW,
+        NOW,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
   }
 
   /** Returns a new {@code row} uuid. */

@@ -10,6 +10,7 @@ import static marquez.common.models.CommonModelGenerator.newFields;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
@@ -18,6 +19,8 @@ import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
+import marquez.db.models.RunArgsRow;
+import marquez.db.models.RunRow;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -137,6 +140,13 @@ final class TestingDb {
     return upserted;
   }
 
+  /** Execute {@code UPSERT} for the specified {@link RunArgsRow} object. */
+  RunArgsRow upsert(@NonNull RunArgsRow row) {
+    return delegate
+        .onDemand(RunArgsDao.class)
+        .upsertRunArgs(row.getUuid(), row.getCreatedAt(), row.getArgs(), row.getChecksum());
+  }
+
   /** Execute {@code UPSERT} for the specified {@link JobRow} object. */
   JobRow upsert(@NonNull JobRow row) {
     return delegate
@@ -171,6 +181,28 @@ final class TestingDb {
     row.getInputUuids().forEach(out -> dao.upsertInputDatasetFor(row.getUuid(), out));
     // ...
     delegate.onDemand(JobDao.class).updateVersionFor(row.getJobUuid(), NOW, upserted.getUuid());
+    return upserted;
+  }
+
+  RunRow upsertWith(@NonNull RunRow row, @NonNull final UUID datasetVersionUuidAsInput) {
+    final RunDao dao = delegate.onDemand(RunDao.class);
+    final RunRow upserted =
+        dao.upsert(
+            row.getUuid(),
+            row.getParentRunUuid().orElse(null),
+            null, // ...
+            row.getCreatedAt(),
+            row.getJobUuid(),
+            row.getJobVersionUuid().orElse(null),
+            row.getRunArgsUuid(),
+            row.getNominalStartTime().orElse(null),
+            row.getNominalEndTime().orElse(null),
+            row.getNamespaceName(),
+            row.getJobName(),
+            null // ...
+            );
+    // ...
+    dao.updateInputMapping(row.getUuid(), datasetVersionUuidAsInput);
     return upserted;
   }
 

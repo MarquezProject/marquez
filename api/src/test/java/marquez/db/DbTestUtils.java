@@ -252,7 +252,6 @@ final class DbTestUtils {
         runArgsUuid,
         newTimestamp(),
         newTimestamp(),
-        namespaceUuid,
         namespaceName,
         jobName,
         jobLocation);

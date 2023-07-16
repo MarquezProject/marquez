@@ -63,7 +63,6 @@ public class BackfillTestUtils {
             runArgsRow.getUuid(),
             now,
             now,
-            namespace.getUuid(),
             namespace.getName(),
             jobName,
             null);
