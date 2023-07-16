@@ -331,26 +331,32 @@ final class DbTestUtils {
         .takeWhile(Predicates.notNull());
   }
 
+  public static <T> boolean rowExist(@NonNull final Handle handle, final @NonNull T rowToVerify) {
+    return rowsExist(handle, ImmutableSet.of(rowToVerify));
+  }
+
   /** Returns {@code true} ... */
   public static boolean rowsExist(
       @NonNull final Handle handle, final @NonNull Set<?> rowsToVerify) {
     // TODO (wslulciuc): ...
-    return (rowsToVerify.stream().anyMatch(DatasetRow.class::isInstance)
-        ? rowsArePresentIn(
-            handle,
-            "datasets",
-            rowsToVerify.stream()
-                .map(DatasetRow.class::cast)
-                .map(DatasetRow::getUuid)
-                .collect(toImmutableSet()))
-        : (rowsToVerify.stream().anyMatch(DatasetVersionRow.class::isInstance)
-            && rowsArePresentIn(
-                handle,
-                "dataset_versions",
-                rowsToVerify.stream()
-                    .map(DatasetVersionRow.class::cast)
-                    .map(DatasetVersionRow::getUuid)
-                    .collect(toImmutableSet()))));
+    if (rowsToVerify.stream().anyMatch(DatasetRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "datasets",
+          rowsToVerify.stream()
+              .map(DatasetRow.class::cast)
+              .map(DatasetRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(DatasetVersionRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "dataset_versions",
+          rowsToVerify.stream()
+              .map(DatasetVersionRow.class::cast)
+              .map(DatasetVersionRow::getUuid)
+              .collect(toImmutableSet()));
+    }
+    throw new IllegalArgumentException();
   }
 
   /** Returns {@code true} ... */
