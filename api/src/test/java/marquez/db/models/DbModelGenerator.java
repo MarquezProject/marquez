@@ -289,20 +289,40 @@ public final class DbModelGenerator extends Generator {
     return new RunArgsRow(newRowUuid(), NOW, runArgsAsJson, checksum);
   }
 
-  public static RunRow newRunRow(
+  /** Returns new {@link RunRow} objects with a specified {@code limit}. */
+  public static Set<RunRow> newRunRowsWith(
+      @NotNull final Instant now,
+      @NonNull final UUID jobUuid,
+      @NonNull final UUID jobVersionUuid,
+      @NonNull final UUID runArgUuid,
+      final int limit) {
+    return Stream.generate(() -> newRunRowWith(now, jobUuid, jobVersionUuid, runArgUuid))
+        .limit(limit)
+        .collect(toImmutableSet());
+  }
+
+  public static RunRow newRunRowWith(
+      @NonNull final UUID jobUuid,
+      @NonNull final UUID jobVersionUuid,
+      @NonNull final UUID runArgUuid) {
+    return newRunRowWith(NOW, jobUuid, jobVersionUuid, runArgUuid);
+  }
+
+  public static RunRow newRunRowWith(
+      @NotNull final Instant now,
       @NonNull final UUID jobUuid,
       @NonNull final UUID jobVersionUuid,
       @NonNull final UUID runArgUuid) {
     return new RunRow(
         newRowUuid(),
-        NOW,
-        NOW,
+        now,
+        now,
         jobUuid,
         jobVersionUuid,
         null,
         runArgUuid,
-        NOW,
-        NOW,
+        now,
+        now,
         null,
         null,
         null,

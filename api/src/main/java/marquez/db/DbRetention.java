@@ -57,8 +57,8 @@ public final class DbRetention {
     // (3)
     retentionOnJobs(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
-    retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun); // delete lineage event
-    // not needed: retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+    retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnDatasetVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
   }
@@ -423,7 +423,7 @@ public final class DbRetention {
                               WHERE uuid IN (
                                 SELECT uuid
                                   FROM runs
-                                 WHERE ended_at < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
+                                 WHERE updated_at < CURRENT_TIMESTAMP - INTERVAL '${retentionDays} days'
                                    FOR UPDATE SKIP LOCKED
                                  LIMIT rows_per_batch
                               ) RETURNING uuid

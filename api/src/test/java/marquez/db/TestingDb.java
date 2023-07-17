@@ -9,8 +9,10 @@ import static marquez.common.models.CommonModelGenerator.newFields;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
@@ -92,6 +94,8 @@ final class TestingDb {
       return upsert((JobRow) row);
     } else if (row instanceof JobVersionRow) {
       return upsert((JobVersionRow) row);
+    } else if (row instanceof RunRow) {
+      return upsert((RunRow) row);
     }
     throw new IllegalArgumentException();
   }
@@ -188,7 +192,11 @@ final class TestingDb {
     return upserted;
   }
 
-  RunRow upsertWith(@NonNull RunRow row, @NonNull final UUID datasetVersionUuidAsInput) {
+  RunRow upsert(@NonNull RunRow row) {
+    return upsertWith(row, null);
+  }
+
+  RunRow upsertWith(@NonNull RunRow row, @Nullable final UUID datasetVersionUuidAsInput) {
     final RunDao dao = delegate.onDemand(RunDao.class);
     final RunRow upserted =
         dao.upsert(
@@ -206,7 +214,8 @@ final class TestingDb {
             null // ...
             );
     // ...
-    dao.updateInputMapping(row.getUuid(), datasetVersionUuidAsInput);
+    Optional.ofNullable(datasetVersionUuidAsInput)
+        .ifPresent(uuidOfInput -> dao.updateInputMapping(row.getUuid(), uuidOfInput));
     return upserted;
   }
 

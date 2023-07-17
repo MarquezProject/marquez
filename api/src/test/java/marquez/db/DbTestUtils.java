@@ -370,6 +370,14 @@ final class DbTestUtils {
               .map(JobVersionRow.class::cast)
               .map(JobVersionRow::getUuid)
               .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(RunRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "runs",
+          rowsToVerify.stream()
+              .map(RunRow.class::cast)
+              .map(RunRow::getUuid)
+              .collect(toImmutableSet()));
     }
     throw new IllegalArgumentException();
   }
