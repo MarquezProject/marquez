@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SortDirection;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
+import marquez.service.models.BaseEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
@@ -61,20 +62,26 @@ public class OpenLineageResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   @Path("/lineage")
-  public void create(
-      @Valid @NotNull LineageEvent event, @Suspended final AsyncResponse asyncResponse)
+  public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
-    openLineageService
-        .createAsync(event)
-        .whenComplete(
-            (result, err) -> {
-              if (err != null) {
-                log.error("Unexpected error while processing request", err);
-                asyncResponse.resume(Response.status(determineStatusCode(err)).build());
-              } else {
-                asyncResponse.resume(Response.status(201).build());
-              }
-            });
+    if (event instanceof LineageEvent) {
+      openLineageService
+          .createAsync((LineageEvent) event)
+          .whenComplete(
+              (result, err) -> {
+                if (err != null) {
+                  log.error("Unexpected error while processing request", err);
+                  asyncResponse.resume(Response.status(determineStatusCode(err)).build());
+                } else {
+                  asyncResponse.resume(Response.status(201).build());
+                }
+              });
+    } else {
+      log.warn("Unsupported event type {}. Skipping without error", event.getClass().getName());
+
+      // return serialized event
+      asyncResponse.resume(Response.status(200).entity(event).build());
+    }
   }
 
   private int determineStatusCode(Throwable e) {

@@ -83,20 +83,23 @@ public class BackfillTestUtils {
                         new RunLink(runId),
                         new JobLink(NAMESPACE, parentJobName)));
     LineageEvent event =
-        new LineageEvent(
-            COMPLETE,
-            Instant.now().atZone(LOCAL_ZONE),
-            new Run(
-                runUuid.toString(),
-                new RunFacet(
-                    nominalTimeRunFacet,
-                    parentRun.orElse(null),
-                    ImmutableMap.of("airflow_version", ImmutableMap.of("version", "abc")))),
-            new LineageEvent.Job(
-                NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)),
-            Collections.emptyList(),
-            Collections.emptyList(),
-            PRODUCER_URL.toString());
+        LineageEvent.builder()
+            .eventType(COMPLETE)
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .run(
+                new Run(
+                    runUuid.toString(),
+                    new RunFacet(
+                        nominalTimeRunFacet,
+                        parentRun.orElse(null),
+                        ImmutableMap.of("airflow_version", ImmutableMap.of("version", "abc")))))
+            .job(
+                new LineageEvent.Job(
+                    NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)))
+            .inputs(Collections.emptyList())
+            .outputs(Collections.emptyList())
+            .producer(PRODUCER_URL.toString())
+            .build();
     PGobject eventJson = new PGobject();
     eventJson.setType("json");
     eventJson.setValue(Utils.getMapper().writeValueAsString(event));

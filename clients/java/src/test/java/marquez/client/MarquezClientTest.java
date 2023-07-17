@@ -188,7 +188,8 @@ public class MarquezClientTest {
           Collections.emptyMap(),
           Collections.emptyList(),
           Collections.emptyList(),
-          URI.create("http://localhost:8080"));
+          URI.create("http://localhost:8080"),
+          URI.create("https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent"));
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
