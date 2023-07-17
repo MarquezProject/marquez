@@ -6,6 +6,9 @@
 package marquez.db;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static marquez.api.models.ApiModelGenerator.newRunEvents;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
 import static marquez.db.models.DbModelGenerator.newDatasetRowsWith;
 import static marquez.db.models.DbModelGenerator.newDatasetVersionRowWith;
@@ -22,6 +25,8 @@ import static marquez.db.models.DbModelGenerator.newSourceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import io.openlineage.client.OpenLineage;
+import java.net.URI;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +52,12 @@ public class DbRetentionTest extends DbTest {
   private static final boolean DRY_RUN = true;
   private static final Instant OLDER_THAN_X_DAYS = Instant.now().minus(RETENTION_DAYS + 1, DAYS);
   private static final Instant LAST_X_DAYS = Instant.now().minus(RETENTION_DAYS - 1, DAYS);
+
+  /* Configure OL. */
+  private static final URI OL_PRODUCER =
+      URI.create(
+          "https://github.com/MarquezProject/marquez/tree/main/api/src/test/java/marquez/db/DbRetentionTest");
+  private static final OpenLineage OL = new OpenLineage(OL_PRODUCER);
 
   @Test
   public void testRetentionOnDbOrErrorWithDatasetsOlderThanXDays() {
@@ -625,6 +636,51 @@ public class DbRetentionTest extends DbTest {
       try (final Handle handle = DB.open()) {
         assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
         assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply retention policy", e);
+    }
+  }
+
+  @Test
+  public void testRetentionOnDbOrErrorWithOlEventsOlderThanXDays() {
+    // (1) Add namespace and job for OL event.
+    final String namespaceName = newNamespaceName().getValue();
+    final String jobName = newJobName().getValue();
+
+    // (2) Add OL events older than X days.
+    final Set<OpenLineage.RunEvent> olEventsOlderThanXDays =
+        newRunEvents(OL, OLDER_THAN_X_DAYS, namespaceName, jobName, 4);
+    DB.insertAll(olEventsOlderThanXDays);
+
+    // (3) Add OL events within last X days.
+    final Set<OpenLineage.RunEvent> olEventsLastXDays =
+        newRunEvents(OL, LAST_X_DAYS, namespaceName, jobName, 2);
+    DB.insertAll(olEventsLastXDays);
+
+    // (4) Apply retention policy as dry run on OL events older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
+      // (5) Query 'lineage events' table for rows. We want to ensure: OL events older than X
+      // days have not been deleted; OL events within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.olEventsExist(handle, olEventsOlderThanXDays)).isTrue();
+        assertThat(DbTestUtils.olEventsExist(handle, olEventsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply dry run", e);
+    }
+
+    // (6) Apply retention policy on OL events older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
+      // (7) Query 'lineage events' table for rows deleted. We want to ensure: OL events older
+      // than X days have been deleted; OL events within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.olEventsExist(handle, olEventsOlderThanXDays)).isFalse();
+        assertThat(DbTestUtils.olEventsExist(handle, olEventsLastXDays)).isTrue();
       }
     } catch (DbRetentionException e) {
       fail("failed to apply retention policy", e);

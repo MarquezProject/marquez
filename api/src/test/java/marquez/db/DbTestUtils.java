@@ -22,6 +22,7 @@ import static marquez.service.models.ServiceModelGenerator.newRunMeta;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -393,6 +394,22 @@ final class DbTestUtils {
                 + uuidsForRowsExistsInTable
                 + " WHERE uuid IN (<uuidsForRowsToVerify>))")
         .bindList("uuidsForRowsToVerify", uuidsForRowsToVerify)
+        .mapTo(Boolean.class)
+        .one();
+  }
+
+  /** Returns {@code true} ... */
+  public static boolean olEventsExist(
+      @NonNull final Handle handle, @NonNull final Set<OpenLineage.RunEvent> olEventsToVerify) {
+    final Set<UUID> runUuidsToVerify =
+        olEventsToVerify.stream()
+            .map(OpenLineage.RunEvent::getRun)
+            .map(OpenLineage.Run::getRunId)
+            .collect(toImmutableSet());
+    return handle
+        .createQuery(
+            "SELECT EXISTS (SELECT 1 FROM lineage_events WHERE run_uuid IN (<runUuidsToVerify>))")
+        .bindList("runUuidsToVerify", runUuidsToVerify)
         .mapTo(Boolean.class)
         .one();
   }

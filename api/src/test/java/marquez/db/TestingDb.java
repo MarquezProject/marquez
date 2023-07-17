@@ -8,6 +8,7 @@ package marquez.db;
 import static marquez.common.models.CommonModelGenerator.newFields;
 
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -217,6 +218,25 @@ final class TestingDb {
     Optional.ofNullable(datasetVersionUuidAsInput)
         .ifPresent(uuidOfInput -> dao.updateInputMapping(row.getUuid(), uuidOfInput));
     return upserted;
+  }
+
+  void insertAll(@NonNull Set<OpenLineage.RunEvent> olEvents) {
+    for (final OpenLineage.RunEvent olEvent : olEvents) {
+      insert(olEvent);
+    }
+  }
+
+  void insert(@NonNull OpenLineage.RunEvent olEvent) {
+    delegate
+        .onDemand(OpenLineageDao.class)
+        .createLineageEvent(
+            olEvent.getEventType().toString(),
+            olEvent.getEventTime().toInstant(),
+            olEvent.getRun().getRunId(),
+            olEvent.getJob().getName(),
+            olEvent.getJob().getNamespace(),
+            Columns.toPgObject(olEvent),
+            olEvent.getProducer().toASCIIString());
   }
 
   /** Obtain a new {@link Handle} by delegating to underlying {@code jdbi}. */

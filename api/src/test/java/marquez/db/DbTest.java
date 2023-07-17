@@ -5,6 +5,7 @@
 
 package marquez.db;
 
+import io.openlineage.client.OpenLineage;
 import javax.sql.DataSource;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -54,6 +55,7 @@ class DbTest {
 
   // Wraps test database connection.
   static TestingDb DB;
+  static OpenLineage OL;
 
   @BeforeAll
   public static void setUpOnce() {
