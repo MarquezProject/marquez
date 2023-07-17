@@ -190,16 +190,34 @@ public final class DbModelGenerator extends Generator {
         namespaceName);
   }
 
-  public static JobRow newJobRow(
+  /** Returns new {@link JobRow} objects with a specified {@code limit}. */
+  public static Set<JobRow> newJobRowsWith(
+      @NotNull final Instant now,
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName,
+      final int limit) {
+    return Stream.generate(() -> newJobRowWith(now, namespaceUuid, namespaceName))
+        .limit(limit)
+        .collect(toImmutableSet());
+  }
+
+  public static JobRow newJobRowWith(
       @NonNull final UUID namespaceUuid, @NonNull final String namespaceName) {
+    return newJobRowWith(NOW, namespaceUuid, namespaceName);
+  }
+
+  public static JobRow newJobRowWith(
+      @NotNull final Instant now,
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName) {
     final String parentJobName = newJobName().getValue();
     final String jobName = newJobName().getValue();
     final String jobSimpleName = jobName;
     return new JobRow(
         newRowUuid(),
         newJobType().name(),
-        NOW,
-        NOW,
+        now,
+        now,
         namespaceUuid,
         namespaceName,
         jobName,

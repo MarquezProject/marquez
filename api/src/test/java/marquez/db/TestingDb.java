@@ -88,6 +88,8 @@ final class TestingDb {
       return upsert((DatasetRow) row);
     } else if (row instanceof DatasetVersionRow) {
       return upsert((DatasetVersionRow) row);
+    } else if (row instanceof JobRow) {
+      return upsert((JobRow) row);
     }
     throw new IllegalArgumentException();
   }

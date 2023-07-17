@@ -330,7 +330,7 @@ final class DbTestUtils {
         .takeWhile(Predicates.notNull());
   }
 
-  public static <T> boolean rowExist(@NonNull final Handle handle, final @NonNull T rowToVerify) {
+  public static <T> boolean rowExists(@NonNull final Handle handle, final @NonNull T rowToVerify) {
     return rowsExist(handle, ImmutableSet.of(rowToVerify));
   }
 
@@ -353,6 +353,14 @@ final class DbTestUtils {
           rowsToVerify.stream()
               .map(DatasetVersionRow.class::cast)
               .map(DatasetVersionRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(JobRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "jobs",
+          rowsToVerify.stream()
+              .map(JobRow.class::cast)
+              .map(JobRow::getUuid)
               .collect(toImmutableSet()));
     }
     throw new IllegalArgumentException();
