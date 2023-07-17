@@ -230,7 +230,37 @@ public final class DbModelGenerator extends Generator {
         null);
   }
 
+  /** Returns new {@link JobVersionRow} objects with a specified {@code limit}. */
+  public static Set<JobVersionRow> newJobVersionRowsWith(
+      @NotNull final Instant now,
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName,
+      @NonNull final UUID jobUuid,
+      @NonNull final String jobName,
+      @NonNull final Set<DatasetRow> inputs,
+      @NonNull final Set<DatasetRow> outputs,
+      final int limit) {
+    return Stream.generate(
+            () ->
+                newJobVersionRowWith(
+                    now, namespaceUuid, namespaceName, jobUuid, jobName, inputs, outputs))
+        .limit(limit)
+        .collect(toImmutableSet());
+  }
+
   public static JobVersionRow newJobVersionRowWith(
+      @NonNull final UUID namespaceUuid,
+      @NonNull final String namespaceName,
+      @NonNull final UUID jobUuid,
+      @NonNull final String jobName,
+      @NonNull final Set<DatasetRow> inputs,
+      @NonNull final Set<DatasetRow> outputs) {
+    return newJobVersionRowWith(
+        NOW, namespaceUuid, namespaceName, jobUuid, jobName, inputs, outputs);
+  }
+
+  public static JobVersionRow newJobVersionRowWith(
+      @NotNull final Instant now,
       @NonNull final UUID namespaceUuid,
       @NonNull final String namespaceName,
       @NonNull final UUID jobUuid,
@@ -239,8 +269,8 @@ public final class DbModelGenerator extends Generator {
       @NonNull final Set<DatasetRow> outputs) {
     return new JobVersionRow(
         newRowUuid(),
-        NOW,
-        NOW,
+        now,
+        now,
         jobUuid,
         jobName,
         inputs.stream().map(DatasetRow::getUuid).collect(toImmutableList()),
