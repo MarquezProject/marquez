@@ -1,14 +1,14 @@
-<!-- SPDX-License-Identifier: Apache-2.0 -->
+# Getting Started with Airflow and OpenLineage+Marquez
 
-# [Airflow](https://airflow.apache.org) Example
+> **Note:** For a modified version of this guide that uses [Astro](https://www.astronomer.io/try-astro/?referral=docs-what-astro-banner) instead of vanilla Airflow, visit see the OpenLineage [docs](https://openlineage.io/docs/guides/airflow-quickstart).
 
-In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to Marquez using [OpenLineage](https://openlineage.io/). The example will help demonstrate some of the features of Marquez.
+In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to [Marquez](https://marquezproject.ai/) using OpenLineage. 
 
-### What you’ll learn:
+### You’ll learn how to:
 
-* Enable OpenLineage in Airflow
-* Write your very first OpenLineage enabled DAG
-* Troubleshoot a failing DAG using Marquez
+* enable OpenLineage in Airflow
+* write your very first OpenLineage-enabled DAG
+* troubleshoot a failing DAG using Marquez
 
 # Prerequisites
 
@@ -24,7 +24,7 @@ Before you begin, make sure you have installed:
 First, if you haven't already, clone the Marquez repository and change into the [`examples/airflow`](https://github.com/MarquezProject/marquez/tree/main/examples/airflow) directory:
 
 ```bash
-git clone https://github.com/MarquezProject/marquez && cd examples/airflow
+git clone https://github.com/MarquezProject/marquez && cd marquez/examples/airflow
 ```
 
 To make sure the latest [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) library is downloaded and installed when starting Airflow, you'll need to create a `requirements.txt` file with the following content:
@@ -58,7 +58,7 @@ Your `examples/airflow/` directory should now contain the following:
 
 # Step 2: Write Airflow DAGs using OpenLineage
 
-In this step, we'll create two new Airflow DAGs that perform simple tasks. The `counter` DAG will generate a random number every minute, while the `sum` DAG calculates a sum every five minutes. This will result in a simple pipeline containing two jobs and two datasets.
+In this step, we'll create two new Airflow DAGs that perform simple tasks. The `counter` DAG generates a random number every minute, while the `sum` DAG calculates a sum every five minutes. This will result in a simple pipeline containing two jobs and two datasets.
 
 First, let's create the `dags/` folder where our example DAGs will be located:
 
@@ -66,9 +66,9 @@ First, let's create the `dags/` folder where our example DAGs will be located:
 $ mkdir dags
 ```
 
-When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata. If you're using Airflow 2.3+ no further changes to your dag code, or configuration are needed. If you're using older version of Airflow, please look [here](https://github.com/OpenLineage/OpenLineage/blob/main/integration/airflow/README.md#setup) to understand how to configure Airflow integration.
+When writing our DAGs, we'll use [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow), enabling OpenLineage to observe the DAG and automatically collect task-level metadata. If you're using Airflow 2.3+ no further changes to your DAG code or configuration are needed. If you're using an older version of Airflow, please read [this](https://github.com/OpenLineage/OpenLineage/blob/main/integration/airflow/README.md#setup) to understand how to configure the Airflow integration.
 
-# Step 2.1: Create DAG `counter`
+## Step 2.1: Create `counter` DAG
 
 Under `dags/`, create a file named `counter.py` and add the following code:
 
@@ -124,9 +124,9 @@ t2 = PostgresOperator(
 t1 >> t2
 ```
 
-# Step 2.2: Create DAG `sum`
+## Step 2.2: Create `sum` DAG
 
-Under `dags/`, create a file named `sum.py` and add the following code:
+In `dags/`, create a file named `sum.py` and add the following code:
 
 ```python
 from airflow import DAG
@@ -175,7 +175,7 @@ t2 = PostgresOperator(
 t1 >> t2
 ```
 
-At this point, you should have the following under your `examples/airflow/` directory:
+At this point, your `examples/airflow/` directory should look like this:
 
 ```
 .
@@ -202,11 +202,11 @@ $ docker-compose up
 
 **The above command will:**
 
-* Start Airflow and install `openlineage-airflow`
-* Start Marquez
-* Start Postgres
+* start Airflow and install `openlineage-airflow`
+* start Marquez
+* start Postgres
 
-To view the Airflow UI and verify it's running, open [http://localhost:8080](http://localhost:8080). Then, login using the username and password: `airflow` / `airflow`. You can also browse to [http://localhost:3000](http://localhost:3000) to view the Marquez UI.
+To view the Airflow UI and verify it's running, open [http://localhost:8080](http://localhost:8080). Then, log in using the username and password `airflow` / `airflow`. You can also browse to [http://localhost:3000](http://localhost:3000) to view the Marquez UI.
 
 # Step 4: View Collected Metadata
 
@@ -218,11 +218,13 @@ To view DAG metadata collected by Marquez from Airflow, browse to the Marquez UI
 
 > **Note:** If the `counter.inc` job is not in the drop-down list, check to see if Airflow has successfully executed the DAG.
 
-![](./docs/search.png)
+<p align="center">
+  <img src={require("./docs/current-search-count.png").default} />
+</p>
 
-If you take a quick look at the lineage graph for `counter.inc`, you should see `public.counts` as an output dataset and `sum.total` as a downstream job!
+If you take a quick look at the lineage graph for `counter.if_not_exists`, you should see `example.public.counts` as an output dataset and `sum.total` as a downstream job!
 
-![](./docs/lineage-view-job.png)
+![](./docs/current-lineage-view-job.png)
 
 # Step 5: Troubleshoot a Failing DAG with Marquez
 
@@ -308,7 +310,3 @@ _Congrats_! You successfully step through a troubleshooting scenario of a failin
 # Feedback
 
 What did you think of this example? You can reach out to us on [slack](http://bit.ly/MarquezSlack) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
-
-----
-SPDX-License-Identifier: Apache-2.0 
-Copyright 2018-2023 contributors to the Marquez project.

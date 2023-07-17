@@ -122,14 +122,17 @@ public class LineageTestUtils {
 
     UUID runId = UUID.randomUUID();
     LineageEvent event =
-        new LineageEvent(
-            status,
-            Instant.now().atZone(LOCAL_ZONE),
-            new Run(runId.toString(), new RunFacet(nominalTimeRunFacet, parentRunFacet, runFacets)),
-            new Job(NAMESPACE, jobName, jobFacet),
-            inputs,
-            outputs,
-            PRODUCER_URL.toString());
+        LineageEvent.builder()
+            .eventType(status)
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .run(
+                new Run(
+                    runId.toString(), new RunFacet(nominalTimeRunFacet, parentRunFacet, runFacets)))
+            .job(new Job(NAMESPACE, jobName, jobFacet))
+            .inputs(inputs)
+            .outputs(outputs)
+            .producer(PRODUCER_URL.toString())
+            .build();
     // emulate an OpenLineage RunEvent
     event
         .getProperties()
