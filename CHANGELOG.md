@@ -5,7 +5,7 @@
 ## [0.37.0](https://github.com/MarquezProject/marquez/compare/0.36.0...0.37.0) - 2023-07-17
 ### Added
 * API: add ability to decode static metadata events [`#2495`](https://github.com/MarquezProject/marquez/pull/2495) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
-    *Introduces an `EventTypeResolver` for decoding incoming `/create` requests to `LineageEvent`, `DatasetEvent` or `JobEvent` based on the `schemaURL` field, as the first step in implementing static lineage support.*
+    *Introduces an `EventTypeResolver` for using the `schemaURL` field to decode `POST` requests to `/lineage` with `LineageEvent`s, `DatasetEvent`s or `JobEvent`s, as the first step in implementing static lineage support.*
 
 ### Fixed
 * API: remove unnecessary DB updates [`#2531`](https://github.com/MarquezProject/marquez/pull/2531) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
