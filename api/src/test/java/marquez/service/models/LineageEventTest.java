@@ -57,7 +57,8 @@ public class LineageEventTest {
     URL expectedResource = Resources.getResource(inputFile);
     ObjectMapper objectMapper = Utils.newObjectMapper();
     RunEvent expectedEvent = objectMapper.readValue(expectedResource, RunEvent.class);
-    LineageEvent lineageEvent = objectMapper.readValue(expectedResource, LineageEvent.class);
+    LineageEvent lineageEvent =
+        (LineageEvent) objectMapper.readValue(expectedResource, BaseEvent.class);
     RunEvent converted =
         objectMapper.readValue(objectMapper.writeValueAsString(lineageEvent), RunEvent.class);
     assertThat(converted)
@@ -75,7 +76,7 @@ public class LineageEventTest {
 
   public void testSerialization(ObjectMapper mapper, String expectedFile) throws IOException {
     URL expectedResource = Resources.getResource(expectedFile);
-    LineageEvent deserialized = mapper.readValue(expectedResource, LineageEvent.class);
+    LineageEvent deserialized = (LineageEvent) mapper.readValue(expectedResource, BaseEvent.class);
     String serialized = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(deserialized);
 
     JsonNode expectedNode = mapper.readTree(expectedResource);
