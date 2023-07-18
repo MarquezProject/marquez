@@ -38,7 +38,7 @@ import lombok.ToString;
 @Getter
 @Valid
 @ToString
-public class LineageEvent extends BaseJsonModel {
+public class LineageEvent extends BaseEvent {
 
   private String eventType;
 
@@ -48,6 +48,7 @@ public class LineageEvent extends BaseJsonModel {
   @Valid private List<Dataset> inputs;
   @Valid private List<Dataset> outputs;
   @Valid @NotNull private String producer;
+  @Valid private URI schemaURL;
 
   @AllArgsConstructor
   @NoArgsConstructor
