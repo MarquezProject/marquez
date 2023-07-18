@@ -338,7 +338,7 @@ final class DbTestUtils {
   /** Returns {@code true} ... */
   public static boolean rowsExist(
       @NonNull final Handle handle, final @NonNull Set<?> rowsToVerify) {
-    // TODO (wslulciuc): ...
+    // TODO (wslulciuc): Add interface for rows to allow for Row.getUuid()
     if (rowsToVerify.stream().anyMatch(DatasetRow.class::isInstance)) {
       return rowsArePresentIn(
           handle,

@@ -54,6 +54,230 @@ public class DbRetentionTest extends DbTest {
   private static final Instant LAST_X_DAYS = Instant.now().minus(RETENTION_DAYS - 1, DAYS);
 
   @Test
+  public void testRetentionOnDbOrErrorWithJobsOlderThanXDays() {
+    // (1) Add namespace.
+    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
+
+    // (2) Add jobs older than X days.
+    final Set<JobRow> rowsOlderThanXDays =
+        DB.upsertAll(
+            newJobRowsWith(OLDER_THAN_X_DAYS, namespaceRow.getUuid(), namespaceRow.getName(), 4));
+
+    // (3) Add jobs within last X days.
+    final Set<JobRow> rowsLastXDays =
+        DB.upsertAll(
+            newJobRowsWith(LAST_X_DAYS, namespaceRow.getUuid(), namespaceRow.getName(), 2));
+
+    // (4) Apply retention policy as dry run on jobs older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
+      // (5) Query 'jobs' table for rows. We want to ensure: jobs older than X days
+      // have not deleted; jobs within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply dry run", e);
+    }
+
+    // (6) Apply retention policy on jobs older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
+      // (7) Query 'jobs' table for rows deleted. We want to ensure: jobs older than X days
+      // have been deleted; jobs within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply retention policy", e);
+    }
+  }
+
+  @Test
+  public void testRetentionOnDbOrErrorWithJobVersionsOlderThanXDays() {
+    // (1) Add namespace and source.
+    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
+    final SourceRow sourceRow = DB.upsert(newSourceRow());
+
+    // (2) Add dataset (as inputs) associated with job version.
+    final Set<DatasetRow> datasetsAsInput =
+        DB.upsertAll(
+            newDatasetRowsWith(
+                namespaceRow.getUuid(),
+                namespaceRow.getName(),
+                sourceRow.getUuid(),
+                sourceRow.getName(),
+                2));
+
+    // (3) Add dataset (as outputs) associated with job version.
+    final Set<DatasetRow> datasetsAsOutput =
+        DB.upsertAll(
+            newDatasetRowsWith(
+                namespaceRow.getUuid(),
+                namespaceRow.getName(),
+                sourceRow.getUuid(),
+                sourceRow.getName(),
+                4));
+
+    // (4) Use any output dataset for job versions to obtain namespace and associate with job.
+    final DatasetRow datasetAsOutput = datasetsAsOutput.stream().findAny().orElseThrow();
+    final UUID namespaceUuid = datasetAsOutput.getNamespaceUuid();
+    final String namespaceName = datasetAsOutput.getNamespaceName();
+
+    // (5) Add job.
+    final JobRow jobRow = DB.upsert(newJobRowWith(namespaceUuid, namespaceName));
+
+    // (6) Add job versions older than X days associated with job.
+    final Set<JobVersionRow> rowsOlderThanXDays =
+        DB.upsertAll(
+            newJobVersionRowsWith(
+                OLDER_THAN_X_DAYS,
+                namespaceUuid,
+                namespaceName,
+                jobRow.getUuid(),
+                jobRow.getName(),
+                datasetsAsInput,
+                datasetsAsOutput,
+                4));
+
+    // (7) Add job versions within last X days associated with job.
+    final Set<JobVersionRow> rowsLastXDays =
+        DB.upsertAll(
+            newJobVersionRowsWith(
+                LAST_X_DAYS,
+                namespaceUuid,
+                namespaceName,
+                jobRow.getUuid(),
+                jobRow.getName(),
+                datasetsAsInput,
+                datasetsAsOutput,
+                2));
+
+    // (8) Apply retention policy as dry run on job versions older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
+      // (9) Query 'job versions' table for rows. We want to ensure: job versions older
+      // than X days have not been deleted; job versions within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply dry run", e);
+    }
+
+    // (10) Apply retention policy on job versions older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
+      // (11) Query 'job versions' table for rows deleted. We want to ensure: job versions older
+      // than X days have been deleted; job versions within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply retention policy", e);
+    }
+  }
+
+  @Test
+  public void testRetentionOnDbOrErrorWithRunsOlderThanXDays() {
+    // (1) Add namespace and source.
+    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
+    final SourceRow sourceRow = DB.upsert(newSourceRow());
+
+    // (2) Add dataset (as inputs) associated with job.
+    final Set<DatasetRow> datasetsAsInput =
+        DB.upsertAll(
+            newDatasetRowsWith(
+                namespaceRow.getUuid(),
+                namespaceRow.getName(),
+                sourceRow.getUuid(),
+                sourceRow.getName(),
+                2));
+
+    // (3) Add dataset (as outputs) associated with job.
+    final Set<DatasetRow> datasetsAsOutput =
+        DB.upsertAll(
+            newDatasetRowsWith(
+                namespaceRow.getUuid(),
+                namespaceRow.getName(),
+                sourceRow.getUuid(),
+                sourceRow.getName(),
+                4));
+
+    // (4) Use any output dataset for run to obtain namespace and associate with job.
+    final DatasetRow datasetAsOutput = datasetsAsOutput.stream().findAny().orElseThrow();
+    final UUID namespaceUuid = datasetAsOutput.getNamespaceUuid();
+    final String namespaceName = datasetAsOutput.getNamespaceName();
+
+    // (5) Add version for job.
+    final JobRow jobRow = DB.upsert(newJobRowWith(namespaceUuid, namespaceName));
+    final JobVersionRow jobVersionRow =
+        DB.upsert(
+            newJobVersionRowWith(
+                namespaceUuid,
+                namespaceName,
+                jobRow.getUuid(),
+                jobRow.getName(),
+                datasetsAsInput,
+                datasetsAsOutput));
+
+    // (6) Add args for run.
+    final RunArgsRow runArgsRow = DB.upsert(newRunArgRow());
+
+    // (7) Add runs older than X days.
+    final Set<RunRow> rowsOlderThanXDays =
+        DB.upsertAll(
+            newRunRowsWith(
+                OLDER_THAN_X_DAYS,
+                jobRow.getUuid(),
+                jobVersionRow.getUuid(),
+                runArgsRow.getUuid(),
+                4));
+
+    // (8) Add runs within last X days.
+    final Set<RunRow> rowsLastXDays =
+        DB.upsertAll(
+            newRunRowsWith(
+                LAST_X_DAYS, jobRow.getUuid(), jobVersionRow.getUuid(), runArgsRow.getUuid(), 2));
+
+    // (9) Apply retention policy as dry run on runs older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
+      // (10) Query 'runs' table for rows. We want to ensure: runs older than X days have not been
+      // deleted; runs within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply dry run", e);
+    }
+
+    // (11) Apply retention policy on runs older than X days.
+    try {
+      DbRetention.retentionOnDbOrError(
+          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
+      // (12) Query 'runs' table for rows deleted. We want to ensure: runs older than X days have
+      // been deleted; runs within last X days have not been deleted.
+      try (final Handle handle = DB.open()) {
+        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
+        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
+      }
+    } catch (DbRetentionException e) {
+      fail("failed to apply retention policy", e);
+    }
+  }
+
+  @Test
   public void testRetentionOnDbOrErrorWithDatasetsOlderThanXDays() {
     // (1) Add namespace and source.
     final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
@@ -406,230 +630,6 @@ public class DbRetentionTest extends DbTest {
         assertThat(DbTestUtils.rowExists(handle, rowOlderThanXDaysAsInput)).isTrue();
         assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDaysAsInput)).isFalse();
         assertThat(DbTestUtils.rowsExist(handle, rowsLastXDaysAsOutput)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply retention policy", e);
-    }
-  }
-
-  @Test
-  public void testRetentionOnDbOrErrorWithJobsOlderThanXDays() {
-    // (1) Add namespace.
-    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
-
-    // (2) Add jobs older than X days.
-    final Set<JobRow> rowsOlderThanXDays =
-        DB.upsertAll(
-            newJobRowsWith(OLDER_THAN_X_DAYS, namespaceRow.getUuid(), namespaceRow.getName(), 4));
-
-    // (3) Add jobs within last X days.
-    final Set<JobRow> rowsLastXDays =
-        DB.upsertAll(
-            newJobRowsWith(LAST_X_DAYS, namespaceRow.getUuid(), namespaceRow.getName(), 2));
-
-    // (4) Apply retention policy as dry run on jobs older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
-      // (5) Query 'jobs' table for rows. We want to ensure: jobs older than X days
-      // have not deleted; jobs within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply dry run", e);
-    }
-
-    // (6) Apply retention policy on jobs older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
-      // (7) Query 'jobs' table for rows deleted. We want to ensure: jobs older than X days
-      // have been deleted; jobs within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply retention policy", e);
-    }
-  }
-
-  @Test
-  public void testRetentionOnDbOrErrorWithJobVersionsOlderThanXDays() {
-    // (1) Add namespace and source.
-    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
-    final SourceRow sourceRow = DB.upsert(newSourceRow());
-
-    // (2) Add dataset (as inputs) associated with job version.
-    final Set<DatasetRow> datasetsAsInput =
-        DB.upsertAll(
-            newDatasetRowsWith(
-                namespaceRow.getUuid(),
-                namespaceRow.getName(),
-                sourceRow.getUuid(),
-                sourceRow.getName(),
-                2));
-
-    // (3) Add dataset (as outputs) associated with job version.
-    final Set<DatasetRow> datasetsAsOutput =
-        DB.upsertAll(
-            newDatasetRowsWith(
-                namespaceRow.getUuid(),
-                namespaceRow.getName(),
-                sourceRow.getUuid(),
-                sourceRow.getName(),
-                4));
-
-    // (4) Use any output dataset for job versions to obtain namespace and associate with job.
-    final DatasetRow datasetAsOutput = datasetsAsOutput.stream().findAny().orElseThrow();
-    final UUID namespaceUuid = datasetAsOutput.getNamespaceUuid();
-    final String namespaceName = datasetAsOutput.getNamespaceName();
-
-    // (5) Add job.
-    final JobRow jobRow = DB.upsert(newJobRowWith(namespaceUuid, namespaceName));
-
-    // (6) Add job versions older than X days associated with job.
-    final Set<JobVersionRow> rowsOlderThanXDays =
-        DB.upsertAll(
-            newJobVersionRowsWith(
-                OLDER_THAN_X_DAYS,
-                namespaceUuid,
-                namespaceName,
-                jobRow.getUuid(),
-                jobRow.getName(),
-                datasetsAsInput,
-                datasetsAsOutput,
-                4));
-
-    // (7) Add job versions within last X days associated with job.
-    final Set<JobVersionRow> rowsLastXDays =
-        DB.upsertAll(
-            newJobVersionRowsWith(
-                LAST_X_DAYS,
-                namespaceUuid,
-                namespaceName,
-                jobRow.getUuid(),
-                jobRow.getName(),
-                datasetsAsInput,
-                datasetsAsOutput,
-                2));
-
-    // (8) Apply retention policy as dry run on job versions older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
-      // (9) Query 'job versions' table for rows. We want to ensure: job versions older
-      // than X days have not been deleted; job versions within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply dry run", e);
-    }
-
-    // (10) Apply retention policy on job versions older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
-      // (11) Query 'job versions' table for rows deleted. We want to ensure: job versions older
-      // than X days have been deleted; job versions within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply retention policy", e);
-    }
-  }
-
-  @Test
-  public void testRetentionOnDbOrErrorWithRunsOlderThanXDays() {
-    // (1) Add namespace and source.
-    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
-    final SourceRow sourceRow = DB.upsert(newSourceRow());
-
-    // (2) Add dataset (as inputs) associated with job.
-    final Set<DatasetRow> datasetsAsInput =
-        DB.upsertAll(
-            newDatasetRowsWith(
-                namespaceRow.getUuid(),
-                namespaceRow.getName(),
-                sourceRow.getUuid(),
-                sourceRow.getName(),
-                2));
-
-    // (3) Add dataset (as outputs) associated with job.
-    final Set<DatasetRow> datasetsAsOutput =
-        DB.upsertAll(
-            newDatasetRowsWith(
-                namespaceRow.getUuid(),
-                namespaceRow.getName(),
-                sourceRow.getUuid(),
-                sourceRow.getName(),
-                4));
-
-    // (4) Use any output dataset for run to obtain namespace and associate with job.
-    final DatasetRow datasetAsOutput = datasetsAsOutput.stream().findAny().orElseThrow();
-    final UUID namespaceUuid = datasetAsOutput.getNamespaceUuid();
-    final String namespaceName = datasetAsOutput.getNamespaceName();
-
-    // (5) Add version for job.
-    final JobRow jobRow = DB.upsert(newJobRowWith(namespaceUuid, namespaceName));
-    final JobVersionRow jobVersionRow =
-        DB.upsert(
-            newJobVersionRowWith(
-                namespaceUuid,
-                namespaceName,
-                jobRow.getUuid(),
-                jobRow.getName(),
-                datasetsAsInput,
-                datasetsAsOutput));
-
-    // (6) Add args for run.
-    final RunArgsRow runArgsRow = DB.upsert(newRunArgRow());
-
-    // (7) Add runs older than X days.
-    final Set<RunRow> rowsOlderThanXDays =
-        DB.upsertAll(
-            newRunRowsWith(
-                OLDER_THAN_X_DAYS,
-                jobRow.getUuid(),
-                jobVersionRow.getUuid(),
-                runArgsRow.getUuid(),
-                4));
-
-    // (8) Add runs within last X days.
-    final Set<RunRow> rowsLastXDays =
-        DB.upsertAll(
-            newRunRowsWith(
-                LAST_X_DAYS, jobRow.getUuid(), jobVersionRow.getUuid(), runArgsRow.getUuid(), 2));
-
-    // (9) Apply retention policy as dry run on runs older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
-      // (10) Query 'runs' table for rows. We want to ensure: runs older than X days have not been
-      // deleted; runs within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isTrue();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
-      }
-    } catch (DbRetentionException e) {
-      fail("failed to apply dry run", e);
-    }
-
-    // (11) Apply retention policy on runs older than X days.
-    try {
-      DbRetention.retentionOnDbOrError(
-          jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
-      // (12) Query 'runs' table for rows deleted. We want to ensure: runs older than X days have
-      // been deleted; runs within last X days have not been deleted.
-      try (final Handle handle = DB.open()) {
-        assertThat(DbTestUtils.rowsExist(handle, rowsOlderThanXDays)).isFalse();
-        assertThat(DbTestUtils.rowsExist(handle, rowsLastXDays)).isTrue();
       }
     } catch (DbRetentionException e) {
       fail("failed to apply retention policy", e);
