@@ -47,7 +47,9 @@ public final class RunRowMapper implements RowMapper<RunRow> {
             : null,
         uuidOrNull(results, Columns.START_RUN_STATE_UUID),
         columnNames.contains(Columns.ENDED_AT) ? timestampOrNull(results, Columns.ENDED_AT) : null,
-        uuidOrNull(results, Columns.END_RUN_STATE_UUID));
+        uuidOrNull(results, Columns.END_RUN_STATE_UUID),
+        stringOrNull(results, Columns.JOB_NAME),
+        stringOrNull(results, Columns.NAMESPACE_NAME));
   }
 
   private List<DatasetVersionId> toDatasetVersion(ResultSet rs, String column) throws SQLException {

@@ -16,10 +16,16 @@ import org.flywaydb.core.api.output.MigrateResult;
 public final class DbMigration {
   private DbMigration() {}
 
+  private static final boolean DEFAULT_MIGRATE_DB_ON_STARTUP = false;
+
+  public static void migrateDbOrError(@NonNull final DataSource source) {
+    migrateDbOrError(new FlywayFactory(), source, DEFAULT_MIGRATE_DB_ON_STARTUP);
+  }
+
   public static void migrateDbOrError(
       @NonNull final FlywayFactory flywayFactory,
       @NonNull final DataSource source,
-      final boolean migrateOnStartup) {
+      final boolean migrateDbOnStartup) {
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
@@ -27,7 +33,7 @@ public final class DbMigration {
     if (!hasPendingDbMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
-    } else if (!migrateOnStartup && hasDbMigrationsApplied(flyway)) {
+    } else if (!migrateDbOnStartup && hasDbMigrationsApplied(flyway)) {
       errorOnPendingDbMigrations(flyway);
     }
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts
