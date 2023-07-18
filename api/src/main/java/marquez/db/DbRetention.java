@@ -58,9 +58,11 @@ public final class DbRetention {
     retentionOnJobs(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnJobVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnRuns(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
-    retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnDatasets(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
     retentionOnDatasetVersions(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
+
+    // ...
+    retentionOnLineageEvents(jdbi, numberOfRowsPerBatch, retentionDays, dryRun);
   }
 
   /** ... */

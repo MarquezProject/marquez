@@ -53,12 +53,6 @@ public class DbRetentionTest extends DbTest {
   private static final Instant OLDER_THAN_X_DAYS = Instant.now().minus(RETENTION_DAYS + 1, DAYS);
   private static final Instant LAST_X_DAYS = Instant.now().minus(RETENTION_DAYS - 1, DAYS);
 
-  /* Configure OL. */
-  private static final URI OL_PRODUCER =
-      URI.create(
-          "https://github.com/MarquezProject/marquez/tree/main/api/src/test/java/marquez/db/DbRetentionTest");
-  private static final OpenLineage OL = new OpenLineage(OL_PRODUCER);
-
   @Test
   public void testRetentionOnDbOrErrorWithDatasetsOlderThanXDays() {
     // (1) Add namespace and source.
@@ -644,25 +638,29 @@ public class DbRetentionTest extends DbTest {
 
   @Test
   public void testRetentionOnDbOrErrorWithOlEventsOlderThanXDays() {
-    // (1) Add namespace and job for OL event.
+    // (1) Configure OL.
+    final URI olProducer = URI.create("https://test.com/test");
+    final OpenLineage ol = new OpenLineage(olProducer);
+
+    // (2) Add namespace and job for OL events.
     final String namespaceName = newNamespaceName().getValue();
     final String jobName = newJobName().getValue();
 
-    // (2) Add OL events older than X days.
+    // (3) Add OL events older than X days.
     final Set<OpenLineage.RunEvent> olEventsOlderThanXDays =
-        newRunEvents(OL, OLDER_THAN_X_DAYS, namespaceName, jobName, 4);
+        newRunEvents(ol, OLDER_THAN_X_DAYS, namespaceName, jobName, 4);
     DB.insertAll(olEventsOlderThanXDays);
 
-    // (3) Add OL events within last X days.
+    // (4) Add OL events within last X days.
     final Set<OpenLineage.RunEvent> olEventsLastXDays =
-        newRunEvents(OL, LAST_X_DAYS, namespaceName, jobName, 2);
+        newRunEvents(ol, LAST_X_DAYS, namespaceName, jobName, 2);
     DB.insertAll(olEventsLastXDays);
 
-    // (4) Apply retention policy as dry run on OL events older than X days.
+    // (5) Apply retention policy as dry run on OL events older than X days.
     try {
       DbRetention.retentionOnDbOrError(
           jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS, DRY_RUN);
-      // (5) Query 'lineage events' table for rows. We want to ensure: OL events older than X
+      // (6) Query 'lineage events' table for events. We want to ensure: OL events older than X
       // days have not been deleted; OL events within last X days have not been deleted.
       try (final Handle handle = DB.open()) {
         assertThat(DbTestUtils.olEventsExist(handle, olEventsOlderThanXDays)).isTrue();
@@ -672,11 +670,11 @@ public class DbRetentionTest extends DbTest {
       fail("failed to apply dry run", e);
     }
 
-    // (6) Apply retention policy on OL events older than X days.
+    // (7) Apply retention policy on OL events older than X days.
     try {
       DbRetention.retentionOnDbOrError(
           jdbiExtension.getJdbi(), NUMBER_OF_ROWS_PER_BATCH, RETENTION_DAYS);
-      // (7) Query 'lineage events' table for rows deleted. We want to ensure: OL events older
+      // (8) Query 'lineage events' table for events deleted. We want to ensure: OL events older
       // than X days have been deleted; OL events within last X days have not been deleted.
       try (final Handle handle = DB.open()) {
         assertThat(DbTestUtils.olEventsExist(handle, olEventsOlderThanXDays)).isFalse();
