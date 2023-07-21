@@ -39,14 +39,14 @@ const MqChip: React.FC<MqChipProps> = ({
   return (
     <Box
       id={`chip-${value}`}
-      sx={Object.assign({
+      sx={{
         display: 'inline-block',
         borderRadius: theme.spacing(2),
         padding: '2px 8px',
         cursor: 'pointer',
         userSelect: 'none',
-        boxShadow: 'initial',
-      }, selected ? { boxShadow: `0 0 2px 3px ${theme.palette.common.white}` } : {})}
+        boxShadow: selected ? `0 0 2px 3px ${theme.palette.common.white}` : 'initial',
+      }}
       onClick={() => {
         if (selectable !== false && onSelect) {
           onSelect(value)
