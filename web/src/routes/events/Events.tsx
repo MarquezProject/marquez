@@ -185,7 +185,7 @@ const Events: React.FC<EventsProps> = ({ events, isEventsLoading, isEventsInit, 
           <Box p={2} sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: theme.spacing(2)
+            gap: theme.spacing(3)
           }}>
             <MqDatePicker
               label={i18next.t('events_route.from_date')}
