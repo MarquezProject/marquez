@@ -233,7 +233,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                 <Box sx={{
                   margin: 0,
                   overflow: 'auto',
-                  maxHeight: `calc(100vh - ${theme.spacing(30)}px)`,
+                  maxHeight: `calc(100vh - ${theme.spacing(30)})`,
                   paddingLeft: 0,
                   borderBottomLeftRadius: theme.spacing(1),
                   borderBottomRightRadius: theme.spacing(1)
@@ -255,9 +255,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                               sx={{
                                 borderTop: `2px solid ${theme.palette.common.white}`,
                                 borderBottom: `2px solid ${theme.palette.common.white}`,
-                                padding: `${theme.spacing(1)}px ${theme.spacing(3)}px ${theme.spacing(0.5)}px ${theme.spacing(
-                                  1
-                                )}px`,
+                                padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(0.5)} ${theme.spacing(1)}`,
                                 backgroundColor: darken(theme.palette.background.paper, 0.05)
                               }}
                               key={result}

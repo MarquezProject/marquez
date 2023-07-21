@@ -38,57 +38,62 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, se
   return (
     <RouterLink
       key={key}
-      className={selected ? 'selected' : ''}
       style={{
-        display: 'block',
-        color: 'inherit',
         textDecoration: 'none',
-        margin: 0,
-        cursor: 'pointer',
-        padding: `${theme.spacing(1)} ${theme.spacing(3)}`
       }}
       onClick={() => onClick(searchResult.name)}
       to={`/lineage/${encodeNode(searchResult.type, searchResult.namespace, searchResult.name)}`}
     >
-      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} sx={{
-        '&:not(:last-child)': {
-          borderBottom: `1px solid ${theme.palette.secondary.main}`
-        },
-        '&:last-child': {
-          borderBottomLeftRadius: '2px',
-          borderBottomRightRadius: '2px'
-        },
-        '&:hover, &.selected': {
-          backgroundColor: darken(theme.palette.background.paper, 0.02)
-        },
-        '&:nth-child(even)': {
-          backgroundColor: darken(theme.palette.background.paper, 0.2),
-          '&:hover, &.selected': {
-            backgroundColor: darken(theme.palette.background.paper, 0.02)
+      <Box
+        className={selected ? 'selected' : ''}
+        sx={
+          {
+            display: 'block',
+            color: 'inherit',
+            textDecoration: 'none',
+            margin: 0,
+            cursor: 'pointer',
+            padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
+            '&:not(:last-child)': {
+              borderBottom: `1px solid ${theme.palette.secondary.main}`
+            },
+            '&:last-child': {
+              borderBottomLeftRadius: '2px',
+              borderBottomRightRadius: '2px'
+            },
+            '&:hover, &.selected': {
+              backgroundColor: darken(theme.palette.background.paper, 0.02)
+            },
+            '&:nth-child(even)': {
+              backgroundColor: darken(theme.palette.background.paper, 0.2),
+              '&:hover, &.selected': {
+                backgroundColor: darken(theme.palette.background.paper, 0.02)
+              }
+            }
           }
-        }
-      }}>
-        <Box display={'flex'} alignItems={'center'}>
-          <Box display={'inline'} mr={1}>
-            {searchResultIcon[searchResult.type]}
-          </Box>
-          <Box sx={{
-            display: 'inline',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            maxWidth: '370px'
-          }}>
-            {searchMatchIndex === -1 ? (
-              <MqText inline font={'mono'} bold small>
-                {name}
-              </MqText>
-            ) : (
-              <>
+        }>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box display={'inline'} mr={1}>
+              {searchResultIcon[searchResult.type]}
+            </Box>
+            <Box sx={{
+              display: 'inline',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '370px'
+            }}>
+              {searchMatchIndex === -1 ? (
                 <MqText inline font={'mono'} bold small>
-                  {name.substring(0, searchMatchIndex)}
+                  {name}
                 </MqText>
-                <MqText inline font={'mono'} bold highlight small>
+              ) : (
+                <>
+                  <MqText inline font={'mono'} bold small>
+                    {name.substring(0, searchMatchIndex)}
+                  </MqText>
+                  <MqText inline font={'mono'} bold highlight small>
                     {name.substring(searchMatchIndex, searchMatchIndex + search.length)}
                   </MqText>
                   <MqText inline font={'mono'} bold small>
@@ -96,17 +101,19 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, se
                       searchMatchIndex + search.length,
                       searchResult.name.length
                     )}
-                </MqText>
-              </>
-            )}
+                  </MqText>
+                </>
+              )}
+            </Box>
+          </Box>
+          <Box>
+            <MqText subdued small>
+              {moment(searchResult.updatedAt).fromNow()}
+            </MqText>
           </Box>
         </Box>
-        <Box>
-          <MqText subdued small>
-            {moment(searchResult.updatedAt).fromNow()}
-          </MqText>
-        </Box>
       </Box>
+
     </RouterLink>
   )
 }
