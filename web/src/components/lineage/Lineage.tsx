@@ -106,7 +106,6 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
     visitedNodes.successors.add(node)
 
     const successors = g?.successors(node)
-    console.log('successors', successors)
     if (successors?.length) {
       for (let i = 0; i < node.length - 1; i++) {
         if (successors[i]) {
@@ -143,12 +142,6 @@ export interface LineageProps extends StateProps, DispatchProps {}
 let g: graphlib.Graph<MqNode>
 
 const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
-  console.log('Lineage props', props.depth)
-
-  React.useEffect(() => {
-    console.log('props.lineage', props.lineage)
-  }, [props.lineage])
-
   const [state, setState] = React.useState<LineageState>({
     graph: g,
     edges: [],
@@ -171,7 +164,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           nodeName
         )
         props.setSelectedNode(nodeId)
-        console.log('depth in init', props.depth)
+
         props.fetchLineage(
           nodeType.toUpperCase() as JobOrDataset,
           namespace,
@@ -200,7 +193,6 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
         props.selectedNode !== prevSelectedNode.current
         || props.depth !== prevDepth.current
       ) {
-        console.log('depth in update', props.depth)
         props.fetchLineage(
           nodeType?.toUpperCase() as JobOrDataset,
           namespace || '',
