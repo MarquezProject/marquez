@@ -23,36 +23,23 @@ const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', 
     <DateTimePicker
       label={label}
       sx={{
-        minWidth: '200px', 
-        cursor: 'pointer',
-        backgroundColor: 'transparent',
-        border: `2px solid ${theme.palette.common.white}`,
-        padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
-        transition: theme.transitions.create(['border-color', 'box-shadow']),
-        borderRadius: theme.spacing(4),
-        '& *': {
-          cursor: 'pointer'
-        },
+        minWidth: '200px',
+
         '&:hover': {
-          borderColor: theme.palette.primary.main,
-          boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
-          '& > label': {
-            color: theme.palette.primary.main,
-            transition: theme.transitions.create(['color'])
+          '.MuiOutlinedInput-notchedOutline': {
+            borderColor: `${theme.palette.primary.main} !important`,
+            boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
+            transition: theme.transitions.create(['color']),
           }
         },
-        '& > label': {
-          top: 'initial',
-          left: 'initial'
-        },
-        '& > div': {
-          marginTop: theme.spacing(1),
-          '&:before': {
+        '.MuiOutlinedInput-notchedOutline': {
+          border: `2px solid ${theme.palette.common.white}`,
+          borderRadius: theme.spacing(4),
+          top: '-16px',
+          left: '-6px',
+          '> legend': {
             display: 'none'
-          },
-          '&:after': {
-            display: 'none'
-          },
+          }
         }
       }}
       value={dayjs(value)}
