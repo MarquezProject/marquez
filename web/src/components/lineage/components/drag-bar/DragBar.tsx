@@ -15,46 +15,51 @@ interface DispatchProps {
   setBottomBarHeight: (offset: number) => void
 }
 
-interface DragBarState {
-  isResizing: boolean
-  lastY: number
-}
-
 type DragBarProps = DispatchProps
 
 // height of bar / 2
 const MAGIC_OFFSET_BASE = 4
 
 const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
-  const [state, setState] = React.useState<DragBarState>({
-    isResizing: false,
-    lastY: 0
-  })
+  const [isResizing, setIsResizing] = React.useState<boolean>(false)
+
+  console.log('DragBar render', isResizing)
+
+  // React.useEffect(() => {
+  //   window.addEventListener('mousemove', handleMousemove)
+  //   window.addEventListener('mouseup', handleMouseup)
+
+  //   return () => {
+  //     window.removeEventListener('mousemove', handleMousemove)
+  //     window.removeEventListener('mouseup', handleMouseup)
+  //   }
+  // }, [])
 
   React.useEffect(() => {
-    window.addEventListener('mousemove', e => handleMousemove(e))
-    window.addEventListener('mouseup', () => handleMouseup())
+    window.addEventListener('mousemove', handleMousemove)
+    window.addEventListener('mouseup', handleMouseup)
 
     return () => {
       window.removeEventListener('mousemove', handleMousemove)
       window.removeEventListener('mouseup', handleMouseup)
     }
-  }, [])
+  }, [isResizing]);
 
-
-  const handleMousedown = (e: React.MouseEvent) => {
-    setState({ isResizing: true, lastY: e.clientY })
+  const handleMousedown = () => {
+    console.log('handleMousedown', isResizing)
+    setIsResizing(true)
   }
 
   const handleMousemove = (e: MouseEvent) => {
-    if (!state.isResizing) {
+    if (!isResizing) {
       return
     }
     setBottomBarHeight(window.innerHeight - e.clientY - MAGIC_OFFSET_BASE)
   }
 
   const handleMouseup = () => {
-    setState({ ...state, isResizing: false })
+    console.log('handleMouseup', isResizing)
+    setIsResizing(false)
   }
 
   const theme = createTheme(useTheme())
@@ -73,7 +78,7 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
         '&:hover': {
           backgroundColor: theme.palette.primary.main
         }
-      }, state.isResizing ? {
+      }, isResizing ? {
         backgroundColor: theme.palette.primary.main
       } : {})}
       onMouseDown={handleMousedown}
