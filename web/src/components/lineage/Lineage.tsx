@@ -251,9 +251,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                 scaleYMax={MAX_ZOOM}
                 initialTransformMatrix={INITIAL_TRANSFORM}
               >
-                {zoom => {
-                  return (
-                    <Box position='relative'>
+                {zoom => (
+                  <div>
                       <svg
                         id={'GRAPH'}
                         width={parent.width}
@@ -261,6 +260,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                         style={{
                           cursor: zoom.isDragging ? 'grabbing' : 'grab'
                         }}
+                      // @ts-ignore
+                      ref={zoom.containerRef}
                       >
                         {/* background */}
                         <g transform={zoom.toString()}>
@@ -304,9 +305,9 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                           ))}
                         </g>
                       </svg>
-                    </Box>
+                  </div>
                   )
-                }}
+                }
               </Zoom>
             )}
           </ParentSize>
