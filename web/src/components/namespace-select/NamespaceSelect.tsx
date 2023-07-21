@@ -33,14 +33,19 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedN
   if (selectedNamespace) {
     return (
       <FormControl variant='outlined' sx={{
-        minWidth: '140px'
+        minWidth: '140px',
+        position: 'relative'
       }}>
-        <Box position={'relative'}>
-          <Box position={'absolute'} left={12} top={9}>
+        <Box sx={{
+          position: 'absolute',
+          left: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          height: '100%',
+        }}>
             <MqText color={theme.palette.primary.main} font={'mono'}>
               {i18next.t('namespace_select.prompt')}
-            </MqText>
-          </Box>
+          </MqText>
         </Box>
         <Select
           labelId='namespace-label'
