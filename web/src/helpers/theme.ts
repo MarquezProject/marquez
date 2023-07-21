@@ -10,7 +10,11 @@ export const theme = createTheme({
         '@global': {
           body: {
             color: '#fff'
-          }
+          },
+        },
+        '.MuiInputBase-root': {
+          paddingTop: '0',
+          paddingBottom: '0'
         }
       }
     }
