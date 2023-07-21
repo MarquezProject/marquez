@@ -28,21 +28,28 @@ interface DispatchProps {
 type NamespaceSelectProps = OwnProps & StateProps & DispatchProps
 
 const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedNamespace, selectNamespace }) => {
-
+  const [open, setOpen] = React.useState(false)
   const i18next = require('i18next')
+
   if (selectedNamespace) {
     return (
-      <FormControl variant='outlined' sx={{
-        minWidth: '140px',
-        position: 'relative'
-      }}>
-        <Box sx={{
-          position: 'absolute',
-          left: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          height: '100%',
-        }}>
+      <FormControl
+        variant='outlined'
+        sx={{
+          minWidth: '140px',
+          position: 'relative',
+        }}
+        onClick={() => setOpen(!open)}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            left: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%'
+          }}
+        >
             <MqText color={theme.palette.primary.main} font={'mono'}>
               {i18next.t('namespace_select.prompt')}
           </MqText>
@@ -56,6 +63,10 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedN
           }}
           label='Namespace'
           input={<MqInputBase />}
+          open={open}
+          onClick={() => setOpen(!open)}
+          onClose={() => setOpen(false)}
+          sx={{ cursor: 'pointer' }}
         >
           {namespaces.map(namespace => (
             <MenuItem key={namespace.name} value={namespace.name}>
