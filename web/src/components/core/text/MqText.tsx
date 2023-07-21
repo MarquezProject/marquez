@@ -129,12 +129,15 @@ const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, la
     )
   } else if (link && linkTo) {
     return (
+
       <LinkRouter
         to={linkTo}
         aria-disabled={disabled}
-        style={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
+        style={{ textDecoration: 'none' }}
       >
+        <Box component="span" sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}>
         {children}
+        </Box>
       </LinkRouter>
     )
   } else if (link && href) {
