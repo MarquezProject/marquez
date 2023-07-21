@@ -29,7 +29,7 @@ const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', 
           '.MuiOutlinedInput-notchedOutline': {
             borderColor: `${theme.palette.primary.main} !important`,
             boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
-            transition: theme.transitions.create(['color']),
+            transition: theme.transitions.create(['border-color', 'box-shadow']),
           }
         },
         '.MuiOutlinedInput-notchedOutline': {
