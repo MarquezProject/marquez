@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2023 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.jobs;
 
 import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
