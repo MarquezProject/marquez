@@ -137,13 +137,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // Add scheduled jobs to lifecycle.
     if (config.hasDbRetentionPolicy()) {
       // Add job to apply retention policy to database.
-      env.lifecycle()
-          .manage(
-              new DbRetentionJob(
-                  jdbi,
-                  config.getDbRetention().getFrequencyMins(),
-                  config.getDbRetention().getNumberOfRowsPerBatch(),
-                  config.getDbRetention().getRetentionDays()));
+      env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }
   }
 
