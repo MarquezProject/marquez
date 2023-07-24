@@ -27,6 +27,9 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
 
   /* The number of rows deleted per batch. */
+  private final int frequencyMins;
+
+  /* The number of rows deleted per batch. */
   private final int numberOfRowsPerBatch;
 
   /* The retention days. */
@@ -61,8 +64,12 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
 
   @Override
   public void start() throws Exception {
-    log.info("Starting db retention job...");
     startAsync().awaitRunning();
+    log.info(
+        "Started db retention job with retention policy of '{}' days, "
+            + "scheduled to be applied every '{}' mins.",
+        retentionDays,
+        frequencyMins);
   }
 
   @Override
