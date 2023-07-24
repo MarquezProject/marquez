@@ -5,8 +5,6 @@
 
 package marquez.jobs;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.util.concurrent.AbstractScheduledService;
 import io.dropwizard.lifecycle.Managed;
 import java.time.Duration;
@@ -43,21 +41,17 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
    * of {@code retentionDays}.
    */
   public DbRetentionJob(
-      @NonNull final Jdbi jdbi,
-      final int frequencyMins,
-      final int numberOfRowsPerBatch,
-      final int retentionDays) {
-    checkArgument(frequencyMins > 0, "'frequencyMins' must be > 0");
-    checkArgument(numberOfRowsPerBatch > 0, "'numberOfRowsPerBatch' must be > 0");
-    checkArgument(retentionDays > 0, "'retentionDays' must be > 0");
-    this.numberOfRowsPerBatch = numberOfRowsPerBatch;
-    this.retentionDays = retentionDays;
+      @NonNull final Jdbi jdbi, @NonNull final DbRetentionConfig dbRetentionConfig) {
+    this.numberOfRowsPerBatch = dbRetentionConfig.getNumberOfRowsPerBatch();
+    this.retentionDays = dbRetentionConfig.getRetentionDays();
 
+    // Open connection.
     this.jdbi = jdbi;
 
     // Define fixed schedule with no delay.
     this.fixedRateScheduler =
-        Scheduler.newFixedRateSchedule(NO_DELAY, Duration.ofMinutes(frequencyMins));
+        Scheduler.newFixedRateSchedule(
+            NO_DELAY, Duration.ofMinutes(dbRetentionConfig.getFrequencyMins()));
   }
 
   @Override
