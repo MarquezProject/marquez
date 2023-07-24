@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 
 /** Configuration for {@link DbRetentionJob}. */
-@Value
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Value
 public class DbRetentionConfig {
   public static final int DEFAULT_FREQUENCY_MINS = 15;
 
