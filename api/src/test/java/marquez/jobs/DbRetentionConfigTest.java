@@ -32,6 +32,11 @@ public class DbRetentionConfigTest {
     final DbRetentionConfig configWithFrequencyMinsOverride =
         DbRetentionConfig.builder().frequencyMins(frequencyMinsOverride).build();
 
+    // No constraint violations.
+    final Set<ConstraintViolation<DbRetentionConfig>> violations =
+        VALIDATOR.validate(configWithFrequencyMinsOverride);
+    assertThat(violations).isEmpty();
+
     assertThat(configWithFrequencyMinsOverride.getFrequencyMins()).isEqualTo(frequencyMinsOverride);
     assertThat(configWithFrequencyMinsOverride.getNumberOfRowsPerBatch())
         .isEqualTo(DEFAULT_NUMBER_OF_ROWS_PER_BATCH);
@@ -44,6 +49,11 @@ public class DbRetentionConfigTest {
     final int numberOfRowsPerBatchOverride = 25;
     final DbRetentionConfig configWithNumberOfRowsPerBatchOverride =
         DbRetentionConfig.builder().numberOfRowsPerBatch(numberOfRowsPerBatchOverride).build();
+
+    // No constraint violations.
+    final Set<ConstraintViolation<DbRetentionConfig>> violations =
+        VALIDATOR.validate(configWithNumberOfRowsPerBatchOverride);
+    assertThat(violations).isEmpty();
 
     assertThat(configWithNumberOfRowsPerBatchOverride.getFrequencyMins())
         .isEqualTo(DEFAULT_FREQUENCY_MINS);
@@ -58,6 +68,11 @@ public class DbRetentionConfigTest {
     final int retentionDaysOverride = 14;
     final DbRetentionConfig configWithNumberOfRowsPerBatchOverride =
         DbRetentionConfig.builder().retentionDays(retentionDaysOverride).build();
+
+    // No constraint violations.
+    final Set<ConstraintViolation<DbRetentionConfig>> violations =
+        VALIDATOR.validate(configWithNumberOfRowsPerBatchOverride);
+    assertThat(violations).isEmpty();
 
     assertThat(configWithNumberOfRowsPerBatchOverride.getFrequencyMins())
         .isEqualTo(DEFAULT_FREQUENCY_MINS);
