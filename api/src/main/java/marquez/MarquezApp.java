@@ -5,6 +5,10 @@
 
 package marquez;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
@@ -38,6 +42,9 @@ import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -127,8 +134,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
+    final ElasticsearchClient elasticsearchClient = newElasticsearchClient(config);
     final MarquezContext marquezContext =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+        MarquezContext.builder()
+            .jdbi(jdbi)
+            .elasticSearchClient(elasticsearchClient)
+            .tags(config.getTags())
+            .build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);
@@ -169,6 +181,20 @@ public final class MarquezApp extends Application<MarquezConfig> {
     jdbi.setSqlLogger(sqlLogger);
     jdbi.getConfig(Jackson2Config.class).setMapper(Utils.getMapper());
     return jdbi;
+  }
+
+  private ElasticsearchClient newElasticsearchClient(@NonNull MarquezConfig config) {
+    String serverUrl = "https://localhost:9200";
+    RestClient restClient =
+        RestClient.builder(HttpHost.create(serverUrl))
+            .setDefaultHeaders(
+                new Header[] {
+                  //                    new BasicHeader("Authorization", "ApiKey " + apiKey)
+                })
+            .build();
+    ElasticsearchTransport transport =
+        new RestClientTransport(restClient, new JacksonJsonpMapper());
+    return new ElasticsearchClient(transport);
   }
 
   public void registerResources(

@@ -15,7 +15,22 @@ services:
       - "db:postgres"
     depends_on:
       - db
+      - search
     entrypoint: ["/opt/marquez/wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
+
+  search:
+    image: elasticsearch:8.8.1
+    container_name: marquez-search
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "9200:9200"
+      - "9300:9300"
 
   db:
     image: postgres:12.1
@@ -38,6 +53,7 @@ services:
 
 volumes:
   data:
+  elasticsearch-data:
   db-conf:
   db-init:
   db-backup:
