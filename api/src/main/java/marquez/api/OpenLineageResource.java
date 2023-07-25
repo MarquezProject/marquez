@@ -16,12 +16,15 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.Collections;
 import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -42,7 +45,6 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SortDirection;
 import marquez.db.OpenLineageDao;
-import marquez.service.OpenLineageService;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
 import marquez.service.models.LineageEvent;
@@ -111,23 +113,67 @@ public class OpenLineageResource extends BaseResource {
       UUID runUuid = runUuidFromEvent(event.getRun());
       log.info("Indexing event {}", event);
 
-      Map<String, Object> jsonMap = new HashMap<>();
-      jsonMap.put("uuid", runUuid.toString());
-      jsonMap.put("eventTime", event.getEventType());
-      jsonMap.put("job", event.getJob().getName());
-      jsonMap.put("jobFacets", event.getJob().getFacets());
-
-      IndexRequest<Map<String, Object>> request =
-          IndexRequest.of(
-              i ->
-                  i.index("events")
-                      .id(runUuid.toString())
-                      .document(jsonMap));
-      try {
-        this.elasticsearchClient.index(request);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+      if (event.getInputs() != null) {
+        indexDatasets(event.getInputs(), runUuid, event);
       }
+      if (event.getOutputs() != null) {
+        indexDatasets(event.getOutputs(), runUuid, event);
+      }
+      indexJob(runUuid, event);
+    }
+  }
+
+  private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("uuid", runUuid.toString());
+    jsonMap.put("eventTime", event.getEventType());
+    jsonMap.put("name", event.getJob().getName());
+    jsonMap.put("type", "JOB");
+    jsonMap.put("namespace", event.getJob().getNamespace());
+    jsonMap.put("jobFacets", event.getJob().getFacets());
+    return jsonMap;
+  }
+
+  private Map<String, Object> buildDatasetIndexRequest(
+      UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("uuid", runUuid.toString());
+    jsonMap.put("eventTime", event.getEventType());
+    jsonMap.put("name", dataset.getName());
+    jsonMap.put("type", "DATASET");
+    jsonMap.put("namespace", dataset.getNamespace());
+    jsonMap.put("jobFacets", dataset.getFacets());
+    return jsonMap;
+  }
+
+  private void indexJob(UUID runUuid, LineageEvent event) {
+    index(
+        IndexRequest.of(
+            i ->
+                i.index("jobs")
+                    .id(runUuid.toString())
+                    .document(buildJobIndexRequest(runUuid, event))));
+  }
+
+  private void indexDatasets(
+      List<LineageEvent.Dataset> datasets, UUID runUuid, LineageEvent event) {
+    datasets.stream()
+        .map(dataset -> buildDatasetIndexRequest(runUuid, dataset, event))
+        .forEach(
+            jsonMap -> {
+              index(
+                  IndexRequest.of(
+                      i -> i.index("datasets").id(runUuid.toString()).document(jsonMap)));
+            });
+  }
+
+  private void index(IndexRequest<Map<String, Object>> request) {
+    try {
+      if (this.elasticsearchClient != null) {
+        this.elasticsearchClient.index(request);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
