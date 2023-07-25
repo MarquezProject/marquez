@@ -14,13 +14,20 @@ services:
     links:
       - "db:postgres"
     depends_on:
-      - db
       - search
+      - db
     entrypoint: ["/opt/marquez/wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
 
   search:
     image: elasticsearch:8.8.1
     container_name: marquez-search
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node

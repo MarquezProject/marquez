@@ -16,13 +16,12 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -111,12 +110,19 @@ public class OpenLineageResource extends BaseResource {
     if (this.elasticsearchClient != null) {
       UUID runUuid = runUuidFromEvent(event.getRun());
       log.info("Indexing event {}", event);
-      IndexRequest<BaseEvent> request =
+
+      Map<String, Object> jsonMap = new HashMap<>();
+      jsonMap.put("uuid", runUuid.toString());
+      jsonMap.put("eventTime", event.getEventType());
+      jsonMap.put("job", event.getJob().getName());
+      jsonMap.put("jobFacets", event.getJob().getFacets());
+
+      IndexRequest<Map<String, Object>> request =
           IndexRequest.of(
               i ->
                   i.index("events")
                       .id(runUuid.toString())
-                      .document(event));
+                      .document(jsonMap));
       try {
         this.elasticsearchClient.index(request);
       } catch (IOException e) {

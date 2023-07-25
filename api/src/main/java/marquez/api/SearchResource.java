@@ -26,10 +26,12 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import jakarta.json.JsonObject;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import marquez.MarquezApp;
 import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
@@ -80,18 +82,17 @@ public class SearchResource {
     @Path("/elastic/{text}")
     public Response searchElastic(@PathParam("text") @NotNull String text) throws IOException {
         if (this.elasticsearchClient != null) {
-            SearchResponse<LineageEvent> response = elasticsearchClient.search(s -> s
+            SearchResponse<JsonObject> response = new MarquezApp().newElasticsearchClient().search(s -> s
                             .index("events")
                             .query(q -> q
                                     .match(t -> t
                                             .field("job")
-                                            .field("name")
                                             .query(text)
                                     )
                             ),
-                    LineageEvent.class
+                    JsonObject.class
             );
-            List<Hit<LineageEvent>> hits = response.hits().hits();
+            List<Hit<JsonObject>> hits = response.hits().hits();
             return hits.stream().map(Hit::source).toList().size() > 0 ? Response.ok(hits.stream().map(Hit::source).collect(Collectors.toList())).build() : Response.status(400).build();
         }
         return Response.status(400).build();

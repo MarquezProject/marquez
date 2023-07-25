@@ -134,7 +134,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
-    final ElasticsearchClient elasticsearchClient = newElasticsearchClient(config);
+    final ElasticsearchClient elasticsearchClient = newElasticsearchClient();
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)
@@ -183,10 +183,11 @@ public final class MarquezApp extends Application<MarquezConfig> {
     return jdbi;
   }
 
-  private ElasticsearchClient newElasticsearchClient(@NonNull MarquezConfig config) {
-    String serverUrl = "https://localhost:9200";
+  public ElasticsearchClient newElasticsearchClient() {
+    String host = "search";
+    int port = 9200;
     RestClient restClient =
-        RestClient.builder(HttpHost.create(serverUrl))
+        RestClient.builder(new HttpHost(host, port, "http"))
             .setDefaultHeaders(
                 new Header[] {
                   //                    new BasicHeader("Authorization", "ApiKey " + apiKey)
