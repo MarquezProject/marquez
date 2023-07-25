@@ -26,6 +26,9 @@ import org.jdbi.v3.core.Jdbi;
 public class DbRetentionJob extends AbstractScheduledService implements Managed {
   private static final Duration NO_DELAY = Duration.ofMinutes(0);
 
+  /* The retention policy frequency. */
+  private final int frequencyMins;
+
   /* The number of rows deleted per batch. */
   private final int numberOfRowsPerBatch;
 
@@ -42,10 +45,11 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
    */
   public DbRetentionJob(
       @NonNull final Jdbi jdbi, @NonNull final DbRetentionConfig dbRetentionConfig) {
+    this.frequencyMins = dbRetentionConfig.getFrequencyMins();
     this.numberOfRowsPerBatch = dbRetentionConfig.getNumberOfRowsPerBatch();
     this.retentionDays = dbRetentionConfig.getRetentionDays();
 
-    // Open connection.
+    // Connection to database retention policy will be applied.
     this.jdbi = jdbi;
 
     // Define fixed schedule with no delay.
@@ -61,8 +65,12 @@ public class DbRetentionJob extends AbstractScheduledService implements Managed 
 
   @Override
   public void start() throws Exception {
-    log.info("Starting db retention job...");
     startAsync().awaitRunning();
+    log.info(
+        "Started db retention job with retention policy of '{}' days, "
+            + "scheduled to be applied every '{}' mins.",
+        retentionDays,
+        frequencyMins);
   }
 
   @Override
