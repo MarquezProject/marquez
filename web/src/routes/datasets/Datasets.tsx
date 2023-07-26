@@ -98,7 +98,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
   pageNavigation() {
     const { datasets, page, pageIsLast } = this.state
     const titlePos = datasets.length < PAGE_SIZE && page === 1
-      ? `1 - ${datasets.length}` 
+      ? `1 - ${datasets.length}`
       : datasets.length > PAGE_SIZE && page === 1
       ? `1 - ${PAGE_SIZE}`
       : datasets.length && page > 1 && pageIsLast === false
@@ -136,7 +136,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
                 <MqEmpty title={i18next.t('datasets_route.empty_title')}>
                   <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
                 </MqEmpty>
-              </Box>       
+              </Box>
             ) : (
               <>
                 <Box p={2} display={'flex'} justifyContent={'space-between'}>

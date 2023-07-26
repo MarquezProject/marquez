@@ -117,11 +117,11 @@ This Code of Conduct is adapted from the [Contributor Covenant][homepage],
 version 2.0, available at
 [https://www.contributor-covenant.org/version/2/0/code_of_conduct.html][v2.0].
 
-Community Impact Guidelines were inspired by 
+Community Impact Guidelines were inspired by
 [Mozilla's code of conduct enforcement ladder][Mozilla CoC].
 
 For answers to common questions about this code of conduct, see the FAQ at
-[https://www.contributor-covenant.org/faq][FAQ]. Translations are available 
+[https://www.contributor-covenant.org/faq][FAQ]. Translations are available
 at [https://www.contributor-covenant.org/translations][translations].
 
 [homepage]: https://www.contributor-covenant.org
@@ -131,5 +131,5 @@ at [https://www.contributor-covenant.org/translations][translations].
 [translations]: https://www.contributor-covenant.org/translations
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

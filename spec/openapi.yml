@@ -875,7 +875,7 @@ components:
         type: string
         format: date-time
         example: 2022-09-15T07:47:19Z
-    
+
     type:
       name: type
       in: query

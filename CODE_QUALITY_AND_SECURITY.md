@@ -2,12 +2,12 @@
 
 The authors of Marquez are committed to providing secure software of the highest quality possible. To this end, we employ a number of tools and methodologies to ensure that our design, build, maintenance and testing practices maximize efficiency and minimize risk.
 
-The specific security and analysis methodologies that we employ include but are not limited to: 
+The specific security and analysis methodologies that we employ include but are not limited to:
 
 ## Security
 
 - Participation in the [OpenSSF Best Practices Badge Program](https://bestpractices.coreinfrastructure.org/en/projects/5106) for Free/Libre and FLOSS projects to ensure that we follow current best practices for quality and security
-- Use of [HTTPS](https://en.wikipedia.org/wiki/HTTPS) for network communication 
+- Use of [HTTPS](https://en.wikipedia.org/wiki/HTTPS) for network communication
 - Support for multiple cryptographic algorithms (through the use of HTTPS)
 - Separate storage of authentication credentials according to best practices
 - Use of secure protocols for network communication (through the use of HTTPS)
@@ -30,5 +30,5 @@ For more information about our approach to quality and security, feel free to re
 - Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

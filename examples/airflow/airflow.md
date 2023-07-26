@@ -2,7 +2,7 @@
 
 > **Note:** For a modified version of this guide that uses [Astro](https://www.astronomer.io/try-astro/?referral=docs-what-astro-banner) instead of vanilla Airflow, visit see the OpenLineage [docs](https://openlineage.io/docs/guides/airflow-quickstart).
 
-In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to [Marquez](https://marquezproject.ai/) using OpenLineage. 
+In this example, we'll walk you through how to enable Airflow DAGs to send lineage metadata to [Marquez](https://marquezproject.ai/) using OpenLineage.
 
 ### You’ll learn how to:
 
