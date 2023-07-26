@@ -54,8 +54,6 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
     >
       {job ? (
         <g>
-          {/* { console.log(job.latestRun)} */}
-          {/* {console.log(runStateToNodeColor(job.latestRun))} */}
           <circle
             style={{ cursor: 'pointer' }}
             r={RADIUS}
