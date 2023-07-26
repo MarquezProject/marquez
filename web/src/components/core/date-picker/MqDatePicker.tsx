@@ -24,7 +24,9 @@ const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', 
       label={label}
       sx={{
         minWidth: '200px',
-
+        '.MuiFormLabel-root': {
+          transform: 'translate(14px, 0px) scale(0.75)'
+        },
         '&:hover': {
           '.MuiOutlinedInput-notchedOutline': {
             borderColor: `${theme.palette.primary.main} !important`,
