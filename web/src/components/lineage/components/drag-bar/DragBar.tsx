@@ -73,12 +73,12 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
     >
       <Box sx={{
         width: theme.spacing(5),
-        height: 1,
+        height: '1px',
         backgroundColor: theme.palette.common.white
       }} />
       <Box sx={{
         width: theme.spacing(5),
-        height: 1,
+        height: '1px',
         backgroundColor: theme.palette.common.white
       }} />
     </Box>
