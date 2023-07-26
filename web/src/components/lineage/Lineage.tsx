@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React from 'react'
+import React, { LegacyRef } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
@@ -260,8 +260,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                         style={{
                           cursor: zoom.isDragging ? 'grabbing' : 'grab'
                         }}
-                      // @ts-ignore
-                      ref={zoom.containerRef}
+                      ref={zoom.containerRef as LegacyRef<SVGSVGElement>}
                       >
                         {/* background */}
                         <g transform={zoom.toString()}>
