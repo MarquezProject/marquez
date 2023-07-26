@@ -32,10 +32,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import marquez.MarquezApp;
 import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
+import marquez.common.models.ElasticResponse;
 import marquez.db.SearchDao;
 
 @Slf4j
@@ -80,13 +80,50 @@ public class SearchResource {
   @Path("/elastic/{text}")
   public Response searchElastic(@PathParam("text") @NotNull String text) throws IOException {
     if (this.elasticsearchClient != null) {
-      SearchResponse<ObjectNode> response =
-          new MarquezApp()
-              .newElasticsearchClient()
-              .search(
-                  s -> s.query(q -> q.match(t -> t.field("name").query(text))), ObjectNode.class);
-      List<Hit<ObjectNode>> hits = response.hits().hits();
-      return Response.ok(hits.stream().map(Hit::source).collect(Collectors.toList())).build();
+      // datasets search
+      SearchResponse<ObjectNode> datasetsResponse =
+          this.elasticsearchClient.search(
+              s ->
+                  s.index("datasets")
+                      .query(
+                          q ->
+                              q.bool(
+                                  b ->
+                                      b.should(sh -> sh.match(m -> m.field("name").query(text)))
+                                          .should(
+                                              sh1 ->
+                                                  sh1.match(
+                                                      m1 ->
+                                                          m1.field("facets.schema.fields.name")
+                                                              .query(text)))
+                                          .should(
+                                              sh2 ->
+                                                  sh2.match(m2 -> m2.field("name").query(text))))),
+              ObjectNode.class);
+
+      // jobs search
+      SearchResponse<ObjectNode> jobsResponse = this.elasticsearchClient.search(s -> s
+                      .index("jobs")
+
+                      .query(q -> q
+                              .match(t -> t
+                                      .field("job")
+                                      .query(text)
+                              )
+                      ).query(q -> q
+                              .match(t -> t
+                                      .field("namespace")
+                                      .query(text)
+                              )
+                      ),
+              ObjectNode.class
+      );
+
+
+      List<Hit<ObjectNode>> datasetsHits = datasetsResponse.hits().hits();
+      List<Hit<ObjectNode>> jobHits = jobsResponse.hits().hits();
+      ElasticResponse elasticResponse = new ElasticResponse(datasetsHits.stream().map(Hit::source).collect(Collectors.toList()), jobHits.stream().map(Hit::source).collect(Collectors.toList()));
+      return Response.ok(elasticResponse).build();
     }
     return Response.status(400).build();
   }

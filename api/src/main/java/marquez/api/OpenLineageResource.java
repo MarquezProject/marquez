@@ -20,11 +20,11 @@ import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Collections;
 import java.util.concurrent.CompletionException;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -125,24 +125,24 @@ public class OpenLineageResource extends BaseResource {
 
   private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
     Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("uuid", runUuid.toString());
+    jsonMap.put("run_id", runUuid.toString());
     jsonMap.put("eventTime", event.getEventType());
     jsonMap.put("name", event.getJob().getName());
     jsonMap.put("type", "JOB");
     jsonMap.put("namespace", event.getJob().getNamespace());
-    jsonMap.put("jobFacets", event.getJob().getFacets());
+    jsonMap.put("facets", event.getJob().getFacets());
     return jsonMap;
   }
 
   private Map<String, Object> buildDatasetIndexRequest(
       UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
     Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("uuid", runUuid.toString());
+    jsonMap.put("run_id", runUuid.toString());
     jsonMap.put("eventTime", event.getEventType());
     jsonMap.put("name", dataset.getName());
     jsonMap.put("type", "DATASET");
     jsonMap.put("namespace", dataset.getNamespace());
-    jsonMap.put("jobFacets", dataset.getFacets());
+    jsonMap.put("facets", dataset.getFacets());
     return jsonMap;
   }
 
@@ -151,7 +151,9 @@ public class OpenLineageResource extends BaseResource {
         IndexRequest.of(
             i ->
                 i.index("jobs")
-                    .id(runUuid.toString())
+                    .id(
+                        String.format(
+                            "JOB:%s:%s", event.getJob().getNamespace(), event.getJob().getName()))
                     .document(buildJobIndexRequest(runUuid, event))));
   }
 
@@ -163,7 +165,13 @@ public class OpenLineageResource extends BaseResource {
             jsonMap -> {
               index(
                   IndexRequest.of(
-                      i -> i.index("datasets").id(runUuid.toString()).document(jsonMap)));
+                      i ->
+                          i.index("datasets")
+                              .id(
+                                  String.format(
+                                      "DATASET:%s:%s",
+                                      jsonMap.get("namespace"), jsonMap.get("name")))
+                              .document(jsonMap)));
             });
   }
 
