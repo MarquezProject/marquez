@@ -45,9 +45,7 @@ export const MqInputNoIcon: React.FC<InputBaseProps> = (props) => {
     backgroundColor: 'transparent',
     border: `2px solid ${theme.palette.common.white}`,
     fontSize: 16,
-    padding: `${theme.spacing(1)} ${theme.spacing(5)} ${theme.spacing(1)} ${theme.spacing(
-      1
-    )}`,
+    padding: `${theme.spacing(1)} 0 ${theme.spacing(1)} ${theme.spacing(1)}`,
     transition: theme.transitions.create(['border-color', 'box-shadow']),
     '&:focus': {
       borderColor: theme.palette.primary.main,
