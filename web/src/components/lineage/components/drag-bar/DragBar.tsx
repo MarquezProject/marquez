@@ -23,18 +23,6 @@ const MAGIC_OFFSET_BASE = 4
 const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
 
-  console.log('DragBar render', isResizing)
-
-  // React.useEffect(() => {
-  //   window.addEventListener('mousemove', handleMousemove)
-  //   window.addEventListener('mouseup', handleMouseup)
-
-  //   return () => {
-  //     window.removeEventListener('mousemove', handleMousemove)
-  //     window.removeEventListener('mouseup', handleMouseup)
-  //   }
-  // }, [])
-
   React.useEffect(() => {
     window.addEventListener('mousemove', handleMousemove)
     window.addEventListener('mouseup', handleMouseup)
