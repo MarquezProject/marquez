@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,6 +62,11 @@ public class SearchDaoTest {
     DbTestUtils.newDataset(jdbi, "time_ordering_1");
     DbTestUtils.newDataset(jdbi, "time_ordering_2");
 
+    DbTestUtils.newDataset(jdbi, "namespace1", "datasetA");
+    DbTestUtils.newDataset(jdbi, "namespace1", "datasetB");
+    DbTestUtils.newDataset(jdbi, "namespace111", "excludeMe");
+    DbTestUtils.newDataset(jdbi, "namespace2", "datasetC");
+
     ImmutableSet<JobRow> jobRows = DbTestUtils.newJobs(jdbi, NUM_OF_JOBS);
 
     // add a symlinked job - validate that the number of results is the same in the below unit test
@@ -104,6 +110,68 @@ public class SearchDaoTest {
                 throw new RuntimeException(e);
               }
             });
+  }
+
+  @Test
+  public void testSearch_filterByNamespace() {
+    final String query = "dataset";
+    final String namespace = "namespace1";
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(2);
+    assertThat(resultsWithSort).extracting("name").contains("datasetA", "datasetB");
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceAndAfter() {
+    final String query = "dataset";
+    final String namespace = "namespace2";
+    Instant after = Instant.now().minus(1, ChronoUnit.DAYS);
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(
+            query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace, null, after);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(1);
+    assertThat(resultsWithSort).extracting("name").contains("datasetC");
+  }
+
+  @Test
+  public void testSearch_filterByAfterFuture() {
+    final String query = "dataset";
+    Instant after = Instant.now().plus(1, ChronoUnit.DAYS);
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, null, after);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(0);
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceBeforeFuture() {
+    final String query = "dataset";
+    final String namespace = "namespace1";
+    Instant before = Instant.now().plus(1, ChronoUnit.DAYS);
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, before);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(15);
+    assertThat(resultsWithSort).extracting("name").contains("datasetA", "datasetB");
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceBeforePast() {
+    final String query = "dataset";
+    final String namespace = "namespace1";
+    Instant before = Instant.now().minus(1, ChronoUnit.DAYS);
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, before);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(0);
   }
 
   @Test
