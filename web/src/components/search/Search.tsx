@@ -177,11 +177,13 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     this.setState({ search: event.target.value, open: true }, () => {
-      this.fetchSearch(
-        this.state.search,
-        this.state.filter.toUpperCase(),
-        this.state.sort.toUpperCase()
-      )
+      if (this.state.search.length !== 0) {
+        this.fetchSearch(
+          this.state.search.toLowerCase(),
+          this.state.filter.toUpperCase(),
+          this.state.sort.toUpperCase()
+        )
+      }
     })
   }
 

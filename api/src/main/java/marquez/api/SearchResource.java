@@ -38,6 +38,7 @@ import marquez.api.models.SearchSort;
 import marquez.common.models.ElasticResponse;
 import marquez.db.SearchDao;
 
+
 @Slf4j
 @Path("/api/v1/search")
 public class SearchResource {
@@ -81,25 +82,20 @@ public class SearchResource {
   public Response searchElastic(@PathParam("text") @NotNull String text) throws IOException {
     if (this.elasticsearchClient != null) {
       // datasets search
-      SearchResponse<ObjectNode> datasetsResponse =
-          this.elasticsearchClient.search(
-              s ->
-                  s.index("datasets")
-                      .query(
-                          q ->
-                              q.bool(
-                                  b ->
-                                      b.should(sh -> sh.matchBoolPrefix(m -> m.field("name").query(text)))
-                                          .should(
-                                              sh1 ->
-                                                  sh1.matchBoolPrefix(
-                                                      m1 ->
-                                                          m1.field("facets.schema.fields.name")
-                                                              .query(text)))
-                                          .should(
-                                              sh2 ->
-                                                  sh2.matchBoolPrefix(m2 -> m2.field("namespace").query(text))))),
-              ObjectNode.class);
+
+
+      SearchResponse<ObjectNode> datasetsResponse = elasticsearchClient.search(s -> s
+                      .index("datasets")
+                      .query(q -> q
+                              .bool(b -> b
+                                      .minimumShouldMatch("1")
+                                      .should(sh -> sh.wildcard(m -> m.field("name").value("*" + text + "*")))
+                                      .should(sh -> sh.wildcard(m -> m.field("namespace").value("*" + text + "*")))
+                                      .should(sh -> sh.wildcard(m -> m.field("facets.schema.fields.name").value("*" + text + "*")))
+                              )
+                      ),
+              ObjectNode.class
+      );
 
       // jobs search
       SearchResponse<ObjectNode> jobsResponse = this.elasticsearchClient.search(s -> s

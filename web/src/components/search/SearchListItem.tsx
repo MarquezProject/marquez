@@ -112,7 +112,7 @@ class SearchListItem extends React.Component<DkSearchListItemProps> {
           </Box>
           <Box>
             <MqText subdued small>
-              <Chip label={searchResult.namespace} size={'small'} variant="outlined"  />
+              <Chip label={searchResult.namespace} size={'small'} variant="outlined" color={searchResult.namespace.includes(search) ? 'primary' : 'secondary'} />
             </MqText>
           </Box>
         </Box>
