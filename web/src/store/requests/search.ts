@@ -4,10 +4,7 @@
 import { API_URL } from '../../globals'
 import { genericFetchWrapper } from './index'
 
-export const getSearch = async (q: string, filter = 'ALL', sort = 'NAME', limit = 100) => {
-  let url = `${API_URL}/search/?q=${q}&sort=${sort}&limit=${limit}`
-  if (filter === 'JOB' || filter === 'DATASET') {
-    url += `&filter=${filter}`
-  }
+export const getSearch = async (q: string) => {
+  const url = `${API_URL}/search/elastic/${q}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchSearch')
 }

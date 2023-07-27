@@ -4,16 +4,15 @@
 import * as Redux from 'redux'
 import { Box, Theme, createStyles, darken } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { GroupedSearch } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { SearchResult } from '../../types/api'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog, faDatabase, faSearch, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { fetchSearch, setSelectedNode } from '../../store/actionCreators'
-import { parseSearchGroup } from '../../helpers/nodes'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import MqChipGroup from '../core/chip/MqChipGroup'
 import MqText from '../core/text/MqText'
@@ -126,7 +125,7 @@ const styles = (theme: Theme) =>
   })
 
 interface StateProps {
-  searchResults: Map<string, GroupedSearch[]>
+  searchResults: SearchResult
   isSearching: boolean
   isSearchingInit: boolean
 }
@@ -222,6 +221,7 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   render() {
     const { classes, isSearching, isSearchingInit } = this.props
+    console.log(this.props.searchResults)
     return (
       <Box width={538} position={'relative'} px={10} mr={-8} id={'searchContainer'}>
         <Box className={classes.searchIcon}>
@@ -272,66 +272,75 @@ class Search extends React.Component<SearchProps, SearchState> {
                     />
                   </Box>
                   <Box className={classes.listContainer}>
-                    {this.props.searchResults.size === 0 && (
-                      <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
-                        <MqText>
-                          {isSearching || !isSearchingInit ? 'Searching...' : 'No Results'}
-                        </MqText>
+                    {this.props.searchResults.jobs.length === 0 &&
+                      this.props.searchResults.datasets.length === 0 && (
+                        <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+                          <MqText>
+                            {isSearching || !isSearchingInit ? 'Searching...' : 'No Results'}
+                          </MqText>
+                        </Box>
+                      )}
+                    {this.props.searchResults.jobs.length > 0 && (
+                      <Box
+                        className={classes.groupName}
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
+                      >
+                        <Box>
+                          <MqText bold font={'mono'}>
+                            JOBS
+                          </MqText>
+                        </Box>
                       </Box>
                     )}
-                    {[...this.props.searchResults].map((resultsWithGroups, index) => {
-                      return resultsWithGroups.map(result => {
-                        if (typeof result === 'string') {
-                          // is group
-                          if (result.length > 0) {
-                            return (
-                              <Box
-                                className={classes.groupName}
-                                key={result}
-                                display={'flex'}
-                                justifyContent={'space-between'}
-                                alignItems={'center'}
-                              >
-                                <Box>
-                                  <MqText bold font={'mono'}>
-                                    {parseSearchGroup(result, 'group')}
-                                  </MqText>
-                                </Box>
-                                <Box>
-                                  <MqText bold font={'mono'} small>
-                                    {parseSearchGroup(result, 'namespace')}
-                                  </MqText>
-                                </Box>
-                              </Box>
-                            )
-                          } else return null
-                          // is a list of group members
-                        } else if (result.length) {
-                          return (
-                            <Box key={result[0].group + index}>
-                              {result.map(listItem => {
-                                return (
-                                  <SearchListItem
-                                    key={listItem.name}
-                                    searchResult={listItem}
-                                    search={this.state.search}
-                                    selected={listItem.name === this.state.selected}
-                                    onClick={nodeName => {
-                                      this.setState({
-                                        open: false,
-                                        search: nodeName
-                                      })
-                                      this.props.setSelectedNode(listItem.nodeId)
-                                    }}
-                                  />
-                                )
-                              })}
-                            </Box>
-                          )
-                        } else {
-                          return null
-                        }
-                      })
+                    {...this.props.searchResults.jobs.map(result => {
+                      return (
+                        <SearchListItem
+                          key={result.name}
+                          searchResult={result}
+                          search={this.state.search}
+                          selected={result.name === this.state.selected}
+                          onClick={nodeName => {
+                            this.setState({
+                              open: false,
+                              search: nodeName
+                            })
+                            this.props.setSelectedNode(result.nodeId)
+                          }}
+                        />
+                      )
+                    })}
+                    {this.props.searchResults.datasets.length > 0 && (
+                      <Box
+                        className={classes.groupName}
+                        display={'flex'}
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
+                      >
+                        <Box>
+                          <MqText bold font={'mono'}>
+                            DATASETS
+                          </MqText>
+                        </Box>
+                      </Box>
+                    )}
+                    {...this.props.searchResults.datasets.map(result => {
+                      return (
+                        <SearchListItem
+                          key={result.name}
+                          searchResult={result}
+                          search={this.state.search}
+                          selected={result.name === this.state.selected}
+                          onClick={nodeName => {
+                            this.setState({
+                              open: false,
+                              search: nodeName
+                            })
+                            this.props.setSelectedNode(result.nodeId)
+                          }}
+                        />
+                      )
                     })}
                   </Box>
                 </Box>
@@ -346,8 +355,7 @@ class Search extends React.Component<SearchProps, SearchState> {
 
 const mapStateToProps = (state: IState) => {
   return {
-    searchResults: state.search.data.results,
-    rawResults: state.search.data.rawResults,
+    searchResults: state.search.data,
     isSearching: state.search.isLoading,
     isSearchingInit: state.search.init
   }
@@ -362,4 +370,9 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withRouter(Search)))
+export default withStyles(styles)(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(withRouter(Search))
+)

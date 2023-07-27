@@ -183,14 +183,9 @@ export interface Run {
 export type RunState = 'NEW' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'ABORTED'
 
 export interface SearchResult {
-  name: string
-  namespace: string
-  nodeId: string
-  type: JobOrDataset
-  updatedAt: string
+  jobs: any[]
+  datasets: any[]
 }
-
-export type GroupedSearch = { group: string } & SearchResult
 
 export interface LineageGraph {
   graph: LineageNode[]
@@ -199,11 +194,6 @@ export interface LineageGraph {
 export interface Search {
   totalCount: number
   results: SearchResult[]
-}
-
-export interface GroupedSearchResult {
-  results: Map<string, GroupedSearch[]>
-  rawResults: GroupedSearch[]
 }
 
 export interface Facets {

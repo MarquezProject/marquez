@@ -1,11 +1,10 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Theme, createStyles, darken } from '@material-ui/core'
+import { Box, Chip, Theme, createStyles, darken } from '@material-ui/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { JobOrDataset } from '../lineage/types'
 import { Link as RouterLink } from 'react-router-dom'
-import { SearchResult } from '../../types/api'
 import { encodeNode } from '../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
@@ -53,7 +52,7 @@ const styles = (theme: Theme) =>
 
 interface OwnProps {
   key: string | number
-  searchResult: SearchResult
+  searchResult: any
   search: string
   onClick: (nodeName: string) => void
   selected: boolean
@@ -83,9 +82,6 @@ class SearchListItem extends React.Component<DkSearchListItemProps> {
       >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           <Box display={'flex'} alignItems={'center'}>
-            <Box display={'inline'} mr={1}>
-              {searchResultIcon[searchResult.type]}
-            </Box>
             <Box className={classes.textOverflow}>
               {searchMatchIndex === -1 ? (
                 <MqText inline font={'mono'} bold small>
@@ -107,11 +103,16 @@ class SearchListItem extends React.Component<DkSearchListItemProps> {
                   </MqText>
                 </>
               )}
+              <Box>
+              {searchResult.facets?.schema?.fields?.map((field: any) => (
+                <Chip key={field.name} label={field.name} size={'small'} style={{marginRight: 8, marginTop: 4 }} color={field.name.includes(search) ? 'primary' : 'secondary'} />
+              ))}
+              </Box>
             </Box>
           </Box>
           <Box>
             <MqText subdued small>
-              {moment(searchResult.updatedAt).fromNow()}
+              <Chip label={searchResult.namespace} size={'small'} variant="outlined"  />
             </MqText>
           </Box>
         </Box>

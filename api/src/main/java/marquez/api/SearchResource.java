@@ -89,16 +89,16 @@ public class SearchResource {
                           q ->
                               q.bool(
                                   b ->
-                                      b.should(sh -> sh.match(m -> m.field("name").query(text)))
+                                      b.should(sh -> sh.matchBoolPrefix(m -> m.field("name").query(text)))
                                           .should(
                                               sh1 ->
-                                                  sh1.match(
+                                                  sh1.matchBoolPrefix(
                                                       m1 ->
                                                           m1.field("facets.schema.fields.name")
                                                               .query(text)))
                                           .should(
                                               sh2 ->
-                                                  sh2.match(m2 -> m2.field("name").query(text))))),
+                                                  sh2.matchBoolPrefix(m2 -> m2.field("namespace").query(text))))),
               ObjectNode.class);
 
       // jobs search
@@ -106,12 +106,12 @@ public class SearchResource {
                       .index("jobs")
 
                       .query(q -> q
-                              .match(t -> t
+                              .matchBoolPrefix(t -> t
                                       .field("job")
                                       .query(text)
                               )
                       ).query(q -> q
-                              .match(t -> t
+                              .matchBoolPrefix(t -> t
                                       .field("namespace")
                                       .query(text)
                               )

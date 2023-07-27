@@ -12,7 +12,7 @@ import {
   LineageGraph,
   Namespace,
   Run,
-  Search
+  Search, SearchResult
 } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
@@ -260,7 +260,7 @@ export const fetchSearch = (q: string, filter: string, sort: string) => ({
   }
 })
 
-export const fetchSearchSuccess = (search: Search) => ({
+export const fetchSearchSuccess = (search: SearchResult) => ({
   type: actionTypes.FETCH_SEARCH_SUCCESS,
   payload: search
 })

@@ -126,7 +126,7 @@ public class OpenLineageResource extends BaseResource {
   private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
     Map<String, Object> jsonMap = new HashMap<>();
     jsonMap.put("run_id", runUuid.toString());
-    jsonMap.put("eventTime", event.getEventType());
+    jsonMap.put("eventType", event.getEventType());
     jsonMap.put("name", event.getJob().getName());
     jsonMap.put("type", "JOB");
     jsonMap.put("namespace", event.getJob().getNamespace());
@@ -138,7 +138,7 @@ public class OpenLineageResource extends BaseResource {
       UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
     Map<String, Object> jsonMap = new HashMap<>();
     jsonMap.put("run_id", runUuid.toString());
-    jsonMap.put("eventTime", event.getEventType());
+    jsonMap.put("eventType", event.getEventType());
     jsonMap.put("name", dataset.getName());
     jsonMap.put("type", "DATASET");
     jsonMap.put("namespace", dataset.getNamespace());
