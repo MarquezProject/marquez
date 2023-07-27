@@ -61,7 +61,7 @@ def test_is_none():
 
 def test_check_name_length():
     with pytest.raises(ValueError):
-        Utils.check_name_length(variable_value='a'*65,
+        Utils.check_name_length(variable_value='a'*1025,
                                 variable_name='namespace_name')
     with pytest.raises(ValueError):
         Utils.check_name_length(variable_value='a'*65,
