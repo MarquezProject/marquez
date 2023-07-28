@@ -30,6 +30,16 @@ public interface SearchDao extends SqlObject {
   }
 
   default List<SearchResult> search(
+      String query,
+      SearchFilter filter,
+      SearchSort sort,
+      int limit,
+      String namespace,
+      Instant before) {
+    return search(query, filter, sort, limit, namespace, null, null);
+  }
+
+  default List<SearchResult> search(
       String query, SearchFilter filter, SearchSort sort, int limit, Instant before) {
     return search(query, filter, sort, limit, null, before, null);
   }

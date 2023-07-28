@@ -11,6 +11,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.time.Instant;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -52,11 +53,13 @@ public class SearchResource {
       @QueryParam("q") @NotNull String query,
       @QueryParam("filter") @Nullable SearchFilter filter,
       @QueryParam("sort") @DefaultValue(DEFAULT_SORT) SearchSort sort,
-      @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Min(MIN_LIMIT) int limit) {
+      @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Min(MIN_LIMIT) int limit,
+      @QueryParam("namespace") @Nullable String namespace,
+      @QueryParam("before") Instant before) {
     return Response.ok(
             isQueryBlank(query)
                 ? SearchResults.EMPTY
-                : searchWithNonBlankQuery(query, filter, sort, limit))
+                : searchWithNonBlankQuery(query, filter, sort, limit, namespace, before))
         .build();
   }
 
@@ -65,8 +68,14 @@ public class SearchResource {
   }
 
   private SearchResults searchWithNonBlankQuery(
-      String query, SearchFilter filter, SearchSort sort, int limit) {
-    final List<SearchResult> results = searchDao.search(query, filter, sort, limit);
+      String query,
+      SearchFilter filter,
+      SearchSort sort,
+      int limit,
+      String namespace,
+      Instant before) {
+    final List<SearchResult> results =
+        searchDao.search(query, filter, sort, limit, namespace, before);
     return new SearchResults(results);
   }
 

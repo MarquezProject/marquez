@@ -143,7 +143,8 @@ public class SearchDaoTest {
     final String query = "dataset";
     Instant after = Instant.now().plus(1, ChronoUnit.DAYS);
     final List<SearchResult> resultsWithSort =
-        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, null, after);
+        searchDao.search(
+            query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, null, null, after);
 
     // Ensure sorted search results contain N datasets.
     assertThat(resultsWithSort).hasSize(0);

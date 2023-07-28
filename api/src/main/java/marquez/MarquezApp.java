@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.api.InstantParamConverterProvider;
 import marquez.api.filter.JobRedirectFilter;
 import marquez.cli.DbMigrationCommand;
 import marquez.cli.DbRetentionCommand;
@@ -98,6 +99,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void run(@NonNull MarquezConfig config, @NonNull Environment env) {
+    env.jersey().register(new InstantParamConverterProvider());
+
     final DataSourceFactory sourceFactory = config.getDataSourceFactory();
     final ManagedDataSource source = sourceFactory.build(env.metrics(), DB_SOURCE_NAME);
 
