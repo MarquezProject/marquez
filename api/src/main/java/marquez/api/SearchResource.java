@@ -33,6 +33,7 @@ import marquez.common.models.NamespaceName;
 import marquez.db.SearchDao;
 
 @Slf4j
+@Path("/api/v1/search")
 public class SearchResource {
   private static final String DEFAULT_SORT = "name";
   private static final String DEFAULT_LIMIT = "10";
@@ -48,7 +49,6 @@ public class SearchResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Path("/api/v1/search")
   @Produces(APPLICATION_JSON)
   public Response search(
       @QueryParam("q") @NotBlank String query,
