@@ -56,6 +56,7 @@ public class SearchResource {
       @QueryParam("sort") @DefaultValue(DEFAULT_SORT) SearchSort sort,
       @QueryParam("limit") @DefaultValue(DEFAULT_LIMIT) @Min(MIN_LIMIT) int limit,
       @QueryParam("namespace") @Nullable NamespaceName namespace,
+      @QueryParam("before") @Nullable Instant before,
       @QueryParam("after") @Nullable Instant after) {
     final List<SearchResult> searchResults = searchDao.search(query, filter, sort, limit);
     return Response.ok(new SearchResults(searchResults)).build();
