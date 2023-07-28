@@ -48,8 +48,8 @@ public class SearchResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
   @Path("/api/v1/search")
+  @Produces(APPLICATION_JSON)
   public Response search(
       @QueryParam("q") @NotBlank String query,
       @QueryParam("filter") @Nullable SearchFilter filter,
