@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -106,8 +107,8 @@ public final class Utils {
   @JsonDeserialize(using = FlexibleDateTimeDeserializer.class)
   static final class ZonedDateTimeMixin {}
 
-  public static Instant toInstantOrNull(@Nullable final String timeAsString) {
-    return Optional.ofNullable(timeAsString).map(Instant::parse).orElse(null);
+  public static LocalDate toLocateDateOrNull(@Nullable final String timeAsString) {
+    return Optional.ofNullable(timeAsString).map(LocalDate::parse).orElse(null);
   }
 
   public static String toJson(@NonNull final Object value) {

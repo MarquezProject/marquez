@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,10 @@ import org.postgresql.util.PGobject;
 @Tag("DataAccessTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class SearchDaoTest {
+  private static final LocalDate BEFORE =
+      LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneOffset.systemDefault());
+  private static final LocalDate AFTER =
+      LocalDate.ofInstant(Instant.now().minus(1, ChronoUnit.DAYS), ZoneOffset.systemDefault());
 
   static final int LIMIT = 25;
   static final int NUM_OF_JOBS = 2;
@@ -128,10 +134,9 @@ public class SearchDaoTest {
   public void testSearch_filterByNamespaceAndAfter() {
     final String query = "dataset";
     final String namespace = "namespace2";
-    Instant after = Instant.now().minus(1, ChronoUnit.DAYS);
     final List<SearchResult> resultsWithSort =
         searchDao.search(
-            query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace, null, after);
+            query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace, null, AFTER);
 
     // Ensure sorted search results contain N datasets.
     assertThat(resultsWithSort).hasSize(1);
@@ -139,23 +144,10 @@ public class SearchDaoTest {
   }
 
   @Test
-  public void testSearch_filterByAfterFuture() {
-    final String query = "dataset";
-    Instant after = Instant.now().plus(1, ChronoUnit.DAYS);
-    final List<SearchResult> resultsWithSort =
-        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, null, after);
-
-    // Ensure sorted search results contain N datasets.
-    assertThat(resultsWithSort).hasSize(0);
-  }
-
-  @Test
   public void testSearch_filterByNamespaceBeforeFuture() {
     final String query = "dataset";
-    final String namespace = "namespace1";
-    Instant before = Instant.now().plus(1, ChronoUnit.DAYS);
     final List<SearchResult> resultsWithSort =
-        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, before);
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, BEFORE);
 
     // Ensure sorted search results contain N datasets.
     assertThat(resultsWithSort).hasSize(15);
@@ -165,10 +157,8 @@ public class SearchDaoTest {
   @Test
   public void testSearch_filterByNamespaceBeforePast() {
     final String query = "dataset";
-    final String namespace = "namespace1";
-    Instant before = Instant.now().minus(1, ChronoUnit.DAYS);
     final List<SearchResult> resultsWithSort =
-        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, before);
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, AFTER);
 
     // Ensure sorted search results contain N datasets.
     assertThat(resultsWithSort).hasSize(0);

@@ -6,7 +6,7 @@
 package marquez.api;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static marquez.common.Utils.toInstantOrNull;
+import static marquez.common.Utils.toLocateDateOrNull;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
@@ -36,7 +36,7 @@ import marquez.db.SearchDao;
 @Slf4j
 @Path("/api/v1/search")
 public class SearchResource {
-  private static final String YYYY_MM_DD = "YYYY-MM-DD";
+  private static final String YYYY_MM_DD = "^\\d{4}-\\d{2}-\\d{2}$";
   private static final String DEFAULT_SORT = "name";
   private static final String DEFAULT_LIMIT = "10";
   private static final int MIN_LIMIT = 0;
@@ -62,7 +62,13 @@ public class SearchResource {
       @QueryParam("after") @Valid @Pattern(regexp = YYYY_MM_DD) @Nullable String after) {
     final List<SearchResult> searchResults =
         searchDao.search(
-            query, filter, sort, limit, namespace, toInstantOrNull(before), toInstantOrNull(after));
+            query,
+            filter,
+            sort,
+            limit,
+            namespace,
+            toLocateDateOrNull(before),
+            toLocateDateOrNull(after));
     return Response.ok(new SearchResults(searchResults)).build();
   }
 

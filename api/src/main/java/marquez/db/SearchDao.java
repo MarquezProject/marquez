@@ -5,7 +5,7 @@
 
 package marquez.db;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nullable;
 import marquez.api.models.SearchFilter;
@@ -30,7 +30,7 @@ public interface SearchDao extends SqlObject {
   }
 
   default List<SearchResult> search(
-      String query, SearchFilter filter, SearchSort sort, int limit, Instant before) {
+      String query, SearchFilter filter, SearchSort sort, int limit, LocalDate before) {
     return search(query, filter, sort, limit, null, before, null);
   }
 
@@ -39,8 +39,8 @@ public interface SearchDao extends SqlObject {
       SearchFilter filter,
       SearchSort sort,
       int limit,
-      Instant before,
-      Instant after) {
+      LocalDate before,
+      LocalDate after) {
     return search(query, filter, sort, limit, null, before, after);
   }
 
@@ -87,6 +87,6 @@ public interface SearchDao extends SqlObject {
       SearchSort sort,
       int limit,
       @Nullable String namespace,
-      @Nullable Instant before,
-      @Nullable Instant after);
+      @Nullable LocalDate before,
+      @Nullable LocalDate after);
 }
