@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -104,6 +105,10 @@ public final class Utils {
 
   @JsonDeserialize(using = FlexibleDateTimeDeserializer.class)
   static final class ZonedDateTimeMixin {}
+
+  public static Instant toInstantOrNull(@Nullable final String timeAsString) {
+    return Optional.ofNullable(timeAsString).map(Instant::parse).orElse(null);
+  }
 
   public static String toJson(@NonNull final Object value) {
     try {
