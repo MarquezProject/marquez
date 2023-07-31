@@ -37,6 +37,15 @@ i18next
             dialog_confirmation_title: 'Are you sure?'
           },
           search: {
+            filter: {
+              all: 'All',
+              jobs: 'Jobs',
+              datasets: 'Datasets',
+              updated: 'Updated',
+              name: 'Name'
+            },
+            status: 'Searching...',
+            none: 'No Results',
             search: 'Search',
             jobs: 'Jobs',
             and: 'and',
@@ -148,6 +157,15 @@ i18next
             dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           search: {
+            filter: {
+              all: 'Tout',
+              jobs: "d'Emplois",
+              datasets: 'Jeux de Données',
+              updated: 'Mis à jour',
+              name: 'Nom'
+            },
+            status: 'Recherche...',
+            none: 'Aucun Résultat',
             search: 'Recherche',
             jobs: "d'Emplois",
             and: 'et',
@@ -262,6 +280,15 @@ i18next
             dialog_confirmation_title: 'Estás seguro?'
           },
           search: {
+            filter: {
+              all: 'Todo',
+              jobs: 'Trabajos',
+              datasets: 'Conjuntos de Datos',
+              updated: 'Actualizado',
+              name: 'Nombre'
+            },
+            status: 'Buscando...',
+            none: 'No Hay Resultados',
             search: 'Buscar',
             jobs: 'Trabajos',
             and: 'y',
@@ -376,6 +403,15 @@ i18next
             dialog_confirmation_title: 'Jesteś pewny?'
           },
           search: {
+            filter: {
+              all: 'Wszystko',
+              jobs: 'Zadania',
+              datasets: 'Zbiory Danych',
+              updated: 'Zaktualizowano',
+              name: 'Nazwa'
+            },
+            status: 'Badawczy...',
+            none: 'Brak Wyników',
             search: 'Wyszukiwanie',
             jobs: 'Zadania',
             and: 'i',
