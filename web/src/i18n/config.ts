@@ -26,6 +26,7 @@ i18next
             docs_link: 'API Docs'
           },
           jobs: {
+            search: 'Search',
             latest_tab: 'LATEST RUN',
             history_tab: 'RUN HISTORY',
             location: 'LOCATION',
@@ -146,6 +147,7 @@ i18next
             docs_link: 'Documents API'
           },
           jobs: {
+            search: 'Recherche',
             latest_tab: 'DERNIÈRE COURSE',
             history_tab: "HISTORIQUE D'EXECUTION",
             location: 'EMPLACEMENT',
@@ -269,6 +271,7 @@ i18next
             docs_link: 'Documentos API'
           },
           jobs: {
+            search: 'Buscar',
             latest_tab: 'ÚLTIMA EJECUCIÓN',
             history_tab: 'HISTORIAL DE EJECUCIONES',
             location: 'UBICACIÓN',
@@ -392,6 +395,7 @@ i18next
             docs_link: 'Dokumentacja API'
           },
           jobs: {
+            search: 'Wyszukiwanie',
             latest_tab: 'OSTATNI WYKONANIE',
             history_tab: 'HISTORIA WYKONAŃ',
             location: 'LOKALIZACJA',
