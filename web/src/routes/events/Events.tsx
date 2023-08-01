@@ -186,9 +186,7 @@ class Events extends React.Component<EventsProps, EventsState> {
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
                 Page: {this.pageNavigation()}
               </Box>
-              {events.length === 0 ? (
-                <></>
-              ) : (
+              {events.length === 0 && (
                 <Box>
                   <Tooltip title={i18next.t('events_route.previous_page')}>
                     <IconButton
