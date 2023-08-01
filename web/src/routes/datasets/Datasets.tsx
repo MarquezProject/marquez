@@ -136,7 +136,7 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
                 <MqEmpty title={i18next.t('datasets_route.empty_title')}>
                   <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
                 </MqEmpty>
-              </Box>       
+              </Box>
             ) : (
               <>
                 <Box p={2} display={'flex'} justifyContent={'space-between'}>
@@ -227,29 +227,29 @@ class Datasets extends React.Component<DatasetsProps, DatasetsState> {
                       })}
                   </TableBody>
                 </Table>
+                <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+                  <Tooltip title={i18next.t('events_route.previous_page')}>
+                    <IconButton
+                      className={classes.ml2}
+                      color='primary'
+                      disabled={page === 1}
+                      onClick={() => this.handleClickPage('prev')}
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={i18next.t('events_route.next_page')}>
+                    <IconButton
+                      color='primary'
+                      disabled={pageIsLast}
+                      onClick={() => this.handleClickPage('next')}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </>
             )}
-            <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
-              <Tooltip title={i18next.t('events_route.previous_page')}>
-                <IconButton
-                  className={classes.ml2}
-                  color='primary'
-                  disabled={page === 1}
-                  onClick={() => this.handleClickPage('prev')}
-                >
-                  <ChevronLeftRounded />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={i18next.t('events_route.next_page')}>
-                <IconButton
-                  color='primary'
-                  disabled={pageIsLast}
-                  onClick={() => this.handleClickPage('next')}
-                >
-                  <ChevronRightRounded />
-                </IconButton>
-              </Tooltip>
-            </Box>
           </>
         </MqScreenLoad>
       </Container>
