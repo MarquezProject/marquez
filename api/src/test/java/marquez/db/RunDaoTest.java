@@ -224,7 +224,6 @@ class RunDaoTest {
             row.getRunArgsUuid(),
             null,
             null,
-            namespaceRow.getUuid(),
             namespaceRow.getName(),
             jobRow.getName(),
             null);
@@ -256,7 +255,6 @@ class RunDaoTest {
         row.getRunArgsUuid(),
         null,
         null,
-        namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
         null);
@@ -271,7 +269,6 @@ class RunDaoTest {
         row.getRunArgsUuid(),
         null,
         null,
-        namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
         null);

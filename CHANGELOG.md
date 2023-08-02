@@ -1,6 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.36.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.37.0...HEAD)
+
+## [0.37.0](https://github.com/MarquezProject/marquez/compare/0.36.0...0.37.0) - 2023-07-17
+### Added
+* API: add ability to decode static metadata events [`#2495`](https://github.com/MarquezProject/marquez/pull/2495) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Introduces an `EventTypeResolver` for using the `schemaURL` field to decode `POST` requests to `/lineage` with `LineageEvent`s, `DatasetEvent`s or `JobEvent`s, as the first step in implementing static lineage support.*
+
+### Fixed
+* API: remove unnecessary DB updates [`#2531`](https://github.com/MarquezProject/marquez/pull/2531) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Prevent updates that are not needed and are deadlock-prone.*
+* Web: revert URL encoding when fetching lineage [`#2529`](https://github.com/MarquezProject/marquez/pull/2529) [@jlukenoff](https://github.com/jlukenoff)  
+    *Reverts the node ID from being URL-encoded and allows the backend to return lineage details successfully even when a node ID contains special characters.*
 
 ## [0.36.0](https://github.com/MarquezProject/marquez/compare/0.35.0...0.36.0) - 2023-06-27
 ### Added
@@ -24,6 +35,12 @@
 ### Fixed
 * Web: handle lineage graph cycles on the client [`#2506`](https://github.com/MarquezProject/marquez/pull/2506) [@jlukenoff](https://github.com/jlukenoff)  
     *Fixes a bug where we blow the stack on the client-side if the user selects a node that is part of a cycle in the graph.*
+
+### Added
+
+* Ability to decode static metadata events [`#2495`](https://github.com/MarquezProject/marquez/pull/2495) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+  *Adds the ability to distinguish on a bakend static metadata events introduced based on the [proposal](https://github.com/OpenLineage/OpenLineage/blob/main/proposals/1837/static_lineage.md).*
+
 
 ## [0.34.0](https://github.com/MarquezProject/marquez/compare/0.33.0...0.34.0) - 2023-05-18
 

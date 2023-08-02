@@ -53,6 +53,7 @@ dependencies {
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"
+    testImplementation "org.jdbi:jdbi3-testcontainers:${jdbi3Version}"
     testImplementation "org.junit.vintage:junit-vintage-engine:${junit5Version}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"

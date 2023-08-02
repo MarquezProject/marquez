@@ -20,6 +20,7 @@ public class JobRow {
   @NonNull String type;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
+  @Nullable UUID namespaceUuid;
   @NonNull String namespaceName;
   @NonNull String name;
   @NonNull String simpleName;

@@ -15,6 +15,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.With;
+import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
+import marquez.common.models.NamespaceName;
 
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -25,7 +28,9 @@ public class DatasetRow {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final Instant updatedAt;
   @Getter @NonNull private final UUID namespaceUuid;
+  @Getter @Nullable private final String namespaceName;
   @Getter @NonNull private final UUID sourceUuid;
+  @Getter @Nullable private final String sourceName;
   @Getter @NonNull private final String name;
   @Getter @NonNull private final String physicalName;
   @Nullable private final Instant lastModifiedAt;
@@ -43,5 +48,10 @@ public class DatasetRow {
 
   public Optional<UUID> getCurrentVersionUuid() {
     return Optional.ofNullable(currentVersionUuid);
+  }
+
+  /** ... */
+  public DatasetId toDatasetId() {
+    return new DatasetId(NamespaceName.of(namespaceName), DatasetName.of(name));
   }
 }

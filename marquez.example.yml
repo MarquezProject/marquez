@@ -27,6 +27,15 @@ db:
   user: ${POSTGRES_USER}
   password: ${POSTGRES_PASSWORD}
 
+# Adjusts retention policy
+# dbRetention:
+  # Apply retention policy at a frequency of every 'X' minutes (default: 15)
+  # frequencyMins: ${DB_RETENTION_FREQUENCY_MINS:-15}
+  # Maximum number of rows deleted per batch (default: 1000)
+  # numberOfRowsPerBatch:  ${DB_RETENTION_NUMBER_OF_ROWS_PER_BATCH:-1000}
+  # Maximum retention days (default: 7)
+  # retentionDays: ${DB_RETENTION_DAYS:-7}
+
 # Enables flyway configuration overrides (see: https://flywaydb.org/documentation/configfiles)
 # flyway:
 #   connectRetries: 3
