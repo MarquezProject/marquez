@@ -10,6 +10,7 @@ import Box from '@material-ui/core/Box'
 import ButtonBase from '@material-ui/core/ButtonBase'
 import createStyles from '@material-ui/core/styles/createStyles'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
+import MqText from '../text/MqText'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -69,7 +70,7 @@ class MqIconButton extends React.Component<IconButtonProps> {
           width={theme.spacing(8)}
           className={classes.tooltip}
         >
-          {title}
+          <MqText>{title}</MqText>
         </Box>
       </Box>
     )
