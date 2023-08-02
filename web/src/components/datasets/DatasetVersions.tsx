@@ -100,22 +100,32 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps &
               key={version.createdAt}
               onClick={() => handleClick(version)}
             >
-              <TableCell align='left'>{version.version}</TableCell>
-              <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
-              <TableCell align='left'>{version.fields.length}</TableCell>
+              <TableCell align='left'>
+                <MqText>{version.version}</MqText>
+              </TableCell>
+              <TableCell align='left'>
+                <MqText>{formatUpdatedAt(version.createdAt)}</MqText>
+              </TableCell>
+              <TableCell align='left'>
+                <MqText>{version.fields.length}</MqText>
+              </TableCell>
               <TableCell align='left'>
                 <Box display={'flex'} alignItems={'center'}>
-                  {version.createdByRun ? (
-                    <>
-                      <RunStatus run={version.createdByRun} />
-                      {version.createdByRun ? version.createdByRun.id : 'N/A'}
-                    </>
-                  ) : (
-                    'N/A'
-                  )}
+                  <MqText>
+                    {version.createdByRun ? (
+                      <>
+                        <RunStatus run={version.createdByRun} />
+                        {version.createdByRun ? version.createdByRun.id : 'N/A'}
+                      </>
+                    ) : (
+                      'N/A'
+                    )}
+                  </MqText>
                 </Box>
               </TableCell>
-              <TableCell align='left'>{version.lifecycleState}</TableCell>
+              <TableCell align='left'>
+                <MqText>{version.lifecycleState}</MqText>
+              </TableCell>
             </TableRow>
           )
         })}
