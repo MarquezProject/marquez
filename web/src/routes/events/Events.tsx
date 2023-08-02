@@ -273,7 +273,9 @@ class Events extends React.Component<EventsProps, EventsState> {
                                 label={event.eventType}
                               />
                             </TableCell>
-                            <TableCell align='left'>{event.job.name}</TableCell>
+                            <TableCell align='left'>
+                              <MqText>{event.job.name}</MqText>
+                            </TableCell>
                             <TableCell align='left'>
                               <MqText> {event.job.namespace} </MqText>
                             </TableCell>
