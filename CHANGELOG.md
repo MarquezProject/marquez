@@ -1,6 +1,25 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.37.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.38.0...HEAD)
+
+## [0.38.0](https://github.com/MarquezProject/marquez/compare/0.37.0...0.38.0) - 2023-08-02
+### Added
+* API: add db retention support [`#2486`](https://github.com/MarquezProject/marquez/pull/2486) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds migration, a `dbRetention` config in `marquez.yml` for enabling a retention policy, and a `db-retention` command for executing a policy.*
+* API: add runs state indices [`#2535`](https://github.com/MarquezProject/marquez/pull/2535) [@phixme](https://github.com/phixMe)  
+    *Adds four indices to help run retention faster.*
+* API: define `DbRetentionJob(Jdbi, DbRetentionConfig)` [`#2549`](https://github.com/MarquezProject/marquez/pull/2549) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds `@Positive` to `DbRetentionConfig` instance variables for validating `DbRetentionConfig` properties internally within the class.*
+* API: add log for when retention job starts [`#2551`](https://github.com/MarquezProject/marquez/pull/2551) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds logging of `DbRetentionJob`.*
+
+### Fixed
+* API: fix slow dataset query updates [`#2534`](https://github.com/MarquezProject/marquez/pull/2534) [@phixme](https://github.com/phixMe)  
+    *Scopes down nested facet queries to be the same scope as the outer query.*
+* Client/Python: increase namespace length to 1024 characters [`#2554`](https://github.com/MarquezProject/marquez/pull/2554) [@hloomupgrade](https://github.com/hloombaupgrade)  
+    *Changes the namespace length constraint to sync up with the Java client's.*
+* Web: remove pagination in case of no content [`#2559`](https://github.com/MarquezProject/marquez/pull/2559) [@Nisarg-Chokshi](https://github.com/Nisarg-Chokshi)  
+    *Updates `Dataset` & `Event` route rendering to remove pagination in the case of no content.*
 
 ## [0.37.0](https://github.com/MarquezProject/marquez/compare/0.36.0...0.37.0) - 2023-07-17
 ### Added
