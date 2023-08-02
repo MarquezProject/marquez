@@ -118,17 +118,27 @@ const Runs: FunctionComponent<RunsProps & WithStyles<typeof styles>> = props => 
           {runs.map(run => {
             return (
               <TableRow key={run.id} className={classes.tableRow} onClick={() => handleClick(run)}>
-                <TableCell align='left'>{run.id}</TableCell>
+                <TableCell align='left'>
+                  <MqText>{run.id}</MqText>
+                </TableCell>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
                     <RunStatus run={run} />
                     <MqText>{run.state}</MqText>
                   </Box>
                 </TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.endedAt)}</TableCell>
-                <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
+                <TableCell align='left'>
+                  <MqText>{formatUpdatedAt(run.createdAt)}</MqText>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqText>{formatUpdatedAt(run.startedAt)}</MqText>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqText>{formatUpdatedAt(run.endedAt)}</MqText>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqText>{stopWatchDuration(run.durationMs)}</MqText>
+                </TableCell>
               </TableRow>
             )
           })}
