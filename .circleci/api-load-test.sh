@@ -14,7 +14,7 @@
 set -e
 
 # Build version of Marquez
-readonly MARQUEZ_VERSION=0.38.0-SNAPSHOT
+readonly MARQUEZ_VERSION=0.39.0-SNAPSHOT
 # Fully qualified path to marquez.jar
 readonly MARQUEZ_JAR="api/build/libs/marquez-api-${MARQUEZ_VERSION}.jar"
 
