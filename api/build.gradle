@@ -148,7 +148,7 @@ application {
 }
 
 shadowJar {
-    classifier = ''
+    archiveClassifier.set('')
     transform(ServiceFileTransformer)
     // Add LICENSE to Jar
     from(projectDir) {
