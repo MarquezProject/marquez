@@ -1,9 +1,36 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.36.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.38.0...HEAD)
+
+## [0.38.0](https://github.com/MarquezProject/marquez/compare/0.37.0...0.38.0) - 2023-08-02
+### Added
+* API: add db retention support [`#2486`](https://github.com/MarquezProject/marquez/pull/2486) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds migration, a `dbRetention` config in `marquez.yml` for enabling a retention policy, and a `db-retention` command for executing a policy.*
+* API: add runs state indices [`#2535`](https://github.com/MarquezProject/marquez/pull/2535) [@phixme](https://github.com/phixMe)  
+    *Adds four indices to help run retention faster.*
+* API: define `DbRetentionJob(Jdbi, DbRetentionConfig)` [`#2549`](https://github.com/MarquezProject/marquez/pull/2549) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds `@Positive` to `DbRetentionConfig` instance variables for validating `DbRetentionConfig` properties internally within the class.*
+* API: add log for when retention job starts [`#2551`](https://github.com/MarquezProject/marquez/pull/2551) [@wslulciuc](https://github.com/wslulciuc)  
+    *Adds logging of `DbRetentionJob`.*
+
 ### Fixed
-* API: remove unnecessary DB updates [`#2531`](https://github.com/MarquezProject/marquez/pull/2531)[@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
-  *Prevent updates that are not needed and are deadlock prone.*
+* API: fix slow dataset query updates [`#2534`](https://github.com/MarquezProject/marquez/pull/2534) [@phixme](https://github.com/phixMe)  
+    *Scopes down nested facet queries to be the same scope as the outer query.*
+* Client/Python: increase namespace length to 1024 characters [`#2554`](https://github.com/MarquezProject/marquez/pull/2554) [@hloomupgrade](https://github.com/hloombaupgrade)  
+    *Changes the namespace length constraint to sync up with the Java client's.*
+* Web: remove pagination in case of no content [`#2559`](https://github.com/MarquezProject/marquez/pull/2559) [@Nisarg-Chokshi](https://github.com/Nisarg-Chokshi)  
+    *Updates `Dataset` & `Event` route rendering to remove pagination in the case of no content.*
+
+## [0.37.0](https://github.com/MarquezProject/marquez/compare/0.36.0...0.37.0) - 2023-07-17
+### Added
+* API: add ability to decode static metadata events [`#2495`](https://github.com/MarquezProject/marquez/pull/2495) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Introduces an `EventTypeResolver` for using the `schemaURL` field to decode `POST` requests to `/lineage` with `LineageEvent`s, `DatasetEvent`s or `JobEvent`s, as the first step in implementing static lineage support.*
+
+### Fixed
+* API: remove unnecessary DB updates [`#2531`](https://github.com/MarquezProject/marquez/pull/2531) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Prevent updates that are not needed and are deadlock-prone.*
+* Web: revert URL encoding when fetching lineage [`#2529`](https://github.com/MarquezProject/marquez/pull/2529) [@jlukenoff](https://github.com/jlukenoff)  
+    *Reverts the node ID from being URL-encoded and allows the backend to return lineage details successfully even when a node ID contains special characters.*
 
 ## [0.36.0](https://github.com/MarquezProject/marquez/compare/0.35.0...0.36.0) - 2023-06-27
 ### Added
@@ -27,6 +54,12 @@
 ### Fixed
 * Web: handle lineage graph cycles on the client [`#2506`](https://github.com/MarquezProject/marquez/pull/2506) [@jlukenoff](https://github.com/jlukenoff)  
     *Fixes a bug where we blow the stack on the client-side if the user selects a node that is part of a cycle in the graph.*
+
+### Added
+
+* Ability to decode static metadata events [`#2495`](https://github.com/MarquezProject/marquez/pull/2495) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+  *Adds the ability to distinguish on a bakend static metadata events introduced based on the [proposal](https://github.com/OpenLineage/OpenLineage/blob/main/proposals/1837/static_lineage.md).*
+
 
 ## [0.34.0](https://github.com/MarquezProject/marquez/compare/0.33.0...0.34.0) - 2023-05-18
 

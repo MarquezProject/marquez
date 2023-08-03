@@ -62,7 +62,7 @@ subprojects {
         mockitoVersion = '5.1.1'
         openlineageVersion = '0.26.0'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.5.4'
+        postgresqlVersion = '42.6.0'
         isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 
@@ -95,14 +95,14 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    task sourceJar(type: Jar) {
-        classifier 'sources'
+    task sourceJar(type: Jar, dependsOn: classes) {
         from sourceSets.main.allJava
+        archiveClassifier.set("sources")
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier 'javadoc'
         from javadoc.destinationDir
+        archiveClassifier.set("javadoc")
     }
 
     pmd {
@@ -146,9 +146,9 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            xml.enabled = true
-            html.enabled = true
-            html.destination = file(coverageDir)
+            xml.required = true
+            html.required = true
+            html.outputLocation = file(coverageDir)
         }
     }
 }

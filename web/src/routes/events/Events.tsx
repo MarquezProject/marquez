@@ -158,7 +158,7 @@ const Events: React.FC<EventsProps> = ({ events, isEventsLoading, isEventsInit, 
               <MqText heading>{i18next.t('events_route.title')}</MqText>
               Page: {pageNavigation()}
             </Box>
-            <Box>
+            {getEvents()?.length > 0 && (<Box>
               <Tooltip title={i18next.t('events_route.previous_page')}>
                 <IconButton
                   sx={{
@@ -180,7 +180,7 @@ const Events: React.FC<EventsProps> = ({ events, isEventsLoading, isEventsInit, 
                   <ChevronRightRounded />
                 </IconButton>
               </Tooltip>
-            </Box>
+            </Box>)}
           </Box>
           <Box p={2} sx={{
             display: 'flex',
@@ -296,31 +296,31 @@ const Events: React.FC<EventsProps> = ({ events, isEventsLoading, isEventsInit, 
                     })}
                 </TableBody>
               </Table>
+              <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <IconButton
+                    sx={{
+                      marginLeft: theme.spacing(2)
+                    }}
+                    color='primary'
+                    disabled={state.page === 1}
+                    onClick={() => handleClickPage('prev')}
+                    size="large">
+                    <ChevronLeftRounded />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <IconButton
+                    color='primary'
+                    disabled={state.pageIsLast}
+                    onClick={() => handleClickPage('next')}
+                    size="large">
+                    <ChevronRightRounded />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </>
           )}
-          <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
-            <Tooltip title={i18next.t('events_route.previous_page')}>
-              <IconButton
-                sx={{
-                  marginLeft: theme.spacing(2)
-                }}
-                color='primary'
-                disabled={state.page === 1}
-                onClick={() => handleClickPage('prev')}
-                size="large">
-                <ChevronLeftRounded />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={i18next.t('events_route.next_page')}>
-              <IconButton
-                color='primary'
-                disabled={state.pageIsLast}
-                onClick={() => handleClickPage('next')}
-                size="large">
-                <ChevronRightRounded />
-              </IconButton>
-            </Tooltip>
-          </Box>
         </>
       </MqScreenLoad>
     </Container>
