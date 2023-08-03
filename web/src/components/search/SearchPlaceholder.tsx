@@ -30,7 +30,7 @@ const SearchPlaceholder: React.FC<WithStyles<typeof styles>> = ({ classes }) => 
   return (
     <Box className={classes.root}>
       <Box display={'inline'}>
-        <MqText disabled inline>
+        <MqText disabled inline aria-label={i18next.t('search.search_aria')} aria-required='true'>
           {' '}
           {i18next.t('search.search')}
         </MqText>{' '}
