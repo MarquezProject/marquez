@@ -36,10 +36,11 @@ export const resetEvents = () => ({
   type: actionTypes.RESET_EVENTS
 })
 
-export const fetchDatasets = (namespace: string) => ({
+export const fetchDatasets = (namespace: string, limit: number) => ({
   type: actionTypes.FETCH_DATASETS,
   payload: {
-    namespace
+    namespace,
+    limit
   }
 })
 
