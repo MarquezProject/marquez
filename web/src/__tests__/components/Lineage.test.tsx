@@ -1,8 +1,20 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Lineage, LineageProps } from '../../components/lineage/Lineage'
+import React from 'react'
+import Lineage, { LineageProps, getSelectedPaths, initGraph, buildGraphAll } from '../../components/lineage/Lineage'
 import { LineageNode } from '../../components/lineage/types'
+import { render } from '@testing-library/react'
+import { createBrowserHistory } from 'history'
+import createSagaMiddleware from 'redux-saga'
+import { createRouterMiddleware } from '@lagunovsky/redux-react-router'
+import createRootReducer from '../../store/reducers'
+import { composeWithDevTools } from '@redux-devtools/extension'
+import { applyMiddleware, createStore } from 'redux'
+import { Provider } from 'react-redux'
+import { MqNode } from '../../components/lineage/types'
+import { graphlib } from 'dagre'
+import rootSaga from '../../store/sagas'
 
 const mockGraphWithCycle = [
   {
@@ -67,22 +79,19 @@ const mockGraphWithCycle = [
   }
 ]
 
-function mockSetState(newState: any) {
-  this.state = { ...this.state, ...newState }
-}
-
 describe('Lineage Component', () => {
-  let instance: Lineage
+  const selectedNode = 'job_foo'
+  let g: graphlib.Graph<MqNode>
 
   beforeEach(() => {
-    instance = new Lineage(({ selectedNode: 'job_foo' } as unknown) as LineageProps)
-    instance.setState = mockSetState
-    instance.initGraph()
-    instance.buildGraphAll((mockGraphWithCycle as unknown) as LineageNode[])
+    g = initGraph()
+    buildGraphAll(g, mockGraphWithCycle, (gResult: graphlib.Graph<MqNode>) => {
+      g = gResult
+    })
   })
 
   it("doesn't follow cycles in the lineage graph", () => {
-    const paths = instance.getSelectedPaths()
+    const paths = getSelectedPaths(g, selectedNode)
 
     const pathCounts = paths.reduce((acc, p) => {
       const pathId = p.join(':')
@@ -94,7 +103,7 @@ describe('Lineage Component', () => {
   })
 
   it('renders a valid cycle', () => {
-    const actualPaths = instance.getSelectedPaths()
+    const actualPaths = getSelectedPaths(g, selectedNode)
 
     const expectedPaths = [
       ['job_foo', 'dataset_bar'],

@@ -3,19 +3,46 @@
 
 import React, { ReactElement } from 'react'
 
-import { Link } from 'react-router-dom'
+import { Box } from '@mui/system'
+import { Link as LinkRouter } from 'react-router-dom'
 import { THEME_EXTRA } from '../../../helpers/theme'
-import { Theme, WithStyles, createStyles } from '@material-ui/core'
-import { alpha } from '@material-ui/core/styles'
-import classNames from 'classnames'
-import withStyles from '@material-ui/core/styles/withStyles'
+import { Typography } from '@mui/material'
+import { alpha, createTheme } from '@mui/material/styles'
+import { useTheme } from '@emotion/react'
+import Link from '@mui/material/Link'
 
-const styles = (theme: Theme) =>
-  createStyles({
+interface OwnProps {
+  heading?: boolean
+  subheading?: boolean
+  bold?: boolean
+  disabled?: boolean
+  subdued?: boolean
+  label?: boolean
+  inline?: boolean
+  inverse?: boolean
+  highlight?: boolean
+  paragraph?: boolean
+  color?: string
+  link?: boolean
+  href?: string
+  linkTo?: string
+  font?: 'primary' | 'mono'
+  small?: boolean
+  bottomMargin?: boolean
+  children: ReactElement | (string | ReactElement)[] | string | string[] | number | undefined | null
+}
+
+type MqTextProps = OwnProps
+
+const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, label, font, bottomMargin, subdued, children, link, linkTo, paragraph, href, inverse, inline, highlight, color, small }) => {
+
+  const theme = createTheme(useTheme())
+
+  const classesObject = {
     root: {
       lineHeight: 1.5,
       fontSize: '.875rem',
-      fontFamily: `${'Karla'}, sans-serif`,
+      fontFamily: 'Karla, sans-serif',
       margin: 0,
       padding: 0,
       color: theme.palette.common.white,
@@ -72,110 +99,66 @@ const styles = (theme: Theme) =>
     paragraph: {
       marginBottom: theme.spacing(2)
     }
-  })
+  }
 
-interface OwnProps {
-  heading?: boolean
-  subheading?: boolean
-  bold?: boolean
-  disabled?: boolean
-  subdued?: boolean
-  label?: boolean
-  inline?: boolean
-  inverse?: boolean
-  highlight?: boolean
-  paragraph?: boolean
-  color?: string
-  link?: boolean
-  href?: string
-  linkTo?: string
-  font?: 'primary' | 'mono'
-  small?: boolean
-  bottomMargin?: boolean
-  children: ReactElement | (string | ReactElement)[] | string | string[] | number | undefined | null
-}
+  const conditionalClasses = Object.assign({},
+    subdued ? classesObject.subdued : {},
+    bold ? classesObject.bold : {},
+    label ? classesObject.label : {},
+    disabled ? classesObject.disabled : {},
+    highlight ? classesObject.highlight : {},
+    font === 'mono' ? classesObject.mono : {},
+    bottomMargin ? classesObject.bottomMargin : {},
+    inverse ? classesObject.inverse : {},
+    inline ? classesObject.inline : {},
+    small ? classesObject.small : {},
+    link ? classesObject.link : {},
+    paragraph ? classesObject.paragraph : {},
+    subheading ? classesObject.subheading : {}
+  )
 
-type MqTextProps = WithStyles<typeof styles> & OwnProps
+  const style = {
+    color: color && color
+  }
 
-class MqText extends React.Component<MqTextProps> {
-  render() {
-    const {
-      classes,
-      heading,
-      subheading,
-      bold,
-      disabled,
-      label,
-      font,
-      bottomMargin,
-      subdued,
-      children,
-      link,
-      linkTo,
-      paragraph,
-      href,
-      inverse,
-      inline,
-      highlight,
-      color,
-      small
-    } = this.props
-
-    const conditionalClasses = classNames(
-      subdued && classes.subdued,
-      bold && classes.bold,
-      label && classes.label,
-      disabled && classes.disabled,
-      highlight && classes.highlight,
-      font === 'mono' && classes.mono,
-      bottomMargin && classes.bottomMargin,
-      inverse && classes.inverse,
-      inline && classes.inline,
-      small && classes.small,
-      link && classes.link,
-      paragraph && classes.paragraph,
-      subheading && classes.subheading
+  if (heading) {
+    return (
+      <Typography variant='h4' sx={Object.assign(classesObject.root, classesObject.heading, conditionalClasses)} style={style}>
+        {children}
+      </Typography>
     )
+  } else if (link && linkTo) {
+    return (
 
-    const style = {
-      color: color && color
-    }
+      <LinkRouter
+        to={linkTo}
+        aria-disabled={disabled}
+        style={{ textDecoration: 'none' }}
+      >
+        <Box component="span" sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}>
+        {children}
+        </Box>
+      </LinkRouter>
+    )
+  } else if (link && href) {
+    return (
+      <Link
+        href={href}
+        target={'_blank'}
+        rel='noopener noreferrer'
+        sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
+      >
+        {children}
+      </Link>
 
-    if (heading) {
-      return (
-        <h4 className={classNames(classes.root, classes.heading, conditionalClasses)} style={style}>
-          {children}
-        </h4>
-      )
-    } else if (link && linkTo) {
-      return (
-        <Link
-          to={linkTo}
-          aria-disabled={disabled}
-          className={classNames(classes.root, classes.link, conditionalClasses)}
-        >
-          {children}
-        </Link>
-      )
-    } else if (link && href) {
-      return (
-        <a
-          href={href}
-          target={'_blank'}
-          rel='noopener noreferrer'
-          className={classNames(classes.root, classes.link, conditionalClasses)}
-        >
-          {children}
-        </a>
-      )
-    } else {
-      return (
-        <div className={classNames(classes.root, conditionalClasses)} style={style}>
-          {children}
-        </div>
-      )
-    }
+    )
+  } else {
+    return (
+      <Box sx={Object.assign(classesObject.root, conditionalClasses)} style={style}>
+        {children}
+      </Box>
+    )
   }
 }
 
-export default withStyles(styles)(MqText)
+export default MqText

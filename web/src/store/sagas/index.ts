@@ -16,11 +16,13 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH
 } from '../actionCreators/actionTypes'
-import { Namespaces } from '../../types/api'
+import { Dataset, DatasetVersion, Event, Facets, LineageGraph, Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
 
+import { Job } from '../../types/api'
+import { Search } from '../../types/api'
 import {
   applicationError,
   deleteDatasetSuccess,
@@ -66,7 +68,7 @@ export function* fetchLineage() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_LINEAGE)
-      const result = yield call(
+      const result: LineageGraph = yield call(
         getLineage,
         payload.nodeType,
         payload.namespace,
@@ -84,7 +86,7 @@ export function* fetchSearch() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_SEARCH)
-      const result = yield call(getSearch, payload.q, payload.filter, payload.sort)
+      const result: Search = yield call(getSearch, payload.q, payload.filter, payload.sort)
       yield put(fetchSearchSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching search'))
@@ -108,7 +110,7 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const jobs = yield call(getJobs, payload.namespace)
+      const jobs: Job[] = yield call(getJobs, payload.namespace)
       yield put(fetchJobsSuccess(jobs))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
@@ -120,7 +122,7 @@ export function* deleteJobSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_JOB)
-      const job = yield call(deleteJob, payload.jobName, payload.namespace)
+      const job: Job = yield call(deleteJob, payload.jobName, payload.namespace)
       yield put(deleteJobSuccess(job.name))
     } catch (e) {
       yield put(applicationError('Something went wrong while removing job'))
@@ -132,7 +134,7 @@ export function* fetchDatasetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASETS)
-      const datasets = yield call(getDatasets, payload.namespace)
+      const datasets: Dataset[] = yield call(getDatasets, payload.namespace)
       yield put(fetchDatasetsSuccess(datasets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
@@ -144,7 +146,7 @@ export function* fetchEventsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_EVENTS)
-      const events = yield call(getEvents, payload.after, payload.before, payload.limit)
+      const events: Event[] = yield call(getEvents, payload.after, payload.before, payload.limit)
       yield put(fetchEventsSuccess(events))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching event runs'))
@@ -156,7 +158,7 @@ export function* fetchDatasetSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET)
-      const datasets = yield call(getDataset, payload.namespace, payload.name)
+      const datasets: Dataset = yield call(getDataset, payload.namespace, payload.name)
       yield put(fetchDatasetSuccess(datasets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset'))
@@ -168,7 +170,7 @@ export function* deleteDatasetSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_DATASET)
-      const dataset = yield call(deleteDataset, payload.datasetName, payload.namespace)
+      const dataset: Dataset = yield call(deleteDataset, payload.datasetName, payload.namespace)
       yield put(deleteDatasetSuccess(dataset.name))
     } catch (e) {
       yield put(applicationError('Something went wrong while removing job'))
@@ -180,7 +182,7 @@ export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET_VERSIONS)
-      const datasets = yield call(getDatasetVersions, payload.namespace, payload.name)
+      const datasets: DatasetVersion[] = yield call(getDatasetVersions, payload.namespace, payload.name)
       yield put(fetchDatasetVersionsSuccess(datasets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
@@ -192,7 +194,7 @@ export function* fetchJobFacetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOB_FACETS)
-      const jobFacets = yield call(getJobFacets, payload.runId)
+      const jobFacets: Facets = yield call(getJobFacets, payload.runId)
       yield put(fetchFacetsSuccess(jobFacets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job facets'))
@@ -204,7 +206,7 @@ export function* fetchRunFacetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_RUN_FACETS)
-      const runFacets = yield call(getRunFacets, payload.runId)
+      const runFacets: Facets = yield call(getRunFacets, payload.runId)
       yield put(fetchFacetsSuccess(runFacets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching run facets'))
