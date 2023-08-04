@@ -60,7 +60,9 @@ public class ExtendedRunRow extends RunRow {
         startedAt,
         startRunStateUuid,
         endedAt,
-        endRunStateUuid);
+        endRunStateUuid,
+        jobName,
+        namespaceName);
     this.inputVersions = inputVersions;
     this.outputVersions = outputVersions;
     this.args = args;

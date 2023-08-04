@@ -91,6 +91,10 @@ public final class CommonModelGenerator extends Generator {
     return DatasetType.values()[newIdWithBound(DatasetType.values().length - 1)];
   }
 
+  public static DatasetName newPhysicalDatasetName() {
+    return DatasetName.of("test_physical_dataset" + newId());
+  }
+
   public static Field newField() {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
   }

@@ -140,6 +140,7 @@ public final class Columns {
 
   /* LINEAGE EVENT ROW COLUMNS */
   public static final String EVENT = "event";
+  public static final String EVENT_TIME = "event_time";
 
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {

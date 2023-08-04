@@ -20,4 +20,12 @@ public class LineageEvent {
   List<Object> inputs;
   List<Object> outputs;
   URI producer;
+  URI schemaURL;
+
+  public URI getSchemaURL() {
+    if (schemaURL == null) {
+      return URI.create("https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent");
+    }
+    return schemaURL;
+  }
 }

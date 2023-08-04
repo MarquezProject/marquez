@@ -301,7 +301,6 @@ public interface RunDao extends BaseDao {
       UUID runArgsUuid,
       Instant nominalStartTime,
       Instant nominalEndTime,
-      UUID namespaceUuid,
       String namespaceName,
       String jobName,
       String location);

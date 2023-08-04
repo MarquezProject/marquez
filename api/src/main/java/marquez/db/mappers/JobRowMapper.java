@@ -40,6 +40,7 @@ public final class JobRowMapper implements RowMapper<JobRow> {
         stringOrThrow(results, Columns.TYPE),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
+        uuidOrNull(results, Columns.NAMESPACE_UUID),
         stringOrThrow(results, Columns.NAMESPACE_NAME),
         stringOrThrow(results, Columns.NAME),
         stringOrThrow(results, Columns.SIMPLE_NAME),

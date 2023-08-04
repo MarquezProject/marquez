@@ -33,6 +33,8 @@ public class RunRow {
   @Nullable private final UUID startRunStateUuid;
   @Nullable private final Instant endedAt;
   @Nullable private final UUID endRunStateUuid;
+  @Getter @Nullable private final String jobName;
+  @Getter @Nullable private final String namespaceName;
 
   public Optional<UUID> getParentRunUuid() {
     return Optional.ofNullable(parentRunUuid);
