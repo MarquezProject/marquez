@@ -26,6 +26,7 @@ i18next
             docs_link: 'API Docs'
           },
           jobs: {
+            search: 'Search',
             latest_tab: 'LATEST RUN',
             history_tab: 'RUN HISTORY',
             location: 'LOCATION',
@@ -38,6 +39,15 @@ i18next
             dialog_confirmation_title: 'Are you sure?'
           },
           search: {
+            filter: {
+              all: 'All',
+              jobs: 'Jobs',
+              datasets: 'Datasets',
+              updated: 'Updated',
+              name: 'Name'
+            },
+            status: 'Searching...',
+            none: 'No Results',
             search: 'Search',
             search_aria: 'Search jobs and datasets',
             jobs: 'Jobs',
@@ -140,6 +150,7 @@ i18next
             docs_link: 'Documents API'
           },
           jobs: {
+            search: 'Recherche',
             latest_tab: 'DERNIÈRE COURSE',
             history_tab: "HISTORIQUE D'EXECUTION",
             location: 'EMPLACEMENT',
@@ -152,6 +163,15 @@ i18next
             dialog_confirmation_title: 'Êtes-vous sûr?'
           },
           search: {
+            filter: {
+              all: 'Tout',
+              jobs: "d'Emplois",
+              datasets: 'Jeux de Données',
+              updated: 'Mis à jour',
+              name: 'Nom'
+            },
+            status: 'Recherche...',
+            none: 'Aucun Résultat',
             search: 'Recherche',
             search_aria: 'Recherchez des emplois et des ensembles de données',
             jobs: "d'Emplois",
@@ -257,6 +277,7 @@ i18next
             docs_link: 'Documentos API'
           },
           jobs: {
+            search: 'Buscar',
             latest_tab: 'ÚLTIMA EJECUCIÓN',
             history_tab: 'HISTORIAL DE EJECUCIONES',
             location: 'UBICACIÓN',
@@ -269,6 +290,15 @@ i18next
             dialog_confirmation_title: 'Estás seguro?'
           },
           search: {
+            filter: {
+              all: 'Todo',
+              jobs: 'Trabajos',
+              datasets: 'Conjuntos de Datos',
+              updated: 'Actualizado',
+              name: 'Nombre'
+            },
+            status: 'Buscando...',
+            none: 'No Hay Resultados',
             search: 'Buscar',
             search_aria: 'Buscar trabajos y conjuntos de datos',
             jobs: 'Trabajos',
@@ -374,6 +404,7 @@ i18next
             docs_link: 'Dokumentacja API'
           },
           jobs: {
+            search: 'Wyszukiwanie',
             latest_tab: 'OSTATNI WYKONANIE',
             history_tab: 'HISTORIA WYKONAŃ',
             location: 'LOKALIZACJA',
@@ -386,6 +417,15 @@ i18next
             dialog_confirmation_title: 'Jesteś pewny?'
           },
           search: {
+            filter: {
+              all: 'Wszystko',
+              jobs: 'Zadania',
+              datasets: 'Zbiory Danych',
+              updated: 'Zaktualizowano',
+              name: 'Nazwa'
+            },
+            status: 'Badawczy...',
+            none: 'Brak Wyników',
             search: 'Wyszukiwanie',
             search_aria: 'Wyszukiwanie zadań i zbiorów danych',
             jobs: 'Zadania',

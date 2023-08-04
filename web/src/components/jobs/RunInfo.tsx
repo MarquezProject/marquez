@@ -69,7 +69,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
             searchable={true} 
             aria-label={i18next.t('jobs.facets_subhead_aria')} 
             aria-required='true' 
-            placeholder='Search' 
+            placeholder={i18next.t('jobs.search')} 
           />
         </Box>
       )}
