@@ -19,23 +19,29 @@ const Header = (): ReactElement => {
   const theme = createTheme(useTheme())
 
   return (
-    <AppBar position='fixed' elevation={0} sx={{
-      zIndex: theme.zIndex.drawer + 1,
-      backgroundColor: theme.palette.background.default,
-      borderBottom: `2px dashed ${theme.palette.secondary.main}`,
-      padding: `${theme.spacing(2)} 0`,
-      left: `${DRAWER_WIDTH + 1}px`,
-      width: `calc(100% - ${DRAWER_WIDTH}px)`
-    }}>
+    <AppBar
+      position='fixed'
+      elevation={0}
+      sx={{
+        zIndex: theme.zIndex.drawer + 1,
+        backgroundColor: theme.palette.background.default,
+        borderBottom: `2px dashed ${theme.palette.secondary.main}`,
+        padding: `${theme.spacing(2)} 0`,
+        left: `${DRAWER_WIDTH + 1}px`,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+      }}
+    >
       <Toolbar>
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          maxWidth: theme.breakpoints.values.lg,
-          width: theme.breakpoints.values.lg,
-          margin: '0 auto'
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            maxWidth: theme.breakpoints.values.lg,
+            width: theme.breakpoints.values.lg,
+            margin: '0 auto',
+          }}
+        >
           <Link to='/'>
             <img src={marquez_logo} height={48} alt='Marquez Logo' />
           </Link>

@@ -48,10 +48,7 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
   const ariaJobLabel = 'Job'
   const ariaDatasetLabel = 'Dataset'
   return (
-    <Link
-      to={determineLink(node)}
-      onClick={() => node.label && setSelectedNode(node.label)}
-    >
+    <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
       {job ? (
         <g>
           <circle
@@ -117,7 +114,7 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setSelectedNode: setSelectedNode
+      setSelectedNode: setSelectedNode,
     },
     dispatch
   )

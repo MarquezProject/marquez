@@ -26,7 +26,6 @@ interface StateProps {
 type BottomBarProps = StateProps & OwnProps
 
 const BottomBar: React.FC<BottomBarProps> = ({ bottomBarHeight, selectedNodeData }) => {
-
   const theme = createTheme(useTheme())
 
   if (!selectedNodeData) {
@@ -35,19 +34,24 @@ const BottomBar: React.FC<BottomBarProps> = ({ bottomBarHeight, selectedNodeData
   const lineageJob = isLineageJob(selectedNodeData.data)
   const lineageDataset = isLineageDataset(selectedNodeData.data)
   return (
-    <Box sx={{
-      marginLeft: `${DRAWER_WIDTH}px`,
-      right: 0,
-      width: `calc(100% - ${DRAWER_WIDTH}px)`,
-      bottom: 0,
-      position: 'fixed',
-      zIndex: theme.zIndex.appBar + 1
-    }}>
+    <Box
+      sx={{
+        marginLeft: `${DRAWER_WIDTH}px`,
+        right: 0,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+        bottom: 0,
+        position: 'fixed',
+        zIndex: theme.zIndex.appBar + 1,
+      }}
+    >
       <DragBar />
-      <Box sx={{
-        overflow: 'auto',
-        backgroundColor: theme.palette.background.default
-      }} height={bottomBarHeight}>
+      <Box
+        sx={{
+          overflow: 'auto',
+          backgroundColor: theme.palette.background.default,
+        }}
+        height={bottomBarHeight}
+      >
         <Container maxWidth={'lg'} disableGutters={true}>
           {lineageJob && <JobDetailPage job={lineageJob} />}
           {lineageDataset && <DatasetDetailPage lineageDataset={lineageDataset} />}
@@ -59,7 +63,9 @@ const BottomBar: React.FC<BottomBarProps> = ({ bottomBarHeight, selectedNodeData
 
 const mapStateToProps = (state: IState) => ({
   bottomBarHeight: state.lineage.bottomBarHeight,
-  selectedNodeData: state.lineage.lineage.graph.find(node => state.lineage.selectedNode === node.id)
+  selectedNodeData: state.lineage.lineage.graph.find(
+    (node) => state.lineage.selectedNode === node.id
+  ),
 })
 
 export default connect(mapStateToProps)(BottomBar)

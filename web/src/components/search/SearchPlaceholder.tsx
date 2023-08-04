@@ -11,21 +11,23 @@ const importI18next = () => {
   return i18next
 }
 
-interface SearchPlaceholderProps { }
+interface SearchPlaceholderProps {}
 
 const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
   const i18next = importI18next()
   return (
-    <Box sx={{
-      zIndex: theme.zIndex.appBar + 3,
-      position: 'absolute',
-      left: 122,
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      overflow: 'visible',
-      pointerEvents: 'none'
-    }}>
+    <Box
+      sx={{
+        zIndex: theme.zIndex.appBar + 3,
+        position: 'absolute',
+        left: 122,
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'visible',
+        pointerEvents: 'none',
+      }}
+    >
       <Box display={'inline'}>
         <MqText disabled inline>
           {' '}

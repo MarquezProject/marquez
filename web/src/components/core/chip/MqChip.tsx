@@ -31,9 +31,8 @@ const MqChip: React.FC<MqChipProps> = ({
   value,
   foregroundColor,
   backgroundColor,
-  selectable
+  selectable,
 }) => {
-
   const theme = createTheme(useTheme())
 
   return (

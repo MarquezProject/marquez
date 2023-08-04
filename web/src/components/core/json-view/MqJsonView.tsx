@@ -21,15 +21,24 @@ type JsonViewProps = OwnProps
 const InputSearchJsonView: React.FC<MqInputBaseProps> = (props) => {
   const theme = createTheme(useTheme())
 
-  return <MqInputBase {...props} sx={{
-    ...props.sx,
-    padding: `${theme.spacing(1)} ${theme.spacing(2)}`
-  }} />
+  return (
+    <MqInputBase
+      {...props}
+      sx={{
+        ...props.sx,
+        padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
+      }}
+    />
+  )
 }
 
-const MqJsonView: React.FC<JsonViewProps> = ({ data, searchable = false, placeholder = 'Search' }) => {
+const MqJsonView: React.FC<JsonViewProps> = ({
+  data,
+  searchable = false,
+  placeholder = 'Search',
+}) => {
   const [state, setState] = React.useState<StateProps>({
-    search: ''
+    search: '',
   })
 
   const onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -40,27 +49,26 @@ const MqJsonView: React.FC<JsonViewProps> = ({ data, searchable = false, placeho
 
   return (
     <>
-      {searchable &&
+      {searchable && (
         <InputSearchJsonView
           sx={{
-            marginBottom: theme.spacing(2)
+            marginBottom: theme.spacing(2),
           }}
-          onChange={event => onSearch(event)}
+          onChange={(event) => onSearch(event)}
           value={state.search}
           autoComplete={'off'}
           id={'json-view'}
           placeholder={placeholder}
         />
-      }
+      )}
       <JSONTree
         data={data}
         theme={'rjv_white'}
         collectionLimit={2}
-      // highlightSearch={search} // TODO find a solution to do this
+        // highlightSearch={search} // TODO find a solution to do this
       />
     </>
   )
 }
-
 
 export default MqJsonView

@@ -10,7 +10,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
 } from '@mui/material'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
@@ -29,7 +29,7 @@ interface RunsProps {
   facets?: object
 }
 
-const Runs: FunctionComponent<RunsProps> = props => {
+const Runs: FunctionComponent<RunsProps> = (props) => {
   const { runs, facets } = props
   const i18next = require('i18next')
   if (runs.length === 0) {
@@ -44,15 +44,17 @@ const Runs: FunctionComponent<RunsProps> = props => {
   const theme = createTheme(useTheme())
 
   if (infoView) {
-    return <>
-      <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-        <Chip label={infoView.id} />
-        <IconButton onClick={() => handleClick(null)} size="large">
-          <ArrowBackIosRounded fontSize={'small'} />
-        </IconButton>
-      </Box>
-      <RunInfo run={infoView} />
-    </>
+    return (
+      <>
+        <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+          <Chip label={infoView.id} />
+          <IconButton onClick={() => handleClick(null)} size='large'>
+            <ArrowBackIosRounded fontSize={'small'} />
+          </IconButton>
+        </Box>
+        <RunInfo run={infoView} />
+      </>
+    )
   }
 
   return (
@@ -93,15 +95,19 @@ const Runs: FunctionComponent<RunsProps> = props => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {runs.map(run => {
+          {runs.map((run) => {
             return (
-              <TableRow key={run.id} sx={{
-                cursor: 'pointer',
-                transition: theme.transitions.create(['background-color']),
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.common.white, 0.1)
-                }
-              }} onClick={() => handleClick(run)}>
+              <TableRow
+                key={run.id}
+                sx={{
+                  cursor: 'pointer',
+                  transition: theme.transitions.create(['background-color']),
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.common.white, 0.1),
+                  },
+                }}
+                onClick={() => handleClick(run)}
+              >
                 <TableCell align='left'>{run.id}</TableCell>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>

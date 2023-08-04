@@ -32,7 +32,6 @@ export interface SqlFacet {
   query: string
 }
 
-
 type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
@@ -40,7 +39,7 @@ type DatasetInfoProps = {
 } & JobFacetsProps &
   DispatchProps
 
-const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
+const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
 
@@ -86,7 +85,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {datasetFields.map(field => {
+            {datasetFields.map((field) => {
               return (
                 <TableRow key={field.name}>
                   <TableCell align='left'>{field.name}</TableCell>
@@ -121,7 +120,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </Box>
             <MqText subdued>{run.jobVersion && run.jobVersion.name}</MqText>
           </Box>
-          {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
+          {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
         </Box>
       )}
     </Box>
@@ -129,19 +128,16 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobFacets: state.facets.result
+  jobFacets: state.facets.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   Redux.bindActionCreators(
     {
       fetchJobFacets: fetchJobFacets,
-      resetFacets: resetFacets
+      resetFacets: resetFacets,
     },
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DatasetInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetInfo)

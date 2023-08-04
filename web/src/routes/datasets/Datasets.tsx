@@ -2,7 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Container, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, createTheme } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import {
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  createTheme,
+} from '@mui/material'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -12,14 +22,13 @@ import { connect } from 'react-redux'
 import { datasetFacetsStatus, encodeNode } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
-import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
-import { useTheme } from '@emotion/react'
-import IconButton from '@mui/material/IconButton'
 
 interface StateProps {
   datasets: Dataset[]
@@ -41,7 +50,14 @@ interface DispatchProps {
 
 type DatasetsProps = StateProps & DispatchProps
 
-const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isDatasetsInit, selectedNamespace, fetchDatasets, resetDatasets }) => {
+const Datasets: React.FC<DatasetsProps> = ({
+  datasets,
+  isDatasetsLoading,
+  isDatasetsInit,
+  selectedNamespace,
+  fetchDatasets,
+  resetDatasets,
+}) => {
   const PAGE_SIZE = 20
   const mounted = React.useRef<boolean>(false)
   const prevSelectedNamespace = React.useRef<Nullable<string>>()
@@ -49,8 +65,8 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
   const defaultState = {
     datasets: [],
     page: 1,
-    pageIsLast: false
-  };
+    pageIsLast: false,
+  }
   const [state, setState] = React.useState<DatasetsState>(defaultState)
 
   const theme = createTheme(useTheme())
@@ -64,10 +80,7 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
       mounted.current = true
     } else {
       // on update
-      if (
-        prevSelectedNamespace.current !== selectedNamespace &&
-        selectedNamespace
-      ) {
+      if (prevSelectedNamespace.current !== selectedNamespace && selectedNamespace) {
         fetchDatasets(selectedNamespace, PAGE_SIZE)
         setState(defaultState)
       }
@@ -76,7 +89,7 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
         setState({
           ...state,
           datasets,
-          pageIsLast: datasets.length < state.page * PAGE_SIZE
+          pageIsLast: datasets.length < state.page * PAGE_SIZE,
         })
       }
 
@@ -93,15 +106,16 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
 
   const pageNavigation = () => {
     const { datasets, page, pageIsLast } = state
-    const titlePos = datasets.length < PAGE_SIZE && page === 1
-      ? `1 - ${datasets.length}`
-      : datasets.length > PAGE_SIZE && page === 1
+    const titlePos =
+      datasets.length < PAGE_SIZE && page === 1
+        ? `1 - ${datasets.length}`
+        : datasets.length > PAGE_SIZE && page === 1
         ? `1 - ${PAGE_SIZE}`
         : datasets.length && page > 1 && pageIsLast === false
-          ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${PAGE_SIZE * page}`
-          : datasets.length && page > 1 && pageIsLast
-            ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${datasets.length}`
-            : `${datasets.length}`
+        ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${PAGE_SIZE * page}`
+        : datasets.length && page > 1 && pageIsLast
+        ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${datasets.length}`
+        : `${datasets.length}`
     return `${page} (${titlePos})`
   }
 
@@ -127,35 +141,37 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
             </Box>
           ) : (
             <>
-                <Box display={'flex'} justifyContent={'space-between'} p={2}>
-                  <Box>
-                    <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
-                    Page: {pageNavigation()}
-                  </Box>
-                  <Box>
-                    <Tooltip title={i18next.t('events_route.previous_page')}>
-                      <IconButton
-                        sx={{
-                          marginLeft: theme.spacing(2)
-                        }}
-                        color='primary'
-                        disabled={state.page === 1}
-                        onClick={() => handleClickPage('prev')}
-                        size="large">
-                        <ChevronLeftRounded />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={i18next.t('events_route.next_page')}>
-                      <IconButton
-                        color='primary'
-                        disabled={state.pageIsLast}
-                        onClick={() => handleClickPage('next')}
-                        size="large">
-                        <ChevronRightRounded />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
+              <Box display={'flex'} justifyContent={'space-between'} p={2}>
+                <Box>
+                  <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                  Page: {pageNavigation()}
                 </Box>
+                <Box>
+                  <Tooltip title={i18next.t('events_route.previous_page')}>
+                    <IconButton
+                      sx={{
+                        marginLeft: theme.spacing(2),
+                      }}
+                      color='primary'
+                      disabled={state.page === 1}
+                      onClick={() => handleClickPage('prev')}
+                      size='large'
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={i18next.t('events_route.next_page')}>
+                    <IconButton
+                      color='primary'
+                      disabled={state.pageIsLast}
+                      onClick={() => handleClickPage('next')}
+                      size='large'
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
               <Table size='small'>
                 <TableHead>
                   <TableRow>
@@ -178,8 +194,8 @@ const Datasets: React.FC<DatasetsProps> = ({ datasets, isDatasetsLoading, isData
                 </TableHead>
                 <TableBody>
                   {datasets
-                    .filter(dataset => !dataset.deleted)
-                    .map(dataset => {
+                    .filter((dataset) => !dataset.deleted)
+                    .map((dataset) => {
                       return (
                         <TableRow key={dataset.name}>
                           <TableCell align='left'>
@@ -229,14 +245,14 @@ const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
   isDatasetsLoading: state.datasets.isLoading,
   isDatasetsInit: state.datasets.init,
-  selectedNamespace: state.namespaces.selectedNamespace
+  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasets: fetchDatasets,
-      resetDatasets: resetDatasets
+      resetDatasets: resetDatasets,
     },
     dispatch
   )

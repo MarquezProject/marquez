@@ -31,7 +31,7 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
       window.removeEventListener('mousemove', handleMousemove)
       window.removeEventListener('mouseup', handleMouseup)
     }
-  }, [isResizing]);
+  }, [isResizing])
 
   const handleMousedown = () => {
     console.log('handleMousedown', isResizing)
@@ -54,33 +54,42 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
 
   return (
     <Box
-      sx={Object.assign({
-        backgroundColor: theme.palette.secondary.main,
-        height: theme.spacing(1),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-evenly',
-        cursor: 'ns-resize',
-        transition: theme.transitions.create(['background-color']),
-        '&:hover': {
-          backgroundColor: theme.palette.primary.main
-        }
-      }, isResizing ? {
-        backgroundColor: theme.palette.primary.main
-      } : {})}
+      sx={Object.assign(
+        {
+          backgroundColor: theme.palette.secondary.main,
+          height: theme.spacing(1),
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          cursor: 'ns-resize',
+          transition: theme.transitions.create(['background-color']),
+          '&:hover': {
+            backgroundColor: theme.palette.primary.main,
+          },
+        },
+        isResizing
+          ? {
+              backgroundColor: theme.palette.primary.main,
+            }
+          : {}
+      )}
       onMouseDown={handleMousedown}
     >
-      <Box sx={{
-        width: theme.spacing(5),
-        height: '1px',
-        backgroundColor: theme.palette.common.white
-      }} />
-      <Box sx={{
-        width: theme.spacing(5),
-        height: '1px',
-        backgroundColor: theme.palette.common.white
-      }} />
+      <Box
+        sx={{
+          width: theme.spacing(5),
+          height: '1px',
+          backgroundColor: theme.palette.common.white,
+        }}
+      />
+      <Box
+        sx={{
+          width: theme.spacing(5),
+          height: '1px',
+          backgroundColor: theme.palette.common.white,
+        }}
+      />
     </Box>
   )
 }
@@ -88,7 +97,7 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setBottomBarHeight: setBottomBarHeight
+      setBottomBarHeight: setBottomBarHeight,
     },
     dispatch
   )

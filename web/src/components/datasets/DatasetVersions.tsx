@@ -17,7 +17,7 @@ interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
 
-const DatasetVersions: FunctionComponent<DatasetVersionsProps> = props => {
+const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
   const { versions } = props
 
   const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)
@@ -31,19 +31,21 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = props => {
     return null
   }
   if (infoView) {
-    return <>
-      <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-        <Chip label={infoView.version} />
-        <IconButton onClick={() => handleClick(null)} size="large">
-          <ArrowBackIosRounded fontSize={'small'} />
-        </IconButton>
-      </Box>
-      <DatasetInfo
-        datasetFields={infoView.fields}
-        facets={infoView.facets}
-        run={infoView.createdByRun}
-      />
-    </>
+    return (
+      <>
+        <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+          <Chip label={infoView.version} />
+          <IconButton onClick={() => handleClick(null)} size='large'>
+            <ArrowBackIosRounded fontSize={'small'} />
+          </IconButton>
+        </Box>
+        <DatasetInfo
+          datasetFields={infoView.fields}
+          facets={infoView.facets}
+          run={infoView.createdByRun}
+        />
+      </>
+    )
   }
   return (
     <Table size='small'>
@@ -77,15 +79,15 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = props => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {versions.map(version => {
+        {versions.map((version) => {
           return (
             <TableRow
               sx={{
                 cursor: 'pointer',
                 transition: theme.transitions.create(['background-color']),
                 '&:hover': {
-                  backgroundColor: alpha(theme.palette.common.white, 0.1)
-                }
+                  backgroundColor: alpha(theme.palette.common.white, 0.1),
+                },
               }}
               key={version.createdAt}
               onClick={() => handleClick(version)}

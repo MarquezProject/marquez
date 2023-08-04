@@ -15,11 +15,7 @@ interface OwnProps {
   description?: string
 }
 
-const MqCode: React.FC<OwnProps> = ({
-  code,
-  description,
-  language
-}) => {
+const MqCode: React.FC<OwnProps> = ({ code, description, language }) => {
   return (
     <Box>
       {description && (
@@ -35,7 +31,7 @@ const MqCode: React.FC<OwnProps> = ({
         customStyle={{
           backgroundColor: alpha(theme.palette.common.white, 0.1),
           borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
-          padding: theme.spacing(2)
+          padding: theme.spacing(2),
         }}
       >
         {code ? code : 'No code available'}

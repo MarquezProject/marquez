@@ -31,7 +31,7 @@ interface DispatchProps {
 
 type IProps = DatasetColumnLineageProps & DispatchProps & StateProps
 
-const DatasetColumnLineage: FunctionComponent<IProps> = props => {
+const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
   const { dataset, lineageDataset, fetchDataset, resetDataset } = props
   const columnLineage = dataset.columnLineage
 
@@ -90,14 +90,14 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  dataset: state.dataset.result
+  dataset: state.dataset.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDataset: fetchDataset,
-      resetDataset: resetDataset
+      resetDataset: resetDataset,
     },
     dispatch
   )

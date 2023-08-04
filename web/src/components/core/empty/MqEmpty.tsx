@@ -14,25 +14,24 @@ interface MqEmptyProps {
   children?: ReactElement
 }
 
-const MqEmpty: React.FC<MqEmptyProps> = ({
-  title,
-  body,
-  emoji,
-  children
-}) => {
+const MqEmpty: React.FC<MqEmptyProps> = ({ title, body, emoji, children }) => {
   const theme = createTheme(useTheme())
 
   return (
-    <Box sx={{
-      display: 'flex',
-      justifyContent: 'center'
-    }}>
-      <Box sx={{
-        padding: theme.spacing(2),
-        border: `2px dashed ${theme.palette.secondary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        width: '400px'
-      }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+      <Box
+        sx={{
+          padding: theme.spacing(2),
+          border: `2px dashed ${theme.palette.secondary.main}`,
+          borderRadius: theme.shape.borderRadius,
+          width: '400px',
+        }}
+      >
         {title && (
           <Box mb={1}>
             <MqText heading>{title}</MqText>
@@ -45,12 +44,15 @@ const MqEmpty: React.FC<MqEmptyProps> = ({
         )}
         {children && <Box>{children}</Box>}
         {emoji && (
-          <Box sx={{
-            padding: theme.spacing(2),
-            border: `2px dashed ${theme.palette.secondary.main}`,
-            borderRadius: theme.shape.borderRadius,
-            width: '400px'
-          }} mt={1}>
+          <Box
+            sx={{
+              padding: theme.spacing(2),
+              border: `2px dashed ${theme.palette.secondary.main}`,
+              borderRadius: theme.shape.borderRadius,
+              width: '400px',
+            }}
+            mt={1}
+          >
             <span role={'img'} aria-label={'icon'}>
               {emoji}
             </span>

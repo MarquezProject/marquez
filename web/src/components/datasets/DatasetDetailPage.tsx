@@ -16,7 +16,7 @@ import {
   dialogToggle,
   fetchDatasetVersions,
   resetDataset,
-  resetDatasetVersions
+  resetDatasetVersions,
 } from '../../store/actionCreators'
 import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
@@ -52,11 +52,11 @@ type IProps = StateProps & DispatchProps
 function a11yProps(index: number) {
   return {
     id: `tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`
+    'aria-controls': `simple-tabpanel-${index}`,
   }
 }
 
-const DatasetDetailPage: FunctionComponent<IProps> = props => {
+const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
     display,
@@ -67,7 +67,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     dialogToggle,
     versions,
     versionsLoading,
-    lineageDataset
+    lineageDataset,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
@@ -114,22 +114,34 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   return (
-    <Box my={2} sx={{
-      padding: `0 ${theme.spacing(2)}`
-    }}>
+    <Box
+      my={2}
+      sx={{
+        padding: `0 ${theme.spacing(2)}`,
+      }}
+    >
       <Box>
         {tags.length > 0 && (
-          <ul style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            listStyle: 'none',
-            margin: 0,
-            padding: 0
-          }}>
+          <ul
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              listStyle: 'none',
+              margin: 0,
+              padding: 0,
+            }}
+          >
             {tags.map((tag, index) => (
-              <li key={tag} style={index < tags.length - 1 ? {
-                marginRight: theme.spacing(1)
-              } : {}}>
+              <li
+                key={tag}
+                style={
+                  index < tags.length - 1
+                    ? {
+                        marginRight: theme.spacing(1),
+                      }
+                    : {}
+                }
+              >
                 <Chip size='small' label={tag} />
               </li>
             ))}
@@ -164,8 +176,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
                   color: theme.palette.error.main,
                   '&:hover': {
                     borderColor: alpha(theme.palette.error.main, 0.3),
-                    backgroundColor: alpha(theme.palette.error.main, 0.3)
-                  }
+                    backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  },
                 }}
                 onClick={() => {
                   props.dialogToggle('')
@@ -219,7 +231,7 @@ const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
   display: state.display,
   versions: state.datasetVersions.result.versions,
-  versionsLoading: state.datasetVersions.isLoading
+  versionsLoading: state.datasetVersions.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -229,7 +241,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset,
       deleteDataset: deleteDataset,
-      dialogToggle: dialogToggle
+      dialogToggle: dialogToggle,
     },
     dispatch
   )

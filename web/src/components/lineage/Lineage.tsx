@@ -19,7 +19,7 @@ import {
   fetchLineage,
   resetLineage,
   setLineageGraphDepth,
-  setSelectedNode
+  setSelectedNode,
 } from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
@@ -70,14 +70,18 @@ export function initGraph() {
   return g
 }
 
-export function buildGraphAll(g: graphlib.Graph<MqNode>, graph: LineageNode[], callBack: (g: graphlib.Graph<MqNode>) => void) {
+export function buildGraphAll(
+  g: graphlib.Graph<MqNode>,
+  graph: LineageNode[],
+  callBack: (g: graphlib.Graph<MqNode>) => void
+) {
   // nodes
   for (let i = 0; i < graph.length; i++) {
     g.setNode(graph[i].id, {
       label: graph[i].id,
       data: graph[i].data,
       width: NODE_SIZE,
-      height: NODE_SIZE
+      height: NODE_SIZE,
     })
   }
 
@@ -98,7 +102,7 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
   // Sets used to detect cycles and break out of the recursive loop
   const visitedNodes = {
     successors: new Set(),
-    predecessors: new Set()
+    predecessors: new Set(),
   }
 
   const getSuccessors = (node: string) => {
@@ -109,8 +113,8 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
     if (successors?.length) {
       for (let i = 0; i < node.length - 1; i++) {
         if (successors[i]) {
-          paths.push([node, (successors[i] as unknown) as string])
-          getSuccessors((successors[i] as unknown) as string)
+          paths.push([node, successors[i] as unknown as string])
+          getSuccessors(successors[i] as unknown as string)
         }
       }
     }
@@ -124,8 +128,8 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
     if (predecessors?.length) {
       for (let i = 0; i < node.length - 1; i++) {
         if (predecessors[i]) {
-          paths.push([(predecessors[i] as unknown) as string, node])
-          getPredecessors((predecessors[i] as unknown) as string)
+          paths.push([predecessors[i] as unknown as string, node])
+          getPredecessors(predecessors[i] as unknown as string)
         }
       }
     }
@@ -145,7 +149,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const [state, setState] = React.useState<LineageState>({
     graph: g,
     edges: [],
-    nodes: []
+    nodes: [],
   })
   const { nodeName, namespace, nodeType } = useParams()
   const mounted = React.useRef<boolean>(false)
@@ -158,19 +162,10 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
     if (!mounted.current) {
       // on mount
       if (nodeName && namespace && nodeType) {
-        const nodeId = generateNodeId(
-          nodeType.toUpperCase() as JobOrDataset,
-          namespace,
-          nodeName
-        )
+        const nodeId = generateNodeId(nodeType.toUpperCase() as JobOrDataset, namespace, nodeName)
         props.setSelectedNode(nodeId)
 
-        props.fetchLineage(
-          nodeType.toUpperCase() as JobOrDataset,
-          namespace,
-          nodeName,
-          props.depth
-        )
+        props.fetchLineage(nodeType.toUpperCase() as JobOrDataset, namespace, nodeName, props.depth)
       }
       mounted.current = true
     } else {
@@ -185,14 +180,11 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           setState({
             graph: gResult,
             edges: getEdges(),
-            nodes: gResult.nodes().map(v => gResult.node(v))
+            nodes: gResult.nodes().map((v) => gResult.node(v)),
           })
         })
       }
-      if (
-        props.selectedNode !== prevSelectedNode.current
-        || props.depth !== prevDepth.current
-      ) {
+      if (props.selectedNode !== prevSelectedNode.current || props.depth !== prevDepth.current) {
         props.fetchLineage(
           nodeType?.toUpperCase() as JobOrDataset,
           namespace || '',
@@ -218,7 +210,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const getEdges = () => {
     const selectedPaths = getSelectedPaths(g, props.selectedNode)
 
-    return g?.edges().map(e => {
+    return g?.edges().map((e) => {
       const isSelected = selectedPaths.some((r: any) => e.v === r[0] && e.w === r[1])
       return Object.assign(g.edge(e), { isSelected: isSelected })
     })
@@ -226,99 +218,96 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
 
   const i18next = require('i18next')
 
-    return (
-      <Box sx={{
+  return (
+    <Box
+      sx={{
         marginTop: `${HEADER_HEIGHT}px`,
-        height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
-      }}>
-        {props.selectedNode === null && (
-          <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
-            <MqEmpty title={i18next.t('lineage.empty_title')}>
-              <MqText subdued>{i18next.t('lineage.empty_body')}</MqText>
-            </MqEmpty>
-          </Box>
-        )}
-        <DepthConfig depth={props.depth} />
-        {state?.graph && (
-          <ParentSize>
-            {parent => (
-              <Zoom
-                width={parent.width}
-                height={parent.height}
-                scaleXMin={MIN_ZOOM}
-                scaleXMax={MAX_ZOOM}
-                scaleYMin={MIN_ZOOM}
-                scaleYMax={MAX_ZOOM}
-                initialTransformMatrix={INITIAL_TRANSFORM}
-              >
-                {zoom => (
-                  <div>
-                      <svg
-                        id={'GRAPH'}
-                        width={parent.width}
-                        height={parent.height}
-                        style={{
-                          cursor: zoom.isDragging ? 'grabbing' : 'grab'
-                        }}
-                      ref={zoom.containerRef as LegacyRef<SVGSVGElement>}
-                      >
-                        {/* background */}
-                        <g transform={zoom.toString()}>
-                          <Edge edgePoints={state?.edges} />
-                        </g>
-                        <rect
-                          width={parent.width}
-                          height={parent.height}
-                          fill={'transparent'}
-                          onTouchStart={zoom.dragStart}
-                          onTouchMove={zoom.dragMove}
-                          onTouchEnd={zoom.dragEnd}
-                          onMouseDown={event => {
-                            zoom.dragStart(event)
-                          }}
-                          onMouseMove={zoom.dragMove}
-                          onMouseUp={zoom.dragEnd}
-                          onMouseLeave={() => {
-                            if (zoom.isDragging) zoom.dragEnd()
-                          }}
-                          onDoubleClick={event => {
-                            const point = localPoint(event) || {
-                              x: 0,
-                              y: 0
-                            }
-                            zoom.scale({
-                              scaleX: DOUBLE_CLICK_MAGNIFICATION,
-                              scaleY: DOUBLE_CLICK_MAGNIFICATION,
-                              point
-                            })
-                          }}
-                        />
-                        {/* foreground */}
-                        <g transform={zoom.toString()}>
-                          {state?.nodes.map(node => (
-                            <Node
-                              key={node.data.name}
-                              node={node}
-                              selectedNode={props.selectedNode}
-                            />
-                          ))}
-                        </g>
-                      </svg>
-                  </div>
-                  )
-                }
-              </Zoom>
-            )}
-          </ParentSize>
-        )}
-      </Box>
-    )
+        height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`,
+      }}
+    >
+      {props.selectedNode === null && (
+        <Box display={'flex'} justifyContent={'center'} alignItems={'center'} pt={2}>
+          <MqEmpty title={i18next.t('lineage.empty_title')}>
+            <MqText subdued>{i18next.t('lineage.empty_body')}</MqText>
+          </MqEmpty>
+        </Box>
+      )}
+      <DepthConfig depth={props.depth} />
+      {state?.graph && (
+        <ParentSize>
+          {(parent) => (
+            <Zoom
+              width={parent.width}
+              height={parent.height}
+              scaleXMin={MIN_ZOOM}
+              scaleXMax={MAX_ZOOM}
+              scaleYMin={MIN_ZOOM}
+              scaleYMax={MAX_ZOOM}
+              initialTransformMatrix={INITIAL_TRANSFORM}
+            >
+              {(zoom) => (
+                <div>
+                  <svg
+                    id={'GRAPH'}
+                    width={parent.width}
+                    height={parent.height}
+                    style={{
+                      cursor: zoom.isDragging ? 'grabbing' : 'grab',
+                    }}
+                    ref={zoom.containerRef as LegacyRef<SVGSVGElement>}
+                  >
+                    {/* background */}
+                    <g transform={zoom.toString()}>
+                      <Edge edgePoints={state?.edges} />
+                    </g>
+                    <rect
+                      width={parent.width}
+                      height={parent.height}
+                      fill={'transparent'}
+                      onTouchStart={zoom.dragStart}
+                      onTouchMove={zoom.dragMove}
+                      onTouchEnd={zoom.dragEnd}
+                      onMouseDown={(event) => {
+                        zoom.dragStart(event)
+                      }}
+                      onMouseMove={zoom.dragMove}
+                      onMouseUp={zoom.dragEnd}
+                      onMouseLeave={() => {
+                        if (zoom.isDragging) zoom.dragEnd()
+                      }}
+                      onDoubleClick={(event) => {
+                        const point = localPoint(event) || {
+                          x: 0,
+                          y: 0,
+                        }
+                        zoom.scale({
+                          scaleX: DOUBLE_CLICK_MAGNIFICATION,
+                          scaleY: DOUBLE_CLICK_MAGNIFICATION,
+                          point,
+                        })
+                      }}
+                    />
+                    {/* foreground */}
+                    <g transform={zoom.toString()}>
+                      {state?.nodes.map((node) => (
+                        <Node key={node.data.name} node={node} selectedNode={props.selectedNode} />
+                      ))}
+                    </g>
+                  </svg>
+                </div>
+              )}
+            </Zoom>
+          )}
+        </ParentSize>
+      )}
+    </Box>
+  )
 }
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
   selectedNode: state.lineage.selectedNode,
-  depth: state.lineage.depth
+  depth: state.lineage.depth,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -327,7 +316,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       setSelectedNode: setSelectedNode,
       fetchLineage: fetchLineage,
       resetLineage: resetLineage,
-      setDepth: setLineageGraphDepth
+      setDepth: setLineageGraphDepth,
     },
     dispatch
   )

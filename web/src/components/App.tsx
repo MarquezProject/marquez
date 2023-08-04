@@ -29,7 +29,7 @@ import rootSaga from '../store/sagas'
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
     console.log('There was an error in the saga', error)
-  }
+  },
 })
 const history = createBrowserHistory()
 const historyMiddleware = createRouterMiddleware(history)
@@ -64,10 +64,15 @@ const App = (): ReactElement => {
                     <Route path={'/'} element={<Jobs />} />
                     <Route path={'/datasets'} element={<Datasets />} />
                     <Route path={'/events'} element={<Events />} />
-                    <Route path={'/lineage/:nodeType/:namespace/:nodeName'} element={<>
-                      <Lineage />
-                      <BottomBar />
-                    </>} />
+                    <Route
+                      path={'/lineage/:nodeType/:namespace/:nodeName'}
+                      element={
+                        <>
+                          <Lineage />
+                          <BottomBar />
+                        </>
+                      }
+                    />
                   </Routes>
                   <Toast />
                 </Box>

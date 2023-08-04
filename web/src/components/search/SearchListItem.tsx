@@ -24,12 +24,18 @@ interface OwnProps {
 
 const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
   JOB: <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />,
-  DATASET: <FontAwesomeIcon icon={faDatabase} color={theme.palette.primary.main} />
+  DATASET: <FontAwesomeIcon icon={faDatabase} color={theme.palette.primary.main} />,
 }
 
 type DkSearchListItemProps = OwnProps
 
-const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, search, onClick, selected }) => {
+const SearchListItem: React.FC<DkSearchListItemProps> = ({
+  key,
+  searchResult,
+  search,
+  onClick,
+  selected,
+}) => {
   const name = searchResult.name.substring(
     searchResult.name.lastIndexOf('.') + 1,
     searchResult.name.length
@@ -46,44 +52,45 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, se
     >
       <Box
         className={selected ? 'selected' : ''}
-        sx={
-          {
-            display: 'block',
-            color: 'inherit',
-            textDecoration: 'none',
-            margin: 0,
-            cursor: 'pointer',
-            padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
-            '&:not(:last-child)': {
-              borderBottom: `1px solid ${theme.palette.secondary.main}`
-            },
-            '&:last-child': {
-              borderBottomLeftRadius: '2px',
-              borderBottomRightRadius: '2px'
-            },
+        sx={{
+          display: 'block',
+          color: 'inherit',
+          textDecoration: 'none',
+          margin: 0,
+          cursor: 'pointer',
+          padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
+          '&:not(:last-child)': {
+            borderBottom: `1px solid ${theme.palette.secondary.main}`,
+          },
+          '&:last-child': {
+            borderBottomLeftRadius: '2px',
+            borderBottomRightRadius: '2px',
+          },
+          '&:hover, &.selected': {
+            backgroundColor: darken(theme.palette.background.paper, 0.02),
+          },
+          '&:nth-child(even)': {
+            backgroundColor: darken(theme.palette.background.paper, 0.2),
             '&:hover, &.selected': {
-              backgroundColor: darken(theme.palette.background.paper, 0.02)
+              backgroundColor: darken(theme.palette.background.paper, 0.02),
             },
-            '&:nth-child(even)': {
-              backgroundColor: darken(theme.palette.background.paper, 0.2),
-              '&:hover, &.selected': {
-                backgroundColor: darken(theme.palette.background.paper, 0.02)
-              }
-            }
-          }
-        }>
+          },
+        }}
+      >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           <Box display={'flex'} alignItems={'center'}>
             <Box display={'inline'} mr={1}>
               {searchResultIcon[searchResult.type]}
             </Box>
-            <Box sx={{
-              display: 'inline',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: '370px'
-            }}>
+            <Box
+              sx={{
+                display: 'inline',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '370px',
+              }}
+            >
               {searchMatchIndex === -1 ? (
                 <MqText inline font={'mono'} bold small>
                   {name}
@@ -97,10 +104,7 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, se
                     {name.substring(searchMatchIndex, searchMatchIndex + search.length)}
                   </MqText>
                   <MqText inline font={'mono'} bold small>
-                    {name.substring(
-                      searchMatchIndex + search.length,
-                      searchResult.name.length
-                    )}
+                    {name.substring(searchMatchIndex + search.length, searchResult.name.length)}
                   </MqText>
                 </>
               )}
@@ -113,7 +117,6 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ key, searchResult, se
           </Box>
         </Box>
       </Box>
-
     </RouterLink>
   )
 }

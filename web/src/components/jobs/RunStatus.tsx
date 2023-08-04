@@ -12,7 +12,7 @@ interface RunStatusProps {
   run: Run
 }
 
-const RunStatus: FunctionComponent<RunStatusProps> = props => {
+const RunStatus: FunctionComponent<RunStatusProps> = (props) => {
   const { run } = props
   const theme = createTheme(useTheme())
 
@@ -23,7 +23,7 @@ const RunStatus: FunctionComponent<RunStatusProps> = props => {
         sx={{
           width: theme.spacing(2),
           height: theme.spacing(2),
-          borderRadius: '50%'
+          borderRadius: '50%',
         }}
         style={{ backgroundColor: runStateColor(run.state) }}
       />

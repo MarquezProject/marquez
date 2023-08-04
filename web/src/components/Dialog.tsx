@@ -20,7 +20,7 @@ interface IProps {
   title?: string
 }
 
-const AlertDialog: FunctionComponent<IProps> = props => {
+const AlertDialog: FunctionComponent<IProps> = (props) => {
   const handleClose = () => {
     props.dialogToggle('')
   }

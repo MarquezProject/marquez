@@ -25,22 +25,22 @@ import debounce from '@mui/material/utils/debounce'
 const INITIAL_SEARCH_FILTER = [
   {
     text: 'All',
-    value: 'All'
+    value: 'All',
   },
   {
     icon: faCog,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: 'Jobs',
-    value: 'JOB'
+    value: 'JOB',
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: 'Datasets',
-    value: 'DATASET'
-  }
+    value: 'DATASET',
+  },
 ]
 
 const INITIAL_SEARCH_SORT_FILTER = [
@@ -49,16 +49,16 @@ const INITIAL_SEARCH_SORT_FILTER = [
     value: 'Sort',
     foregroundColor: theme.palette.common.white,
     backgroundColor: 'transparent',
-    selectable: false
+    selectable: false,
   },
   {
     text: 'Updated',
-    value: 'UPDATE_AT'
+    value: 'UPDATE_AT',
   },
   {
     text: 'Name',
-    value: 'NAME'
-  }
+    value: 'NAME',
+  },
 ]
 
 interface StateProps {
@@ -88,7 +88,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     search: '',
     selected: '',
     filter: 'All',
-    sort: 'UPDATE_AT'
+    sort: 'UPDATE_AT',
   })
 
   const fetchSearch = (q: string, filter = 'ALL', sort = 'NAME') => {
@@ -107,43 +107,29 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     setState({ ...state, search: event.target.value, open: true })
 
     setTimeout(() => {
-      fetchSearch(
-        state.search,
-        state.filter.toUpperCase(),
-        state.sort.toUpperCase()
-      )
+      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
     }, 1)
   }
 
   const onSelectFilter = (label: string) => {
-    setState(
-      {
-        ...state,
-        filter: label
-      })
+    setState({
+      ...state,
+      filter: label,
+    })
 
     setTimeout(() => {
-      fetchSearch(
-        state.search,
-        state.filter.toUpperCase(),
-        state.sort.toUpperCase()
-        )
+      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
     }, 1)
   }
 
   const onSelectSortFilter = (label: string) => {
-    setState(
-      {
-        ...state,
-        sort: label
-      })
+    setState({
+      ...state,
+      sort: label,
+    })
 
     setTimeout(() => {
-      fetchSearch(
-        state.search,
-        state.filter.toUpperCase(),
-        state.sort.toUpperCase()
-        )
+      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
     }, 1)
   }
 
@@ -151,27 +137,31 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
 
   return (
     <Box width={538} position={'relative'} px={10} mr={-8} id={'searchContainer'}>
-      <Box sx={{
-        zIndex: theme.zIndex.appBar + 3,
-        position: 'absolute',
-        left: theme.spacing(12),
-        display: 'flex',
-        alignItems: 'center',
-        height: '100%',
-      }}>
+      <Box
+        sx={{
+          zIndex: theme.zIndex.appBar + 3,
+          position: 'absolute',
+          left: theme.spacing(12),
+          display: 'flex',
+          alignItems: 'center',
+          height: '100%',
+        }}
+      >
         <FontAwesomeIcon icon={faSearch} color={THEME_EXTRA.typography.disabled} />
       </Box>
       {state.search.length === 0 && <SearchPlaceholder />}
       {state.search.length > 0 && (
-        <Box sx={{
-          position: 'absolute',
-          zIndex: theme.zIndex.appBar + 3,
-          right: theme.spacing(12),
-          display: 'flex',
-          alignItems: 'center',
-          height: '100%',
-          cursor: 'pointer'
-        }}>
+        <Box
+          sx={{
+            position: 'absolute',
+            zIndex: theme.zIndex.appBar + 3,
+            right: theme.spacing(12),
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%',
+            cursor: 'pointer',
+          }}
+        >
           <FontAwesomeIcon
             icon={faTimes}
             size={'1x'}
@@ -186,11 +176,11 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
         <MqInputBase
           spellCheck={false}
           sx={{
-            zIndex: theme.zIndex.appBar + 2
+            zIndex: theme.zIndex.appBar + 2,
           }}
           fullWidth={true}
           onFocus={() => setState({ ...state, open: true })}
-          onChange={event => onSearch(event)}
+          onChange={(event) => onSearch(event)}
           value={state.search}
           autoComplete={'off'}
           id={'searchBar'}
@@ -202,23 +192,29 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
         >
           <Box>
             {state.open && state.search.length > 0 && (
-              <Box position={'absolute'} width={'100%'} sx={{
-                position: 'absolute',
-                top: theme.spacing(-2),
-                width: '100%',
-                right: 0,
-                left: 0,
-                zIndex: theme.zIndex.appBar + 1,
-                border: `2px dashed ${theme.palette.secondary.main}`,
-                borderRadius: theme.spacing(1),
-                backgroundColor: theme.palette.background.default
-              }}>
-                <Box sx={{
-                  marginTop: '64px',
-                  padding: theme.spacing(2),
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}>
+              <Box
+                position={'absolute'}
+                width={'100%'}
+                sx={{
+                  position: 'absolute',
+                  top: theme.spacing(-2),
+                  width: '100%',
+                  right: 0,
+                  left: 0,
+                  zIndex: theme.zIndex.appBar + 1,
+                  border: `2px dashed ${theme.palette.secondary.main}`,
+                  borderRadius: theme.spacing(1),
+                  backgroundColor: theme.palette.background.default,
+                }}
+              >
+                <Box
+                  sx={{
+                    marginTop: '64px',
+                    padding: theme.spacing(2),
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <MqChipGroup
                     chips={INITIAL_SEARCH_FILTER}
                     onSelect={onSelectFilter}
@@ -230,14 +226,16 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                     initialSelection={state.sort}
                   />
                 </Box>
-                <Box sx={{
-                  margin: 0,
-                  overflow: 'auto',
-                  maxHeight: `calc(100vh - ${theme.spacing(30)})`,
-                  paddingLeft: 0,
-                  borderBottomLeftRadius: theme.spacing(1),
-                  borderBottomRightRadius: theme.spacing(1)
-                }}>
+                <Box
+                  sx={{
+                    margin: 0,
+                    overflow: 'auto',
+                    maxHeight: `calc(100vh - ${theme.spacing(30)})`,
+                    paddingLeft: 0,
+                    borderBottomLeftRadius: theme.spacing(1),
+                    borderBottomRightRadius: theme.spacing(1),
+                  }}
+                >
                   {props.searchResults.size === 0 && (
                     <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                       <MqText>
@@ -246,7 +244,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                     </Box>
                   )}
                   {[...props.searchResults].map((resultsWithGroups, index) => {
-                    return resultsWithGroups.map(result => {
+                    return resultsWithGroups.map((result) => {
                       if (typeof result === 'string') {
                         // is group
                         if (result.length > 0) {
@@ -255,8 +253,10 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                               sx={{
                                 borderTop: `2px solid ${theme.palette.common.white}`,
                                 borderBottom: `2px solid ${theme.palette.common.white}`,
-                                padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(0.5)} ${theme.spacing(1)}`,
-                                backgroundColor: darken(theme.palette.background.paper, 0.05)
+                                padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(
+                                  0.5
+                                )} ${theme.spacing(1)}`,
+                                backgroundColor: darken(theme.palette.background.paper, 0.05),
                               }}
                               key={result}
                               display={'flex'}
@@ -280,19 +280,19 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                       } else if (result.length) {
                         return (
                           <Box key={result[0].group + index}>
-                            {result.map(listItem => {
+                            {result.map((listItem) => {
                               return (
                                 <SearchListItem
                                   key={listItem.name}
                                   searchResult={listItem}
                                   search={state.search}
                                   selected={listItem.name === state.selected}
-                                  onClick={nodeName => {
-                                  setState({
-                                    ...state,
-                                    open: false,
-                                    search: nodeName
-                                  })
+                                  onClick={(nodeName) => {
+                                    setState({
+                                      ...state,
+                                      open: false,
+                                      search: nodeName,
+                                    })
                                     props.setSelectedNode(listItem.nodeId)
                                   }}
                                 />
@@ -320,7 +320,7 @@ const mapStateToProps = (state: IState) => {
     searchResults: state.search.data.results,
     rawResults: state.search.data.rawResults,
     isSearching: state.search.isLoading,
-    isSearchingInit: state.search.init
+    isSearchingInit: state.search.init,
   }
 }
 
@@ -328,7 +328,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       setSelectedNode: setSelectedNode,
-      fetchSearch: fetchSearch
+      fetchSearch: fetchSearch,
     },
     dispatch
   )

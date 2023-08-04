@@ -28,16 +28,16 @@ const ICON_SIZE = 16
 const Edge: React.FC<EdgeProps> = ({ edgePoints }) => {
   const getPoints = (edge: EdgePoint) => edge.points[edge.points.length - 1]
 
-  const edgeEnds = edgePoints.map(edge => {
+  const edgeEnds = edgePoints.map((edge) => {
     const isSelected = edgePoints.find(
-      o =>
+      (o) =>
         getPoints(o as EdgePoint).x == getPoints(edge as EdgePoint).x &&
         getPoints(o as EdgePoint).y == getPoints(edge as EdgePoint).y &&
         o.isSelected === true
     )
     return {
       ...edge.points[edge.points.length - 1],
-      ...{ isSelected: typeof isSelected !== 'undefined' }
+      ...{ isSelected: typeof isSelected !== 'undefined' },
     }
   })
 
@@ -49,7 +49,7 @@ const Edge: React.FC<EdgeProps> = ({ edgePoints }) => {
           curve={curveMonotoneX}
           data={edge.points}
           x={(d, index) => (index === 0 ? d.x + 20 : d.x - 25)}
-          y={d => d.y}
+          y={(d) => d.y}
           stroke={edge.isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
           strokeWidth={1}
           opacity={1}

@@ -16,7 +16,12 @@ interface OwnProps {
 
 type DatePickerProps = OwnProps
 
-const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', format = 'MM DD YYYY hh:mm a' }) => {
+const MqDatePicker: React.FC<DatePickerProps> = ({
+  value,
+  onChange,
+  label = '',
+  format = 'MM DD YYYY hh:mm a',
+}) => {
   const theme = createTheme(useTheme())
 
   return (
@@ -25,14 +30,14 @@ const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', 
       sx={{
         minWidth: '200px',
         '.MuiFormLabel-root': {
-          transform: 'translate(14px, 0px) scale(0.75)'
+          transform: 'translate(14px, 0px) scale(0.75)',
         },
         '&:hover': {
           '.MuiOutlinedInput-notchedOutline': {
             borderColor: `${theme.palette.primary.main} !important`,
             boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 3px`,
             transition: theme.transitions.create(['border-color', 'box-shadow']),
-          }
+          },
         },
         '.MuiOutlinedInput-notchedOutline': {
           border: `2px solid ${theme.palette.common.white}`,
@@ -40,9 +45,9 @@ const MqDatePicker: React.FC<DatePickerProps> = ({ value, onChange, label = '', 
           top: '-16px',
           left: '-6px',
           '> legend': {
-            display: 'none'
-          }
-        }
+            display: 'none',
+          },
+        },
       }}
       value={dayjs(value)}
       onChange={onChange}

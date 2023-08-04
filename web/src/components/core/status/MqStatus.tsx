@@ -15,16 +15,21 @@ const MqStatus: React.FC<OwnProps> = ({ label, color }) => {
     return null
   }
   return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(1)
-    }}>
-      <Box sx={{
-        width: theme.spacing(2),
-        height: theme.spacing(2),
-        borderRadius: '50%'
-      }} style={{ backgroundColor: color }} />
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: theme.spacing(1),
+      }}
+    >
+      <Box
+        sx={{
+          width: theme.spacing(2),
+          height: theme.spacing(2),
+          borderRadius: '50%',
+        }}
+        style={{ backgroundColor: color }}
+      />
       {label && <MqText>{label}</MqText>}
     </Box>
   )

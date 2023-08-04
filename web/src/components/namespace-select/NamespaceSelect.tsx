@@ -27,7 +27,11 @@ interface DispatchProps {
 
 type NamespaceSelectProps = OwnProps & StateProps & DispatchProps
 
-const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedNamespace, selectNamespace }) => {
+const NamespaceSelect: React.FC<NamespaceSelectProps> = ({
+  namespaces,
+  selectedNamespace,
+  selectNamespace,
+}) => {
   const [open, setOpen] = React.useState(false)
   const i18next = require('i18next')
 
@@ -47,18 +51,18 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedN
             left: '12px',
             display: 'flex',
             alignItems: 'center',
-            height: '100%'
+            height: '100%',
           }}
         >
-            <MqText color={theme.palette.primary.main} font={'mono'}>
-              {i18next.t('namespace_select.prompt')}
+          <MqText color={theme.palette.primary.main} font={'mono'}>
+            {i18next.t('namespace_select.prompt')}
           </MqText>
         </Box>
         <Select
           labelId='namespace-label'
           id='namespace-select'
           value={selectedNamespace}
-          onChange={event => {
+          onChange={(event) => {
             selectNamespace(event.target.value as string)
           }}
           label='Namespace'
@@ -68,7 +72,7 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedN
           onClose={() => setOpen(false)}
           sx={{ cursor: 'pointer' }}
         >
-          {namespaces.map(namespace => (
+          {namespaces.map((namespace) => (
             <MenuItem key={namespace.name} value={namespace.name}>
               {namespace.name}
             </MenuItem>
@@ -81,13 +85,13 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({ namespaces, selectedN
 
 const mapStateToProps = (state: IState) => ({
   namespaces: state.namespaces.result,
-  selectedNamespace: state.namespaces.selectedNamespace
+  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      selectNamespace: selectNamespace
+      selectNamespace: selectNamespace,
     },
     dispatch
   )

@@ -34,8 +34,26 @@ interface OwnProps {
 
 type MqTextProps = OwnProps
 
-const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, label, font, bottomMargin, subdued, children, link, linkTo, paragraph, href, inverse, inline, highlight, color, small }) => {
-
+const MqText: React.FC<MqTextProps> = ({
+  heading,
+  subheading,
+  bold,
+  disabled,
+  label,
+  font,
+  bottomMargin,
+  subdued,
+  children,
+  link,
+  linkTo,
+  paragraph,
+  href,
+  inverse,
+  inline,
+  highlight,
+  color,
+  small,
+}) => {
   const theme = createTheme(useTheme())
 
   const classesObject = {
@@ -46,62 +64,63 @@ const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, la
       margin: 0,
       padding: 0,
       color: theme.palette.common.white,
-      fontWeight: 400
+      fontWeight: 400,
     },
     inline: {
-      display: 'inline'
+      display: 'inline',
     },
     heading: {
       fontWeight: 700,
-      fontSize: '1.125rem'
+      fontSize: '1.125rem',
     },
     subheading: {
       fontWeight: 700,
-      fontSize: '.875rem'
+      fontSize: '.875rem',
     },
     mono: {
-      fontFamily: `${'Source Code Pro'}, serif`
+      fontFamily: `${'Source Code Pro'}, serif`,
     },
     bold: {
-      fontWeight: 700
+      fontWeight: 700,
     },
     subdued: {
-      color: THEME_EXTRA.typography.subdued
+      color: THEME_EXTRA.typography.subdued,
     },
     disabled: {
-      color: THEME_EXTRA.typography.disabled
+      color: THEME_EXTRA.typography.disabled,
     },
     link: {
       color: theme.palette.primary.main,
       cursor: 'pointer',
       textDecoration: 'none',
       '&:hover': {
-        textDecoration: 'underline'
-      }
+        textDecoration: 'underline',
+      },
     },
     label: {
       fontSize: '.625rem',
       textTransform: 'uppercase',
-      lineHeight: 1.4
+      lineHeight: 1.4,
     },
     highlight: {
-      backgroundColor: alpha(theme.palette.primary.main, 0.5)
+      backgroundColor: alpha(theme.palette.primary.main, 0.5),
     },
     bottomMargin: {
-      marginBottom: theme.spacing(1)
+      marginBottom: theme.spacing(1),
     },
     inverse: {
-      color: theme.palette.common.white
+      color: theme.palette.common.white,
     },
     small: {
-      fontSize: '.625rem'
+      fontSize: '.625rem',
     },
     paragraph: {
-      marginBottom: theme.spacing(2)
-    }
+      marginBottom: theme.spacing(2),
+    },
   }
 
-  const conditionalClasses = Object.assign({},
+  const conditionalClasses = Object.assign(
+    {},
     subdued ? classesObject.subdued : {},
     bold ? classesObject.bold : {},
     label ? classesObject.label : {},
@@ -118,25 +137,27 @@ const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, la
   )
 
   const style = {
-    color: color && color
+    color: color && color,
   }
 
   if (heading) {
     return (
-      <Typography variant='h4' sx={Object.assign(classesObject.root, classesObject.heading, conditionalClasses)} style={style}>
+      <Typography
+        variant='h4'
+        sx={Object.assign(classesObject.root, classesObject.heading, conditionalClasses)}
+        style={style}
+      >
         {children}
       </Typography>
     )
   } else if (link && linkTo) {
     return (
-
-      <LinkRouter
-        to={linkTo}
-        aria-disabled={disabled}
-        style={{ textDecoration: 'none' }}
-      >
-        <Box component="span" sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}>
-        {children}
+      <LinkRouter to={linkTo} aria-disabled={disabled} style={{ textDecoration: 'none' }}>
+        <Box
+          component='span'
+          sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
+        >
+          {children}
         </Box>
       </LinkRouter>
     )
@@ -150,7 +171,6 @@ const MqText: React.FC<MqTextProps> = ({ heading, subheading, bold, disabled, la
       >
         {children}
       </Link>
-
     )
   } else {
     return (

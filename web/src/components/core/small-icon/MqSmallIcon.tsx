@@ -13,12 +13,7 @@ interface OwnProps {
   shape: 'circle' | 'rect'
 }
 
-const MqSmallIcon: React.FC<OwnProps> = ({
-  icon,
-  backgroundColor,
-  foregroundColor,
-  shape
-}) => {
+const MqSmallIcon: React.FC<OwnProps> = ({ icon, backgroundColor, foregroundColor, shape }) => {
   return (
     <Box
       width={16}
@@ -29,11 +24,16 @@ const MqSmallIcon: React.FC<OwnProps> = ({
       justifyContent={'center'}
       alignItems={'center'}
     >
-      <FontAwesomeIcon style={{
-        width: '10px !important',
-        height: 9,
-        fontSize: 9
-      }} fixedWidth icon={icon} color={foregroundColor} />
+      <FontAwesomeIcon
+        style={{
+          width: '10px !important',
+          height: 9,
+          fontSize: 9,
+        }}
+        fixedWidth
+        icon={icon}
+        color={foregroundColor}
+      />
     </Box>
   )
 }

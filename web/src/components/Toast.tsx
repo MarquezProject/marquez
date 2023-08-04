@@ -18,20 +18,23 @@ const Toast = ({ error, success }: IProps) => {
 
   return error || success ? (
     <Box
-      sx={Object.assign({
-        position: 'fixed',
-        bottom: 0,
-        left: '30%',
-        borderRadius: theme.shape.borderRadius,
-        color: theme.palette.common.white,
-        padding: theme.spacing(2),
-        maxWidth: '40%',
-        minWidth: '40%',
-        textAlign: 'center',
-        border: `2px dashed ${theme.palette.secondary.main}`,
-        borderBottom: 'none',
-        backgroundColor: theme.palette.background.default
-      }, error ? { color: theme.palette.error.main } : { color: theme.palette.primary.main })}
+      sx={Object.assign(
+        {
+          position: 'fixed',
+          bottom: 0,
+          left: '30%',
+          borderRadius: theme.shape.borderRadius,
+          color: theme.palette.common.white,
+          padding: theme.spacing(2),
+          maxWidth: '40%',
+          minWidth: '40%',
+          textAlign: 'center',
+          border: `2px dashed ${theme.palette.secondary.main}`,
+          borderBottom: 'none',
+          backgroundColor: theme.palette.background.default,
+        },
+        error ? { color: theme.palette.error.main } : { color: theme.palette.primary.main }
+      )}
       className={'shadow animated faster bounceInUp'}
     >
       <p>{error || success}</p>
@@ -39,10 +42,9 @@ const Toast = ({ error, success }: IProps) => {
   ) : null
 }
 
-
 const mapStateToProps = (state: IState) => ({
   error: state.display.error,
-  success: state.display.success
+  success: state.display.success,
 })
 
 export default connect(mapStateToProps)(Toast)

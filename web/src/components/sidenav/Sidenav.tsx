@@ -4,7 +4,6 @@
 import React from 'react'
 import SVG from 'react-inlinesvg'
 
-
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
@@ -20,10 +19,9 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
-interface SidenavProps { }
+interface SidenavProps {}
 
 const Sidenav: React.FC<SidenavProps> = () => {
-
   const i18next = require('i18next')
   const changeLanguage = (lng: string) => {
     i18next.changeLanguage(lng)
@@ -33,15 +31,18 @@ const Sidenav: React.FC<SidenavProps> = () => {
   const location = useLocation()
 
   return (
-    <Drawer sx={{
-      marginTop: `${HEADER_HEIGHT}px`,
-      width: `${DRAWER_WIDTH}px`,
-      flexShrink: 0,
-      whiteSpace: 'nowrap',
-      '& > :first-of-type': {
-        borderRight: 'none'
-      }
-    }} variant='permanent'>
+    <Drawer
+      sx={{
+        marginTop: `${HEADER_HEIGHT}px`,
+        width: `${DRAWER_WIDTH}px`,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        '& > :first-of-type': {
+          borderRight: 'none',
+        },
+      }}
+      variant='permanent'
+    >
       <Box
         position={'relative'}
         width={DRAWER_WIDTH}
@@ -52,13 +53,16 @@ const Sidenav: React.FC<SidenavProps> = () => {
         pt={2}
         pb={2}
         sx={{
-          borderRight: `2px dashed ${theme.palette.secondary.main}`
+          borderRight: `2px dashed ${theme.palette.secondary.main}`,
         }}
       >
         <Box ml={2}>
-          <RouterLink to={'/'} style={{
-            textDecoration: 'none'
-          }}>
+          <RouterLink
+            to={'/'}
+            style={{
+              textDecoration: 'none',
+            }}
+          >
             <MqIconButton
               id={'homeDrawerButton'}
               title={i18next.t('sidenav.jobs')}
@@ -67,9 +71,12 @@ const Sidenav: React.FC<SidenavProps> = () => {
               <FontAwesomeIcon icon={faCogs} size={'2x'} />
             </MqIconButton>
           </RouterLink>
-          <RouterLink to={'/datasets'} style={{
-            textDecoration: 'none'
-          }}>
+          <RouterLink
+            to={'/datasets'}
+            style={{
+              textDecoration: 'none',
+            }}
+          >
             <MqIconButton
               id={'datasetsDrawerButton'}
               title={i18next.t('sidenav.datasets')}
@@ -78,9 +85,12 @@ const Sidenav: React.FC<SidenavProps> = () => {
               <FontAwesomeIcon icon={faDatabase} size={'2x'} />
             </MqIconButton>
           </RouterLink>
-          <RouterLink to={'/events'} style={{
-            textDecoration: 'none'
-          }}>
+          <RouterLink
+            to={'/events'}
+            style={{
+              textDecoration: 'none',
+            }}
+          >
             <MqIconButton
               id={'eventsButton'}
               title={i18next.t('sidenav.events')}
@@ -106,14 +116,17 @@ const Sidenav: React.FC<SidenavProps> = () => {
           {/*  </MqIconButton>*/}
           {/*</RouterLink>*/}
         </Box>
-        <FormControl variant='outlined' sx={{
-          maxWidth: '100px'
-        }}>
+        <FormControl
+          variant='outlined'
+          sx={{
+            maxWidth: '100px',
+          }}
+        >
           <Box px={1}>
             <Select
               fullWidth
               value={i18next.resolvedLanguage}
-              onChange={event => {
+              onChange={(event) => {
                 changeLanguage(event.target.value as string)
                 window.location.reload()
               }}

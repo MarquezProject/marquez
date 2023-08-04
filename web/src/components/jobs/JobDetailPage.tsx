@@ -17,7 +17,7 @@ import {
   dialogToggle,
   fetchRuns,
   resetJobs,
-  resetRuns
+  resetRuns,
 } from '../../store/actionCreators'
 import { jobRunsStatus } from '../../helpers/nodes'
 import { useNavigate } from 'react-router-dom'
@@ -47,19 +47,10 @@ type IProps = {
   display: IState['display']
 } & DispatchProps
 
-const JobDetailPage: FunctionComponent<IProps> = props => {
+const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
-  const {
-    job,
-    jobs,
-    fetchRuns,
-    resetRuns,
-    deleteJob,
-    dialogToggle,
-    runs,
-    display,
-    runsLoading
-  } = props
+  const { job, jobs, fetchRuns, resetRuns, deleteJob, dialogToggle, runs, display, runsLoading } =
+    props
   const navigate = useNavigate()
 
   const [tab, setTab] = React.useState(0)
@@ -101,7 +92,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       flexDirection='column'
       justifyContent='space-between'
       sx={{
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
       }}
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -118,8 +109,8 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
                 color: theme.palette.error.main,
                 '&:hover': {
                   borderColor: alpha(theme.palette.error.main, 0.3),
-                  backgroundColor: alpha(theme.palette.error.main, 0.3)
-                }
+                  backgroundColor: alpha(theme.palette.error.main, 0.3),
+                },
               }}
               onClick={() => {
                 props.dialogToggle('')
@@ -148,7 +139,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
               {i18next.t('jobs.location')}
             </Button>
           </Box>
-          <IconButton onClick={() => navigate('/')} size="large">
+          <IconButton onClick={() => navigate('/')} size='large'>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -185,7 +176,7 @@ const mapStateToProps = (state: IState) => ({
   runs: state.runs.result,
   runsLoading: state.runs.isLoading,
   display: state.display,
-  jobs: state.jobs
+  jobs: state.jobs,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -195,7 +186,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       resetRuns: resetRuns,
       resetJobs: resetJobs,
       deleteJob: deleteJob,
-      dialogToggle: dialogToggle
+      dialogToggle: dialogToggle,
     },
     dispatch
   )

@@ -33,7 +33,14 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const Jobs: React.FC<JobsProps> = ({ jobs, isJobsLoading, isJobsInit, selectedNamespace, fetchJobs, resetJobs }) => {
+const Jobs: React.FC<JobsProps> = ({
+  jobs,
+  isJobsLoading,
+  isJobsInit,
+  selectedNamespace,
+  fetchJobs,
+  resetJobs,
+}) => {
   const mounted = React.useRef<boolean>(false)
   const prevSelectedNamespace = React.useRef<Nullable<string>>()
 
@@ -46,10 +53,7 @@ const Jobs: React.FC<JobsProps> = ({ jobs, isJobsLoading, isJobsInit, selectedNa
       mounted.current = true
     } else {
       // on update
-      if (
-        prevSelectedNamespace.current !== selectedNamespace &&
-        selectedNamespace
-      ) {
+      if (prevSelectedNamespace.current !== selectedNamespace && selectedNamespace) {
         fetchJobs(selectedNamespace)
       }
 
@@ -101,7 +105,7 @@ const Jobs: React.FC<JobsProps> = ({ jobs, isJobsLoading, isJobsInit, selectedNa
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {jobs.map(job => {
+                  {jobs.map((job) => {
                     return (
                       <TableRow key={job.name}>
                         <TableCell align='left'>
@@ -128,7 +132,9 @@ const Jobs: React.FC<JobsProps> = ({ jobs, isJobsLoading, isJobsInit, selectedNa
                         <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
                           <MqStatus
                             color={job.latestRun && runStateColor(job.latestRun.state || 'NEW')}
-                            label={job.latestRun && job.latestRun.state ? job.latestRun.state : 'N/A'}
+                            label={
+                              job.latestRun && job.latestRun.state ? job.latestRun.state : 'N/A'
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -148,14 +154,14 @@ const mapStateToProps = (state: IState) => ({
   isJobsInit: state.jobs.init,
   jobs: state.jobs.result,
   isJobsLoading: state.jobs.isLoading,
-  selectedNamespace: state.namespaces.selectedNamespace
+  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchJobs: fetchJobs,
-      resetJobs: resetJobs
+      resetJobs: resetJobs,
     },
     dispatch
   )

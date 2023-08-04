@@ -35,14 +35,13 @@ type MqChipGroupProps = OwnProps
  */
 const MqChipGroup: React.FC<MqChipGroupProps> = ({ chips, initialSelection, onSelect }) => {
   const [state, setState] = React.useState<StateProps>({
-    selected: initialSelection
+    selected: initialSelection,
   })
 
   const handlerOnSelect = (label: string) => {
-    setState(
-      {
-        selected: label
-      })
+    setState({
+      selected: label,
+    })
 
     setTimeout(() => {
       onSelect(label)
@@ -52,14 +51,16 @@ const MqChipGroup: React.FC<MqChipGroupProps> = ({ chips, initialSelection, onSe
   const theme = createTheme(useTheme())
 
   return (
-    <Box sx={{
-      border: `1px solid ${theme.palette.primary.main}`,
-      backgroundColor: theme.palette.background.paper,
-      borderRadius: theme.spacing(2),
-      display: 'inline-block',
-      padding: '1px'
-    }}>
-      {chips.map(chip => (
+    <Box
+      sx={{
+        border: `1px solid ${theme.palette.primary.main}`,
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: theme.spacing(2),
+        display: 'inline-block',
+        padding: '1px',
+      }}
+    >
+      {chips.map((chip) => (
         <MqChip
           {...chip}
           onSelect={handlerOnSelect}
