@@ -33,6 +33,7 @@ i18next
             empty_title: 'No Run Information Available',
             empty_body: 'Try adding some runs for this job.',
             runinfo_subhead: 'FACETS',
+            facets_subhead_aria: 'Search',
             runs_subhead: 'FACETS',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?'
@@ -48,6 +49,7 @@ i18next
             status: 'Searching...',
             none: 'No Results',
             search: 'Search',
+            search_aria: 'Search jobs and datasets',
             jobs: 'Jobs',
             and: 'and',
             datasets: 'Datasets'
@@ -69,6 +71,7 @@ i18next
             empty_title: 'No Fields',
             empty_body: 'Try adding dataset fields.',
             facets_subhead: 'FACETS',
+            facets_subhead_aria: 'Search',
             run_subhead: 'Created by Run',
             duration: 'Duration'
           },
@@ -155,6 +158,7 @@ i18next
             empty_body: "Essayez d'ajouter quelques exécutions pour ce travail.",
             runinfo_subhead: 'FACETTES',
             runs_subhead: 'FACETTES',
+            facets_subhead_aria: 'Recherche',
             dialog_delete: 'EFFACER',
             dialog_confirmation_title: 'Êtes-vous sûr?'
           },
@@ -169,6 +173,7 @@ i18next
             status: 'Recherche...',
             none: 'Aucun Résultat',
             search: 'Recherche',
+            search_aria: 'Recherchez des emplois et des ensembles de données',
             jobs: "d'Emplois",
             and: 'et',
             datasets: 'Jeux de Données'
@@ -190,6 +195,7 @@ i18next
             empty_title: 'Aucun jeu de données trouvé',
             empty_body: "Essayez d'ajouter des champs de jeu de données.",
             facets_subhead: 'FACETTES',
+            facets_subhead_aria: 'Recherche',
             run_subhead: 'Créé par Run',
             duration: 'Durée'
           },
@@ -279,6 +285,7 @@ i18next
             empty_body: 'Intente agregar algunas ejecuciones para este trabajo.',
             runinfo_subhead: 'FACETAS',
             runs_subhead: 'FACETAS',
+            facets_subhead_aria: 'Buscar',
             dialog_delete: 'ELIMINAR',
             dialog_confirmation_title: 'Estás seguro?'
           },
@@ -293,6 +300,7 @@ i18next
             status: 'Buscando...',
             none: 'No Hay Resultados',
             search: 'Buscar',
+            search_aria: 'Buscar trabajos y conjuntos de datos',
             jobs: 'Trabajos',
             and: 'y',
             datasets: 'Conjuntos de Datos'
@@ -314,6 +322,7 @@ i18next
             empty_title: 'No se encontraron conjuntos de datos',
             empty_body: 'Intente agregar campos de conjuntos de datos.',
             facets_subhead: 'FACETAS',
+            facets_subhead_aria: 'Buscar',
             run_subhead: 'Creado por Ejecutar',
             duration: 'Duración'
           },
@@ -403,6 +412,7 @@ i18next
             empty_body: 'Spróbuj dodać kilka przebiegów dla tego zadania.',
             runinfo_subhead: 'ASPECTY',
             runs_subhead: 'ASPECTY',
+            facets_subhead_aria: 'Wyszukiwanie',
             dialog_delete: 'USUNĄĆ',
             dialog_confirmation_title: 'Jesteś pewny?'
           },
@@ -417,6 +427,7 @@ i18next
             status: 'Badawczy...',
             none: 'Brak Wyników',
             search: 'Wyszukiwanie',
+            search_aria: 'Wyszukiwanie zadań i zbiorów danych',
             jobs: 'Zadania',
             and: 'i',
             datasets: 'Zbiory Danych'
@@ -438,6 +449,7 @@ i18next
             empty_title: 'Nie znaleziono zbiorów danych',
             empty_body: 'Spróbuj dodać pola zbiory danych.',
             facets_subhead: 'ASPECTY',
+            facets_subhead_aria: 'Wyszukiwanie',
             run_subhead: 'Stworzony przez Run',
             duration: 'Czas trwania'
           },
