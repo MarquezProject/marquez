@@ -23,23 +23,25 @@ import SearchPlaceholder from './SearchPlaceholder'
 import debounce from '@material-ui/core/utils/debounce'
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
+const i18next = require('i18next')
+
 const INITIAL_SEARCH_FILTER = [
   {
-    text: 'All',
+    text: i18next.t('search.filter.all'),
     value: 'All'
   },
   {
     icon: faCog,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
-    text: 'Jobs',
+    text: i18next.t('search.filter.jobs'),
     value: 'JOB'
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
-    text: 'Datasets',
+    text: i18next.t('search.filter.datasets'),
     value: 'DATASET'
   }
 ]
@@ -53,11 +55,11 @@ const INITIAL_SEARCH_SORT_FILTER = [
     selectable: false
   },
   {
-    text: 'Updated',
+    text: i18next.t('search.filter.updated'),
     value: 'UPDATE_AT'
   },
   {
-    text: 'Name',
+    text: i18next.t('search.filter.name'),
     value: 'NAME'
   }
 ]
@@ -222,6 +224,7 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   render() {
     const { classes, isSearching, isSearchingInit } = this.props
+    const i18next = require('i18next')
     return (
       <Box width={538} position={'relative'} px={10} mr={-8} id={'searchContainer'}>
         <Box className={classes.searchIcon}>
@@ -275,7 +278,7 @@ class Search extends React.Component<SearchProps, SearchState> {
                     {this.props.searchResults.size === 0 && (
                       <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                         <MqText>
-                          {isSearching || !isSearchingInit ? 'Searching...' : 'No Results'}
+                          {isSearching || !isSearchingInit ? i18next.t('search.status') : i18next.t('search.none')}
                         </MqText>
                       </Box>
                     )}
