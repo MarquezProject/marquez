@@ -186,27 +186,29 @@ class Events extends React.Component<EventsProps, EventsState> {
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
                 Page: {this.pageNavigation()}
               </Box>
-              <Box>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
-                  <IconButton
-                    className={classes.ml2}
-                    color='primary'
-                    disabled={page === 1}
-                    onClick={() => this.handleClickPage('prev')}
-                  >
-                    <ChevronLeftRounded />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
-                  <IconButton
-                    color='primary'
-                    disabled={pageIsLast}
-                    onClick={() => this.handleClickPage('next')}
-                  >
-                    <ChevronRightRounded />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              {events.length === 0 && (
+                <Box>
+                  <Tooltip title={i18next.t('events_route.previous_page')}>
+                    <IconButton
+                      className={classes.ml2}
+                      color='primary'
+                      disabled={page === 1}
+                      onClick={() => this.handleClickPage('prev')}
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={i18next.t('events_route.next_page')}>
+                    <IconButton
+                      color='primary'
+                      disabled={pageIsLast}
+                      onClick={() => this.handleClickPage('next')}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
             </Box>
             <Box p={2} className={classes.nav}>
               <MqDatePicker
@@ -311,29 +313,29 @@ class Events extends React.Component<EventsProps, EventsState> {
                     })}
                   </TableBody>
                 </Table>
+                <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+                  <Tooltip title={i18next.t('events_route.previous_page')}>
+                    <IconButton
+                      className={classes.ml2}
+                      color='primary'
+                      disabled={page === 1}
+                      onClick={() => this.handleClickPage('prev')}
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={i18next.t('events_route.next_page')}>
+                    <IconButton
+                      color='primary'
+                      disabled={pageIsLast}
+                      onClick={() => this.handleClickPage('next')}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </>
             )}
-            <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
-              <Tooltip title={i18next.t('events_route.previous_page')}>
-                <IconButton
-                  className={classes.ml2}
-                  color='primary'
-                  disabled={page === 1}
-                  onClick={() => this.handleClickPage('prev')}
-                >
-                  <ChevronLeftRounded />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={i18next.t('events_route.next_page')}>
-                <IconButton
-                  color='primary'
-                  disabled={pageIsLast}
-                  onClick={() => this.handleClickPage('next')}
-                >
-                  <ChevronRightRounded />
-                </IconButton>
-              </Tooltip>
-            </Box>
           </>
         </MqScreenLoad>
       </Container>
