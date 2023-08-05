@@ -69,8 +69,8 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
       to={determineLink(node)}
       onClick={() => node.label && setSelectedNode(node.label)}
       onMouseEnter={() => delayedSetShowFullNodeLabel()}
-      onMouseLeave={() => handleMouseLeave()}
       onFocus={() => delayedSetShowFullNodeLabel()}
+      onMouseLeave={() => handleMouseLeave()}
       onBlur={() => handleMouseLeave()}
     >
       {job ? (
