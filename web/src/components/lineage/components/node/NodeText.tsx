@@ -8,13 +8,14 @@ import React from 'react'
 
 type NodeTextProps = {
   node: GraphNode<MqNode>
+  showFullNodeLabel: boolean
 }
 
 const TEXT_BOTTOM_SPACING = theme.spacing(3)
 const MAX_CHARACTERS = 20
 const LEADING_AND_TRAILING_CHARACTERS = 10
 
-export function NodeText({ node }: NodeTextProps) {
+export function NodeText({ node, showFullNodeLabel }: NodeTextProps) {
   return (
     <text
       x={node.x}
@@ -23,7 +24,7 @@ export function NodeText({ node }: NodeTextProps) {
       textAnchor='middle'
       fill={'white'}
     >
-      {node.data.name.length > MAX_CHARACTERS
+      {node.data.name.length > MAX_CHARACTERS && !showFullNodeLabel
         ? `${node.data.name.substring(
             0,
             LEADING_AND_TRAILING_CHARACTERS
