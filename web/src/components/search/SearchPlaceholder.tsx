@@ -29,18 +29,17 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
       }}
     >
       <Box display={'inline'}>
-        <MqText disabled inline>
-          {' '}
+        <MqText disabled inline font={'mono'} aria-label={i18next.t('search.search_aria')} aria-required='true'>
           {i18next.t('search.search')}
-        </MqText>{' '}
+        </MqText>
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
           {i18next.t('search.jobs')}
-        </MqText>{' '}
-        <MqText disabled inline>
+        </MqText>
+        <MqText disabled inline font={'mono'}>
           {' '}
           {i18next.t('search.and')}
-        </MqText>{' '}
+        </MqText>
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>
           {' '}
           {i18next.t('search.datasets')}

@@ -22,25 +22,27 @@ import SearchListItem from './SearchListItem'
 import SearchPlaceholder from './SearchPlaceholder'
 import debounce from '@mui/material/utils/debounce'
 
+const i18next = require('i18next')
+
 const INITIAL_SEARCH_FILTER = [
   {
-    text: 'All',
-    value: 'All',
+    text: i18next.t('search.filter.all'),
+    value: 'All'
   },
   {
     icon: faCog,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
-    text: 'Jobs',
-    value: 'JOB',
+    text: i18next.t('search.filter.jobs'),
+    value: 'JOB'
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
-    text: 'Datasets',
-    value: 'DATASET',
-  },
+    text: i18next.t('search.filter.datasets'),
+    value: 'DATASET'
+  }
 ]
 
 const INITIAL_SEARCH_SORT_FILTER = [
@@ -52,13 +54,13 @@ const INITIAL_SEARCH_SORT_FILTER = [
     selectable: false,
   },
   {
-    text: 'Updated',
-    value: 'UPDATE_AT',
+    text: i18next.t('search.filter.updated'),
+    value: 'UPDATE_AT'
   },
   {
-    text: 'Name',
-    value: 'NAME',
-  },
+    text: i18next.t('search.filter.name'),
+    value: 'NAME'
+  }
 ]
 
 interface StateProps {
@@ -239,7 +241,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                   {props.searchResults.size === 0 && (
                     <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                       <MqText>
-                        {isSearching || !isSearchingInit ? 'Searching...' : 'No Results'}
+                        {isSearching || !isSearchingInit ? i18next.t('search.status') : i18next.t('search.none')}
                       </MqText>
                     </Box>
                   )}
