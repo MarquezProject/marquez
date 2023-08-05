@@ -53,10 +53,15 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
 
   useEffect(() => clearTimeout(showFullNodeLabelTimeout), [])
 
-  const delayedSetShowFullNodeLabel = (delayMs = 1500) => {
+  const delayedSetShowFullNodeLabel = (delayMs = 400) => {
     showFullNodeLabelTimeout = window.setTimeout(() => {
       setShowFullNodeLabel(true)
     }, delayMs)
+  }
+
+  const handleMouseLeave = () => {
+    setShowFullNodeLabel(false)
+    clearTimeout(showFullNodeLabelTimeout)
   }
 
   return (
@@ -64,8 +69,9 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
       to={determineLink(node)}
       onClick={() => node.label && setSelectedNode(node.label)}
       onMouseEnter={() => delayedSetShowFullNodeLabel()}
-      onMouseLeave={() => setShowFullNodeLabel(false)}
+      onMouseLeave={() => handleMouseLeave()}
       onFocus={() => delayedSetShowFullNodeLabel()}
+      onBlur={() => handleMouseLeave()}
     >
       {job ? (
         <g>
