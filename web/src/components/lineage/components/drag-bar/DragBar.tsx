@@ -4,107 +4,101 @@
 import React from 'react'
 
 import * as Redux from 'redux'
-import { Theme } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { createTheme } from '@mui/material/styles'
 import { setBottomBarHeight } from '../../../../store/actionCreators'
-import Box from '@material-ui/core/Box'
-import classNames from 'classnames'
-import createStyles from '@material-ui/core/styles/createStyles'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-const styles = (theme: Theme) =>
-  createStyles({
-    dragBarContainer: {
-      backgroundColor: theme.palette.secondary.main,
-      height: theme.spacing(1),
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'space-evenly',
-      cursor: 'ns-resize',
-      transition: theme.transitions.create(['background-color']),
-      '&:hover': {
-        backgroundColor: theme.palette.primary.main
-      }
-    },
-    resizing: {
-      backgroundColor: theme.palette.primary.main
-    },
-    slit: {
-      width: theme.spacing(5),
-      height: 1,
-      backgroundColor: theme.palette.common.white
-    }
-  })
+import { useTheme } from '@emotion/react'
+import Box from '@mui/material/Box'
 
 interface DispatchProps {
   setBottomBarHeight: (offset: number) => void
 }
 
-interface DragBarState {
-  isResizing: boolean
-  lastY: number
-}
-
-type DragBarProps = WithStyles<typeof styles> & DispatchProps
+type DragBarProps = DispatchProps
 
 // height of bar / 2
 const MAGIC_OFFSET_BASE = 4
 
-class DragBar extends React.Component<DragBarProps, DragBarState> {
-  constructor(props: DragBarProps) {
-    super(props)
-    this.state = {
-      isResizing: false,
-      lastY: 0
+const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
+  const [isResizing, setIsResizing] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    window.addEventListener('mousemove', handleMousemove)
+    window.addEventListener('mouseup', handleMouseup)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMousemove)
+      window.removeEventListener('mouseup', handleMouseup)
     }
+  }, [isResizing])
+
+  const handleMousedown = () => {
+    console.log('handleMousedown', isResizing)
+    setIsResizing(true)
   }
 
-  componentDidMount() {
-    window.addEventListener('mousemove', e => this.handleMousemove(e))
-    window.addEventListener('mouseup', () => this.handleMouseup())
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('mousemove', this.handleMousemove)
-    window.removeEventListener('mouseup', this.handleMouseup)
-  }
-
-  handleMousedown = (e: React.MouseEvent) => {
-    this.setState({ isResizing: true, lastY: e.clientY })
-  }
-
-  handleMousemove = (e: MouseEvent) => {
-    if (!this.state.isResizing) {
+  const handleMousemove = (e: MouseEvent) => {
+    if (!isResizing) {
       return
     }
-    this.props.setBottomBarHeight(window.innerHeight - e.clientY - MAGIC_OFFSET_BASE)
+    setBottomBarHeight(window.innerHeight - e.clientY - MAGIC_OFFSET_BASE)
   }
 
-  handleMouseup = () => {
-    this.setState({ isResizing: false })
+  const handleMouseup = () => {
+    console.log('handleMouseup', isResizing)
+    setIsResizing(false)
   }
 
-  render() {
-    const { classes } = this.props
-    return (
+  const theme = createTheme(useTheme())
+
+  return (
+    <Box
+      sx={Object.assign(
+        {
+          backgroundColor: theme.palette.secondary.main,
+          height: theme.spacing(1),
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-evenly',
+          cursor: 'ns-resize',
+          transition: theme.transitions.create(['background-color']),
+          '&:hover': {
+            backgroundColor: theme.palette.primary.main,
+          },
+        },
+        isResizing
+          ? {
+              backgroundColor: theme.palette.primary.main,
+            }
+          : {}
+      )}
+      onMouseDown={handleMousedown}
+    >
       <Box
-        className={classNames(classes.dragBarContainer, this.state.isResizing && classes.resizing)}
-        onMouseDown={this.handleMousedown}
-      >
-        <Box className={classes.slit} />
-        <Box className={classes.slit} />
-      </Box>
-    )
-  }
+        sx={{
+          width: theme.spacing(5),
+          height: '1px',
+          backgroundColor: theme.palette.common.white,
+        }}
+      />
+      <Box
+        sx={{
+          width: theme.spacing(5),
+          height: '1px',
+          backgroundColor: theme.palette.common.white,
+        }}
+      />
+    </Box>
+  )
 }
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setBottomBarHeight: setBottomBarHeight
+      setBottomBarHeight: setBottomBarHeight,
     },
     dispatch
   )
-export default connect(null, mapDispatchToProps)(withStyles(styles)(DragBar))
+export default connect(null, mapDispatchToProps)(DragBar)

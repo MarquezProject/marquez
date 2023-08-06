@@ -1,8 +1,12 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import * as Redux from 'redux'
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { Field, Run } from '../../types/api'
+import { IState } from '../../store/reducers'
+import { connect } from 'react-redux'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import { stopWatchDuration } from '../../helpers/time'
 import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
@@ -10,10 +14,6 @@ import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 import RunStatus from '../jobs/RunStatus'
-import * as Redux from 'redux'
-import { IState } from '../../store/reducers'
-import { connect } from 'react-redux'
-import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -32,7 +32,6 @@ export interface SqlFacet {
   query: string
 }
 
-
 type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
@@ -40,7 +39,7 @@ type DatasetInfoProps = {
 } & JobFacetsProps &
   DispatchProps
 
-const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
+const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
 
@@ -86,7 +85,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {datasetFields.map(field => {
+            {datasetFields.map((field) => {
               return (
                 <TableRow key={field.name}>
                   <TableCell align='left'>{field.name}</TableCell>
@@ -121,7 +120,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
             </Box>
             <MqText subdued>{run.jobVersion && run.jobVersion.name}</MqText>
           </Box>
-          {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
+          {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
         </Box>
       )}
     </Box>
@@ -129,19 +128,16 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  jobFacets: state.facets.result
+  jobFacets: state.facets.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   Redux.bindActionCreators(
     {
       fetchJobFacets: fetchJobFacets,
-      resetFacets: resetFacets
+      resetFacets: resetFacets,
     },
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DatasetInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetInfo)

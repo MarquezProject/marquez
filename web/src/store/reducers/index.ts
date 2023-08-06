@@ -3,7 +3,7 @@
 
 import { History } from 'history'
 import { Reducer, combineReducers } from 'redux'
-import { connectRouter } from 'connected-react-router'
+import { createRouterReducer } from '@lagunovsky/redux-react-router'
 import dataset, { IDatasetState } from './dataset'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
@@ -33,7 +33,7 @@ export interface IState {
 
 export default (history: History): Reducer =>
   combineReducers({
-    router: connectRouter(history),
+    router: createRouterReducer(history),
     dataset,
     datasets,
     datasetVersions,

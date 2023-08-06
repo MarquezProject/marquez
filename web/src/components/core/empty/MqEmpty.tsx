@@ -1,10 +1,11 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Box, Theme, createStyles } from '@material-ui/core'
+import { Box } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
+import { useTheme } from '@emotion/react'
 import MqText from '../text/MqText'
 import React, { ReactElement } from 'react'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
 
 interface MqEmptyProps {
   emoji?: string
@@ -13,35 +14,24 @@ interface MqEmptyProps {
   children?: ReactElement
 }
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-      justifyContent: 'center'
-    },
-    inner: {
-      padding: theme.spacing(2),
-      border: `2px dashed ${theme.palette.secondary.main}`,
-      borderRadius: theme.shape.borderRadius,
-      width: '400px'
-    },
-    icon: {
-      fontSize: theme.spacing(7),
-      height: theme.spacing(7),
-      lineHeight: `${theme.spacing(7)}px`
-    }
-  })
+const MqEmpty: React.FC<MqEmptyProps> = ({ title, body, emoji, children }) => {
+  const theme = createTheme(useTheme())
 
-const MqEmpty: React.FC<MqEmptyProps & WithStyles<typeof styles>> = ({
-  classes,
-  title,
-  body,
-  emoji,
-  children
-}) => {
   return (
-    <Box className={classes.root}>
-      <Box className={classes.inner}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+      <Box
+        sx={{
+          padding: theme.spacing(2),
+          border: `2px dashed ${theme.palette.secondary.main}`,
+          borderRadius: theme.shape.borderRadius,
+          width: '400px',
+        }}
+      >
         {title && (
           <Box mb={1}>
             <MqText heading>{title}</MqText>
@@ -54,7 +44,15 @@ const MqEmpty: React.FC<MqEmptyProps & WithStyles<typeof styles>> = ({
         )}
         {children && <Box>{children}</Box>}
         {emoji && (
-          <Box className={classes.icon} mt={1}>
+          <Box
+            sx={{
+              padding: theme.spacing(2),
+              border: `2px dashed ${theme.palette.secondary.main}`,
+              borderRadius: theme.shape.borderRadius,
+              width: '400px',
+            }}
+            mt={1}
+          >
             <span role={'img'} aria-label={'icon'}>
               {emoji}
             </span>
@@ -65,4 +63,4 @@ const MqEmpty: React.FC<MqEmptyProps & WithStyles<typeof styles>> = ({
   )
 }
 
-export default withStyles(styles)(MqEmpty)
+export default MqEmpty

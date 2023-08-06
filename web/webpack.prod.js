@@ -1,7 +1,7 @@
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const webpackProd = {
@@ -29,4 +29,4 @@ const webpackProd = {
   ]
 }
 
-module.exports = merge.smart(webpackShared, webpackProd)
+module.exports = merge(webpackShared, webpackProd)

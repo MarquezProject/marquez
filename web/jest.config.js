@@ -1,20 +1,20 @@
 module.exports = {
   roots: ['<rootDir>/src'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        isolatedModules: 'true'
+      }
+    ]
   },
   testRegex: '__tests__/(.+).(test|spec).tsx?',
   testPathIgnorePatterns: ['<rootDir>/src/__tests__(.+)__snapshots__'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupTestFrameworkScriptFile: '<rootDir>/setupEnzyme.ts',
   globalSetup: '<rootDir>globalSetup.ts',
   setupFiles: ['<rootDir>setupJest.ts'],
   testEnvironment: 'jsdom',
   globals: {
-    'ts-jest': {
-      isolatedModules: 'true'
-    },
     __API_URL__: '/api/v1',
     __FEEDBACK_FORM_URL__: 'https://forms.gle/f3tTSrZ8wPj3sHTA7',
     __API_DOCS_URL__: 'https://marquezproject.github.io/marquez/openapi.html',
@@ -23,6 +23,8 @@ module.exports = {
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/__tests__/__mocks__/fileMock.js',
-    '\\.(css|less)$': 'identity-obj-proxy'
+    '\\.(css|less)$': 'identity-obj-proxy',
+    "d3": "<rootDir>/node_modules/d3/dist/d3.min.js",
+    "^d3-(.*)$": "<rootDir>/node_modules/d3-$1/dist/d3-$1.min.js"
   }
 }

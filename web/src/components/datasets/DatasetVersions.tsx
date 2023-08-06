@@ -1,45 +1,31 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { ArrowBackIosRounded } from '@material-ui/icons'
-import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import { ArrowBackIosRounded } from '@mui/icons-material'
+import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { DatasetVersion } from '../../types/api'
-import { Theme as ITheme } from '@material-ui/core/styles/createTheme'
-import { WithStyles as IWithStyles } from '@material-ui/core/styles/withStyles'
-import { alpha, createStyles, withStyles } from '@material-ui/core/styles'
+import { alpha, createTheme } from '@mui/material/styles'
 import { formatUpdatedAt } from '../../helpers'
+import { useTheme } from '@emotion/react'
 import DatasetInfo from './DatasetInfo'
-import IconButton from '@material-ui/core/IconButton'
+import IconButton from '@mui/material/IconButton'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunStatus from '../jobs/RunStatus'
-import transitions from '@material-ui/core/styles/transitions'
-
-const styles = (theme: ITheme) => {
-  return createStyles({
-    tableRow: {
-      cursor: 'pointer',
-      transition: transitions.create(['background-color']),
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.1)
-      }
-    }
-  })
-}
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
 }
 
-const DatasetVersions: FunctionComponent<DatasetVersionsProps &
-  IWithStyles<typeof styles>> = props => {
-  const { versions, classes } = props
+const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
+  const { versions } = props
 
   const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)
   const handleClick = (newValue: SetStateAction<DatasetVersion | null>) => {
     setInfoView(newValue)
   }
   const i18next = require('i18next')
+  const theme = createTheme(useTheme())
 
   if (versions.length === 0) {
     return null
@@ -49,7 +35,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps &
       <>
         <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
           <Chip label={infoView.version} />
-          <IconButton onClick={() => handleClick(null)}>
+          <IconButton onClick={() => handleClick(null)} size='large'>
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
@@ -93,10 +79,16 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps &
         </TableRow>
       </TableHead>
       <TableBody>
-        {versions.map(version => {
+        {versions.map((version) => {
           return (
             <TableRow
-              className={classes.tableRow}
+              sx={{
+                cursor: 'pointer',
+                transition: theme.transitions.create(['background-color']),
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.common.white, 0.1),
+                },
+              }}
               key={version.createdAt}
               onClick={() => handleClick(version)}
             >
@@ -124,4 +116,4 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps &
   )
 }
 
-export default withStyles(styles)(DatasetVersions)
+export default DatasetVersions

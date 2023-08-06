@@ -10,10 +10,10 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Theme,
-  Tooltip
-} from '@material-ui/core'
-import { ChevronLeftRounded, ChevronRightRounded } from '@material-ui/icons'
+  Tooltip,
+  createTheme,
+} from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import { Event } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -24,39 +24,16 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
-import Box from '@material-ui/core/Box'
-import IconButton from '@material-ui/core/IconButton'
+import { useTheme } from '@emotion/react'
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
+import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import MqJsonView from '../../components/core/json-view/MqJsonView'
 import React from 'react'
-import createStyles from '@material-ui/core/styles/createStyles'
 import moment from 'moment'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-const styles = (theme: Theme) => {
-  return createStyles({
-    nav: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: theme.spacing(2)
-    },
-    table: {
-      marginBottom: theme.spacing(2)
-    },
-    row: {
-      cursor: 'pointer',
-      '&:hover': {
-        backgroundColor: theme.palette.action.hover
-      }
-    },
-    ml2: {
-      marginLeft: theme.spacing(2)
-    }
-  })
-}
 
 interface StateProps {
   events: Event[]
@@ -78,284 +55,304 @@ interface DispatchProps {
   resetEvents: typeof resetEvents
 }
 
-type EventsProps = WithStyles<typeof styles> & StateProps & DispatchProps
+type EventsProps = StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
-class Events extends React.Component<EventsProps, EventsState> {
-  pageSize: number
+const Events: React.FC<EventsProps> = ({
+  events,
+  isEventsLoading,
+  isEventsInit,
+  fetchEvents,
+  resetEvents,
+}) => {
+  const pageSize = 20
+  const [state, setState] = React.useState<EventsState>({
+    page: 1,
+    events: [],
+    rowExpanded: null,
+    pageIsLast: false,
+    dateFrom: formatDateAPIQuery(moment().startOf('day').toString()),
+    dateTo: formatDateAPIQuery(moment().endOf('day').toString()),
+  })
 
-  constructor(props: EventsProps) {
-    super(props)
-    this.state = {
-      page: 1,
-      events: [],
-      rowExpanded: null,
-      pageIsLast: false,
-      dateFrom: formatDateAPIQuery(
-        moment()
-          .startOf('day')
-          .toString()
-      ),
-      dateTo: formatDateAPIQuery(
-        moment()
-          .endOf('day')
-          .toString()
-      )
+  const mounted = React.useRef<boolean>(false)
+
+  React.useEffect(() => {
+    if (!mounted.current) {
+      // on mount
+      fetchEvents(state.dateFrom, state.dateTo, pageSize)
+      mounted.current = true
+    } else {
+      // on update
+      if (events !== state.events) {
+        setState({
+          ...state,
+          events: events,
+          pageIsLast: events.length < state.page * pageSize,
+        })
+      }
     }
-    this.pageSize = 20
-  }
+  })
 
-  componentDidMount() {
-    const { dateFrom, dateTo } = this.state
-    this.props.fetchEvents(dateFrom, dateTo, this.pageSize)
-  }
-
-  componentDidUpdate() {
-    const { events: eventsState, page } = this.state
-    const { events: eventsProps } = this.props
-
-    if (eventsProps !== eventsState) {
-      this.setState({
-        events: eventsProps,
-        pageIsLast: eventsProps.length < page * this.pageSize
-      })
+  React.useEffect(() => {
+    return () => {
+      // on unmount
+      resetEvents()
     }
+  }, [])
+
+  const getEvents = () => {
+    return state.events?.slice((state.page - 1) * pageSize, pageSize + (state.page - 1) * pageSize)
   }
 
-  componentWillUnmount() {
-    this.props.resetEvents()
+  const pageNavigation = () => {
+    const titlePos =
+      state.events?.length > 0
+        ? `${pageSize * state.page - pageSize} - ${state.events.length}`
+        : null
+    return `${state.page} ${titlePos ? `(${titlePos})` : ''}`
   }
 
-  getEvents() {
-    const { events, page } = this.state
-    return events.slice((page - 1) * this.pageSize, this.pageSize + (page - 1) * this.pageSize)
-  }
-
-  pageNavigation() {
-    const { events, page } = this.state
-    const titlePos = events.length
-      ? `${this.pageSize * page - this.pageSize} - ${events.length}`
-      : `${events.length}`
-    return `${page} (${titlePos})`
-  }
-
-  handleChangeDatepicker(e: any, direction: 'from' | 'to') {
-    const { dateFrom, dateTo } = this.state
+  const handleChangeDatepicker = (e: any, direction: 'from' | 'to') => {
     const isDirectionFrom = direction === 'from'
     const keyDate = isDirectionFrom ? 'dateFrom' : 'dateTo'
 
-    this.props.fetchEvents(
-      formatDateAPIQuery(isDirectionFrom ? e.toDate() : dateFrom),
-      formatDateAPIQuery(isDirectionFrom ? dateTo : e.toDate()),
-      this.pageSize
+    fetchEvents(
+      formatDateAPIQuery(isDirectionFrom ? e.toDate() : state.dateFrom),
+      formatDateAPIQuery(isDirectionFrom ? state.dateTo : e.toDate()),
+      pageSize
     )
 
-    this.setState({ [keyDate]: formatDatePicker(e.toDate()), page: 1, rowExpanded: null } as any)
+    setState({ [keyDate]: formatDatePicker(e.toDate()), page: 1, rowExpanded: null } as any)
   }
 
-  handleClickPage(direction: 'prev' | 'next') {
-    const { dateFrom, dateTo, page } = this.state
-    const directionPage = direction === 'next' ? page + 1 : page - 1
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
-    this.props.fetchEvents(
-      formatDateAPIQuery(dateFrom),
-      formatDateAPIQuery(dateTo),
-      this.pageSize * directionPage
+    fetchEvents(
+      formatDateAPIQuery(state.dateFrom),
+      formatDateAPIQuery(state.dateTo),
+      pageSize * directionPage
     )
-    this.setState({ page: directionPage, rowExpanded: null })
+    setState({ ...state, page: directionPage, rowExpanded: null })
   }
 
-  handleDownloadPayload(data: Event) {
+  const handleDownloadPayload = (data: Event) => {
     const title = `${data.job.name}-${data.eventType}-${data.run.runId}`
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
     saveAs(blob, `${title}.json`)
   }
 
-  render() {
-    const { classes, isEventsLoading, isEventsInit } = this.props
-    const { events, rowExpanded, page, dateFrom, dateTo, pageIsLast } = this.state
-    const i18next = require('i18next')
+  const i18next = require('i18next')
+  const theme = createTheme(useTheme())
 
-    return (
-      <Container maxWidth={'lg'} disableGutters>
-        <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
-          <>
-            <Box p={2} display={'flex'} justifyContent={'space-between'}>
+  return (
+    <Container maxWidth={'lg'} disableGutters>
+      <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
+        <>
+          <Box p={2} display={'flex'} justifyContent={'space-between'}>
+            <Box>
+              <MqText heading>{i18next.t('events_route.title')}</MqText>
+              Page: {pageNavigation()}
+            </Box>
+            {getEvents()?.length > 0 && (
               <Box>
-                <MqText heading>{i18next.t('events_route.title')}</MqText>
-                Page: {this.pageNavigation()}
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <IconButton
+                    sx={{
+                      marginLeft: theme.spacing(2),
+                    }}
+                    color='primary'
+                    disabled={state.page === 1}
+                    onClick={() => handleClickPage('prev')}
+                    size='large'
+                  >
+                    <ChevronLeftRounded />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <IconButton
+                    color='primary'
+                    disabled={state.pageIsLast}
+                    onClick={() => handleClickPage('next')}
+                    size='large'
+                  >
+                    <ChevronRightRounded />
+                  </IconButton>
+                </Tooltip>
               </Box>
-              {events.length === 0 && (
-                <Box>
-                  <Tooltip title={i18next.t('events_route.previous_page')}>
-                    <IconButton
-                      className={classes.ml2}
-                      color='primary'
-                      disabled={page === 1}
-                      onClick={() => this.handleClickPage('prev')}
-                    >
-                      <ChevronLeftRounded />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={i18next.t('events_route.next_page')}>
-                    <IconButton
-                      color='primary'
-                      disabled={pageIsLast}
-                      onClick={() => this.handleClickPage('next')}
-                    >
-                      <ChevronRightRounded />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              )}
+            )}
+          </Box>
+          <Box
+            p={2}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: theme.spacing(3),
+            }}
+          >
+            <MqDatePicker
+              label={i18next.t('events_route.from_date')}
+              value={formatDatePicker(state.dateFrom)}
+              onChange={(e: any) => handleChangeDatepicker(e, 'from')}
+            />
+            <MqDatePicker
+              label={i18next.t('events_route.to_date')}
+              value={formatDatePicker(state.dateTo)}
+              onChange={(e: any) => handleChangeDatepicker(e, 'to')}
+            />
+          </Box>
+          {state.events?.length === 0 ? (
+            <Box p={2}>
+              <MqEmpty title={i18next.t('events_route.empty_title')}>
+                <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
+              </MqEmpty>
             </Box>
-            <Box p={2} className={classes.nav}>
-              <MqDatePicker
-                label={i18next.t('events_route.from_date')}
-                value={formatDatePicker(dateFrom)}
-                onChange={(e: any) => this.handleChangeDatepicker(e, 'from')}
-              />
-              <MqDatePicker
-                label={i18next.t('events_route.to_date')}
-                value={formatDatePicker(dateTo)}
-                onChange={(e: any) => this.handleChangeDatepicker(e, 'to')}
-              />
-            </Box>
-            {events.length === 0 ? (
-              <Box p={2}>
-                <MqEmpty title={i18next.t('events_route.empty_title')}>
-                  <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
-                </MqEmpty>
-              </Box>
-            ) : (
-              <>
-                <Table className={classes.table} size='small'>
-                  <TableHead>
-                    <TableRow>
-                      {/* {EVENTS_COLUMNS.map(field => {
-                        return ( */}
-                      <TableCell align='left'>
-                        <MqText subheading>{i18next.t('events_columns.id')}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText subheading>{i18next.t('events_columns.state')}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText subheading>{i18next.t('events_columns.name')}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText subheading>{i18next.t('events_columns.namespace')}</MqText>
-                      </TableCell>
-                      <TableCell align='left'>
-                        <MqText subheading>{i18next.t('events_columns.time')}</MqText>
-                      </TableCell>
-                      {/* )
-                      })} */}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {this.getEvents().map((event, key: number) => {
-                      return (
-                        <React.Fragment key={key}>
-                          <TableRow
-                            className={classes.row}
-                            onClick={() => {
-                              this.setState({ rowExpanded: key === rowExpanded ? null : key })
-                            }}
-                          >
-                            <TableCell align='left'>
-                              <MqText>{event.run.runId}</MqText>
-                            </TableCell>
-                            <TableCell align='left'>
-                              <MqStatus
-                                color={eventTypeColor(event.eventType)}
-                                label={event.eventType}
-                              />
-                            </TableCell>
-                            <TableCell align='left'>{event.job.name}</TableCell>
-                            <TableCell align='left'>
-                              <MqText> {event.job.namespace} </MqText>
-                            </TableCell>
-                            <TableCell align='left'>
-                              <MqText>{formatUpdatedAt(event.eventTime)}</MqText>
+          ) : (
+            <>
+              <Table
+                sx={{
+                  marginBottom: theme.spacing(2),
+                }}
+                size='small'
+              >
+                <TableHead>
+                  <TableRow>
+                    {/* {EVENTS_COLUMNS.map(field => {
+                      return ( */}
+                    <TableCell align='left'>
+                      <MqText subheading>{i18next.t('events_columns.id')}</MqText>
+                    </TableCell>
+                    <TableCell align='left'>
+                      <MqText subheading>{i18next.t('events_columns.state')}</MqText>
+                    </TableCell>
+                    <TableCell align='left'>
+                      <MqText subheading>{i18next.t('events_columns.name')}</MqText>
+                    </TableCell>
+                    <TableCell align='left'>
+                      <MqText subheading>{i18next.t('events_columns.namespace')}</MqText>
+                    </TableCell>
+                    <TableCell align='left'>
+                      <MqText subheading>{i18next.t('events_columns.time')}</MqText>
+                    </TableCell>
+                    {/* )
+                    })} */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {getEvents()?.map((event, key: number) => {
+                    return (
+                      <React.Fragment key={key}>
+                        <TableRow
+                          sx={{
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.hover,
+                            },
+                          }}
+                          onClick={() => {
+                            setState({
+                              ...state,
+                              rowExpanded: key === state.rowExpanded ? null : key,
+                            })
+                          }}
+                        >
+                          <TableCell align='left'>
+                            <MqText>{event.run.runId}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqStatus
+                              color={eventTypeColor(event.eventType)}
+                              label={event.eventType}
+                            />
+                          </TableCell>
+                          <TableCell align='left'>{event.job.name}</TableCell>
+                          <TableCell align='left'>
+                            <MqText> {event.job.namespace} </MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText>{formatUpdatedAt(event.eventTime)}</MqText>
+                          </TableCell>
+                        </TableRow>
+                        {state.rowExpanded === key && (
+                          <TableRow>
+                            <TableCell colSpan={EVENTS_COLUMNS.length}>
+                              {fileSize(JSON.stringify(event)).kiloBytes > 500 ? (
+                                <Box p={2}>
+                                  <MqEmpty title={'Payload is too big for render'}>
+                                    <div>
+                                      <MqText subdued>
+                                        Please click on button and download payload as file
+                                      </MqText>
+                                      <br />
+                                      <Button
+                                        variant='outlined'
+                                        color='primary'
+                                        onClick={() => handleDownloadPayload(event)}
+                                      >
+                                        Download payload
+                                      </Button>
+                                    </div>
+                                  </MqEmpty>
+                                </Box>
+                              ) : (
+                                <MqJsonView data={event} />
+                              )}
                             </TableCell>
                           </TableRow>
-                          {rowExpanded === key && (
-                            <TableRow>
-                              <TableCell colSpan={EVENTS_COLUMNS.length}>
-                                {fileSize(JSON.stringify(event)).kiloBytes > 500 ? (
-                                  <Box p={2}>
-                                    <MqEmpty title={'Payload is too big for render'}>
-                                      <div>
-                                        <MqText subdued>
-                                          Please click on button and download payload as file
-                                        </MqText>
-                                        <br />
-                                        <Button
-                                          variant='outlined'
-                                          color='primary'
-                                          onClick={() => this.handleDownloadPayload(event)}
-                                        >
-                                          Download payload
-                                        </Button>
-                                      </div>
-                                    </MqEmpty>
-                                  </Box>
-                                ) : (
-                                  <MqJsonView data={event} />
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </React.Fragment>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-                <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
-                  <Tooltip title={i18next.t('events_route.previous_page')}>
-                    <IconButton
-                      className={classes.ml2}
-                      color='primary'
-                      disabled={page === 1}
-                      onClick={() => this.handleClickPage('prev')}
-                    >
-                      <ChevronLeftRounded />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={i18next.t('events_route.next_page')}>
-                    <IconButton
-                      color='primary'
-                      disabled={pageIsLast}
-                      onClick={() => this.handleClickPage('next')}
-                    >
-                      <ChevronRightRounded />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </>
-            )}
-          </>
-        </MqScreenLoad>
-      </Container>
-    )
-  }
+                        )}
+                      </React.Fragment>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+              <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <IconButton
+                    sx={{
+                      marginLeft: theme.spacing(2),
+                    }}
+                    color='primary'
+                    disabled={state.page === 1}
+                    onClick={() => handleClickPage('prev')}
+                    size='large'
+                  >
+                    <ChevronLeftRounded />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <IconButton
+                    color='primary'
+                    disabled={state.pageIsLast}
+                    onClick={() => handleClickPage('next')}
+                    size='large'
+                  >
+                    <ChevronRightRounded />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </>
+          )}
+        </>
+      </MqScreenLoad>
+    </Container>
+  )
 }
 
 const mapStateToProps = (state: IState) => ({
-  events: state.events.result,
-  isEventsLoading: state.events.isLoading,
-  isEventsInit: state.events.init
+  events: state.events?.result,
+  isEventsLoading: state.events?.isLoading,
+  isEventsInit: state.events?.init,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchEvents: fetchEvents,
-      resetEvents: resetEvents
+      resetEvents: resetEvents,
     },
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Events))
+export default connect(mapStateToProps, mapDispatchToProps)(Events)

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button } from '@material-ui/core'
+import { Box, Button } from '@mui/material'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
@@ -31,7 +31,7 @@ interface DispatchProps {
 
 type IProps = DatasetColumnLineageProps & DispatchProps & StateProps
 
-const DatasetColumnLineage: FunctionComponent<IProps> = props => {
+const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
   const { dataset, lineageDataset, fetchDataset, resetDataset } = props
   const columnLineage = dataset.columnLineage
 
@@ -90,14 +90,14 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  dataset: state.dataset.result
+  dataset: state.dataset.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDataset: fetchDataset,
-      resetDataset: resetDataset
+      resetDataset: resetDataset,
     },
     dispatch
   )

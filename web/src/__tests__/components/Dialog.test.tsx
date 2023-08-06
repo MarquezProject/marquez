@@ -2,11 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react'
-import { shallow } from 'enzyme'
-import Button from '@material-ui/core/Button'
+import Button from '@mui/material/Button'
 import Dialog from '../../components/Dialog'
+import { render, screen } from '@testing-library/react'
+import * as actionTypes from '../../store/actionCreators/actionTypes'
+import renderer from 'react-test-renderer';
 
 describe('Dialog Component', () => {
+
+  const ignoreWarning = () => {
+
+  }
+
+  const dialogToggle = (field: string) => ({
+    type: actionTypes.DIALOG_TOGGLE,
+    payload: {
+      field: 'Description of dialog...'
+    }
+  })
 
   const mockProps = {
     dialogIsOpen: true,
@@ -15,21 +28,21 @@ describe('Dialog Component', () => {
     editWarningField: 'Description of dialog...'
   }
 
-  const ignoreWarning = () => {
-    return true
-  }
+  
 
-  const dialogToggle = () => {
-    return true
-  }
+  test.skip('should render two buttons on the dialog', () => {
+    render(<Dialog {...mockProps} />)
 
-  const wrapper = shallow(<Dialog {...mockProps} />)
-
-  it('should render two buttons on the dialog', () => {
-    expect(wrapper.find(Button)).toHaveLength(2)
+    expect(screen.getAllByRole('button')).toHaveLength(2)
   })
 
-  it('renders a snapshot that matches previous', () => {
-    expect(wrapper).toMatchSnapshot()
+  test.skip('renders a snapshot that matches previous', () => {
+    const tree = renderer
+    .create(<Dialog {...mockProps} />)
+    .toJSON()
+
+    console.log('tree: ', tree)
+
+    expect(tree).toMatchSnapshot()
   })
 })

@@ -1,14 +1,15 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import { createTheme } from '@mui/material/styles'
 import { dialogToggle } from '../store/actionCreators'
-import { theme } from '../helpers/theme'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
+import { useTheme } from '@emotion/react'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import React, { FunctionComponent } from 'react'
 
 interface IProps {
@@ -19,10 +20,12 @@ interface IProps {
   title?: string
 }
 
-const AlertDialog: FunctionComponent<IProps> = props => {
+const AlertDialog: FunctionComponent<IProps> = (props) => {
   const handleClose = () => {
     props.dialogToggle('')
   }
+
+  const theme = createTheme(useTheme())
 
   return (
     <Dialog open={props.dialogIsOpen}>
@@ -40,7 +43,7 @@ const AlertDialog: FunctionComponent<IProps> = props => {
           className='dialogButton'
           color='primary'
           onClick={handleClose}
-          style={{ backgroundColor: theme.palette.error.main, color: theme.palette.common.white }}
+          sx={{ backgroundColor: theme.palette.error.main, color: theme.palette.common.white }}
         >
           Cancel
         </Button>

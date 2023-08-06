@@ -1,10 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { createNetworkData, formatUpdatedAt } from '../../helpers'
-const datasets = require('../../../docker/db/data/datasets.json')
-const jobs = require('../../../docker/db/data/jobs.json')
-
+import { formatUpdatedAt } from '../../helpers'
 describe('formatUpdated Function', () => {
   it('Should return an empty string when passed a falsey value', () => {
     const updatedAt = ''
