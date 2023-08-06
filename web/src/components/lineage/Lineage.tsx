@@ -19,7 +19,7 @@ import {
   fetchLineage,
   resetLineage,
   setLineageGraphDepth,
-  setSelectedNode,
+  setSelectedNode
 } from '../../store/actionCreators'
 import { generateNodeId } from '../../helpers/nodes'
 import { localPoint } from '@visx/event'
@@ -81,7 +81,7 @@ export function buildGraphAll(
       label: graph[i].id,
       data: graph[i].data,
       width: NODE_SIZE,
-      height: NODE_SIZE,
+      height: NODE_SIZE
     })
   }
 
@@ -102,7 +102,7 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
   // Sets used to detect cycles and break out of the recursive loop
   const visitedNodes = {
     successors: new Set(),
-    predecessors: new Set(),
+    predecessors: new Set()
   }
 
   const getSuccessors = (node: string) => {
@@ -113,8 +113,8 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
     if (successors?.length) {
       for (let i = 0; i < node.length - 1; i++) {
         if (successors[i]) {
-          paths.push([node, successors[i] as unknown as string])
-          getSuccessors(successors[i] as unknown as string)
+          paths.push([node, (successors[i] as unknown) as string])
+          getSuccessors((successors[i] as unknown) as string)
         }
       }
     }
@@ -128,8 +128,8 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
     if (predecessors?.length) {
       for (let i = 0; i < node.length - 1; i++) {
         if (predecessors[i]) {
-          paths.push([predecessors[i] as unknown as string, node])
-          getPredecessors(predecessors[i] as unknown as string)
+          paths.push([(predecessors[i] as unknown) as string, node])
+          getPredecessors((predecessors[i] as unknown) as string)
         }
       }
     }
@@ -149,7 +149,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const [state, setState] = React.useState<LineageState>({
     graph: g,
     edges: [],
-    nodes: [],
+    nodes: []
   })
   const { nodeName, namespace, nodeType } = useParams()
   const mounted = React.useRef<boolean>(false)
@@ -180,7 +180,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           setState({
             graph: gResult,
             edges: getEdges(),
-            nodes: gResult.nodes().map((v) => gResult.node(v)),
+            nodes: gResult.nodes().map(v => gResult.node(v))
           })
         })
       }
@@ -210,7 +210,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const getEdges = () => {
     const selectedPaths = getSelectedPaths(g, props.selectedNode)
 
-    return g?.edges().map((e) => {
+    return g?.edges().map(e => {
       const isSelected = selectedPaths.some((r: any) => e.v === r[0] && e.w === r[1])
       return Object.assign(g.edge(e), { isSelected: isSelected })
     })
@@ -222,7 +222,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
     <Box
       sx={{
         marginTop: `${HEADER_HEIGHT}px`,
-        height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`,
+        height: `calc(100vh - ${HEADER_HEIGHT}px - ${BOTTOM_OFFSET}px)`
       }}
     >
       {props.selectedNode === null && (
@@ -235,7 +235,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
       <DepthConfig depth={props.depth} />
       {state?.graph && (
         <ParentSize>
-          {(parent) => (
+          {parent => (
             <Zoom
               width={parent.width}
               height={parent.height}
@@ -245,14 +245,14 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
               scaleYMax={MAX_ZOOM}
               initialTransformMatrix={INITIAL_TRANSFORM}
             >
-              {(zoom) => (
+              {zoom => (
                 <div>
                   <svg
                     id={'GRAPH'}
                     width={parent.width}
                     height={parent.height}
                     style={{
-                      cursor: zoom.isDragging ? 'grabbing' : 'grab',
+                      cursor: zoom.isDragging ? 'grabbing' : 'grab'
                     }}
                     ref={zoom.containerRef as LegacyRef<SVGSVGElement>}
                   >
@@ -267,7 +267,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                       onTouchStart={zoom.dragStart}
                       onTouchMove={zoom.dragMove}
                       onTouchEnd={zoom.dragEnd}
-                      onMouseDown={(event) => {
+                      onMouseDown={event => {
                         zoom.dragStart(event)
                       }}
                       onMouseMove={zoom.dragMove}
@@ -275,21 +275,21 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
                       onMouseLeave={() => {
                         if (zoom.isDragging) zoom.dragEnd()
                       }}
-                      onDoubleClick={(event) => {
+                      onDoubleClick={event => {
                         const point = localPoint(event) || {
                           x: 0,
-                          y: 0,
+                          y: 0
                         }
                         zoom.scale({
                           scaleX: DOUBLE_CLICK_MAGNIFICATION,
                           scaleY: DOUBLE_CLICK_MAGNIFICATION,
-                          point,
+                          point
                         })
                       }}
                     />
                     {/* foreground */}
                     <g transform={zoom.toString()}>
-                      {state?.nodes.map((node) => (
+                      {state?.nodes.map(node => (
                         <Node key={node.data.name} node={node} selectedNode={props.selectedNode} />
                       ))}
                     </g>
@@ -307,7 +307,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
   selectedNode: state.lineage.selectedNode,
-  depth: state.lineage.depth,
+  depth: state.lineage.depth
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -316,7 +316,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       setSelectedNode: setSelectedNode,
       fetchLineage: fetchLineage,
       resetLineage: resetLineage,
-      setDepth: setLineageGraphDepth,
+      setDepth: setLineageGraphDepth
     },
     dispatch
   )
