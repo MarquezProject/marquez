@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import Lineage, { LineageProps, getSelectedPaths, initGraph, buildGraphAll } from '../../components/lineage/Lineage'
+import Lineage, {
+  LineageProps,
+  getSelectedPaths,
+  initGraph,
+  buildGraphAll
+} from '../../components/lineage/Lineage'
 import { LineageNode } from '../../components/lineage/types'
 import { render } from '@testing-library/react'
 import { createBrowserHistory } from 'history'
@@ -85,7 +90,7 @@ describe('Lineage Component', () => {
 
   beforeEach(() => {
     g = initGraph()
-    buildGraphAll(g, mockGraphWithCycle, (gResult: graphlib.Graph<MqNode>) => {
+    buildGraphAll(g, mockGraphWithCycle, false, selectedNode, (gResult: graphlib.Graph<MqNode>) => {
       g = gResult
     })
   })
