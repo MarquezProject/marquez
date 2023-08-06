@@ -22,30 +22,26 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ setDepth, depth }) => {
   return (
     <Box
       sx={{
-        position: 'absolute',
         display: 'flex',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        right: 0,
-        marginRight: '3rem',
-        padding: '1rem',
-        zIndex: theme.zIndex.appBar,
+        zIndex: theme.zIndex.appBar
       }}
     >
       <Typography>{GRAPH_TITLE}</Typography>
       <TextField
         type='number'
         value={depth}
-        onChange={(e) => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
+        onChange={e => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
         variant='outlined'
         size='small'
         aria-label={GRAPH_TITLE}
         sx={{
-          textAlign: 'center',
+          textAlign: 'center'
         }}
         inputProps={{
           min: 0,
-          max: 100,
+          max: 100
         }}
       />
     </Box>
@@ -55,7 +51,7 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ setDepth, depth }) => {
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setDepth: setLineageGraphDepth,
+      setDepth: setLineageGraphDepth
     },
     dispatch
   )

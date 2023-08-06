@@ -4,41 +4,32 @@
 import * as Redux from 'redux'
 import { Box, FormControlLabel, Switch } from '@mui/material'
 import { IState } from '../../store/reducers'
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setShowFullGraph } from '../../store/actionCreators'
 import React from 'react'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-      justifyContent: 'space-evenly',
-      alignItems: 'center',
-      zIndex: theme.zIndex.appBar
-    },
-    formControl: {
-      marginLeft: 0
-    }
-  })
-
-interface FullGraphSwitch extends WithStyles<typeof styles> {
+interface FullGraphSwitch {
   showFullGraph: boolean
   setShowFullGraph: (showFullGraph: boolean) => void
 }
 
-const FullGraphSwitch: React.FC<FullGraphSwitch> = ({
-  classes,
-  setShowFullGraph,
-  showFullGraph
-}) => {
+const FullGraphSwitch: React.FC<FullGraphSwitch> = ({ setShowFullGraph, showFullGraph }) => {
   const i18next = require('i18next')
   const FULL_GRAPH_LABEL = i18next.t('lineage.full_graph_label')
   return (
-    <Box className={classes.root}>
+    <Box
+      sx={theme => ({
+        display: 'flex',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        zIndex: theme.zIndex.appBar
+      })}
+    >
       <FormControlLabel
-        className={classes.formControl}
+        sx={{
+          marginLeft: 0
+        }}
         labelPlacement='start'
         control={
           <Switch
@@ -65,4 +56,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(FullGraphSwitch))
+export default connect(mapStateToProps, mapDispatchToProps)(FullGraphSwitch)

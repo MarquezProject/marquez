@@ -26,6 +26,7 @@ import { localPoint } from '@visx/event'
 import { useParams } from 'react-router-dom'
 import DepthConfig from './components/depth-config/DepthConfig'
 import Edge from './components/edge/Edge'
+import FullGraphSwitch from '../full-graph-switch/FullGraphSwitch'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import Node from './components/node/Node'
@@ -40,6 +41,7 @@ interface StateProps {
   lineage: LineageGraph
   selectedNode: string
   depth: number
+  showFullGraph: boolean
 }
 
 interface LineageState {
@@ -73,6 +75,8 @@ export function initGraph() {
 export function buildGraphAll(
   g: graphlib.Graph<MqNode>,
   graph: LineageNode[],
+  fullGraph: boolean,
+  selectedNode: string,
   callBack: (g: graphlib.Graph<MqNode>) => void
 ) {
   // nodes
@@ -90,6 +94,10 @@ export function buildGraphAll(
     for (let j = 0; j < graph[i].inEdges.length; j++) {
       g.setEdge(graph[i].inEdges[j].origin, graph[i].id)
     }
+  }
+
+  if (!fullGraph) {
+    removeUnselectedNodes(g, selectedNode)
   }
   layout(g)
 
@@ -141,6 +149,15 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
   return paths
 }
 
+export function removeUnselectedNodes(g: graphlib.Graph<MqNode>, selectedNode: string) {
+  const nodesInSelectedPath = new Set(getSelectedPaths(g, selectedNode).flat())
+  const nodesToRemove = g.nodes().filter(n => !nodesInSelectedPath.has(n))
+
+  for (const node of nodesToRemove) {
+    g.removeNode(node)
+  }
+}
+
 export interface LineageProps extends StateProps, DispatchProps {}
 
 let g: graphlib.Graph<MqNode>
@@ -157,6 +174,7 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
   const prevLineage = React.useRef<LineageGraph>()
   const prevDepth = React.useRef<number>()
   const prevSelectedNode = React.useRef<string>()
+  const prevShowFullGraph = React.useRef<boolean>()
 
   React.useEffect(() => {
     if (!mounted.current) {
@@ -172,17 +190,24 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
       // on update
       if (
         (JSON.stringify(props.lineage) !== JSON.stringify(prevLineage.current) ||
-          props.depth !== prevDepth.current) &&
+          props.depth !== prevDepth.current ||
+          props.showFullGraph !== prevShowFullGraph.current) &&
         props.selectedNode
       ) {
         g = initGraph()
-        buildGraphAll(g, props.lineage.graph, (gResult: graphlib.Graph<MqNode>) => {
-          setState({
-            graph: gResult,
-            edges: getEdges(),
-            nodes: gResult.nodes().map(v => gResult.node(v))
-          })
-        })
+        buildGraphAll(
+          g,
+          props.lineage.graph,
+          props.showFullGraph,
+          props.selectedNode,
+          (gResult: graphlib.Graph<MqNode>) => {
+            setState({
+              graph: gResult,
+              edges: getEdges(),
+              nodes: gResult.nodes().map(v => gResult.node(v))
+            })
+          }
+        )
       }
       if (props.selectedNode !== prevSelectedNode.current || props.depth !== prevDepth.current) {
         props.fetchLineage(
@@ -194,9 +219,27 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
         getEdges()
       }
 
+      if (props.selectedNode !== prevSelectedNode.current && !props.showFullGraph) {
+        // Always render the graph if the selected node changes and we aren't showing the full graph
+        // since new nodes may need to be added or removed from view
+        buildGraphAll(
+          g,
+          props.lineage.graph,
+          props.showFullGraph,
+          props.selectedNode,
+          (gResult: graphlib.Graph<MqNode>) => {
+            setState({
+              graph: gResult,
+              edges: getEdges(),
+              nodes: gResult.nodes().map(v => gResult.node(v))
+            })
+          }
+        )
+      }
       prevLineage.current = props.lineage
       prevDepth.current = props.depth
       prevSelectedNode.current = props.selectedNode
+      prevShowFullGraph.current = props.showFullGraph
     }
   })
 
@@ -232,7 +275,17 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
           </MqEmpty>
         </Box>
       )}
-      <DepthConfig depth={props.depth} />
+      <Box
+        sx={theme => ({
+          zIndex: theme.zIndex.appBar + 1,
+          position: 'absolute',
+          right: 0,
+          margin: '1rem 3rem'
+        })}
+      >
+        <DepthConfig depth={props.depth} />
+        <FullGraphSwitch />
+      </Box>
       {state?.graph && (
         <ParentSize>
           {parent => (
@@ -307,7 +360,8 @@ const Lineage: React.FC<LineageProps> = (props: LineageProps) => {
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
   selectedNode: state.lineage.selectedNode,
-  depth: state.lineage.depth
+  depth: state.lineage.depth,
+  showFullGraph: state.lineage.showFullGraph
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

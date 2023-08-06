@@ -246,6 +246,11 @@ export const setLineageGraphDepth = (depth: number) => ({
   payload: depth
 })
 
+export const setShowFullGraph = (showFullGraph: boolean) => ({
+  type: actionTypes.SET_SHOW_FULL_GRAPH,
+  payload: showFullGraph
+})
+
 export const selectNamespace = (namespace: string) => ({
   type: actionTypes.SELECT_NAMESPACE,
   payload: namespace
