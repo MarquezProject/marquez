@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, FormControlLabel, TextField, Typography, createTheme } from '@mui/material'
+import { Box, FormControlLabel, TextField, createTheme } from '@mui/material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setLineageGraphDepth } from '../../../../store/actionCreators'
