@@ -119,7 +119,7 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
 
     const successors = g?.successors(node)
     if (successors?.length) {
-      for (let i = 0; i < node.length - 1; i++) {
+      for (let i = 0; i < successors.length; i++) {
         if (successors[i]) {
           paths.push([node, (successors[i] as unknown) as string])
           getSuccessors((successors[i] as unknown) as string)
@@ -134,7 +134,7 @@ export function getSelectedPaths(g: graphlib.Graph<MqNode>, selectedNode: string
 
     const predecessors = g?.predecessors(node)
     if (predecessors?.length) {
-      for (let i = 0; i < node.length - 1; i++) {
+      for (let i = 0; i < predecessors.length; i++) {
         if (predecessors[i]) {
           paths.push([(predecessors[i] as unknown) as string, node])
           getPredecessors((predecessors[i] as unknown) as string)
