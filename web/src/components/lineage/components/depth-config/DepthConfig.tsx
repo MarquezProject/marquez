@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, TextField, Typography, createTheme } from '@mui/material'
+import { Box, FormControlLabel, TextField, Typography, createTheme } from '@mui/material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { setLineageGraphDepth } from '../../../../store/actionCreators'
@@ -28,21 +28,32 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ setDepth, depth }) => {
         zIndex: theme.zIndex.appBar
       }}
     >
-      <Typography>{GRAPH_TITLE}</Typography>
-      <TextField
-        type='number'
-        value={depth}
-        onChange={e => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
-        variant='outlined'
-        size='small'
-        aria-label={GRAPH_TITLE}
+      <FormControlLabel
         sx={{
-          textAlign: 'center'
+          marginLeft: 0,
+          '& .MuiFormControlLabel-label': {
+            marginRight: '.5rem'
+          }
         }}
-        inputProps={{
-          min: 0,
-          max: 100
-        }}
+        labelPlacement='start'
+        control={
+          <TextField
+            type='number'
+            value={depth}
+            onChange={e => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
+            variant='outlined'
+            size='small'
+            aria-label={GRAPH_TITLE}
+            sx={{
+              textAlign: 'center'
+            }}
+            inputProps={{
+              min: 0,
+              max: 100
+            }}
+          />
+        }
+        label={GRAPH_TITLE}
       />
     </Box>
   )
