@@ -57,7 +57,8 @@ i18next
           lineage: {
             empty_title: 'No node selected',
             empty_body: 'Try selecting a node through search or the jobs or datasets page.',
-            graph_depth_title: 'Graph Depth'
+            graph_depth_title: 'Depth',
+            full_graph_label: 'Full'
           },
           sidenav: {
             jobs: 'JOBS',
