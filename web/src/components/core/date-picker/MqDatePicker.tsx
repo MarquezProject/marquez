@@ -28,9 +28,8 @@ const MqDatePicker: React.FC<DatePickerProps> = ({
     <DateTimePicker
       label={label}
       sx={{
-        minWidth: '200px',
-        '.MuiFormLabel-root': {
-          transform: 'translate(14px, 0px) scale(0.75)',
+        label: {
+          left: theme.spacing(2),
         },
         '&:hover': {
           '.MuiOutlinedInput-notchedOutline': {
@@ -42,10 +41,9 @@ const MqDatePicker: React.FC<DatePickerProps> = ({
         '.MuiOutlinedInput-notchedOutline': {
           border: `2px solid ${theme.palette.common.white}`,
           borderRadius: theme.spacing(4),
-          top: '-16px',
-          left: '-6px',
           '> legend': {
-            display: 'none',
+            marginLeft: theme.spacing(2),
+            left: theme.spacing(2),
           },
         },
       }}
