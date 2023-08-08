@@ -1,6 +1,25 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.38.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.39.0...HEAD)
+
+## [0.39.0](https://github.com/MarquezProject/marquez/compare/0.38.0...0.39.0) - 2023-08-08
+### Added
+* Web: add full graph toggle [`#2569`](https://github.com/MarquezProject/marquez/pull/2569) [@jlukenoff](https://github.com/jlukenoff)  
+    *Adds a toggle to the Lineage UI to let users switch between viewing the full graph and only the selected paths.*
+* Web: add ARIA labels to input fields [`#2562`](https://github.com/MarquezProject/marquez/pull/2562) [@merobi-hub](https://github.com/merobi-hub)  
+    *Adds i18next-compliant ARIA labels to input fields for improved accessibility.*
+
+### Changed
+* Web: upgrade React to version 18 [`#2563`](https://github.com/MarquezProject/marquez/pull/2563) [@Xavier-Cliquennois](https://github.com/Xavier-Cliquennois)  
+    *Upgrades the Web client in order to utilize the latest version of Node.js and update all dependencies to their respective latest versions.*
+
+### Fixed
+* Web: fix the stylesheet for the date selector [`#2573`](https://github.com/MarquezProject/marquez/pull/2573) [@phixme](https://github.com/phixMe)  
+    *Fixes margins and moves the label to be more inline with what the defaults are to fix issues caused by the recent Material-UI upgrade.*
+* Web: update i18n for general search filter and `runInfo` facets search [`#2557`](https://github.com/MarquezProject/marquez/pull/2557) [@merobi-hub](https://github.com/merobi-hub)  
+    *Adds missing i18n support for `runInfo` and search.*
+* Docker: update web proxy import [`#2571`](https://github.com/MarquezProject/marquez/pull/2571) [@phixme](https://github.com/phixMe)  
+    *Updates the import style for the `http-proxy-middleware`.*
 
 ## [0.38.0](https://github.com/MarquezProject/marquez/compare/0.37.0...0.38.0) - 2023-08-02
 ### Added
