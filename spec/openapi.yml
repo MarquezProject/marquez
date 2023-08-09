@@ -91,6 +91,7 @@ paths:
         - $ref: '#/components/parameters/before'
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       summary: List all received OpenLineage events.
       description: Returns a list of OpenLineage events, sorted in direction of passed sort parameter. By default it is desc.
       tags:
@@ -945,6 +946,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LineageEvent'
+        totalCount:
+          type: number
+          description: The total number of events returned matching our conditions.
 
     CreatedSource:
       type: object
