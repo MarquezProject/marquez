@@ -163,28 +163,28 @@ An extra `v55_migration_lock` table will be introduced:
 | run_uuid   | `UUID`        |
 | created_at | `TIMESTAMPTZ` |
 
-Data migration will be run in chunks each chunk will 
+Data migration will be run in chunks each chunk will
 contain events older than rows in `v55_migration_lock` table.
 
 ```
 WITH events_chunk AS (
 	SELECT * FROM lineage_events
 	JOIN migration_lock m
-	WHERE lineage_events.created_at < migration_lock.created_at 
-	OR (lineage_events.created_at = migration_lock.created_at AND lineage_events.run_uuid < migration_lock.run_uuid) 
+	WHERE lineage_events.created_at < migration_lock.created_at
+	OR (lineage_events.created_at = migration_lock.created_at AND lineage_events.run_uuid < migration_lock.run_uuid)
 	ORDER BY created_at DESC, run_uuid DESC -- start with latest and move to older events
 	LIMIT :chunk_size
 ),
-insert_datasets AS ( 
-	INSERT INTO dataset_facets 
+insert_datasets AS (
+	INSERT INTO dataset_facets
 	SELECT ... FROM events_chunk
 ),
 insert_runs AS (
-	INSERT INTO run_facets 
+	INSERT INTO run_facets
 	SELECT ... FROM events_chunk
 ),
 insert_jobs AS (
-	INSERT INTO job_facets 
+	INSERT INTO job_facets
 	SELECT ... FROM events_chunk
 ),
 INSERT INTO v55_migration_lock  -- insert lock for the oldest event migrated
@@ -192,7 +192,7 @@ SELECT events_chunk.created_at, event_chunk_run_uuid
 FROM events_chunk
 ORDER BY created_at ASC , run_uuid ASC
 LIMIT 1
-``` 
+```
 Such a query will be run until `created_at` and `run_uuid` in `v55_migration_lock` will equal:
 ```
 SELECT run_uuid, created_at FROM lineage_events ORDER BY created_at ASC, run_uuid ASC LIMIT 1;
@@ -203,5 +203,5 @@ the second step will fail and ask to manually run data migration command and ret
 the command runs successfully. Table `migration_lock` will be dropped at the end of second migration step.
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

@@ -17,7 +17,7 @@ To develop on this project, you need to have Node version 18 installed. In order
    ```
    $ npm run dev
    ```
-   
+
    > **Note:** Marquez listens on port `8080` for all API calls; use the `MARQUEZ_PORT` environment variable to  override the API port.
 
 ### Testing
@@ -53,7 +53,7 @@ Our types are defined in the `src/types` folder
 
 Fix all style issues in project
 ```
-   $ npm run eslint-fix 
+   $ npm run eslint-fix
 ```
 
 ### Seeding data

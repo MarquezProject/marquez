@@ -1,6 +1,6 @@
 # Why the DCO?
 
-We have tried to make it as easy as possible to make contributions. 
+We have tried to make it as easy as possible to make contributions.
 This applies to how we handle the legal aspects of contribution.
 
 We simply ask that when submitting a patch for review,
@@ -28,5 +28,5 @@ makes it suitable to add to this project.  See
 
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

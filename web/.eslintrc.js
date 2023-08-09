@@ -57,13 +57,13 @@ module.exports = {
       "ignoreCase": false,
       "ignoreMemberSort": false,
       "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
-    }] 
+    }]
   },
   'overrides': [
     {
       'files': './src/i18n/config.ts',
       'rules': {
-        '@typescript-eslint/quotes': 'off' 
+        '@typescript-eslint/quotes': 'off'
       }
     }
   ]

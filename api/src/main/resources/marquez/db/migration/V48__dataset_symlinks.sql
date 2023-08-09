@@ -21,4 +21,3 @@ CREATE TYPE DATASET_NAME AS (
     namespace       VARCHAR(255),
     name            VARCHAR(255)
 );
-
