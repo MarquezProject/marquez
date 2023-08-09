@@ -25,7 +25,7 @@ implementation 'io.github.marquezproject:marquez-java:0.39.0
 ### Reading Metadata
 ```java
 // Connect to http://localhost:5000
-MarquezClient client = MarquezClient().builder()
+MarquezClient client = MarquezClient.builder()
   .baseUrl("http://localhost:5000")
   .build()
 
