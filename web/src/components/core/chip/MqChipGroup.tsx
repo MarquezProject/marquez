@@ -4,22 +4,11 @@
 import React from 'react'
 
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import { Theme, WithStyles, createStyles } from '@material-ui/core'
 import { Undefinable } from '../../../types/util/Nullable'
-import Box from '@material-ui/core/Box'
+import { createTheme } from '@mui/material/styles'
+import { useTheme } from '@emotion/react'
+import Box from '@mui/material/Box'
 import MqChip from './MqChip'
-import withStyles from '@material-ui/core/styles/withStyles'
-
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      border: `1px solid ${theme.palette.primary.main}`,
-      backgroundColor: theme.palette.background.paper,
-      borderRadius: theme.spacing(2),
-      display: 'inline-block',
-      padding: '1px'
-    }
-  })
 
 interface OwnProps {
   chips: {
@@ -38,47 +27,50 @@ interface StateProps {
   selected: Undefinable<string>
 }
 
-type MqChipGroupProps = WithStyles<typeof styles> & OwnProps
+type MqChipGroupProps = OwnProps
 
 /**
  * This functions as a standard button group and wraps the <Chip /> component with
  * selection logic and callbacks needed to manage and change state
  */
-class MqChipGroup extends React.Component<MqChipGroupProps, StateProps> {
-  constructor(props: MqChipGroupProps) {
-    super(props)
-    this.state = {
-      selected: props.initialSelection
-    }
+const MqChipGroup: React.FC<MqChipGroupProps> = ({ chips, initialSelection, onSelect }) => {
+  const [state, setState] = React.useState<StateProps>({
+    selected: initialSelection,
+  })
+
+  const handlerOnSelect = (label: string) => {
+    setState({
+      selected: label,
+    })
+
+    setTimeout(() => {
+      onSelect(label)
+    }, 1)
   }
 
-  onSelect = (label: string) => {
-    this.setState(
-      {
-        selected: label
-      },
-      () => {
-        this.props.onSelect(label)
-      }
-    )
-  }
+  const theme = createTheme(useTheme())
 
-  render() {
-    const { classes, chips } = this.props
-    return (
-      <Box className={classes.root}>
-        {chips.map(chip => (
-          <MqChip
-            {...chip}
-            onSelect={this.onSelect}
-            selected={this.state.selected === chip.value}
-            key={chip.value}
-            value={chip.value}
-          />
-        ))}
-      </Box>
-    )
-  }
+  return (
+    <Box
+      sx={{
+        border: `1px solid ${theme.palette.primary.main}`,
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: theme.spacing(2),
+        display: 'inline-block',
+        padding: '1px',
+      }}
+    >
+      {chips.map((chip) => (
+        <MqChip
+          {...chip}
+          onSelect={handlerOnSelect}
+          selected={state.selected === chip.value}
+          key={chip.value}
+          value={chip.value}
+        />
+      ))}
+    </Box>
+  )
 }
 
-export default withStyles(styles)(MqChipGroup)
+export default MqChipGroup

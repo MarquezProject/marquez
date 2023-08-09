@@ -10,14 +10,14 @@ Maven:
 <dependency>
     <groupId>io.github.marquezproject</groupId>
     <artifactId>marquez-java</artifactId>
-    <version>0.37.0</version>
+    <version>0.39.0</version>
 </dependency>
 ```
 
 or Gradle:
 
 ```groovy
-implementation 'io.github.marquezproject:marquez-java:0.37.0
+implementation 'io.github.marquezproject:marquez-java:0.39.0
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ implementation 'io.github.marquezproject:marquez-java:0.37.0
 ### Reading Metadata
 ```java
 // Connect to http://localhost:5000
-MarquezClient client = MarquezClient().builder()
+MarquezClient client = MarquezClient.builder()
   .baseUrl("http://localhost:5000")
   .build()
 

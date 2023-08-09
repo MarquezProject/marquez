@@ -2,52 +2,46 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_DOCS_URL } from '../../globals'
-import { AppBar, Toolbar } from '@material-ui/core'
+import { AppBar, Toolbar } from '@mui/material'
 import { DRAWER_WIDTH } from '../../helpers/theme'
 import { Link } from 'react-router-dom'
-import { Theme, WithStyles, createStyles, withStyles } from '@material-ui/core/styles'
-import Box from '@material-ui/core/Box'
+import { createTheme } from '@mui/material/styles'
+import { useTheme } from '@emotion/react'
+import Box from '@mui/material/Box'
 import MqText from '../core/text/MqText'
 import NamespaceSelect from '../namespace-select/NamespaceSelect'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
 import marquez_logo from './marquez_logo.svg'
 
-const styles = (theme: Theme) => {
-  return createStyles({
-    appBar: {
-      zIndex: theme.zIndex.drawer + 1,
-      backgroundColor: theme.palette.background.default,
-      borderBottom: `2px dashed ${theme.palette.secondary.main}`,
-      padding: `${theme.spacing(2)}px 0`,
-      left: DRAWER_WIDTH + 1,
-      width: `calc(100% - ${DRAWER_WIDTH}px)`
-    },
-    toolbar: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    },
-    innerToolbar: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      maxWidth: theme.breakpoints.values.lg,
-      width: theme.breakpoints.values.lg,
-      margin: '0 auto'
-    }
-  })
-}
-
-type HeaderProps = WithStyles<typeof styles>
-
-const Header = (props: HeaderProps): ReactElement => {
-  const { classes } = props
+const Header = (): ReactElement => {
   const i18next = require('i18next')
+  const theme = createTheme(useTheme())
+
   return (
-    <AppBar position='fixed' elevation={0} className={classes.appBar}>
+    <AppBar
+      position='fixed'
+      elevation={0}
+      sx={{
+        zIndex: theme.zIndex.drawer + 1,
+        backgroundColor: theme.palette.background.default,
+        borderBottom: `2px dashed ${theme.palette.secondary.main}`,
+        padding: `${theme.spacing(2)} 0`,
+        left: `${DRAWER_WIDTH + 1}px`,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+      }}
+    >
       <Toolbar>
-        <Box className={classes.innerToolbar}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            maxWidth: theme.breakpoints.values.lg,
+            width: theme.breakpoints.values.lg,
+            margin: '0 auto',
+          }}
+        >
           <Link to='/'>
             <img src={marquez_logo} height={48} alt='Marquez Logo' />
           </Link>
@@ -66,4 +60,4 @@ const Header = (props: HeaderProps): ReactElement => {
   )
 }
 
-export default withStyles(styles)(Header)
+export default Header
