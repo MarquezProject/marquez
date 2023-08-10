@@ -104,7 +104,8 @@ public interface OpenLineageDao extends BaseDao {
   AND le.event_time >= :after)
   ORDER BY le.event_time DESC
   LIMIT :limit OFFSET :offset""")
-  List<LineageEvent> getAllLineageEventsDesc(ZonedDateTime before, ZonedDateTime after, int limit, int offset);
+  List<LineageEvent> getAllLineageEventsDesc(
+      ZonedDateTime before, ZonedDateTime after, int limit, int offset);
 
   @SqlQuery(
       """
@@ -114,10 +115,11 @@ public interface OpenLineageDao extends BaseDao {
   AND le.event_time >= :after)
   ORDER BY le.event_time ASC
   LIMIT :limit OFFSET :offset""")
-  List<LineageEvent> getAllLineageEventsAsc(ZonedDateTime before, ZonedDateTime after, int limit, int offset);
+  List<LineageEvent> getAllLineageEventsAsc(
+      ZonedDateTime before, ZonedDateTime after, int limit, int offset);
 
   @SqlQuery(
-          """
+      """
       SELECT count(*)
       FROM lineage_events le
       WHERE (le.event_time < :before

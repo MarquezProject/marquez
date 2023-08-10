@@ -123,7 +123,8 @@ public class OpenLineageResource extends BaseResource {
     switch (sortDirection) {
       case DESC -> events =
           openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit, offset);
-      case ASC -> events = openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit, offset);
+      case ASC -> events =
+          openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit, offset);
     }
     int totalCount = openLineageDao.getAllLineageTotalCount(before.get(), after.get());
     return Response.ok(new Events(events, totalCount)).build();

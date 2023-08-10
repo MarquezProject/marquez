@@ -16,15 +16,7 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
-import {
-  Dataset,
-  DatasetVersion,
-  Event,
-  Events,
-  Facets,
-  LineageGraph,
-  Namespaces,
-} from '../../types/api'
+import { Dataset, DatasetVersion, Events, Facets, LineageGraph, Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
