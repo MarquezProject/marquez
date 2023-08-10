@@ -24,7 +24,7 @@ ext {
     jdbi3Version = '3.37.1'
     prometheusVersion = '0.16.0'
     testcontainersVersion = '1.17.6'
-    sentryVersion = '6.21.0'
+    sentryVersion = '6.28.0'
 }
 
 dependencies {
