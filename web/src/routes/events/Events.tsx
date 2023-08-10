@@ -37,6 +37,7 @@ import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect, useRef } from 'react'
 import moment from 'moment'
+import MqCopy from '../../components/core/copy/MqCopy'
 
 interface StateProps {
   events: Event[]
@@ -248,7 +249,10 @@ const Events: React.FC<EventsProps> = ({
                           }}
                         >
                           <TableCell align='left'>
-                            <MqText font={'mono'}>{event.run.runId}</MqText>
+                            <Box display={"flex"} alignItems={"center"}>
+                              <MqText font={'mono'}>{event.run.runId}</MqText>
+                              <MqCopy string={event.run.runId}/>
+                            </Box>
                           </TableCell>
                           <TableCell align='left'>
                             <MqStatus
