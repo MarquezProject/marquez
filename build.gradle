@@ -132,6 +132,7 @@ subprojects {
         java {
             googleJavaFormat()
             removeUnusedImports()
+            endWithNewline()
             custom 'disallowWildcardImports', disallowWildcardImports
         }
     }
