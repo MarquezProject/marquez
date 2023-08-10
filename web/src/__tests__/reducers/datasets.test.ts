@@ -15,9 +15,9 @@ describe('datasets reducer', () => {
       }
     }
     expect(datasetsReducer(initialState, action)).toStrictEqual({
-      init: true, 
-      isLoading: false, 
-      result: datasets, 
+      init: true,
+      isLoading: false,
+      result: datasets,
       deletedDatasetName: ''
     })
   })

@@ -10,4 +10,4 @@ git clone --branch add-testing-script --single-branch git@github.com:merobi-hub/
 
 python3 changelog-ci/scripts/main.py
 
-rm -rf changelog-ci 
+rm -rf changelog-ci

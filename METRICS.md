@@ -12,5 +12,5 @@
 | `marquez_job_runs_completed`     | _gauge_ |                                                            | Total number of completed job runs. |
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.
