@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Badge } from 'material-ui'
 import {
   Button,
   Chip,
@@ -29,6 +28,7 @@ import { saveAs } from 'file-saver'
 import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
@@ -177,19 +177,24 @@ const Events: React.FC<EventsProps> = ({
             sx={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
               gap: theme.spacing(3),
             }}
           >
-            <MqDatePicker
-              label={i18next.t('events_route.from_date')}
-              value={formatDatePicker(state.dateFrom)}
-              onChange={(e: any) => handleChangeDatepicker(e, 'from')}
-            />
-            <MqDatePicker
-              label={i18next.t('events_route.to_date')}
-              value={formatDatePicker(state.dateTo)}
-              onChange={(e: any) => handleChangeDatepicker(e, 'to')}
-            />
+            <Box display={'flex'}>
+              <MqDatePicker
+                label={i18next.t('events_route.from_date')}
+                value={formatDatePicker(state.dateFrom)}
+                onChange={(e: any) => handleChangeDatepicker(e, 'from')}
+              />
+              <Box sx={{ marginLeft: theme.spacing(2) }} />
+              <MqDatePicker
+                label={i18next.t('events_route.to_date')}
+                value={formatDatePicker(state.dateTo)}
+                onChange={(e: any) => handleChangeDatepicker(e, 'to')}
+              />
+            </Box>
+            {isEventsLoading && <CircularProgress size={16} />}
           </Box>
           {state.events?.length === 0 ? (
             <Box p={2}>
