@@ -14,9 +14,9 @@ import {
   FETCH_LINEAGE,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
-  FETCH_SEARCH
+  FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
-import { Dataset, DatasetVersion, Event, Facets, LineageGraph, Namespaces } from '../../types/api'
+import { Dataset, DatasetVersion, Events, Facets, LineageGraph, Namespaces } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
@@ -36,7 +36,7 @@ import {
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
-  fetchSearchSuccess
+  fetchSearchSuccess,
 } from '../actionCreators'
 import {
   deleteDataset,
@@ -49,7 +49,7 @@ import {
   getJobs,
   getNamespaces,
   getRunFacets,
-  getRuns
+  getRuns,
 } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
@@ -146,7 +146,14 @@ export function* fetchEventsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_EVENTS)
-      const events: Event[] = yield call(getEvents, payload.after, payload.before, payload.limit)
+      const events: Events = yield call(
+        getEvents,
+        payload.after,
+        payload.before,
+        payload.limit,
+        payload.offset
+      )
+      console.log(events)
       yield put(fetchEventsSuccess(events))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching event runs'))
@@ -182,7 +189,11 @@ export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET_VERSIONS)
-      const datasets: DatasetVersion[] = yield call(getDatasetVersions, payload.namespace, payload.name)
+      const datasets: DatasetVersion[] = yield call(
+        getDatasetVersions,
+        payload.namespace,
+        payload.name
+      )
       yield put(fetchDatasetVersionsSuccess(datasets))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
@@ -228,7 +239,7 @@ export default function* rootSaga(): Generator {
     fetchLineage(),
     fetchSearch(),
     deleteJobSaga(),
-    deleteDatasetSaga()
+    deleteDatasetSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

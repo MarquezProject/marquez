@@ -26,6 +26,7 @@ export interface Namespace {
 
 export interface Events {
   events: Event[]
+  totalCount: number
 }
 
 export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'

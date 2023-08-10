@@ -103,8 +103,9 @@ public interface OpenLineageDao extends BaseDao {
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
   ORDER BY le.event_time DESC
-  LIMIT :limit""")
-  List<LineageEvent> getAllLineageEventsDesc(ZonedDateTime before, ZonedDateTime after, int limit);
+  LIMIT :limit OFFSET :offset""")
+  List<LineageEvent> getAllLineageEventsDesc(
+      ZonedDateTime before, ZonedDateTime after, int limit, int offset);
 
   @SqlQuery(
       """
@@ -113,8 +114,17 @@ public interface OpenLineageDao extends BaseDao {
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
   ORDER BY le.event_time ASC
-  LIMIT :limit""")
-  List<LineageEvent> getAllLineageEventsAsc(ZonedDateTime before, ZonedDateTime after, int limit);
+  LIMIT :limit OFFSET :offset""")
+  List<LineageEvent> getAllLineageEventsAsc(
+      ZonedDateTime before, ZonedDateTime after, int limit, int offset);
+
+  @SqlQuery(
+      """
+      SELECT count(*)
+      FROM lineage_events le
+      WHERE (le.event_time < :before
+      AND le.event_time >= :after)""")
+  int getAllLineageTotalCount(ZonedDateTime before, ZonedDateTime after);
 
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);

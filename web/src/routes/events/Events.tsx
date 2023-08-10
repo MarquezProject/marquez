@@ -4,6 +4,7 @@
 import * as Redux from 'redux'
 import {
   Button,
+  Chip,
   Container,
   Table,
   TableBody,
@@ -24,19 +25,22 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
+import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import moment from 'moment'
 
 interface StateProps {
   events: Event[]
+  totalCount: number
   isEventsLoading: boolean
   isEventsInit: boolean
 }
@@ -47,7 +51,6 @@ interface EventsState {
   dateFrom: string
   dateTo: string
   page: number
-  pageIsLast: boolean
 }
 
 interface DispatchProps {
@@ -59,29 +62,32 @@ type EventsProps = StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
+const PAGE_SIZE = 20
+
 const Events: React.FC<EventsProps> = ({
   events,
+  totalCount,
   isEventsLoading,
   isEventsInit,
   fetchEvents,
   resetEvents,
 }) => {
-  const pageSize = 20
+  const [searchParams, setSearchParams] = useSearchParams()
   const [state, setState] = React.useState<EventsState>({
-    page: 1,
+    page: 0,
     events: [],
     rowExpanded: null,
-    pageIsLast: false,
-    dateFrom: formatDateAPIQuery(moment().startOf('day').toString()),
-    dateTo: formatDateAPIQuery(moment().endOf('day').toString()),
+    dateFrom:
+      searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString()),
+    dateTo: searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString()),
   })
 
-  const mounted = React.useRef<boolean>(false)
+  const mounted = useRef<boolean>(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!mounted.current) {
       // on mount
-      fetchEvents(state.dateFrom, state.dateTo, pageSize)
+      fetchEvents(state.dateFrom, state.dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
       mounted.current = true
     } else {
       // on update
@@ -89,30 +95,26 @@ const Events: React.FC<EventsProps> = ({
         setState({
           ...state,
           events: events,
-          pageIsLast: events.length < state.page * pageSize,
         })
       }
     }
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (!searchParams.get('dateFrom') && !searchParams.get('dateTo')) {
+      setSearchParams({
+        dateFrom: formatDateAPIQuery(moment().startOf('day').toString()),
+        dateTo: formatDateAPIQuery(moment().endOf('day').toString()),
+      })
+    }
+  }, [])
+
+  useEffect(() => {
     return () => {
       // on unmount
       resetEvents()
     }
   }, [])
-
-  const getEvents = () => {
-    return state.events?.slice((state.page - 1) * pageSize, pageSize + (state.page - 1) * pageSize)
-  }
-
-  const pageNavigation = () => {
-    const titlePos =
-      state.events?.length > 0
-        ? `${pageSize * state.page - pageSize} - ${state.events.length}`
-        : null
-    return `${state.page} ${titlePos ? `(${titlePos})` : ''}`
-  }
 
   const handleChangeDatepicker = (e: any, direction: 'from' | 'to') => {
     const isDirectionFrom = direction === 'from'
@@ -121,10 +123,14 @@ const Events: React.FC<EventsProps> = ({
     fetchEvents(
       formatDateAPIQuery(isDirectionFrom ? e.toDate() : state.dateFrom),
       formatDateAPIQuery(isDirectionFrom ? state.dateTo : e.toDate()),
-      pageSize
+      PAGE_SIZE,
+      state.page * PAGE_SIZE
     )
 
-    setState({ [keyDate]: formatDatePicker(e.toDate()), page: 1, rowExpanded: null } as any)
+    const params: { [key: string]: string } = {}
+    searchParams.forEach((value, key) => (params[key] = value))
+    setSearchParams({ ...params, [keyDate]: formatDateAPIQuery(e.toDate()) })
+    setState({ [keyDate]: formatDatePicker(e.toDate()), page: 0, rowExpanded: null } as any)
   }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
@@ -133,7 +139,8 @@ const Events: React.FC<EventsProps> = ({
     fetchEvents(
       formatDateAPIQuery(state.dateFrom),
       formatDateAPIQuery(state.dateTo),
-      pageSize * directionPage
+      PAGE_SIZE,
+      directionPage * PAGE_SIZE
     )
     setState({ ...state, page: directionPage, rowExpanded: null })
   }
@@ -149,59 +156,45 @@ const Events: React.FC<EventsProps> = ({
 
   return (
     <Container maxWidth={'lg'} disableGutters>
-      <MqScreenLoad loading={isEventsLoading || !isEventsInit}>
+      <MqScreenLoad loading={!isEventsInit}>
         <>
           <Box p={2} display={'flex'} justifyContent={'space-between'}>
             <Box>
-              <MqText heading>{i18next.t('events_route.title')}</MqText>
-              Page: {pageNavigation()}
-            </Box>
-            {getEvents()?.length > 0 && (
-              <Box>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
-                  <IconButton
-                    sx={{
-                      marginLeft: theme.spacing(2),
-                    }}
-                    color='primary'
-                    disabled={state.page === 1}
-                    onClick={() => handleClickPage('prev')}
-                    size='large'
-                  >
-                    <ChevronLeftRounded />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
-                  <IconButton
-                    color='primary'
-                    disabled={state.pageIsLast}
-                    onClick={() => handleClickPage('next')}
-                    size='large'
-                  >
-                    <ChevronRightRounded />
-                  </IconButton>
-                </Tooltip>
+              <Box display={'flex'} alignItems={'center'}>
+                <MqText heading>{i18next.t('events_route.title')}</MqText>
+                <Chip
+                  size={'small'}
+                  variant={'outlined'}
+                  color={'primary'}
+                  sx={{ marginLeft: 1 }}
+                  label={totalCount + ' total'}
+                ></Chip>
               </Box>
-            )}
+            </Box>
           </Box>
           <Box
             p={2}
             sx={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
               gap: theme.spacing(3),
             }}
           >
-            <MqDatePicker
-              label={i18next.t('events_route.from_date')}
-              value={formatDatePicker(state.dateFrom)}
-              onChange={(e: any) => handleChangeDatepicker(e, 'from')}
-            />
-            <MqDatePicker
-              label={i18next.t('events_route.to_date')}
-              value={formatDatePicker(state.dateTo)}
-              onChange={(e: any) => handleChangeDatepicker(e, 'to')}
-            />
+            <Box display={'flex'}>
+              <MqDatePicker
+                label={i18next.t('events_route.from_date')}
+                value={formatDatePicker(state.dateFrom)}
+                onChange={(e: any) => handleChangeDatepicker(e, 'from')}
+              />
+              <Box sx={{ marginLeft: theme.spacing(2) }} />
+              <MqDatePicker
+                label={i18next.t('events_route.to_date')}
+                value={formatDatePicker(state.dateTo)}
+                onChange={(e: any) => handleChangeDatepicker(e, 'to')}
+              />
+            </Box>
+            {isEventsLoading && <CircularProgress size={16} />}
           </Box>
           {state.events?.length === 0 ? (
             <Box p={2}>
@@ -219,8 +212,6 @@ const Events: React.FC<EventsProps> = ({
               >
                 <TableHead>
                   <TableRow>
-                    {/* {EVENTS_COLUMNS.map(field => {
-                      return ( */}
                     <TableCell align='left'>
                       <MqText subheading>{i18next.t('events_columns.id')}</MqText>
                     </TableCell>
@@ -236,12 +227,10 @@ const Events: React.FC<EventsProps> = ({
                     <TableCell align='left'>
                       <MqText subheading>{i18next.t('events_columns.time')}</MqText>
                     </TableCell>
-                    {/* )
-                    })} */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {getEvents()?.map((event, key: number) => {
+                  {events.map((event, key: number) => {
                     return (
                       <React.Fragment key={key}>
                         <TableRow
@@ -259,7 +248,7 @@ const Events: React.FC<EventsProps> = ({
                           }}
                         >
                           <TableCell align='left'>
-                            <MqText>{event.run.runId}</MqText>
+                            <MqText font={'mono'}>{event.run.runId}</MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqStatus
@@ -307,29 +296,39 @@ const Events: React.FC<EventsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <Box display={'flex'} justifyContent={'flex-end'} mb={2}>
+              <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+                <MqText subdued>
+                  <>
+                    {PAGE_SIZE * state.page + 1} -{' '}
+                    {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
+                  </>
+                </MqText>
                 <Tooltip title={i18next.t('events_route.previous_page')}>
-                  <IconButton
-                    sx={{
-                      marginLeft: theme.spacing(2),
-                    }}
-                    color='primary'
-                    disabled={state.page === 1}
-                    onClick={() => handleClickPage('prev')}
-                    size='large'
-                  >
-                    <ChevronLeftRounded />
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      sx={{
+                        marginLeft: theme.spacing(2),
+                      }}
+                      color='primary'
+                      disabled={state.page === 0}
+                      onClick={() => handleClickPage('prev')}
+                      size='large'
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </span>
                 </Tooltip>
                 <Tooltip title={i18next.t('events_route.next_page')}>
-                  <IconButton
-                    color='primary'
-                    disabled={state.pageIsLast}
-                    onClick={() => handleClickPage('next')}
-                    size='large'
-                  >
-                    <ChevronRightRounded />
-                  </IconButton>
+                  <span>
+                    <IconButton
+                      color='primary'
+                      onClick={() => handleClickPage('next')}
+                      size='large'
+                      disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               </Box>
             </>
@@ -342,6 +341,7 @@ const Events: React.FC<EventsProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   events: state.events?.result,
+  totalCount: state.events.totalCount,
   isEventsLoading: state.events?.isLoading,
   isEventsInit: state.events?.init,
 })
