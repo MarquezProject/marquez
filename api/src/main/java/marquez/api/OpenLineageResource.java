@@ -136,7 +136,6 @@ public class OpenLineageResource extends BaseResource {
     @JsonProperty("events")
     List<LineageEvent> value;
 
-    @NonNull
-    int totalCount;
+    @NonNull int totalCount;
   }
 }
