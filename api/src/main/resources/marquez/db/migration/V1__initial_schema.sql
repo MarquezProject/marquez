@@ -76,7 +76,7 @@ CREATE TABLE job_versions_io_mapping (
   job_version_uuid UUID REFERENCES job_versions(uuid),
   dataset_uuid     UUID REFERENCES datasets(uuid),
   io_type          VARCHAR(64) NOT NULL,
-  PRIMARY KEY (job_version_uuid, dataset_uuid, io_type) 
+  PRIMARY KEY (job_version_uuid, dataset_uuid, io_type)
 );
 
 CREATE TABLE run_args (
@@ -121,5 +121,5 @@ CREATE TABLE stream_versions (
 CREATE TABLE runs_input_mapping (
   run_uuid             UUID REFERENCES runs(uuid),
   dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
-  PRIMARY KEY (run_uuid, dataset_version_uuid) 
+  PRIMARY KEY (run_uuid, dataset_version_uuid)
 );

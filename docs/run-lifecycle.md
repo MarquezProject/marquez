@@ -91,5 +91,5 @@ If the job can not be introspected statically, we will have to capture the infor
  We mark the run as successful (similarly 'fail' for a failed job)
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

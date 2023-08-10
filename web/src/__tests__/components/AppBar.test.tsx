@@ -12,5 +12,5 @@ describe('AppBar Test', () => {
   // const componentText = screen.render().text()
   test.skip('should render the dataset name', () => {
     expect(componentText).toContain('MARQUEZ')
-  })  
+  })
 })

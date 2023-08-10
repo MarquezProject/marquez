@@ -28,7 +28,7 @@ describe('Dialog Component', () => {
     editWarningField: 'Description of dialog...'
   }
 
-  
+
 
   test.skip('should render two buttons on the dialog', () => {
     render(<Dialog {...mockProps} />)

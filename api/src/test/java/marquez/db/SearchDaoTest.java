@@ -39,6 +39,7 @@ public class SearchDaoTest {
 
   static final int LIMIT = 25;
   static final int NUM_OF_JOBS = 2;
+
   /**
    * Using {@link DbTestUtils#newJobs(Jdbi, int)} generates 4 input datasets and 3 output datasets
    * for each job inserted into the {@code jobs} table.

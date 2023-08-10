@@ -32,7 +32,7 @@ jobs:
         run: |
           ok=1
           readarray -t files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
-          for file in ${files[@]}; do 
+          for file in ${files[@]}; do
             if [[ ($file == *".java") ]]; then
               if ! grep -q Copyright "$file"; then
                 ok=0

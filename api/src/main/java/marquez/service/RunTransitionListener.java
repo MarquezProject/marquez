@@ -87,8 +87,10 @@ public interface RunTransitionListener {
   class RunTransition {
     /** the unique ID of the run. */
     @NonNull RunId runId;
+
     /** The old state of the run. */
     @Nullable RunState oldState;
+
     /** The new state of the run. */
     @NonNull RunState newState;
 

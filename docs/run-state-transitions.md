@@ -3,8 +3,8 @@ Run states change based on the success or failure of a job run. The datasets con
 by a job run are immutable and do not change based on the success or failure of the run.
 
 # Dataset Versioning Lifecycle
-Dataset versions change based on the success or failure of job runs that consume or generate those 
-datasets. Typically, Runs generate dataset versions as outputs, but sometimes a job run may result 
+Dataset versions change based on the success or failure of job runs that consume or generate those
+datasets. Typically, Runs generate dataset versions as outputs, but sometimes a job run may result
 in an input dataset version being created if that dataset did not previously exist in the database.
 Once a dataset exists, a new version will only be created if the dataset is the output of a job run.
 
@@ -16,7 +16,7 @@ for dataset in jobRun.inputDatasets:
     version = dataset.createVersion('version1')
     dataset.setCurrentVersion(version)
   jobRun.addInputVersion(dataset.getCurrentVersion())
-  
+
 for dataset in jobRun.outputDatasets:
   datasetVersion
   if not exists(dataset):
@@ -48,7 +48,7 @@ Assume the following job graph
   * Create DatasetX@V1
   * Set DatasetX current version to V1
   * JobA@Run1 produces DatasetX@V1
-  
+
 ### Consume a new dataset
 * Given
   * JobB does not exist
@@ -84,7 +84,7 @@ Assume the following job graph
   * Set DatasetY current version to V1
   * JobB@Run1 consumes DatasetX@V1
   * JobB@Run1 produces DatasetY@V1
-    
+
 ![Consume and produce dataset](./assets/dot/job_input_dataset_creation.dot.png)
 
 ### Successful Job Chain - Produce and Consume Existing Datasets
@@ -124,7 +124,7 @@ Assume the following job graph
     * DatasetX current version is V1
     * JobA@Run2 produces DatasetX@V2
     * DatasetY current version remains at V1
-  
+
 ### Failed Job Chain - Produce and Consume Existing Datasets - Workflow Continues
 * Given
     * JobA@Run1 exists
@@ -197,7 +197,7 @@ Parent job failure does not impact the status of the datasets created by child j
   * JobB@Run1 consumes DatasetX@V1
   * JobC@Run1 consumes DatasetY@V1
   * JobC@Run1 produces DatasetZ@V2
-  
+
 ![Parent has failed child jobs](./assets/dot/parent_job_component_failed_dataset_creation.dot.png)
 
 ### Parent jobs **fails**
@@ -223,9 +223,9 @@ Parent job failure does not impact the status of the datasets created by child j
   * JobB@Run1 produces DatasetY@V2
   * JobC@Run1 consumes DatasetY@V2
   * JobC@Run1 produces DatasetZ@V2
-  
+
 ![Parent has failed child jobs](./assets/dot/parent_job_failed_dataset_creation.dot.png)
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.
