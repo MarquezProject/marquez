@@ -29,9 +29,6 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url = 'https://datakin.jfrog.io/artifactory/maven-public-libs-snapshot'
-        }
     }
 }
 
@@ -59,7 +56,7 @@ subprojects {
         jacocoVersion = '0.8.10'
         junit5Version = '5.9.3'
         lombokVersion = '1.18.28'
-        mockitoVersion = '5.1.1'
+        mockitoVersion = '5.4.0'
         openlineageVersion = '0.26.0'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.6.0'
@@ -73,7 +70,6 @@ subprojects {
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
