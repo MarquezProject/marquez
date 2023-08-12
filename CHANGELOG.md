@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.39.0...HEAD)
+### Added
+* Web: add html tooltip [`#2580`](https://github.com/MarquezProject/marquez/pull/2587) [@davidsharp7](https://github.com/davidsharp7)  
 
 ## [0.39.0](https://github.com/MarquezProject/marquez/compare/0.38.0...0.39.0) - 2023-08-08
 ### Added
