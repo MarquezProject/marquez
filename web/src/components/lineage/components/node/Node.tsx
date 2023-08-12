@@ -10,13 +10,16 @@ import { Link } from 'react-router-dom'
 import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
-
 import { connect } from 'react-redux'
+
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
+import { styled } from '@mui/material/styles'
 import { theme } from '../../../../helpers/theme'
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 
 const RADIUS = 14
 const ICON_SIZE = 16
@@ -43,25 +46,49 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
     return '/'
   }
 
+  // configure the tool tip
+  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.common.white,
+      maxWidth: 400,
+      fontSize: theme.typography.pxToRem(14),
+      border: '1px solid ' + theme.palette.common.white,
+    },
+  }))
+
+  // return the object namespace/name
+  const addToToolTip = (inputString: string) => {
+    return <React.Fragment>
+      <Typography color="inherit">{inputString.split(':')[0]}</Typography>
+      <b>{"Namespace: "}</b>{inputString.split(':')[1]}<br></br>
+      <b>{"Object Name: "}</b>{inputString.split(':')[2]}<br></br>
+      </React.Fragment>
+  }
+
   const job = isJob(node)
   const isSelected = selectedNode === node.label
-  const ariaJobLabel = 'Job'
-  const ariaDatasetLabel = 'Dataset'
+  // convert the node label to  string
+  const nodeLabelToString = String(node.label)
+
   return (
     <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
       {job ? (
         <g>
-          <circle
-            style={{ cursor: 'pointer' }}
-            r={RADIUS}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-            strokeWidth={BORDER / 2}
-            cx={node.x}
-            cy={node.y}
-          />
+          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+            <circle
+              style={{ cursor: 'pointer' }}
+              r={RADIUS}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
+              cx={node.x}
+              cy={node.y}
+            />
+          </HtmlTooltip>
           <FontAwesomeIcon
-            title={ariaJobLabel}
             aria-hidden={'true'}
             style={{ transformOrigin: `${node.x}px ${node.y}px` }}
             icon={faCog}
@@ -74,28 +101,31 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
         </g>
       ) : (
         <g>
-          <rect
-            style={{ cursor: 'pointer' }}
-            x={node.x - RADIUS}
-            y={node.y - RADIUS}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-            strokeWidth={BORDER / 2}
-            width={RADIUS * 2}
-            height={RADIUS * 2}
-            rx={4}
-          />
-          <rect
-            style={{ cursor: 'pointer' }}
-            x={node.x - (RADIUS - 2)}
-            y={node.y - (RADIUS - 2)}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            width={(RADIUS - 2) * 2}
-            height={(RADIUS - 2) * 2}
-            rx={4}
-          />
+          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+            <rect
+              style={{ cursor: 'pointer' }}
+              x={node.x - RADIUS}
+              y={node.y - RADIUS}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
+              width={RADIUS * 2}
+              height={RADIUS * 2}
+              rx={4}
+            />
+          </HtmlTooltip>
+          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+            <rect
+              style={{ cursor: 'pointer' }}
+              x={node.x - (RADIUS - 2)}
+              y={node.y - (RADIUS - 2)}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              width={(RADIUS - 2) * 2}
+              height={(RADIUS - 2) * 2}
+              rx={4}
+            />
+          </HtmlTooltip>
           <FontAwesomeIcon
-            title={ariaDatasetLabel}
             aria-hidden={'true'}
             icon={faDatabase}
             width={ICON_SIZE}
