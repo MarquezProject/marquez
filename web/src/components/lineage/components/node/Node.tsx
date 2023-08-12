@@ -53,31 +53,34 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
     [`& .${tooltipClasses.tooltip}`]: {
       backgroundColor: theme.palette.background.default,
       color: theme.palette.common.white,
-      maxWidth: 400,
+      maxWidth: 600,
       fontSize: theme.typography.pxToRem(14),
       border: '1px solid ' + theme.palette.common.white,
     },
   }))
 
   // return the object namespace/name
-  const addToToolTip = (inputString: string) => {
+  const addToToolTip = (inputData: any) => {
+    const inputString = String(inputData.label)
+    const desc = String(inputData.data.description)
+    const namespace = String(inputData.data.namespace)
+    const objectName = String(inputData.data.name)
     return <React.Fragment>
       <Typography color="inherit">{inputString.split(':')[0]}</Typography>
-      <b>{"Namespace: "}</b>{inputString.split(':')[1]}<br></br>
-      <b>{"Object Name: "}</b>{inputString.split(':')[2]}<br></br>
+      <b>{"Namespace: "}</b>{namespace}<br></br>
+      <b>{"Name: "}</b>{objectName}<br></br>
+      <b>{"Description: "}</b>{desc === 'null' ? "No Description" : desc}
       </React.Fragment>
   }
 
   const job = isJob(node)
   const isSelected = selectedNode === node.label
-  // convert the node label to  string
-  const nodeLabelToString = String(node.label)
 
   return (
     <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
       {job ? (
         <g>
-          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+          <HtmlTooltip title={addToToolTip(node)}>
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
@@ -101,7 +104,7 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
         </g>
       ) : (
         <g>
-          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+          <HtmlTooltip title={addToToolTip(node)}>
             <rect
               style={{ cursor: 'pointer' }}
               x={node.x - RADIUS}
@@ -114,7 +117,7 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               rx={4}
             />
           </HtmlTooltip>
-          <HtmlTooltip title={addToToolTip(nodeLabelToString)}>
+          <HtmlTooltip title={addToToolTip(node)}>
             <rect
               style={{ cursor: 'pointer' }}
               x={node.x - (RADIUS - 2)}
