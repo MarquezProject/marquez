@@ -5,10 +5,9 @@
     "docker:disable",
     ":gitSignOff",
     ":separateMultipleMajorReleases",
-    ":automergePatch",
     ":maintainLockFilesDisabled"
   ],
-  "schedule": ["every weekend"],
+  "schedule": ["every 3 months on the first day of the month"],
   "npm": {
     "enabled": false
   },
@@ -24,5 +23,5 @@
       "addLabels": ["dependencies", "renovate"]
     }
   ],
-  "ignorePaths": ["**/chart/**"]
+  "ignorePaths": ["**/chart/**", "**/dev/**"]
 }
