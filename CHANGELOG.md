@@ -13,9 +13,6 @@
 * Web: add copy button for lineage ID [`#2578`](https://github.com/MarquezProject/marquez/pull/2578) [@AmandaYao00](https://github.com/AmandaYao00)  
     *Adds a copy button to the IDs on the Events page.*
 
-### Changed
-
-
 ### Fixed
 * API: add defaults for `idFromValue()` and `idFromValueAndType()` [`#2581`](https://github.com/MarquezProject/marquez/pull/2581) [@wslulciuc](https://github.com/wslulciuc)  
     *Replaces the `null` values in these functions in `EventTypeResolver` with defaults.*
