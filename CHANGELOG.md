@@ -1,6 +1,21 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.39.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.40.0...HEAD)
+
+## [0.40.0](https://github.com/MarquezProject/marquez/compare/0.39.0...0.40.0) - 2023-08-15
+### Added
+* API: lineage events paging update [`#2577`](https://github.com/MarquezProject/marquez/pull/2577) [@phixme](https://github.com/phixMe)  
+    *Updates the API for lineage events and restyles the lineage events page to fix a number of bugs and code duplication.*
+* Chart: do not use hardcoded Postgres image for init container [`#2579`](https://github.com/MarquezProject/marquez/pull/2579) [@terrpan](https://github.com/terrpan)  
+    *Adds a template in `chart/templates/helpers` to use the `global.imageRegistry` input value for the `wait-for-db` container to improve performance on private registries.*
+* Web: add copy button for lineage ID [`#2578`](https://github.com/MarquezProject/marquez/pull/2578) [@AmandaYao00](https://github.com/AmandaYao00)  
+    *Adds a copy button to the IDs on the Events page.*
+
+### Fixed
+* API: add defaults for `idFromValue()` and `idFromValueAndType()` [`#2581`](https://github.com/MarquezProject/marquez/pull/2581) [@wslulciuc](https://github.com/wslulciuc)  
+    *Replaces the `null` values in these functions in `EventTypeResolver` with defaults.*
+* Client: correct example syntax [`#2575`](https://github.com/MarquezProject/marquez/pull/2575) [@davidjgoss](https://github.com/davidjgoss)  
+    *Removes errant parens from the sample code's client instantiation.*
 
 ## [0.39.0](https://github.com/MarquezProject/marquez/compare/0.38.0...0.39.0) - 2023-08-08
 ### Added
