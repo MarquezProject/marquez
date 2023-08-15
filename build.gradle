@@ -60,7 +60,6 @@ subprojects {
         openlineageVersion = '0.26.0'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.6.0'
-        isReleaseVersion = !version.endsWith('SNAPSHOT')
     }
 
     dependencies {
