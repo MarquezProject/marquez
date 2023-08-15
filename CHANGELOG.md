@@ -17,8 +17,7 @@
 * API: add defaults for `idFromValue()` and `idFromValueAndType()` [`#2581`](https://github.com/MarquezProject/marquez/pull/2581) [@wslulciuc](https://github.com/wslulciuc)  
     *Replaces the `null` values in these functions in `EventTypeResolver` with defaults.*
 * Client: correct example syntax [`#2575`](https://github.com/MarquezProject/marquez/pull/2575) [@davidjgoss](https://github.com/davidjgoss)  
-    *Removes errant parens from the sample code's client instantiation.* 
-
+    *Removes errant parens from the sample code's client instantiation.*
 
 ## [0.39.0](https://github.com/MarquezProject/marquez/compare/0.38.0...0.39.0) - 2023-08-08
 ### Added
