@@ -138,7 +138,6 @@ publishing {
 }
 
 signing {
-    required { isReleaseVersion }
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
