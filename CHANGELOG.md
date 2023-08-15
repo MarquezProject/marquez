@@ -4,8 +4,6 @@
 
 ## [0.40.0](https://github.com/MarquezProject/marquez/compare/0.39.0...0.40.0) - 2023-08-15
 ### Added
-* API: apply `pre-commit run --all-files` [`#2576`](https://github.com/MarquezProject/marquez/pull/2576) [@wslulciuc](https://github.com/wslulciuc)  
-    *Applies `pre-commit` to all files and ignores `chart/`.*
 * API: lineage events paging update [`#2577`](https://github.com/MarquezProject/marquez/pull/2577) [@phixme](https://github.com/phixMe)  
     *Updates the API for lineage events and restyles the lineage events page to fix a number of bugs and code duplication.*
 * Chart: do not use hardcoded Postgres image for init container [`#2579`](https://github.com/MarquezProject/marquez/pull/2579) [@terrpan](https://github.com/terrpan)  
