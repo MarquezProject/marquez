@@ -172,6 +172,15 @@ jobs:
       - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/db-migration.sh
 
+  publish-snapshot:
+    working_directory: ~/marquez
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run: ./.circleci/get-jdk17.sh
+      - run: ./.circleci/publish.sh # *SNAPSHOT.jar
+
   release-java:
     working_directory: ~/marquez
     machine:
@@ -179,11 +188,7 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
-      - run: |
-          # Get, then decode the GPG private key used to sign *.jar
-          export ORG_GRADLE_PROJECT_signingKey=$(echo $GPG_SIGNING_KEY | base64 -d)
-          # Publish *.jar
-          ./gradlew publish
+      - run: ./.circleci/publish.sh # *.jar
 
   release-python:
     working_directory: ~/marquez
@@ -225,6 +230,16 @@ workflows:
       - migrate-db:
           requires:
             - build-api
+      - publish-snapshot:
+          filters:
+            branches:
+              only: main
+          context: release
+          requires:
+            - build-image-api
+            - load-test-api
+            - migrate-db
+
   release:
     jobs:
       - build-client-python:
