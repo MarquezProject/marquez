@@ -45,7 +45,6 @@ public final class DbMigration {
       log.info(
           "Successfully applied '{}' migrations to database.", migrateResult.migrationsExecuted);
     } catch (FlywayException errorOnDbMigrate) {
-      log.error("Failed to apply migration to database.", errorOnDbMigrate);
       try {
         log.info("Repairing failed database migration...");
         flyway.repair();
