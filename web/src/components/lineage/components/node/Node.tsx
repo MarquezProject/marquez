@@ -11,15 +11,12 @@ import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-
+import MQTooltip from '../../../core/tooltip/MQToolTip'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
-import { styled } from '@mui/material/styles'
 import { theme } from '../../../../helpers/theme'
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 
 const RADIUS = 14
 const ICON_SIZE = 16
@@ -46,41 +43,25 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
     return '/'
   }
 
-  // configure the tool tip
-  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))(({ theme }) => ({
-    [`& .${tooltipClasses.tooltip}`]: {
-      backgroundColor: theme.palette.background.default,
-      color: theme.palette.common.white,
-      maxWidth: 600,
-      fontSize: theme.typography.pxToRem(14),
-      border: '1px solid ' + theme.palette.common.white,
-    },
-  }))
-
-  // return the object namespace/name
-  const addToToolTip = (inputData: any) => {
-    const inputString = String(inputData.label)
-    const desc = String(inputData.data.description)
-    const namespace = String(inputData.data.namespace)
-    const objectName = String(inputData.data.name)
-    return <React.Fragment>
-      <Typography color="inherit">{inputString.split(':')[0]}</Typography>
-      <b>{"Namespace: "}</b>{namespace}<br></br>
-      <b>{"Name: "}</b>{objectName}<br></br>
-      <b>{"Description: "}</b>{desc === 'null' ? "No Description" : desc}
-      </React.Fragment>
+  const addToToolTip = (inputData: GraphNode<MqNode>) => {
+    // return react fragment
+    return <>
+      <b>{"Namespace: "}</b>{inputData.data.namespace}<br></br>
+      <b>{"Name: "}</b>{inputData.data.name}<br></br>
+      <b>{"Description: "}</b>{inputData.data.description === null ? "No Description" : inputData.data.description}<br></br>
+      </>
   }
 
   const job = isJob(node)
   const isSelected = selectedNode === node.label
+  const ariaJobLabel = 'Job'
+  const ariaDatasetLabel = 'Dataset'
 
   return (
     <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
+      <MQTooltip title={addToToolTip(node)}>
       {job ? (
         <g>
-          <HtmlTooltip title={addToToolTip(node)}>
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
@@ -90,9 +71,9 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               cx={node.x}
               cy={node.y}
             />
-          </HtmlTooltip>
           <FontAwesomeIcon
             aria-hidden={'true'}
+            title={ariaJobLabel}
             style={{ transformOrigin: `${node.x}px ${node.y}px` }}
             icon={faCog}
             width={ICON_SIZE}
@@ -104,7 +85,6 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
         </g>
       ) : (
         <g>
-          <HtmlTooltip title={addToToolTip(node)}>
             <rect
               style={{ cursor: 'pointer' }}
               x={node.x - RADIUS}
@@ -116,8 +96,6 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               height={RADIUS * 2}
               rx={4}
             />
-          </HtmlTooltip>
-          <HtmlTooltip title={addToToolTip(node)}>
             <rect
               style={{ cursor: 'pointer' }}
               x={node.x - (RADIUS - 2)}
@@ -127,9 +105,9 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               height={(RADIUS - 2) * 2}
               rx={4}
             />
-          </HtmlTooltip>
           <FontAwesomeIcon
             aria-hidden={'true'}
+            title={ariaDatasetLabel}
             icon={faDatabase}
             width={ICON_SIZE}
             height={ICON_SIZE}
@@ -139,6 +117,7 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
           />
         </g>
       )}
+       </MQTooltip>
       <NodeText node={node} />
     </Link>
   )
