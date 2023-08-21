@@ -11,12 +11,12 @@ import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import MQTooltip from '../../../core/tooltip/MQTooltip'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
+import MQTooltip from '../../../core/tooltip/MQTooltip'
 
 const RADIUS = 14
 const ICON_SIZE = 16
@@ -44,12 +44,19 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
   }
 
   const addToToolTip = (inputData: GraphNode<MqNode>) => {
-    // return react fragment
-    return <>
-      <b>{"Namespace: "}</b>{inputData.data.namespace}<br></br>
-      <b>{"Name: "}</b>{inputData.data.name}<br></br>
-      <b>{"Description: "}</b>{inputData.data.description === null ? "No Description" : inputData.data.description}<br></br>
+    return (
+      <>
+        <b>{'Namespace: '}</b>
+        {inputData.data.namespace}
+        <br></br>
+        <b>{'Name: '}</b>
+        {inputData.data.name}
+        <br></br>
+        <b>{'Description: '}</b>
+        {inputData.data.description === null ? 'No Description' : inputData.data.description}
+        <br></br>
       </>
+    )
   }
 
   const job = isJob(node)
@@ -60,8 +67,8 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
   return (
     <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
       <MQTooltip title={addToToolTip(node)}>
-      {job ? (
-        <g>
+        {job ? (
+          <g>
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
@@ -71,20 +78,20 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               cx={node.x}
               cy={node.y}
             />
-          <FontAwesomeIcon
-            aria-hidden={'true'}
-            title={ariaJobLabel}
-            style={{ transformOrigin: `${node.x}px ${node.y}px` }}
-            icon={faCog}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            x={node.x - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-          />
-        </g>
-      ) : (
-        <g>
+            <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaJobLabel}
+              style={{ transformOrigin: `${node.x}px ${node.y}px` }}
+              icon={faCog}
+              width={ICON_SIZE}
+              height={ICON_SIZE}
+              x={node.x - ICON_SIZE / 2}
+              y={node.y - ICON_SIZE / 2}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+            />
+          </g>
+        ) : (
+          <g>
             <rect
               style={{ cursor: 'pointer' }}
               x={node.x - RADIUS}
@@ -105,19 +112,19 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
               height={(RADIUS - 2) * 2}
               rx={4}
             />
-          <FontAwesomeIcon
-            aria-hidden={'true'}
-            title={ariaDatasetLabel}
-            icon={faDatabase}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            x={node.x - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-          />
-        </g>
-      )}
-       </MQTooltip>
+            <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaDatasetLabel}
+              icon={faDatabase}
+              width={ICON_SIZE}
+              height={ICON_SIZE}
+              x={node.x - ICON_SIZE / 2}
+              y={node.y - ICON_SIZE / 2}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+            />
+          </g>
+        )}
+      </MQTooltip>
       <NodeText node={node} />
     </Link>
   )
