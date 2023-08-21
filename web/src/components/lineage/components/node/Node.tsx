@@ -10,13 +10,13 @@ import { Link } from 'react-router-dom'
 import { MqNode } from '../../types'
 import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
-
 import { connect } from 'react-redux'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
+import MQTooltip from '../../../core/tooltip/MQTooltip'
 
 const RADIUS = 14
 const ICON_SIZE = 16
@@ -43,69 +43,88 @@ const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
     return '/'
   }
 
+  const addToToolTip = (inputData: GraphNode<MqNode>) => {
+    return (
+      <>
+        <b>{'Namespace: '}</b>
+        {inputData.data.namespace}
+        <br></br>
+        <b>{'Name: '}</b>
+        {inputData.data.name}
+        <br></br>
+        <b>{'Description: '}</b>
+        {inputData.data.description === null ? 'No Description' : inputData.data.description}
+        <br></br>
+      </>
+    )
+  }
+
   const job = isJob(node)
   const isSelected = selectedNode === node.label
   const ariaJobLabel = 'Job'
   const ariaDatasetLabel = 'Dataset'
+
   return (
     <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
-      {job ? (
-        <g>
-          <circle
-            style={{ cursor: 'pointer' }}
-            r={RADIUS}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-            strokeWidth={BORDER / 2}
-            cx={node.x}
-            cy={node.y}
-          />
-          <FontAwesomeIcon
-            title={ariaJobLabel}
-            aria-hidden={'true'}
-            style={{ transformOrigin: `${node.x}px ${node.y}px` }}
-            icon={faCog}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            x={node.x - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-          />
-        </g>
-      ) : (
-        <g>
-          <rect
-            style={{ cursor: 'pointer' }}
-            x={node.x - RADIUS}
-            y={node.y - RADIUS}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-            strokeWidth={BORDER / 2}
-            width={RADIUS * 2}
-            height={RADIUS * 2}
-            rx={4}
-          />
-          <rect
-            style={{ cursor: 'pointer' }}
-            x={node.x - (RADIUS - 2)}
-            y={node.y - (RADIUS - 2)}
-            fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
-            width={(RADIUS - 2) * 2}
-            height={(RADIUS - 2) * 2}
-            rx={4}
-          />
-          <FontAwesomeIcon
-            title={ariaDatasetLabel}
-            aria-hidden={'true'}
-            icon={faDatabase}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            x={node.x - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
-          />
-        </g>
-      )}
+      <MQTooltip title={addToToolTip(node)}>
+        {job ? (
+          <g>
+            <circle
+              style={{ cursor: 'pointer' }}
+              r={RADIUS}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
+              cx={node.x}
+              cy={node.y}
+            />
+            <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaJobLabel}
+              style={{ transformOrigin: `${node.x}px ${node.y}px` }}
+              icon={faCog}
+              width={ICON_SIZE}
+              height={ICON_SIZE}
+              x={node.x - ICON_SIZE / 2}
+              y={node.y - ICON_SIZE / 2}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+            />
+          </g>
+        ) : (
+          <g>
+            <rect
+              style={{ cursor: 'pointer' }}
+              x={node.x - RADIUS}
+              y={node.y - RADIUS}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
+              width={RADIUS * 2}
+              height={RADIUS * 2}
+              rx={4}
+            />
+            <rect
+              style={{ cursor: 'pointer' }}
+              x={node.x - (RADIUS - 2)}
+              y={node.y - (RADIUS - 2)}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              width={(RADIUS - 2) * 2}
+              height={(RADIUS - 2) * 2}
+              rx={4}
+            />
+            <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaDatasetLabel}
+              icon={faDatabase}
+              width={ICON_SIZE}
+              height={ICON_SIZE}
+              x={node.x - ICON_SIZE / 2}
+              y={node.y - ICON_SIZE / 2}
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+            />
+          </g>
+        )}
+      </MQTooltip>
       <NodeText node={node} />
     </Link>
   )
