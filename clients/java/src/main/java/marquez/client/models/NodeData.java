@@ -8,9 +8,10 @@ package marquez.client.models;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
-    property = "type")
-@JsonSubTypes({@JsonSubTypes.Type(value = ColumnLineageNodeData.class, name = "DATASET_FIELD")})
+@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, defaultImpl = ColumnLineageNodeData.class)
+@JsonSubTypes({
+  @JsonSubTypes.Type(DatasetNodeData.class),
+  @JsonSubTypes.Type(JobNodeData.class),
+  @JsonSubTypes.Type(ColumnLineageNodeData.class),
+})
 public interface NodeData {}
