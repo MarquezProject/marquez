@@ -37,18 +37,20 @@ export const resetEvents = () => ({
   type: actionTypes.RESET_EVENTS,
 })
 
-export const fetchDatasets = (namespace: string, limit: number) => ({
+export const fetchDatasets = (namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_DATASETS,
   payload: {
     namespace,
     limit,
+    offset,
   },
 })
 
-export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
+export const fetchDatasetsSuccess = (datasets: Dataset[], totalCount: number) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {
     datasets,
+    totalCount,
   },
 })
 

@@ -59,6 +59,7 @@ export interface Event {
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {

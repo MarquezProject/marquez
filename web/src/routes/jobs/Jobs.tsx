@@ -4,6 +4,7 @@
 import * as Redux from 'redux'
 import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import {
+  Chip,
   Container,
   Table,
   TableBody,
@@ -57,8 +58,6 @@ const Jobs: React.FC<JobsProps> = ({
   fetchJobs,
   resetJobs,
 }) => {
-  const mounted = React.useRef<boolean>(false)
-  const prevSelectedNamespace = React.useRef<Nullable<string>>()
   const theme = createTheme(useTheme())
 
   const [state, setState] = React.useState({
@@ -66,22 +65,10 @@ const Jobs: React.FC<JobsProps> = ({
   })
 
   React.useEffect(() => {
-    if (!mounted.current) {
-      // on mount
-      if (selectedNamespace) {
-        fetchJobs(selectedNamespace, PAGE_SIZE, state.page)
-      }
-      mounted.current = true
-    } else {
-      // on update
-      if (prevSelectedNamespace.current !== selectedNamespace && selectedNamespace) {
-        setState({ page: 0 })
-        fetchJobs(selectedNamespace, PAGE_SIZE, 0)
-      }
-
-      prevSelectedNamespace.current = selectedNamespace
+    if (selectedNamespace) {
+      fetchJobs(selectedNamespace, PAGE_SIZE, state.page)
     }
-  })
+  }, [selectedNamespace, state.page])
 
   React.useEffect(() => {
     return () => {
@@ -112,8 +99,15 @@ const Jobs: React.FC<JobsProps> = ({
             </Box>
           ) : (
             <>
-              <Box p={2}>
+              <Box p={2} display={'flex'}>
                 <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
+                <Chip
+                  size={'small'}
+                  variant={'outlined'}
+                  color={'primary'}
+                  sx={{ marginLeft: 1 }}
+                  label={totalCount + ' total'}
+                ></Chip>
               </Box>
               <Table size='small'>
                 <TableHead>

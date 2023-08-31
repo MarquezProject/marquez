@@ -4,6 +4,7 @@
 import * as Redux from 'redux'
 import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import {
+  Chip,
   Container,
   Table,
   TableBody,
@@ -35,12 +36,11 @@ interface StateProps {
   isDatasetsLoading: boolean
   isDatasetsInit: boolean
   selectedNamespace: Nullable<string>
+  totalCount: number
 }
 
 interface DatasetsState {
-  datasets: Dataset[]
   page: number
-  pageIsLast: boolean
 }
 
 interface DispatchProps {
@@ -50,52 +50,29 @@ interface DispatchProps {
 
 type DatasetsProps = StateProps & DispatchProps
 
+const PAGE_SIZE = 20
+
 const Datasets: React.FC<DatasetsProps> = ({
   datasets,
+  totalCount,
   isDatasetsLoading,
   isDatasetsInit,
   selectedNamespace,
   fetchDatasets,
   resetDatasets,
 }) => {
-  const PAGE_SIZE = 20
-  const mounted = React.useRef<boolean>(false)
-  const prevSelectedNamespace = React.useRef<Nullable<string>>()
-
   const defaultState = {
-    datasets: [],
-    page: 1,
-    pageIsLast: false,
+    page: 0,
   }
   const [state, setState] = React.useState<DatasetsState>(defaultState)
 
   const theme = createTheme(useTheme())
 
   React.useEffect(() => {
-    if (!mounted.current) {
-      // on mount
-      if (selectedNamespace) {
-        fetchDatasets(selectedNamespace, PAGE_SIZE)
-      }
-      mounted.current = true
-    } else {
-      // on update
-      if (prevSelectedNamespace.current !== selectedNamespace && selectedNamespace) {
-        fetchDatasets(selectedNamespace, PAGE_SIZE)
-        setState(defaultState)
-      }
-
-      if (datasets !== state.datasets) {
-        setState({
-          ...state,
-          datasets,
-          pageIsLast: datasets.length < state.page * PAGE_SIZE,
-        })
-      }
-
-      prevSelectedNamespace.current = selectedNamespace
+    if (selectedNamespace) {
+      fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
     }
-  })
+  }, [selectedNamespace, state.page])
 
   React.useEffect(() => {
     return () => {
@@ -104,28 +81,13 @@ const Datasets: React.FC<DatasetsProps> = ({
     }
   }, [])
 
-  const pageNavigation = () => {
-    const { datasets, page, pageIsLast } = state
-    const titlePos =
-      datasets.length < PAGE_SIZE && page === 1
-        ? `1 - ${datasets.length}`
-        : datasets.length > PAGE_SIZE && page === 1
-        ? `1 - ${PAGE_SIZE}`
-        : datasets.length && page > 1 && pageIsLast === false
-        ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${PAGE_SIZE * page}`
-        : datasets.length && page > 1 && pageIsLast
-        ? `${PAGE_SIZE * page - PAGE_SIZE + 1} - ${datasets.length}`
-        : `${datasets.length}`
-    return `${page} (${titlePos})`
-  }
-
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
-    if (selectedNamespace) {
-      fetchDatasets(selectedNamespace, PAGE_SIZE * directionPage)
-      setState({ ...state, page: directionPage })
-    }
+    fetchDatasets(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    // reset page scroll
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
   }
 
   const i18next = require('i18next')
@@ -141,36 +103,15 @@ const Datasets: React.FC<DatasetsProps> = ({
             </Box>
           ) : (
             <>
-              <Box display={'flex'} justifyContent={'space-between'} p={2}>
-                <Box>
-                  <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
-                  Page: {pageNavigation()}
-                </Box>
-                <Box>
-                  <Tooltip title={i18next.t('events_route.previous_page')}>
-                    <IconButton
-                      sx={{
-                        marginLeft: theme.spacing(2),
-                      }}
-                      color='primary'
-                      disabled={state.page === 1}
-                      onClick={() => handleClickPage('prev')}
-                      size='large'
-                    >
-                      <ChevronLeftRounded />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={i18next.t('events_route.next_page')}>
-                    <IconButton
-                      color='primary'
-                      disabled={state.pageIsLast}
-                      onClick={() => handleClickPage('next')}
-                      size='large'
-                    >
-                      <ChevronRightRounded />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
+              <Box p={2} display={'flex'}>
+                <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                <Chip
+                  size={'small'}
+                  variant={'outlined'}
+                  color={'primary'}
+                  sx={{ marginLeft: 1 }}
+                  label={totalCount + ' total'}
+                ></Chip>
               </Box>
               <Table size='small'>
                 <TableHead>
@@ -233,6 +174,41 @@ const Datasets: React.FC<DatasetsProps> = ({
                     })}
                 </TableBody>
               </Table>
+              <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+                <MqText subdued>
+                  <>
+                    {PAGE_SIZE * state.page + 1} -{' '}
+                    {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
+                  </>
+                </MqText>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <span>
+                    <IconButton
+                      sx={{
+                        marginLeft: theme.spacing(2),
+                      }}
+                      color='primary'
+                      disabled={state.page === 0}
+                      onClick={() => handleClickPage('prev')}
+                      size='large'
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <span>
+                    <IconButton
+                      color='primary'
+                      onClick={() => handleClickPage('next')}
+                      size='large'
+                      disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
             </>
           )}
         </>
@@ -243,6 +219,7 @@ const Datasets: React.FC<DatasetsProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets.result,
+  totalCount: state.datasets.totalCount,
   isDatasetsLoading: state.datasets.isLoading,
   isDatasetsInit: state.datasets.init,
   selectedNamespace: state.namespaces.selectedNamespace,
