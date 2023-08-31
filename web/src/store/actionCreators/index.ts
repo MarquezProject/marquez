@@ -109,17 +109,20 @@ export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS,
 })
 
-export const fetchJobs = (namespace: string) => ({
+export const fetchJobs = (namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_JOBS,
   payload: {
     namespace,
+    limit,
+    offset,
   },
 })
 
-export const fetchJobsSuccess = (jobs: Job[]) => ({
+export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs,
+    totalCount,
   },
 })
 

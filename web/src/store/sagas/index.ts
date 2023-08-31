@@ -16,7 +16,15 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
-import { Dataset, DatasetVersion, Events, Facets, LineageGraph, Namespaces } from '../../types/api'
+import {
+  Dataset,
+  DatasetVersion,
+  Events,
+  Facets,
+  Jobs,
+  LineageGraph,
+  Namespaces,
+} from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
@@ -110,8 +118,8 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const jobs: Job[] = yield call(getJobs, payload.namespace)
-      yield put(fetchJobsSuccess(jobs))
+      const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
+      yield put(fetchJobsSuccess(response.jobs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }

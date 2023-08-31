@@ -132,6 +132,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 
