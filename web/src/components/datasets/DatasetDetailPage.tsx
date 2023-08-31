@@ -29,6 +29,7 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 
 import { useTheme } from '@emotion/react'
+import Io from '../io/Io'
 import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
 
 interface StateProps {
@@ -155,14 +156,15 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 {...a11yProps(0)}
                 disableRipple={true}
               />
+              <Tab label={'Inputs/Outputs'} {...a11yProps(1)} disableRipple={true} />
               <Tab
                 label={i18next.t('datasets.history_tab')}
-                {...a11yProps(1)}
+                {...a11yProps(2)}
                 disableRipple={true}
               />
               <Tab
                 label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(1)}
+                {...a11yProps(3)}
                 disableRipple={true}
               />
             </Tabs>
@@ -221,8 +223,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           run={firstVersion.createdByRun}
         />
       )}
-      {tab === 1 && <DatasetVersions versions={props.versions} />}
-      {tab === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
+      {tab === 1 && <Io />}
+      {tab === 2 && <DatasetVersions versions={props.versions} />}
+      {tab === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }

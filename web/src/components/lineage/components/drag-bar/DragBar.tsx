@@ -34,7 +34,6 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
   }, [isResizing])
 
   const handleMousedown = () => {
-    console.log('handleMousedown', isResizing)
     setIsResizing(true)
   }
 
@@ -46,7 +45,6 @@ const DragBar: React.FC<DragBarProps> = ({ setBottomBarHeight }) => {
   }
 
   const handleMouseup = () => {
-    console.log('handleMouseup', isResizing)
     setIsResizing(false)
   }
 
