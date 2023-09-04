@@ -44,19 +44,24 @@ type DatasetInfoProps = {
 
 const formatColumnTags = (tags: string[]) => {
   const theme = createTheme(useTheme())
-  return <>{tags.map((tag, index) => (
-    <span
-      key={tag}
-      style={
-        index < tags.length - 1
-          ? {
-            marginRight: theme.spacing(1),
+  return (
+    <>
+      {tags.map((tag, index) => (
+        <Chip
+          key={tag}
+          label={tag}
+          size="small"
+          style={
+            index < tags.length - 1
+              ? {
+                  marginRight: theme.spacing(1),
+                }
+              : {}
           }
-          : {}
-      }>
-      <Chip size='small' label={tag} />
-    </span>
-  ))}</>
+        />
+      ))}
+    </>
+  )
 }
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
