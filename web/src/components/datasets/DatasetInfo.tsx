@@ -51,13 +51,7 @@ const formatColumnTags = (tags: string[]) => {
           key={tag}
           label={tag}
           size="small"
-          style={
-            index < tags.length - 1
-              ? {
-                  marginRight: theme.spacing(1),
-                }
-              : {}
-          }
+          style={{display: 'inline', marginRight: index < tags.length - 1 ? theme.spacing(1) : 0}}
         />
       ))}
     </>
