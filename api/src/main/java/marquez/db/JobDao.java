@@ -129,50 +129,50 @@ public interface JobDao extends BaseDao {
     AS (
       SELECT
         *
-      FROM 
+      FROM
         jobs_view AS j
-      WHERE 
+      WHERE
         j.namespace_name = :namespaceName
       ORDER BY
         j.name
-      LIMIT 
+      LIMIT
         :limit
-      OFFSET 
+      OFFSET
         :offset
     ),
     job_versions_temp AS (
-      SELECT 
+      SELECT
         *
-      FROM 
+      FROM
         job_versions AS j
-      WHERE 
+      WHERE
         j.namespace_name = :namespaceName
     ),
     facets_temp AS (
-    SELECT 
+    SELECT
       run_uuid,
         JSON_AGG(e.facet) AS facets
     FROM (
-        SELECT 
+        SELECT
           jf.run_uuid,
             jf.facet
-        FROM 
+        FROM
           job_facets_view AS jf
-        INNER JOIN job_versions_temp jv2 
+        INNER JOIN job_versions_temp jv2
           ON jv2.latest_run_uuid = jf.run_uuid
-        INNER JOIN jobs_view_page j2 
+        INNER JOIN jobs_view_page j2
           ON j2.current_version_uuid = jv2.uuid
-        ORDER BY 
+        ORDER BY
           lineage_event_time ASC
         ) e
     GROUP BY e.run_uuid
     )
-    SELECT 
+    SELECT
       j.*,
       f.facets
-    FROM 
+    FROM
       jobs_view_page AS j
-    LEFT OUTER JOIN job_versions_temp AS jv 
+    LEFT OUTER JOIN job_versions_temp AS jv
       ON jv.uuid = j.current_version_uuid
     LEFT OUTER JOIN facets_temp AS f
       ON f.run_uuid = jv.latest_run_uuid
