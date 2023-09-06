@@ -14,6 +14,9 @@ import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 import RunStatus from '../jobs/RunStatus'
+import { Chip } from '@mui/material'
+import { createTheme } from '@mui/material/styles'
+import { useTheme } from '@emotion/react'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -38,6 +41,22 @@ type DatasetInfoProps = {
   run?: Run
 } & JobFacetsProps &
   DispatchProps
+
+const formatColumnTags = (tags: string[]) => {
+  const theme = createTheme(useTheme())
+  return (
+    <>
+      {tags.map((tag, index) => (
+        <Chip
+          key={tag}
+          label={tag}
+          size="small"
+          style={{display: 'inline', marginRight: index < tags.length - 1 ? theme.spacing(1) : 0}}
+        />
+      ))}
+    </>
+  )
+}
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
@@ -82,6 +101,11 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                   {i18next.t('dataset_info_columns.description')}
                 </MqText>
               </TableCell>
+              <TableCell align='left'>
+                <MqText subheading inline>
+                {i18next.t('dataset_info_columns.tags')}
+                </MqText>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -91,6 +115,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                   <TableCell align='left'>{field.name}</TableCell>
                   <TableCell align='left'>{field.type}</TableCell>
                   <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                  <TableCell align='left'>{formatColumnTags(field.tags)}</TableCell>
                 </TableRow>
               )
             })}
