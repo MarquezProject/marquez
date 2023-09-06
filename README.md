@@ -100,7 +100,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 ## Requirements
 
 * [Java 17](https://adoptium.net)
-* [PostgreSQL 12.1](https://www.postgresql.org/download)
+* [PostgreSQL 14](https://www.postgresql.org/download)
 
 > **Note:** To connect to your running PostgreSQL instance, you will need the standard [`psql`](https://www.postgresql.org/docs/9.6/app-psql.html) tool.
 
