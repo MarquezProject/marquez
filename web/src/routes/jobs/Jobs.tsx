@@ -18,6 +18,7 @@ import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 interface StateProps {
   jobs: Job[]
@@ -69,6 +70,51 @@ const Jobs: React.FC<JobsProps> = ({
   }, [])
 
   const i18next = require('i18next')
+
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: i18next.t('jobs_route.name_col'),
+      renderCell: (params) => (<MqText
+        link
+        linkTo={`/lineage/${encodeNode('JOB', params.row.namespace, params.row.name)}`}
+      >
+        {params.row.name}
+      </MqText>),
+      flex: 2,
+      editable: false
+    },
+    { field: 'namespace', headerName: i18next.t('jobs_route.namespace_col'), flex: 1, editable: false },
+    {
+      field: 'updatedAt',
+      headerName: i18next.t('jobs_route.updated_col'),
+      renderCell: (params) => (<MqText>{formatUpdatedAt(params.row.updatedAt)}</MqText>),
+      flex: 1,
+      editable: false
+    },
+    {
+      field: 'latestRun',
+      headerName: i18next.t('jobs_route.latest_run_col'),
+      renderCell: (params) => (<MqText>
+        {params.row.latestRun && params.row.latestRun.durationMs
+          ? stopWatchDuration(params.row.latestRun.durationMs)
+          : 'N/A'}
+      </MqText>),
+      flex: 1,
+      editable: false
+    },
+    {
+      field: 'runState',
+      headerName: i18next.t('jobs_route.latest_run_state_col'),
+      renderCell: (params) => (<MqStatus
+        color={params.row.latestRun && runStateColor(params.row.latestRun.state || 'NEW')}
+        label={params.row.latestRun && params.row.latestRun.state ? params.row.latestRun.state : 'N/A'}
+      />),
+      flex: 1,
+      editable: false,
+    },
+  ]
+
   return (
     <Container maxWidth={'lg'} disableGutters>
       <MqScreenLoad loading={isJobsLoading || !isJobsInit}>
@@ -84,64 +130,12 @@ const Jobs: React.FC<JobsProps> = ({
               <Box p={2}>
                 <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
               </Box>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell key={i18next.t('jobs_route.name_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.name_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('jobs_route.namespace_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.namespace_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('jobs_route.updated_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
-                      <MqText subheading>{i18next.t('jobs_route.latest_run_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('jobs_route.latest_run_state_col')} align='left'>
-                      <MqText subheading>{i18next.t('jobs_route.latest_run_state_col')}</MqText>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {jobs.map((job) => {
-                    return (
-                      <TableRow key={job.name}>
-                        <TableCell align='left'>
-                          <MqText
-                            link
-                            linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
-                          >
-                            {job.name}
-                          </MqText>
-                        </TableCell>
-                        <TableCell align='left'>
-                          <MqText>{job.namespace}</MqText>
-                        </TableCell>
-                        <TableCell align='left'>
-                          <MqText>{formatUpdatedAt(job.updatedAt)}</MqText>
-                        </TableCell>
-                        <TableCell align='left'>
-                          <MqText>
-                            {job.latestRun && job.latestRun.durationMs
-                              ? stopWatchDuration(job.latestRun.durationMs)
-                              : 'N/A'}
-                          </MqText>
-                        </TableCell>
-                        <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
-                          <MqStatus
-                            color={job.latestRun && runStateColor(job.latestRun.state || 'NEW')}
-                            label={
-                              job.latestRun && job.latestRun.state ? job.latestRun.state : 'N/A'
-                            }
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+                <DataGrid
+                  rows={jobs}
+                  columns={columns}
+                  getRowId={(row) => JSON.stringify(row.id)}
+                  disableRowSelectionOnClick
+                />
             </>
           )}
         </>
