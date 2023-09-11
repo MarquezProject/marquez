@@ -5,11 +5,6 @@ import * as Redux from 'redux'
 import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import {
   Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Tooltip,
   createTheme,
 } from '@mui/material'
@@ -29,6 +24,7 @@ import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 interface StateProps {
   datasets: Dataset[]
@@ -125,10 +121,62 @@ const Datasets: React.FC<DatasetsProps> = ({
     if (selectedNamespace) {
       fetchDatasets(selectedNamespace, PAGE_SIZE * directionPage)
       setState({ ...state, page: directionPage })
+      setPaginationModel({ ...paginationModel, page: directionPage - 1 })
     }
   }
 
   const i18next = require('i18next')
+
+  const columns: GridColDef[] = [
+    {
+      field: 'name',
+      headerName: i18next.t('datasets_route.name_col'),
+      renderCell: (params) => {
+        return <MqText
+          link
+          linkTo={`/lineage/${encodeNode(
+            'DATASET',
+            params.row.namespace,
+            params.row.name
+          )}`}
+        >
+          {params.row.name}
+        </MqText>
+      },
+      width: 400
+    },
+    { field: 'namespace', headerName: i18next.t('datasets_route.namespace_col'), width: 200 },
+    { field: 'sourceName', headerName: i18next.t('datasets_route.source_col'), width: 200 },
+    {
+      field: 'updatedAt',
+      headerName: i18next.t('datasets_route.updated_col'),
+      renderCell: (params) => {
+        return <MqText>{formatUpdatedAt(params.row.updatedAt)}</MqText>
+      },
+      width: 200
+    },
+    {
+      field: 'facets',
+      headerName: i18next.t('datasets_route.status_col'),
+      renderCell: (params) => {
+        return (datasetFacetsStatus(params.row.facets) ? (
+          <>
+            <MqStatus color={datasetFacetsStatus(params.row.facets)} />
+          </>
+        ) : (
+          <MqText>N/A</MqText>
+        ))
+      },
+      width: 200
+    }
+  ]
+
+  const [paginationModel, setPaginationModel] = React.useState({
+    pageSize: PAGE_SIZE,
+    page: 0,
+  });
+
+
   return (
     <Container maxWidth={'lg'} disableGutters>
       <MqScreenLoad loading={isDatasetsLoading || !isDatasetsInit}>
@@ -172,67 +220,14 @@ const Datasets: React.FC<DatasetsProps> = ({
                   </Tooltip>
                 </Box>
               </Box>
-              <Table size='small'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell key={i18next.t('datasets_route.name_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.name_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('datasets_route.namespace_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.namespace_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('datasets_route.source_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.source_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
-                    </TableCell>
-                    <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {datasets
-                    .filter((dataset) => !dataset.deleted)
-                    .map((dataset) => {
-                      return (
-                        <TableRow key={dataset.name}>
-                          <TableCell align='left'>
-                            <MqText
-                              link
-                              linkTo={`/lineage/${encodeNode(
-                                'DATASET',
-                                dataset.namespace,
-                                dataset.name
-                              )}`}
-                            >
-                              {dataset.name}
-                            </MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.namespace}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{dataset.sourceName}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{formatUpdatedAt(dataset.updatedAt)}</MqText>
-                          </TableCell>
-                          <TableCell align='left'>
-                            {datasetFacetsStatus(dataset.facets) ? (
-                              <>
-                                <MqStatus color={datasetFacetsStatus(dataset.facets)} />
-                              </>
-                            ) : (
-                              <MqText>N/A</MqText>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                </TableBody>
-              </Table>
+                <DataGrid
+                  rows={datasets.filter(dataset => !dataset.deleted)}
+                  columns={columns}
+                  getRowId={(row) => JSON.stringify(row.id)}
+                  disableRowSelectionOnClick
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
+                />
             </>
           )}
         </>
