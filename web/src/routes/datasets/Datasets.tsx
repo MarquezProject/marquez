@@ -23,7 +23,7 @@ import IconButton from '@mui/material/IconButton'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
 interface StateProps {
@@ -173,6 +173,12 @@ const Datasets: React.FC<DatasetsProps> = ({
     page: 0,
   });
 
+  useEffect(() => {
+    if (selectedNamespace) {
+      fetchDatasets(selectedNamespace, PAGE_SIZE * paginationModel?.page + 1)
+    }
+    setState({ ...state, page: paginationModel?.page + 1 })
+  }, [paginationModel?.page])
 
   return (
     <Container maxWidth={'lg'} disableGutters>
