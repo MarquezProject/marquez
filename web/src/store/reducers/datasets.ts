@@ -27,7 +27,8 @@ export const initialState: IDatasetsState = {
   deletedDatasetName: '',
 }
 
-type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> & ReturnType<typeof deleteDataset>
+export type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
+  ReturnType<typeof deleteDataset>
 
 export default (state: IDatasetsState = initialState, action: IDatasetsAction): IDatasetsState => {
   const { type, payload } = action

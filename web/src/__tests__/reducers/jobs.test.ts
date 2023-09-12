@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from '../../store/actionCreators/actionTypes'
-import jobsReducer, { initialState } from '../../store/reducers/jobs'
+import jobsReducer, {IJobsAction, initialState} from '../../store/reducers/jobs'
 import { stopWatchDuration } from "../../helpers/time";
+import { Job } from "../../types/api";
 
 const jobs = require('../../../docker/db/data/jobs.json')
 
@@ -13,10 +14,11 @@ describe('jobs reducer', () => {
     const action = {
       type: actionTypes.FETCH_JOBS_SUCCESS,
       payload: {
-        jobs: jobs
+        totalCount: 13,
+        jobs: jobs as Job[]
       }
-    }
-    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, init: true, deletedJobName: '' })
+    } as IJobsAction
+    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, totalCount: 13, init: true, deletedJobName: '' })
   })
 })
 
