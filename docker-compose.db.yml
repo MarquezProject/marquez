@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   db:
-    image: postgres:12.1
+    image: postgres:14
     container_name: marquez-db
     ports:
       - "5432:5432"

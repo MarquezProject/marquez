@@ -125,23 +125,59 @@ public interface JobDao extends BaseDao {
 
   @SqlQuery(
       """
-    SELECT j.*, f.facets
-      FROM jobs_view AS j
-      LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
-    LEFT OUTER JOIN (
-      SELECT run_uuid, JSON_AGG(e.facet) AS facets
-      FROM (
-        SELECT jf.run_uuid, jf.facet
-        FROM job_facets_view AS jf
-        INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=jf.run_uuid
-        INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
-        WHERE j2.namespace_name=:namespaceName
-        ORDER BY lineage_event_time ASC
-      ) e
-      GROUP BY e.run_uuid
-    ) f ON f.run_uuid=jv.latest_run_uuid
-    WHERE j.namespace_name = :namespaceName
-    ORDER BY j.name LIMIT :limit OFFSET :offset
+    WITH jobs_view_page
+    AS (
+      SELECT
+        *
+      FROM
+        jobs_view AS j
+      WHERE
+        j.namespace_name = :namespaceName
+      ORDER BY
+        j.name
+      LIMIT
+        :limit
+      OFFSET
+        :offset
+    ),
+    job_versions_temp AS (
+      SELECT
+        *
+      FROM
+        job_versions AS j
+      WHERE
+        j.namespace_name = :namespaceName
+    ),
+    facets_temp AS (
+    SELECT
+      run_uuid,
+        JSON_AGG(e.facet) AS facets
+    FROM (
+        SELECT
+          jf.run_uuid,
+            jf.facet
+        FROM
+          job_facets_view AS jf
+        INNER JOIN job_versions_temp jv2
+          ON jv2.latest_run_uuid = jf.run_uuid
+        INNER JOIN jobs_view_page j2
+          ON j2.current_version_uuid = jv2.uuid
+        ORDER BY
+          lineage_event_time ASC
+        ) e
+    GROUP BY e.run_uuid
+    )
+    SELECT
+      j.*,
+      f.facets
+    FROM
+      jobs_view_page AS j
+    LEFT OUTER JOIN job_versions_temp AS jv
+      ON jv.uuid = j.current_version_uuid
+    LEFT OUTER JOIN facets_temp AS f
+      ON f.run_uuid = jv.latest_run_uuid
+    ORDER BY
+        j.name
   """)
   List<Job> findAll(String namespaceName, int limit, int offset);
 

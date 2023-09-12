@@ -33,7 +33,7 @@ import org.testcontainers.utility.DockerImageName;
 @Tag("DataAccessTests")
 @Testcontainers
 class DbTest {
-  private static final DockerImageName POSTGRES_12_1 = DockerImageName.parse("postgres:12.1");
+  private static final DockerImageName POSTGRES_12_1 = DockerImageName.parse("postgres:14");
 
   @Container
   private static final PostgreSQLContainer<?> DB_CONTAINER =
