@@ -11,7 +11,7 @@
 # Usage: $ ./db-migration.sh
 
 # Version of PostgreSQL
-readonly POSTGRES_VERSION="12.1"
+readonly POSTGRES_VERSION="14"
 # Version of Marquez
 readonly MARQUEZ_VERSION=0.40.0
 # Build version of Marquez

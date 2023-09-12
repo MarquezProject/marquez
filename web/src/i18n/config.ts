@@ -118,7 +118,8 @@ i18next
           dataset_info_columns: {
             name: 'NAME',
             type: 'TYPE',
-            description: 'DESCRIPTION'
+            description: 'DESCRIPTION',
+            tags: 'TAGS'
           },
           dataset_versions_columns: {
             version: 'VERSION',
@@ -244,7 +245,8 @@ i18next
           dataset_info_columns: {
             name: 'NOM',
             type: 'TAPER',
-            description: 'DESCRIPTION'
+            description: 'DESCRIPTION',
+            tags: 'MOTS CLÉS'
           },
           dataset_versions_columns: {
             version: 'VERSION',
@@ -371,7 +373,8 @@ i18next
           dataset_info_columns: {
             name: 'NOMBRE',
             type: 'ESCRIBE',
-            description: 'DESCRIPCIÓN'
+            description: 'DESCRIPCIÓN',
+            tags: 'ETIQUETAS'
           },
           dataset_versions_columns: {
             version: 'VERSIÓN',
@@ -498,7 +501,8 @@ i18next
           dataset_info_columns: {
             name: 'NAZWA',
             type: 'RODZAJ',
-            description: 'OPIS'
+            description: 'OPIS',
+            tags: 'TAGI'
           },
           dataset_versions_columns: {
             version: 'WERSJA',
