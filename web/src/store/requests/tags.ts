@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { Tags } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
 export const getTags = async () => {
