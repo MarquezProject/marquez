@@ -72,8 +72,9 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const i18next = require('i18next')
 
   useEffect(() => {
-    run && fetchJobFacets(run.id) && fetchTags()
-  }, [])
+    run && fetchJobFacets(run.id)
+    run && fetchTags()
+  }, [run])
 
   // unmounting
   useEffect(
