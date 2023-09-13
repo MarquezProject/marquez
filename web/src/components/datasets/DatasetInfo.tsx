@@ -3,20 +3,21 @@
 
 import * as Redux from 'redux'
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { Field, Run } from '../../types/api'
+import { Chip } from '@mui/material'
+import { Field, Run, Tag } from '../../types/api'
 import { IState } from '../../store/reducers'
-import { connect } from 'react-redux'
-import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
+import { connect, useSelector } from 'react-redux'
+import { createTheme } from '@mui/material/styles'
+import { fetchJobFacets, fetchTags, resetFacets } from '../../store/actionCreators'
 import { stopWatchDuration } from '../../helpers/time'
+import { useTheme } from '@emotion/react'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 import RunStatus from '../jobs/RunStatus'
-import { Chip } from '@mui/material'
-import { createTheme } from '@mui/material/styles'
-import { useTheme } from '@emotion/react'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -42,18 +43,26 @@ type DatasetInfoProps = {
 } & JobFacetsProps &
   DispatchProps
 
-const formatColumnTags = (tags: string[]) => {
+const formatColumnTags = (tags: string[], tag_desc: Tag[]) => {
   const theme = createTheme(useTheme())
   return (
     <>
-      {tags.map((tag, index) => (
-        <Chip
-          key={tag}
-          label={tag}
-          size="small"
-          style={{display: 'inline', marginRight: index < tags.length - 1 ? theme.spacing(1) : 0}}
-        />
-      ))}
+      {tags.map((tag, index) => {
+        const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
+        const tooltipTitle = tagDescription?.description || 'No Tag Description'
+        return (
+          <MQTooltip title={tooltipTitle} key={tag}>
+            <Chip
+              label={tag}
+              size='small'
+              style={{
+                display: 'inline',
+                marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
+              }}
+            />
+          </MQTooltip>
+        )
+      })}
     </>
   )
 }
@@ -64,7 +73,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
-  }, [])
+    run && fetchTags()
+  }, [run])
 
   // unmounting
   useEffect(
@@ -73,6 +83,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
     },
     []
   )
+
+  const tagData = useSelector((state: IState) => state.tags.tags)
 
   return (
     <Box>
@@ -103,7 +115,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               </TableCell>
               <TableCell align='left'>
                 <MqText subheading inline>
-                {i18next.t('dataset_info_columns.tags')}
+                  {i18next.t('dataset_info_columns.tags')}
                 </MqText>
               </TableCell>
             </TableRow>
@@ -115,7 +127,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                   <TableCell align='left'>{field.name}</TableCell>
                   <TableCell align='left'>{field.type}</TableCell>
                   <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                  <TableCell align='left'>{formatColumnTags(field.tags)}</TableCell>
+                  <TableCell align='left'>{formatColumnTags(field.tags, tagData)}</TableCell>
                 </TableRow>
               )
             })}
@@ -127,7 +139,13 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJsonView data={facets} searchable={true} aria-label={i18next.t('dataset_info.facets_subhead_aria')} aria-required='True' placeholder='Search' />
+          <MqJsonView
+            data={facets}
+            searchable={true}
+            aria-label={i18next.t('dataset_info.facets_subhead_aria')}
+            aria-required='True'
+            placeholder='Search'
+          />
         </Box>
       )}
       {run && (
@@ -161,6 +179,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       fetchJobFacets: fetchJobFacets,
       resetFacets: resetFacets,
+      fetchTags: fetchTags,
     },
     dispatch
   )

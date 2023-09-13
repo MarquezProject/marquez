@@ -13,6 +13,7 @@ import {
   Namespace,
   Run,
   Search,
+  Tag,
 } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
@@ -191,6 +192,17 @@ export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
     namespaces,
+  },
+})
+
+export const fetchTags = () => ({
+  type: actionTypes.FETCH_TAGS,
+})
+
+export const fetchTagsSuccess = (tags: Tag[]) => ({
+  type: actionTypes.FETCH_TAGS_SUCCESS,
+  payload: {
+    tags,
   },
 })
 
