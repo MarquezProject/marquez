@@ -15,8 +15,10 @@ import lineage, { ILineageState } from './lineage'
 import namespaces, { INamespacesState } from './namespaces'
 import runs, { IRunsState } from './runs'
 import search, { ISearchState } from './search'
+import tags, { ITagsState } from './tags'
 
 export interface IState {
+  tags: ITagsState
   datasets: IDatasetsState
   dataset: IDatasetState
   datasetVersions: IDatasetVersionsState
@@ -44,5 +46,6 @@ export default (history: History): Reducer =>
     display,
     lineage,
     search,
-    facets
+    facets,
+    tags,
   })

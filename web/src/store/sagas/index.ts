@@ -25,6 +25,7 @@ import {
   Jobs,
   LineageGraph,
   Namespaces,
+  Tags,
 } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
@@ -46,6 +47,7 @@ import {
   fetchNamespacesSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
+  fetchTagsSuccess,
 } from '../actionCreators'
 import {
   deleteDataset,
@@ -59,9 +61,20 @@ import {
   getNamespaces,
   getRunFacets,
   getRuns,
+  getTags,
 } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
+
+export function* fetchTags() {
+  try {
+    const response: Tags = yield call(getTags)
+    const { tags } = response
+    yield put(fetchTagsSuccess(tags))
+  } catch (e) {
+    yield put(applicationError('Something went wrong while fetching initial data.'))
+  }
+}
 
 export function* fetchNamespaces() {
   try {
@@ -235,7 +248,7 @@ export function* fetchRunFacetsSaga() {
 }
 
 export default function* rootSaga(): Generator {
-  const sagasThatAreKickedOffImmediately = [fetchNamespaces()]
+  const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
     fetchJobsSaga(),
     fetchRunsSaga(),

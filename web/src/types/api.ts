@@ -7,6 +7,11 @@ export interface Tag {
   name: string
   description: string
 }
+
+export interface Tags {
+  tags: Tag[]
+}
+
 export interface Runs {
   runs: Run[]
 }
