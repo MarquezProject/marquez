@@ -47,5 +47,5 @@ export default (history: History): Reducer =>
     lineage,
     search,
     facets,
-    tags
+    tags,
   })
