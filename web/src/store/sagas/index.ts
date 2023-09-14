@@ -156,7 +156,12 @@ export function* fetchDatasetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASETS)
-      const datasets: Datasets = yield call(getDatasets, payload.namespace)
+      const datasets: Datasets = yield call(
+        getDatasets,
+        payload.namespace,
+        payload.limit,
+        payload.offset
+      )
       yield put(fetchDatasetsSuccess(datasets.datasets, datasets.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
