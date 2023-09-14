@@ -11,6 +11,9 @@ import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +39,10 @@ import org.postgresql.util.PGobject;
 @Tag("DataAccessTests")
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class SearchDaoTest {
+  private static final LocalDate BEFORE =
+      LocalDate.ofInstant(Instant.now().plus(1, ChronoUnit.DAYS), ZoneOffset.systemDefault());
+  private static final LocalDate AFTER =
+      LocalDate.ofInstant(Instant.now().minus(1, ChronoUnit.DAYS), ZoneOffset.systemDefault());
 
   static final int LIMIT = 25;
   static final int NUM_OF_JOBS = 2;
@@ -61,6 +68,11 @@ public class SearchDaoTest {
     DbTestUtils.newDataset(jdbi, "time_ordering_0");
     DbTestUtils.newDataset(jdbi, "time_ordering_1");
     DbTestUtils.newDataset(jdbi, "time_ordering_2");
+
+    DbTestUtils.newDataset(jdbi, "namespace1", "datasetA");
+    DbTestUtils.newDataset(jdbi, "namespace1", "datasetB");
+    DbTestUtils.newDataset(jdbi, "namespace111", "excludeMe");
+    DbTestUtils.newDataset(jdbi, "namespace2", "datasetC");
 
     ImmutableSet<JobRow> jobRows = DbTestUtils.newJobs(jdbi, NUM_OF_JOBS);
 
@@ -105,6 +117,52 @@ public class SearchDaoTest {
                 throw new RuntimeException(e);
               }
             });
+  }
+
+  @Test
+  public void testSearch_filterByNamespace() {
+    final String query = "dataset";
+    final String namespace = "namespace1";
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(2);
+    assertThat(resultsWithSort).extracting("name").contains("datasetA", "datasetB");
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceAndAfter() {
+    final String query = "dataset";
+    final String namespace = "namespace2";
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(
+            query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, namespace, null, AFTER);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(1);
+    assertThat(resultsWithSort).extracting("name").contains("datasetC");
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceBeforeFuture() {
+    final String query = "dataset";
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, BEFORE);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(15);
+    assertThat(resultsWithSort).extracting("name").contains("datasetA", "datasetB");
+  }
+
+  @Test
+  public void testSearch_filterByNamespaceBeforePast() {
+    final String query = "dataset";
+    final List<SearchResult> resultsWithSort =
+        searchDao.search(query, SearchFilter.DATASET, SearchSort.UPDATE_AT, LIMIT, AFTER);
+
+    // Ensure sorted search results contain N datasets.
+    assertThat(resultsWithSort).hasSize(0);
   }
 
   @Test
