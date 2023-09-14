@@ -19,8 +19,10 @@ import {
 import {
   Dataset,
   DatasetVersion,
+  Datasets,
   Events,
   Facets,
+  Jobs,
   LineageGraph,
   Namespaces,
   Tags,
@@ -130,8 +132,8 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const jobs: Job[] = yield call(getJobs, payload.namespace)
-      yield put(fetchJobsSuccess(jobs))
+      const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
+      yield put(fetchJobsSuccess(response.jobs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
@@ -154,8 +156,8 @@ export function* fetchDatasetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASETS)
-      const datasets: Dataset[] = yield call(getDatasets, payload.namespace)
-      yield put(fetchDatasetsSuccess(datasets))
+      const datasets: Datasets = yield call(getDatasets, payload.namespace)
+      yield put(fetchDatasetsSuccess(datasets.datasets, datasets.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
     }

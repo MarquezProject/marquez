@@ -64,6 +64,7 @@ export interface Event {
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {
@@ -137,6 +138,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 
