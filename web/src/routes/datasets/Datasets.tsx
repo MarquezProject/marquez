@@ -70,6 +70,7 @@ const Datasets: React.FC<DatasetsProps> = ({
 
   React.useEffect(() => {
     if (selectedNamespace) {
+      console.log(state.page)
       fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
     }
   }, [selectedNamespace, state.page])
