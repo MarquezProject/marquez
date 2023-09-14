@@ -117,14 +117,17 @@ public class OpenLineageResource extends BaseResource {
       @QueryParam("before") @DefaultValue("2030-01-01T00:00:00+00:00") ZonedDateTimeParam before,
       @QueryParam("after") @DefaultValue("1970-01-01T00:00:00+00:00") ZonedDateTimeParam after,
       @QueryParam("sortDirection") @DefaultValue("desc") SortDirection sortDirection,
-      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit) {
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     List<LineageEvent> events = Collections.emptyList();
     switch (sortDirection) {
       case DESC -> events =
-          openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit);
-      case ASC -> events = openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit);
+          openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit, offset);
+      case ASC -> events =
+          openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit, offset);
     }
-    return Response.ok(new Events(events)).build();
+    int totalCount = openLineageDao.getAllLineageTotalCount(before.get(), after.get());
+    return Response.ok(new Events(events, totalCount)).build();
   }
 
   @Value
@@ -132,5 +135,7 @@ public class OpenLineageResource extends BaseResource {
     @NonNull
     @JsonProperty("events")
     List<LineageEvent> value;
+
+    int totalCount;
   }
 }

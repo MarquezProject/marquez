@@ -7,6 +7,11 @@ export interface Tag {
   name: string
   description: string
 }
+
+export interface Tags {
+  tags: Tag[]
+}
+
 export interface Runs {
   runs: Run[]
 }
@@ -26,6 +31,7 @@ export interface Namespace {
 
 export interface Events {
   events: Event[]
+  totalCount: number
 }
 
 export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'
@@ -58,6 +64,7 @@ export interface Event {
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {
@@ -131,6 +138,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 

@@ -18,7 +18,7 @@ export function NodeText({ node }: NodeTextProps) {
   return (
     <text
       x={node.x}
-      y={node.y + TEXT_BOTTOM_SPACING}
+      y={node.y + parseInt(TEXT_BOTTOM_SPACING)}
       fontSize='8'
       textAnchor='middle'
       fill={'white'}

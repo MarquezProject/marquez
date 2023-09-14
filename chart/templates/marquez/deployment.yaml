@@ -28,7 +28,7 @@ spec:
       # This init container is for avoiding CrashLoopback errors in the Marquez container because the PostgreSQL container is not ready
       initContainers:
         - name: wait-for-db
-          image: postgres:12.1
+          image: {{ include "marquez.wait-for-db.image" . }}
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash

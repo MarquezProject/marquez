@@ -37,7 +37,7 @@ class Utils:
         # ['namespace_name', 'owner_name', 'source_name'] <= 64
         # ['dataset_name', 'field_name', 'job_name', 'tag_name'] <= 255
         if variable_name in ['namespace_name', 'owner_name', 'source_name']:
-            if len(variable_value) > 64:
+            if len(variable_value) > 1024:
                 raise ValueError(f"{variable_name} length is"
                                  f" {len(variable_value)}, must be <= 64")
         else:

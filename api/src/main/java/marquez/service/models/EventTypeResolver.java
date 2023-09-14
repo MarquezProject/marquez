@@ -50,12 +50,14 @@ public class EventTypeResolver extends TypeIdResolverBase {
 
   @Override
   public String idFromValue(Object value) {
-    return null;
+    return idFromValueAndType(value, value.getClass());
   }
 
   @Override
   public String idFromValueAndType(Object value, Class<?> suggestedType) {
-    return null;
+    // FIXME: We are hardcoding the 'eventType' for now as we currently don't support static
+    // lineage!
+    return "eventType";
   }
 
   @Override

@@ -5,17 +5,11 @@ import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box, Button, CircularProgress, Tab, Tabs } from '@material-ui/core'
+import { Box, Button, CircularProgress, Tab, Tabs } from '@mui/material'
 import { IState } from '../../store/reducers'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
-import { alpha } from '@material-ui/core/styles'
+import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
@@ -23,35 +17,19 @@ import {
   dialogToggle,
   fetchRuns,
   resetJobs,
-  resetRuns
+  resetRuns,
 } from '../../store/actionCreators'
 import { jobRunsStatus } from '../../helpers/nodes'
-import { theme } from '../../helpers/theme'
-import { useHistory } from 'react-router-dom'
-import CloseIcon from '@material-ui/icons/Close'
+import { useNavigate } from 'react-router-dom'
+import { useTheme } from '@emotion/react'
+import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
-import IconButton from '@material-ui/core/IconButton'
+import IconButton from '@mui/material/IconButton'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
-
-const styles = ({ spacing }: ITheme) => {
-  return createStyles({
-    root: {
-      padding: spacing(2)
-    },
-    buttonDelete: {
-      borderColor: theme.palette.error.main,
-      color: theme.palette.error.main,
-      '&:hover': {
-        borderColor: alpha(theme.palette.error.main, 0.3),
-        backgroundColor: alpha(theme.palette.error.main, 0.3)
-      }
-    }
-  })
-}
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -61,7 +39,7 @@ interface DispatchProps {
   dialogToggle: typeof dialogToggle
 }
 
-type IProps = IWithStyles<typeof styles> & {
+type IProps = {
   job: LineageJob
   jobs: IState['jobs']
   runs: Run[]
@@ -69,20 +47,11 @@ type IProps = IWithStyles<typeof styles> & {
   display: IState['display']
 } & DispatchProps
 
-const JobDetailPage: FunctionComponent<IProps> = props => {
-  const {
-    job,
-    jobs,
-    classes,
-    fetchRuns,
-    resetRuns,
-    deleteJob,
-    dialogToggle,
-    runs,
-    display,
-    runsLoading
-  } = props
-  const history = useHistory()
+const JobDetailPage: FunctionComponent<IProps> = (props) => {
+  const theme = createTheme(useTheme())
+  const { job, jobs, fetchRuns, resetRuns, deleteJob, dialogToggle, runs, display, runsLoading } =
+    props
+  const navigate = useNavigate()
 
   const [tab, setTab] = React.useState(0)
   const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
@@ -96,7 +65,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
 
   useEffect(() => {
     if (jobs.deletedJobName) {
-      history.push('/')
+      navigate('/')
     }
   }, [jobs.deletedJobName])
 
@@ -122,7 +91,9 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
       display='flex'
       flexDirection='column'
       justifyContent='space-between'
-      className={classes.root}
+      sx={{
+        padding: theme.spacing(2),
+      }}
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
@@ -133,7 +104,14 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
           <Box mr={1}>
             <Button
               variant='outlined'
-              className={classes.buttonDelete}
+              sx={{
+                borderColor: theme.palette.error.main,
+                color: theme.palette.error.main,
+                '&:hover': {
+                  borderColor: alpha(theme.palette.error.main, 0.3),
+                  backgroundColor: alpha(theme.palette.error.main, 0.3),
+                },
+              }}
               onClick={() => {
                 props.dialogToggle('')
               }}
@@ -161,7 +139,7 @@ const JobDetailPage: FunctionComponent<IProps> = props => {
               {i18next.t('jobs.location')}
             </Button>
           </Box>
-          <IconButton onClick={() => history.push('/')}>
+          <IconButton onClick={() => navigate('/')} size='large'>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -198,7 +176,7 @@ const mapStateToProps = (state: IState) => ({
   runs: state.runs.result,
   runsLoading: state.runs.isLoading,
   display: state.display,
-  jobs: state.jobs
+  jobs: state.jobs,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -208,9 +186,9 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       resetRuns: resetRuns,
       resetJobs: resetJobs,
       deleteJob: deleteJob,
-      dialogToggle: dialogToggle
+      dialogToggle: dialogToggle,
     },
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(JobDetailPage))
+export default connect(mapStateToProps, mapDispatchToProps)(JobDetailPage)

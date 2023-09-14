@@ -4,7 +4,7 @@ Before you can manually apply migrations to the `marquez` database, make sure yo
 
 ```bash
 $ brew install flyway
-``` 
+```
 
 **You'll also need the following details about the migration:**
 
@@ -39,5 +39,5 @@ $ flyway migrate \
 ```
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

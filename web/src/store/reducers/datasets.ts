@@ -6,7 +6,7 @@ import {
   DELETE_DATASET_SUCCESS,
   FETCH_DATASETS,
   FETCH_DATASETS_SUCCESS,
-  RESET_DATASETS
+  RESET_DATASETS,
 } from '../actionCreators/actionTypes'
 import { Dataset } from '../../types/api'
 import { deleteDataset, fetchDatasetsSuccess } from '../actionCreators'
@@ -14,6 +14,7 @@ import { deleteDataset, fetchDatasetsSuccess } from '../actionCreators'
 export type IDatasetsState = {
   isLoading: boolean
   result: Dataset[]
+  totalCount: number
   init: boolean
   deletedDatasetName: string
 }
@@ -22,10 +23,12 @@ export const initialState: IDatasetsState = {
   isLoading: false,
   init: false,
   result: [],
-  deletedDatasetName: ''
+  totalCount: 0,
+  deletedDatasetName: '',
 }
 
-type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> & ReturnType<typeof deleteDataset>
+export type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
+  ReturnType<typeof deleteDataset>
 
 export default (state: IDatasetsState = initialState, action: IDatasetsAction): IDatasetsState => {
   const { type, payload } = action
@@ -34,11 +37,17 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case FETCH_DATASETS:
       return { ...state, isLoading: true }
     case FETCH_DATASETS_SUCCESS:
-      return { ...state, isLoading: false, init: true, result: payload.datasets }
+      return {
+        ...state,
+        isLoading: false,
+        init: true,
+        result: payload.datasets,
+        totalCount: payload.totalCount,
+      }
     case RESET_DATASETS:
       return initialState
     case DELETE_DATASET:
-      return { ...state, result: state.result.filter(e => e.name !== payload.datasetName) }
+      return { ...state, result: state.result.filter((e) => e.name !== payload.datasetName) }
     case DELETE_DATASET_SUCCESS:
       return { ...state, deletedDatasetName: payload.datasetName }
     default:

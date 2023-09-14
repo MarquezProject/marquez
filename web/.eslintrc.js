@@ -14,7 +14,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    "prettier/@typescript-eslint",
+    "prettier",
     "plugin:prettier/recommended"
   ],
   settings: {
@@ -57,13 +57,13 @@ module.exports = {
       "ignoreCase": false,
       "ignoreMemberSort": false,
       "memberSyntaxSortOrder": ["none", "all", "multiple", "single"]
-    }] 
+    }]
   },
   'overrides': [
     {
       'files': './src/i18n/config.ts',
       'rules': {
-        '@typescript-eslint/quotes': 'off' 
+        '@typescript-eslint/quotes': 'off'
       }
     }
   ]

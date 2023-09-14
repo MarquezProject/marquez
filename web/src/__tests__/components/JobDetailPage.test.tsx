@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react'
-import { mount } from 'enzyme'
-import Box from '@material-ui/core/Box'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import Box from '@mui/material/Box'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { render, screen } from '@testing-library/react';
+import { within } from '@testing-library/dom'
 
 import { formatUpdatedAt } from '../../helpers'
 import JobDetailPage from '../../components/jobs/JobDetailPage'
@@ -21,27 +22,27 @@ import { useParams } from 'react-router-dom'
 
 test.skip('JobDetailPage Component', () => {
   describe('when there is no match for the jobName in url params', () => {
-    useParams.mockImplementation(() => ({
-      jobName: 'job.nomatch'
-    }))
+    // useParams.mockImplementation(() => ({
+    //   jobName: 'job.nomatch'
+    // }))
 
-    const wrapper = mount(<JobDetailPage />)
+    render(<JobDetailPage />)
 
     it('should render', () => {
-      expect(wrapper.exists()).toBe(true)
+      expect(screen).toBeInTheDocument()
     })
 
     it('should render text explaining that there was no matching job found', () => {
       expect(
-        wrapper
-          .find(Typography)
-          .text()
+        screen
+          .getByRole('Typography')
+          .innerText
           .toLowerCase()
       ).toContain('no job')
     })
 
     it('renders a snapshot that matches previous', () => {
-      expect(wrapper).toMatchSnapshot()
+      expect(screen).toMatchSnapshot()
     })
   })
 
@@ -198,100 +199,78 @@ test.skip('JobDetailPage Component', () => {
 
     const job = { ...jobs[0], latestRuns: tempJobRuns }
 
-    useParams.mockImplementation(() => ({
-      jobName: job.name
-    }))
+    // useParams.mockImplementation(() => ({
+    //   jobName: job.name
+    // }))
 
-    const wrapper = mount(<JobDetailPage />)
+    render(<JobDetailPage />)
 
-    wrapper.setProps({
+    screen.setProps({
       jobs: jobs.map(j => (j.name === job.name ? job : j)),
       fetchJobRuns: () => {}
     })
 
     it('should render', () => {
-      expect(wrapper.exists()).toBe(true)
+      expect(screen).toBeInTheDocument()
     })
 
     it('does not render \'no job\'', () => {
       expect(
-        wrapper.findWhere(n =>
-          n
-            .text()
-            .toLowerCase()
-            .includes('no job')
-        )
+        screen.getAllByText('no job', { exact: false })
       ).toHaveLength(0)
     })
 
     it('should render the job name', () => {
       expect(
-        wrapper
-          .find(Typography)
-          .first()
-          .text()
+        screen
+          .getByRole('Typography')
+          .innerText
       ).toContain(job.name)
     })
 
     it('job name should contain a link to the job description', () => {
       expect(
-        wrapper
-          .find(Typography)
-          .first()
-          .find('a')
-          .first()
-          .html()
+        within(screen.getAllByRole('Typography')[0]).getByRole('a').innerHTML
       ).toContain(job.location)
     })
 
     it('should render the job description', () => {
       expect(
-        wrapper
-          .find(Typography)
-          .at(1) // zero-indexed
-          .text()
+        screen.getAllByRole('Typography')[1].innerText
       ).toContain(job.description)
     })
 
     it('should render the job time', () => {
       expect(
-        wrapper
-          .find(Typography)
-          .at(3) // zero-indexed
-          .text()
+        screen.getAllByRole('Typography')[0].innerText
       ).toContain(formatUpdatedAt(job.updatedAt))
     })
 
     it('should render a tooltip per job run', () => {
-      expect(wrapper.find(Tooltip)).toHaveLength(job.latestRuns.length)
+      expect(screen.getByRole('Tooltip')).toHaveLength(job.latestRuns.length)
     })
 
     it('if there is no SQL, should render text saying so', () => {
       const job = { ...jobs[0], context: {} }
 
-      useParams.mockImplementation(() => ({
-        jobName: job.name
-      }))
+      // useParams.mockImplementation(() => ({
+      //   jobName: job.name
+      // }))
 
-      const wrapper = mount(<JobDetailPage />)
+      render(<JobDetailPage />)
 
-      wrapper.setProps({
+      screen.setProps({
         jobs: jobs.map(j => (j.name === job.name ? job : j)),
         fetchJobRuns: () => {}
       })
 
       expect(
-        wrapper
-          .find(Box)
-          .at(1) // zero-indexed
-          .find(Typography)
-          .first()
-          .text()
+        within(screen.getAllByRole('Box')[1]).getByRole('Typography').innerText
       ).toContain('no SQL')
     })
 
     it('renders a snapshot that matches previous', () => {
-      expect(wrapper).toMatchSnapshot()
+      expect(screen).toMatchSnapshot()
     })
   })
 })

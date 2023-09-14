@@ -6,7 +6,8 @@ import {
   RESET_LINEAGE,
   SET_BOTTOM_BAR_HEIGHT,
   SET_LINEAGE_GRAPH_DEPTH,
-  SET_SELECTED_NODE
+  SET_SELECTED_NODE,
+  SET_SHOW_FULL_GRAPH
 } from '../actionCreators/actionTypes'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { LineageGraph } from '../../types/api'
@@ -18,13 +19,15 @@ export interface ILineageState {
   selectedNode: Nullable<string>
   bottomBarHeight: number
   depth: number
+  showFullGraph: boolean
 }
 
 const initialState: ILineageState = {
   lineage: { graph: [] },
   selectedNode: null,
   bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3,
-  depth: 5
+  depth: 5,
+  showFullGraph: true
 }
 
 type ILineageActions = ReturnType<typeof setSelectedNode> &
@@ -51,6 +54,11 @@ export default (state = initialState, action: ILineageActions) => {
       return {
         ...state,
         depth: action.payload
+      }
+    case SET_SHOW_FULL_GRAPH:
+      return {
+        ...state,
+        showFullGraph: action.payload
       }
     case RESET_LINEAGE: {
       return { ...state, lineage: { graph: [] } }

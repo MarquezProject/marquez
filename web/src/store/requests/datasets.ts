@@ -10,7 +10,10 @@ export const getDatasets = async (namespace: string, limit = 25, offset = 0) => 
     namespace
   )}/datasets?limit=${limit}&offset=${offset}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchDatasets').then((r: Datasets) => {
-    return r.datasets.map(d => ({ ...d, namespace: namespace }))
+    return {
+      datasets: r.datasets.map((d) => ({ ...d, namespace: namespace })),
+      totalCount: r.totalCount,
+    }
   })
 }
 

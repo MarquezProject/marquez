@@ -25,7 +25,7 @@ They take responsibility for guiding new pull requests into the main branch.
 | Ross Turk          | [@rossturk](https://github.com/rossturk)             |
 | Minkyu Park        | [@fm100](https://github.com/fm100)                   |
 | Paweł Leszczyński  | [@pawel-big-lebowski](https://github.com/pawel-big-lebowski) |
-     
+
 ## Emeritus
 
 The following people are no longer working on the Marquez project.
@@ -41,5 +41,5 @@ A Contributor may become a Committer by the approval of a majority of the
 existing Committers (as per the project [charter](https://wiki.lfaidata.foundation/download/attachments/18481434/Marquez%20Project%20Technical%20Charter%20Final_Adopted%2005.21.20.pdf?version=1&modificationDate=1591718661000&api=v2)).
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.
