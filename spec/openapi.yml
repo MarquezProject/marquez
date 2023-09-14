@@ -669,6 +669,33 @@ paths:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/limit'
+        - name: namespace
+          in: query
+          description: Match jobs or datasets within the given namespace.
+          required: false
+          schema:
+           type: string
+           maxLength: 1024
+           example: my-namespace
+        - before:
+          name: before
+          in: query
+          description: Match jobs or datasets **before** `YYYY-MM-DD`.
+          required: false
+          schema:
+            type: string
+            pattern: YYYY-MM-DD
+            example: "2022-09-15"
+        - after:
+          name: after
+          in: query
+          description: Match jobs or datasets **after** `YYYY-MM-DD`.
+          required: false
+          schema:
+            type: string
+            pattern: YYYY-MM-DD
+            example: "2022-09-15"
+
       summary: Query all datasets and jobs
       description: Returns one or more datasets and jobs of your query.
       tags:
@@ -773,7 +800,7 @@ components:
     limit:
       name: limit
       in: query
-      description: The number of results to return from offset
+      description: The number of results to return from offset.
       required: false
       schema:
         type: integer
@@ -783,7 +810,7 @@ components:
     offset:
       name: offset
       in: query
-      description: The initial position from which to return results
+      description: The initial position from which to return results.
       required: false
       schema:
         type: integer
