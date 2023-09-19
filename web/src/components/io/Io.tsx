@@ -73,7 +73,6 @@ const Io: FunctionComponent<IOProps & DispatchProps> = ({
                     link
                     linkTo={determineLink(node, input.origin)}
                     onClick={() => {
-                      console.log('here')
                       setSelectedNode(input.origin)
                     }}
                   >
