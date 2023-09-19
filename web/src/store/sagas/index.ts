@@ -16,7 +16,17 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
-import { Dataset, DatasetVersion, Events, Facets, LineageGraph, Namespaces } from '../../types/api'
+import {
+  Dataset,
+  DatasetVersion,
+  Datasets,
+  Events,
+  Facets,
+  Jobs,
+  LineageGraph,
+  Namespaces,
+  Tags,
+} from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
@@ -37,6 +47,7 @@ import {
   fetchNamespacesSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
+  fetchTagsSuccess,
 } from '../actionCreators'
 import {
   deleteDataset,
@@ -50,9 +61,20 @@ import {
   getNamespaces,
   getRunFacets,
   getRuns,
+  getTags,
 } from '../requests'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
+
+export function* fetchTags() {
+  try {
+    const response: Tags = yield call(getTags)
+    const { tags } = response
+    yield put(fetchTagsSuccess(tags))
+  } catch (e) {
+    yield put(applicationError('Something went wrong while fetching initial data.'))
+  }
+}
 
 export function* fetchNamespaces() {
   try {
@@ -110,8 +132,8 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const jobs: Job[] = yield call(getJobs, payload.namespace)
-      yield put(fetchJobsSuccess(jobs))
+      const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
+      yield put(fetchJobsSuccess(response.jobs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
@@ -134,8 +156,13 @@ export function* fetchDatasetsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASETS)
-      const datasets: Dataset[] = yield call(getDatasets, payload.namespace)
-      yield put(fetchDatasetsSuccess(datasets))
+      const datasets: Datasets = yield call(
+        getDatasets,
+        payload.namespace,
+        payload.limit,
+        payload.offset
+      )
+      yield put(fetchDatasetsSuccess(datasets.datasets, datasets.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
     }
@@ -226,7 +253,7 @@ export function* fetchRunFacetsSaga() {
 }
 
 export default function* rootSaga(): Generator {
-  const sagasThatAreKickedOffImmediately = [fetchNamespaces()]
+  const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
     fetchJobsSaga(),
     fetchRunsSaga(),

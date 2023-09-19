@@ -2,7 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Container, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import {
+  Chip,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  createTheme,
+} from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -13,7 +24,9 @@ import { encodeNode, runStateColor } from '../../helpers/nodes'
 import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
+import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
@@ -21,6 +34,7 @@ import React from 'react'
 
 interface StateProps {
   jobs: Job[]
+  totalCount: number
   isJobsInit: boolean
   isJobsLoading: boolean
   selectedNamespace: Nullable<string>
@@ -33,33 +47,28 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
+const PAGE_SIZE = 20
+
 const Jobs: React.FC<JobsProps> = ({
   jobs,
+  totalCount,
   isJobsLoading,
   isJobsInit,
   selectedNamespace,
   fetchJobs,
   resetJobs,
 }) => {
-  const mounted = React.useRef<boolean>(false)
-  const prevSelectedNamespace = React.useRef<Nullable<string>>()
+  const theme = createTheme(useTheme())
+
+  const [state, setState] = React.useState({
+    page: 0,
+  })
 
   React.useEffect(() => {
-    if (!mounted.current) {
-      // on mount
-      if (selectedNamespace) {
-        fetchJobs(selectedNamespace)
-      }
-      mounted.current = true
-    } else {
-      // on update
-      if (prevSelectedNamespace.current !== selectedNamespace && selectedNamespace) {
-        fetchJobs(selectedNamespace)
-      }
-
-      prevSelectedNamespace.current = selectedNamespace
+    if (selectedNamespace) {
+      fetchJobs(selectedNamespace, PAGE_SIZE, state.page)
     }
-  })
+  }, [selectedNamespace, state.page])
 
   React.useEffect(() => {
     return () => {
@@ -67,6 +76,15 @@ const Jobs: React.FC<JobsProps> = ({
       resetJobs()
     }
   }, [])
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+
+    fetchJobs(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    // reset page scroll
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
+  }
 
   const i18next = require('i18next')
   return (
@@ -81,8 +99,15 @@ const Jobs: React.FC<JobsProps> = ({
             </Box>
           ) : (
             <>
-              <Box p={2}>
+              <Box p={2} display={'flex'}>
                 <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
+                <Chip
+                  size={'small'}
+                  variant={'outlined'}
+                  color={'primary'}
+                  sx={{ marginLeft: 1 }}
+                  label={totalCount + ' total'}
+                ></Chip>
               </Box>
               <Table size='small'>
                 <TableHead>
@@ -144,6 +169,41 @@ const Jobs: React.FC<JobsProps> = ({
               </Table>
             </>
           )}
+          <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+            <MqText subdued>
+              <>
+                {PAGE_SIZE * state.page + 1} - {Math.min(PAGE_SIZE * (state.page + 1), totalCount)}{' '}
+                of {totalCount}
+              </>
+            </MqText>
+            <Tooltip title={i18next.t('events_route.previous_page')}>
+              <span>
+                <IconButton
+                  sx={{
+                    marginLeft: theme.spacing(2),
+                  }}
+                  color='primary'
+                  disabled={state.page === 0}
+                  onClick={() => handleClickPage('prev')}
+                  size='large'
+                >
+                  <ChevronLeftRounded />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={i18next.t('events_route.next_page')}>
+              <span>
+                <IconButton
+                  color='primary'
+                  onClick={() => handleClickPage('next')}
+                  size='large'
+                  disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+                >
+                  <ChevronRightRounded />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
         </>
       </MqScreenLoad>
     </Container>
@@ -153,6 +213,7 @@ const Jobs: React.FC<JobsProps> = ({
 const mapStateToProps = (state: IState) => ({
   isJobsInit: state.jobs.init,
   jobs: state.jobs.result,
+  totalCount: state.jobs.totalCount,
   isJobsLoading: state.jobs.isLoading,
   selectedNamespace: state.namespaces.selectedNamespace,
 })

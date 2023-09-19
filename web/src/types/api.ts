@@ -7,6 +7,11 @@ export interface Tag {
   name: string
   description: string
 }
+
+export interface Tags {
+  tags: Tag[]
+}
+
 export interface Runs {
   runs: Run[]
 }
@@ -59,6 +64,7 @@ export interface Event {
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {
@@ -132,6 +138,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 

@@ -13,6 +13,7 @@ import {
   Namespace,
   Run,
   Search,
+  Tag,
 } from '../../types/api'
 import { JobOrDataset } from '../../components/lineage/types'
 
@@ -37,18 +38,20 @@ export const resetEvents = () => ({
   type: actionTypes.RESET_EVENTS,
 })
 
-export const fetchDatasets = (namespace: string, limit: number) => ({
+export const fetchDatasets = (namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_DATASETS,
   payload: {
     namespace,
     limit,
+    offset,
   },
 })
 
-export const fetchDatasetsSuccess = (datasets: Dataset[]) => ({
+export const fetchDatasetsSuccess = (datasets: Dataset[], totalCount: number) => ({
   type: actionTypes.FETCH_DATASETS_SUCCESS,
   payload: {
     datasets,
+    totalCount,
   },
 })
 
@@ -109,17 +112,20 @@ export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS,
 })
 
-export const fetchJobs = (namespace: string) => ({
+export const fetchJobs = (namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_JOBS,
   payload: {
     namespace,
+    limit,
+    offset,
   },
 })
 
-export const fetchJobsSuccess = (jobs: Job[]) => ({
+export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs,
+    totalCount,
   },
 })
 
@@ -191,6 +197,17 @@ export const fetchNamespacesSuccess = (namespaces: Namespace[]) => ({
   type: actionTypes.FETCH_NAMESPACES_SUCCESS,
   payload: {
     namespaces,
+  },
+})
+
+export const fetchTags = () => ({
+  type: actionTypes.FETCH_TAGS,
+})
+
+export const fetchTagsSuccess = (tags: Tag[]) => ({
+  type: actionTypes.FETCH_TAGS_SUCCESS,
+  payload: {
+    tags,
   },
 })
 

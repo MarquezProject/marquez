@@ -30,6 +30,7 @@ import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
+import MqCopy from '../../components/core/copy/MqCopy'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
@@ -37,7 +38,6 @@ import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect, useRef } from 'react'
 import moment from 'moment'
-import MqCopy from '../../components/core/copy/MqCopy'
 
 interface StateProps {
   events: Event[]
@@ -143,6 +143,8 @@ const Events: React.FC<EventsProps> = ({
       PAGE_SIZE,
       directionPage * PAGE_SIZE
     )
+    // reset page scroll
+    window.scrollTo(0, 0)
     setState({ ...state, page: directionPage, rowExpanded: null })
   }
 
@@ -249,9 +251,9 @@ const Events: React.FC<EventsProps> = ({
                           }}
                         >
                           <TableCell align='left'>
-                            <Box display={"flex"} alignItems={"center"}>
+                            <Box display={'flex'} alignItems={'center'}>
                               <MqText font={'mono'}>{event.run.runId}</MqText>
-                              <MqCopy string={event.run.runId}/>
+                              <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>
                           <TableCell align='left'>

@@ -128,6 +128,18 @@ public class V57_1__BackfillFacets implements JavaMigration {
     }
 
     int estimatedEventsCount = estimateCountLineageEvents();
+
+    if (estimatedEventsCount < 0) {
+      // https://www.postgresql.org/docs/current/catalog-pg-class.html
+      // -1 indicating that the row count is unknown.
+      // This happens when lineage_events table is empty.
+      log.info("Vacuuming lineage_events table");
+      jdbi.withHandle(h -> h.execute("VACUUM lineage_events;"));
+      log.info("Vacuuming lineage_events table finished");
+
+      estimatedEventsCount = estimateCountLineageEvents();
+    }
+
     log.info("Estimating {} events in lineage_events table", estimatedEventsCount);
     if (estimatedEventsCount == 0 && countLineageEvents() == 0) {
       // lineage_events table is empty -> no need to run migration
