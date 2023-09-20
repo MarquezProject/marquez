@@ -11,7 +11,7 @@
     - *`after` - matches jobs or datasets after `YYYY-MM-DD`.*  
 * Web: add paging on jobs and datasets [`#2614`](https://github.com/MarquezProject/marquez/pull/2614) [@phixme](https://github.com/phixMe)  
     *Adds paging to jobs and datasets just like we already have on the lineage events page.*
-* Web: add tag descriptions to tooltips [`#2612`](https://github.com/MarquezProject/marquez/pull/2612) [`@davidsharp7`](https://github.com/davidsharp7)  
+* Web: add tag descriptions to tooltips [`#2612`](https://github.com/MarquezProject/marquez/pull/2612) [@davidsharp7](https://github.com/davidsharp7)  
     *Get the tag descriptions from the tags endpoint and when a column has a tag display the corresponding description on hover over. Context can be found [here](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).*
 * Web: add available column-level tags [`#2606`](https://github.com/MarquezProject/marquez/pull/2606) [@davidsharp7](https://github.com/davidsharp7)  
     *Adds a new column called "tags" to the dataset column view along with the tags associated with the dataset column.*
@@ -21,7 +21,7 @@
 ### Fixed 
 * Web: fix dataset saga for paging (`#2615`)[https://github.com/MarquezProject/marquez/pull/2615] [@phixme](https://github.com/phixMe)  
     *Updates the saga, changes the default page size.*
-* API: perf/improve `jobdao` query [`#2609`](https://github.com/MarquezProject/marquez/pull/2609) (https://github.com/algorithmy1)  
+* API: perf/improve `jobdao` query [`#2609`](https://github.com/MarquezProject/marquez/pull/2609) [@algorithmy1](https://github.com/algorithmy1)  
     *Optimizes the query to make use of Common Table Expressions to fetch the required data more efficiently and before the join, fixing a significant bottleneck.*
 
 ### Changed
