@@ -136,7 +136,7 @@ public interface JobDao extends BaseDao {
       WHERE
         j.namespace_name = :namespaceName
       AND
-        j.name ilike '%' || :pattern || '%'
+        j.name ILIKE '%' || :pattern || '%'
       ORDER BY <order_by> <sort_direction>
       LIMIT
         :limit

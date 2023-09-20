@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
 import marquez.api.JdbiUtils;
+import marquez.api.models.SortDirection;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
@@ -349,12 +350,13 @@ class DatasetDaoTest {
                     new SchemaField("address", "string", "the address")))),
         Collections.emptyList());
 
-    List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
+    List<marquez.service.models.Dataset> datasets =
+        datasetDao.findAll(NAMESPACE, "%", "name", SortDirection.ASC, 5, 0);
     assertThat(datasets).hasSize(3);
 
     datasetDao.delete(NAMESPACE, deletedDatasetName);
 
-    datasets = datasetDao.findAll(NAMESPACE, 5, 0);
+    datasets = datasetDao.findAll(NAMESPACE, "%", "name", SortDirection.ASC, 5, 0);
     assertThat(datasets).hasSize(2);
 
     // datasets sorted alphabetically, so commonDataset is first
@@ -412,6 +414,16 @@ class DatasetDaoTest {
                 "http://test.producer/",
                 "_schemaURL",
                 "http://test.schema/"));
+
+    datasets = datasetDao.findAll(NAMESPACE, "second", "name", SortDirection.ASC, 5, 0);
+
+    assertThat(datasets).hasSize(1);
+
+    datasets = datasetDao.findAll(NAMESPACE, "%", "name", SortDirection.DESC, 5, 0);
+
+    // assert order reversal for DESC
+    assertThat(datasets.get(0)).matches(ds -> ds.getName().getValue().equals(secondDatasetName));
+    assertThat(datasets.get(1)).matches(ds -> ds.getName().getValue().equals(DATASET));
   }
 
   @Test
@@ -535,7 +547,8 @@ class DatasetDaoTest {
                     new SchemaField("age", "int", "the age"),
                     new SchemaField("address", "string", "the address")))));
 
-    List<marquez.service.models.Dataset> datasets = datasetDao.findAll(NAMESPACE, 5, 0);
+    List<marquez.service.models.Dataset> datasets =
+        datasetDao.findAll(NAMESPACE, "%", "name", SortDirection.ASC, 5, 0);
     assertThat(datasets).hasSize(2);
 
     // datasets sorted alphabetically, so commonDataset is first
@@ -601,7 +614,7 @@ class DatasetDaoTest {
                     "writeFacet",
                     new CustomValueFacet("thirdWriteValue")))));
 
-    datasets = datasetDao.findAll(NAMESPACE, 5, 0);
+    datasets = datasetDao.findAll(NAMESPACE, "%", "name", SortDirection.ASC, 5, 0);
     assertThat(datasets).hasSize(2);
 
     assertThat(datasets.get(0))

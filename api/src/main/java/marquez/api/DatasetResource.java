@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.DatasetVersionNotFoundException;
 import marquez.api.models.ResultsPage;
+import marquez.api.models.SortDirection;
 import marquez.common.models.DatasetName;
 import marquez.common.models.FieldName;
 import marquez.common.models.NamespaceName;
@@ -143,12 +144,16 @@ public class DatasetResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("pattern") @DefaultValue("%") String pattern,
+      @QueryParam("orderBy") @DefaultValue("name") String orderBy,
+      @QueryParam("sortDirection") @DefaultValue("ASC") SortDirection sortDirection,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
     final List<Dataset> datasets =
-        datasetService.findAllWithTags(namespaceName.getValue(), limit, offset);
+        datasetService.findAllWithTags(
+            namespaceName.getValue(), pattern, orderBy, sortDirection, limit, offset);
     columnLineageService.enrichWithColumnLineage(datasets);
     final int totalCount = datasetService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("datasets", datasets, totalCount)).build();

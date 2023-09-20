@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Value;
+import marquez.api.models.SortDirection;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.NamespaceName;
@@ -34,6 +35,7 @@ import marquez.service.models.DatasetMeta;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -142,10 +144,17 @@ public interface DatasetDao extends BaseDao {
               GROUP BY df.dataset_version_uuid
           ) f ON f.dataset_version_uuid = d.current_version_uuid
           WHERE d.namespace_name = :namespaceName
-          ORDER BY d.name
+          AND d.name ILIKE  '%' || :pattern || '%'
+          ORDER BY <order_by> <sort_direction>
           LIMIT :limit OFFSET :offset
           """)
-  List<Dataset> findAll(String namespaceName, int limit, int offset);
+  List<Dataset> findAll(
+      String namespaceName,
+      String pattern,
+      @Define("order_by") String orderBy,
+      @Define("sort_direction") SortDirection sortDirection,
+      int limit,
+      int offset);
 
   @SqlQuery("SELECT count(*) FROM datasets_view")
   int count();
@@ -153,8 +162,14 @@ public interface DatasetDao extends BaseDao {
   @SqlQuery("SELECT count(*) FROM datasets_view AS j WHERE j.namespace_name = :namespaceName")
   int countFor(String namespaceName);
 
-  default List<Dataset> findAllWithTags(String namespaceName, int limit, int offset) {
-    List<Dataset> datasets = findAll(namespaceName, limit, offset);
+  default List<Dataset> findAllWithTags(
+      String namespaceName,
+      String pattern,
+      String orderBy,
+      SortDirection sortDirection,
+      int limit,
+      int offset) {
+    List<Dataset> datasets = findAll(namespaceName, pattern, orderBy, sortDirection, limit, offset);
     return datasets.stream().peek(this::setFields).collect(Collectors.toList());
   }
 
