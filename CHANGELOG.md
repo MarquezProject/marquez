@@ -19,7 +19,7 @@
     *Adds a Tool Tip to display basic node details.*
 
 ### Fixed 
-* Web: fix dataset saga for paging (`#2615`)[https://github.com/MarquezProject/marquez/pull/2615] [@phixme](https://github.com/phixMe)  
+* Web: fix dataset saga for paging [`#2615`](https://github.com/MarquezProject/marquez/pull/2615) [@phixme](https://github.com/phixMe)  
     *Updates the saga, changes the default page size.*
 * API: perf/improve `jobdao` query [`#2609`](https://github.com/MarquezProject/marquez/pull/2609) [@algorithmy1](https://github.com/algorithmy1)  
     *Optimizes the query to make use of Common Table Expressions to fetch the required data more efficiently and before the join, fixing a significant bottleneck.*
