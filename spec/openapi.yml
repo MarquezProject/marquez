@@ -374,6 +374,7 @@ paths:
         - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/sortDirection'
+        - $ref: '#/components/parameters/pattern'
       summary: List all jobs
       description: Returns a list of jobs.
       tags:
@@ -884,6 +885,16 @@ components:
         type: string
         example: name
         description: Sorts the results of your query by indicated direction `asc` or `desc`.
+      required: false
+
+    pattern:
+      name: pattern
+      in: query
+      schema:
+        default: '%'
+        type: string
+        example: etl
+        description: Filters the results of your query by indicated pattern. Matches any substring
       required: false
 
     orderBy:
