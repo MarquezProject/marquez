@@ -372,6 +372,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/sortDirection'
       summary: List all jobs
       description: Returns a list of jobs.
       tags:
@@ -882,6 +884,16 @@ components:
         type: string
         example: name
         description: Sorts the results of your query by indicated direction `asc` or `desc`.
+      required: false
+
+    orderBy:
+      name: orderBy
+      in: query
+      schema:
+        type: string
+        default: name
+        example: name
+        description: Orders the results of your query by indicated `sortDirection` by any column on the row.
       required: false
 
     before:

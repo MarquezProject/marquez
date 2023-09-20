@@ -38,6 +38,7 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.JobVersionNotFoundException;
 import marquez.api.models.JobVersion;
 import marquez.api.models.ResultsPage;
+import marquez.api.models.SortDirection;
 import marquez.common.models.FacetType;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -163,11 +164,16 @@ public class JobResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("pattern") @DefaultValue("%") String pattern,
+      @QueryParam("orderBy") @DefaultValue("name") String orderBy,
+      @QueryParam("sortDirection") @DefaultValue("ASC") SortDirection sortDirection,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
+    final List<Job> jobs =
+        jobService.findAllWithRun(
+            namespaceName.getValue(), pattern, orderBy, sortDirection, limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
