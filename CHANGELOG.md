@@ -5,12 +5,10 @@
 ## [0.41.0](https://github.com/MarquezProject/marquez/compare/0.40.0...0.41.0) - 2023-09-20
 ### Added
 * API: add support for the following parameters in the `SearchDao` [`#2556`](https://github.com/MarquezProject/marquez/pull/2556) [@tati](https://github.com/tati) [@wslulciuc](https://github.com/wslulciuc)  
-    *This PR updates the search endpoint to support the following query params:*
+    *This PR updates the search endpoint to enforce `YYYY-MM-DD` for query params, use `YYYY-MM-DD` as `LocalDate`, and support the following query params:*
     - *`namespace` - matches jobs or datasets within the given namespace.*
     - *`before` - matches jobs or datasets before `YYYY-MM-DD`.*
     - *`after` - matches jobs or datasets after `YYYY-MM-DD`.*  
-    *Enforces `YYYY-MM-DD` for query params.*
-    *Uses `YYYY-MM-DD` as `LocalDate`.*
 * Web: add paging on jobs and datasets [`#2614`](https://github.com/MarquezProject/marquez/pull/2614) [@phixme](https://github.com/phixMe)  
     *Adds paging to jobs and datasets just like we already have on the lineage events page.*
 * Web: add tag descriptions to tooltips [`#2612`](https://github.com/MarquezProject/marquez/pull/2612) [`@davidsharp7`](https://github.com/davidsharp7)  
