@@ -8,7 +8,7 @@
     *This PR updates the search endpoint to support the following query params:*
     - *`namespace` - matches jobs or datasets within the given namespace.*
     - *`before` - matches jobs or datasets before `YYYY-MM-DD`.*
-    - *`after` - matches jobs or datasets after `YYYY-MM-DD`.*
+    - *`after` - matches jobs or datasets after `YYYY-MM-DD`.*  
     *Enforces `YYYY-MM-DD` for query params.*
     *Uses `YYYY-MM-DD` as `LocalDate`.*
 * Web: add paging on jobs and datasets [`#2614`](https://github.com/MarquezProject/marquez/pull/2614) [@phixme](https://github.com/phixMe)  
