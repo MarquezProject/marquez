@@ -56,7 +56,10 @@ const config = {
                     docItemComponent: "@theme/ApiItem" // Derived from docusaurus-theme-openapi-docs
                 },
                 blog: {
+                    blogTitle: 'Marquez Blog',
+                    blogDescription: 'News and Updates on the Marquez Project',
                     showReadingTime: true,
+                    postsPerPage: 'ALL',
                     // Please change this to your repo.
                     // Remove this to remove the "edit this page" links.
                     editUrl:
