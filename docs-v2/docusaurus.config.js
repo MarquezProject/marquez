@@ -60,10 +60,9 @@ const config = {
                     blogDescription: 'News and Updates on the Marquez Project',
                     showReadingTime: true,
                     postsPerPage: 'ALL',
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
+                    // To do: update with correct url
                     editUrl:
-                        'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+                        'https://github.com/MarquezProject/marquez/tree/docs/v2/docs-v2/',
                 },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
