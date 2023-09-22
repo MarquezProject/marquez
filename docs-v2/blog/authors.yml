@@ -1,17 +1,17 @@
-endi:
-  name: Endilie Yacop Sucipto
-  title: Maintainer of Docusaurus
-  url: https://github.com/endiliey
-  image_url: https://github.com/endiliey.png
+Leszczynski:
+    name: Pawel Leszczynski
+    title: Marquez Committer
+    url: https://github.com/pawel-big-lebowski
+    image_url: https://github.com/pawel-big-lebowski.png
+    
+Obuchowski:
+    name: Maciej Obuchowski
+    title: Marquez Committer
+    url: https://github.com/mobuchowski
+    image_url: https://github.com/mobuchowski.png
 
-yangshun:
-  name: Yangshun Tay
-  title: Front End Engineer @ Facebook
-  url: https://github.com/yangshun
-  image_url: https://github.com/yangshun.png
-
-slorber:
-  name: Sébastien Lorber
-  title: Docusaurus maintainer
-  url: https://sebastienlorber.com
-  image_url: https://github.com/slorber.png
+Robinson:
+    name: Michael Robinson
+    title: Marquez Community Manager
+    url: https://github.com/merobi-hub
+    image_url: https://github.com/merobi-hub.png
