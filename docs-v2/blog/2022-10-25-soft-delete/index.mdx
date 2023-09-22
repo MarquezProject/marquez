@@ -6,11 +6,13 @@ authors: [Obuchowski, Robinson]
 tags: [API, web, features]
 ---
 
+Read on to learn how to use the new soft-delete feature to clean up your lineage graphs.
+
+<!--truncate-->
+
 ## Background
 
 An exciting new feature is coming to the Marquez UI: the ability to “soft delete” datasets and jobs. Once work on the feature is finished, users will be able to hide inactive datasets and jobs from the UI, allowing for the easy removal of unused or stale metadata. At this point, most of the necessary backend development is complete. 
-
-<!--truncate-->
 
 ## Motivations and Goals
 The idea for this feature came out of a need to keep deleted or renamed datasets and jobs from cluttering the lineage view in Marquez. In Issue [#1736](https://github.com/MarquezProject/marquez/issues/1736), project co-creator [Julien Le Dem](https://github.com/julienledem) suggested a change to the internal Marquez model to create a “new” version of such a dataset or job – a deleted version – that would not show up in the current lineage view produced by `GET /api/v1/lineage`.  

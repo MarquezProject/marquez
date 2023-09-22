@@ -6,13 +6,15 @@ authors: [Robinson]
 tags: [API, tutorials]
 ---
 
+Read on to learn how to use the API behind Marquez to explore datasets, jobs, and lineage.
+
+<!--truncate-->
+
 ## Background
 
 If you’re a Marquez user, then you might already know that the project is an open source metadata service for the collection, aggregation, and visualization of a data ecosystem’s metadata. Based on the OpenLineage standard, it solves a hard problem: representing data pipeline lineage holistically and agnostically – or, more precisely, as holistically and agnostically as possible (lineage being above all else a pursuit).
 
 But did you know that Marquez is also a metadata *server* that offers an OpenLineage-compatible endpoint for real-time metadata collection?
-
-<!--truncate-->
 
 The key to the Marquez metadata server is the Marquez Lineage API, a REST API that offers users the ability to retrieve, modify, and add to the metadata about their pipelines in the Marquez database. In response to queries, the API emits JSON via HTTP.
 
