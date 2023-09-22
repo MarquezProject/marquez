@@ -64,6 +64,19 @@ const config = {
                     editUrl:
                         'https://github.com/MarquezProject/marquez/tree/docs/v2/docs-v2/',
                 },
+                pages: {
+                    path: 'src/pages',
+                    include: ['**/*.{js,jsx,ts,tsx,md,mdx}'],
+                    exclude: [
+                      'home.tsx', // this page served from plugin
+                      '**/_*.{js,jsx,ts,tsx,md,mdx}',
+                      '**/_*.{js,jsx,ts,tsx,md,mdx}',
+                      '**/_*/**',
+                      '**/*.test.{js,jsx,ts,tsx}',
+                      '**/__tests__/**',
+                    ],
+                    mdxPageComponent: '@theme/MDXPage',
+                },
                 theme: {
                     customCss: require.resolve('./src/css/custom.css'),
                 },
@@ -86,6 +99,7 @@ const config = {
                     src: 'img/logo-lfai.svg',
                 },
                 items: [
+                    {to: '/about', label: 'About', position: 'left'},
                     {
                         type: 'docSidebar',
                         sidebarId: 'tutorialSidebar',
