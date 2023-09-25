@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
+import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
@@ -18,6 +18,7 @@ import {
   fetchRuns,
   resetJobs,
   resetRuns,
+  setTabIndex,
 } from '../../store/actionCreators'
 import { jobRunsStatus } from '../../helpers/nodes'
 import { useNavigate } from 'react-router-dom'
@@ -25,6 +26,7 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import Io from '../io/Io'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
@@ -37,6 +39,7 @@ interface DispatchProps {
   resetJobs: typeof resetJobs
   deleteJob: typeof deleteJob
   dialogToggle: typeof dialogToggle
+  setTabIndex: typeof setTabIndex
 }
 
 type IProps = {
@@ -45,17 +48,28 @@ type IProps = {
   runs: Run[]
   runsLoading: boolean
   display: IState['display']
+  tabIndex: IState['lineage']['tabIndex']
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
-  const { job, jobs, fetchRuns, resetRuns, deleteJob, dialogToggle, runs, display, runsLoading } =
-    props
+  const {
+    job,
+    jobs,
+    fetchRuns,
+    resetRuns,
+    deleteJob,
+    dialogToggle,
+    runs,
+    display,
+    runsLoading,
+    tabIndex,
+    setTabIndex,
+  } = props
   const navigate = useNavigate()
 
-  const [tab, setTab] = React.useState(0)
-  const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
-    setTab(newValue)
+  const handleChange = (event: ChangeEvent, newValue: number) => {
+    setTabIndex(newValue)
   }
   const i18next = require('i18next')
 
@@ -96,8 +110,9 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-        <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
+        <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
           <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
+          <Tab label={'I/O'} disableRipple={true} />
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
@@ -158,7 +173,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
-      {tab === 0 ? (
+      {tabIndex === 0 ? (
         job.latestRun ? (
           <RunInfo run={job.latestRun} />
         ) : (
@@ -167,7 +182,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tab === 1 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Io />}
+      {tabIndex === 2 && <Runs runs={runs} />}
     </Box>
   )
 }
@@ -177,6 +193,7 @@ const mapStateToProps = (state: IState) => ({
   runsLoading: state.runs.isLoading,
   display: state.display,
   jobs: state.jobs,
+  tabIndex: state.lineage.tabIndex,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -187,6 +204,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       resetJobs: resetJobs,
       deleteJob: deleteJob,
       dialogToggle: dialogToggle,
+      setTabIndex: setTabIndex,
     },
     dispatch
   )
