@@ -26,7 +26,7 @@ The specific security and analysis methodologies that we employ include but are 
 
 For more information about our approach to quality and security, feel free to reach out to the Marquez development team:
 
-- Slack: [Marquezproject.slack.com](http://bit.ly/MarquezSlack)
+- Slack: [Marquezproject.slack.com](http://bit.ly/Marquez_invite)
 - Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ----
