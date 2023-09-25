@@ -12,6 +12,7 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode } from '../../helpers/nodes'
 import { setSelectedNode } from '../../store/actionCreators'
+import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
 
@@ -50,6 +51,7 @@ const Io: FunctionComponent<IOProps & DispatchProps> = ({
   outputs,
   setSelectedNode,
 }) => {
+  const i18next = require('i18next')
   if (!node) {
     return null
   }
@@ -83,6 +85,13 @@ const Io: FunctionComponent<IOProps & DispatchProps> = ({
             ))}
           </TableBody>
         </Table>
+        {inputs && inputs.length === 0 && (
+          <Box mt={2}>
+            <MqEmpty title={i18next.t('lineage.empty')}>
+              <MqText subdued>{i18next.t('lineage.no_inputs')}</MqText>
+            </MqEmpty>
+          </Box>
+        )}
       </Box>
       <Box width={'50%'}>
         <Table sx={{ p: 2, ml: 1 }}>
@@ -109,6 +118,13 @@ const Io: FunctionComponent<IOProps & DispatchProps> = ({
             ))}
           </TableBody>
         </Table>
+        {outputs && outputs.length === 0 && (
+          <Box mt={2}>
+            <MqEmpty title={i18next.t('lineage.empty')}>
+              <MqText subdued>{i18next.t('lineage.no_outputs')}</MqText>
+            </MqEmpty>
+          </Box>
+        )}
       </Box>
     </Box>
   )

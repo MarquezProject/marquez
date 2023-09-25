@@ -59,6 +59,9 @@ i18next
             empty_body: 'Try selecting a node through search or the jobs or datasets page.',
             graph_depth_title: 'Depth',
             full_graph_label: 'Full',
+            empty: 'Empty',
+            no_inputs: 'No inputs for this node.',
+            no_outputs: 'No outputs for this node.',
           },
           sidenav: {
             jobs: 'JOBS',
@@ -246,7 +249,7 @@ i18next
             name: 'NOM',
             type: 'TAPER',
             description: 'DESCRIPTION',
-            tags: 'MOTS CLÉS'
+            tags: 'MOTS CLÉS',
           },
           dataset_versions_columns: {
             version: 'VERSION',
@@ -374,7 +377,7 @@ i18next
             name: 'NOMBRE',
             type: 'ESCRIBE',
             description: 'DESCRIPCIÓN',
-            tags: 'ETIQUETAS'
+            tags: 'ETIQUETAS',
           },
           dataset_versions_columns: {
             version: 'VERSIÓN',
@@ -502,7 +505,7 @@ i18next
             name: 'NAZWA',
             type: 'RODZAJ',
             description: 'OPIS',
-            tags: 'TAGI'
+            tags: 'TAGI',
           },
           dataset_versions_columns: {
             version: 'WERSJA',
