@@ -107,6 +107,7 @@ const config = {
                         label: 'Docs',
                     },
                     {to: '/blog', label: 'Blog', position: 'left'},
+                    {to: '/resources', label: 'Resources', position: 'left'},
                     {
                         href: 'https://github.com/MarquezProject/marquez',
                         label: 'GitHub',
