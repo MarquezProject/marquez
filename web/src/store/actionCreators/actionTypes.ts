@@ -16,6 +16,8 @@ export const SET_SELECTED_NODE = 'SET_SELECTED_NODE'
 
 export const SET_BOTTOM_BAR_HEIGHT = 'SET_BOTTOM_BAR_HEIGHT'
 
+export const SET_TAB_INDEX = 'SET_TAB_INDEX'
+
 // jobs
 export const FETCH_JOBS = 'FETCH_JOBS'
 export const FETCH_JOBS_SUCCESS = 'FETCH_JOBS_SUCCESS'

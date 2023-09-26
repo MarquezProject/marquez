@@ -1,6 +1,37 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.40.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.41.0...HEAD)
+
+## [0.41.0](https://github.com/MarquezProject/marquez/compare/0.40.0...0.41.0) - 2023-09-20
+### Added
+* API: add support for the following parameters in the `SearchDao` [`#2556`](https://github.com/MarquezProject/marquez/pull/2556) [@tati](https://github.com/tati) [@wslulciuc](https://github.com/wslulciuc)  
+    *This PR updates the search endpoint to enforce `YYYY-MM-DD` for query params, use `YYYY-MM-DD` as `LocalDate`, and support the following query params:*
+    - *`namespace` - matches jobs or datasets within the given namespace.*
+    - *`before` - matches jobs or datasets before `YYYY-MM-DD`.*
+    - *`after` - matches jobs or datasets after `YYYY-MM-DD`.*  
+* Web: add paging on jobs and datasets [`#2614`](https://github.com/MarquezProject/marquez/pull/2614) [@phixme](https://github.com/phixMe)  
+    *Adds paging to jobs and datasets just like we already have on the lineage events page.*
+* Web: add tag descriptions to tooltips [`#2612`](https://github.com/MarquezProject/marquez/pull/2612) [@davidsharp7](https://github.com/davidsharp7)  
+    *Get the tag descriptions from the tags endpoint and when a column has a tag display the corresponding description on hover over. Context can be found [here](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).*
+* Web: add available column-level tags [`#2606`](https://github.com/MarquezProject/marquez/pull/2606) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds a new column called "tags" to the dataset column view along with the tags associated with the dataset column.*
+* Web: add HTML Tool Tip [`#2601`](https://github.com/MarquezProject/marquez/pull/2601) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds a Tool Tip to display basic node details.*
+
+### Fixed 
+* Web: fix dataset saga for paging [`#2615`](https://github.com/MarquezProject/marquez/pull/2615) [@phixme](https://github.com/phixMe)  
+    *Updates the saga, changes the default page size.*
+* API: perf/improve `jobdao` query [`#2609`](https://github.com/MarquezProject/marquez/pull/2609) [@algorithmy1](https://github.com/algorithmy1)  
+    *Optimizes the query to make use of Common Table Expressions to fetch the required data more efficiently and before the join, fixing a significant bottleneck.*
+
+### Changed
+* Docker: Postgres `14` [`#2607`](https://github.com/MarquezProject/marquez/pull/2607) [@wslulciuc](https://github.com/wslulciuc)  
+    *Bumps the recommended version of Postgres to 14.*
+    *When deploying locally, you might need to run `./docker/down.sh` to clean existing volumes.*
+
+### Removed
+* Client: tolerate null transformation attrs in field model [`#2600`](https://github.com/MarquezProject/marquez/pull/2600) [@davidjgoss](https://github.com/davidjgoss)  
+    *Removes the @NonNull annotation from the client class and the @NotNull from the model class.*
 
 ## [0.40.0](https://github.com/MarquezProject/marquez/compare/0.39.0...0.40.0) - 2023-08-15
 ### Added

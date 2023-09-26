@@ -30,6 +30,7 @@ interface OwnProps {
   small?: boolean
   bottomMargin?: boolean
   children: ReactElement | (string | ReactElement)[] | string | string[] | number | undefined | null
+  onClick?: () => void
 }
 
 type MqTextProps = OwnProps
@@ -53,6 +54,7 @@ const MqText: React.FC<MqTextProps> = ({
   highlight,
   color,
   small,
+  onClick,
 }) => {
   const theme = createTheme(useTheme())
 
@@ -143,6 +145,7 @@ const MqText: React.FC<MqTextProps> = ({
   if (heading) {
     return (
       <Typography
+        onClick={onClick}
         variant='h4'
         sx={Object.assign(classesObject.root, classesObject.heading, conditionalClasses)}
         style={style}
@@ -152,7 +155,12 @@ const MqText: React.FC<MqTextProps> = ({
     )
   } else if (link && linkTo) {
     return (
-      <LinkRouter to={linkTo} aria-disabled={disabled} style={{ textDecoration: 'none' }}>
+      <LinkRouter
+        to={linkTo}
+        aria-disabled={disabled}
+        style={{ textDecoration: 'none' }}
+        onClick={onClick}
+      >
         <Box
           component='span'
           sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
@@ -164,6 +172,7 @@ const MqText: React.FC<MqTextProps> = ({
   } else if (link && href) {
     return (
       <Link
+        onClick={onClick}
         href={href}
         target={'_blank'}
         rel='noopener noreferrer'
@@ -174,7 +183,11 @@ const MqText: React.FC<MqTextProps> = ({
     )
   } else {
     return (
-      <Box sx={Object.assign(classesObject.root, conditionalClasses)} style={style}>
+      <Box
+        onClick={onClick}
+        sx={Object.assign(classesObject.root, conditionalClasses)}
+        style={style}
+      >
         {children}
       </Box>
     )
