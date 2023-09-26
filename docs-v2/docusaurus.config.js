@@ -119,7 +119,7 @@ const config = {
                 style: 'dark',
                 links: [
                     {
-                        title: 'Docs',
+                        title: 'Get Started',
                         items: [
                             {
                                 label: 'Quickstart',
@@ -128,21 +128,25 @@ const config = {
                         ],
                     },
                     {
-                        title: 'Community',
+                        title: 'Connect',
                         items: [
                             {
-                                label: 'Twitter',
-                                href: 'https://twitter.com/docusaurus',
+                                label: 'Slack',
+                                href: 'https://bit.ly/Marquez_invite',
+                            },
+                            {
+                                label: 'YouTube',
+                                href: 'https://bit.ly/MarquezYouTube',
+                            },
+                            {
+                                label: 'Twitter/X',
+                                href: 'https://twitter.com/marquezproject',
                             },
                         ],
                     },
                     {
-                        title: 'More',
+                        title: 'Contribute',
                         items: [
-                            {
-                                label: 'Blog',
-                                to: '/blog',
-                            },
                             {
                                 label: 'GitHub',
                                 href: 'https://github.com/MarquezProject/marquez',

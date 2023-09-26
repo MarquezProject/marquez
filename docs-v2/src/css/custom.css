@@ -36,3 +36,7 @@
 .navbar, .dashed {
   border-bottom: 2px dashed var(--ifm-color-primary-lighter);
 }
+
+.footer, .col {
+  text-align: center;
+}
