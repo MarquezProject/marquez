@@ -73,10 +73,9 @@ public interface LineageDao {
               WHERE io.job_uuid != l.job_uuid AND
                   array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
                 AND depth < :depth)
-      SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context
+      SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
       FROM lineage l2
-      INNER JOIN jobs_view j ON j.uuid=l2.job_uuid
-      LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid;
+      INNER JOIN jobs_view j ON j.uuid=l2.job_uuid;
   """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
@@ -116,11 +115,10 @@ public interface LineageDao {
           + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
           + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"
           + ")\n"
-          + "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+          + "SELECT r.*, ra.args, f.facets,\n"
           + "  r.version AS job_version, ri.input_versions, ro.output_versions\n"
           + "  from latest_runs AS r\n"
           + "LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
           + "LEFT JOIN LATERAL (\n"
           + "    SELECT im.run_uuid,\n"
           + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"

@@ -33,16 +33,16 @@ interface OwnProps {
 
 type NodeProps = DispatchProps & OwnProps
 
-const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
-  const determineLink = (node: GraphNode<MqNode>) => {
-    if (isJob(node)) {
-      return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
-    } else if (isDataset(node)) {
-      return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
-    }
-    return '/'
+export const determineLink = (node: GraphNode<MqNode>) => {
+  if (isJob(node)) {
+    return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
+  } else if (isDataset(node)) {
+    return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
   }
+  return '/'
+}
 
+const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
   const addToToolTip = (inputData: GraphNode<MqNode>) => {
     return (
       <>

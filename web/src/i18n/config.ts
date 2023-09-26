@@ -10,7 +10,7 @@ export const defaultNS = 'translation'
 const DETECTION_OPTIONS = {
   order: ['localStorage'],
   lookupLocalStorage: 'lng',
-  caches: ['localStorage']
+  caches: ['localStorage'],
 }
 
 i18next
@@ -23,7 +23,7 @@ i18next
       en: {
         translation: {
           header: {
-            docs_link: 'API Docs'
+            docs_link: 'API Docs',
           },
           jobs: {
             search: 'Search',
@@ -36,7 +36,7 @@ i18next
             facets_subhead_aria: 'Search',
             runs_subhead: 'FACETS',
             dialog_delete: 'DELETE',
-            dialog_confirmation_title: 'Are you sure?'
+            dialog_confirmation_title: 'Are you sure?',
           },
           search: {
             filter: {
@@ -44,7 +44,7 @@ i18next
               jobs: 'Jobs',
               datasets: 'Datasets',
               updated: 'Updated',
-              name: 'Name'
+              name: 'Name',
             },
             status: 'Searching...',
             none: 'No Results',
@@ -52,21 +52,24 @@ i18next
             search_aria: 'Search jobs and datasets',
             jobs: 'Jobs',
             and: 'and',
-            datasets: 'Datasets'
+            datasets: 'Datasets',
           },
           lineage: {
             empty_title: 'No node selected',
             empty_body: 'Try selecting a node through search or the jobs or datasets page.',
             graph_depth_title: 'Depth',
-            full_graph_label: 'Full'
+            full_graph_label: 'Full',
+            empty: 'Empty',
+            no_inputs: 'No inputs for this node.',
+            no_outputs: 'No outputs for this node.',
           },
           sidenav: {
             jobs: 'JOBS',
             datasets: 'DATASETS',
-            events: 'EVENTS'
+            events: 'EVENTS',
           },
           namespace_select: {
-            prompt: 'ns'
+            prompt: 'ns',
           },
           dataset_info: {
             empty_title: 'No Fields',
@@ -74,14 +77,14 @@ i18next
             facets_subhead: 'FACETS',
             facets_subhead_aria: 'Search',
             run_subhead: 'Created by Run',
-            duration: 'Duration'
+            duration: 'Duration',
           },
           datasets: {
             latest_tab: 'LATEST SCHEMA',
             history_tab: 'VERSION HISTORY',
             column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
-            dialog_confirmation_title: 'Are you sure?'
+            dialog_confirmation_title: 'Are you sure?',
           },
           datasets_route: {
             empty_title: 'No datasets found',
@@ -91,11 +94,11 @@ i18next
             namespace_col: 'NAMESPACE',
             source_col: 'SOURCE',
             updated_col: 'UPDATED AT',
-            status_col: 'STATUS'
+            status_col: 'STATUS',
           },
           datasets_column_lineage: {
             empty_title: 'No column lineage',
-            empty_body: 'Column lineage not available for the specified dataset.'
+            empty_body: 'Column lineage not available for the specified dataset.',
           },
           jobs_route: {
             empty_title: 'No jobs found',
@@ -105,7 +108,7 @@ i18next
             namespace_col: 'NAMESPACE',
             updated_col: 'UPDATED AT',
             latest_run_col: 'LATEST RUN DURATION',
-            latest_run_state_col: 'LATEST RUN STATE'
+            latest_run_state_col: 'LATEST RUN STATE',
           },
           runs_columns: {
             id: 'ID',
@@ -113,20 +116,20 @@ i18next
             created_at: 'CREATED AT',
             started_at: 'STARTED AT',
             ended_at: 'ENDED AT',
-            duration: 'DURATION'
+            duration: 'DURATION',
           },
           dataset_info_columns: {
             name: 'NAME',
             type: 'TYPE',
             description: 'DESCRIPTION',
-            tags: 'TAGS'
+            tags: 'TAGS',
           },
           dataset_versions_columns: {
             version: 'VERSION',
             created_at: 'CREATED AT',
             fields: 'FIELDS',
             created_by_run: 'CREATED BY RUN',
-            lifecycle_state: 'LIFECYCLE STATE'
+            lifecycle_state: 'LIFECYCLE STATE',
           },
           events_route: {
             title: 'EVENTS',
@@ -135,21 +138,21 @@ i18next
             previous_page: 'Previous page',
             next_page: 'Next page',
             empty_title: 'No events found',
-            empty_body: 'Try changing dates or consulting our documentation to add events.'
+            empty_body: 'Try changing dates or consulting our documentation to add events.',
           },
           events_columns: {
             id: 'ID',
             state: 'STATE',
             name: 'NAME',
             namespace: 'NAMESPACE',
-            time: 'TIME'
-          }
-        }
+            time: 'TIME',
+          },
+        },
       },
       fr: {
         translation: {
           header: {
-            docs_link: 'Documents API'
+            docs_link: 'Documents API',
           },
           jobs: {
             search: 'Recherche',
@@ -162,7 +165,7 @@ i18next
             runs_subhead: 'FACETTES',
             facets_subhead_aria: 'Recherche',
             dialog_delete: 'EFFACER',
-            dialog_confirmation_title: 'Êtes-vous sûr?'
+            dialog_confirmation_title: 'Êtes-vous sûr?',
           },
           search: {
             filter: {
@@ -170,7 +173,7 @@ i18next
               jobs: "d'Emplois",
               datasets: 'Jeux de Données',
               updated: 'Mis à jour',
-              name: 'Nom'
+              name: 'Nom',
             },
             status: 'Recherche...',
             none: 'Aucun Résultat',
@@ -178,20 +181,20 @@ i18next
             search_aria: 'Recherchez des emplois et des ensembles de données',
             jobs: "d'Emplois",
             and: 'et',
-            datasets: 'Jeux de Données'
+            datasets: 'Jeux de Données',
           },
           lineage: {
             empty_title: 'Aucun nœud sélectionné',
             empty_body:
-              'Essayez de sélectionner un nœud via la recherche ou la page des travaux ou des jeux de données.'
+              'Essayez de sélectionner un nœud via la recherche ou la page des travaux ou des jeux de données.',
           },
           sidenav: {
             jobs: 'EMPLOIS',
             datasets: 'JEUX DE DONNÉES',
-            events: 'ÉVÉNEMENTS'
+            events: 'ÉVÉNEMENTS',
           },
           namespace_select: {
-            prompt: 'en'
+            prompt: 'en',
           },
           dataset_info: {
             empty_title: 'Aucun jeu de données trouvé',
@@ -199,14 +202,14 @@ i18next
             facets_subhead: 'FACETTES',
             facets_subhead_aria: 'Recherche',
             run_subhead: 'Créé par Run',
-            duration: 'Durée'
+            duration: 'Durée',
           },
           datasets: {
             latest_tab: 'DERNIER SCHEMA',
             history_tab: 'HISTORIQUE DES VERSIONS',
             column_lineage_tab: 'LIGNÉE DE COLONNE',
             dialog_delete: 'EFFACER',
-            dialog_confirmation_title: 'Êtes-vous sûr?'
+            dialog_confirmation_title: 'Êtes-vous sûr?',
           },
           datasets_route: {
             empty_title: 'Aucun jeu de données trouvé',
@@ -217,11 +220,11 @@ i18next
             namespace_col: 'ESPACE DE NOMS',
             source_col: 'SOURCE',
             updated_col: 'MISE À JOUR À',
-            status_col: 'STATUT'
+            status_col: 'STATUT',
           },
           datasets_column_lineage: {
             empty_title: 'Aucune lignée de colonne',
-            empty_body: "Lignage de colonne non disponible pour l'ensemble de données spécifié."
+            empty_body: "Lignage de colonne non disponible pour l'ensemble de données spécifié.",
           },
           jobs_route: {
             empty_title: 'Aucun emploi trouvé',
@@ -232,7 +235,7 @@ i18next
             namespace_col: 'ESPACE DE NOMS',
             updated_col: 'MISE À JOUR À',
             latest_run_col: "DERNIÈRE DURÉE D'EXÉCUTION",
-            latest_run_state_col: "DERNIER ÉTAT D'EXÉCUTIONE"
+            latest_run_state_col: "DERNIER ÉTAT D'EXÉCUTIONE",
           },
           runs_columns: {
             id: 'ID',
@@ -240,20 +243,20 @@ i18next
             created_at: 'CRÉÉ À',
             started_at: 'COMMENCÉ À',
             ended_at: 'TERMINÉ À',
-            duration: 'DURÉE'
+            duration: 'DURÉE',
           },
           dataset_info_columns: {
             name: 'NOM',
             type: 'TAPER',
             description: 'DESCRIPTION',
-            tags: 'MOTS CLÉS'
+            tags: 'MOTS CLÉS',
           },
           dataset_versions_columns: {
             version: 'VERSION',
             created_at: 'CRÉÉ À',
             fields: 'DOMAINES',
             created_by_run: 'CRÉÉ PAR RUN',
-            lifecycle_state: 'ÉTAT DU CYCLE DE VIE'
+            lifecycle_state: 'ÉTAT DU CYCLE DE VIE',
           },
           events_route: {
             title: 'ÉVÉNEMENTS',
@@ -263,21 +266,21 @@ i18next
             next_page: 'Page suivante',
             empty_title: 'Aucun événement trouvé',
             empty_body:
-              'Essayez de changer les dates ou consultez notre documentation pour ajouter des événements.'
+              'Essayez de changer les dates ou consultez notre documentation pour ajouter des événements.',
           },
           events_columns: {
             id: 'ID',
             state: 'ETAT',
             name: 'NOM',
             namespace: 'ESPACE DE NOMS',
-            time: 'TEMPS'
-          }
-        }
+            time: 'TEMPS',
+          },
+        },
       },
       es: {
         translation: {
           header: {
-            docs_link: 'Documentos API'
+            docs_link: 'Documentos API',
           },
           jobs: {
             search: 'Buscar',
@@ -290,7 +293,7 @@ i18next
             runs_subhead: 'FACETAS',
             facets_subhead_aria: 'Buscar',
             dialog_delete: 'ELIMINAR',
-            dialog_confirmation_title: 'Estás seguro?'
+            dialog_confirmation_title: 'Estás seguro?',
           },
           search: {
             filter: {
@@ -298,7 +301,7 @@ i18next
               jobs: 'Trabajos',
               datasets: 'Conjuntos de Datos',
               updated: 'Actualizado',
-              name: 'Nombre'
+              name: 'Nombre',
             },
             status: 'Buscando...',
             none: 'No Hay Resultados',
@@ -306,20 +309,20 @@ i18next
             search_aria: 'Buscar trabajos y conjuntos de datos',
             jobs: 'Trabajos',
             and: 'y',
-            datasets: 'Conjuntos de Datos'
+            datasets: 'Conjuntos de Datos',
           },
           lineage: {
             empty_title: 'Ningún nodo seleccionado',
             empty_body:
-              'Intente seleccionar un nodo mediante la búsqueda o la página de trabajos o conjuntos de datos.'
+              'Intente seleccionar un nodo mediante la búsqueda o la página de trabajos o conjuntos de datos.',
           },
           sidenav: {
             jobs: 'TRABAJOS',
             datasets: 'CONJUNTOS DE DATOS',
-            events: 'EVENTOS'
+            events: 'EVENTOS',
           },
           namespace_select: {
-            prompt: 'en'
+            prompt: 'en',
           },
           dataset_info: {
             empty_title: 'No se encontraron conjuntos de datos',
@@ -327,14 +330,14 @@ i18next
             facets_subhead: 'FACETAS',
             facets_subhead_aria: 'Buscar',
             run_subhead: 'Creado por Ejecutar',
-            duration: 'Duración'
+            duration: 'Duración',
           },
           datasets: {
             latest_tab: 'ESQUEMA ÚLTIMO',
             history_tab: 'HISTORIAL DE VERSIONES',
             column_lineage_tab: 'LINAJE DE COLUMNA',
             dialog_delete: 'ELIMINAR',
-            dialog_confirmation_title: 'Estás seguro?'
+            dialog_confirmation_title: 'Estás seguro?',
           },
           datasets_route: {
             empty_title: 'No se encontraron conjuntos de datos',
@@ -345,11 +348,11 @@ i18next
             namespace_col: 'ESPACIO DE NOMBRES',
             source_col: 'FUENTE',
             updated_col: 'ACTUALIZADO EN',
-            status_col: 'ESTADO'
+            status_col: 'ESTADO',
           },
           datasets_column_lineage: {
             empty_title: 'Sin linaje de columna',
-            empty_body: 'Linaje de columna no disponible para el conjunto de datos especificado.'
+            empty_body: 'Linaje de columna no disponible para el conjunto de datos especificado.',
           },
           jobs_route: {
             empty_title: 'No se encontraron trabajos',
@@ -360,7 +363,7 @@ i18next
             namespace_col: 'ESPACIO DE NOMBRES',
             updated_col: 'ACTUALIZADO EN',
             latest_run_col: 'DURACIÓN DE LA ÚLTIMA EJECUCIÓN',
-            latest_run_state_col: 'ESTADO DE LA ÚLTIMA EJECUCIÓN'
+            latest_run_state_col: 'ESTADO DE LA ÚLTIMA EJECUCIÓN',
           },
           runs_columns: {
             id: 'ID',
@@ -368,20 +371,20 @@ i18next
             created_at: 'CREADO EN',
             started_at: 'EMPEZÓ A LAS',
             ended_at: 'TERMINÓ EN',
-            duration: 'DURACIÓN'
+            duration: 'DURACIÓN',
           },
           dataset_info_columns: {
             name: 'NOMBRE',
             type: 'ESCRIBE',
             description: 'DESCRIPCIÓN',
-            tags: 'ETIQUETAS'
+            tags: 'ETIQUETAS',
           },
           dataset_versions_columns: {
             version: 'VERSIÓN',
             created_at: 'CREADO EN',
             fields: 'CAMPOS',
             created_by_run: 'CREADO POR EJECUTAR',
-            lifecycle_state: 'ESTADO DEL CICLO DE VIDA'
+            lifecycle_state: 'ESTADO DEL CICLO DE VIDA',
           },
           events_route: {
             title: 'EVENTOS',
@@ -391,21 +394,21 @@ i18next
             next_page: 'Siguiente página',
             empty_title: 'No se encontraron eventos',
             empty_body:
-              'Prueba a cambiar las fechas o consulta nuestra documentación para añadir eventos.'
+              'Prueba a cambiar las fechas o consulta nuestra documentación para añadir eventos.',
           },
           events_columns: {
             id: 'ID',
             state: 'ESTADO',
             name: 'NOMBRE',
             namespace: 'ESPACIO DE NOMBRES',
-            time: 'TIEMPO'
-          }
-        }
+            time: 'TIEMPO',
+          },
+        },
       },
       pl: {
         translation: {
           header: {
-            docs_link: 'Dokumentacja API'
+            docs_link: 'Dokumentacja API',
           },
           jobs: {
             search: 'Wyszukiwanie',
@@ -418,7 +421,7 @@ i18next
             runs_subhead: 'ASPECTY',
             facets_subhead_aria: 'Wyszukiwanie',
             dialog_delete: 'USUNĄĆ',
-            dialog_confirmation_title: 'Jesteś pewny?'
+            dialog_confirmation_title: 'Jesteś pewny?',
           },
           search: {
             filter: {
@@ -426,7 +429,7 @@ i18next
               jobs: 'Zadania',
               datasets: 'Zbiory Danych',
               updated: 'Zaktualizowano',
-              name: 'Nazwa'
+              name: 'Nazwa',
             },
             status: 'Badawczy...',
             none: 'Brak Wyników',
@@ -434,20 +437,20 @@ i18next
             search_aria: 'Wyszukiwanie zadań i zbiorów danych',
             jobs: 'Zadania',
             and: 'i',
-            datasets: 'Zbiory Danych'
+            datasets: 'Zbiory Danych',
           },
           lineage: {
             empty_title: 'Nie wybrano węzła',
             empty_body:
-              'Spróbuj wybrać węzeł za pomocą wyszukiwania lub strony zadań lub zestawów danych.'
+              'Spróbuj wybrać węzeł za pomocą wyszukiwania lub strony zadań lub zestawów danych.',
           },
           sidenav: {
             jobs: 'ZADANIA',
             datasets: 'ZBIORY DANYCH',
-            events: 'WYDARZENIA'
+            events: 'WYDARZENIA',
           },
           namespace_select: {
-            prompt: 'pn'
+            prompt: 'pn',
           },
           dataset_info: {
             empty_title: 'Nie znaleziono zbiorów danych',
@@ -455,14 +458,14 @@ i18next
             facets_subhead: 'ASPECTY',
             facets_subhead_aria: 'Wyszukiwanie',
             run_subhead: 'Stworzony przez Run',
-            duration: 'Czas trwania'
+            duration: 'Czas trwania',
           },
           datasets: {
             latest_tab: 'NAJNOWSZY SCHEMAT',
             history_tab: 'HISTORIA WERSJI',
             column_lineage_tab: 'RODOWÓD KOLUMNOWY',
             dialog_delete: 'USUNĄĆ',
-            dialog_confirmation_title: 'Jesteś pewny?'
+            dialog_confirmation_title: 'Jesteś pewny?',
           },
           datasets_route: {
             empty_title: 'Nie znaleziono zbiorów danych',
@@ -473,11 +476,11 @@ i18next
             namespace_col: 'PRZESTRZEŃ NAZW',
             source_col: 'ŹRÓDŁO',
             updated_col: 'ZAKTUALIZOWANO',
-            status_col: 'STATUS'
+            status_col: 'STATUS',
           },
           datasets_column_lineage: {
             empty_title: 'Brak rodowodu kolumny',
-            empty_body: 'Pochodzenie kolumny jest niedostępne dla określonego zbioru danych.'
+            empty_body: 'Pochodzenie kolumny jest niedostępne dla określonego zbioru danych.',
           },
           jobs_route: {
             empty_title: 'Nie znaleziono ofert pracy',
@@ -488,7 +491,7 @@ i18next
             namespace_col: 'PRZESTRZEŃ NAZW',
             updated_col: 'ZAKTUALIZOWANO',
             latest_run_col: 'NAJNOWSZY CZAS TRWANIA',
-            latest_run_state_col: 'NAJNOWSZY STAN URUCHOMIENIA'
+            latest_run_state_col: 'NAJNOWSZY STAN URUCHOMIENIA',
           },
           runs_columns: {
             id: 'ID',
@@ -496,20 +499,20 @@ i18next
             created_at: 'UTWORZONY W',
             started_at: 'ROZPOCZĘŁO SIĘ O GODZ',
             ended_at: 'ZAKOŃCZONE O GODZ',
-            duration: 'TRWANIE'
+            duration: 'TRWANIE',
           },
           dataset_info_columns: {
             name: 'NAZWA',
             type: 'RODZAJ',
             description: 'OPIS',
-            tags: 'TAGI'
+            tags: 'TAGI',
           },
           dataset_versions_columns: {
             version: 'WERSJA',
             created_at: 'UTWORZONY W',
             fields: 'KIERUNKI',
             created_by_run: 'STWORZONY PRZEZ URUCHOM',
-            lifecycle_state: 'STAN CYKLU ŻYCIA'
+            lifecycle_state: 'STAN CYKLU ŻYCIA',
           },
           events_route: {
             title: 'WYDARZENIA',
@@ -519,18 +522,18 @@ i18next
             next_page: 'Następna strona',
             empty_title: 'Nie znaleziono wydarzeń',
             empty_body:
-              'Spróbuj zmienić daty lub zapoznaj się z naszą dokumentacją, aby dodać wydarzenia.'
+              'Spróbuj zmienić daty lub zapoznaj się z naszą dokumentacją, aby dodać wydarzenia.',
           },
           events_columns: {
             id: 'ID',
             state: 'PAŃSTWO',
             name: 'NAZWA',
             namespace: 'PRZESTRZEŃ NAZW',
-            time: 'CZAS'
-          }
-        }
-      }
+            time: 'CZAS',
+          },
+        },
+      },
     },
     defaultNS,
-    detection: DETECTION_OPTIONS
+    detection: DETECTION_OPTIONS,
   })
