@@ -17,6 +17,7 @@ import {
   fetchDatasetVersions,
   resetDataset,
   resetDatasetVersions,
+  setTabIndex,
 } from '../../store/actionCreators'
 import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
@@ -29,7 +30,8 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 
 import { useTheme } from '@emotion/react'
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
+import Io from '../io/Io'
+import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 interface StateProps {
   lineageDataset: LineageDataset
@@ -37,6 +39,7 @@ interface StateProps {
   versionsLoading: boolean
   datasets: IState['datasets']
   display: IState['display']
+  tabIndex: IState['lineage']['tabIndex']
 }
 
 interface DispatchProps {
@@ -45,6 +48,7 @@ interface DispatchProps {
   resetDataset: typeof resetDataset
   deleteDataset: typeof deleteDataset
   dialogToggle: typeof dialogToggle
+  setTabIndex: typeof setTabIndex
 }
 
 type IProps = StateProps & DispatchProps
@@ -68,6 +72,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     versions,
     versionsLoading,
     lineageDataset,
+    tabIndex,
+    setTabIndex,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
@@ -92,9 +98,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     []
   )
 
-  const [tab, setTab] = React.useState(0)
-  const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
-    setTab(newValue)
+  const handleChange = (_: ChangeEvent, newValue: number) => {
+    setTabIndex(newValue)
   }
 
   if (versionsLoading) {
@@ -149,20 +154,26 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         )}
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              textColor='primary'
+              indicatorColor='primary'
+            >
               <Tab
                 label={i18next.t('datasets.latest_tab')}
                 {...a11yProps(0)}
                 disableRipple={true}
               />
+              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
               <Tab
                 label={i18next.t('datasets.history_tab')}
-                {...a11yProps(1)}
+                {...a11yProps(2)}
                 disableRipple={true}
               />
               <Tab
                 label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(1)}
+                {...a11yProps(3)}
                 disableRipple={true}
               />
             </Tabs>
@@ -214,15 +225,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      {tab === 0 && (
+      {tabIndex === 0 && (
         <DatasetInfo
           datasetFields={firstVersion.fields}
           facets={firstVersion.facets}
           run={firstVersion.createdByRun}
         />
       )}
-      {tab === 1 && <DatasetVersions versions={props.versions} />}
-      {tab === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
+      {tabIndex === 1 && <Io />}
+      {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
+      {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }
@@ -232,6 +244,7 @@ const mapStateToProps = (state: IState) => ({
   display: state.display,
   versions: state.datasetVersions.result.versions,
   versionsLoading: state.datasetVersions.isLoading,
+  tabIndex: state.lineage.tabIndex,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -242,6 +255,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       resetDataset: resetDataset,
       deleteDataset: deleteDataset,
       dialogToggle: dialogToggle,
+      setTabIndex: setTabIndex,
     },
     dispatch
   )
