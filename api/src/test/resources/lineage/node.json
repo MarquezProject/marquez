@@ -2,7 +2,6 @@
   "id": "dataset:namespace:commonDataset",
   "type": "DATASET",
   "data": {
-    "type": "DATASET",
     "id": {
       "namespace": "namespace",
       "name": "commonDataset"
