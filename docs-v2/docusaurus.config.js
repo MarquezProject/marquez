@@ -92,7 +92,7 @@ const config = {
                 disableSwitch: true
             },
             // Replace with your project's social card
-            image: 'img/docusaurus-social-card.jpg',
+            image: 'img/logo.svg',
             navbar: {
                 logo: {
                     alt: 'My Site Logo',
