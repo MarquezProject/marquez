@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[5457],{62379:e=>{e.exports=JSON.parse('{"label":"releases","permalink":"/blog/tags/releases","allTagsPath":"/blog/tags","count":3}')}}]);

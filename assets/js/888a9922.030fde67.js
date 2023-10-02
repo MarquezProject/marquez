@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[6579],{85464:s=>{s.exports=JSON.parse('{"label":"tutorials","permalink":"/blog/tags/tutorials","allTagsPath":"/blog/tags","count":1}')}}]);

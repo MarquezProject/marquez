@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[5705],{6717:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/releases","page":1,"postsPerPage":3,"totalPages":1,"totalCount":3,"blogDescription":"News and Updates on the Marquez Project","blogTitle":"Marquez Blog"}')}}]);

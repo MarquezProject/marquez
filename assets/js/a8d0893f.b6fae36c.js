@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[9019],{92217:e=>{e.exports=JSON.parse('{"permalink":"/blog/tags/column-lineage","page":1,"postsPerPage":1,"totalPages":1,"totalCount":1,"blogDescription":"News and Updates on the Marquez Project","blogTitle":"Marquez Blog"}')}}]);

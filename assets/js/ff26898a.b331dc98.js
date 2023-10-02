@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[1109],{97051:e=>{e.exports=JSON.parse('{"label":"column lineage","permalink":"/blog/tags/column-lineage","allTagsPath":"/blog/tags","count":1}')}}]);

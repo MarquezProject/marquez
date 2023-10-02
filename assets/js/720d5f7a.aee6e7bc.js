@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmarquez_website_docs=self.webpackChunkmarquez_website_docs||[]).push([[4687],{3162:e=>{e.exports=JSON.parse('{"label":"Spark","permalink":"/blog/tags/spark","allTagsPath":"/blog/tags","count":1}')}}]);
