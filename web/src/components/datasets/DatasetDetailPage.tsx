@@ -123,7 +123,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
-  const formatColumnTags = (tags: string[], tag_desc: Tag[]) => {
+  const formatTags = (tags: string[], tag_desc: Tag[]) => {
     const theme = createTheme(useTheme())
     return (
       <>
@@ -155,7 +155,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        {formatColumnTags(tags, tagData)}
+        {formatTags(tags, tagData)}
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
