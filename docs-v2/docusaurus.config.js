@@ -92,7 +92,7 @@ const config = {
                 disableSwitch: true
             },
             // Replace with your project's social card
-            image: 'img/marquez-social-card.jpg',
+            image: 'img/marquez-social-card-name.jpg',
             navbar: {
                 logo: {
                     alt: 'My Site Logo',
