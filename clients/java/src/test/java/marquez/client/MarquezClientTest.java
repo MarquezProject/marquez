@@ -74,6 +74,8 @@ import marquez.client.models.ColumnLineageNodeData;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetFieldId;
 import marquez.client.models.DatasetId;
+import marquez.client.models.DatasetNodeData;
+import marquez.client.models.DatasetType;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
@@ -410,6 +412,9 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION,
           CREATED_BY_RUN,
           DB_FACETS);
+
+  private static final DatasetId DATASET_ID = new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME);
+
   private static final DatasetFieldId DATASET_FIELD_ID =
       new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
 
@@ -417,6 +422,29 @@ public class MarquezClientTest {
       new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
 
   private static final Node LINEAGE_NODE =
+      new Node(
+          NodeId.of(DATASET_ID),
+          NodeType.DATASET,
+          new DatasetNodeData(
+              DATASET_ID,
+              DatasetType.DB_TABLE,
+              DB_TABLE_NAME,
+              DB_TABLE_PHYSICAL_NAME,
+              CREATED_AT,
+              UPDATED_AT,
+              NAMESPACE_NAME,
+              DB_TABLE_SOURCE_NAME,
+              FIELDS,
+              TAGS,
+              null,
+              DB_TABLE_DESCRIPTION,
+              null),
+          ImmutableSet.of(
+              Edge.of(NodeId.of(DATASET_ID), NodeId.of(new DatasetId("namespace", "inDataset")))),
+          ImmutableSet.of(
+              Edge.of(NodeId.of(new DatasetId("namespace", "outDataset")), NodeId.of(DATASET_ID))));
+
+  private static final Node COLUMN_LINEAGE_NODE =
       new Node(
           NodeId.of(DATASET_FIELD_ID),
           NodeType.DATASET_FIELD,
@@ -1000,8 +1028,22 @@ public class MarquezClientTest {
   }
 
   @Test
-  public void testGetColumnLineage() throws Exception {
+  public void testGetLineage() throws Exception {
     MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(LINEAGE_NODE));
+    String lineageJson = lineage.toJson();
+    when(http.get(buildUrlFor("/lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client.getLineage(NodeId.of(new DatasetId("namespace", "dataset"))).getGraph().stream()
+            .findAny()
+            .get();
+    assertThat(retrievedNode).isEqualTo(LINEAGE_NODE);
+  }
+
+  @Test
+  public void testGetColumnLineage() throws Exception {
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(COLUMN_LINEAGE_NODE));
     String lineageJson = lineage.toJson();
     when(http.get(
             buildUrlFor(
@@ -1015,7 +1057,7 @@ public class MarquezClientTest {
             .stream()
             .findAny()
             .get();
-    assertThat(retrievedNode).isEqualTo(LINEAGE_NODE);
+    assertThat(retrievedNode).isEqualTo(COLUMN_LINEAGE_NODE);
   }
 
   private URL buildUrlFor(String pathTemplate) throws Exception {

@@ -116,6 +116,15 @@ public class MarquezClient {
     @Getter public final String value;
   }
 
+  public Lineage getLineage(NodeId nodeId) {
+    return getLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH);
+  }
+
+  public Lineage getLineage(NodeId nodeId, int depth) {
+    final String bodyAsJson = http.get(url.toLineageUrl(nodeId, depth));
+    return Lineage.fromJson(bodyAsJson);
+  }
+
   public Lineage getColumnLineage(NodeId nodeId) {
     return getColumnLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
   }

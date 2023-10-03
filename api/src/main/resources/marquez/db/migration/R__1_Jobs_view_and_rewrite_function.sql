@@ -52,7 +52,7 @@ BEGIN
            NEW.description,
            NEW.current_version_uuid,
            NEW.namespace_name,
-           NEW.current_job_context_uuid,
+           NULL,
            NEW.current_location,
            NEW.current_inputs,
            NEW.symlink_target_uuid,
@@ -67,7 +67,6 @@ BEGIN
                             END,
                       type                     = EXCLUDED.type,
                       description              = EXCLUDED.description,
-                      current_job_context_uuid = EXCLUDED.current_job_context_uuid,
                       current_location         = EXCLUDED.current_location,
                       current_inputs           = EXCLUDED.current_inputs,
                       -- update the symlink target if null. otherwise, keep the old value
