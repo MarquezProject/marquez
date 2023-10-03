@@ -87,6 +87,7 @@ const config = {
     themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            metadata: [{property: 'og:title', content: 'Marquez Project | LFAI & Data'}],
             colorMode: {
                 defaultMode: 'dark',
                 disableSwitch: true
