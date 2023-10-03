@@ -2,7 +2,6 @@
   "id": "datasetField:namespace:commonDataset:columnA",
   "type": "DATASET_FIELD",
   "data": {
-    "type": "DATASET_FIELD",
     "namespace": "namespace",
     "dataset": "otherDataset",
     "field": "columnA",

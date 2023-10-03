@@ -178,6 +178,10 @@ class MarquezPathV1 {
     return path("/search");
   }
 
+  static String lineagePath() {
+    return path("/lineage/");
+  }
+
   static String columnLineagePath() {
     return path("/column-lineage/");
   }
