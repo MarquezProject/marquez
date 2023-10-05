@@ -48,6 +48,8 @@ import marquez.db.models.RunStateRow;
 import marquez.db.models.SourceRow;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
+import marquez.service.models.BaseEvent;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -93,6 +95,14 @@ public interface OpenLineageDao extends BaseDao {
       PGobject event,
       String producer);
 
+  @SqlUpdate(
+      "INSERT INTO lineage_events ("
+          + "event_time, "
+          + "event, "
+          + "producer) "
+          + "VALUES (?, ?, ?)")
+  void createDatasetEvent(Instant eventTime, PGobject event, String producer);
+
   @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
   List<LineageEvent> findLineageEventsByRunUuid(UUID runUuid);
 
@@ -133,6 +143,80 @@ public interface OpenLineageDao extends BaseDao {
       updateMarquezOnComplete(event, updateLineageRow, runState);
     }
     return updateLineageRow;
+  }
+
+  default UpdateLineageRow updateMarquezModel(DatasetEvent event, ObjectMapper mapper) {
+    NamespaceDao namespaceDao = createNamespaceDao();
+    DatasetSymlinkDao datasetSymlinkDao = createDatasetSymlinkDao();
+    DatasetDao datasetDao = createDatasetDao();
+    SourceDao sourceDao = createSourceDao();
+    DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
+    DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
+    RunDao runDao = createRunDao();
+    DatasetFacetsDao datasetFacetsDao = createDatasetFacetsDao();
+    ColumnLineageDao columnLineageDao = createColumnLineageDao();
+
+    Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
+
+    UpdateLineageRow bag = new UpdateLineageRow();
+    NamespaceRow namespace =
+        namespaceDao.upsertNamespaceRow(
+            UUID.randomUUID(),
+            now,
+            formatNamespaceName(event.getDataset().getNamespace()),
+            DEFAULT_NAMESPACE_OWNER);
+    bag.setNamespace(namespace);
+
+    Dataset dataset = event.getDataset();
+    List<DatasetRecord> datasetOutputs = new ArrayList<>();
+    DatasetRecord record =
+        upsertLineageDataset(
+            dataset,
+            now,
+            null,
+            false,
+            namespaceDao,
+            datasetSymlinkDao,
+            sourceDao,
+            datasetDao,
+            datasetVersionDao,
+            datasetFieldDao,
+            runDao,
+            columnLineageDao);
+    datasetOutputs.add(record);
+
+    // Facets ...
+    Optional.ofNullable(dataset.getFacets())
+        .ifPresent(
+            facets ->
+                datasetFacetsDao.insertDatasetFacetsFor(
+                    record.getDatasetRow().getUuid(),
+                    record.getDatasetVersionRow().getUuid(),
+                    null,
+                    now,
+                    null,
+                    facets));
+
+    // OutputFacets ...
+    Optional.ofNullable(dataset.getOutputFacets())
+        .ifPresent(
+            facets ->
+                datasetFacetsDao.insertOutputDatasetFacetsFor(
+                    record.getDatasetRow().getUuid(),
+                    record.getDatasetVersionRow().getUuid(),
+                    null,
+                    now,
+                    null,
+                    facets));
+
+    datasetDao.updateVersion(
+        record.getDatasetVersionRow().getDatasetUuid(),
+        Instant.now(),
+        record.getDatasetVersionRow().getUuid());
+
+    bag.setOutputs(Optional.ofNullable(datasetOutputs));
+
+    return bag;
   }
 
   default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
@@ -938,7 +1022,7 @@ public interface OpenLineageDao extends BaseDao {
     }
   }
 
-  default PGobject createJsonArray(LineageEvent event, ObjectMapper mapper) {
+  default PGobject createJsonArray(BaseEvent event, ObjectMapper mapper) {
     try {
       PGobject jsonObject = new PGobject();
       jsonObject.setType("json");

@@ -97,6 +97,22 @@ class OpenLineageDaoTest {
   }
 
   @Test
+  void testUpdateMarquezModelWithDatasetEvent() {
+    UpdateLineageRow datasetEventRow =
+        LineageTestUtils.createLineageRow(
+            dao, new Dataset(LineageTestUtils.NAMESPACE, DATASET_NAME, datasetFacets));
+
+    assertThat(datasetEventRow.getOutputs()).isPresent();
+    assertThat(datasetEventRow.getOutputs().get()).hasSize(1).first();
+    assertThat(datasetEventRow.getOutputs().get().get(0).getDatasetRow())
+        .hasFieldOrPropertyWithValue("name", DATASET_NAME)
+        .hasFieldOrPropertyWithValue("namespaceName", LineageTestUtils.NAMESPACE);
+
+    assertThat(datasetEventRow.getOutputs().get().get(0).getDatasetVersionRow())
+        .hasNoNullFieldsOrPropertiesExcept("runUuid");
+  }
+
+  @Test
   void testUpdateMarquezModelLifecycleStateChangeFacet() {
     Dataset dataset =
         new Dataset(

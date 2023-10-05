@@ -5,6 +5,8 @@
 
 package marquez.service;
 
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -28,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.common.Utils;
+import marquez.common.models.FieldName;
 import marquez.common.models.JobType;
 import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
@@ -47,11 +50,14 @@ import marquez.service.RunTransitionListener.JobInputUpdate;
 import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.Dataset;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.Job;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
 import marquez.service.models.LineageEvent.RunFacet;
+import marquez.service.models.LineageEvent.SchemaDatasetFacet;
+import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Assertions;
@@ -435,6 +441,45 @@ public class OpenLineageServiceIntegrationTest {
         .get();
 
     assertThat(jobService.findJobByName(NAMESPACE, name)).isNotEmpty();
+  }
+
+  @Test
+  void testDatasetEvent() throws ExecutionException, InterruptedException {
+    LineageEvent.Dataset dataset =
+        LineageEvent.Dataset.builder()
+            .name(DATASET_NAME)
+            .namespace(NAMESPACE)
+            .facets(
+                DatasetFacets.builder()
+                    .schema(
+                        new SchemaDatasetFacet(
+                            PRODUCER_URL,
+                            SCHEMA_URL,
+                            Arrays.asList(new SchemaField("col", "STRING", "my name"))))
+                    .dataSource(
+                        DatasourceDatasetFacet.builder()
+                            .name("theDatasource")
+                            .uri("http://thedatasource")
+                            .build())
+                    .build())
+            .build();
+
+    lineageService
+        .createAsync(
+            DatasetEvent.builder()
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .dataset(dataset)
+                .build())
+        .get();
+
+    Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
+    assertThat(datasetRow).isPresent().map(Dataset::getCurrentVersion).isPresent();
+    assertThat(datasetRow.get().getSourceName().getValue()).isEqualTo("theDatasource");
+    assertThat(datasetRow.get().getFields())
+        .hasSize(1)
+        .first()
+        .hasFieldOrPropertyWithValue("name", FieldName.of("col"))
+        .hasFieldOrPropertyWithValue("type", "STRING");
   }
 
   private void checkExists(LineageEvent.Dataset ds) {
