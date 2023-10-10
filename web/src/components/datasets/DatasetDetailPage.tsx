@@ -4,33 +4,34 @@
 import * as Redux from 'redux'
 import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion } from '../../types/api'
+import { DatasetVersion, Tag } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
   fetchDatasetVersions,
+  fetchTags,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import Io from '../io/Io'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-
-import { useTheme } from '@emotion/react'
-import Io from '../io/Io'
 import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 interface StateProps {
@@ -49,6 +50,7 @@ interface DispatchProps {
   deleteDataset: typeof deleteDataset
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
+  fetchTags: typeof fetchTags
 }
 
 type IProps = StateProps & DispatchProps
@@ -74,13 +76,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     lineageDataset,
     tabIndex,
     setTabIndex,
+    fetchTags,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
+  const tagData = useSelector((state: IState) => state.tags.tags)
 
   useEffect(() => {
     fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
+    fetchTags()
   }, [props.lineageDataset.name])
 
   useEffect(() => {
@@ -118,6 +123,30 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
+  const formatTags = (tags: string[], tag_desc: Tag[]) => {
+    const theme = createTheme(useTheme())
+    return (
+      <>
+        {tags.map((tag, index) => {
+          const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
+          const tooltipTitle = tagDescription?.description || 'No Tag Description'
+          return (
+            <MQTooltip title={tooltipTitle} key={tag}>
+              <Chip
+                label={tag}
+                size='small'
+                style={{
+                  display: 'inline',
+                  marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
+                }}
+              />
+            </MQTooltip>
+          )
+        })}
+      </>
+    )
+  }
+
   return (
     <Box
       my={2}
@@ -126,32 +155,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        {tags.length > 0 && (
-          <ul
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-            }}
-          >
-            {tags.map((tag, index) => (
-              <li
-                key={tag}
-                style={
-                  index < tags.length - 1
-                    ? {
-                        marginRight: theme.spacing(1),
-                      }
-                    : {}
-                }
-              >
-                <Chip size='small' label={tag} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {formatTags(tags, tagData)}
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
@@ -256,6 +260,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteDataset: deleteDataset,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
+      fetchTags: fetchTags,
     },
     dispatch
   )
