@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.42.0...HEAD)
 
-## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-16
+## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-17
 ### Added
 Client: add Java client method for dataset/job lineage [`#2623`](https://github.com/MarquezProject/marquez/pull/2623) [@wslulciuc](https://github.com/wslulciuc)  
     *To add a method for the dataset/job-level endpoint (`GET /lineage`) to the Java SDK, this adds a new method to the `MarquezClient` for the endpoint, along with tests, and the necessary new subclasses of `NodeData` for datasets and jobs.*
@@ -12,7 +12,7 @@ Web: add hover-over Tag tooltip to datasets [`#2630`](https://github.com/Marquez
     *For parity with columns in the GUI, this adds a Tag tooltip to datasets.*
 
 ### Changed
-Docker: migrate to Docker Compose V2 [`#2644`](https://github.com/MarquezProject/marquez/pull/2644) [@merobi-hub](https://github.com/merobi-hub)  
+Docker: upgrade to Docker Compose V2 [`#2644`](https://github.com/MarquezProject/marquez/pull/2644) [@merobi-hub](https://github.com/merobi-hub)  
     *Docker Compose V1 has been at EOL since June, but docker/up.sh uses the V1 format. This upgrades the `up` command in up.sh to V2.*
 
 ### Removed
