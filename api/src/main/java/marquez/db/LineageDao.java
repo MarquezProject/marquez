@@ -10,11 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
-import org.jdbi.v3.sqlobject.customizer.BindList;
-import org.jdbi.v3.sqlobject.statement.SqlQuery;
-
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.db.mappers.DatasetDataMapper;
@@ -25,6 +20,9 @@ import marquez.db.mappers.SimpleLineageEdgeMapper;
 import marquez.service.models.DatasetData;
 import marquez.service.models.JobData;
 import marquez.service.models.Run;
+import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(DatasetDataMapper.class)
 @RegisterRowMapper(JobDataMapper.class)
@@ -33,8 +31,7 @@ import marquez.service.models.Run;
 @RegisterRowMapper(SimpleLineageEdgeMapper.class)
 public interface LineageDao {
 
-  public record SimpleLineage(Collection<SimpleLineageEdge> edges) {
-  }
+  public record SimpleLineage(Collection<SimpleLineageEdge> edges) {}
 
   public record SimpleLineageEdge(
       JobId job1,
@@ -42,10 +39,8 @@ public interface LineageDao {
       DatasetId dataset,
       String direction2,
       JobId job2,
-      JobId job2parent
-  ) {
+      JobId job2parent) {}
 
-  }
   /**
    * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
    * input jobIds. This returns a single layer from the BFS using datasets as edges. Jobs that have
@@ -99,7 +94,7 @@ public interface LineageDao {
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
   /**
-   *  1 level of lineage for all the children jobs of the given parent
+   * 1 level of lineage for all the children jobs of the given parent
    *
    * @param parentJobNamespace the namespace of the parent
    * @param parentJobName the name of the parent
@@ -128,7 +123,8 @@ public interface LineageDao {
             WHERE namespace_name=:parentJobNamespace and simple_name=:parentJobName
       );
   """)
-  Collection<SimpleLineageEdge> getDirectLineageFromParent(String parentJobNamespace, String parentJobName);
+  Collection<SimpleLineageEdge> getDirectLineageFromParent(
+      String parentJobNamespace, String parentJobName);
 
   @SqlQuery(
       """

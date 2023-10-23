@@ -79,7 +79,7 @@ public class EventTypeResolver extends TypeIdResolverBase {
             .filter(s -> s.getName().equals(type))
             .findAny()
             .map(EventSchemaURL::getSubType)
-            .map(p -> (Class)p)
+            .map(p -> (Class) p)
             .orElse(LINEAGE_EVENT.subType);
 
     return context.constructSpecializedType(superType, subType);

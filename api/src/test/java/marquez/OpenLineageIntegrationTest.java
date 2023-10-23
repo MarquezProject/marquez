@@ -12,6 +12,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.collect.ImmutableMap;
+import io.dropwizard.util.Resources;
+import io.openlineage.client.OpenLineage;
+import io.openlineage.client.OpenLineage.RunEvent;
+import io.openlineage.client.OpenLineage.RunEvent.EventType;
+import io.openlineage.client.OpenLineage.RunFacet;
+import io.openlineage.client.OpenLineage.RunFacetsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -33,32 +46,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import org.assertj.core.api.InstanceOfAssertFactories;
-import org.jdbi.v3.core.Jdbi;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.google.common.collect.ImmutableMap;
-
-import io.dropwizard.util.Resources;
-import io.openlineage.client.OpenLineage;
-import io.openlineage.client.OpenLineage.RunEvent;
-import io.openlineage.client.OpenLineage.RunEvent.EventType;
-import io.openlineage.client.OpenLineage.RunFacet;
-import io.openlineage.client.OpenLineage.RunFacetsBuilder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.JdbiUtils;
@@ -76,6 +63,16 @@ import marquez.db.LineageTestUtils;
 import marquez.service.models.DatasetEvent;
 import marquez.service.models.JobEvent;
 import marquez.service.models.NodeId;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.jdbi.v3.core.Jdbi;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
 @Slf4j
@@ -326,16 +323,15 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
 
-
-
-    marquez.common.models.JobId jobId = new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
+    marquez.common.models.JobId jobId =
+        new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
     String nodeId = NodeId.of(jobId).getValue();
     HttpRequest request =
         HttpRequest.newBuilder()
-        .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
-        .header("Content-Type", "application/json")
-        .GET()
-        .build();
+            .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
+            .header("Content-Type", "application/json")
+            .GET()
+            .build();
 
     HttpResponse<String> resp;
     try {
@@ -347,7 +343,6 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);
     }
-
   }
 
   @Test
@@ -423,14 +418,15 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
 
-    marquez.common.models.JobId jobId = new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
+    marquez.common.models.JobId jobId =
+        new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
     String nodeId = NodeId.of(jobId).getValue();
     HttpRequest request =
         HttpRequest.newBuilder()
-        .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
-        .header("Content-Type", "application/json")
-        .GET()
-        .build();
+            .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
+            .header("Content-Type", "application/json")
+            .GET()
+            .build();
 
     HttpResponse<String> resp;
     try {
