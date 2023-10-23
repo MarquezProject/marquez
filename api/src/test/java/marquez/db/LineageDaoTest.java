@@ -322,6 +322,14 @@ public class LineageDaoTest {
   }
 
   @Test
+  public void testGetDirectLineageFromParent() {
+    FacetTestUtils.createLineageWithFacets(openLineageDao);
+    Collection<SimpleLineageEdge> directLineageFromParent =
+        lineageDao.getDirectLineageFromParent("namespace", "name");
+    assertTrue(directLineageFromParent.toString(), directLineageFromParent.size() == 2);
+  }
+
+  @Test
   public void testGetLineageWithJobThatHasNoDatasets() {
 
     UpdateLineageRow writeJob =
