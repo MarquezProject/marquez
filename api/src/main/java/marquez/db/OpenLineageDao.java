@@ -166,32 +166,7 @@ public interface OpenLineageDao extends BaseDao {
     List<DatasetRecord> datasetOutputs = new ArrayList<>();
     DatasetRecord record = upsertLineageDataset(dataset, now, null, false, daos);
     datasetOutputs.add(record);
-
-    // Facets ...
-    Optional.ofNullable(dataset.getFacets())
-        .ifPresent(
-            facets ->
-                daos.getDatasetFacetsDao()
-                    .insertDatasetFacetsFor(
-                        record.getDatasetRow().getUuid(),
-                        record.getDatasetVersionRow().getUuid(),
-                        null,
-                        now,
-                        null,
-                        facets));
-
-    // OutputFacets ...
-    Optional.ofNullable(dataset.getOutputFacets())
-        .ifPresent(
-            facets ->
-                daos.getDatasetFacetsDao()
-                    .insertOutputDatasetFacetsFor(
-                        record.getDatasetRow().getUuid(),
-                        record.getDatasetVersionRow().getUuid(),
-                        null,
-                        now,
-                        null,
-                        facets));
+    insertOutputFacets(dataset, record, null, null, now, daos);
 
     daos.getDatasetDao()
         .updateVersion(
@@ -334,32 +309,7 @@ public interface OpenLineageDao extends BaseDao {
       for (Dataset dataset : event.getInputs()) {
         DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, true, daos);
         datasetInputs.add(record);
-
-        // Facets ...
-        Optional.ofNullable(dataset.getFacets())
-            .ifPresent(
-                facets ->
-                    daos.getDatasetFacetsDao()
-                        .insertDatasetFacetsFor(
-                            record.getDatasetRow().getUuid(),
-                            record.getDatasetVersionRow().getUuid(),
-                            runUuid,
-                            now,
-                            event.getEventType(),
-                            facets));
-
-        // InputFacets ...
-        Optional.ofNullable(dataset.getInputFacets())
-            .ifPresent(
-                facets ->
-                    daos.getDatasetFacetsDao()
-                        .insertInputDatasetFacetsFor(
-                            record.getDatasetRow().getUuid(),
-                            record.getDatasetVersionRow().getUuid(),
-                            runUuid,
-                            now,
-                            event.getEventType(),
-                            facets));
+        insertInputFacets(dataset, record, runUuid, event.getEventType(), now, daos);
       }
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
@@ -370,37 +320,80 @@ public interface OpenLineageDao extends BaseDao {
       for (Dataset dataset : event.getOutputs()) {
         DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, false, daos);
         datasetOutputs.add(record);
-
-        // Facets ...
-        Optional.ofNullable(dataset.getFacets())
-            .ifPresent(
-                facets ->
-                    daos.getDatasetFacetsDao()
-                        .insertDatasetFacetsFor(
-                            record.getDatasetRow().getUuid(),
-                            record.getDatasetVersionRow().getUuid(),
-                            runUuid,
-                            now,
-                            event.getEventType(),
-                            facets));
-
-        // OutputFacets ...
-        Optional.ofNullable(dataset.getOutputFacets())
-            .ifPresent(
-                facets ->
-                    daos.getDatasetFacetsDao()
-                        .insertOutputDatasetFacetsFor(
-                            record.getDatasetRow().getUuid(),
-                            record.getDatasetVersionRow().getUuid(),
-                            runUuid,
-                            now,
-                            event.getEventType(),
-                            facets));
+        insertOutputFacets(dataset, record, runUuid, event.getEventType(), now, daos);
       }
     }
 
     bag.setOutputs(Optional.ofNullable(datasetOutputs));
     return bag;
+  }
+
+  private void insertInputFacets(
+      Dataset dataset,
+      DatasetRecord record,
+      UUID runUuid,
+      String eventType,
+      Instant now,
+      ModelDaos daos) {
+    // Facets ...
+    Optional.ofNullable(dataset.getFacets())
+        .ifPresent(
+            facets ->
+                daos.getDatasetFacetsDao()
+                    .insertDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        eventType,
+                        facets));
+
+    // InputFacets ...
+    Optional.ofNullable(dataset.getInputFacets())
+        .ifPresent(
+            facets ->
+                daos.getDatasetFacetsDao()
+                    .insertInputDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        eventType,
+                        facets));
+  }
+
+  private void insertOutputFacets(
+      Dataset dataset,
+      DatasetRecord record,
+      UUID runUuid,
+      String eventType,
+      Instant now,
+      ModelDaos daos) {
+    // Facets ...
+    Optional.ofNullable(dataset.getFacets())
+        .ifPresent(
+            facets ->
+                daos.getDatasetFacetsDao()
+                    .insertDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        eventType,
+                        facets));
+
+    // OutputFacets ...
+    Optional.ofNullable(dataset.getOutputFacets())
+        .ifPresent(
+            facets ->
+                daos.getDatasetFacetsDao()
+                    .insertOutputDatasetFacetsFor(
+                        record.getDatasetRow().getUuid(),
+                        record.getDatasetVersionRow().getUuid(),
+                        runUuid,
+                        now,
+                        eventType,
+                        facets));
   }
 
   private JobRow buildJobFromEvent(
