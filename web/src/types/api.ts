@@ -12,10 +12,6 @@ export interface Tags {
   tags: Tag[]
 }
 
-export interface Runs {
-  runs: Run[]
-}
-
 export interface Namespaces {
   namespaces: Namespace[]
 }
@@ -164,6 +160,7 @@ export interface JobId {
 export type JobType = 'BATCH' | 'STREAM' | 'SERVICE'
 
 export interface Runs {
+  totalCount: number
   runs: Run[]
 }
 

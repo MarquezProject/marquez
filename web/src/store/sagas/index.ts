@@ -121,7 +121,7 @@ export function* fetchRunsSaga() {
     try {
       const { payload } = yield take(FETCH_RUNS)
       const { runs } = yield call(getRuns, payload.jobName, payload.namespace)
-      yield put(fetchRunsSuccess(payload.jobName, runs))
+      yield put(fetchRunsSuccess(payload.jobName, runs, payload.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }

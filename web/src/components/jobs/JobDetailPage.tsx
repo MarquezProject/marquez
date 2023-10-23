@@ -5,7 +5,8 @@ import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box, Button, CircularProgress, Tab, Tabs } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import { Box, Button, CircularProgress, Tab, Tabs, Tooltip } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
@@ -33,6 +34,18 @@ import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
 
+const PAGE_SIZE = 20
+
+interface StateProps {
+  job: LineageJob
+  jobs: IState['jobs']
+  runs: Run[]
+  runsLoading: boolean
+  display: IState['display']
+  tabIndex: IState['lineage']['tabIndex']
+  totalCount: number
+}
+
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
   resetRuns: typeof resetRuns
@@ -42,30 +55,35 @@ interface DispatchProps {
   setTabIndex: typeof setTabIndex
 }
 
-type IProps = {
-  job: LineageJob
-  jobs: IState['jobs']
-  runs: Run[]
-  runsLoading: boolean
-  display: IState['display']
-  tabIndex: IState['lineage']['tabIndex']
-} & DispatchProps
+interface JobDetailState {
+  page: number
+}
 
-const JobDetailPage: FunctionComponent<IProps> = (props) => {
+type JobDetailProps = StateProps & DispatchProps
+
+const JobDetailPage: React.FC<JobDetailProps> = ({
+  job,
+  jobs,
+  fetchRuns,
+  resetRuns,
+  deleteJob,
+  dialogToggle,
+  runs,
+  display,
+  runsLoading,
+  tabIndex,
+  setTabIndex,
+  totalCount
+}) => {
+  
+  const defaultState = {
+    page: 0,
+  }
+  
   const theme = createTheme(useTheme())
-  const {
-    job,
-    jobs,
-    fetchRuns,
-    resetRuns,
-    deleteJob,
-    dialogToggle,
-    runs,
-    display,
-    runsLoading,
-    tabIndex,
-    setTabIndex,
-  } = props
+  
+  const [state, setState] = React.useState<JobDetailState>(defaultState)
+  
   const navigate = useNavigate()
 
   const handleChange = (event: ChangeEvent, newValue: number) => {
@@ -74,8 +92,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchRuns(job.name, job.namespace)
-  }, [job.name])
+    fetchRuns(job.name, job.namespace, PAGE_SIZE, state.page * PAGE_SIZE)
+  }, [job.name, state.page])
 
   useEffect(() => {
     if (jobs.deletedJobName) {
@@ -97,6 +115,15 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         <CircularProgress color='primary' />
       </Box>
     )
+  }
+  
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+
+    fetchRuns('', '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    // reset page scroll
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
   }
 
   return (
@@ -128,7 +155,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                 },
               }}
               onClick={() => {
-                props.dialogToggle('')
+                dialogToggle('')
               }}
             >
               {i18next.t('jobs.dialog_delete')}
@@ -139,7 +166,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
               title={i18next.t('jobs.dialog_confirmation_title')}
               ignoreWarning={() => {
                 deleteJob(job.name, job.namespace)
-                props.dialogToggle('')
+                dialogToggle('')
               }}
             />
           </Box>
@@ -184,6 +211,43 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       ) : null}
       {tabIndex === 1 && <Io />}
       {tabIndex === 2 && <Runs runs={runs} />}
+	  {tabIndex === 2 &&
+	    <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+		  <MqText subdued>
+			  <>
+				{PAGE_SIZE * state.page + 1} -{' '}
+				{Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
+			  </>
+			</MqText>
+			<Tooltip title={i18next.t('events_route.previous_page')}>
+			  <span>
+				<IconButton
+				  sx={{
+					marginLeft: theme.spacing(2),
+				  }}
+				  color='primary'
+				  disabled={state.page === 0}
+				  onClick={() => handleClickPage('prev')}
+				  size='large'
+				>
+				  <ChevronLeftRounded />
+				</IconButton>
+			  </span>
+			</Tooltip>
+			<Tooltip title={i18next.t('events_route.next_page')}>
+			  <span>
+				<IconButton
+				  color='primary'
+				  onClick={() => handleClickPage('next')}
+				  size='large'
+				  disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+				>
+				  <ChevronRightRounded />
+				</IconButton>
+			  </span>
+			</Tooltip>
+	    </Box>
+	  }
     </Box>
   )
 }
@@ -194,6 +258,7 @@ const mapStateToProps = (state: IState) => ({
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
+  totalCount: state.runs.totalCount,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
