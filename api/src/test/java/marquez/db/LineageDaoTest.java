@@ -165,6 +165,9 @@ public class LineageDaoTest {
           .containsAll(
               expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
     }
+
+
+    lineageDao.getDirectLineageFromParent("foo", "bar");
   }
 
   @Test

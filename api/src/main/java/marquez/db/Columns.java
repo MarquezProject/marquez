@@ -183,7 +183,7 @@ public final class Columns {
   public static String stringOrThrow(final ResultSet results, final String column)
       throws SQLException {
     if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("no column found for " + column);
     }
     return results.getString(column);
   }
