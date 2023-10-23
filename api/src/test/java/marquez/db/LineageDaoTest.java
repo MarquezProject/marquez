@@ -12,11 +12,14 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.base.Functions;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.api.JdbiUtils;
 import marquez.common.models.JobType;
+import marquez.db.LineageDao.SimpleLineageEdge;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.models.JobRow;
@@ -166,7 +170,11 @@ public class LineageDaoTest {
               expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
     }
 
-    lineageDao.getDirectLineageFromParent("foo", "bar");
+    Collection<SimpleLineageEdge> directLineageFromParent =
+        lineageDao.getDirectLineageFromParent(
+            disjointJob.getJob().getNamespaceName(), disjointJob.getJob().getName());
+    assertNotNull(directLineageFromParent);
+    assertTrue(directLineageFromParent.toString(), directLineageFromParent.size() == 0);
   }
 
   @Test
