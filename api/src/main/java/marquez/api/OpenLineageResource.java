@@ -36,6 +36,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SortDirection;
+import marquez.common.models.RunId;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
@@ -128,6 +129,21 @@ public class OpenLineageResource extends BaseResource {
     }
     int totalCount = openLineageDao.getAllLineageTotalCount(before.get(), after.get());
     return Response.ok(new Events(events, totalCount)).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Path("/runlineage/upstream")
+  public Response getRunLineageUpstream(
+      @QueryParam("runId") @NotNull RunId runId,
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
+      @QueryParam("facets") String facets) {
+    throwIfNotExists(runId);
+    return Response.ok(lineageService.upstream(runId, depth, facets == null ? null : facets.split(","))).build();
   }
 
   @Value
