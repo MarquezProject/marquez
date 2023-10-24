@@ -27,7 +27,7 @@ Web: fix Unix epoch time display for null `endedAt` values [`#2647`](https://git
 
 ### Added
 * API: support `DatasetEvent` [`#2641`](https://github.com/MarquezProject/marquez/pull/2641) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
-    * Save into Marquez model datasets sent via `DatasetEvent` event type 
+    *Save into Marquez model datasets sent via `DatasetEvent` event type 
 
 ## [0.41.0](https://github.com/MarquezProject/marquez/compare/0.40.0...0.41.0) - 2023-09-20
 ### Added

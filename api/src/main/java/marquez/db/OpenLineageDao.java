@@ -33,6 +33,8 @@ import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
+import marquez.db.RunDao.RunUpsert;
+import marquez.db.RunDao.RunUpsert.RunUpsertBuilder;
 import marquez.db.mappers.LineageEventMapper;
 import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetFieldRow;
@@ -149,7 +151,6 @@ public interface OpenLineageDao extends BaseDao {
 
   default UpdateLineageRow updateMarquezModel(DatasetEvent event, ObjectMapper mapper) {
     daos.initBaseDao(this);
-
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
     UpdateLineageRow bag = new UpdateLineageRow();
@@ -164,9 +165,9 @@ public interface OpenLineageDao extends BaseDao {
 
     Dataset dataset = event.getDataset();
     List<DatasetRecord> datasetOutputs = new ArrayList<>();
-    DatasetRecord record = upsertLineageDataset(dataset, now, null, false, daos);
+    DatasetRecord record = upsertLineageDataset(dataset, now, null, false);
     datasetOutputs.add(record);
-    insertOutputFacets(dataset, record, null, null, now, daos);
+    insertOutputFacets(dataset, record, null, null, now);
 
     daos.getDatasetDao()
         .updateVersion(
@@ -192,18 +193,8 @@ public interface OpenLineageDao extends BaseDao {
                 DEFAULT_NAMESPACE_OWNER);
     bag.setNamespace(namespace);
 
-    Instant nominalStartTime =
-        Optional.ofNullable(event.getRun().getFacets())
-            .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
-            .map(NominalTimeRunFacet::getNominalStartTime)
-            .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
-            .orElse(null);
-    Instant nominalEndTime =
-        Optional.ofNullable(event.getRun().getFacets())
-            .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
-            .map(NominalTimeRunFacet::getNominalEndTime)
-            .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
-            .orElse(null);
+    Instant nominalStartTime = getNominalStartTime(event);
+    Instant nominalEndTime = getNominalEndTime(event);
 
     Optional<ParentRunFacet> parentRun =
         Optional.ofNullable(event.getRun()).map(Run::getFacets).map(RunFacet::getParent);
@@ -230,51 +221,25 @@ public interface OpenLineageDao extends BaseDao {
     bag.setRunArgs(runArgs);
 
     final UUID runUuid = runToUuid(event.getRun().getRunId());
-
     RunRow run;
+    RunUpsertBuilder runUpsertBuilder =
+        RunUpsert.builder()
+            .runUuid(runUuid)
+            .parentRunUuid(parentUuid.orElse(null))
+            .externalId(event.getRun().getRunId())
+            .now(now)
+            .jobUuid(job.getUuid())
+            .jobVersionUuid(null)
+            .runArgsUuid(runArgs.getUuid())
+            .namespaceName(namespace.getName())
+            .jobName(job.getName())
+            .location(job.getLocation());
+
     if (event.getEventType() != null) {
-      RunState runStateType = getRunState(event.getEventType());
-      run =
-          daos.getRunDao()
-              .upsert(
-                  runUuid,
-                  parentUuid.orElse(null),
-                  event.getRun().getRunId(),
-                  now,
-                  job.getUuid(),
-                  null,
-                  runArgs.getUuid(),
-                  nominalStartTime,
-                  nominalEndTime,
-                  runStateType,
-                  now,
-                  namespace.getName(),
-                  job.getName(),
-                  job.getLocation());
-      // Add ...
-      Optional.ofNullable(event.getRun().getFacets())
-          .ifPresent(
-              runFacet ->
-                  daos.getRunFacetsDao()
-                      .insertRunFacetsFor(
-                          runUuid, now, event.getEventType(), event.getRun().getFacets()));
-    } else {
-      run =
-          daos.getRunDao()
-              .upsert(
-                  runUuid,
-                  parentUuid.orElse(null),
-                  event.getRun().getRunId(),
-                  now,
-                  job.getUuid(),
-                  null,
-                  runArgs.getUuid(),
-                  nominalStartTime,
-                  nominalEndTime,
-                  namespace.getName(),
-                  job.getName(),
-                  job.getLocation());
+      runUpsertBuilder.runStateType(getRunState(event.getEventType())).runStateTime(now);
     }
+    run = daos.getRunDao().upsert(runUpsertBuilder.build());
+    insertRunFacets(event, runUuid, now);
     bag.setRun(run);
 
     if (event.getEventType() != null) {
@@ -290,37 +255,28 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    // Add ...
-    Optional.ofNullable(event.getJob().getFacets())
-        .ifPresent(
-            jobFacet ->
-                daos.getJobFacetsDao()
-                    .insertJobFacetsFor(
-                        job.getUuid(),
-                        runUuid,
-                        now,
-                        event.getEventType(),
-                        event.getJob().getFacets()));
+    insertJobFacets(event, job.getUuid(), runUuid, now);
 
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetInputs = null;
     if (event.getInputs() != null) {
       datasetInputs = new ArrayList<>();
       for (Dataset dataset : event.getInputs()) {
-        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, true, daos);
+        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, true);
         datasetInputs.add(record);
-        insertInputFacets(dataset, record, runUuid, event.getEventType(), now, daos);
+        insertInputFacets(dataset, record, runUuid, event.getEventType(), now);
       }
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
+
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetOutputs = null;
     if (event.getOutputs() != null) {
       datasetOutputs = new ArrayList<>();
       for (Dataset dataset : event.getOutputs()) {
-        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, false, daos);
+        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, false);
         datasetOutputs.add(record);
-        insertOutputFacets(dataset, record, runUuid, event.getEventType(), now, daos);
+        insertOutputFacets(dataset, record, runUuid, event.getEventType(), now);
       }
     }
 
@@ -328,13 +284,44 @@ public interface OpenLineageDao extends BaseDao {
     return bag;
   }
 
+  private static Instant getNominalStartTime(LineageEvent event) {
+    return Optional.ofNullable(event.getRun().getFacets())
+        .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
+        .map(NominalTimeRunFacet::getNominalStartTime)
+        .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
+        .orElse(null);
+  }
+
+  private static Instant getNominalEndTime(LineageEvent event) {
+    return Optional.ofNullable(event.getRun().getFacets())
+        .flatMap(f -> Optional.ofNullable(f.getNominalTime()))
+        .map(NominalTimeRunFacet::getNominalEndTime)
+        .map(t -> t.withZoneSameInstant(ZoneId.of("UTC")).toInstant())
+        .orElse(null);
+  }
+
+  private void insertRunFacets(LineageEvent event, UUID runUuid, Instant now) {
+    // Add ...
+    Optional.ofNullable(event.getRun().getFacets())
+        .ifPresent(
+            runFacet ->
+                daos.getRunFacetsDao()
+                    .insertRunFacetsFor(
+                        runUuid, now, event.getEventType(), event.getRun().getFacets()));
+  }
+
+  private void insertJobFacets(LineageEvent event, UUID jobUuid, UUID runUuid, Instant now) {
+    // Add ...
+    Optional.ofNullable(event.getJob().getFacets())
+        .ifPresent(
+            jobFacet ->
+                daos.getJobFacetsDao()
+                    .insertJobFacetsFor(
+                        jobUuid, runUuid, now, event.getEventType(), event.getJob().getFacets()));
+  }
+
   private void insertInputFacets(
-      Dataset dataset,
-      DatasetRecord record,
-      UUID runUuid,
-      String eventType,
-      Instant now,
-      ModelDaos daos) {
+      Dataset dataset, DatasetRecord record, UUID runUuid, String eventType, Instant now) {
     // Facets ...
     Optional.ofNullable(dataset.getFacets())
         .ifPresent(
@@ -363,12 +350,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private void insertOutputFacets(
-      Dataset dataset,
-      DatasetRecord record,
-      UUID runUuid,
-      String eventType,
-      Instant now,
-      ModelDaos daos) {
+      Dataset dataset, DatasetRecord record, UUID runUuid, String eventType, Instant now) {
     // Facets ...
     Optional.ofNullable(dataset.getFacets())
         .ifPresent(
@@ -665,7 +647,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default DatasetRecord upsertLineageDataset(
-      Dataset ds, Instant now, UUID runUuid, boolean isInput, ModelDaos daos) {
+      Dataset ds, Instant now, UUID runUuid, boolean isInput) {
     NamespaceRow dsNamespace =
         daos.getNamespaceDao()
             .upsertNamespaceRow(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
