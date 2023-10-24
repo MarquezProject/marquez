@@ -39,10 +39,12 @@ public final class UpstreamRunRowMapper implements RowMapper<UpstreamRunRow> {
             timestampOrThrow(results, Columns.STARTED_AT),
             timestampOrThrow(results, Columns.ENDED_AT),
             stringOrThrow(results, Columns.STATE)),
-        results.getObject("dataset_name") == null ? null : new DatasetSummary(
-            new NamespaceName(stringOrThrow(results, "dataset_namespace")),
-            new DatasetName(stringOrThrow(results, "dataset_name")),
-            UUID.fromString(stringOrThrow(results, "dataset_version_uuid")),
-            new RunId(UUID.fromString(stringOrThrow(results, "u_r_uuid")))));
+        results.getObject("dataset_name") == null
+            ? null
+            : new DatasetSummary(
+                new NamespaceName(stringOrThrow(results, "dataset_namespace")),
+                new DatasetName(stringOrThrow(results, "dataset_name")),
+                UUID.fromString(stringOrThrow(results, "dataset_version_uuid")),
+                new RunId(UUID.fromString(stringOrThrow(results, "u_r_uuid")))));
   }
 }

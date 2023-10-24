@@ -280,7 +280,10 @@ public class LineageService extends DelegatingLineageDao {
                 row -> {
                   UpstreamRunRow upstreamRunRow = row.getValue().get(0);
                   List<DatasetSummary> inputs =
-                      row.getValue().stream().map(UpstreamRunRow::input).collect(toList());
+                      row.getValue().stream()
+                          .map(UpstreamRunRow::input)
+                          .filter(i -> i != null)
+                          .collect(toList());
                   return new UpstreamRun(upstreamRunRow.job(), upstreamRunRow.run(), inputs);
                 })
             .collect(toList());

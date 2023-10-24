@@ -143,7 +143,9 @@ public class OpenLineageResource extends BaseResource {
       @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
       @QueryParam("facets") String facets) {
     throwIfNotExists(runId);
-    return Response.ok(lineageService.upstream(runId, depth, facets == null ? null : facets.split(","))).build();
+    return Response.ok(
+            lineageService.upstream(runId, depth, facets == null ? null : facets.split(",")))
+        .build();
   }
 
   @Value

@@ -204,7 +204,7 @@ WITH RECURSIVE
     LEFT JOIN dataset_versions dv2 ON dv2.uuid = rim2.dataset_version_uuid
     WHERE ur.u_r_uuid IS NOT NULL AND depth < :depth
   )
-SELECT * FROM upstream_runs ORDER BY depth DESC;
+SELECT * FROM upstream_runs ORDER BY depth ASC;
 ;
 """)
   List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
