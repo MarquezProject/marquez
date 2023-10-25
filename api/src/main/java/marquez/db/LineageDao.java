@@ -176,35 +176,31 @@ public interface LineageDao {
       """
 WITH RECURSIVE
   upstream_runs(
-          r_uuid, started_at, ended_at, state,
-          job_uuid, job_version_uuid, job_namespace, job_name,
+          r_uuid,
           dataset_uuid, dataset_version_uuid, dataset_namespace, dataset_name,
           u_r_uuid, depth) AS (
-    SELECT
-          r.uuid, r.started_at, r.ended_at, r.current_run_state,
-          r.job_uuid, r.job_version_uuid, r.namespace_name, r.job_name,
-          dv.dataset_uuid, dv."version", dv.namespace_name, dv.dataset_name,
-          dv.run_uuid,
-          0 AS depth
-    FROM runs r
+    select r.uuid,
+           dv.dataset_uuid, dv."version", dv.namespace_name, dv.dataset_name,
+           dv.run_uuid,
+           0 AS depth
+    FROM (SELECT :runId::uuid AS uuid) r
     LEFT JOIN runs_input_mapping rim ON rim.run_uuid = r.uuid
     LEFT JOIN dataset_versions dv ON dv.uuid = rim.dataset_version_uuid
-    LEFT JOIN runs r1 ON r1.uuid = dv.run_uuid
-    WHERE r.uuid = :runId
   UNION
     SELECT
-          ur.u_r_uuid, r2.started_at, r2.ended_at, r2.current_run_state,
-          r2.job_uuid, r2.job_version_uuid, r2.namespace_name, r2.job_name,
+          ur.u_r_uuid,
           dv2.dataset_uuid, dv2."version", dv2.namespace_name, dv2.dataset_name,
           dv2.run_uuid,
           ur.depth + 1 AS depth
     FROM upstream_runs ur
-    INNER JOIN runs r2 ON r2.uuid = ur.u_r_uuid
     LEFT JOIN runs_input_mapping rim2 ON rim2.run_uuid = ur.u_r_uuid
     LEFT JOIN dataset_versions dv2 ON dv2.uuid = rim2.dataset_version_uuid
     WHERE ur.u_r_uuid IS NOT NULL AND depth < :depth
   )
-SELECT * FROM upstream_runs ORDER BY depth ASC;
+SELECT upstream_runs.*,
+       r.started_at, r.ended_at, r.current_run_state as state,
+       r.job_uuid, r.job_version_uuid, r.namespace_name as job_namespace, r.job_name
+FROM upstream_runs, runs r where upstream_runs.r_uuid = r.uuid;
 ;
 """)
   List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
