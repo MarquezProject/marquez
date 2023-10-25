@@ -59,9 +59,12 @@ class GetChanges:
             for comment in comments:
                 if 'Thanks for opening your' in comment.body:
                     self.new_contributors[pull.user.login] = pull.user.url
-        print('New contributors:')
-        for k, v in self.new_contributors.items():
-            print(f'@{k}: {v}')
+        if self.new_contributors:
+            print('New contributors:')
+            for k, v in self.new_contributors.items():
+                print(f'@{k}: {v}')
+        else:
+            print('Note: no new contributors were found.')
 
     def update_changelog(self):
         f = open('changes.txt', 'w+')
