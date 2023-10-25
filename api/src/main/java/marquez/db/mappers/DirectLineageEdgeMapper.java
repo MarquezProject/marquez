@@ -15,13 +15,13 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
-import marquez.db.LineageDao.SimpleLineageEdge;
+import marquez.db.LineageDao.DirectLineageEdge;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public final class SimpleLineageEdgeMapper implements RowMapper<SimpleLineageEdge> {
+public final class DirectLineageEdgeMapper implements RowMapper<DirectLineageEdge> {
   @Override
-  public SimpleLineageEdge map(@NonNull ResultSet results, @NonNull StatementContext context)
+  public DirectLineageEdge map(@NonNull ResultSet results, @NonNull StatementContext context)
       throws SQLException {
     JobId job1 =
         JobId.of(
@@ -48,6 +48,6 @@ public final class SimpleLineageEdgeMapper implements RowMapper<SimpleLineageEdg
             : JobId.of(
                 NamespaceName.of(job2parent_namespace),
                 JobName.of(stringOrThrow(results, "job2_parent_name")));
-    return new SimpleLineageEdge(job1, io1, ds, io2, job2, job2parent);
+    return new DirectLineageEdge(job1, io1, ds, io2, job2, job2parent);
   }
 }

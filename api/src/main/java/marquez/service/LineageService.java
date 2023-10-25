@@ -79,7 +79,7 @@ public class LineageService extends DelegatingLineageDao {
   public ParentLineage parentDirectLineage(JobId parentJobId) {
     log.debug("Attempting to get lineage for parent job '{}'", parentJobId);
 
-    Collection<SimpleLineageEdge> directLineageFromParent =
+    Collection<DirectLineageEdge> directLineageFromParent =
         getDirectLineageFromParent(
             parentJobId.getNamespace().getValue(), parentJobId.getName().getValue());
 
@@ -87,19 +87,19 @@ public class LineageService extends DelegatingLineageDao {
         directLineageFromParent.stream()
             .collect(
                 groupingBy(
-                    SimpleLineageEdge::job1,
+                    DirectLineageEdge::job1,
                     filtering(
                         e -> e.direction() != null,
                         groupingBy(
-                            SimpleLineageEdge::direction,
+                            DirectLineageEdge::direction,
                             filtering(
                                 e -> e.dataset() != null,
                                 groupingBy(
-                                    SimpleLineageEdge::dataset,
+                                    DirectLineageEdge::dataset,
                                     filtering(
                                         e -> e.direction2() != null,
                                         groupingBy(
-                                            SimpleLineageEdge::direction2,
+                                            DirectLineageEdge::direction2,
                                             mapping(
                                                 e -> new JobWithParent(e.job2(), e.job2parent()),
                                                 toList())))))))));

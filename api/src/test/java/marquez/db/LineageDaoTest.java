@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.api.JdbiUtils;
 import marquez.common.models.JobType;
-import marquez.db.LineageDao.SimpleLineageEdge;
+import marquez.db.LineageDao.DirectLineageEdge;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.models.JobRow;
@@ -170,11 +170,11 @@ public class LineageDaoTest {
               expected.getOutput().map(ds -> ds.getDatasetRow().getUuid()).stream()::iterator);
     }
 
-    Collection<SimpleLineageEdge> directLineageFromParent =
+    Collection<DirectLineageEdge> FromParent =
         lineageDao.getDirectLineageFromParent(
             disjointJob.getJob().getNamespaceName(), disjointJob.getJob().getName());
-    assertNotNull(directLineageFromParent);
-    assertTrue(directLineageFromParent.toString(), directLineageFromParent.size() == 0);
+    assertNotNull(FromParent);
+    assertTrue(FromParent.toString(), FromParent.size() == 0);
   }
 
   @Test
@@ -322,11 +322,11 @@ public class LineageDaoTest {
   }
 
   @Test
-  public void testGetDirectLineageFromParent() {
+  public void testGetFromParent() {
     FacetTestUtils.createLineageWithFacets(openLineageDao);
-    Collection<SimpleLineageEdge> directLineageFromParent =
+    Collection<DirectLineageEdge> FromParent =
         lineageDao.getDirectLineageFromParent("namespace", "name");
-    assertTrue(directLineageFromParent.toString(), directLineageFromParent.size() == 2);
+    assertTrue(FromParent.toString(), FromParent.size() == 2);
   }
 
   @Test

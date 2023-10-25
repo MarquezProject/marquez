@@ -114,7 +114,7 @@ public class OpenLineageResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   @Path("/lineage/direct")
-  public Response getSimpleLineage(@QueryParam("parentJobNodeId") @NotNull NodeId parentJobNodeId) {
+  public Response getDirectLineage(@QueryParam("parentJobNodeId") @NotNull NodeId parentJobNodeId) {
     if (!parentJobNodeId.isJobType()) {
       throw new IllegalArgumentException("Only job expected, got " + parentJobNodeId.getValue());
     }
