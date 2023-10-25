@@ -176,28 +176,41 @@ public interface LineageDao {
       """
 WITH RECURSIVE
   upstream_runs(
-          r_uuid,
-          dataset_uuid, dataset_version_uuid, dataset_namespace, dataset_name,
-          u_r_uuid, depth) AS (
+          r_uuid, -- run uuid
+          dataset_uuid, dataset_version_uuid, dataset_namespace, dataset_name, -- input dataset version to the run
+          u_r_uuid, -- upstream run that produced that dataset version
+          depth -- current depth of traversal
+          ) AS (
+
+    -- initial case: find the inputs of the initial runs
     select r.uuid,
            dv.dataset_uuid, dv."version", dv.namespace_name, dv.dataset_name,
            dv.run_uuid,
-           0 AS depth
-    FROM (SELECT :runId::uuid AS uuid) r
+           0 AS depth -- starts at 0
+    FROM (SELECT :runId::uuid AS uuid) r -- initial run
     LEFT JOIN runs_input_mapping rim ON rim.run_uuid = r.uuid
     LEFT JOIN dataset_versions dv ON dv.uuid = rim.dataset_version_uuid
+
   UNION
+
+    -- recursion: find the inputs of the inputs found on the previous iteration and increase depth to know when to stop
     SELECT
           ur.u_r_uuid,
           dv2.dataset_uuid, dv2."version", dv2.namespace_name, dv2.dataset_name,
           dv2.run_uuid,
-          ur.depth + 1 AS depth
+          ur.depth + 1 AS depth -- increase depth to check end condition
     FROM upstream_runs ur
     LEFT JOIN runs_input_mapping rim2 ON rim2.run_uuid = ur.u_r_uuid
     LEFT JOIN dataset_versions dv2 ON dv2.uuid = rim2.dataset_version_uuid
-    WHERE ur.u_r_uuid IS NOT NULL AND depth < :depth
+    -- end condition of the recursion: no input or depth is over the maximum set
+    -- also avoid following cycles (merge statement)
+    WHERE ur.u_r_uuid IS NOT NULL AND ur.u_r_uuid <> ur.r_uuid AND depth < :depth
   )
-SELECT upstream_runs.*,
+
+  -- present the result: use Distinct as we may have traversed the same edge multiple times if there are diamonds in the graph.
+SELECT DISTINCT ON (upstream_runs.r_uuid, upstream_runs.dataset_version_uuid, upstream_runs.u_r_uuid)
+       upstream_runs.*,
+       -- we add the run information after the recursion so that we join with the large run table only once
        r.started_at, r.ended_at, r.current_run_state as state,
        r.job_uuid, r.job_version_uuid, r.namespace_name as job_namespace, r.job_name
 FROM upstream_runs, runs r where upstream_runs.r_uuid = r.uuid;
