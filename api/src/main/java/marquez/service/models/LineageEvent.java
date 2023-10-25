@@ -214,12 +214,19 @@ public class LineageEvent extends BaseEvent {
   @Setter
   @Valid
   @ToString
-  @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description"})
+  @JsonPropertyOrder({
+    "documentation",
+    "sourceCodeLocation",
+    "sql",
+    "description",
+    "processingType"
+  })
   public static class JobFacet {
 
     @Valid private DocumentationJobFacet documentation;
     @Valid private SourceCodeLocationJobFacet sourceCodeLocation;
     @Valid private SQLJobFacet sql;
+    @Valid private ProcessingTypeJobFacet processingType;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
@@ -238,6 +245,10 @@ public class LineageEvent extends BaseEvent {
 
     public SourceCodeLocationJobFacet getSourceCodeLocation() {
       return sourceCodeLocation;
+    }
+
+    public ProcessingTypeJobFacet getProcessingTypeJobFacet() {
+      return processingType;
     }
 
     public SQLJobFacet getSql() {
@@ -294,6 +305,24 @@ public class LineageEvent extends BaseEvent {
     public SQLJobFacet(@NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String query) {
       super(_producer, _schemaURL);
       this.query = query;
+    }
+  }
+
+  // TODO: make it up to date with https://github.com/OpenLineage/OpenLineage/pull/2241/files
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  public static class ProcessingTypeJobFacet extends BaseFacet {
+
+    @NotNull private String processingType;
+
+    @Builder
+    public ProcessingTypeJobFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String processingType) {
+      super(_producer, _schemaURL);
+      this.processingType = processingType;
     }
   }
 

@@ -64,6 +64,7 @@ import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.LifecycleStateChangeFacet;
 import marquez.service.models.LineageEvent.NominalTimeRunFacet;
 import marquez.service.models.LineageEvent.ParentRunFacet;
+import marquez.service.models.LineageEvent.ProcessingTypeJobFacet;
 import marquez.service.models.LineageEvent.Run;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
@@ -170,6 +171,52 @@ public interface OpenLineageDao extends BaseDao {
     if (event.getEventType() != null && runState.isDone()) {
       updateMarquezOnComplete(event, updateLineageRow, runState);
     }
+    // TODO: add a columns: jobType, integration, processingType jobs table to determine job type ->
+    // https://github.com/OpenLineage/OpenLineage/pull/2241
+    // TODO: verify those columns in jobs' api (should be part of JobData)
+
+    // if a job is streaming job - datasets versions should be created on start
+    // TODO: make it enum, use some method for this
+    Optional<String> processingType =
+        Optional.ofNullable(event.getJob())
+            .map(Job::getFacets)
+            .map(JobFacet::getProcessingTypeJobFacet)
+            .map(ProcessingTypeJobFacet::getProcessingType);
+
+    // TODO: migrate this to separate method
+    // TODO: test streaming facet in integration test (read from facet in json file)
+    if (processingType.orElse("").equals("STREAMING")) {
+      // insert IO rows
+      ModelDaos daos = new ModelDaos();
+      daos.initBaseDao(this);
+      updateLineageRow
+          .getInputs()
+          .ifPresent(
+              l ->
+                  l.stream()
+                      .forEach(
+                          d ->
+                              daos.getJobVersionDao()
+                                  .upsertInputDatasetFor(
+                                      null, // no job version Id
+                                      d.getDatasetRow().getUuid(),
+                                      updateLineageRow.getJob().getUuid(),
+                                      updateLineageRow.getJob().getSymlinkTargetId())));
+      updateLineageRow
+          .getOutputs()
+          .ifPresent(
+              l ->
+                  l.stream()
+                      .forEach(
+                          d ->
+                              daos.getJobVersionDao()
+                                  .upsertInputDatasetFor(
+                                      null, // no job version Id
+                                      d.getDatasetRow().getUuid(),
+                                      updateLineageRow.getJob().getUuid(),
+                                      updateLineageRow.getJob().getSymlinkTargetId())));
+    }
+
     return updateLineageRow;
   }
 

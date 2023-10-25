@@ -57,6 +57,7 @@ import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
 import marquez.service.models.LineageEvent.JobFacet;
+import marquez.service.models.LineageEvent.ProcessingTypeJobFacet;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SQLJobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
@@ -546,6 +547,59 @@ public class OpenLineageServiceIntegrationTest {
                 .getSourceName()
                 .getValue())
         .isEqualTo("theDatasource");
+  }
+
+  @Test
+  void testStreamingJob() {
+    LineageEvent.Dataset dataset =
+        LineageEvent.Dataset.builder()
+            .name(DATASET_NAME)
+            .namespace(NAMESPACE)
+            .facets(
+                DatasetFacets.builder()
+                    .schema(
+                        new SchemaDatasetFacet(
+                            PRODUCER_URL,
+                            SCHEMA_URL,
+                            Arrays.asList(new SchemaField("col", "STRING", "my name"))))
+                    .dataSource(
+                        DatasourceDatasetFacet.builder()
+                            .name("theDatasource")
+                            .uri("http://thedatasource")
+                            .build())
+                    .build())
+            .build();
+
+    // Streaming job not followed by a COMPLETE event
+    UUID firstRunId = UUID.randomUUID();
+    lineageService.createAsync(
+        LineageEvent.builder()
+            .eventType("RUNNING")
+            .run(new LineageEvent.Run(firstRunId.toString(), RunFacet.builder().build()))
+            .job(
+                LineageEvent.Job.builder()
+                    .name(JOB_NAME)
+                    .namespace(NAMESPACE)
+                    .facets(
+                        JobFacet.builder()
+                            .processingType(
+                                new ProcessingTypeJobFacet(PRODUCER_URL, SCHEMA_URL, "STREAMING"))
+                            .build())
+                    .build())
+            .eventTime(Instant.now().atZone(TIMEZONE))
+            .inputs(new ArrayList<>())
+            .outputs(Collections.singletonList(dataset))
+            .build());
+    Optional<Dataset> datasetRow = datasetDao.findDatasetByName(NAMESPACE, DATASET_NAME);
+
+    // assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersion).isNotPresent();
+
+    // Assert that datasets can be retrieved
+    // TODO
+
+    // TODO: job can be retrieved by name
+
+    // Assert that it is returned via lineage endpoint
   }
 
   private void checkExists(LineageEvent.Dataset ds) {
