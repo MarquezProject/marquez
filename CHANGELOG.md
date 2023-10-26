@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.42.0...HEAD)
 
+### Added
+* API: support `JobEvent` [`#2661`](https://github.com/MarquezProject/marquez/pull/2661) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
+  *Save into Marquez model jobs and datasets sent via `JobEvent` event type.
+
 ## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-17
 ### Added
 * Client: add Java client method for dataset/job lineage [`#2623`](https://github.com/MarquezProject/marquez/pull/2623) [@davidjgoss](https://github.com/davidjgoss)  

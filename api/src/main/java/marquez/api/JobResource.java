@@ -110,7 +110,7 @@ public class JobResource extends BaseResource {
 
     final Job job =
         jobService
-            .findWithRun(namespaceName.getValue(), jobName.getValue())
+            .findWithDatasetsAndRun(namespaceName.getValue(), jobName.getValue())
             .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }

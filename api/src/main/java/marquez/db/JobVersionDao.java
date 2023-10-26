@@ -5,13 +5,18 @@
 
 package marquez.db;
 
+import static marquez.db.Columns.stringOrThrow;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.api.models.JobVersion;
@@ -23,13 +28,18 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
 import marquez.db.mappers.ExtendedJobVersionRowMapper;
+import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobVersionMapper;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
+import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.Run;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -37,6 +47,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 /** The DAO for {@code JobVersion}. */
 @RegisterRowMapper(ExtendedJobVersionRowMapper.class)
 @RegisterRowMapper(JobVersionMapper.class)
+@RegisterRowMapper(JobDataMapper.class)
 public interface JobVersionDao extends BaseDao {
   /** An {@code enum} used to determine the input / output dataset type for a given job version. */
   enum IoType {
@@ -251,6 +262,16 @@ public interface JobVersionDao extends BaseDao {
   """)
   List<UUID> findInputOrOutputDatasetsFor(UUID jobVersionUuid, IoType ioType);
 
+  @SqlQuery(
+      """
+    SELECT d.namespace_name, d.name, io.io_type
+    FROM job_versions_io_mapping io
+    INNER JOIN jobs_view j ON j.current_version_uuid = io.job_version_uuid
+    INNER JOIN datasets_view d on d.uuid = io.dataset_uuid
+    WHERE j.name = :jobName AND j.namespace_name=:jobNamespace
+  """)
+  List<JobDataset> findCurrentInputOutputDatasetsFor(String jobNamespace, String jobName);
+
   /**
    * Used to associate a {@link Run} to a given job version. A run is an instance of a job version.
    * When a run object is instantiated, the {@code latest_run_uuid} column in the {@code
@@ -282,6 +303,103 @@ public interface JobVersionDao extends BaseDao {
   @VisibleForTesting
   @SqlQuery("SELECT COUNT(*) FROM job_versions")
   int count();
+
+  /**
+   * Links facets of the given run to
+   *
+   * @param runUuid
+   * @param jobVersionUuid
+   */
+  @SqlUpdate(
+      """
+    UPDATE job_facets
+    SET job_version_uuid = :jobVersionUuid
+    WHERE run_uuid = :runUuid
+  """)
+  void linkJobFacetsToJobVersion(UUID runUuid, UUID jobVersionUuid);
+
+  /**
+   * Used to upsert an immutable {@link JobVersionRow}. A {@link Version} is generated using {@link
+   * Utils#newJobVersionFor(NamespaceName, JobName, ImmutableSet, ImmutableSet, String)} based on
+   * the jobs inputs and inputs, source code location, and context.
+   *
+   * @param jobRow The job.
+   * @return A {@link BagOfJobVersionInfo} object.
+   */
+  default BagOfJobVersionInfo upsertRunlessJobVersion(
+      @NonNull JobRow jobRow, List<DatasetRecord> inputs, List<DatasetRecord> outputs) {
+    // Get the job.
+    final JobDao jobDao = createJobDao();
+
+    // Get the namespace for the job.
+    final NamespaceRow namespaceRow =
+        createNamespaceDao().findNamespaceByName(jobRow.getNamespaceName()).get();
+
+    // Generate the version for the job; the version may already exist.
+    final Version jobVersion =
+        Utils.newJobVersionFor(
+            NamespaceName.of(jobRow.getNamespaceName()),
+            JobName.of(
+                Optional.ofNullable(jobRow.getParentJobName())
+                    .map(pn -> pn + "." + jobRow.getSimpleName())
+                    .orElse(jobRow.getName())),
+            toDatasetIds(
+                inputs.stream().map(i -> i.getDatasetVersionRow()).collect(Collectors.toList())),
+            toDatasetIds(
+                outputs.stream().map(i -> i.getDatasetVersionRow()).collect(Collectors.toList())),
+            jobRow.getLocation());
+
+    // Add the job version.
+    final JobVersionDao jobVersionDao = createJobVersionDao();
+    final JobVersionRow jobVersionRow =
+        jobVersionDao.upsertJobVersion(
+            UUID.randomUUID(),
+            jobRow.getCreatedAt(),
+            jobRow.getUuid(),
+            jobRow.getLocation(),
+            jobVersion.getValue(),
+            jobRow.getName(),
+            namespaceRow.getUuid(),
+            jobRow.getNamespaceName());
+
+    // Link the input datasets to the job version.
+    inputs.forEach(
+        i -> {
+          jobVersionDao.upsertInputDatasetFor(
+              jobVersionRow.getUuid(), i.getDatasetVersionRow().getDatasetUuid());
+        });
+
+    // Link the output datasets to the job version.
+    outputs.forEach(
+        o -> {
+          jobVersionDao.upsertOutputDatasetFor(
+              jobVersionRow.getUuid(), o.getDatasetVersionRow().getDatasetUuid());
+        });
+
+    jobDao.updateVersionFor(jobRow.getUuid(), jobRow.getCreatedAt(), jobVersionRow.getUuid());
+
+    return new BagOfJobVersionInfo(
+        jobRow,
+        jobVersionRow,
+        inputs.stream()
+            .map(JobVersionDao::toExtendedDatasetVersionRow)
+            .collect(Collectors.toList()),
+        outputs.stream()
+            .map(JobVersionDao::toExtendedDatasetVersionRow)
+            .collect(Collectors.toList()));
+  }
+
+  private static ExtendedDatasetVersionRow toExtendedDatasetVersionRow(DatasetRecord d) {
+    return new ExtendedDatasetVersionRow(
+        d.getDatasetRow().getUuid(),
+        d.getDatasetRow().getCreatedAt(),
+        d.getDatasetVersionRow().getDatasetUuid(),
+        d.getDatasetVersionRow().getVersion(),
+        null,
+        null,
+        d.getDatasetRow().getNamespaceName(),
+        d.getDatasetRow().getName());
+  }
 
   /**
    * Used to upsert an immutable {@link JobVersionRow} object when a {@link Run} has transitioned. A
@@ -323,8 +441,14 @@ public interface JobVersionDao extends BaseDao {
                 Optional.ofNullable(jobRow.getParentJobName())
                     .map(pn -> pn + "." + jobRow.getSimpleName())
                     .orElse(jobRow.getName())),
-            toDatasetIds(jobVersionInputs),
-            toDatasetIds(jobVersionOutputs),
+            toDatasetIds(
+                jobVersionInputs.stream()
+                    .map(i -> (DatasetVersionRow) i)
+                    .collect(Collectors.toList())),
+            toDatasetIds(
+                jobVersionOutputs.stream()
+                    .map(o -> (DatasetVersionRow) o)
+                    .collect(Collectors.toList())),
             jobRow.getLocation());
 
     // Add the job version.
@@ -360,6 +484,9 @@ public interface JobVersionDao extends BaseDao {
     // Link the run to the job version; multiple run instances may be linked to a job version.
     jobVersionDao.updateLatestRunFor(jobVersionRow.getUuid(), transitionedAt, runUuid);
 
+    // Link the job facets to this job version
+    jobVersionDao.linkJobFacetsToJobVersion(runUuid, jobVersionRow.getUuid());
+
     // Link the job version to the job only if the run is marked done and has transitioned into one
     // of the following states: COMPLETED, ABORTED, or FAILED.
     if (runState.isDone()) {
@@ -371,15 +498,17 @@ public interface JobVersionDao extends BaseDao {
 
   /** Returns the specified {@link ExtendedDatasetVersionRow}s as {@link DatasetId}s. */
   default ImmutableSortedSet<DatasetId> toDatasetIds(
-      @NonNull final List<ExtendedDatasetVersionRow> datasetVersionRows) {
+      @NonNull final List<DatasetVersionRow> datasetVersionRows) {
     final ImmutableSortedSet.Builder<DatasetId> datasetIds = ImmutableSortedSet.naturalOrder();
-    for (final ExtendedDatasetVersionRow datasetVersionRow : datasetVersionRows) {
-      datasetIds.add(
-          new DatasetId(
-              NamespaceName.of(datasetVersionRow.getNamespaceName()),
-              DatasetName.of(datasetVersionRow.getDatasetName())));
+    for (final DatasetVersionRow datasetVersionRow : datasetVersionRows) {
+      datasetIds.add(toDatasetId(datasetVersionRow));
     }
     return datasetIds.build();
+  }
+
+  private DatasetId toDatasetId(DatasetVersionRow dataset) {
+    return new DatasetId(
+        NamespaceName.of(dataset.getNamespaceName()), DatasetName.of(dataset.getDatasetName()));
   }
 
   /** A container class for job version info. */
@@ -389,5 +518,17 @@ public interface JobVersionDao extends BaseDao {
     JobVersionRow jobVersionRow;
     List<ExtendedDatasetVersionRow> inputs;
     List<ExtendedDatasetVersionRow> outputs;
+  }
+
+  record JobDataset(String namespace, String name, IoType ioType) {}
+
+  class JobDatasetMapper implements RowMapper<JobDataset> {
+    @Override
+    public JobDataset map(ResultSet rs, StatementContext ctx) throws SQLException {
+      return new JobDataset(
+          stringOrThrow(rs, Columns.NAMESPACE_NAME),
+          stringOrThrow(rs, Columns.NAME),
+          IoType.valueOf(stringOrThrow(rs, Columns.IO_TYPE)));
+    }
   }
 }
