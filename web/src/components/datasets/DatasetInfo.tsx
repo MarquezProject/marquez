@@ -5,6 +5,8 @@ import * as Redux from 'redux'
 import {
   Accordion,
   Box,
+  Card,
+  CardContent,
   Divider,
   Table,
   TableBody,
@@ -85,7 +87,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const i18next = require('i18next')
 
   const [open, setOpen] = useState(false)
-  const [selectedKey, setSelectedKey] = useState()
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
   const theme = createTheme(useTheme())
 
   useEffect(() => {
@@ -102,7 +104,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   )
 
   const tagData = useSelector((state: IState) => state.tags.tags)
-  const handleOpen = (key: any) => {
+  const handleOpen = (key: string) => {
     setOpen(true)
     setSelectedKey(key)
   }
@@ -166,24 +168,30 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             PaperProps={{
               sx: {
                 width: 400,
-                backgroundColor: theme.palette.common.black,
+                backgroundColor: theme.palette.background.paper,
                 border: `2px dashed ${theme.palette.secondary.main}`,
                 p: 1,
               },
             }}
           >
-            <MqText heading bottomMargin>
-              {selectedKey}
-            </MqText>
+            <Card>
+              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
+                <MqText heading bottomMargin>
+                  {selectedKey}
+                </MqText>
+              </CardContent>
+            </Card>
             <Divider />
-            <MqText bottomMargin>{selectedFieldDesc}</MqText>
-            <Accordion>
+            <Card>
+              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
+                <MqText bottomMargin>{selectedFieldDesc}</MqText>
+              </CardContent>
+            </Card>
+            <Accordion elevation={0}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls='panel1a-content'
-                id='panel1a-header'
                 sx={{
-                  backgroundColor: theme.palette.common.black,
+                  backgroundColor: theme.palette.background.paper,
                 }}
               >
                 <MqText bold bottomMargin>
@@ -192,14 +200,12 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               </AccordionSummary>
               <AccordionDetails
                 sx={{
-                  backgroundColor: theme.palette.common.black,
+                  backgroundColor: theme.palette.background.paper,
                 }}
               >
-                {selectedFieldTags.length > 0 ? (
-                  <>{formatColumnTags(selectedFieldTags, tagData)}</>
-                ) : (
-                  'No Tags'
-                )}
+                {selectedFieldTags.length > 0
+                  ? formatColumnTags(selectedFieldTags, tagData)
+                  : 'No Tags'}
               </AccordionDetails>
             </Accordion>
           </Drawer>
