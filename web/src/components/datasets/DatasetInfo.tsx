@@ -114,8 +114,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   }
 
   const selectedField = datasetFields.find((field) => field.name === selectedKey)
-  const selectedFieldTags = selectedField ? selectedField.tags : []
-  const selectedFieldDesc = selectedField ? selectedField.description : 'No Description'
+  const selectedFieldTags = selectedField?.tags || []
+  const selectedFieldDesc = selectedField?.description || 'No Description'
 
   return (
     <Box>
