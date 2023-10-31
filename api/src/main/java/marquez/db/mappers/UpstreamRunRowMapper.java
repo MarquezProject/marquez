@@ -5,12 +5,14 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
-import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import marquez.common.models.DatasetName;
@@ -25,6 +27,7 @@ import marquez.db.LineageDao.UpstreamRunRow;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
+/** Maps the upstream query result set to a UpstreamRunRow */
 public final class UpstreamRunRowMapper implements RowMapper<UpstreamRunRow> {
   @Override
   public UpstreamRunRow map(@NonNull ResultSet results, @NonNull StatementContext context)
@@ -33,11 +36,13 @@ public final class UpstreamRunRowMapper implements RowMapper<UpstreamRunRow> {
         new JobSummary(
             new NamespaceName(stringOrThrow(results, "job_namespace")),
             new JobName(stringOrThrow(results, "job_name")),
-            UUID.fromString(stringOrThrow(results, "job_version_uuid"))),
+            Optional.ofNullable(stringOrNull(results, "job_version_uuid"))
+                .map(UUID::fromString)
+                .orElse(null)),
         new RunSummary(
             new RunId(uuidOrThrow(results, "r_uuid")),
-            timestampOrThrow(results, Columns.STARTED_AT),
-            timestampOrThrow(results, Columns.ENDED_AT),
+            timestampOrNull(results, Columns.STARTED_AT),
+            timestampOrNull(results, Columns.ENDED_AT),
             stringOrThrow(results, Columns.STATE)),
         results.getObject("dataset_name") == null
             ? null

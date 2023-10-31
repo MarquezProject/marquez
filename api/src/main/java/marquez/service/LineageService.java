@@ -268,9 +268,15 @@ public class LineageService extends DelegatingLineageDao {
     }
   }
 
-  public UpstreamRunLineage upstream(@NotNull RunId runId, int depth, String[] facets
-      /** TODO */
-      ) {
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
+  public UpstreamRunLineage upstream(@NotNull RunId runId, int depth) {
     List<UpstreamRunRow> upstreamRuns = getUpstreamRuns(runId.getValue(), depth);
     Map<RunId, List<UpstreamRunRow>> collect =
         upstreamRuns.stream().collect(groupingBy(r -> r.run().id(), LinkedHashMap::new, toList()));

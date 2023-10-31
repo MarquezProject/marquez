@@ -131,6 +131,14 @@ public class OpenLineageResource extends BaseResource {
     return Response.ok(new Events(events, totalCount)).build();
   }
 
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -140,12 +148,9 @@ public class OpenLineageResource extends BaseResource {
   @Path("/runlineage/upstream")
   public Response getRunLineageUpstream(
       @QueryParam("runId") @NotNull RunId runId,
-      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
-      @QueryParam("facets") String facets) {
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth) {
     throwIfNotExists(runId);
-    return Response.ok(
-            lineageService.upstream(runId, depth, facets == null ? null : facets.split(",")))
-        .build();
+    return Response.ok(lineageService.upstream(runId, depth)).build();
   }
 
   @Value
