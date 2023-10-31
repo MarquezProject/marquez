@@ -33,7 +33,7 @@ function HomepageHeader() {
                             </Link>
                             <Link
                                 className="button button--secondary button--md margin-left--md"
-                                href="https://bit.ly/Marquez_invite">
+                                href="https://bit.ly/Mqz_invite">
                                 Slack
                             </Link>
                         </div>
