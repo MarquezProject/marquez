@@ -3,7 +3,7 @@
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
 
 * Give the repo a star
-* Join our [slack](http://bit.ly/Marquez_invite) channel and leave us feedback or help with answering questions from the community
+* Join our [slack](http://bit.ly/Mqz_invite) channel and leave us feedback or help with answering questions from the community
 * Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
 * Fix or improve documentation
 * For newcomers, pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way (see the [resources](#resources) section below for helpful links to get started)
