@@ -208,6 +208,28 @@ public class LineageTestUtils {
       List<DatasetConsumerJob> downstream,
       JobFacet jobFacet,
       Dataset dataset) {
+    return writeDownstreamLineageWithParent(openLineageDao, downstream, jobFacet, dataset, null);
+  }
+
+  /**
+   * Recursive function which supports writing a lineage graph by supplying an input dataset and a
+   * list of {@link DatasetConsumerJob}s. Each consumer may output up to one dataset, which will be
+   * consumed by the number of consumers specified by the {@link DatasetConsumerJob#numConsumers}
+   * property.
+   *
+   * @param openLineageDao
+   * @param downstream
+   * @param jobFacet
+   * @param dataset
+   * @param parentRunFacet
+   * @return
+   */
+  public static List<JobLineage> writeDownstreamLineageWithParent(
+      OpenLineageDao openLineageDao,
+      List<DatasetConsumerJob> downstream,
+      JobFacet jobFacet,
+      Dataset dataset,
+      @Valid LineageEvent.ParentRunFacet parentRunFacet) {
     DatasetConsumerJob consumer = downstream.get(0);
     return IntStream.range(0, consumer.getNumConsumers())
         .mapToObj(
@@ -232,17 +254,19 @@ public class LineageTestUtils {
                       "COMPLETE",
                       jobFacet,
                       Collections.singletonList(dataset),
-                      outputs.stream().collect(Collectors.toList()));
+                      outputs.stream().collect(Collectors.toList()),
+                      parentRunFacet);
               List<JobLineage> downstreamLineage =
                   outputs.stream()
                       .flatMap(
                           out -> {
                             if (consumer.numConsumers > 0) {
-                              return writeDownstreamLineage(
+                              return writeDownstreamLineageWithParent(
                                   openLineageDao,
                                   downstream.subList(1, downstream.size()),
                                   jobFacet,
-                                  out)
+                                  out,
+                                  parentRunFacet)
                                   .stream();
                             } else {
                               return Stream.empty();
