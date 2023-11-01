@@ -1490,6 +1490,9 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .hasFieldOrPropertyWithValue("namespace", jobNamespace)
         .hasFieldOrPropertyWithValue("name", jobName);
     assertThat(jobVersion.getInputs()).isNotEmpty();
+
+    // (6) verify list lineage endpoint responds correctly with no events returned
+    assertThat(client.listLineageEvents()).hasSize(0);
   }
 
   private void validateDatasetFacets(JsonNode json) {

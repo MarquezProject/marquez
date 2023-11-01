@@ -80,6 +80,14 @@ public interface OpenLineageDao extends BaseDao {
   String DEFAULT_SOURCE_NAME = "default";
   String DEFAULT_NAMESPACE_OWNER = "anonymous";
 
+  enum SpecEventType {
+    RUN_EVENT,
+    DATASET_EVENT,
+    JOB_EVENT;
+  }
+
+  ModelDaos daos = new ModelDaos();
+
   @SqlUpdate(
       "INSERT INTO lineage_events ("
           + "event_type, "
@@ -88,8 +96,9 @@ public interface OpenLineageDao extends BaseDao {
           + "job_name, "
           + "job_namespace, "
           + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
+          + "producer, "
+          + "spec_event_type) "
+          + "VALUES (?, ?, ?, ?, ?, ?, ?, 'RUN_EVENT')")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
@@ -103,8 +112,9 @@ public interface OpenLineageDao extends BaseDao {
       "INSERT INTO lineage_events ("
           + "event_time, "
           + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?)")
+          + "producer, "
+          + "spec_event_type) "
+          + "VALUES (?, ?, ?, 'DATASET_EVENT')")
   void createDatasetEvent(Instant eventTime, PGobject event, String producer);
 
   @SqlUpdate(
@@ -113,12 +123,14 @@ public interface OpenLineageDao extends BaseDao {
           + "job_name, "
           + "job_namespace, "
           + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?, ?, ?)")
+          + "producer, "
+          + "spec_event_type) "
+          + "VALUES (?, ?, ?, ?, ?, 'JOB_EVENT')")
   void createJobEvent(
       Instant eventTime, String jobName, String jobNamespace, PGobject event, String producer);
 
-  @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
+  @SqlQuery(
+      "SELECT event FROM lineage_events WHERE run_uuid = :runUuid AND spec_event_type='RUN_EVENT'")
   List<LineageEvent> findLineageEventsByRunUuid(UUID runUuid);
 
   @SqlQuery(
@@ -127,6 +139,7 @@ public interface OpenLineageDao extends BaseDao {
   FROM lineage_events le
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
+  AND le.spec_event_type='RUN_EVENT'
   ORDER BY le.event_time DESC
   LIMIT :limit OFFSET :offset""")
   List<LineageEvent> getAllLineageEventsDesc(
@@ -138,6 +151,7 @@ public interface OpenLineageDao extends BaseDao {
   FROM lineage_events le
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
+  AND le.spec_event_type='RUN_EVENT'
   ORDER BY le.event_time ASC
   LIMIT :limit OFFSET :offset""")
   List<LineageEvent> getAllLineageEventsAsc(
