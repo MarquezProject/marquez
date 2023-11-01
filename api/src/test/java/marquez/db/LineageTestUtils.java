@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.Valid;
+
+import lombok.Builder;
 import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
@@ -280,5 +282,17 @@ public class LineageTestUtils {
     String name;
     int numConsumers;
     Optional<String> outputDatasetName;
+  }
+
+  @Value
+  @Builder
+  public static class CreateJobLineage {
+    String jobName;
+    String status;
+    JobFacet jobFacet;
+    List<Dataset> inputs;
+    List<Dataset> outputs;
+    @Valid LineageEvent.ParentRunFacet parentRunFacet;
+    ImmutableMap<String, Object> runFacets;
   }
 }
