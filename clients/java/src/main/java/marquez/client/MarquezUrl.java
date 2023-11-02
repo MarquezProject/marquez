@@ -13,6 +13,7 @@ import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
 import static marquez.client.MarquezPathV1.datasetVersionPath;
+import static marquez.client.MarquezPathV1.directLineagePath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
@@ -31,8 +32,6 @@ import static marquez.client.MarquezPathV1.runTransitionPath;
 import static marquez.client.MarquezPathV1.searchPath;
 import static marquez.client.MarquezPathV1.sourcePath;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,13 +40,20 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.Nullable;
+
+import org.apache.http.client.utils.URIBuilder;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.NonNull;
+import marquez.client.models.JobId;
 import marquez.client.models.NodeId;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
 import marquez.client.models.SearchSort;
-import org.apache.http.client.utils.URIBuilder;
 
 class MarquezUrl {
 
@@ -197,7 +203,7 @@ class MarquezUrl {
 
   URL toSearchUrl(
       @NonNull String query, @Nullable SearchFilter filter, @Nullable SearchSort sort, int limit) {
-    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    final ImmutableMap.Builder<String, Object> queryParams = new ImmutableMap.Builder<>();
     queryParams.put("q", query);
     if (filter != null) {
       queryParams.put("filter", filter);
@@ -210,17 +216,24 @@ class MarquezUrl {
   }
 
   URL toLineageUrl(NodeId nodeId, int depth) {
-    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    final ImmutableMap.Builder<String, Object> queryParams = new ImmutableMap.Builder<>();
     queryParams.put("nodeId", nodeId.getValue());
     queryParams.put("depth", String.valueOf(depth));
     return from(lineagePath(), queryParams.build());
   }
 
   URL toColumnLineageUrl(NodeId nodeId, int depth, boolean withDownstream) {
-    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    final ImmutableMap.Builder<String, Object> queryParams = new ImmutableMap.Builder<>();
     queryParams.put("nodeId", nodeId.getValue());
     queryParams.put("depth", String.valueOf(depth));
     queryParams.put("withDownstream", String.valueOf(withDownstream));
     return from(columnLineagePath(), queryParams.build());
   }
+
+  public URL toDirectLineageUrl(@NonNull JobId parentJobId) {
+    final ImmutableMap.Builder<String, Object> queryParams = new ImmutableMap.Builder<>();
+    queryParams.put("parentJobNodeId", NodeId.of(parentJobId).getValue());
+    return from(directLineagePath(), queryParams.build());
+  }
+
 }

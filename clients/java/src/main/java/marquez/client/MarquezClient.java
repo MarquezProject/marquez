@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -35,9 +36,11 @@ import lombok.Setter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.client.models.Dataset;
+import marquez.client.models.DatasetId;
 import marquez.client.models.DatasetMeta;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
+import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobVersion;
 import marquez.client.models.LineageEvent;
@@ -123,6 +126,11 @@ public class MarquezClient {
   public Lineage getLineage(NodeId nodeId, int depth) {
     final String bodyAsJson = http.get(url.toLineageUrl(nodeId, depth));
     return Lineage.fromJson(bodyAsJson);
+  }
+
+  public ParentLineage getDirectLineage(JobId parentJobId) {
+    final String bodyAsJson = http.get(url.toDirectLineageUrl(parentJobId));
+    return ParentLineage.fromJson(bodyAsJson);
   }
 
   public Lineage getColumnLineage(NodeId nodeId) {
@@ -701,6 +709,22 @@ public class MarquezClient {
 
     String toJson() {
       return Utils.toJson(this);
+    }
+  }
+
+  public record JobWithParent(JobId job, JobId parent) {}
+
+  public record DatasetLineage(
+      DatasetId dataset,
+      Collection<JobWithParent> consumers,
+      Collection<JobWithParent> producers) {}
+
+  public record ChildLineage(
+      JobId job, Collection<DatasetLineage> inputs, Collection<DatasetLineage> outputs) {}
+
+  public record ParentLineage(JobId parent, Collection<ChildLineage> children) {
+    static ParentLineage fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<ParentLineage>() {});
     }
   }
 }

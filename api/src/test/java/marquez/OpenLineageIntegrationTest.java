@@ -5,12 +5,12 @@
 
 package marquez;
 
+import static java.util.Arrays.asList;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,9 +27,7 @@ import io.openlineage.client.OpenLineage.RunFacet;
 import io.openlineage.client.OpenLineage.RunFacetsBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -50,6 +48,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
+import marquez.client.MarquezClient.ParentLineage;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
@@ -57,12 +56,9 @@ import marquez.client.models.JobId;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
-import marquez.common.models.JobName;
-import marquez.common.models.NamespaceName;
 import marquez.db.LineageTestUtils;
 import marquez.service.models.DatasetEvent;
 import marquez.service.models.JobEvent;
-import marquez.service.models.NodeId;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
@@ -323,26 +319,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
 
-    marquez.common.models.JobId jobId =
-        new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
-    String nodeId = NodeId.of(jobId).getValue();
-    HttpRequest request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
-            .header("Content-Type", "application/json")
-            .GET()
-            .build();
+    ParentLineage directLineage = client.getDirectLineage(new JobId(NAMESPACE_NAME, dagName));
+    assertThat(directLineage.parent().getNamespace()).isEqualTo(NAMESPACE_NAME);
+    assertThat(directLineage.parent().getName()).isEqualTo(dagName);
+    assertThat(directLineage.children()).size().isEqualTo(2);
 
-    HttpResponse<String> resp;
-    try {
-      resp = http2.send(request, BodyHandlers.ofString());
-
-      assertEquals(200, resp.statusCode(), resp.body());
-      assertTrue(resp.body().contains("task1"), resp.body());
-      assertTrue(resp.body().contains("task2"), resp.body());
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    assertThat(directLineage.children().stream().map(c -> c.job().getName()).sorted().toList())
+        .isEqualTo(asList("the_dag.task1", "the_dag.task2"));
   }
 
   @Test
@@ -418,26 +401,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
 
-    marquez.common.models.JobId jobId =
-        new marquez.common.models.JobId(NamespaceName.of(NAMESPACE_NAME), JobName.of(dagName));
-    String nodeId = NodeId.of(jobId).getValue();
-    HttpRequest request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + "/api/v1/lineage/direct?parentJobNodeId=" + nodeId))
-            .header("Content-Type", "application/json")
-            .GET()
-            .build();
+    ParentLineage directLineage = client.getDirectLineage(new JobId(NAMESPACE_NAME, dagName));
+    assertThat(directLineage.parent().getNamespace()).isEqualTo(NAMESPACE_NAME);
+    assertThat(directLineage.parent().getName()).isEqualTo(dagName);
+    assertThat(directLineage.children()).size().isEqualTo(2);
 
-    HttpResponse<String> resp;
-    try {
-      resp = http2.send(request, BodyHandlers.ofString());
-
-      assertEquals(200, resp.statusCode(), resp.body());
-      assertTrue(resp.body().contains("task1"), resp.body());
-      assertTrue(resp.body().contains("task2"), resp.body());
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    assertThat(directLineage.children().stream().map(c -> c.job().getName()).sorted().toList())
+        .isEqualTo(asList("the_dag.task1", "the_dag.task2"));
   }
 
   @Test

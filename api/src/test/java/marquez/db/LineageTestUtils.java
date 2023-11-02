@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.Valid;
-
 import lombok.Builder;
 import lombok.Value;
 import marquez.common.Utils;
