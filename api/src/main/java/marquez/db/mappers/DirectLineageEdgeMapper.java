@@ -19,6 +19,7 @@ import marquez.db.LineageDao.DirectLineageEdge;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
+/** Maps the result set of direct lineage to a DirectLineageEdge */
 public final class DirectLineageEdgeMapper implements RowMapper<DirectLineageEdge> {
   @Override
   public DirectLineageEdge map(@NonNull ResultSet results, @NonNull StatementContext context)
