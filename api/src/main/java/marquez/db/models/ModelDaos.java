@@ -26,20 +26,20 @@ import marquez.db.SourceDao;
  * exactly once.
  */
 public final class ModelDaos {
-  private static NamespaceDao namespaceDao = null;
-  private static DatasetSymlinkDao datasetSymlinkDao = null;
-  private static DatasetDao datasetDao = null;
-  private static SourceDao sourceDao = null;
-  private static DatasetVersionDao datasetVersionDao = null;
-  private static DatasetFieldDao datasetFieldDao = null;
-  private static RunDao runDao = null;
-  private static DatasetFacetsDao datasetFacetsDao = null;
-  private static ColumnLineageDao columnLineageDao = null;
-  private static JobDao jobDao = null;
-  private static JobFacetsDao jobFacetsDao = null;
-  private static RunArgsDao runArgsDao = null;
-  private static RunStateDao runStateDao = null;
-  private static RunFacetsDao runFacetsDao = null;
+  private NamespaceDao namespaceDao = null;
+  private DatasetSymlinkDao datasetSymlinkDao = null;
+  private DatasetDao datasetDao = null;
+  private SourceDao sourceDao = null;
+  private DatasetVersionDao datasetVersionDao = null;
+  private DatasetFieldDao datasetFieldDao = null;
+  private RunDao runDao = null;
+  private DatasetFacetsDao datasetFacetsDao = null;
+  private ColumnLineageDao columnLineageDao = null;
+  private JobDao jobDao = null;
+  private JobFacetsDao jobFacetsDao = null;
+  private RunArgsDao runArgsDao = null;
+  private RunStateDao runStateDao = null;
+  private RunFacetsDao runFacetsDao = null;
   private BaseDao baseDao;
 
   public void initBaseDao(BaseDao baseDao) {

@@ -78,7 +78,6 @@ import org.slf4j.LoggerFactory;
 public interface OpenLineageDao extends BaseDao {
   String DEFAULT_SOURCE_NAME = "default";
   String DEFAULT_NAMESPACE_OWNER = "anonymous";
-  ModelDaos daos = new ModelDaos();
 
   @SqlUpdate(
       "INSERT INTO lineage_events ("
@@ -150,6 +149,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default UpdateLineageRow updateMarquezModel(DatasetEvent event, ObjectMapper mapper) {
+    ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
@@ -165,10 +165,10 @@ public interface OpenLineageDao extends BaseDao {
 
     Dataset dataset = event.getDataset();
     List<DatasetRecord> datasetOutputs = new ArrayList<>();
-    DatasetRecord record = upsertLineageDataset(dataset, now, null, false);
+    DatasetRecord record = upsertLineageDataset(daos, dataset, now, null, false);
     datasetOutputs.add(record);
-    insertDatasetFacets(dataset, record, null, null, now);
-    insertOutputDatasetFacets(dataset, record, null, null, now);
+    insertDatasetFacets(daos, dataset, record, null, null, now);
+    insertOutputDatasetFacets(daos, dataset, record, null, null, now);
 
     daos.getDatasetDao()
         .updateVersion(
@@ -181,6 +181,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
+    ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
     Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
 
@@ -240,7 +241,7 @@ public interface OpenLineageDao extends BaseDao {
       runUpsertBuilder.runStateType(getRunState(event.getEventType())).runStateTime(now);
     }
     run = daos.getRunDao().upsert(runUpsertBuilder.build());
-    insertRunFacets(event, runUuid, now);
+    insertRunFacets(daos, event, runUuid, now);
     bag.setRun(run);
 
     if (event.getEventType() != null) {
@@ -256,17 +257,17 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    insertJobFacets(event, job.getUuid(), runUuid, now);
+    insertJobFacets(daos, event, job.getUuid(), runUuid, now);
 
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetInputs = null;
     if (event.getInputs() != null) {
       datasetInputs = new ArrayList<>();
       for (Dataset dataset : event.getInputs()) {
-        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, true);
+        DatasetRecord record = upsertLineageDataset(daos, dataset, now, runUuid, true);
         datasetInputs.add(record);
-        insertDatasetFacets(dataset, record, runUuid, event.getEventType(), now);
-        insertInputDatasetFacets(dataset, record, runUuid, event.getEventType(), now);
+        insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
+        insertInputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
@@ -276,10 +277,10 @@ public interface OpenLineageDao extends BaseDao {
     if (event.getOutputs() != null) {
       datasetOutputs = new ArrayList<>();
       for (Dataset dataset : event.getOutputs()) {
-        DatasetRecord record = upsertLineageDataset(dataset, now, runUuid, false);
+        DatasetRecord record = upsertLineageDataset(daos, dataset, now, runUuid, false);
         datasetOutputs.add(record);
-        insertDatasetFacets(dataset, record, runUuid, event.getEventType(), now);
-        insertOutputDatasetFacets(dataset, record, runUuid, event.getEventType(), now);
+        insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
+        insertOutputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
     }
 
@@ -303,7 +304,7 @@ public interface OpenLineageDao extends BaseDao {
         .orElse(null);
   }
 
-  private void insertRunFacets(LineageEvent event, UUID runUuid, Instant now) {
+  private void insertRunFacets(ModelDaos daos, LineageEvent event, UUID runUuid, Instant now) {
     // Add ...
     Optional.ofNullable(event.getRun().getFacets())
         .ifPresent(
@@ -313,7 +314,8 @@ public interface OpenLineageDao extends BaseDao {
                         runUuid, now, event.getEventType(), event.getRun().getFacets()));
   }
 
-  private void insertJobFacets(LineageEvent event, UUID jobUuid, UUID runUuid, Instant now) {
+  private void insertJobFacets(
+      ModelDaos daos, LineageEvent event, UUID jobUuid, UUID runUuid, Instant now) {
     // Add ...
     Optional.ofNullable(event.getJob().getFacets())
         .ifPresent(
@@ -324,7 +326,12 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private void insertDatasetFacets(
-      Dataset dataset, DatasetRecord record, UUID runUuid, String eventType, Instant now) {
+      ModelDaos daos,
+      Dataset dataset,
+      DatasetRecord record,
+      UUID runUuid,
+      String eventType,
+      Instant now) {
     // Facets ...
     Optional.ofNullable(dataset.getFacets())
         .ifPresent(
@@ -340,7 +347,12 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private void insertInputDatasetFacets(
-      Dataset dataset, DatasetRecord record, UUID runUuid, String eventType, Instant now) {
+      ModelDaos daos,
+      Dataset dataset,
+      DatasetRecord record,
+      UUID runUuid,
+      String eventType,
+      Instant now) {
     // InputFacets ...
     Optional.ofNullable(dataset.getInputFacets())
         .ifPresent(
@@ -356,7 +368,12 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private void insertOutputDatasetFacets(
-      Dataset dataset, DatasetRecord record, UUID runUuid, String eventType, Instant now) {
+      ModelDaos daos,
+      Dataset dataset,
+      DatasetRecord record,
+      UUID runUuid,
+      String eventType,
+      Instant now) {
     // OutputFacets ...
     Optional.ofNullable(dataset.getOutputFacets())
         .ifPresent(
@@ -640,7 +657,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default DatasetRecord upsertLineageDataset(
-      Dataset ds, Instant now, UUID runUuid, boolean isInput) {
+      ModelDaos daos, Dataset ds, Instant now, UUID runUuid, boolean isInput) {
     NamespaceRow dsNamespace =
         daos.getNamespaceDao()
             .upsertNamespaceRow(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
