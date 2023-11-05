@@ -73,7 +73,7 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
   runsLoading,
   tabIndex,
   setTabIndex,
-  totalCount
+  totalCount,
 }) => {
   
   const defaultState = {
@@ -89,20 +89,23 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
+  
   const i18next = require('i18next')
 
-  useEffect(() => {
-    fetchRuns(job.name, job.namespace, PAGE_SIZE, state.page * PAGE_SIZE)
+  React.useEffect(() => {
+    if (job.name) {
+      fetchRuns(job.namespace, job.name, PAGE_SIZE, state.page * PAGE_SIZE)
+    }  
   }, [job.name, state.page])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (jobs.deletedJobName) {
       navigate('/')
     }
   }, [jobs.deletedJobName])
 
   // unmounting
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       resetRuns()
       resetJobs()
@@ -120,7 +123,7 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
-    fetchRuns('', '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    fetchRuns(job.namespace, job.name, PAGE_SIZE, directionPage * PAGE_SIZE)
     // reset page scroll
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
@@ -215,8 +218,8 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
 	    <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
 		  <MqText subdued>
 			  <>
-				{PAGE_SIZE * state.page + 1} -{' '}
-				{Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
+          {PAGE_SIZE * state.page + 1} -{' '}
+          {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
 			  </>
 			</MqText>
 			<Tooltip title={i18next.t('events_route.previous_page')}>

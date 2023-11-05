@@ -148,20 +148,19 @@ export const deleteJobSuccess = (jobName: string) => ({
   },
 })
 
-export const fetchRuns = (jobName: string, namespace: string, limit: number, offset: number) => ({
+export const fetchRuns = (namespace:string, jobName: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_RUNS,
   payload: {
-    jobName,
     namespace,
+    jobName,
     limit,
-    offset
+    offset,
   },
 })
 
-export const fetchRunsSuccess = (jobName: string, jobRuns: Run[], totalCount: number) => ({
+export const fetchRunsSuccess = (jobRuns: Run[], totalCount: number) => ({
   type: actionTypes.FETCH_RUNS_SUCCESS,
   payload: {
-    jobName,
     runs: jobRuns,
     totalCount,
   },
