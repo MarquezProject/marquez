@@ -13,6 +13,8 @@ import static marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
 import marquez.db.models.JobRow;
+import marquez.db.models.ModelDaos;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -53,7 +56,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
   static RunDao runDao;
   static OpenLineageDao openLineageDao;
   static JobVersionDao jobVersionDao;
-
+  static ModelDaos modelDaos = mock(ModelDaos.class);
   static NamespaceRow namespaceRow;
   static JobRow jobRow;
 
@@ -65,6 +68,16 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     runDao = jdbi.onDemand(RunDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     jobVersionDao = jdbiForTesting.onDemand(JobVersionDao.class);
+
+    when(modelDaos.getJobDao()).thenReturn(jobDao);
+    when(modelDaos.getRunDao()).thenReturn(runDao);
+    when(modelDaos.getJobVersionDao()).thenReturn(jobVersionDao);
+    when(modelDaos.getNamespaceDao()).thenReturn(jdbi.onDemand(NamespaceDao.class));
+    when(modelDaos.getSourceDao()).thenReturn(jdbi.onDemand(SourceDao.class));
+    when(modelDaos.getDatasetSymlinkDao()).thenReturn(jdbi.onDemand(DatasetSymlinkDao.class));
+    when(modelDaos.getDatasetDao()).thenReturn(jdbi.onDemand(DatasetDao.class));
+    when(modelDaos.getDatasetVersionDao()).thenReturn(jdbi.onDemand(DatasetVersionDao.class));
+    when(modelDaos.getDatasetFieldDao()).thenReturn(jdbi.onDemand(DatasetFieldDao.class));
 
     // Each tests requires both a namespace and job row.
     namespaceRow = DbTestUtils.newNamespace(jdbiForTesting);
@@ -348,6 +361,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     for (DatasetId di : jobMeta.getInputs()) {
       datasetInputs.add(
           openLineageDao.upsertLineageDataset(
+              modelDaos,
               LineageEvent.Dataset.builder()
                   .namespace(di.getNamespace().getValue())
                   .name(di.getName().getValue())
@@ -362,6 +376,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
     for (DatasetId di : jobMeta.getOutputs()) {
       datasetInputs.add(
           openLineageDao.upsertLineageDataset(
+              modelDaos,
               LineageEvent.Dataset.builder()
                   .namespace(di.getNamespace().getValue())
                   .name(di.getName().getValue())
