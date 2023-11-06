@@ -1,12 +1,12 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
+import React, { ChangeEvent } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import { Box, Button, CircularProgress, Tab, Tabs, Tooltip } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../lineage/types'
 import { Run } from '../../types/api'
@@ -75,27 +75,26 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
   setTabIndex,
   totalCount,
 }) => {
-  
   const defaultState = {
     page: 0,
   }
-  
+
   const theme = createTheme(useTheme())
-  
+
   const [state, setState] = React.useState<JobDetailState>(defaultState)
-  
+
   const navigate = useNavigate()
 
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
-  
+
   const i18next = require('i18next')
 
   React.useEffect(() => {
     if (job.name) {
       fetchRuns(job.namespace, job.name, PAGE_SIZE, state.page * PAGE_SIZE)
-    }  
+    }
   }, [job.name, state.page])
 
   React.useEffect(() => {
@@ -119,7 +118,7 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
       </Box>
     )
   }
-  
+
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
@@ -214,43 +213,43 @@ const JobDetailPage: React.FC<JobDetailProps> = ({
       ) : null}
       {tabIndex === 1 && <Io />}
       {tabIndex === 2 && <Runs runs={runs} />}
-	  {tabIndex === 2 &&
-	    <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
-		  <MqText subdued>
-			  <>
-          {PAGE_SIZE * state.page + 1} -{' '}
-          {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
-			  </>
-			</MqText>
-			<Tooltip title={i18next.t('events_route.previous_page')}>
-			  <span>
-				<IconButton
-				  sx={{
-					marginLeft: theme.spacing(2),
-				  }}
-				  color='primary'
-				  disabled={state.page === 0}
-				  onClick={() => handleClickPage('prev')}
-				  size='large'
-				>
-				  <ChevronLeftRounded />
-				</IconButton>
-			  </span>
-			</Tooltip>
-			<Tooltip title={i18next.t('events_route.next_page')}>
-			  <span>
-				<IconButton
-				  color='primary'
-				  onClick={() => handleClickPage('next')}
-				  size='large'
-				  disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
-				>
-				  <ChevronRightRounded />
-				</IconButton>
-			  </span>
-			</Tooltip>
-	    </Box>
-	  }
+      {tabIndex === 2 && (
+        <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+          <MqText subdued>
+            <>
+              {PAGE_SIZE * state.page + 1} - {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of{' '}
+              {totalCount}
+            </>
+          </MqText>
+          <Tooltip title={i18next.t('events_route.previous_page')}>
+            <span>
+              <IconButton
+                sx={{
+                  marginLeft: theme.spacing(2),
+                }}
+                color='primary'
+                disabled={state.page === 0}
+                onClick={() => handleClickPage('prev')}
+                size='large'
+              >
+                <ChevronLeftRounded />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={i18next.t('events_route.next_page')}>
+            <span>
+              <IconButton
+                color='primary'
+                onClick={() => handleClickPage('next')}
+                size='large'
+                disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+              >
+                <ChevronRightRounded />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+      )}
     </Box>
   )
 }
