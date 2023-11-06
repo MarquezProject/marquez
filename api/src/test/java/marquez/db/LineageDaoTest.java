@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import marquez.api.JdbiUtils;
 import marquez.common.models.JobType;
+import marquez.db.LineageDao.UpstreamRunRow;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.models.JobRow;
@@ -887,5 +888,89 @@ public class LineageDaoTest {
         .hasSize(expectedRunIds.size())
         .extracting(r -> r.getId().getValue())
         .containsAll(expectedRunIds);
+  }
+
+  @Test
+  public void testGetRunLineage() {
+
+    Dataset upstreamDataset = new Dataset(NAMESPACE, "upstreamDataset", null);
+
+    UpdateLineageRow upstreamJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "upstreamJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(upstreamDataset));
+
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(upstreamDataset),
+            Arrays.asList(dataset));
+    List<JobLineage> jobRows =
+        writeDownstreamLineage(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 20, Optional.of("outputData")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.empty()))),
+            jobFacet,
+            dataset);
+
+    // don't expect a failed job in the returned lineage
+    UpdateLineageRow failedJobRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "readJobFailed",
+            "FAILED",
+            jobFacet,
+            Arrays.asList(dataset),
+            Arrays.asList());
+
+    // don't expect a disjoint job in the returned lineage
+    UpdateLineageRow disjointJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeRandomDataset",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(
+                new Dataset(
+                    NAMESPACE,
+                    "randomDataset",
+                    newDatasetFacet(
+                        new SchemaField("firstname", "string", "the first name"),
+                        new SchemaField("lastname", "string", "the last name")))),
+            Arrays.asList());
+
+    {
+      List<UpstreamRunRow> upstream =
+          lineageDao.getUpstreamRuns(failedJobRow.getRun().getUuid(), 10);
+
+      assertThat(upstream).size().isEqualTo(3);
+      assertThat(upstream.get(0).job().name().getValue())
+          .isEqualTo(failedJobRow.getJob().getName());
+      assertThat(upstream.get(0).input().name().getValue()).isEqualTo(dataset.getName());
+      assertThat(upstream.get(1).job().name().getValue()).isEqualTo(writeJob.getJob().getName());
+      assertThat(upstream.get(1).input().name().getValue()).isEqualTo(upstreamDataset.getName());
+      assertThat(upstream.get(2).job().name().getValue()).isEqualTo(upstreamJob.getJob().getName());
+    }
+
+    {
+      List<UpstreamRunRow> upstream2 = lineageDao.getUpstreamRuns(jobRows.get(0).getRunId(), 10);
+
+      assertThat(upstream2).size().isEqualTo(3);
+      assertThat(upstream2.get(0).job().name().getValue()).isEqualTo(jobRows.get(0).getName());
+      assertThat(upstream2.get(0).input().name().getValue()).isEqualTo(dataset.getName());
+      assertThat(upstream2.get(1).job().name().getValue()).isEqualTo(writeJob.getJob().getName());
+      assertThat(upstream2.get(1).input().name().getValue()).isEqualTo(upstreamDataset.getName());
+      assertThat(upstream2.get(2).job().name().getValue())
+          .isEqualTo(upstreamJob.getJob().getName());
+    }
   }
 }

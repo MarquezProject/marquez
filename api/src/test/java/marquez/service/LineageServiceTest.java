@@ -9,11 +9,13 @@ import static marquez.db.LineageTestUtils.NAMESPACE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.InputDatasetVersion;
@@ -30,7 +32,9 @@ import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LineageService.UpstreamRunLineage;
 import marquez.service.models.Edge;
+import marquez.service.models.Job;
 import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
@@ -194,6 +198,27 @@ public class LineageServiceTest {
             NodeId.of(
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
+
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    jobs =
+        jobs.stream()
+            .filter(j -> j.getName().getValue().contains("newDownstreamJob"))
+            .collect(Collectors.toList());
+    assertTrue(jobs.size() > 0);
+    Job job = jobs.get(0);
+    assertTrue(job.getLatestRun().isPresent());
+    UpstreamRunLineage upstreamLineage =
+        lineageService.upstream(job.getLatestRun().get().getId(), 10);
+    assertThat(upstreamLineage.runs()).size().isEqualTo(3);
+    assertThat(upstreamLineage.runs().get(0).job().name().getValue())
+        .matches("newDownstreamJob.*<-outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(0).inputs().get(0).name().getValue())
+        .matches("outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).job().name().getValue())
+        .matches("newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).inputs().get(0).name().getValue())
+        .isEqualTo("commonDataset");
+    assertThat(upstreamLineage.runs().get(2).job().name().getValue()).isEqualTo("writeJob");
   }
 
   @Test

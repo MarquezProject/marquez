@@ -36,6 +36,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SortDirection;
+import marquez.common.models.RunId;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
@@ -134,6 +135,28 @@ public class OpenLineageResource extends BaseResource {
     }
     int totalCount = openLineageDao.getAllLineageTotalCount(before.get(), after.get());
     return Response.ok(new Events(events, totalCount)).build();
+  }
+
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Path("/runlineage/upstream")
+  public Response getRunLineageUpstream(
+      @QueryParam("runId") @NotNull RunId runId,
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth) {
+    throwIfNotExists(runId);
+    return Response.ok(lineageService.upstream(runId, depth)).build();
   }
 
   @Value
