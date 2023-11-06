@@ -56,7 +56,6 @@ public class LineageServiceTest {
   private static LineageDao lineageDao;
   private static LineageService lineageService;
   private static OpenLineageDao openLineageDao;
-
   private static DatasetDao datasetDao;
   private static JobDao jobDao;
 

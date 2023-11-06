@@ -39,6 +39,7 @@ import marquez.api.models.SortDirection;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
@@ -67,20 +68,25 @@ public class OpenLineageResource extends BaseResource {
     if (event instanceof LineageEvent) {
       openLineageService
           .createAsync((LineageEvent) event)
-          .whenComplete(
-              (result, err) -> {
-                if (err != null) {
-                  log.error("Unexpected error while processing request", err);
-                  asyncResponse.resume(Response.status(determineStatusCode(err)).build());
-                } else {
-                  asyncResponse.resume(Response.status(201).build());
-                }
-              });
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
+    } else if (event instanceof DatasetEvent) {
+      openLineageService
+          .createAsync((DatasetEvent) event)
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
     } else {
       log.warn("Unsupported event type {}. Skipping without error", event.getClass().getName());
 
       // return serialized event
       asyncResponse.resume(Response.status(200).entity(event).build());
+    }
+  }
+
+  private void onComplete(Void result, Throwable err, AsyncResponse asyncResponse) {
+    if (err != null) {
+      log.error("Unexpected error while processing request", err);
+      asyncResponse.resume(Response.status(determineStatusCode(err)).build());
+    } else {
+      asyncResponse.resume(Response.status(201).build());
     }
   }
 
