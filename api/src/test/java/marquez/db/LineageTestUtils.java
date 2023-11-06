@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.validation.Valid;
+import lombok.Builder;
 import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
@@ -245,6 +246,28 @@ public class LineageTestUtils {
       List<DatasetConsumerJob> downstream,
       JobFacet jobFacet,
       Dataset dataset) {
+    return writeDownstreamLineageWithParent(openLineageDao, downstream, jobFacet, dataset, null);
+  }
+
+  /**
+   * Recursive function which supports writing a lineage graph by supplying an input dataset and a
+   * list of {@link DatasetConsumerJob}s. Each consumer may output up to one dataset, which will be
+   * consumed by the number of consumers specified by the {@link DatasetConsumerJob#numConsumers}
+   * property.
+   *
+   * @param openLineageDao
+   * @param downstream
+   * @param jobFacet
+   * @param dataset
+   * @param parentRunFacet
+   * @return
+   */
+  public static List<JobLineage> writeDownstreamLineageWithParent(
+      OpenLineageDao openLineageDao,
+      List<DatasetConsumerJob> downstream,
+      JobFacet jobFacet,
+      Dataset dataset,
+      @Valid LineageEvent.ParentRunFacet parentRunFacet) {
     DatasetConsumerJob consumer = downstream.get(0);
     return IntStream.range(0, consumer.getNumConsumers())
         .mapToObj(
@@ -269,17 +292,19 @@ public class LineageTestUtils {
                       "COMPLETE",
                       jobFacet,
                       Collections.singletonList(dataset),
-                      outputs.stream().collect(Collectors.toList()));
+                      outputs.stream().collect(Collectors.toList()),
+                      parentRunFacet);
               List<JobLineage> downstreamLineage =
                   outputs.stream()
                       .flatMap(
                           out -> {
                             if (consumer.numConsumers > 0) {
-                              return writeDownstreamLineage(
+                              return writeDownstreamLineageWithParent(
                                   openLineageDao,
                                   downstream.subList(1, downstream.size()),
                                   jobFacet,
-                                  out)
+                                  out,
+                                  parentRunFacet)
                                   .stream();
                             } else {
                               return Stream.empty();
@@ -319,5 +344,17 @@ public class LineageTestUtils {
     String name;
     int numConsumers;
     Optional<String> outputDatasetName;
+  }
+
+  @Value
+  @Builder
+  public static class CreateJobLineage {
+    String jobName;
+    String status;
+    JobFacet jobFacet;
+    List<Dataset> inputs;
+    List<Dataset> outputs;
+    @Valid LineageEvent.ParentRunFacet parentRunFacet;
+    ImmutableMap<String, Object> runFacets;
   }
 }

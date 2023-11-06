@@ -6,14 +6,19 @@
 package marquez.service;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.InputDatasetVersion;
@@ -30,11 +35,15 @@ import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LineageService.ParentLineage;
 import marquez.service.models.Edge;
 import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
+import marquez.service.models.LineageEvent.JobLink;
+import marquez.service.models.LineageEvent.ParentRunFacet;
+import marquez.service.models.LineageEvent.RunLink;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
@@ -430,6 +439,74 @@ public class LineageServiceTest {
         .hasSize(1)
         .extracting(Node::getId)
         .containsExactlyInAnyOrder(datasetNodeId);
+  }
+
+  @Test
+  public void testParentLineage() {
+    String parentJobName1 = "parentJob1";
+    String parentJobName2 = "parentJob2";
+    ParentRunFacet parentRunFacet1 =
+        new ParentRunFacet(
+            PRODUCER_URL,
+            SCHEMA_URL,
+            new RunLink(UUID.randomUUID().toString()),
+            JobLink.builder().namespace(NAMESPACE).name(parentJobName1).build());
+    ParentRunFacet parentRunFacet2 =
+        new ParentRunFacet(
+            PRODUCER_URL,
+            SCHEMA_URL,
+            new RunLink(UUID.randomUUID().toString()),
+            JobLink.builder().namespace(NAMESPACE).name(parentJobName2).build());
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset),
+            parentRunFacet1);
+    List<JobLineage> jobRows =
+        LineageTestUtils.writeDownstreamLineageWithParent(
+            openLineageDao,
+            new LinkedList<>(
+                Arrays.asList(
+                    new DatasetConsumerJob("readJob", 2, Optional.of("outputData")),
+                    new DatasetConsumerJob("downstreamJob", 1, Optional.of("outputData2")),
+                    new DatasetConsumerJob("finalConsumer", 1, Optional.empty()))),
+            jobFacet,
+            dataset,
+            parentRunFacet2);
+
+    ParentLineage parentLineage =
+        lineageService.parentDirectLineage(
+            JobId.of(new NamespaceName(NAMESPACE), new JobName(parentJobName1)));
+    assertEquals(NAMESPACE, parentLineage.parent().getNamespace().getValue());
+    assertEquals(parentJobName1, parentLineage.parent().getName().getValue());
+    assertEquals(1, parentLineage.children().size());
+    parentLineage
+        .children()
+        .forEach(
+            c -> {
+              assertEquals("parentJob1.writeJob", c.job().getName().getValue());
+              assertNull(c.inputs());
+              c.outputs()
+                  .forEach(
+                      i -> {
+                        assertEquals(dataset.getName(), i.dataset().getName().getValue());
+                        i.consumers()
+                            .forEach(
+                                co -> {
+                                  assertThat(co.job().getName().getValue())
+                                      .matches("parentJob2.readJob.*<-commonDataset");
+                                  assertThat(co.parent().getName().getValue())
+                                      .isEqualTo("parentJob2");
+                                  // we don't go further than one level and don't see downstreamJob
+                                  // and finalConsumer
+                                });
+                        assertNull(i.producers());
+                      });
+            });
   }
 
   private boolean jobNameEquals(Node node, String writeJob) {

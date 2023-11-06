@@ -117,6 +117,21 @@ public class OpenLineageResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Path("/lineage/direct")
+  public Response getDirectLineage(@QueryParam("parentJobNodeId") @NotNull NodeId parentJobNodeId) {
+    if (!parentJobNodeId.isJobType()) {
+      throw new IllegalArgumentException("Only job expected, got " + parentJobNodeId.getValue());
+    }
+    throwIfNotExists(parentJobNodeId);
+    return Response.ok(lineageService.parentDirectLineage(parentJobNodeId.asJobId())).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Path("/events/lineage")
   @Produces(APPLICATION_JSON)
   public Response getLineageEvents(

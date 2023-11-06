@@ -5,10 +5,16 @@
 
 package marquez.service;
 
+import static java.util.stream.Collectors.filtering;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,11 +47,85 @@ import marquez.service.models.Run;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
+
+  public record JobWithParent(JobId job, JobId parent) {}
+
+  public record DatasetLineage(
+      DatasetId dataset,
+      Collection<JobWithParent> consumers,
+      Collection<JobWithParent> producers) {}
+
+  public record ChildLineage(
+      JobId job, Collection<DatasetLineage> inputs, Collection<DatasetLineage> outputs) {}
+
+  public record ParentLineage(JobId parent, Collection<ChildLineage> children) {}
+
   private final JobDao jobDao;
 
   public LineageService(LineageDao delegate, JobDao jobDao) {
     super(delegate);
     this.jobDao = jobDao;
+  }
+
+  /**
+   * This method is specialized for returning one level of lineage from a parent job. It finds all
+   * the children of the provided parent node It then finds the input and output datasets those
+   * children write to. It finally returns the other jobs consuming or producing those datasets (and
+   * their parent).
+   *
+   * @param parentJobId the parent job
+   * @return 1 level of lineage for all the children jobs of the given parent
+   */
+  public ParentLineage parentDirectLineage(JobId parentJobId) {
+    log.debug("Attempting to get lineage for parent job '{}'", parentJobId);
+
+    Collection<DirectLineageEdge> directLineageFromParent =
+        getDirectLineageFromParent(
+            parentJobId.getNamespace().getValue(), parentJobId.getName().getValue());
+
+    Map<JobId, Map<String, Map<DatasetId, Map<String, List<JobWithParent>>>>> grouped =
+        directLineageFromParent.stream()
+            .collect(
+                groupingBy(
+                    DirectLineageEdge::job1,
+                    filtering(
+                        e -> e.direction() != null,
+                        groupingBy(
+                            DirectLineageEdge::direction,
+                            filtering(
+                                e -> e.dataset() != null,
+                                groupingBy(
+                                    DirectLineageEdge::dataset,
+                                    filtering(
+                                        e -> e.direction2() != null,
+                                        groupingBy(
+                                            DirectLineageEdge::direction2,
+                                            mapping(
+                                                e -> new JobWithParent(e.job2(), e.job2parent()),
+                                                toList())))))))));
+
+    List<ChildLineage> children =
+        grouped.entrySet().stream()
+            .map(
+                e ->
+                    new ChildLineage(
+                        e.getKey(),
+                        toDatasetLineages(e.getValue().get("INPUT")),
+                        toDatasetLineages(e.getValue().get("OUTPUT"))))
+            .collect(toList());
+    return new ParentLineage(parentJobId, children);
+  }
+
+  private Collection<DatasetLineage> toDatasetLineages(
+      Map<DatasetId, Map<String, List<JobWithParent>>> datasets) {
+    return datasets == null
+        ? null
+        : datasets.entrySet().stream()
+            .map(
+                e ->
+                    new DatasetLineage(
+                        e.getKey(), e.getValue().get("INPUT"), e.getValue().get("OUTPUT")))
+            .collect(toList());
   }
 
   // TODO make input parameters easily extendable if adding more options like 'withJobFacets'

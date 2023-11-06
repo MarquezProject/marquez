@@ -5,6 +5,7 @@
 
 package marquez;
 
+import static java.util.Arrays.asList;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.as;
@@ -47,6 +48,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
+import marquez.client.MarquezClient.ParentLineage;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
@@ -315,6 +317,14 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
+
+    ParentLineage directLineage = client.getDirectLineage(new JobId(NAMESPACE_NAME, dagName));
+    assertThat(directLineage.parent().getNamespace()).isEqualTo(NAMESPACE_NAME);
+    assertThat(directLineage.parent().getName()).isEqualTo(dagName);
+    assertThat(directLineage.children()).size().isEqualTo(2);
+
+    assertThat(directLineage.children().stream().map(c -> c.job().getName()).sorted().toList())
+        .isEqualTo(asList("the_dag.task1", "the_dag.task2"));
   }
 
   @Test
@@ -389,6 +399,14 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
+
+    ParentLineage directLineage = client.getDirectLineage(new JobId(NAMESPACE_NAME, dagName));
+    assertThat(directLineage.parent().getNamespace()).isEqualTo(NAMESPACE_NAME);
+    assertThat(directLineage.parent().getName()).isEqualTo(dagName);
+    assertThat(directLineage.children()).size().isEqualTo(2);
+
+    assertThat(directLineage.children().stream().map(c -> c.job().getName()).sorted().toList())
+        .isEqualTo(asList("the_dag.task1", "the_dag.task2"));
   }
 
   @Test

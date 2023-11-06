@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import marquez.common.models.DatasetId;
+import marquez.common.models.JobId;
 import marquez.db.mappers.DatasetDataMapper;
+import marquez.db.mappers.DirectLineageEdgeMapper;
 import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.mappers.RunMapper;
@@ -25,7 +28,18 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(JobDataMapper.class)
 @RegisterRowMapper(RunMapper.class)
 @RegisterRowMapper(JobRowMapper.class)
+@RegisterRowMapper(DirectLineageEdgeMapper.class)
 public interface LineageDao {
+
+  public record DirectLineage(Collection<DirectLineageEdge> edges) {}
+
+  public record DirectLineageEdge(
+      JobId job1,
+      String direction,
+      DatasetId dataset,
+      String direction2,
+      JobId job2,
+      JobId job2parent) {}
 
   /**
    * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
@@ -78,6 +92,34 @@ public interface LineageDao {
       INNER JOIN jobs_view j ON j.uuid=l2.job_uuid;
   """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
+
+  /**
+   * 1 level of lineage for all the children jobs of the given parent
+   *
+   * @param parentJobNamespace the namespace of the parent
+   * @param parentJobName the name of the parent
+   * @return edges form job to dataset to job
+   */
+  @SqlQuery(
+      """
+      SELECT
+          jobs.namespace_name AS job_namespace, jobs."name" AS job_name,
+          jvim.io_type AS io1,
+          d.namespace_name AS ds_namespace, d."name" AS ds_name,
+          jvim2.io_type AS io2,
+          jv2.namespace_name AS job2_namespace, jv2.job_name  AS job2_name,
+          jv2.namespace_name AS job2_parent_namespace, j2.parent_job_name AS job2_parent_name
+      FROM jobs_view jobs
+      INNER JOIN job_versions jv ON jv.uuid = jobs.current_version_uuid
+      LEFT JOIN job_versions_io_mapping jvim ON jvim.job_version_uuid = jobs.current_version_uuid
+      LEFT JOIN datasets d ON d.uuid = jvim.dataset_uuid
+      LEFT JOIN job_versions_io_mapping jvim2 ON jvim2.dataset_uuid = d.uuid AND jvim2.job_version_uuid <> jvim.job_version_uuid AND jvim2.io_type <> jvim.io_type
+      LEFT JOIN job_versions jv2 ON jv2.uuid = jvim2.job_version_uuid
+      LEFT JOIN jobs_view j2 ON jv2.job_uuid = j2.uuid
+      WHERE jobs.namespace_name = :parentJobNamespace AND jobs.parent_job_name = :parentJobName ;
+  """)
+  Collection<DirectLineageEdge> getDirectLineageFromParent(
+      String parentJobNamespace, String parentJobName);
 
   @SqlQuery(
       """
