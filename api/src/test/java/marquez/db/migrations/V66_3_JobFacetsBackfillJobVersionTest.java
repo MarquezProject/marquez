@@ -34,19 +34,19 @@ import org.postgresql.util.PGobject;
 
 /** Test to validate if a job_version_column is filled properly within job_facets table */
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-@FlywayTarget("66.1")
+@FlywayTarget("66.3")
 @FlywaySkipRepeatable()
 @Slf4j
-public class V66_2_JobFacetsBackfillJobVersionTest {
+public class V66_3_JobFacetsBackfillJobVersionTest {
 
-  private static V66_2_JobFacetsBackfillJobVersion migration =
-      new V66_2_JobFacetsBackfillJobVersion();
+  private static V66_3_JobFacetsBackfillJobVersion migration =
+      new V66_3_JobFacetsBackfillJobVersion();
   static Jdbi jdbi;
   private static OpenLineageDao openLineageDao;
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
-    V66_2_JobFacetsBackfillJobVersionTest.jdbi = jdbi;
+    V66_3_JobFacetsBackfillJobVersionTest.jdbi = jdbi;
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
 
@@ -91,7 +91,7 @@ public class V66_2_JobFacetsBackfillJobVersionTest {
                   }
                 };
             // apply migrations in order
-            new V66_2_JobFacetsBackfillJobVersion().migrate(context);
+            new V66_3_JobFacetsBackfillJobVersion().migrate(context);
           } catch (Exception e) {
             throw new AssertionError("Unable to execute migration", e);
           }

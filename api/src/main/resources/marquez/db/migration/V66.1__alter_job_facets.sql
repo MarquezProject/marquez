@@ -3,6 +3,3 @@ ALTER TABLE job_facets DROP CONSTRAINT job_facets_run_uuid_fkey;
 ALTER TABLE job_facets ADD COLUMN job_version_uuid uuid REFERENCES job_versions (uuid);
 
 CREATE INDEX job_facets_job_version_uuid ON job_facets (job_version_uuid);
-
-ALTER TABLE lineage_events ADD COLUMN spec_event_type VARCHAR(64);
-UPDATE lineage_events SET spec_event_type = 'RunEvent';

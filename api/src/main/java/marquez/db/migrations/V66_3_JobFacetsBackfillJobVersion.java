@@ -12,7 +12,7 @@ import org.flywaydb.core.api.migration.JavaMigration;
 import org.jdbi.v3.core.Jdbi;
 
 @Slf4j
-public class V66_2_JobFacetsBackfillJobVersion implements JavaMigration {
+public class V66_3_JobFacetsBackfillJobVersion implements JavaMigration {
 
   public static final String UPDATE_QUERY =
       """
@@ -24,7 +24,7 @@ public class V66_2_JobFacetsBackfillJobVersion implements JavaMigration {
 
   @Override
   public MigrationVersion getVersion() {
-    return MigrationVersion.fromVersion("66.2");
+    return MigrationVersion.fromVersion("66.3");
   }
 
   @Override
