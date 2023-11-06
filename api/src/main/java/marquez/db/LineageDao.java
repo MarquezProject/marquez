@@ -215,7 +215,7 @@ public interface LineageDao {
             r.job_uuid, r.job_version_uuid, r.namespace_name as job_namespace, r.job_name
           FROM upstream_runs, runs r WHERE upstream_runs.r_uuid = r.uuid
         ) sub
-      ORDER BY depth ASC;
+      ORDER BY depth ASC, job_name ASC;
       """)
   List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
 }

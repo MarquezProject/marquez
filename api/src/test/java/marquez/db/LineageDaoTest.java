@@ -893,13 +893,24 @@ public class LineageDaoTest {
   @Test
   public void testGetRunLineage() {
 
+    Dataset upstreamDataset = new Dataset(NAMESPACE, "upstreamDataset", null);
+
+    UpdateLineageRow upstreamJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "upstreamJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(upstreamDataset));
+
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             openLineageDao,
             "writeJob",
             "COMPLETE",
             jobFacet,
-            Arrays.asList(),
+            Arrays.asList(upstreamDataset),
             Arrays.asList(dataset));
     List<JobLineage> jobRows =
         writeDownstreamLineage(
@@ -941,20 +952,25 @@ public class LineageDaoTest {
       List<UpstreamRunRow> upstream =
           lineageDao.getUpstreamRuns(failedJobRow.getRun().getUuid(), 10);
 
-      assertThat(upstream).size().isEqualTo(2);
+      assertThat(upstream).size().isEqualTo(3);
       assertThat(upstream.get(0).job().name().getValue())
           .isEqualTo(failedJobRow.getJob().getName());
       assertThat(upstream.get(0).input().name().getValue()).isEqualTo(dataset.getName());
       assertThat(upstream.get(1).job().name().getValue()).isEqualTo(writeJob.getJob().getName());
+      assertThat(upstream.get(1).input().name().getValue()).isEqualTo(upstreamDataset.getName());
+      assertThat(upstream.get(2).job().name().getValue()).isEqualTo(upstreamJob.getJob().getName());
     }
 
     {
       List<UpstreamRunRow> upstream2 = lineageDao.getUpstreamRuns(jobRows.get(0).getRunId(), 10);
 
-      assertThat(upstream2).size().isEqualTo(2);
+      assertThat(upstream2).size().isEqualTo(3);
       assertThat(upstream2.get(0).job().name().getValue()).isEqualTo(jobRows.get(0).getName());
       assertThat(upstream2.get(0).input().name().getValue()).isEqualTo(dataset.getName());
       assertThat(upstream2.get(1).job().name().getValue()).isEqualTo(writeJob.getJob().getName());
+      assertThat(upstream2.get(1).input().name().getValue()).isEqualTo(upstreamDataset.getName());
+      assertThat(upstream2.get(2).job().name().getValue())
+          .isEqualTo(upstreamJob.getJob().getName());
     }
   }
 }
