@@ -235,7 +235,8 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
-    final List<Run> runs = runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
+    final List<Run> runs =
+        runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
     final int totalCount = runService.countFor(jobName.getValue());
     return Response.ok(new ResultsPage<>("runs", runs, totalCount)).build();
   }
