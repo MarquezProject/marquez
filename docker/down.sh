@@ -14,7 +14,6 @@ title() {
 usage() {
   echo "usage: ./$(basename -- ${0})"
   echo "A script used to bring down Marquez when run via Docker"
-  echo "If not using Docker Compose, use -v or --volumes"
   echo
 }
 
@@ -25,16 +24,9 @@ cd "${project_root}/"
 compose_files="-f docker-compose.yml"
 compose_args="--remove-orphans"
 
-# Default args
-NO_COMPOSE="false"
-
 # Parse args
 while [ $# -gt 0 ]; do
   case $1 in
-    -v|'--volumes')
-       shift
-       NO_COMPOSE="true"
-       ;;
     -h|'--help')
        usage
        exit 0
@@ -52,9 +44,11 @@ API_ADMIN_PORT=${RANDOM}
 WEB_PORT=${RANDOM}
 TAG=${RANDOM}
 
-if [[ "${NO_COMPOSE}" = "false" ]]; then
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  docker compose ${compose_files} down ${compose_args}
+else
   docker-compose $compose_files down $compose_args
-fi
+fi 
 
 docker volume rm marquez_data && \
   docker volume rm marquez_db-backup && \
