@@ -55,7 +55,6 @@ import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
-import marquez.service.models.DatasetEvent;
 import marquez.service.models.JobEvent;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
@@ -1376,7 +1375,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSendDatasetEventIsDecoded() throws IOException {
+  public void testSendDatasetEvent() throws IOException {
     final String openLineageEventAsString =
         Resources.toString(Resources.getResource(EVENT_DATASET_EVENT), Charset.defaultCharset());
 
@@ -1394,16 +1393,31 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     // Ensure the event was received.
     Map<Integer, String> respMap = resp.join();
 
-    assertThat(respMap.containsKey(200)).isTrue(); // Status should be 200 instead of 201
+    assertThat(respMap.containsKey(201)).isTrue();
 
     // (3) Convert the OpenLineage event to Json.
-    DatasetEvent datasetEvent =
-        marquez.client.Utils.fromJson(respMap.get(200), new TypeReference<DatasetEvent>() {});
-    assertThat(datasetEvent.getDataset().getName()).isEqualTo("my-dataset-name");
-    assertThat(datasetEvent.getDataset().getFacets().getSchema().getFields()).hasSize(1);
-    assertThat(datasetEvent.getDataset().getFacets().getSchema().getFields().get(0).getName())
-        .isEqualTo("col_a");
-    assertThat(datasetEvent.getEventTime().toString()).startsWith("2020-12-28T09:52:00.001");
+    final JsonNode openLineageEventAsJson =
+        Utils.fromJson(openLineageEventAsString, new TypeReference<JsonNode>() {});
+
+    // (4) Verify dataset facet associated with the OpenLineage event.
+    final JsonNode json = openLineageEventAsJson.path("dataset");
+
+    final String namespace = json.path("namespace").asText();
+    final String output = json.path("name").asText();
+    final JsonNode expectedFacets = json.path("facets");
+
+    final Dataset dataset = client.getDataset(namespace, output);
+    assertThat(Utils.getMapper().convertValue(dataset.getFacets(), JsonNode.class))
+        .isEqualTo(expectedFacets);
+
+    List<DatasetVersion> datasetVersions = client.listDatasetVersions(namespace, output);
+    assertThat(datasetVersions).isNotEmpty();
+
+    DatasetVersion latestDatasetVersion = datasetVersions.get(0);
+    assertThat(latestDatasetVersion.getNamespace()).isEqualTo(namespace);
+    assertThat(latestDatasetVersion.getName()).isEqualTo(output);
+    assertThat(Utils.getMapper().convertValue(latestDatasetVersion.getFacets(), JsonNode.class))
+        .isEqualTo(expectedFacets);
   }
 
   @Test
