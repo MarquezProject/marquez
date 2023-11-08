@@ -260,7 +260,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/sortDirection'
-        - $ref: '#/components/parameters/pattern'
+        - $ref: '#/components/parameters/search'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
       summary: List all datasets
@@ -375,7 +375,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/sortDirection'
-        - $ref: '#/components/parameters/pattern'
+        - $ref: '#/components/parameters/search'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
       summary: List all jobs
@@ -890,8 +890,8 @@ components:
         description: Sorts the results of your query by indicated direction `asc` or `desc`.
       required: false
 
-    pattern:
-      name: pattern
+    search:
+      name: search
       in: query
       schema:
         default: '%'
@@ -907,7 +907,7 @@ components:
         type: string
         default: name
         example: name
-        description: Orders the results of your query by indicated `sortDirection` by any column on the row.
+        description: Orders the results of your query by indicated `sortDirection` by any column on the row. For exmaple, `name` or `updated_at`.
       required: false
 
     before:

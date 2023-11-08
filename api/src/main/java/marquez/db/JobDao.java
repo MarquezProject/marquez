@@ -136,7 +136,7 @@ public interface JobDao extends BaseDao {
       WHERE
         j.namespace_name = :namespaceName
       AND
-        j.name ILIKE '%' || :pattern || '%'
+        j.name ILIKE '%' || :search || '%'
       ORDER BY <order_by> <sort_direction>
       LIMIT
         :limit
@@ -183,7 +183,7 @@ public interface JobDao extends BaseDao {
   """)
   List<Job> findAll(
       String namespaceName,
-      String pattern,
+      String search,
       @Define("order_by") String orderBy,
       @Define("sort_direction") SortDirection sortDirection,
       int limit,
@@ -199,13 +199,13 @@ public interface JobDao extends BaseDao {
 
   default List<Job> findAllWithRun(
       String namespaceName,
-      String pattern,
+      String search,
       String orderBy,
       SortDirection sortDirection,
       int limit,
       int offset) {
     RunDao runDao = createRunDao();
-    return findAll(namespaceName, pattern, orderBy, sortDirection, limit, offset).stream()
+    return findAll(namespaceName, search, orderBy, sortDirection, limit, offset).stream()
         .peek(
             j ->
                 runDao

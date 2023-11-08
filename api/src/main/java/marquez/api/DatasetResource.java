@@ -144,7 +144,7 @@ public class DatasetResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("pattern") @DefaultValue("%") String pattern,
+      @QueryParam("search") @DefaultValue("%") String search,
       @QueryParam("orderBy") @DefaultValue("name") String orderBy,
       @QueryParam("sortDirection") @DefaultValue("ASC") SortDirection sortDirection,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
@@ -153,7 +153,7 @@ public class DatasetResource extends BaseResource {
 
     final List<Dataset> datasets =
         datasetService.findAllWithTags(
-            namespaceName.getValue(), pattern, orderBy, sortDirection, limit, offset);
+            namespaceName.getValue(), search, orderBy, sortDirection, limit, offset);
     columnLineageService.enrichWithColumnLineage(datasets);
     final int totalCount = datasetService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("datasets", datasets, totalCount)).build();

@@ -164,7 +164,7 @@ public class JobResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
-      @QueryParam("pattern") @DefaultValue("%") String pattern,
+      @QueryParam("search") @DefaultValue("%") String search,
       @QueryParam("orderBy") @DefaultValue("name") String orderBy,
       @QueryParam("sortDirection") @DefaultValue("ASC") SortDirection sortDirection,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
@@ -173,7 +173,7 @@ public class JobResource extends BaseResource {
 
     final List<Job> jobs =
         jobService.findAllWithRun(
-            namespaceName.getValue(), pattern, orderBy, sortDirection, limit, offset);
+            namespaceName.getValue(), search, orderBy, sortDirection, limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }

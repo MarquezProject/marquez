@@ -144,13 +144,13 @@ public interface DatasetDao extends BaseDao {
               GROUP BY df.dataset_version_uuid
           ) f ON f.dataset_version_uuid = d.current_version_uuid
           WHERE d.namespace_name = :namespaceName
-          AND d.name ILIKE  '%' || :pattern || '%'
+          AND d.name ILIKE  '%' || :search || '%'
           ORDER BY <order_by> <sort_direction>
           LIMIT :limit OFFSET :offset
           """)
   List<Dataset> findAll(
       String namespaceName,
-      String pattern,
+      String search,
       @Define("order_by") String orderBy,
       @Define("sort_direction") SortDirection sortDirection,
       int limit,
@@ -164,12 +164,12 @@ public interface DatasetDao extends BaseDao {
 
   default List<Dataset> findAllWithTags(
       String namespaceName,
-      String pattern,
+      String search,
       String orderBy,
       SortDirection sortDirection,
       int limit,
       int offset) {
-    List<Dataset> datasets = findAll(namespaceName, pattern, orderBy, sortDirection, limit, offset);
+    List<Dataset> datasets = findAll(namespaceName, search, orderBy, sortDirection, limit, offset);
     return datasets.stream().peek(this::setFields).collect(Collectors.toList());
   }
 
