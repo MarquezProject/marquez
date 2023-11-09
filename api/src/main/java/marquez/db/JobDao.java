@@ -297,7 +297,6 @@ public interface JobDao extends BaseDao {
       namespace_name,
       name,
       description,
-      current_job_context_uuid,
       current_location,
       current_inputs,
       symlink_target_uuid,
@@ -311,7 +310,6 @@ public interface JobDao extends BaseDao {
       :namespaceName,
       :name,
       :description,
-      null,
       :location,
       :inputs,
       :symlinkTargetId,
@@ -346,7 +344,6 @@ public interface JobDao extends BaseDao {
       namespace_name,
       name,
       description,
-      current_job_context_uuid,
       current_location,
       current_inputs,
       symlink_target_uuid
@@ -360,7 +357,6 @@ public interface JobDao extends BaseDao {
       :namespaceName,
       :name,
       :description,
-      null,
       :location,
       :inputs,
       :symlinkTargetId

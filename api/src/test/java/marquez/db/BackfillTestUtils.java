@@ -122,8 +122,8 @@ public class BackfillTestUtils {
         h -> {
           return h.createQuery(
                   """
-                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_job_context_uuid, current_inputs)
-                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, null, :currentInputs)
+                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_inputs)
+                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentInputs)
                   RETURNING uuid
                   """)
               .bind("uuid", UUID.randomUUID())

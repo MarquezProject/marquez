@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
@@ -207,8 +208,7 @@ public interface RunDao extends BaseDao {
           + "transitioned_at, "
           + "namespace_name, "
           + "job_name, "
-          + "location, "
-          + "job_context_uuid "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":parentRunUuid, "
@@ -224,8 +224,7 @@ public interface RunDao extends BaseDao {
           + ":runStateTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location, "
-          + "null "
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "external_id = EXCLUDED.external_id, "
@@ -266,8 +265,7 @@ public interface RunDao extends BaseDao {
           + "nominal_end_time, "
           + "namespace_name, "
           + "job_name, "
-          + "location, "
-          + "job_context_uuid "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":parentRunUuid, "
@@ -281,8 +279,7 @@ public interface RunDao extends BaseDao {
           + ":nominalEndTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location, "
-          + "null"
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
           + "external_id = EXCLUDED.external_id, "
@@ -304,6 +301,40 @@ public interface RunDao extends BaseDao {
       String namespaceName,
       String jobName,
       String location);
+
+  default RunRow upsert(RunUpsert runUpsert) {
+    if (runUpsert.runStateType == null) {
+      return upsert(
+          runUpsert.runUuid(),
+          runUpsert.parentRunUuid(),
+          runUpsert.externalId(),
+          runUpsert.now(),
+          runUpsert.jobUuid(),
+          runUpsert.jobVersionUuid(),
+          runUpsert.runArgsUuid(),
+          runUpsert.nominalStartTime(),
+          runUpsert.nominalEndTime(),
+          runUpsert.namespaceName(),
+          runUpsert.jobName(),
+          runUpsert.location());
+    } else {
+      return upsert(
+          runUpsert.runUuid(),
+          runUpsert.parentRunUuid(),
+          runUpsert.externalId(),
+          runUpsert.now(),
+          runUpsert.jobUuid(),
+          runUpsert.jobVersionUuid(),
+          runUpsert.runArgsUuid(),
+          runUpsert.nominalStartTime(),
+          runUpsert.nominalEndTime(),
+          runUpsert.runStateType(),
+          runUpsert.runStateTime(),
+          runUpsert.namespaceName(),
+          runUpsert.jobName(),
+          runUpsert.location());
+    }
+  }
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -456,4 +487,21 @@ public interface RunDao extends BaseDao {
       )
       """)
   Optional<Run> findByLatestJob(String namespace, String jobName);
+
+  @Builder
+  record RunUpsert(
+      UUID runUuid,
+      UUID parentRunUuid,
+      String externalId,
+      Instant now,
+      UUID jobUuid,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      RunState runStateType,
+      Instant runStateTime,
+      String namespaceName,
+      String jobName,
+      String location) {}
 }

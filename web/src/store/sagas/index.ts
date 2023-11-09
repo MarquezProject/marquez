@@ -180,7 +180,6 @@ export function* fetchEventsSaga() {
         payload.limit,
         payload.offset
       )
-      console.log(events)
       yield put(fetchEventsSuccess(events))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching event runs'))

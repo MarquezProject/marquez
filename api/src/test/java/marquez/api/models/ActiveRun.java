@@ -54,7 +54,7 @@ public class ActiveRun {
   }
 
   public void startRun() {
-    olClient.emit(ol.newRunEvent(START, newEventTime(), run, job, inputs, outputs));
+    olClient.emit(ol.newRunEvent(newEventTime(), START, run, job, inputs, outputs));
   }
 
   public void endRun() {
@@ -62,7 +62,7 @@ public class ActiveRun {
   }
 
   public void endRun(@NonNull OpenLineage.RunEvent.EventType eventType) {
-    olClient.emit(ol.newRunEvent(eventType, newEventTime(), run, job, inputs, outputs));
+    olClient.emit(ol.newRunEvent(newEventTime(), eventType, run, job, inputs, outputs));
   }
 
   private static ZonedDateTime newEventTime() {

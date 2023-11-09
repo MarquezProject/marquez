@@ -235,6 +235,11 @@ export const setBottomBarHeight = (height: number) => ({
   payload: height,
 })
 
+export const setTabIndex = (index: number) => ({
+  type: actionTypes.SET_TAB_INDEX,
+  payload: index,
+})
+
 export const fetchLineage = (
   nodeType: JobOrDataset,
   namespace: string,
