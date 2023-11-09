@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import marquez.api.JdbiUtils;
+import marquez.api.models.SortDirection;
 import marquez.common.models.DatasetName;
 import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.JobId;
@@ -199,7 +200,7 @@ public class LineageServiceTest {
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
 
-    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, "%", "name", SortDirection.ASC, 1000, 0);
     jobs =
         jobs.stream()
             .filter(j -> j.getName().getValue().contains("newDownstreamJob"))
