@@ -31,6 +31,7 @@ import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect, useState } from 'react'
+import ReadMoreIcon from '@mui/icons-material/ReadMore'
 import RunStatus from '../jobs/RunStatus'
 
 export interface DispatchProps {
@@ -145,15 +146,22 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                     {i18next.t('dataset_info_columns.description')}
                   </MqText>
                 </TableCell>
+                <TableCell align='left'></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {datasetFields.map((field) => {
                 return (
-                  <TableRow key={field.name} onClick={() => handleOpen(field.name)}>
+                  <TableRow key={field.name}>
                     <TableCell align='left'>{field.name}</TableCell>
                     <TableCell align='left'>{field.type}</TableCell>
                     <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                    <TableCell>
+                      <ReadMoreIcon
+                        onClick={() => handleOpen(field.name)}
+                        sx={{ align: 'Right' }}
+                      ></ReadMoreIcon>
+                    </TableCell>
                   </TableRow>
                 )
               })}
