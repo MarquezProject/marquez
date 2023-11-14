@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,9 +17,6 @@ public interface BaseDao extends SqlObject {
 
   @CreateSqlObject
   DatasetVersionDao createDatasetVersionDao();
-
-  @CreateSqlObject
-  JobContextDao createJobContextDao();
 
   @CreateSqlObject
   JobDao createJobDao();
@@ -56,4 +53,13 @@ public interface BaseDao extends SqlObject {
 
   @CreateSqlObject
   ColumnLineageDao createColumnLineageDao();
+
+  @CreateSqlObject
+  DatasetFacetsDao createDatasetFacetsDao();
+
+  @CreateSqlObject
+  JobFacetsDao createJobFacetsDao();
+
+  @CreateSqlObject
+  RunFacetsDao createRunFacetsDao();
 }

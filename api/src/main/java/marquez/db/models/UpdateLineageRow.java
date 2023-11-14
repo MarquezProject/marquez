@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,7 +17,6 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 public class UpdateLineageRow {
   private NamespaceRow namespace;
   private JobRow job;
-  private JobContextRow jobContext;
   private RunArgsRow runArgs;
   private RunRow run;
   private RunStateRow runState;

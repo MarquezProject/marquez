@@ -1,4 +1,4 @@
-# Copyright 2018-2022 contributors to the Marquez project
+# Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 
 from unittest.mock import patch, MagicMock
@@ -61,13 +61,13 @@ def test_is_none():
 
 def test_check_name_length():
     with pytest.raises(ValueError):
-        Utils.check_name_length(variable_value='a'*65,
+        Utils.check_name_length(variable_value='a'*1025,
                                 variable_name='namespace_name')
     with pytest.raises(ValueError):
-        Utils.check_name_length(variable_value='a'*65,
+        Utils.check_name_length(variable_value='a'*1025,
                                 variable_name='owner_name')
     with pytest.raises(ValueError):
-        Utils.check_name_length(variable_value='a'*65,
+        Utils.check_name_length(variable_value='a'*1026,
                                 variable_name='source_name')
     with pytest.raises(ValueError):
         Utils.check_name_length(variable_value='a'*256,

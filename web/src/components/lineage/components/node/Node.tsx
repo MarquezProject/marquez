@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
@@ -11,21 +12,15 @@ import { NodeText } from './NodeText'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode, isDataset, isJob } from '../../../../helpers/nodes'
-import { faCaretRight } from '@fortawesome/free-solid-svg-icons/faCaretRight'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { setSelectedNode } from '../../../../store/actionCreators'
 import { theme } from '../../../../helpers/theme'
-
-export type Vertex = {
-  x: number
-  y: number
-}
+import MQTooltip from '../../../core/tooltip/MQTooltip'
 
 const RADIUS = 14
-const OUTER_RADIUS = RADIUS + 8
 const ICON_SIZE = 16
-const BORDER = 2
+const BORDER = 4
 
 interface DispatchProps {
   setSelectedNode: (payload: string) => void
@@ -33,66 +28,66 @@ interface DispatchProps {
 
 interface OwnProps {
   node: GraphNode<MqNode>
-  edgeEnds: Vertex[]
   selectedNode: string
 }
 
 type NodeProps = DispatchProps & OwnProps
 
-class Node extends React.Component<NodeProps> {
-  determineLink = (node: GraphNode<MqNode>) => {
-    if (isJob(node)) {
-      return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
-    } else if (isDataset(node)) {
-      return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
-    }
-    return '/'
+export const determineLink = (node: GraphNode<MqNode>) => {
+  if (isJob(node)) {
+    return `/lineage/${encodeNode('JOB', node.data.namespace, node.data.name)}`
+  } else if (isDataset(node)) {
+    return `/lineage/${encodeNode('DATASET', node.data.namespace, node.data.name)}`
+  }
+  return '/'
+}
+
+const Node: React.FC<NodeProps> = ({ node, selectedNode, setSelectedNode }) => {
+  const addToToolTip = (inputData: GraphNode<MqNode>) => {
+    return (
+      <>
+        <b>{'Namespace: '}</b>
+        {inputData.data.namespace}
+        <br></br>
+        <b>{'Name: '}</b>
+        {inputData.data.name}
+        <br></br>
+        <b>{'Description: '}</b>
+        {inputData.data.description === null ? 'No Description' : inputData.data.description}
+        <br></br>
+      </>
+    )
   }
 
-  render() {
-    const { node, edgeEnds, selectedNode } = this.props
-    const job = isJob(node)
-    return (
-      <Link
-        to={this.determineLink(node)}
-        onClick={() => node.label && this.props.setSelectedNode(node.label)}
-      >
+  const job = isJob(node)
+  const isSelected = selectedNode === node.label
+  const ariaJobLabel = 'Job'
+  const ariaDatasetLabel = 'Dataset'
+
+  return (
+    <Link to={determineLink(node)} onClick={() => node.label && setSelectedNode(node.label)}>
+      <MQTooltip title={addToToolTip(node)}>
         {job ? (
           <g>
             <circle
               style={{ cursor: 'pointer' }}
               r={RADIUS}
-              fill={theme.palette.common.white}
-              stroke={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
-              strokeWidth={BORDER}
-              cx={node.x}
-              cy={node.y}
-            />
-            <circle
-              style={{ cursor: 'pointer' }}
-              r={RADIUS - 2}
-              fill={theme.palette.common.white}
-              stroke={theme.palette.common.white}
-              strokeWidth={2}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
               cx={node.x}
               cy={node.y}
             />
             <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaJobLabel}
               style={{ transformOrigin: `${node.x}px ${node.y}px` }}
               icon={faCog}
               width={ICON_SIZE}
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
             />
           </g>
         ) : (
@@ -101,13 +96,9 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               x={node.x - RADIUS}
               y={node.y - RADIUS}
-              fill={theme.palette.common.white}
-              stroke={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
-              strokeWidth={BORDER}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
+              stroke={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
+              strokeWidth={BORDER / 2}
               width={RADIUS * 2}
               height={RADIUS * 2}
               rx={4}
@@ -116,52 +107,35 @@ class Node extends React.Component<NodeProps> {
               style={{ cursor: 'pointer' }}
               x={node.x - (RADIUS - 2)}
               y={node.y - (RADIUS - 2)}
-              fill={theme.palette.common.white}
-              stroke={theme.palette.common.white}
-              strokeWidth={BORDER}
+              fill={isSelected ? theme.palette.secondary.main : theme.palette.common.white}
               width={(RADIUS - 2) * 2}
               height={(RADIUS - 2) * 2}
               rx={4}
             />
             <FontAwesomeIcon
+              aria-hidden={'true'}
+              title={ariaDatasetLabel}
               icon={faDatabase}
               width={ICON_SIZE}
               height={ICON_SIZE}
               x={node.x - ICON_SIZE / 2}
               y={node.y - ICON_SIZE / 2}
-              color={
-                selectedNode === node.label
-                  ? theme.palette.primary.main
-                  : theme.palette.secondary.main
-              }
+              color={isSelected ? theme.palette.primary.main : theme.palette.secondary.main}
             />
           </g>
         )}
-        {edgeEnds.find(edge => edge.x === node.x && edge.y === node.y) && (
-          <FontAwesomeIcon
-            icon={faCaretRight}
-            x={node.x - OUTER_RADIUS - ICON_SIZE / 2}
-            y={node.y - ICON_SIZE / 2}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-            color={theme.palette.secondary.main}
-          />
-        )}
-        <NodeText node={node} />
-      </Link>
-    )
-  }
+      </MQTooltip>
+      <NodeText node={node} />
+    </Link>
+  )
 }
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setSelectedNode: setSelectedNode
+      setSelectedNode: setSelectedNode,
     },
     dispatch
   )
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(Node)
+export default connect(null, mapDispatchToProps)(Node)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,7 +7,6 @@ package marquez.db;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.Generator.newTimestamp;
-import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newExternalId;
@@ -23,15 +22,18 @@ import static marquez.service.models.ServiceModelGenerator.newRunMeta;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.openlineage.client.OpenLineage;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -40,8 +42,8 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.db.models.DatasetRow;
+import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -54,6 +56,7 @@ import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import marquez.service.models.RunMeta;
 import marquez.service.models.ServiceModelGenerator;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 
 /** Static utility methods for inserting and interacting with rows in the database. */
@@ -137,14 +140,7 @@ final class DbTestUtils {
         jdbi,
         namespace.getName(),
         jobName,
-        new JobMeta(
-            JobType.BATCH,
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            null,
-            ImmutableMap.of(),
-            description,
-            null));
+        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
   }
 
   public static JobRow createJobWithSymlinkTarget(
@@ -154,14 +150,7 @@ final class DbTestUtils {
         namespace.getName(),
         jobName,
         jobSymlinkId,
-        new JobMeta(
-            JobType.BATCH,
-            ImmutableSet.of(),
-            ImmutableSet.of(),
-            null,
-            ImmutableMap.of(),
-            description,
-            null));
+        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
   }
 
   /**
@@ -206,20 +195,10 @@ final class DbTestUtils {
         Utils.getMapper());
   }
 
-  /** Adds a new {@link JobContextRow} object to the {@code job_contexts} table. */
-  static JobContextRow newJobContext(final Jdbi jdbi) {
-    final JobContextDao jobContextDao = jdbi.onDemand(JobContextDao.class);
-    final ImmutableMap<String, String> context = newContext();
-    final String contextAsJson = Utils.toJson(newContext());
-    final String checksum = Utils.checksumFor(context);
-    return jobContextDao.upsert(newRowUuid(), newTimestamp(), contextAsJson, checksum);
-  }
-
   /** Adds a new {@link JobVersionRow} object to the {@code job_versions} table. */
   static ExtendedJobVersionRow newJobVersion(
       final Jdbi jdbi,
       final UUID jobUuid,
-      final UUID jobContextUuid,
       final UUID version,
       final String jobName,
       final UUID namespaceUuid,
@@ -229,7 +208,6 @@ final class DbTestUtils {
         newRowUuid(),
         newTimestamp(),
         jobUuid,
-        jobContextUuid,
         newLocation().toString(),
         version,
         jobName,
@@ -263,8 +241,7 @@ final class DbTestUtils {
       final UUID namespaceUuid,
       final String namespaceName,
       final String jobName,
-      final String jobLocation,
-      final UUID jobContextUuid) {
+      final String jobLocation) {
     final RunDao runDao = jdbi.onDemand(RunDao.class);
     return runDao.upsert(
         newRowUuid(),
@@ -276,11 +253,9 @@ final class DbTestUtils {
         runArgsUuid,
         newTimestamp(),
         newTimestamp(),
-        namespaceUuid,
         namespaceName,
         jobName,
-        jobLocation,
-        jobContextUuid);
+        jobLocation);
   }
 
   /** Transition a {@link Run} to the provided {@link RunState}. */
@@ -354,5 +329,88 @@ final class DbTestUtils {
               }
             })
         .takeWhile(Predicates.notNull());
+  }
+
+  public static <T> boolean rowExists(@NonNull final Handle handle, final @NonNull T rowToVerify) {
+    return rowsExist(handle, ImmutableSet.of(rowToVerify));
+  }
+
+  /** Returns {@code true} ... */
+  public static boolean rowsExist(
+      @NonNull final Handle handle, final @NonNull Set<?> rowsToVerify) {
+    // TODO (wslulciuc): Add interface for rows to allow for Row.getUuid()
+    if (rowsToVerify.stream().anyMatch(DatasetRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "datasets",
+          rowsToVerify.stream()
+              .map(DatasetRow.class::cast)
+              .map(DatasetRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(DatasetVersionRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "dataset_versions",
+          rowsToVerify.stream()
+              .map(DatasetVersionRow.class::cast)
+              .map(DatasetVersionRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(JobRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "jobs",
+          rowsToVerify.stream()
+              .map(JobRow.class::cast)
+              .map(JobRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(JobVersionRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "job_versions",
+          rowsToVerify.stream()
+              .map(JobVersionRow.class::cast)
+              .map(JobVersionRow::getUuid)
+              .collect(toImmutableSet()));
+    } else if (rowsToVerify.stream().anyMatch(RunRow.class::isInstance)) {
+      return rowsArePresentIn(
+          handle,
+          "runs",
+          rowsToVerify.stream()
+              .map(RunRow.class::cast)
+              .map(RunRow::getUuid)
+              .collect(toImmutableSet()));
+    }
+    throw new IllegalArgumentException();
+  }
+
+  /** Returns {@code true} ... */
+  private static boolean rowsArePresentIn(
+      @NonNull final Handle handle,
+      @NonNull final String uuidsForRowsExistsInTable,
+      @NonNull final Set<UUID> uuidsForRowsToVerify) {
+    return handle
+        .createQuery(
+            "SELECT EXISTS (SELECT 1 FROM "
+                + uuidsForRowsExistsInTable
+                + " WHERE uuid IN (<uuidsForRowsToVerify>))")
+        .bindList("uuidsForRowsToVerify", uuidsForRowsToVerify)
+        .mapTo(Boolean.class)
+        .one();
+  }
+
+  /** Returns {@code true} ... */
+  public static boolean olEventsExist(
+      @NonNull final Handle handle, @NonNull final Set<OpenLineage.RunEvent> olEventsToVerify) {
+    final Set<UUID> runUuidsToVerify =
+        olEventsToVerify.stream()
+            .map(OpenLineage.RunEvent::getRun)
+            .map(OpenLineage.Run::getRunId)
+            .collect(toImmutableSet());
+    return handle
+        .createQuery(
+            "SELECT EXISTS (SELECT 1 FROM lineage_events WHERE run_uuid IN (<runUuidsToVerify>))")
+        .bindList("runUuidsToVerify", runUuidsToVerify)
+        .mapTo(Boolean.class)
+        .one();
   }
 }

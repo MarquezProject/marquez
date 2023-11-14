@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.UUID;
 import marquez.BaseIntegrationTest;
+import marquez.api.JdbiUtils;
 import marquez.client.MarquezHttpException;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Job;
@@ -43,22 +44,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @AfterEach
   public void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM stream_versions");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   @Test
@@ -106,7 +92,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
@@ -120,7 +105,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(runId)
             .build();
@@ -137,7 +121,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(UUID.randomUUID().toString())
             .build();
@@ -153,7 +136,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(NAMESPACE_NAME, "does-not-exist")
             .outputs(NAMESPACE_NAME, "does-not-exist")
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     Assertions.assertThrows(
@@ -188,7 +170,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(ImmutableSet.of())
             .location(CommonModelGenerator.newLocation())
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .runId(newRunId)
             .build();
@@ -267,7 +248,6 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of(STREAM_ID))
             .outputs(ImmutableSet.of(DB_TABLE_ID))
             .location(CommonModelGenerator.newLocation())
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, jobName, newVersionMeta);

@@ -1,23 +1,58 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
-
-import { Box } from '@material-ui/core'
+import * as Redux from 'redux'
+import { Box } from '@mui/material'
+import { IState } from '../../store/reducers'
 import { Run } from '../../types/api'
+import { connect } from 'react-redux'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
-import MqJson from '../core/code/MqJson'
+import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 
-interface RunInfoProps {
-  run: Run
+export interface DispatchProps {
+  fetchJobFacets: typeof fetchJobFacets
+  resetFacets: typeof resetFacets
 }
 
-const RunInfo: FunctionComponent<RunInfoProps> = props => {
-  const { run } = props
+interface JobFacets {
+  [key: string]: object
+}
+
+export interface JobFacetsProps {
+  jobFacets: JobFacets
+}
+
+export interface SqlFacet {
+  query: string
+}
+
+type RunInfoProps = {
+  run: Run
+} & JobFacetsProps &
+  DispatchProps
+
+const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
+  const { run, jobFacets, fetchJobFacets, resetFacets } = props
+  const i18next = require('i18next')
+
+  useEffect(() => {
+    fetchJobFacets(run.id)
+  }, [])
+
+  // unmounting
+  useEffect(
+    () => () => {
+      resetFacets()
+    },
+    []
+  )
 
   return (
     <Box mt={2}>
-      <MqCode code={run.context.sql} />
+      {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
       <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
         <Box ml={1}>
           <MqText subdued>{formatUpdatedAt(run.updatedAt)}</MqText>
@@ -26,13 +61,32 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>Facets</MqText>
+            <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
           </Box>
-          <MqJson code={run.facets} />
+          <MqJsonView
+            data={run.facets}
+            searchable={true}
+            aria-label={i18next.t('jobs.facets_subhead_aria')}
+            aria-required='true'
+            placeholder={i18next.t('jobs.search')}
+          />
         </Box>
       )}
     </Box>
   )
 }
 
-export default RunInfo
+const mapStateToProps = (state: IState) => ({
+  jobFacets: state.facets.result,
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  Redux.bindActionCreators(
+    {
+      fetchJobFacets: fetchJobFacets,
+      resetFacets: resetFacets,
+    },
+    dispatch
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(RunInfo)

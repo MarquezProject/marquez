@@ -26,12 +26,13 @@ jobs:
         with:
           format: 'json'
           token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
       - name: Check for headers
         run: |
           ok=1
-          readarray -t files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.all }}')"
-          for file in ${files[@]}; do 
+          readarray -t files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added_modified }}')"
+          for file in ${files[@]}; do
             if [[ ($file == *".java") ]]; then
               if ! grep -q Copyright "$file"; then
                 ok=0

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,6 +38,7 @@ public final class JsonGenerator {
         .put("updatedAt", ISO_INSTANT.format(namespace.getUpdatedAt()))
         .put("ownerName", namespace.getOwnerName())
         .put("description", namespace.getDescription().orElse(null))
+        .put("isHidden", namespace.getIsHidden())
         .toString();
   }
 
@@ -244,14 +245,11 @@ public final class JsonGenerator {
     final ArrayNode inputs = MAPPER.valueToTree(meta.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(meta.getOutputs());
     final ObjectNode obj = MAPPER.createObjectNode();
-    final ObjectNode context = MAPPER.createObjectNode();
-    meta.getContext().forEach(context::put);
 
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", meta.getLocation().map(URL::toString).orElse(null));
-    obj.set("context", context);
     obj.put("description", meta.getDescription().orElse(null));
     obj.put("runId", meta.getRunId().orElse(null));
 
@@ -266,8 +264,6 @@ public final class JsonGenerator {
             .put("name", job.getId().getName());
     final ArrayNode inputs = MAPPER.valueToTree(job.getInputs());
     final ArrayNode outputs = MAPPER.valueToTree(job.getOutputs());
-    final ObjectNode context = MAPPER.createObjectNode();
-    job.getContext().forEach(context::put);
 
     final ObjectNode obj = MAPPER.createObjectNode();
     obj.set("id", id);
@@ -280,7 +276,6 @@ public final class JsonGenerator {
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
     obj.put("location", job.getLocation().map(URL::toString).orElse(null));
-    obj.set("context", context);
     obj.put("description", job.getDescription().orElse(null));
     obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
     obj.put("currentVersion", job.getCurrentVersion().map(UUID::toString).orElse(null));
@@ -315,12 +310,17 @@ public final class JsonGenerator {
             .put("id", run.getId())
             .put("createdAt", ISO_INSTANT.format(run.getCreatedAt()))
             .put("updatedAt", ISO_INSTANT.format(run.getUpdatedAt()));
+    final ArrayNode inputDatasetVersions = MAPPER.valueToTree(run.getInputDatasetVersions());
+    final ArrayNode outputDatasetVersions = MAPPER.valueToTree(run.getOutputDatasetVersions());
+
     obj.put("nominalStartTime", run.getNominalStartTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("nominalEndTime", run.getNominalEndTime().map(ISO_INSTANT::format).orElse(null));
     obj.put("state", run.getState().name());
     obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("durationMs", run.getDurationMs().orElse(null));
+    obj.putArray("inputDatasetVersions").addAll(inputDatasetVersions);
+    obj.putArray("outputDatasetVersions").addAll(outputDatasetVersions);
 
     final ObjectNode runArgs = MAPPER.createObjectNode();
     run.getArgs().forEach(runArgs::put);

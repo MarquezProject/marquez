@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -53,6 +53,7 @@ public abstract class Dataset {
   @Nullable private final String lastLifecycleState;
   @Nullable private final String description;
   @Nullable private final UUID currentVersion;
+  @Getter @Setter @Nullable private List<ColumnLineage> columnLineage;
   @Getter ImmutableMap<String, Object> facets;
   @Getter private final boolean isDeleted;
 
@@ -70,6 +71,7 @@ public abstract class Dataset {
       @Nullable final String lastLifecycleState,
       @Nullable final String description,
       @Nullable final UUID currentVersion,
+      @Nullable final ImmutableList<ColumnLineage> columnLineage,
       @Nullable final ImmutableMap<String, Object> facets,
       boolean isDeleted) {
     this.id = id;
@@ -86,6 +88,7 @@ public abstract class Dataset {
     this.lastLifecycleState = lastLifecycleState;
     this.description = description;
     this.currentVersion = currentVersion;
+    this.columnLineage = columnLineage;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
     this.isDeleted = isDeleted;
   }

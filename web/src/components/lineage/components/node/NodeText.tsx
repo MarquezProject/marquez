@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { Node as GraphNode } from 'dagre'
@@ -17,7 +18,7 @@ export function NodeText({ node }: NodeTextProps) {
   return (
     <text
       x={node.x}
-      y={node.y + TEXT_BOTTOM_SPACING}
+      y={node.y + parseInt(TEXT_BOTTOM_SPACING)}
       fontSize='8'
       textAnchor='middle'
       fill={'white'}

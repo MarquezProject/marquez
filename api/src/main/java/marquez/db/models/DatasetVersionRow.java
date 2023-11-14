@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,6 +25,8 @@ public class DatasetVersionRow {
   @Getter @NonNull private final UUID version;
   @Getter @Nullable private final String lifecycleState;
   @Nullable private final UUID runUuid;
+  @Getter @Nullable private final String namespaceName;
+  @Getter @Nullable private final String datasetName;
 
   public Optional<UUID> getRunUuid() {
     return Optional.ofNullable(runUuid);

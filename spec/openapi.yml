@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.27.0-SNAPSHOT
+  version: 0.43.0-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -51,6 +51,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Namespace'
+    delete:
+      operationId: deleteNamespace
+      summary: Deletes a namespace
+      description: Soft deletes a namespace, and every job and dataset inside. On next event containing this namespace, the namespace will be undeleted.
+      tags:
+        - Namespaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Namespace'
 
   /namespaces:
     get:
@@ -78,6 +91,7 @@ paths:
         - $ref: '#/components/parameters/before'
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       summary: List all received OpenLineage events.
       description: Returns a list of OpenLineage events, sorted in direction of passed sort parameter. By default it is desc.
       tags:
@@ -161,7 +175,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - $ref: '#/components/schemas/DbTable'
                 - $ref: '#/components/schemas/Stream'
       responses:
@@ -221,6 +235,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/namespace'
       - $ref: '#/components/parameters/dataset'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
     get:
       operationId: getDatasetVersions
       summary: List all versions for a dataset
@@ -460,7 +476,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IncompleteRun'
+                $ref: '#/components/schemas/Run'
+
+  /jobs/runs/{id}/facets:
+    parameters:
+      - $ref: '#/components/parameters/runId'
+      - $ref: '#/components/parameters/type'
+    get:
+      operationId: getFacets
+      summary: Retrieve run or job facets for a run.
+      description: Retrieve run or job facets for a run.
+      tags:
+        - Jobs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacetsResult'
 
   /jobs/runs/{id}/start:
     parameters:
@@ -569,6 +603,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/LineageGraph'
 
+  /runlineage/upstream:
+    get:
+      operationId: getRunLineageUpstream
+      paramteters:
+        - $ref: '#/components/parameters/runId'
+        - $ref: '#/components/parameters/depth'
+      tags:
+        - Lineage
+      summary: Get the upstream lineage for a given run
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpstreamRunLineage'
+
+  /column-lineage:
+    get:
+      operationId: getLineage
+      parameters:
+        - $ref: '#/components/parameters/nodeId'
+        - $ref: '#/components/parameters/depth'
+        - $ref: '#/components/parameters/withDownstream'
+      tags:
+        - Column lineage
+      summary: Get a column-lineage graph
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineageGraph'
+
   /tags/{tag}:
     parameters:
       - $ref: '#/components/parameters/tag'
@@ -617,6 +686,33 @@ paths:
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/limit'
+        - name: namespace
+          in: query
+          description: Match jobs or datasets within the given namespace.
+          required: false
+          schema:
+           type: string
+           maxLength: 1024
+           example: my-namespace
+        - before:
+          name: before
+          in: query
+          description: Match jobs or datasets **before** `YYYY-MM-DD`.
+          required: false
+          schema:
+            type: string
+            pattern: YYYY-MM-DD
+            example: "2022-09-15"
+        - after:
+          name: after
+          in: query
+          description: Match jobs or datasets **after** `YYYY-MM-DD`.
+          required: false
+          schema:
+            type: string
+            pattern: YYYY-MM-DD
+            example: "2022-09-15"
+
       summary: Query all datasets and jobs
       description: Returns one or more datasets and jobs of your query.
       tags:
@@ -721,7 +817,7 @@ components:
     limit:
       name: limit
       in: query
-      description: The number of results to return from offset
+      description: The number of results to return from offset.
       required: false
       schema:
         type: integer
@@ -731,7 +827,7 @@ components:
     offset:
       name: offset
       in: query
-      description: The initial position from which to return results
+      description: The initial position from which to return results.
       required: false
       schema:
         type: integer
@@ -743,8 +839,9 @@ components:
       schema:
         type: string
         example: dataset:food_delivery:public.delivery_7_days
-      description: The ID of the node. A node can either be a dataset node or a job node. The format of
-        nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>` and for job is
+      description: The ID of the node. A node can either be a dataset node, a dataset field node or a job node.
+        The format of nodeId for dataset is `dataset:<namespace_of_dataset>:<name_of_the_dataset>`, for dataset field
+        is `datasetField:<namespace_of_dataset>:<name_of_the_dataset>:<name_of_field>`, and for job is
         `job:<namespace_of_the_job>:<name_of_the_job>`.
       required: true
 
@@ -755,6 +852,15 @@ components:
         type: integer
         default: 20
       description: Depth of lineage graph to create.
+      required: false
+
+    withDownstream:
+      name: withDownstream
+      in: query
+      schema:
+        type: boolean
+        default: false
+      description: Determines if downstream lineage should be returned.
       required: false
 
     q:
@@ -796,13 +902,13 @@ components:
       required: false
 
     before:
-      name: version
+      name: before
       in: query
       description: Returns events before passed date.
       required: false
       schema:
         type: string
-        format: uuid
+        format: date-time
         example: 2022-09-15T07:47:19Z
 
     after:
@@ -812,8 +918,19 @@ components:
       required: false
       schema:
         type: string
-        format: uuid
+        format: date-time
         example: 2022-09-15T07:47:19Z
+
+    type:
+      name: type
+      in: query
+      description: Indicates if should return job or run facets.
+      required: true
+      schema:
+        type: string
+        enum:
+          - run
+          - job
 
   schemas:
     CreatedNamespace:
@@ -873,6 +990,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LineageEvent'
+        totalCount:
+          type: number
+          description: The total number of events returned matching our conditions.
 
     CreatedSource:
       type: object
@@ -1031,7 +1151,9 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: string
+                type: array
+                items:
+                  type: string
               description:
                 description: The description of the field.
                 type: string
@@ -1040,7 +1162,9 @@ components:
               - type
         tags:
           description: List of tags.
-          type: string
+          type: array
+          items:
+            type: string
         description:
           description: The description of the stream.
           type: string
@@ -1115,11 +1239,14 @@ components:
               tags:
                 description: List of tags.
                 type: array
-                items: 
+                items:
                   type: string
               description:
                 description: The description of the field.
                 type: string
+            required:
+              - name
+              - type
         tags:
           description: List of tags.
           type: array
@@ -1238,10 +1365,15 @@ components:
                 type: string
               tags:
                 description: List of tags.
-                type: string
+                type: array
+                items:
+                  type: string
               description:
                 description: The description of the field.
                 type: string
+            required:
+              - name
+              - type
         tags:
           description: List of tags.
           type: string
@@ -1575,7 +1707,7 @@ components:
       properties:
         id:
           description: An _optional_ user-provided unique ID of the run. A run ID **must** be an [UUID](https://tools.ietf.org/html/rfc4122).
-                       If an ID for the run is not provided, a random UUID will be generated for the given run.
+            If an ID for the run is not provided, a random UUID will be generated for the given run.
           type: string
           format: uuid
         nominalStartTime:
@@ -1650,20 +1782,20 @@ components:
 
     Run:
       type: object
-      allOf:
+      anyOf:
         - $ref: '#/components/schemas/IncompleteRun'
         - type: object
           properties:
             jobVersion:
               $ref: '#/components/schemas/JobVersionId'
-            inputVersions:
+            inputDatasetVersions:
               type: array
               items:
-                $ref: '#/components/schemas/DatasetVersionId'
-            outputVersions:
+                $ref: '#/components/schemas/InputDatasetVersion'
+            outputDatasetVersions:
               type: array
               items:
-                $ref: '#/components/schemas/DatasetVersionId'
+                $ref: '#/components/schemas/OutputDatasetVersion'
             context:
               description: A key/value pair that must be of type `string`. A context can be used for getting additional details about the job.
               type: object
@@ -1712,7 +1844,7 @@ components:
 
     CustomFacet:
       description: A custom facet enables the extension of _dataset_, _job_, and _run_ metadata. A custom facet **must** also have a schema,
-                   where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
+        where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`).
       allOf:
         - $ref: '#/components/schemas/BaseFacet'
         - type: object
@@ -1798,28 +1930,88 @@ components:
       example:
         description: My first tag!
 
+    UpstreamRunLineage:
+      type: object
+      properties:
+        runs:
+          description: the list of upstream runs including the selected run in topological order upstream
+          type: array
+          items:
+            type: object
+            propoerties:
+              job:
+                type: object
+                description: identifier of the job version for this run
+                propoerties:
+                  namespace:
+                    type: string
+                  name:
+                    type: string
+                  version:
+                    type: string
+                    format: uuid
+              run:
+                description: run information
+                type: object
+                properties:
+                  id:
+                    description: the run identifier
+                    type: string
+                    format: uuid
+                  start:
+                    description: start time of the run
+                    type: string
+                    format: date-time
+                  end:
+                    description: end time of the run
+                    type: string
+                    format: date-time
+                  status:
+                    description: whether the run completed succesfully or not
+                    type: string
+              inputs:
+                description: ustream input dataset versions
+                type: array
+                items:
+                  description: identifier of the upstream dataset version consumed by this run
+                  type: object
+                  properties:
+                    namespace:
+                      type: string
+                    name:
+                      type: string
+                    version:
+                      type: string
+                      format: uuid
+                    producedByRunId:
+                      description: the run that produced this dataset version
+                      type: string
+                      format: uuid
+
     LineageEvent:
       example:
         eventType: COMPLETE
         eventTime: 2019-05-09T19:49:24.201361Z
         run: {runId: d46e465b-d358-4d32-83d4-df660ff614dd}
         job: {namespace: my-namespace,name: my-job}
-        outputs: [{
-          namespace: my-namespace,
-          name: my-output,
-          facets: {
-            schema: {
-              _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
-              _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
-              fields: [
-                {name: a, type: INTEGER},
-                {name: b, type: TIMESTAMP},
-                {name: c, type: INTEGER},
-                {name: d, type: INTEGER}
-              ]
+        outputs: [
+          {
+            namespace: my-namespace,
+            name: my-output,
+            facets: {
+              schema: {
+                _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+                _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+                fields: [
+                  { name: a, type: INTEGER },
+                  { name: b, type: TIMESTAMP },
+                  { name: c, type: INTEGER },
+                  { name: d, type: INTEGER }
+                ]
+              }
             }
           }
-        }]
+        ]
         producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
 
     SearchResultList:
@@ -1863,3 +2055,40 @@ components:
       enum: [DATASET, JOB]
       description: The type of search result.
       example: DATASET
+
+    FacetsResult:
+      type: object
+      properties:
+        runId:
+          description: The ID associated with the run modifying the table.
+          type: string
+        facets:
+          $ref: '#/components/schemas/CustomFacet'
+
+    InputDatasetVersion:
+      type: object
+      properties:
+        datasetVersionId:
+          $ref: '#/components/schemas/DatasetVersionId'
+        facets:
+          type: object
+          additionalProperties:
+            type: string
+          description: Dataset facets in run context, like `inputFacets`.
+      required:
+        - datasetVersionId
+        - facets
+
+    OutputDatasetVersion:
+      type: object
+      properties:
+        datasetVersionId:
+          $ref: '#/components/schemas/DatasetVersionId'
+        facets:
+          type: object
+          additionalProperties:
+            type: string
+          description: Dataset facets in run context, like `outputFacets`.
+      required:
+        - datasetVersionId
+        - facets

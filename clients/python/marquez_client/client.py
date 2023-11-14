@@ -1,4 +1,4 @@
-# Copyright 2018-2022 contributors to the Marquez project
+# Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 
 import json
@@ -17,6 +17,8 @@ from marquez_client.constants import (
     DEFAULT_TIMEOUT_MS,
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
+    DEFAULT_DEPTH,
+    DEFAULT_WITH_DOWNSTREAM,
     API_PATH_V1
 )
 from marquez_client.models import (
@@ -340,6 +342,59 @@ class MarquezClient:
     def get_job_run(self, run_id):
         Utils.is_valid_uuid(run_id, 'run_id')
         return self._get(self._url('/jobs/runs/{0}', run_id))
+
+    def get_column_lineage_by_dataset(
+            self,
+            namespace,
+            dataset,
+            depth=None,
+            with_downstream=None,
+            version=None
+    ):
+        node_id = self._append_version_to_node_id(
+            "dataset:{0}:{1}".format(namespace, dataset),
+            version
+        )
+        return self._get_column_lineage(node_id, depth, with_downstream)
+
+    def get_column_lineage_by_dataset_field(
+            self,
+            namespace,
+            dataset,
+            field,
+            depth=None,
+            with_downstream=None,
+            version=None,
+    ):
+        node_id = self._append_version_to_node_id(
+            "datasetField:{0}:{1}:{2}".format(namespace, dataset, field),
+            version
+        )
+        return self._get_column_lineage(node_id, depth, with_downstream)
+
+    def get_column_lineage_by_job(self, namespace, job, depth=None,
+                                  with_downstream=None, version=None):
+        node_id = self._append_version_to_node_id(
+            "job:{0}:{1}".format(namespace, job),
+            version
+        )
+        return self._get_column_lineage(node_id, depth, with_downstream)
+
+    def _append_version_to_node_id(self, node_id, version):
+        if version is not None:
+            return node_id + "#" + version
+        else:
+            return node_id
+
+    def _get_column_lineage(self, node_id, depth, with_downstream):
+        return self._get(
+            self._url('/column-lineage'),
+            params={
+                'nodeId': node_id,
+                'depth': depth or DEFAULT_DEPTH,
+                'withDownstream': with_downstream or DEFAULT_WITH_DOWNSTREAM
+            }
+        )
 
     @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',
                 details='Use OpenLineage instead, see `https://openlineage.io`')

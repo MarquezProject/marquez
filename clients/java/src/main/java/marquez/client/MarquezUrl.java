@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,6 +7,7 @@ package marquez.client;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+import static marquez.client.MarquezPathV1.columnLineagePath;
 import static marquez.client.MarquezPathV1.createRunPath;
 import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
@@ -15,6 +16,7 @@ import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
+import static marquez.client.MarquezPathV1.lineagePath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
 import static marquez.client.MarquezPathV1.listJobVersionsPath;
@@ -41,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.NonNull;
+import marquez.client.models.NodeId;
 import marquez.client.models.RunState;
 import marquez.client.models.SearchFilter;
 import marquez.client.models.SearchSort;
@@ -204,5 +207,20 @@ class MarquezUrl {
     }
     queryParams.put("limit", limit);
     return from(searchPath(), queryParams.build());
+  }
+
+  URL toLineageUrl(NodeId nodeId, int depth) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", nodeId.getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    return from(lineagePath(), queryParams.build());
+  }
+
+  URL toColumnLineageUrl(NodeId nodeId, int depth, boolean withDownstream) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", nodeId.getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    queryParams.put("withDownstream", String.valueOf(withDownstream));
+    return from(columnLineagePath(), queryParams.build());
   }
 }

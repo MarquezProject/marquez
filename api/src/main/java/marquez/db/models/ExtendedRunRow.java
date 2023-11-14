@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -23,6 +23,7 @@ public class ExtendedRunRow extends RunRow {
   @Getter private final String namespaceName;
   @Getter private final String jobName;
   @Getter private final String args;
+  @Getter private final String externalId;
 
   public ExtendedRunRow(
       final UUID uuid,
@@ -32,6 +33,7 @@ public class ExtendedRunRow extends RunRow {
       @Nullable final UUID jobVersionUuid,
       @Nullable final UUID parentRunUuid,
       final UUID runArgsUuid,
+      final String externalId,
       final List<DatasetVersionId> inputVersions,
       final List<DatasetVersionId> outputVersions,
       @Nullable final Instant nominalStartTime,
@@ -58,12 +60,15 @@ public class ExtendedRunRow extends RunRow {
         startedAt,
         startRunStateUuid,
         endedAt,
-        endRunStateUuid);
+        endRunStateUuid,
+        jobName,
+        namespaceName);
     this.inputVersions = inputVersions;
     this.outputVersions = outputVersions;
     this.args = args;
     this.jobName = jobName;
     this.namespaceName = namespaceName;
+    this.externalId = externalId;
   }
 
   public boolean hasInputVersionUuids() {

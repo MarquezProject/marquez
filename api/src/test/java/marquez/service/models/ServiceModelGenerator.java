@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,7 +7,6 @@ package marquez.service.models;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.time.temporal.ChronoUnit.HOURS;
-import static marquez.common.models.CommonModelGenerator.newContext;
 import static marquez.common.models.CommonModelGenerator.newDatasetId;
 import static marquez.common.models.CommonModelGenerator.newDatasetIdsWith;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
@@ -120,7 +119,6 @@ public final class ServiceModelGenerator extends Generator {
         newInputsWith(namespaceName, numOfInputs),
         newOutputsWith(namespaceName, numOfOutputs),
         newLocation(),
-        newContext(),
         newDescription(),
         null);
   }

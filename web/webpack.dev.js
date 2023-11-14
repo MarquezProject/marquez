@@ -1,4 +1,4 @@
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
 
@@ -45,4 +45,4 @@ const webpackDev = {
   ]
 }
 
-module.exports = merge.smart(webpackShared, webpackDev)
+module.exports = merge(webpackShared, webpackDev)

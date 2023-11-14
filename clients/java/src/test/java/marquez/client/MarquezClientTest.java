@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,17 +9,18 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 import static marquez.client.MarquezClient.DEFAULT_BASE_URL;
 import static marquez.client.MarquezPathV1.BASE_PATH;
 import static marquez.client.models.ModelGenerator.newConnectionUrl;
-import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDatasetFacets;
 import static marquez.client.models.ModelGenerator.newDatasetIdWith;
 import static marquez.client.models.ModelGenerator.newDatasetPhysicalName;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newFields;
+import static marquez.client.models.ModelGenerator.newInputDatasetVersion;
 import static marquez.client.models.ModelGenerator.newInputs;
 import static marquez.client.models.ModelGenerator.newJobIdWith;
 import static marquez.client.models.ModelGenerator.newJobType;
 import static marquez.client.models.ModelGenerator.newLocation;
 import static marquez.client.models.ModelGenerator.newNamespaceName;
+import static marquez.client.models.ModelGenerator.newOutputDatasetVersion;
 import static marquez.client.models.ModelGenerator.newOutputs;
 import static marquez.client.models.ModelGenerator.newOwnerName;
 import static marquez.client.models.ModelGenerator.newRunArgs;
@@ -68,13 +69,20 @@ import marquez.client.MarquezClient.Namespaces;
 import marquez.client.MarquezClient.Runs;
 import marquez.client.MarquezClient.Sources;
 import marquez.client.MarquezClient.Tags;
+import marquez.client.models.ColumnLineageInputField;
+import marquez.client.models.ColumnLineageNodeData;
 import marquez.client.models.Dataset;
+import marquez.client.models.DatasetFieldId;
 import marquez.client.models.DatasetId;
+import marquez.client.models.DatasetNodeData;
+import marquez.client.models.DatasetType;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.DbTable;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.DbTableVersion;
+import marquez.client.models.Edge;
 import marquez.client.models.Field;
+import marquez.client.models.InputDatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
@@ -83,6 +91,10 @@ import marquez.client.models.JsonGenerator;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Node;
+import marquez.client.models.NodeId;
+import marquez.client.models.NodeType;
+import marquez.client.models.OutputDatasetVersion;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -112,7 +124,8 @@ public class MarquezClientTest {
   private static final String OWNER_NAME = newOwnerName();
   private static final String NAMESPACE_DESCRIPTION = newDescription();
   private static final Namespace NAMESPACE =
-      new Namespace(NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION);
+      new Namespace(
+          NAMESPACE_NAME, CREATED_AT, UPDATED_AT, OWNER_NAME, NAMESPACE_DESCRIPTION, false);
 
   // SOURCE
   private static final String SOURCE_TYPE = newSourceType();
@@ -132,6 +145,7 @@ public class MarquezClientTest {
   private static final List<Field> FIELDS = newFields(4);
   private static final Set<String> TAGS = newTagNames(4);
   private static final Map<String, Object> DB_FACETS = newDatasetFacets(4);
+  private static final String FIELD_NAME = "test_field";
 
   private static final DbTable DB_TABLE =
       new DbTable(
@@ -146,6 +160,7 @@ public class MarquezClientTest {
           TAGS,
           null,
           DB_TABLE_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
   private static final DbTable DB_TABLE_MODIFIED =
@@ -161,6 +176,7 @@ public class MarquezClientTest {
           TAGS,
           LAST_MODIFIED_AT,
           DB_TABLE_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
 
@@ -174,7 +190,8 @@ public class MarquezClientTest {
           Collections.emptyMap(),
           Collections.emptyList(),
           Collections.emptyList(),
-          URI.create("http://localhost:8080"));
+          URI.create("http://localhost:8080"),
+          URI.create("https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent"));
 
   // STREAM DATASET
   private static final DatasetId STREAM_ID = newDatasetIdWith(NAMESPACE_NAME);
@@ -197,6 +214,7 @@ public class MarquezClientTest {
           null,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
   private static final Stream STREAM_MODIFIED =
@@ -213,6 +231,7 @@ public class MarquezClientTest {
           LAST_MODIFIED_AT,
           STREAM_SCHEMA_LOCATION,
           STREAM_DESCRIPTION,
+          null,
           DB_FACETS,
           CURRENT_VERSION);
 
@@ -224,7 +243,6 @@ public class MarquezClientTest {
   private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
-  private static final Map<String, String> JOB_CONTEXT = newContext();
   private static final Job JOB =
       new Job(
           JOB_ID,
@@ -238,7 +256,6 @@ public class MarquezClientTest {
           INPUTS,
           OUTPUTS,
           LOCATION,
-          JOB_CONTEXT,
           JOB_DESCRIPTION,
           null,
           null,
@@ -251,6 +268,13 @@ public class MarquezClientTest {
   private static final Instant ENDED_AT = START_AT.plusMillis(1000L);
   private static final long DURATION = START_AT.until(ENDED_AT, MILLIS);
   private static final Map<String, String> RUN_ARGS = newRunArgs();
+
+  private static final List<InputDatasetVersion> INPUT_RUN_DATASET_FACETS =
+      Collections.singletonList(newInputDatasetVersion());
+
+  private static final List<OutputDatasetVersion> OUTPUT_RUN_DATASET_FACETS =
+      Collections.singletonList(newOutputDatasetVersion());
+
   private static final Run NEW =
       new Run(
           newRunId(),
@@ -263,7 +287,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run RUNNING =
       new Run(
           newRunId(),
@@ -276,7 +302,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run COMPLETED =
       new Run(
           newRunId(),
@@ -289,7 +317,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run ABORTED =
       new Run(
           newRunId(),
@@ -302,7 +332,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
   private static final Run FAILED =
       new Run(
           newRunId(),
@@ -315,7 +347,9 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
-          null);
+          null,
+          INPUT_RUN_DATASET_FACETS,
+          OUTPUT_RUN_DATASET_FACETS);
 
   private static final String RUN_ID = newRunId();
   private static final Job JOB_WITH_LATEST_RUN =
@@ -331,7 +365,6 @@ public class MarquezClientTest {
           INPUTS,
           OUTPUTS,
           LOCATION,
-          JOB_CONTEXT,
           JOB_DESCRIPTION,
           new Run(
               RUN_ID,
@@ -344,7 +377,9 @@ public class MarquezClientTest {
               ENDED_AT,
               DURATION,
               RUN_ARGS,
-              null),
+              null,
+              INPUT_RUN_DATASET_FACETS,
+              OUTPUT_RUN_DATASET_FACETS),
           null,
           null);
 
@@ -377,6 +412,62 @@ public class MarquezClientTest {
           STREAM_DESCRIPTION,
           CREATED_BY_RUN,
           DB_FACETS);
+
+  private static final DatasetId DATASET_ID = new DatasetId(NAMESPACE_NAME, DB_TABLE_NAME);
+
+  private static final DatasetFieldId DATASET_FIELD_ID =
+      new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
+
+  private static final DatasetFieldId DATASET_FIELD_VERSION_ID =
+      new DatasetFieldId(NAMESPACE_NAME, DB_TABLE_NAME, FIELD_NAME);
+
+  private static final Node LINEAGE_NODE =
+      new Node(
+          NodeId.of(DATASET_ID),
+          NodeType.DATASET,
+          new DatasetNodeData(
+              DATASET_ID,
+              DatasetType.DB_TABLE,
+              DB_TABLE_NAME,
+              DB_TABLE_PHYSICAL_NAME,
+              CREATED_AT,
+              UPDATED_AT,
+              NAMESPACE_NAME,
+              DB_TABLE_SOURCE_NAME,
+              FIELDS,
+              TAGS,
+              null,
+              DB_TABLE_DESCRIPTION,
+              null),
+          ImmutableSet.of(
+              Edge.of(NodeId.of(DATASET_ID), NodeId.of(new DatasetId("namespace", "inDataset")))),
+          ImmutableSet.of(
+              Edge.of(NodeId.of(new DatasetId("namespace", "outDataset")), NodeId.of(DATASET_ID))));
+
+  private static final Node COLUMN_LINEAGE_NODE =
+      new Node(
+          NodeId.of(DATASET_FIELD_ID),
+          NodeType.DATASET_FIELD,
+          new ColumnLineageNodeData(
+              NAMESPACE_NAME,
+              DB_TABLE_NAME,
+              FIELD_NAME,
+              "String",
+              Collections.singletonList(
+                  new ColumnLineageInputField(
+                      "namespace",
+                      "inDataset",
+                      "some-col1",
+                      "transformationDescription",
+                      "transformationType"))),
+          ImmutableSet.of(
+              Edge.of(
+                  NodeId.of(DATASET_FIELD_ID),
+                  NodeId.of(new DatasetFieldId("namespace", "inDataset", "some-col1")))),
+          ImmutableSet.of(
+              Edge.of(
+                  NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
+                  NodeId.of(DATASET_FIELD_ID))));
 
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
@@ -744,7 +835,6 @@ public class MarquezClientTest {
             .outputs(OUTPUTS)
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
-            .context(JOB_CONTEXT)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
     final String jobAsJson = JsonGenerator.newJsonFor(JOB);
@@ -765,7 +855,6 @@ public class MarquezClientTest {
             .outputs(OUTPUTS)
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
-            .context(JOB_CONTEXT)
             .runId(RUN_ID)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
@@ -936,6 +1025,43 @@ public class MarquezClientTest {
 
     assertThat(createdTag.getName()).isEqualTo("tag2");
     assertThat(createdTag.getDescription()).isNotEmpty().contains("description");
+  }
+
+  @Test
+  public void testGetLineage() throws Exception {
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(LINEAGE_NODE));
+    String lineageJson = lineage.toJson();
+    when(http.get(buildUrlFor("/lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client.getLineage(NodeId.of(new DatasetId("namespace", "dataset"))).getGraph().stream()
+            .findAny()
+            .get();
+    assertThat(retrievedNode).isEqualTo(LINEAGE_NODE);
+  }
+
+  @Test
+  public void testGetColumnLineage() throws Exception {
+    MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(COLUMN_LINEAGE_NODE));
+    String lineageJson = lineage.toJson();
+    when(http.get(
+            buildUrlFor(
+                "/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=false")))
+        .thenReturn(lineageJson);
+
+    Node retrievedNode =
+        client
+            .getColumnLineage(NodeId.of(new DatasetId("namespace", "dataset")))
+            .getGraph()
+            .stream()
+            .findAny()
+            .get();
+    assertThat(retrievedNode).isEqualTo(COLUMN_LINEAGE_NODE);
+  }
+
+  private URL buildUrlFor(String pathTemplate) throws Exception {
+    return new URL(DEFAULT_BASE_URL + BASE_PATH + pathTemplate);
   }
 
   private URL buildUrlFor(String pathTemplate, String... pathArgs) throws Exception {

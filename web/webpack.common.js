@@ -7,34 +7,22 @@ module.exports = {
   module: {
     rules: [{
         test: /\.css$/,
-        use: [{
+      use: [{
             loader: 'style-loader',
           },
           {
             loader: 'css-loader',
             options: {
-              modules: true,
               importLoaders: 1,
-              localIdentName: '[path][name]__[local]--[hash:base64:5]'
+              modules : {
+                localIdentName: '[name]__[local]__[hash:base64:5]',
+              },
             }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: [postCssModulesValues, autoprefixer],
-            },
-          }
-        ]
+        }]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            outputPath: 'img/'
-          }
-        }]
+        loader: 'file-loader'
       },
       {
         test: /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/,
@@ -46,11 +34,15 @@ module.exports = {
           }
         }]
       },
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
       {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader"
+        loader: "ts-loader"
       },
+      {
+        test: /\.ico$/,
+        loader: 'file-loader'
+      }
     ]
   },
   resolve: {
@@ -59,6 +51,7 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/'
   }
 };

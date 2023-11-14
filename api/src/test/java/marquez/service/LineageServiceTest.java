@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,15 +9,20 @@ import static marquez.db.LineageTestUtils.NAMESPACE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetVersionId;
+import marquez.common.models.InputDatasetVersion;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.OutputDatasetVersion;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
@@ -25,10 +30,12 @@ import marquez.db.LineageTestUtils;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
-import marquez.db.models.JobData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LineageService.UpstreamRunLineage;
 import marquez.service.models.Edge;
+import marquez.service.models.Job;
+import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
@@ -53,7 +60,6 @@ public class LineageServiceTest {
   private static LineageDao lineageDao;
   private static LineageService lineageService;
   private static OpenLineageDao openLineageDao;
-
   private static DatasetDao datasetDao;
   private static JobDao jobDao;
 
@@ -81,28 +87,7 @@ public class LineageServiceTest {
 
   @AfterEach
   public void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM stream_versions");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("DELETE FROM dataset_symlinks");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          handle.execute("DELETE FROM dataset_fields_tag_mapping");
-          handle.execute("DELETE FROM dataset_fields");
-          handle.execute("DELETE FROM datasets");
-          handle.execute("DELETE FROM sources");
-          handle.execute("DELETE FROM namespaces");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   @Test
@@ -144,7 +129,8 @@ public class LineageServiceTest {
         dataset);
     String jobName = writeJob.getJob().getName();
     Lineage lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 1 commonDataset
     // 20 readJob           + 20 outputData
@@ -176,10 +162,13 @@ public class LineageServiceTest {
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getOutputDatasetVersions,
+            InstanceOfAssertFactories.list(OutputDatasetVersion.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node
@@ -209,6 +198,27 @@ public class LineageServiceTest {
             NodeId.of(
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
+
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    jobs =
+        jobs.stream()
+            .filter(j -> j.getName().getValue().contains("newDownstreamJob"))
+            .collect(Collectors.toList());
+    assertTrue(jobs.size() > 0);
+    Job job = jobs.get(0);
+    assertTrue(job.getLatestRun().isPresent());
+    UpstreamRunLineage upstreamLineage =
+        lineageService.upstream(job.getLatestRun().get().getId(), 10);
+    assertThat(upstreamLineage.runs()).size().isEqualTo(3);
+    assertThat(upstreamLineage.runs().get(0).job().name().getValue())
+        .matches("newDownstreamJob.*<-outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(0).inputs().get(0).name().getValue())
+        .matches("outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).job().name().getValue())
+        .matches("newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).inputs().get(0).name().getValue())
+        .isEqualTo("commonDataset");
+    assertThat(upstreamLineage.runs().get(2).job().name().getValue()).isEqualTo("writeJob");
   }
 
   @Test
@@ -252,7 +262,8 @@ public class LineageServiceTest {
 
     String jobName = writeJob.getJob().getName();
     Lineage lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 0 commonDataset is hidden
     // 20 readJob           + 20 outputData
@@ -284,10 +295,13 @@ public class LineageServiceTest {
             .get();
     runAssert.extracting(r -> r.getId().getValue()).isEqualTo(secondRun.getRun().getUuid());
     runAssert
-        .extracting(Run::getInputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
     runAssert
-        .extracting(Run::getOutputVersions, InstanceOfAssertFactories.list(DatasetVersionId.class))
+        .extracting(
+            Run::getOutputDatasetVersions,
+            InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(1);
 
     // check the output edges for the commonDataset node
@@ -301,7 +315,8 @@ public class LineageServiceTest {
     jobDao.delete(NAMESPACE, "downstreamJob0<-outputData<-readJob0<-commonDataset");
 
     lineage =
-        lineageService.lineage(NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2);
+        lineageService.lineage(
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(jobName)), 2, true);
 
     // 1 writeJob           + 0 commonDataset is hidden
     // 20 readJob           + 20 outputData
@@ -331,7 +346,9 @@ public class LineageServiceTest {
             openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
     Lineage lineage =
         lineageService.lineage(
-            NodeId.of(new NamespaceName(NAMESPACE), new JobName(writeJob.getJob().getName())), 5);
+            NodeId.of(new NamespaceName(NAMESPACE), new JobName(writeJob.getJob().getName())),
+            5,
+            true);
     assertThat(lineage.getGraph())
         .hasSize(1)
         .first()
@@ -382,7 +399,8 @@ public class LineageServiceTest {
         lineageService.lineage(
             NodeId.of(
                 new NamespaceName(NAMESPACE), new JobName(intermediateJob.getJob().getName())),
-            5);
+            5,
+            true);
     assertThat(lineage.getGraph()).extracting(Node::getId).hasSize(6);
     ObjectAssert<Node> datasetNode =
         assertThat(lineage.getGraph())
@@ -405,6 +423,38 @@ public class LineageServiceTest {
         .first()
         .extracting(Edge::getDestination)
         .matches(n -> n.isJobType() && n.asJobId().getName().getValue().equals("writeJob"));
+  }
+
+  @Test
+  public void testLineageForOrphanedDataset() {
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+
+    NodeId datasetNodeId =
+        NodeId.of(new NamespaceName(dataset.getNamespace()), new DatasetName(dataset.getName()));
+    Lineage lineage = lineageService.lineage(datasetNodeId, 2, false);
+    assertThat(lineage.getGraph())
+        .hasSize(2)
+        .extracting(Node::getId)
+        .containsExactlyInAnyOrder(
+            NodeId.of(new JobId(new NamespaceName(NAMESPACE), new JobName("writeJob"))),
+            datasetNodeId);
+
+    UpdateLineageRow updatedWriteJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList());
+
+    lineage = lineageService.lineage(datasetNodeId, 2, false);
+    assertThat(lineage.getGraph())
+        .hasSize(1)
+        .extracting(Node::getId)
+        .containsExactlyInAnyOrder(datasetNodeId);
   }
 
   private boolean jobNameEquals(Node node, String writeJob) {

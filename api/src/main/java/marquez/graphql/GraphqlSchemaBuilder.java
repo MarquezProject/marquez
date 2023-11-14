@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -101,7 +101,6 @@ public class GraphqlSchemaBuilder {
                 .dataFetcher("datasets", dataFetchers.getDatasetsByNamespace()))
         .type(
             newTypeWiring("JobVersion")
-                .dataFetcher("jobContext", dataFetchers.getJobContextByJobVersion())
                 .dataFetcher("latestRun", dataFetchers.getLatestRunByJobVersion())
                 .dataFetcher("job", dataFetchers.getJobByJobVersion())
                 .dataFetcher("inputs", dataFetchers.getInputsByJobVersion())

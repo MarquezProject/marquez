@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.api.ColumnLineageResource;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
@@ -21,24 +22,28 @@ import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
+import marquez.api.exceptions.JsonProcessingExceptionMapper;
 import marquez.db.BaseDao;
+import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.JobContextDao;
 import marquez.db.JobDao;
+import marquez.db.JobFacetsDao;
 import marquez.db.JobVersionDao;
 import marquez.db.LineageDao;
 import marquez.db.NamespaceDao;
 import marquez.db.OpenLineageDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
+import marquez.db.RunFacetsDao;
 import marquez.db.RunStateDao;
 import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
+import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
 import marquez.service.DatasetVersionService;
@@ -63,13 +68,15 @@ public final class MarquezContext {
   @Getter private final DatasetVersionDao datasetVersionDao;
   @Getter private final JobDao jobDao;
   @Getter private final JobVersionDao jobVersionDao;
-  @Getter private final JobContextDao jobContextDao;
+  @Getter private final JobFacetsDao jobFacetsDao;
   @Getter private final RunDao runDao;
   @Getter private final RunArgsDao runArgsDao;
+  @Getter private final RunFacetsDao runFacetsDao;
   @Getter private final RunStateDao runStateDao;
   @Getter private final TagDao tagDao;
   @Getter private final OpenLineageDao openLineageDao;
   @Getter private final LineageDao lineageDao;
+  @Getter private final ColumnLineageDao columnLineageDao;
   @Getter private final SearchDao searchDao;
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
@@ -81,15 +88,18 @@ public final class MarquezContext {
   @Getter private final RunService runService;
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
+  @Getter private final ColumnLineageService columnLineageService;
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
+  @Getter private final ColumnLineageResource columnLineageResource;
   @Getter private final JobResource jobResource;
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final SearchResource searchResource;
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
+  @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
 
   private MarquezContext(
@@ -108,13 +118,15 @@ public final class MarquezContext {
     this.datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     this.jobDao = jdbi.onDemand(JobDao.class);
     this.jobVersionDao = jdbi.onDemand(JobVersionDao.class);
-    this.jobContextDao = jdbi.onDemand(JobContextDao.class);
+    this.jobFacetsDao = jdbi.onDemand(JobFacetsDao.class);
     this.runDao = jdbi.onDemand(RunDao.class);
     this.runArgsDao = jdbi.onDemand(RunArgsDao.class);
+    this.runFacetsDao = jdbi.onDemand(RunFacetsDao.class);
     this.runStateDao = jdbi.onDemand(RunStateDao.class);
     this.tagDao = jdbi.onDemand(TagDao.class);
     this.openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     this.lineageDao = jdbi.onDemand(LineageDao.class);
+    this.columnLineageDao = jdbi.onDemand(ColumnLineageDao.class);
     this.searchDao = jdbi.onDemand(SearchDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
@@ -128,7 +140,9 @@ public final class MarquezContext {
     this.tagService.init(tags);
     this.openLineageService = new OpenLineageService(baseDao, runService);
     this.lineageService = new LineageService(lineageDao, jobDao);
+    this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
     this.jdbiException = new JdbiExceptionExceptionMapper();
+    this.jsonException = new JsonProcessingExceptionMapper();
     final ServiceFactory serviceFactory =
         ServiceFactory.builder()
             .datasetService(datasetService)
@@ -139,13 +153,15 @@ public final class MarquezContext {
             .openLineageService(openLineageService)
             .sourceService(sourceService)
             .lineageService(lineageService)
+            .columnLineageService(columnLineageService)
             .datasetFieldService(new DatasetFieldService(baseDao))
             .datasetVersionService(new DatasetVersionService(baseDao))
             .build();
     this.namespaceResource = new NamespaceResource(serviceFactory);
     this.sourceResource = new SourceResource(serviceFactory);
     this.datasetResource = new DatasetResource(serviceFactory);
-    this.jobResource = new JobResource(serviceFactory, jobVersionDao);
+    this.columnLineageResource = new ColumnLineageResource(serviceFactory);
+    this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
@@ -155,9 +171,11 @@ public final class MarquezContext {
             namespaceResource,
             sourceResource,
             datasetResource,
+            columnLineageResource,
             jobResource,
             tagResource,
             jdbiException,
+            jsonException,
             openLineageResource,
             searchResource);
 

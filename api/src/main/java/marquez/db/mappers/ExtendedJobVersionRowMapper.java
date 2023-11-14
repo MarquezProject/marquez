@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,7 +34,6 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         uuidOrThrow(results, Columns.JOB_UUID),
-        uuidOrThrow(results, Columns.JOB_CONTEXT_UUID),
         columnNames.contains(Columns.INPUT_UUIDS)
             ? uuidArrayOrThrow(results, Columns.INPUT_UUIDS)
             : ImmutableList.<UUID>of(),
@@ -44,7 +43,6 @@ public final class ExtendedJobVersionRowMapper implements RowMapper<ExtendedJobV
         stringOrNull(results, Columns.LOCATION),
         uuidOrThrow(results, Columns.VERSION),
         uuidOrNull(results, Columns.LATEST_RUN_UUID),
-        columnNames.contains(Columns.CONTEXT) ? stringOrThrow(results, Columns.CONTEXT) : "",
         stringOrThrow(results, Columns.NAMESPACE_NAME),
         stringOrThrow(results, Columns.JOB_NAME),
         uuidOrThrow(results, Columns.NAMESPACE_UUID));

@@ -1,4 +1,5 @@
-const proxy = require('http-proxy-middleware')
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
 const express = require('express')
 const router = express.Router()
 
@@ -10,8 +11,9 @@ const path = __dirname + '/dist'
 
 app.use('/', express.static(path))
 app.use('/datasets', express.static(path))
+app.use('/events', express.static(path))
 app.use('/lineage/:type/:namespace/:name', express.static(path))
-app.use(proxy('/api/v1', apiOptions))
+app.use(createProxyMiddleware('/api/v1', apiOptions))
 
 router.get('/healthcheck', function (req, res) {
   res.send('OK')

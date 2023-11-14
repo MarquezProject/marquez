@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -33,6 +33,8 @@ public class RunRow {
   @Nullable private final UUID startRunStateUuid;
   @Nullable private final Instant endedAt;
   @Nullable private final UUID endRunStateUuid;
+  @Getter @Nullable private final String jobName;
+  @Getter @Nullable private final String namespaceName;
 
   public Optional<UUID> getParentRunUuid() {
     return Optional.ofNullable(parentRunUuid);

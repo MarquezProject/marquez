@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,8 +11,10 @@ import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
+import marquez.jobs.DbRetentionConfig;
 import marquez.service.models.Tag;
 import marquez.tracing.SentryConfig;
 
@@ -40,4 +42,14 @@ public class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("sentry")
   private final SentryConfig sentry = new SentryConfig();
+
+  @Getter
+  @Setter
+  @JsonProperty("dbRetention")
+  private DbRetentionConfig dbRetention; // OPTIONAL
+
+  /** Returns {@code true} if a data retention policy has been configured. */
+  public boolean hasDbRetentionPolicy() {
+    return (dbRetention != null);
+  }
 }

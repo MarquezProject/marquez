@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { Namespace } from '../../types/api'
@@ -21,7 +22,7 @@ export default (
   switch (type) {
     case FETCH_NAMESPACES_SUCCESS:
       return {
-        result: payload.namespaces,
+        result: payload.namespaces.filter(namespace => !namespace.isHidden),
         selectedNamespace:
           window.localStorage.getItem('selectedNamespace') &&
           action.payload.namespaces.find(

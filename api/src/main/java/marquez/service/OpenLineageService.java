@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,6 +45,7 @@ import marquez.service.RunTransitionListener.JobOutputUpdate;
 import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
@@ -65,6 +66,30 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     this.runService = runService;
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
     this.executor = executor;
+  }
+
+  public CompletableFuture<Void> createAsync(DatasetEvent event) {
+    CompletableFuture<Void> openLineage =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () ->
+                        createDatasetEvent(
+                            event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                            createJsonArray(event, mapper),
+                            event.getProducer()))),
+            executor);
+
+    CompletableFuture<Void> marquez =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () -> {
+                      updateMarquezModel(event, mapper);
+                    })),
+            executor);
+
+    return CompletableFuture.allOf(marquez, openLineage);
   }
 
   public CompletableFuture<Void> createAsync(LineageEvent event) {

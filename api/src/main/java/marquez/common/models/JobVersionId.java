@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,4 +19,9 @@ public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName name;
   @NonNull UUID version;
+
+  public static JobVersionId of(
+      final NamespaceName namespaceName, final JobName jobName, final UUID version) {
+    return new JobVersionId(namespaceName, jobName, version);
+  }
 }

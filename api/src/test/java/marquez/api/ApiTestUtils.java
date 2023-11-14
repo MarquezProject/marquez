@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -8,6 +8,7 @@ package marquez.api;
 import static org.mockito.Mockito.mock;
 
 import java.util.Map;
+import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
 import marquez.service.DatasetVersionService;
@@ -33,6 +34,9 @@ public class ApiTestUtils {
     return ServiceFactory.builder()
         .lineageService(
             (LineageService) mocks.getOrDefault(LineageService.class, (mock(LineageService.class))))
+        .columnLineageService(
+            (ColumnLineageService)
+                mocks.getOrDefault(ColumnLineageService.class, (mock(ColumnLineageService.class))))
         .openLineageService(
             (OpenLineageService)
                 mocks.getOrDefault(OpenLineageService.class, (mock(OpenLineageService.class))))

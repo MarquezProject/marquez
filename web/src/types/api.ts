@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { JobOrDataset, LineageNode } from '../components/lineage/types'
@@ -6,6 +7,11 @@ export interface Tag {
   name: string
   description: string
 }
+
+export interface Tags {
+  tags: Tag[]
+}
+
 export interface Runs {
   runs: Run[]
 }
@@ -20,10 +26,45 @@ export interface Namespace {
   updatedAt: string
   ownerName: string
   description: string
+  isHidden: boolean
+}
+
+export interface Events {
+  events: Event[]
+  totalCount: number
+}
+
+export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'
+
+export interface Event {
+  eventType: EventType
+  eventTime: string
+  producer: string
+  schemaURL: string
+  run: {
+    runId: string
+    facets: object
+  }
+  job: {
+    name: string
+    namespace: string
+    facets: object
+  }
+  inputs: {
+    name: string
+    namespace: string
+    facets: object
+  }[]
+  outputs: {
+    name: string
+    namespace: string
+    facets: object
+  }[]
 }
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {
@@ -41,10 +82,21 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
+  columnLineage: object
 }
 
 export interface DatasetVersions {
   versions: DatasetVersion[]
+}
+
+export interface DataQualityFacets {
+  dataQualityAssertions?: {
+    assertions?: {
+      assertion: string
+      column: string
+      success: boolean
+    }[]
+  }
 }
 
 export interface DatasetVersion {
@@ -86,6 +138,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 
@@ -99,9 +152,6 @@ export interface Job {
   outputs: DatasetId[]
   namespace: string
   location: string
-  context: {
-    [key: string]: string
-  }
   description: string
   latestRun: Run
 }
@@ -119,9 +169,6 @@ export interface Runs {
 
 export interface Run {
   id: string
-  context: {
-    sql?: string
-  }
   createdAt: string
   updatedAt: string
   nominalStartTime: string
@@ -141,7 +188,7 @@ export interface Run {
   facets: object
 }
 
-export type RunState = 'NEW' | 'COMPLETED' | 'FAILED' | 'ABORTED'
+export type RunState = 'NEW' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'ABORTED'
 
 export interface SearchResult {
   name: string
@@ -165,4 +212,11 @@ export interface Search {
 export interface GroupedSearchResult {
   results: Map<string, GroupedSearch[]>
   rawResults: GroupedSearch[]
+}
+
+export interface Facets {
+  runId: string
+  facets: {
+    [key: string]: object
+  }
 }

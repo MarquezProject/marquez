@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,7 +9,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
@@ -92,6 +91,10 @@ public final class CommonModelGenerator extends Generator {
     return DatasetType.values()[newIdWithBound(DatasetType.values().length - 1)];
   }
 
+  public static DatasetName newPhysicalDatasetName() {
+    return DatasetName.of("test_physical_dataset" + newId());
+  }
+
   public static Field newField() {
     return new Field(newFieldName(), newFieldType(), newTagNames(2), newDescription());
   }
@@ -149,11 +152,6 @@ public final class CommonModelGenerator extends Generator {
 
   public static URL newLocation() {
     return Utils.toUrl("https://github.com/repo/test/commit/" + newId());
-  }
-
-  public static ImmutableMap<String, String> newContext() {
-    return ImmutableMap.of(
-        "sql", String.format("SELECT * FROM test_table WHERE test_column = '%dH';", newId()));
   }
 
   public static RunId newRunId() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,10 +7,10 @@ package marquez.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
+import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
-import marquez.db.JobContextDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.LineageDao;
@@ -37,11 +37,6 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingDatasetVersionDao implements DatasetVersionDao {
     @Delegate private final DatasetVersionDao delegate;
-  }
-
-  @RequiredArgsConstructor
-  public static class DelegatingJobContextDao implements JobContextDao {
-    @Delegate private final JobContextDao delegate;
   }
 
   @RequiredArgsConstructor
@@ -97,5 +92,10 @@ public class DelegatingDaos {
   @RequiredArgsConstructor
   public static class DelegatingLineageDao implements LineageDao {
     @Delegate private final LineageDao delegate;
+  }
+
+  @RequiredArgsConstructor
+  public static class DelegatingColumnLineageDao implements ColumnLineageDao {
+    @Delegate private final ColumnLineageDao delegate;
   }
 }

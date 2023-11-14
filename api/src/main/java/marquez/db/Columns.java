@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,6 +25,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
 import org.postgresql.util.PGInterval;
+import org.postgresql.util.PGobject;
 
 @Slf4j
 public final class Columns {
@@ -54,7 +55,9 @@ public final class Columns {
   public static final String NAMESPACE_NAME = "namespace_name";
   public static final String DATASET_NAME = "dataset_name";
   public static final String FACETS = "facets";
+  public static final String DATASET_FACETS = "dataset_facets";
   public static final String TAGS = "tags";
+  public static final String IS_HIDDEN = "is_hidden";
 
   /* NAMESPACE ROW COLUMNS */
   public static final String CURRENT_OWNER_NAME = "current_owner_name";
@@ -101,14 +104,11 @@ public final class Columns {
 
   /* JOB VERSION ROW COLUMNS */
   public static final String JOB_UUID = "job_uuid";
-  public static final String JOB_CONTEXT_UUID = "job_context_uuid";
   public static final String LOCATION = "location";
   public static final String LATEST_RUN_UUID = "latest_run_uuid";
 
-  /* JOB CONTEXT ROW COLUMNS */
-  public static final String CONTEXT = "context";
-
   /* RUN ROW COLUMNS */
+  public static final String EXTERNAL_ID = "external_id";
   public static final String RUN_ARGS_UUID = "run_args_uuid";
   public static final String INPUT_VERSION_UUIDS = "input_version_uuids";
   public static final String NOMINAL_START_TIME = "nominal_start_time";
@@ -140,6 +140,7 @@ public final class Columns {
 
   /* LINEAGE EVENT ROW COLUMNS */
   public static final String EVENT = "event";
+  public static final String EVENT_TIME = "event_time";
 
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
@@ -149,9 +150,7 @@ public final class Columns {
   }
 
   public static UUID uuidOrThrow(final ResultSet results, final String column) throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getObject(column, UUID.class);
   }
 
@@ -165,9 +164,7 @@ public final class Columns {
 
   public static Instant timestampOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getTimestamp(column).toInstant();
   }
 
@@ -181,9 +178,7 @@ public final class Columns {
 
   public static String stringOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getString(column);
   }
 
@@ -196,34 +191,32 @@ public final class Columns {
     return results.getBoolean(column);
   }
 
+  public static boolean booleanOrThrow(final ResultSet results, final String column)
+      throws SQLException {
+    checkNotNull(results, column);
+    return results.getBoolean(column);
+  }
+
   public static int intOrThrow(final ResultSet results, final String column) throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getInt(column);
   }
 
   public static PGInterval pgIntervalOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return new PGInterval(results.getString(column));
   }
 
   public static BigDecimal bigDecimalOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getBigDecimal(column);
   }
 
   public static List<UUID> uuidArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return Arrays.asList((UUID[]) results.getArray(column).getArray());
   }
 
@@ -237,9 +230,7 @@ public final class Columns {
 
   public static List<String> stringArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return Arrays.asList((String[]) results.getArray(column).getArray());
   }
 
@@ -288,5 +279,25 @@ public final class Columns {
     }
     final String mapAsString = results.getString(column);
     return Utils.fromJson(mapAsString, new TypeReference<>() {});
+  }
+
+  public static PGobject toPgObject(@NonNull final Object object) {
+    final PGobject jsonObject = new PGobject();
+    jsonObject.setType("jsonb");
+    final String json = Utils.toJson(object);
+    try {
+      jsonObject.setValue(json);
+    } catch (SQLException e) {
+      log.error("Error when ...", e);
+      return null;
+    }
+    return jsonObject;
+  }
+
+  private static void checkNotNull(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException(column + " not found in result");
+    }
   }
 }

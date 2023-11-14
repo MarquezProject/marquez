@@ -1,3 +1,4 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { APIError, HttpMethod } from '../../types'
@@ -7,7 +8,7 @@ export const genericErrorMessageConstructor = (functionName: string, error: APIE
   throw `${functionName} responded with error code ${code}: ${message}.  Here are the details: ${details}`
 }
 
-interface IParams {
+export interface IParams {
   method: HttpMethod
   body?: string
 }
@@ -40,5 +41,8 @@ export const genericFetchWrapper = async (url: string, params: IParams, function
 }
 
 export * from './datasets'
+export * from './events'
+export * from './facets'
 export * from './namespaces'
 export * from './jobs'
+export * from './tags'

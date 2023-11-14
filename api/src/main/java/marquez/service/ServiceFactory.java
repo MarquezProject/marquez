@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,4 +22,5 @@ public class ServiceFactory {
   @NonNull DatasetVersionService datasetVersionService;
   @NonNull DatasetFieldService datasetFieldService;
   @NonNull LineageService lineageService;
+  @NonNull ColumnLineageService columnLineageService;
 }

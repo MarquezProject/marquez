@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,5 +69,16 @@ public final class Utils {
   public static void addAuthTo(
       @NonNull final HttpRequestBase request, @NonNull final String apiKey) {
     request.addHeader(AUTHORIZATION, "Bearer " + apiKey);
+  }
+
+  public static String checkNotBlank(@NonNull final String arg) {
+    if (emptyOrBlank(arg)) {
+      throw new IllegalArgumentException();
+    }
+    return arg;
+  }
+
+  private static boolean emptyOrBlank(final String arg) {
+    return arg.trim().isEmpty();
   }
 }

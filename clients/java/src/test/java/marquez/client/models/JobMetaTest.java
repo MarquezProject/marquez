@@ -1,12 +1,11 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.client.models;
 
 import static marquez.client.models.JobType.BATCH;
-import static marquez.client.models.ModelGenerator.newContext;
 import static marquez.client.models.ModelGenerator.newDescription;
 import static marquez.client.models.ModelGenerator.newJobMeta;
 import static marquez.client.models.ModelGenerator.newLocation;
@@ -46,7 +45,6 @@ public class JobMetaTest {
             .inputs(namespaceName, "a", "b", "c")
             .outputs(namespaceName, "d", "e")
             .location(newLocation())
-            .context(newContext())
             .description(newDescription())
             .build();
 

@@ -1,11 +1,12 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.service.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -24,10 +25,11 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.JobVersion;
-import marquez.common.models.DatasetVersionId;
+import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.JobName;
 import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.OutputDatasetVersion;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 
@@ -57,10 +59,10 @@ public final class Run {
   private final String jobName;
   private final UUID jobVersion;
   private final String location;
-  @Getter private final List<DatasetVersionId> inputVersions;
-  @Getter private final List<DatasetVersionId> outputVersions;
-  @Getter private final Map<String, String> context;
+  @Getter private final List<InputDatasetVersion> inputDatasetVersions;
+  @Getter private final List<OutputDatasetVersion> outputDatasetVersions;
   @Getter private final ImmutableMap<String, Object> facets;
+  ;
 
   public Run(
       @NonNull final RunId id,
@@ -77,9 +79,8 @@ public final class Run {
       String jobName,
       UUID jobVersion,
       String location,
-      List<DatasetVersionId> inputVersions,
-      List<DatasetVersionId> outputVersions,
-      Map<String, String> context,
+      List<InputDatasetVersion> inputDatasetVersions,
+      List<OutputDatasetVersion> outputDatasetFacets,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
     this.createdAt = createdAt;
@@ -95,9 +96,8 @@ public final class Run {
     this.jobName = jobName;
     this.jobVersion = jobVersion;
     this.location = location;
-    this.inputVersions = inputVersions;
-    this.outputVersions = outputVersions;
-    this.context = context;
+    this.inputDatasetVersions = inputDatasetVersions;
+    this.outputDatasetVersions = outputDatasetFacets;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
@@ -163,10 +163,15 @@ public final class Run {
     private Map<String, String> args;
     private JobVersionId jobVersion;
     private String location;
-    private List<DatasetVersionId> inputVersions;
-    private List<DatasetVersionId> outputVersions;
-    private Map<String, String> context;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private ImmutableMap<String, Object> facets;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<InputDatasetVersion> inputDatasetVersions;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<OutputDatasetVersion> outputDatasetVersions;
 
     public Run build() {
       return new Run(
@@ -184,9 +189,8 @@ public final class Run {
           jobVersion.getName().getValue(),
           jobVersion.getVersion(),
           location,
-          inputVersions,
-          outputVersions,
-          context,
+          inputDatasetVersions,
+          outputDatasetVersions,
           facets);
     }
   }

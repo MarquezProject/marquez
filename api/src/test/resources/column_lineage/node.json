@@ -1,0 +1,27 @@
+{
+  "id": "datasetField:namespace:commonDataset:columnA",
+  "type": "DATASET_FIELD",
+  "data": {
+    "namespace": "namespace",
+    "dataset": "otherDataset",
+    "field": "columnA",
+    "fieldType": "integer",
+    "transformationDescription": "identical",
+    "transformationType": "IDENTITY",
+    "inputFields": [
+      { "namespace": "namespace"  , "dataset":  "otherDataset", "field": "columnB"}
+    ]
+  },
+  "inEdges": [
+    {
+      "origin": "datasetField:namespace:otherDataset:columnB",
+      "destination": "datasetField:namespace:commonDataset:columnA"
+    }
+  ],
+  "outEdges": [
+    {
+      "origin": "datasetField:namespace:commonDataset:columnA",
+      "destination": "datasetField:namespace:otherDataset:columnC"
+    }
+  ]
+}

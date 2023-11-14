@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2018-2022 contributors to the Marquez project
+# Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 #
 # Requirements:
@@ -110,7 +110,7 @@ fi
 VERSIONS=($RELEASE_VERSION $NEXT_VERSION)
 for VERSION in "${VERSIONS[@]}"; do
   if [[ ! "${VERSION}" =~ ${SEMVER_REGEX} ]]; then
-    echo "Error: Version '${VERSION}' must match '${SEMVER_REGEX}'"
+    echo "error: Version '${VERSION}' must match '${SEMVER_REGEX}'"
     exit 1
   fi
 done
@@ -127,10 +127,11 @@ sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
 # (2) Bump version in helm chart
 sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
-sed -i "" "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
+sed -i "" -E -e "/postgresql/,\$b" -e "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
 
 # (3) Bump version in scripts
 sed -i "" "s/VERSION=.*/VERSION=${RELEASE_VERSION}/g" ./docker/up.sh
+sed -i "" "s/MARQUEZ_VERSION=.*/MARQUEZ_VERSION=${RELEASE_VERSION}/g" ./.circleci/db-migration.sh
 sed -i "" "s/TAG=.*/TAG=${RELEASE_VERSION}/g" .env.example
 
 # (4) Bump version in docs
@@ -161,6 +162,7 @@ if [[ "${NEXT_VERSION}" == *-rc.? ||
 fi
 sed -i "" "s/version=.*/version=${NEXT_VERSION}/g" gradle.properties
 sed -i "" "s/^  version:.*/  version: ${NEXT_VERSION}/g" ./spec/openapi.yml
+sed -i "" "s/MARQUEZ_VERSION=.*/MARQUEZ_VERSION=${NEXT_VERSION}/g" ./.circleci/api-load-test.sh
 
 # (9) Prepare next development version commit
 git commit -sam "Prepare next development version ${NEXT_VERSION}" --no-verify

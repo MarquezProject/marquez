@@ -1,12 +1,11 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.client.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +27,6 @@ public final class JobVersion {
   @Getter private final UUID version;
   @Getter private final String namespace;
   @Nullable private final URL location;
-  @Getter private final ImmutableMap<String, String> context;
   @Getter private final List<DatasetId> inputs;
   @Getter private final List<DatasetId> outputs;
   @Getter @Nullable private final Run latestRun;
@@ -39,7 +37,6 @@ public final class JobVersion {
       @NonNull final Instant createdAt,
       @NonNull final UUID version,
       @Nullable final URL location,
-      @Nullable final ImmutableMap<String, String> context,
       List<DatasetId> inputs,
       List<DatasetId> outputs,
       @Nullable Run latestRun) {
@@ -49,7 +46,6 @@ public final class JobVersion {
     this.version = version;
     this.namespace = id.getNamespace();
     this.location = location;
-    this.context = (context == null) ? ImmutableMap.of() : context;
     this.inputs = inputs;
     this.outputs = outputs;
     this.latestRun = latestRun;

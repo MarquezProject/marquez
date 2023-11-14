@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:14
+    container_name: marquez-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - MARQUEZ_DB=marquez
+      - MARQUEZ_USER=marquez
+      - MARQUEZ_PASSWORD=marquez
+    volumes:
+      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh

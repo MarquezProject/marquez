@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
@@ -62,7 +63,7 @@ public interface RunDao extends BaseDao {
           + "SET updated_at = :transitionedAt, "
           + "    start_run_state_uuid = :startRunStateUuid,"
           + "    started_at = :transitionedAt "
-          + "WHERE uuid = :rowUuid AND (updated_at < :transitionedAt or start_run_state_uuid is null)")
+          + "WHERE uuid = :rowUuid")
   void updateStartState(UUID rowUuid, Instant transitionedAt, UUID startRunStateUuid);
 
   @SqlUpdate(
@@ -74,34 +75,51 @@ public interface RunDao extends BaseDao {
   void updateEndState(UUID rowUuid, Instant transitionedAt, UUID endRunStateUuid);
 
   String BASE_FIND_RUN_SQL =
-      "SELECT r.*, ra.args, ctx.context, f.facets,\n"
-          + "jv.version AS job_version,\n"
-          + "ri.input_versions, ro.output_versions\n"
-          + "FROM runs_view AS r\n"
-          + "LEFT OUTER JOIN\n"
-          + "(\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
-          + "LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + " SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
-          + "        'name', dv.dataset_name,\n"
-          + "        'version', dv.version)) AS input_versions\n"
-          + " FROM runs_input_mapping im\n"
-          + " INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid\n"
-          + " GROUP BY im.run_uuid\n"
-          + ") ri ON ri.run_uuid=r.uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + "  SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
-          + "                                              'name', dataset_name,\n"
-          + "                                              'version', version)) AS output_versions\n"
-          + "  FROM dataset_versions\n"
-          + "  GROUP BY run_uuid\n"
-          + ") ro ON ro.run_uuid=r.uuid\n";
+      """
+      SELECT r.*, ra.args, f.facets,
+      jv.version AS job_version,
+      ri.input_versions, ro.output_versions, df.dataset_facets
+      FROM runs_view AS r
+      LEFT OUTER JOIN
+      (
+          SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
+          FROM run_facets_view rf
+          GROUP BY rf.run_uuid
+      ) AS f ON r.uuid=f.run_uuid
+      LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
+      LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
+      LEFT OUTER JOIN (
+          SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,
+              'name', dv.dataset_name,
+              'version', dv.version,
+              'dataset_version_uuid', uuid)) AS input_versions
+          FROM runs_input_mapping im
+          INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
+          GROUP BY im.run_uuid
+      ) ri ON ri.run_uuid=r.uuid
+      LEFT OUTER JOIN (
+          SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
+                                                      'name', dataset_name,
+                                                      'version', version,
+                                                      'dataset_version_uuid', uuid
+                                                      )) AS output_versions
+          FROM dataset_versions
+          GROUP BY run_uuid
+      ) ro ON ro.run_uuid=r.uuid
+      LEFT OUTER JOIN (
+          SELECT
+              run_uuid,
+              JSON_AGG(json_build_object(
+                  'dataset_version_uuid', dataset_version_uuid,
+                  'name', name,
+                  'type', type,
+                  'facet', facet
+              ) ORDER BY created_at ASC) as dataset_facets
+          FROM dataset_facets_view
+          WHERE (type ILIKE 'output' OR type ILIKE 'input')
+          GROUP BY run_uuid
+      ) AS df ON r.uuid = df.run_uuid
+      """;
 
   @SqlQuery(BASE_FIND_RUN_SQL + "WHERE r.uuid = :runUuid")
   Optional<Run> findRunByUuid(UUID runUuid);
@@ -122,25 +140,26 @@ public interface RunDao extends BaseDao {
 
   @SqlQuery(
       """
-          SELECT r.*, ra.args, ctx.context, f.facets,
+          SELECT r.*, ra.args, f.facets,
           j.namespace_name, j.name, jv.version AS job_version,
-          ri.input_versions, ro.output_versions
+          ri.input_versions, ro.output_versions, df.dataset_facets
           FROM runs_view AS r
           INNER JOIN jobs_view j ON r.job_uuid=j.uuid
           LEFT JOIN LATERAL
           (
-            SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets
-            FROM lineage_events le
-            WHERE le.run_uuid=r.uuid
-            GROUP BY le.run_uuid
+            SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
+            FROM run_facets_view rf
+            WHERE rf.run_uuid=r.uuid
+            GROUP BY rf.run_uuid
           ) AS f ON r.uuid=f.run_uuid
           LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
-          LEFT OUTER JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid
           LEFT OUTER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
           LEFT OUTER JOIN (
            SELECT im.run_uuid, JSON_AGG(json_build_object('namespace', dv.namespace_name,
                   'name', dv.dataset_name,
-                  'version', dv.version)) AS input_versions
+                  'version', dv.version,
+                  'dataset_version_uuid', uuid
+                  )) AS input_versions
            FROM runs_input_mapping im
            INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
            GROUP BY im.run_uuid
@@ -148,10 +167,25 @@ public interface RunDao extends BaseDao {
           LEFT OUTER JOIN (
             SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
                                                         'name', dataset_name,
-                                                        'version', version)) AS output_versions
+                                                        'version', version,
+                                                        'dataset_version_uuid', uuid
+                                                        )) AS output_versions
             FROM dataset_versions
             GROUP BY run_uuid
           ) ro ON ro.run_uuid=r.uuid
+          LEFT OUTER JOIN (
+          SELECT
+              run_uuid,
+              JSON_AGG(json_build_object(
+                  'dataset_version_uuid', dataset_version_uuid,
+                  'name', name,
+                  'type', type,
+                  'facet', facet
+              ) ORDER BY created_at ASC) as dataset_facets
+          FROM dataset_facets_view
+          WHERE (type ILIKE 'output' OR type ILIKE 'input')
+          GROUP BY run_uuid
+          ) AS df ON r.uuid = df.run_uuid
           WHERE j.namespace_name=:namespace AND (j.name=:jobName OR :jobName = ANY(j.aliases))
           ORDER BY STARTED_AT DESC NULLS LAST
           LIMIT :limit OFFSET :offset
@@ -174,8 +208,7 @@ public interface RunDao extends BaseDao {
           + "transitioned_at, "
           + "namespace_name, "
           + "job_name, "
-          + "location, "
-          + "job_context_uuid "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":parentRunUuid, "
@@ -191,10 +224,10 @@ public interface RunDao extends BaseDao {
           + ":runStateTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location, "
-          + ":jobContextUuid "
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
+          + "external_id = EXCLUDED.external_id, "
           + "updated_at = EXCLUDED.updated_at, "
           + "current_run_state = EXCLUDED.current_run_state, "
           + "transitioned_at = EXCLUDED.transitioned_at, "
@@ -216,8 +249,7 @@ public interface RunDao extends BaseDao {
       Instant runStateTime,
       String namespaceName,
       String jobName,
-      String location,
-      UUID jobContextUuid);
+      String location);
 
   @SqlQuery(
       "INSERT INTO runs ( "
@@ -233,8 +265,7 @@ public interface RunDao extends BaseDao {
           + "nominal_end_time, "
           + "namespace_name, "
           + "job_name, "
-          + "location, "
-          + "job_context_uuid "
+          + "location "
           + ") VALUES ( "
           + ":runUuid, "
           + ":parentRunUuid, "
@@ -248,10 +279,10 @@ public interface RunDao extends BaseDao {
           + ":nominalEndTime, "
           + ":namespaceName, "
           + ":jobName, "
-          + ":location, "
-          + ":jobContextUuid "
+          + ":location "
           + ") ON CONFLICT(uuid) DO "
           + "UPDATE SET "
+          + "external_id = EXCLUDED.external_id, "
           + "updated_at = EXCLUDED.updated_at, "
           + "nominal_start_time = COALESCE(EXCLUDED.nominal_start_time, runs.nominal_start_time), "
           + "nominal_end_time = COALESCE(EXCLUDED.nominal_end_time, runs.nominal_end_time), "
@@ -267,11 +298,43 @@ public interface RunDao extends BaseDao {
       UUID runArgsUuid,
       Instant nominalStartTime,
       Instant nominalEndTime,
-      UUID namespaceUuid,
       String namespaceName,
       String jobName,
-      String location,
-      UUID jobContextUuid);
+      String location);
+
+  default RunRow upsert(RunUpsert runUpsert) {
+    if (runUpsert.runStateType == null) {
+      return upsert(
+          runUpsert.runUuid(),
+          runUpsert.parentRunUuid(),
+          runUpsert.externalId(),
+          runUpsert.now(),
+          runUpsert.jobUuid(),
+          runUpsert.jobVersionUuid(),
+          runUpsert.runArgsUuid(),
+          runUpsert.nominalStartTime(),
+          runUpsert.nominalEndTime(),
+          runUpsert.namespaceName(),
+          runUpsert.jobName(),
+          runUpsert.location());
+    } else {
+      return upsert(
+          runUpsert.runUuid(),
+          runUpsert.parentRunUuid(),
+          runUpsert.externalId(),
+          runUpsert.now(),
+          runUpsert.jobUuid(),
+          runUpsert.jobVersionUuid(),
+          runUpsert.runArgsUuid(),
+          runUpsert.nominalStartTime(),
+          runUpsert.nominalEndTime(),
+          runUpsert.runStateType(),
+          runUpsert.runStateTime(),
+          runUpsert.namespaceName(),
+          runUpsert.jobName(),
+          runUpsert.location());
+    }
+  }
 
   @SqlUpdate(
       "INSERT INTO runs_input_mapping (run_uuid, dataset_version_uuid) "
@@ -400,8 +463,7 @@ public interface RunDao extends BaseDao {
             now,
             namespaceRow.getName(),
             jobRow.getName(),
-            jobRow.getLocation(),
-            jobRow.getJobContextUuid().orElse(null));
+            jobRow.getLocation());
 
     updateInputDatasetMapping(jobRow.getInputs(), uuid);
 
@@ -414,25 +476,32 @@ public interface RunDao extends BaseDao {
   void updateJobVersion(UUID runUuid, UUID jobVersionUuid);
 
   @SqlQuery(
-      """
-      WITH RECURSIVE job_names AS (
-        SELECT uuid, namespace_name, name, symlink_target_uuid
-        FROM jobs_view j
-        WHERE j.namespace_name=:namespace AND j.name=:jobName
-        UNION
-        SELECT j.uuid, j.namespace_name, j.name, j.symlink_target_uuid
-        FROM jobs_view j
-        INNER JOIN job_names jn ON j.uuid=jn.symlink_target_uuid OR j.symlink_target_uuid=jn.uuid
-      )
-      """
-          + BASE_FIND_RUN_SQL
+      BASE_FIND_RUN_SQL
           + """
       WHERE r.uuid=(
         SELECT r.uuid FROM runs_view r
-        INNER JOIN job_names j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
+        INNER JOIN jobs_view j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
+        WHERE j.namespace_name=:namespace AND (j.name=:jobName OR j.name=ANY(j.aliases))
         ORDER BY transitioned_at DESC
         LIMIT 1
       )
       """)
   Optional<Run> findByLatestJob(String namespace, String jobName);
+
+  @Builder
+  record RunUpsert(
+      UUID runUuid,
+      UUID parentRunUuid,
+      String externalId,
+      Instant now,
+      UUID jobUuid,
+      UUID jobVersionUuid,
+      UUID runArgsUuid,
+      Instant nominalStartTime,
+      Instant nominalEndTime,
+      RunState runStateType,
+      Instant runStateTime,
+      String namespaceName,
+      String jobName,
+      String location) {}
 }

@@ -1,98 +1,110 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { ChangeEvent, FunctionComponent, SetStateAction, useEffect } from 'react'
-
 import * as Redux from 'redux'
-import { Box, Chip, Tab, Tabs } from '@material-ui/core'
-import { DatasetVersion } from '../../types/api'
+import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
+import { CircularProgress } from '@mui/material'
+import { DatasetVersion, Tag } from '../../types/api'
 import { IState } from '../../store/reducers'
-import {
-  Theme as ITheme,
-  WithStyles as IWithStyles,
-  createStyles,
-  withStyles
-} from '@material-ui/core/styles'
 import { LineageDataset } from '../lineage/types'
+import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { fetchDatasetVersions, resetDatasetVersions } from '../../store/actionCreators'
-import { useHistory } from 'react-router-dom'
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
-import CloseIcon from '@material-ui/icons/Close'
+import { connect, useSelector } from 'react-redux'
+import { datasetFacetsStatus } from '../../helpers/nodes'
+import {
+  deleteDataset,
+  dialogToggle,
+  fetchDatasetVersions,
+  fetchTags,
+  resetDataset,
+  resetDatasetVersions,
+  setTabIndex,
+} from '../../store/actionCreators'
+import { useNavigate } from 'react-router-dom'
+import { useTheme } from '@emotion/react'
+import CloseIcon from '@mui/icons-material/Close'
+import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetVersions from './DatasetVersions'
-import IconButton from '@material-ui/core/IconButton'
+import Dialog from '../Dialog'
+import IconButton from '@mui/material/IconButton'
+import Io from '../io/Io'
+import MQTooltip from '../core/tooltip/MQTooltip'
+import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-
-const styles = ({ spacing }: ITheme) => {
-  return createStyles({
-    root: {
-      padding: `0 ${spacing(2)}px`
-    },
-    tagList: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      listStyle: 'none',
-      margin: 0,
-      padding: 0
-    },
-    tag: {
-      '&:not(:last-of-type)': {
-        marginRight: spacing(1)
-      }
-    },
-    noData: {
-      padding: '125px 0 0 0'
-    },
-    infoIcon: {
-      paddingLeft: '3px',
-      paddingTop: '3px'
-    },
-    updated: {
-      marginTop: '10px'
-    }
-  })
-}
+import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 interface StateProps {
-  dataset: LineageDataset
+  lineageDataset: LineageDataset
   versions: DatasetVersion[]
   versionsLoading: boolean
+  datasets: IState['datasets']
+  display: IState['display']
+  tabIndex: IState['lineage']['tabIndex']
 }
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
   resetDatasetVersions: typeof resetDatasetVersions
+  resetDataset: typeof resetDataset
+  deleteDataset: typeof deleteDataset
+  dialogToggle: typeof dialogToggle
+  setTabIndex: typeof setTabIndex
+  fetchTags: typeof fetchTags
 }
 
-type IProps = IWithStyles<typeof styles> & StateProps & DispatchProps
+type IProps = StateProps & DispatchProps
 
 function a11yProps(index: number) {
   return {
     id: `tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`
+    'aria-controls': `simple-tabpanel-${index}`,
   }
 }
 
-const DatasetDetailPage: FunctionComponent<IProps> = props => {
-  const { classes, fetchDatasetVersions, resetDatasetVersions, versions, versionsLoading } = props
-  const { root } = classes
-  const history = useHistory()
+const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
+  const {
+    datasets,
+    display,
+    fetchDatasetVersions,
+    resetDataset,
+    resetDatasetVersions,
+    deleteDataset,
+    dialogToggle,
+    versions,
+    versionsLoading,
+    lineageDataset,
+    tabIndex,
+    setTabIndex,
+    fetchTags,
+  } = props
+  const navigate = useNavigate()
+  const i18next = require('i18next')
+  const theme = createTheme(useTheme())
+  const tagData = useSelector((state: IState) => state.tags.tags)
 
   useEffect(() => {
-    fetchDatasetVersions(props.dataset.namespace, props.dataset.name)
-  }, [props.dataset.name])
+    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
+    fetchTags()
+  }, [props.lineageDataset.name])
+
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      navigate('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   // unmounting
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
+      resetDataset()
       resetDatasetVersions()
-    }
-  }, [])
+    },
+    []
+  )
 
-  const [tab, setTab] = React.useState(0)
-  const handleChange = (event: ChangeEvent, newValue: SetStateAction<number>) => {
-    setTab(newValue)
+  const handleChange = (_: ChangeEvent, newValue: number) => {
+    setTabIndex(newValue)
   }
 
   if (versionsLoading) {
@@ -107,67 +119,150 @@ const DatasetDetailPage: FunctionComponent<IProps> = props => {
     return null
   }
 
-  const dataset = versions[0]
-  const { name, tags, description } = dataset
+  const firstVersion = versions[0]
+  const { name, tags, description } = firstVersion
+  const facetsStatus = datasetFacetsStatus(firstVersion.facets)
+
+  const formatTags = (tags: string[], tag_desc: Tag[]) => {
+    const theme = createTheme(useTheme())
+    return (
+      <>
+        {tags.map((tag, index) => {
+          const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
+          const tooltipTitle = tagDescription?.description || 'No Tag Description'
+          return (
+            <MQTooltip title={tooltipTitle} key={tag}>
+              <Chip
+                label={tag}
+                size='small'
+                style={{
+                  display: 'inline',
+                  marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
+                }}
+              />
+            </MQTooltip>
+          )
+        })}
+      </>
+    )
+  }
 
   return (
-    <Box my={2} className={root}>
+    <Box
+      my={2}
+      sx={{
+        padding: `0 ${theme.spacing(2)}`,
+      }}
+    >
       <Box>
-        {tags.length > 0 && (
-          <ul className={classes.tagList}>
-            {tags.map(tag => (
-              <li key={tag} className={classes.tag}>
-                <Chip size='small' label={tag} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {formatTags(tags, tagData)}
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tab} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-              <Tab label='LATEST SCHEMA' {...a11yProps(0)} disableRipple={true} />
-              <Tab label='VERSION HISTORY' {...a11yProps(1)} disableRipple={true} />
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              textColor='primary'
+              indicatorColor='primary'
+            >
+              <Tab
+                label={i18next.t('datasets.latest_tab')}
+                {...a11yProps(0)}
+                disableRipple={true}
+              />
+              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
+              <Tab
+                label={i18next.t('datasets.history_tab')}
+                {...a11yProps(2)}
+                disableRipple={true}
+              />
+              <Tab
+                label={i18next.t('datasets.column_lineage_tab')}
+                {...a11yProps(3)}
+                disableRipple={true}
+              />
             </Tabs>
           </Box>
-          <IconButton onClick={() => history.push('/datasets')}>
-            <CloseIcon />
-          </IconButton>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                variant='outlined'
+                sx={{
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.3),
+                    backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  },
+                }}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
+              >
+                {i18next.t('datasets.dialog_delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={i18next.t('jobs.dialog_confirmation_title')}
+                ignoreWarning={() => {
+                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
+                  props.dialogToggle('')
+                }}
+              />
+            </Box>
+            <IconButton onClick={() => navigate('/datasets')}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
-        <MqText heading font={'mono'}>
-          {name}
-        </MqText>
+        <Box display={'flex'} alignItems={'center'}>
+          {facetsStatus && (
+            <Box mr={1}>
+              <MqStatus color={facetsStatus} />
+            </Box>
+          )}
+          <MqText heading font={'mono'}>
+            {name}
+          </MqText>
+        </Box>
         <Box mb={2}>
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      {tab === 0 && (
+      {tabIndex === 0 && (
         <DatasetInfo
-          datasetFields={dataset.fields}
-          facets={dataset.facets}
-          run={dataset.createdByRun}
+          datasetFields={firstVersion.fields}
+          facets={firstVersion.facets}
+          run={firstVersion.createdByRun}
         />
       )}
-      {tab === 1 && <DatasetVersions versions={props.versions} />}
+      {tabIndex === 1 && <Io />}
+      {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
+      {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  datasets: state.datasets.result,
+  datasets: state.datasets,
+  display: state.display,
   versions: state.datasetVersions.result.versions,
-  versionsLoading: state.datasetVersions.isLoading
+  versionsLoading: state.datasetVersions.isLoading,
+  tabIndex: state.lineage.tabIndex,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
-      resetDatasetVersions: resetDatasetVersions
+      resetDatasetVersions: resetDatasetVersions,
+      resetDataset: resetDataset,
+      deleteDataset: deleteDataset,
+      dialogToggle: dialogToggle,
+      setTabIndex: setTabIndex,
+      fetchTags: fetchTags,
     },
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(DatasetDetailPage))
+export default connect(mapStateToProps, mapDispatchToProps)(DatasetDetailPage)

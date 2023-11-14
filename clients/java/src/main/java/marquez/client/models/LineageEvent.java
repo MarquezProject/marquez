@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,4 +20,12 @@ public class LineageEvent {
   List<Object> inputs;
   List<Object> outputs;
   URI producer;
+  URI schemaURL;
+
+  public URI getSchemaURL() {
+    if (schemaURL == null) {
+      return URI.create("https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent");
+    }
+    return schemaURL;
+  }
 }

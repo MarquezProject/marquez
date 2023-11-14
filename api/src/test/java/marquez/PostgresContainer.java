@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public final class PostgresContainer extends PostgreSQLContainer<PostgresContainer> {
-  private static final DockerImageName POSTGRES = DockerImageName.parse("postgres:11.8");
+  private static final DockerImageName POSTGRES = DockerImageName.parse("postgres:14");
   private static final int JDBC = 5;
 
   private static final Map<String, PostgresContainer> containers = new HashMap<>();

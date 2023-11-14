@@ -18,7 +18,8 @@ SELECT r.uuid,
        ended_at,
        job_context_uuid,
        job_uuid,
-       j.name AS job_name,
-       j.namespace_name
+       COALESCE(s.name, j.name) AS job_name,
+       COALESCE(s.namespace_name, j.namespace_name) AS namespace_name
 FROM runs r
-INNER JOIN jobs_view j ON j.uuid = r.job_uuid;
+INNER JOIN jobs j ON j.uuid = r.job_uuid
+LEFT JOIN jobs_view s ON j.symlink_target_uuid=s.uuid;

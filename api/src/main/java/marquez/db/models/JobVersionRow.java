@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -25,7 +25,6 @@ public class JobVersionRow {
   @Getter @NonNull private final Instant updateAt;
   @Getter @NonNull private final UUID jobUuid;
   @Getter @NonNull private final String jobName;
-  @Getter @NonNull private final UUID jobContextUuid;
   @Getter @NonNull private final List<UUID> inputUuids;
   @Getter @NonNull private final List<UUID> outputUuids;
   @Nullable private final String location;

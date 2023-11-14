@@ -1,13 +1,20 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { createTheme } from '@material-ui/core'
+import { createTheme } from '@mui/material'
 
 export const theme = createTheme({
-  overrides: {
+  components: {
     MuiCssBaseline: {
-      '@global': {
-        body: {
-          color: '#fff'
+      styleOverrides: {
+        '@global': {
+          body: {
+            color: '#fff'
+          },
+        },
+        '.MuiInputBase-root': {
+          paddingTop: '0',
+          paddingBottom: '0'
         }
       }
     }
@@ -25,12 +32,18 @@ export const theme = createTheme({
     fontSize: 14
   },
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
       main: '#71ddbf'
     },
     error: {
       main: '#ee7b7b'
+    },
+    warning: {
+      main: '#7D7D7D'
+    },
+    info: {
+      main: '#FECC00'
     },
     background: {
       default: '#191f26'

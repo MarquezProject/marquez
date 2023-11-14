@@ -1,8 +1,9 @@
+// Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { HEADER_HEIGHT } from '../../../helpers/theme'
-import Box from '@material-ui/core/Box/Box'
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress'
+import Box from '@mui/material/Box/Box'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import React, { ReactElement } from 'react'
 
 interface MqScreenLoadProps {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -69,7 +69,6 @@ public class RunIntegrationTest extends BaseIntegrationTest {
             .inputs(ImmutableSet.of())
             .outputs(NAMESPACE_NAME, "my-output-ds")
             .location(JOB_LOCATION)
-            .context(JOB_CONTEXT)
             .description(JOB_DESCRIPTION)
             .build();
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
@@ -110,7 +109,6 @@ public class RunIntegrationTest extends BaseIntegrationTest {
             "location",
             ImmutableList.of(),
             ImmutableList.of(),
-            ImmutableMap.of(),
             ImmutableMap.of());
     ObjectMapper objectMapper = Utils.newObjectMapper();
     String json = objectMapper.writeValueAsString(run);

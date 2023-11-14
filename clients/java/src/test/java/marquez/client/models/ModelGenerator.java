@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +38,7 @@ public final class ModelGenerator {
 
   public static Namespace newNamespace() {
     final Instant now = newTimestamp();
-    return new Namespace(newNamespaceName(), now, now, newOwnerName(), newDescription());
+    return new Namespace(newNamespaceName(), now, now, newOwnerName(), newDescription(), false);
   }
 
   public static SourceMeta newSourceMeta() {
@@ -86,6 +86,7 @@ public final class ModelGenerator {
         newTagNames(2),
         null,
         newDescription(),
+        null,
         newDatasetFacets(2),
         currentVersion);
   }
@@ -134,6 +135,7 @@ public final class ModelGenerator {
         null,
         newSchemaLocation(),
         newDescription(),
+        null,
         newDatasetFacets(2),
         currentVersion);
   }
@@ -177,7 +179,6 @@ public final class ModelGenerator {
         .outputs(newOutputs(4))
         .location(newLocation())
         .description(newDescription())
-        .context(newContext())
         .build();
   }
 
@@ -204,7 +205,6 @@ public final class ModelGenerator {
         newInputs(2),
         newOutputs(4),
         newLocation(),
-        newContext(),
         newDescription(),
         latestRun,
         null,
@@ -238,7 +238,19 @@ public final class ModelGenerator {
   public static Run newRun() {
     final Instant now = newTimestamp();
     return new Run(
-        newRunId(), now, now, now, now, RunState.NEW, null, null, null, newRunArgs(), null);
+        newRunId(),
+        now,
+        now,
+        now,
+        now,
+        RunState.NEW,
+        null,
+        null,
+        null,
+        newRunArgs(),
+        null,
+        null,
+        null);
   }
 
   public static String newOwnerName() {
@@ -298,11 +310,6 @@ public final class ModelGenerator {
   public static URL newLocation() {
     return Utils.toUrl(
         String.format("https://github.com/test-org/test-repo/blob/%s/test.java", newId()));
-  }
-
-  public static Map<String, String> newContext() {
-    return ImmutableMap.of(
-        "sql", String.format("SELECT * FROM room_bookings WHERE room = '%dH';", newId()));
   }
 
   public static URL newSchemaLocation() {
@@ -398,5 +405,17 @@ public final class ModelGenerator {
 
   public static Map.Entry<String, String> newFacetSchemaURL() {
     return new AbstractMap.SimpleImmutableEntry<>("_schemaURL", "test_schemaURL" + newId());
+  }
+
+  public static InputDatasetVersion newInputDatasetVersion() {
+    return new InputDatasetVersion(
+        new DatasetVersionId(newNamespaceName(), newDatasetName(), UUID.randomUUID()),
+        ImmutableMap.of("datasetFacet", "{some-facet1}"));
+  }
+
+  public static OutputDatasetVersion newOutputDatasetVersion() {
+    return new OutputDatasetVersion(
+        new DatasetVersionId(newNamespaceName(), newDatasetName(), UUID.randomUUID()),
+        ImmutableMap.of("datasetFacet", "{some-facet1}"));
   }
 }

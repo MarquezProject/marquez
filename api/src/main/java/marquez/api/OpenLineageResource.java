@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -36,8 +36,11 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.SortDirection;
+import marquez.common.models.RunId;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
+import marquez.service.models.BaseEvent;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
@@ -61,20 +64,31 @@ public class OpenLineageResource extends BaseResource {
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   @Path("/lineage")
-  public void create(
-      @Valid @NotNull LineageEvent event, @Suspended final AsyncResponse asyncResponse)
+  public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
-    openLineageService
-        .createAsync(event)
-        .whenComplete(
-            (result, err) -> {
-              if (err != null) {
-                log.error("Unexpected error while processing request", err);
-                asyncResponse.resume(Response.status(determineStatusCode(err)).build());
-              } else {
-                asyncResponse.resume(Response.status(201).build());
-              }
-            });
+    if (event instanceof LineageEvent) {
+      openLineageService
+          .createAsync((LineageEvent) event)
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
+    } else if (event instanceof DatasetEvent) {
+      openLineageService
+          .createAsync((DatasetEvent) event)
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
+    } else {
+      log.warn("Unsupported event type {}. Skipping without error", event.getClass().getName());
+
+      // return serialized event
+      asyncResponse.resume(Response.status(200).entity(event).build());
+    }
+  }
+
+  private void onComplete(Void result, Throwable err, AsyncResponse asyncResponse) {
+    if (err != null) {
+      log.error("Unexpected error while processing request", err);
+      asyncResponse.resume(Response.status(determineStatusCode(err)).build());
+    } else {
+      asyncResponse.resume(Response.status(201).build());
+    }
   }
 
   private int determineStatusCode(Throwable e) {
@@ -96,7 +110,8 @@ public class OpenLineageResource extends BaseResource {
   public Response getLineage(
       @QueryParam("nodeId") @NotNull NodeId nodeId,
       @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth) {
-    return Response.ok(lineageService.lineage(nodeId, depth)).build();
+    throwIfNotExists(nodeId);
+    return Response.ok(lineageService.lineage(nodeId, depth, true)).build();
   }
 
   @Timed
@@ -109,14 +124,39 @@ public class OpenLineageResource extends BaseResource {
       @QueryParam("before") @DefaultValue("2030-01-01T00:00:00+00:00") ZonedDateTimeParam before,
       @QueryParam("after") @DefaultValue("1970-01-01T00:00:00+00:00") ZonedDateTimeParam after,
       @QueryParam("sortDirection") @DefaultValue("desc") SortDirection sortDirection,
-      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit) {
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     List<LineageEvent> events = Collections.emptyList();
     switch (sortDirection) {
       case DESC -> events =
-          openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit);
-      case ASC -> events = openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit);
+          openLineageDao.getAllLineageEventsDesc(before.get(), after.get(), limit, offset);
+      case ASC -> events =
+          openLineageDao.getAllLineageEventsAsc(before.get(), after.get(), limit, offset);
     }
-    return Response.ok(new Events(events)).build();
+    int totalCount = openLineageDao.getAllLineageTotalCount(before.get(), after.get());
+    return Response.ok(new Events(events, totalCount)).build();
+  }
+
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Consumes(APPLICATION_JSON)
+  @Produces(APPLICATION_JSON)
+  @Path("/runlineage/upstream")
+  public Response getRunLineageUpstream(
+      @QueryParam("runId") @NotNull RunId runId,
+      @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth) {
+    throwIfNotExists(runId);
+    return Response.ok(lineageService.upstream(runId, depth)).build();
   }
 
   @Value
@@ -124,5 +164,7 @@ public class OpenLineageResource extends BaseResource {
     @NonNull
     @JsonProperty("events")
     List<LineageEvent> value;
+
+    int totalCount;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,13 +20,13 @@ public class JobRow {
   @NonNull String type;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
+  @Nullable UUID namespaceUuid;
   @NonNull String namespaceName;
   @NonNull String name;
   @NonNull String simpleName;
   @Nullable String parentJobName;
   @Nullable String description;
   @Nullable UUID currentVersionUuid;
-  @Nullable UUID jobContextUuid;
   @Nullable String location;
   @Nullable Set<DatasetId> inputs;
   @Nullable UUID symlinkTargetId;
@@ -37,9 +37,5 @@ public class JobRow {
 
   public Optional<UUID> getCurrentVersionUuid() {
     return Optional.ofNullable(currentVersionUuid);
-  }
-
-  public Optional<UUID> getJobContextUuid() {
-    return Optional.ofNullable(jobContextUuid);
   }
 }

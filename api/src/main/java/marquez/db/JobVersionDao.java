@@ -1,13 +1,11 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.db;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import java.time.Instant;
@@ -28,7 +26,6 @@ import marquez.db.mappers.ExtendedJobVersionRowMapper;
 import marquez.db.mappers.JobVersionMapper;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedJobVersionRow;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.NamespaceRow;
@@ -70,10 +67,9 @@ public interface JobVersionDao extends BaseDao {
           GROUP BY io.job_version_uuid
       ), relevant_job_versions AS (
           SELECT jv.uuid, jv.created_at, jv.updated_at, jv.job_uuid, jv.version,\s
-          jv.location, jv.latest_run_uuid, jv.job_context_uuid, j.namespace_uuid,\s
-          j.namespace_name, j.name AS job_name, jc.context
+          jv.location, jv.latest_run_uuid, j.namespace_uuid,\s
+          j.namespace_name, j.name AS job_name
           FROM job_versions jv
-          LEFT OUTER JOIN job_contexts AS jc ON jc.uuid = jv.job_context_uuid
           INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
           WHERE j.name = :jobName AND j.namespace_name=:namespaceName
           ORDER BY jv.created_at DESC
@@ -94,7 +90,6 @@ public interface JobVersionDao extends BaseDao {
              jv.version           AS run_job_version,
              r.location           AS run_location,
              ra.args              AS run_args,
-             jv.context           AS run_context,
              f.facets             AS run_facets,
              ri.input_versions    AS run_input_versions,
              ro.output_versions   AS run_output_versions
@@ -102,10 +97,10 @@ public interface JobVersionDao extends BaseDao {
       LEFT JOIN job_version_io dsio ON dsio.job_version_uuid = jv.uuid
       LEFT OUTER JOIN runs r ON r.uuid = jv.latest_run_uuid
       LEFT JOIN LATERAL (
-          SELECT le.run_uuid, JSON_AGG(event -> 'run' -> 'facets') AS facets
-          FROM lineage_events le
-          WHERE le.run_uuid=jv.latest_run_uuid
-          GROUP BY le.run_uuid
+          SELECT jf.run_uuid, JSON_AGG(jf.facet ORDER BY jf.lineage_event_time ASC) AS facets
+          FROM job_facets_view AS jf
+          WHERE jf.run_uuid=jv.latest_run_uuid AND jf.job_uuid = jv.job_uuid
+          GROUP BY jf.run_uuid
       ) AS f ON r.uuid = f.run_uuid
       LEFT OUTER JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
       LEFT JOIN LATERAL (
@@ -141,7 +136,6 @@ public interface JobVersionDao extends BaseDao {
    * @param jobVersionUuid The unique ID of the job version.
    * @param now The last modified timestamp of the job version.
    * @param jobUuid The unique ID of the job associated with the version.
-   * @param jobContextUuid The unique ID of the job context associated with the version.
    * @param jobLocation The source code location for the job.
    * @param version The version of the job; for internal use only.
    * @param jobName The name of the job.
@@ -151,36 +145,35 @@ public interface JobVersionDao extends BaseDao {
    */
   // TODO: A JobVersionRow object should be immutable; replace with JobVersionDao.insertJobVersion()
   @SqlQuery(
-      "INSERT INTO job_versions ("
-          + "uuid, "
-          + "created_at, "
-          + "updated_at, "
-          + "job_uuid, "
-          + "job_context_uuid, "
-          + "location, "
-          + "version, "
-          + "job_name, "
-          + "namespace_uuid, "
-          + "namespace_name"
-          + ") VALUES ("
-          + ":jobVersionUuid, "
-          + ":now, "
-          + ":now, "
-          + ":jobUuid, "
-          + ":jobContextUuid, "
-          + ":jobLocation, "
-          + ":version, "
-          + ":jobName, "
-          + ":namespaceUuid, "
-          + ":namespaceName) "
-          + "ON CONFLICT(version) DO "
-          + "UPDATE SET updated_at = EXCLUDED.updated_at "
-          + "RETURNING *")
+      """
+    INSERT INTO job_versions (
+      uuid,
+      created_at,
+      updated_at,
+      job_uuid,
+      location,
+      version,
+      job_name,
+      namespace_uuid,
+      namespace_name
+    ) VALUES (
+      :jobVersionUuid,
+      :now,
+      :now,
+      :jobUuid,
+      :jobLocation,
+      :version,
+      :jobName,
+      :namespaceUuid,
+      :namespaceName)
+    ON CONFLICT(version) DO
+    UPDATE SET updated_at = EXCLUDED.updated_at
+    RETURNING *
+  """)
   ExtendedJobVersionRow upsertJobVersion(
       UUID jobVersionUuid,
       Instant now,
       UUID jobUuid,
-      UUID jobContextUuid,
       String jobLocation,
       UUID version,
       String jobName,
@@ -215,9 +208,12 @@ public interface JobVersionDao extends BaseDao {
    * @param ioType The {@link IoType} of the dataset.
    */
   @SqlUpdate(
-      "INSERT INTO job_versions_io_mapping ("
-          + "job_version_uuid, dataset_uuid, io_type) "
-          + "VALUES (:jobVersionUuid, :datasetUuid, :ioType) ON CONFLICT DO NOTHING")
+      """
+    INSERT INTO job_versions_io_mapping (
+      job_version_uuid, dataset_uuid, io_type)
+    VALUES (:jobVersionUuid, :datasetUuid, :ioType)
+    ON CONFLICT DO NOTHING
+  """)
   void upsertInputOrOutputDatasetFor(UUID jobVersionUuid, UUID datasetUuid, IoType ioType);
 
   /**
@@ -247,8 +243,12 @@ public interface JobVersionDao extends BaseDao {
    * @param ioType The {@link IoType} of the dataset.
    */
   @SqlQuery(
-      "SELECT dataset_uuid FROM job_versions_io_mapping "
-          + "WHERE job_version_uuid = :jobVersionUuid AND io_type = :ioType")
+      """
+    SELECT dataset_uuid
+    FROM job_versions_io_mapping
+    WHERE job_version_uuid = :jobVersionUuid
+    AND io_type = :ioType
+  """)
   List<UUID> findInputOrOutputDatasetsFor(UUID jobVersionUuid, IoType ioType);
 
   /**
@@ -262,10 +262,12 @@ public interface JobVersionDao extends BaseDao {
    * @param latestRunUuid The unique ID of the {@link Run} associated with the job version.
    */
   @SqlUpdate(
-      "UPDATE job_versions "
-          + "SET updated_at = :updatedAt, "
-          + "    latest_run_uuid = :latestRunUuid "
-          + "WHERE uuid = :jobVersionUuid")
+      """
+    UPDATE job_versions
+    SET updated_at = :updatedAt,
+      latest_run_uuid = :latestRunUuid
+    WHERE uuid = :jobVersionUuid
+  """)
   void updateLatestRunFor(UUID jobVersionUuid, Instant updatedAt, UUID latestRunUuid);
 
   /** Returns the unique ID of the latest {@link Run} for a given job version. */
@@ -284,9 +286,9 @@ public interface JobVersionDao extends BaseDao {
   /**
    * Used to upsert an immutable {@link JobVersionRow} object when a {@link Run} has transitioned. A
    * {@link Version} is generated using {@link Utils#newJobVersionFor(NamespaceName, JobName,
-   * ImmutableSet, ImmutableSet, ImmutableMap, String)} based on the jobs inputs and inputs, source
-   * code location, and context. A version for a given job is created <i>only</i> when a {@link Run}
-   * transitions into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
+   * ImmutableSet, ImmutableSet, String)} based on the jobs inputs and inputs, source code location,
+   * and context. A version for a given job is created <i>only</i> when a {@link Run} transitions
+   * into a {@code COMPLETED}, {@code ABORTED}, or {@code FAILED} state.
    *
    * @param jobRow The job.
    * @param runUuid The unique ID of the run associated with the job version.
@@ -301,13 +303,6 @@ public interface JobVersionDao extends BaseDao {
       @NonNull Instant transitionedAt) {
     // Get the job.
     final JobDao jobDao = createJobDao();
-
-    // Get the job context.
-    final UUID jobContextUuid = jobRow.getJobContextUuid().get();
-    final JobContextRow jobContextRow =
-        createJobContextDao().findContextByUuid(jobContextUuid).get();
-    final ImmutableMap<String, String> jobContext =
-        Utils.fromJson(jobContextRow.getContext(), new TypeReference<>() {});
 
     // Get the inputs and outputs dataset versions for the run associated with the job version.
     final DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
@@ -330,7 +325,6 @@ public interface JobVersionDao extends BaseDao {
                     .orElse(jobRow.getName())),
             toDatasetIds(jobVersionInputs),
             toDatasetIds(jobVersionOutputs),
-            jobContext,
             jobRow.getLocation());
 
     // Add the job version.
@@ -340,7 +334,6 @@ public interface JobVersionDao extends BaseDao {
             UUID.randomUUID(),
             transitionedAt, // Use the timestamp of when the run state transitioned.
             jobRow.getUuid(),
-            jobContextUuid,
             jobRow.getLocation(),
             jobVersion.getValue(),
             jobRow.getName(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,6 +31,7 @@ public final class DbTable extends Dataset {
       @Nullable final Set<String> tags,
       @Nullable final Instant lastModifiedAt,
       @Nullable final String description,
+      @Nullable final List<ColumnLineage> columnLineage,
       @Nullable final Map<String, Object> facets,
       @Nullable final UUID currentVersion) {
     super(
@@ -46,6 +47,7 @@ public final class DbTable extends Dataset {
         tags,
         lastModifiedAt,
         description,
+        columnLineage,
         facets,
         currentVersion);
   }

@@ -107,9 +107,9 @@ Collection of lineage events:
 
 When a run completes:
 
-#### **Job versioning** : 
+#### **Job versioning** :
 We create a new version of a job if the following has changed from the previously identified current version of a job.
-    
+
 * If the job did not exist before
 * **If present:** a change in the list of input or output datasets. This is considered a change in the definition of the job. (the last version of the job tracks the current lineage)
 * **If present:** If the job code version (through git sha metadata or similar) is available and has changed. if inputs and outputs are missing and were previously present but the code version has changed. We should not remove the lineage but keep the existing lineage from the previous version (copy input/output from previous). A lineageUnknown field reflects the missing lineage.
@@ -137,4 +137,3 @@ Job:
 * Job Id (namespace/name)
 * Array[Input dataset]
 * Array[Output dataset]
-

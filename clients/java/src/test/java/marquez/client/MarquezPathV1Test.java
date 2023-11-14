@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -80,5 +80,10 @@ public class MarquezPathV1Test {
         () -> {
           MarquezPathV1.path("/whatever/%s/next/%s");
         });
+  }
+
+  @Test
+  void testPath_columnLineage() {
+    Assertions.assertEquals("/api/v1/column-lineage", MarquezPathV1.columnLineagePath());
   }
 }

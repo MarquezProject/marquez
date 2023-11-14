@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import marquez.api.JdbiUtils;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
@@ -63,29 +64,7 @@ class DatasetDaoTest {
 
   @AfterEach
   public void tearDown(Jdbi jdbi) {
-    jdbi.inTransaction(
-        handle -> {
-          handle.execute("DELETE FROM lineage_events");
-          handle.execute("DELETE FROM runs_input_mapping");
-          handle.execute("DELETE FROM dataset_versions_field_mapping");
-          handle.execute("DELETE FROM stream_versions");
-          handle.execute("DELETE FROM dataset_versions");
-          handle.execute("DELETE FROM dataset_symlinks");
-          handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-          handle.execute("DELETE FROM run_states");
-          handle.execute("DELETE FROM runs");
-          handle.execute("DELETE FROM run_args");
-          handle.execute("DELETE FROM job_versions_io_mapping");
-          handle.execute("DELETE FROM job_versions");
-          handle.execute("DELETE FROM jobs");
-          handle.execute("DELETE FROM dataset_fields_tag_mapping");
-          handle.execute("DELETE FROM dataset_fields");
-          handle.execute("DELETE FROM datasets_tag_mapping");
-          handle.execute("DELETE FROM datasets");
-          handle.execute("DELETE FROM sources");
-          handle.execute("DELETE FROM namespaces");
-          return null;
-        });
+    JdbiUtils.cleanDatabase(jdbi);
   }
 
   @Test
@@ -115,7 +94,11 @@ class DatasetDaoTest {
         jobFacet,
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("anotherInputFacet", new CustomValueFacet("aFacetValue")))),
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "anotherInputFacet",
+                    new CustomValueFacet("aFacetValue")))),
         Collections.emptyList());
 
     Optional<marquez.service.models.Dataset> datasetByName =
@@ -269,7 +252,11 @@ class DatasetDaoTest {
         jobFacet,
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("thirdReadValue")))),
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "inputFacet",
+                    new CustomValueFacet("thirdReadValue")))),
         Collections.emptyList());
 
     Optional<marquez.service.models.Dataset> datasetByName =
@@ -314,7 +301,11 @@ class DatasetDaoTest {
         Collections.emptyList(),
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "writeFacet",
+                    new CustomValueFacet("firstWriteValue")))));
 
     String secondDatasetName = "secondDataset";
     String deletedDatasetName = "deletedDataset";
@@ -329,7 +320,11 @@ class DatasetDaoTest {
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("writeFacet", new CustomValueFacet("secondWriteValue")),
+                    ImmutableMap.of(
+                        "description",
+                        "some description",
+                        "writeFacet",
+                        new CustomValueFacet("secondWriteValue")),
                     new SchemaField("age", "int", "the age"),
                     new SchemaField("address", "string", "the address"))),
             new Dataset(NAMESPACE, deletedDatasetName, newDatasetFacet())));
@@ -345,7 +340,11 @@ class DatasetDaoTest {
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")),
+                    ImmutableMap.of(
+                        "description",
+                        "some description",
+                        "inputFacet",
+                        new CustomValueFacet("secondReadValue")),
                     new SchemaField("age", "int", "the age"),
                     new SchemaField("address", "string", "the address")))),
         Collections.emptyList());
@@ -416,7 +415,7 @@ class DatasetDaoTest {
   }
 
   @Test
-  public void testGetSpecificDatasetReturnsDatasetIfDeleted() {
+  public void testDeleteDatasetByNamespaceDoesNotReturnFromDeletedNamespace() {
     createLineageRow(
         openLineageDao,
         "writeJob",
@@ -424,6 +423,37 @@ class DatasetDaoTest {
         jobFacet,
         Collections.emptyList(),
         Collections.singletonList(newCommonDataset(Collections.emptyMap())));
+
+    createLineageRow(
+        openLineageDao,
+        "writeJob2",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            new Dataset(
+                NAMESPACE,
+                DATASET,
+                LineageEvent.DatasetFacets.builder()
+                    .lifecycleStateChange(
+                        new LineageEvent.LifecycleStateChangeFacet(
+                            PRODUCER_URL, SCHEMA_URL, "DROP"))
+                    .build())));
+
+    datasetDao.deleteByNamespaceName(NAMESPACE);
+    assertThat(datasetDao.findDatasetByName(NAMESPACE, DATASET)).isEmpty();
+  }
+
+  @Test
+  public void testGetSpecificDatasetReturnsDatasetIfDeleted() {
+    createLineageRow(
+        openLineageDao,
+        "writeJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Collections.singletonList(
+            newCommonDataset(Collections.singletonMap("description", "some description"))));
 
     marquez.service.models.Dataset dataset = datasetDao.findDatasetByName(NAMESPACE, DATASET).get();
 
@@ -448,7 +478,11 @@ class DatasetDaoTest {
         Collections.emptyList(),
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("firstWriteValue")))));
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "writeFacet",
+                    new CustomValueFacet("firstWriteValue")))));
     createLineageRow(
         openLineageDao,
         "aReadJob",
@@ -483,13 +517,21 @@ class DatasetDaoTest {
         jobFacet,
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("inputFacet", new CustomValueFacet("secondReadValue")))),
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "inputFacet",
+                    new CustomValueFacet("secondReadValue")))),
         Collections.singletonList(
             new Dataset(
                 NAMESPACE,
                 secondDatasetName,
                 newDatasetFacet(
-                    ImmutableMap.of("writeFacet", new CustomValueFacet("readJobSecondWriteValue")),
+                    ImmutableMap.of(
+                        "description",
+                        "some description",
+                        "writeFacet",
+                        new CustomValueFacet("readJobSecondWriteValue")),
                     new SchemaField("age", "int", "the age"),
                     new SchemaField("address", "string", "the address")))));
 
@@ -553,7 +595,11 @@ class DatasetDaoTest {
         Collections.emptyList(),
         Collections.singletonList(
             newCommonDataset(
-                ImmutableMap.of("writeFacet", new CustomValueFacet("thirdWriteValue")))));
+                ImmutableMap.of(
+                    "description",
+                    "some description",
+                    "writeFacet",
+                    new CustomValueFacet("thirdWriteValue")))));
 
     datasets = datasetDao.findAll(NAMESPACE, 5, 0);
     assertThat(datasets).hasSize(2);

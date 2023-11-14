@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
@@ -32,9 +31,11 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -105,6 +106,10 @@ public final class Utils {
 
   @JsonDeserialize(using = FlexibleDateTimeDeserializer.class)
   static final class ZonedDateTimeMixin {}
+
+  public static LocalDate toLocateDateOrNull(@Nullable final String timeAsString) {
+    return Optional.ofNullable(timeAsString).map(LocalDate::parse).orElse(null);
+  }
 
   public static String toJson(@NonNull final Object value) {
     try {
@@ -236,7 +241,6 @@ public final class Utils {
    * @param jobName The name of the job.
    * @param jobInputIds The input dataset IDs for the job.
    * @param jobOutputIds The output dataset IDs for the job.
-   * @param jobContext The context of the job.
    * @param jobLocation The source code location for the job.
    * @return A {@link Version} object based on the specified job meta.
    */
@@ -245,7 +249,6 @@ public final class Utils {
       @NonNull final JobName jobName,
       @NonNull final ImmutableSet<DatasetId> jobInputIds,
       @NonNull final ImmutableSet<DatasetId> jobOutputIds,
-      @NonNull final ImmutableMap<String, String> jobContext,
       @Nullable final String jobLocation) {
     final byte[] bytes =
         VERSION_JOINER
@@ -268,8 +271,7 @@ public final class Utils {
                                 jobOutputId.getNamespace().getValue(),
                                 jobOutputId.getName().getValue()))
                     .collect(joining(VERSION_DELIM)),
-                jobLocation,
-                KV_JOINER.join(jobContext))
+                jobLocation)
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
   }

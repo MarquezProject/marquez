@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -38,7 +38,7 @@ import lombok.ToString;
 @Getter
 @Valid
 @ToString
-public class LineageEvent extends BaseJsonModel {
+public class LineageEvent extends BaseEvent {
 
   private String eventType;
 
@@ -48,6 +48,7 @@ public class LineageEvent extends BaseJsonModel {
   @Valid private List<Dataset> inputs;
   @Valid private List<Dataset> outputs;
   @Valid @NotNull private String producer;
+  @Valid private URI schemaURL;
 
   @AllArgsConstructor
   @NoArgsConstructor
@@ -153,8 +154,8 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class ParentRunFacet extends BaseFacet {
 
-    @NotNull private RunLink run;
-    @NotNull private JobLink job;
+    @Valid @NotNull private RunLink run;
+    @Valid @NotNull private JobLink job;
 
     @Builder
     public ParentRunFacet(
@@ -309,6 +310,22 @@ public class LineageEvent extends BaseJsonModel {
     @NotNull private String namespace;
     @NotNull private String name;
     @Valid private DatasetFacets facets;
+    @Valid private InputDatasetFacets inputFacets;
+    @Valid private OutputDatasetFacets outputFacets;
+
+    /**
+     * Constructor with three args added manually to support dozens of existing usages created
+     * before adding inputFacets and outputFacets, as Lombok does not provide SomeArgsConstructor.
+     *
+     * @param namespace
+     * @param name
+     * @param facets
+     */
+    public Dataset(String namespace, String name, DatasetFacets facets) {
+      this.namespace = namespace;
+      this.name = name;
+      this.facets = facets;
+    }
   }
 
   @Builder
@@ -332,7 +349,7 @@ public class LineageEvent extends BaseJsonModel {
     @Valid private SchemaDatasetFacet schema;
     @Valid private LifecycleStateChangeFacet lifecycleStateChange;
     @Valid private DatasourceDatasetFacet dataSource;
-    @Valid private ColumnLineageFacet columnLineage;
+    @Valid private LineageEvent.ColumnLineageDatasetFacet columnLineage;
     @Valid private DatasetSymlinkFacet symlinks;
     private String description;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
@@ -367,7 +384,7 @@ public class LineageEvent extends BaseJsonModel {
       return dataSource;
     }
 
-    public ColumnLineageFacet getColumnLineage() {
+    public ColumnLineageDatasetFacet getColumnLineage() {
       return columnLineage;
     }
 
@@ -490,22 +507,47 @@ public class LineageEvent extends BaseJsonModel {
     }
   }
 
-  @NoArgsConstructor
   @Getter
   @Setter
   @Valid
   @ToString
-  public static class ColumnLineageFacet extends BaseFacet {
-
-    private List<ColumnLineageOutputColumn> outputColumnsList;
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class ColumnLineageDatasetFacet extends BaseFacet {
+    @Valid private ColumnLineageDatasetFacetFields fields;
 
     @Builder
-    public ColumnLineageFacet(
-        @NotNull URI _producer,
-        @NotNull URI _schemaURL,
-        List<ColumnLineageOutputColumn> outputColumnsList) {
+    public ColumnLineageDatasetFacet(
+        @NotNull URI _producer, @NotNull URI _schemaURL, ColumnLineageDatasetFacetFields fields) {
       super(_producer, _schemaURL);
-      this.outputColumnsList = outputColumnsList;
+      this.fields = fields;
+    }
+  }
+
+  @Builder
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  @NoArgsConstructor
+  public static class ColumnLineageDatasetFacetFields {
+
+    @Builder.Default @JsonIgnore
+    private Map<String, ColumnLineageOutputColumn> additional = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void setFacet(String key, ColumnLineageOutputColumn value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, ColumnLineageOutputColumn> getAdditionalFacets() {
+      return additional;
+    }
+
+    @Builder
+    public ColumnLineageDatasetFacetFields(Map<String, ColumnLineageOutputColumn> additional) {
+      this.additional = additional;
     }
   }
 
@@ -518,10 +560,9 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class ColumnLineageOutputColumn extends BaseJsonModel {
 
-    @NotNull private String name;
     @NotNull private List<ColumnLineageInputField> inputFields;
-    @NotNull private String transformationDescription;
-    @NotNull private String transformationType;
+    private String transformationDescription;
+    private String transformationType;
   }
 
   @Builder
@@ -533,8 +574,52 @@ public class LineageEvent extends BaseJsonModel {
   @ToString
   public static class ColumnLineageInputField extends BaseJsonModel {
 
-    @NotNull private String datasetNamespace;
-    @NotNull private String datasetName;
-    @NotNull private String fieldName;
+    @NotNull private String namespace;
+    @NotNull private String name;
+    @NotNull private String field;
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class InputDatasetFacets {
+
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void setInputFacet(String key, Object value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalFacets() {
+      return additional;
+    }
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class OutputDatasetFacets {
+
+    @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void setOutputFacet(String key, Object value) {
+      additional.put(key, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalFacets() {
+      return additional;
+    }
   }
 }

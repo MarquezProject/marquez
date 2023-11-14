@@ -12,4 +12,3 @@ UPDATE datasets SET
     source_name = s.name
 FROM sources s
 WHERE s.uuid = datasets.source_uuid;
-

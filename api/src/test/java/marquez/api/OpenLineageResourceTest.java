@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -7,7 +7,9 @@ package marquez.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +21,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import marquez.common.Utils;
 import marquez.db.OpenLineageDao;
+import marquez.service.JobService;
 import marquez.service.LineageService;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Lineage;
@@ -35,16 +38,19 @@ class OpenLineageResourceTest {
   static {
     LineageService lineageService = mock(LineageService.class);
     OpenLineageDao openLineageDao = mock(OpenLineageDao.class);
+    JobService jobService = mock(JobService.class);
+    when(jobService.exists(anyString(), anyString())).thenReturn(true);
 
     Node testNode =
         Utils.fromJson(
             OpenLineageResourceTest.class.getResourceAsStream("/lineage/node.json"),
             new TypeReference<>() {});
     LINEAGE = new Lineage(ImmutableSortedSet.of(testNode));
-    when(lineageService.lineage(any(NodeId.class), anyInt())).thenReturn(LINEAGE);
+    when(lineageService.lineage(any(NodeId.class), anyInt(), anyBoolean())).thenReturn(LINEAGE);
 
     ServiceFactory serviceFactory =
-        ApiTestUtils.mockServiceFactory(Map.of(LineageService.class, lineageService));
+        ApiTestUtils.mockServiceFactory(
+            Map.of(LineageService.class, lineageService, JobService.class, jobService));
 
     UNDER_TEST =
         ResourceExtension.builder()
@@ -57,7 +63,7 @@ class OpenLineageResourceTest {
     final Lineage lineage =
         UNDER_TEST
             .target("/api/v1/lineage")
-            .queryParam("nodeId", "job:test")
+            .queryParam("nodeId", "job:test-namespace:test-job")
             .request()
             .get()
             .readEntity(Lineage.class);

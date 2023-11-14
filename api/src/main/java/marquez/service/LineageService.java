@@ -1,16 +1,21 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.service;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +25,24 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
+import marquez.common.models.RunId;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
-import marquez.db.models.DatasetData;
-import marquez.db.models.JobData;
+import marquez.db.LineageDao.DatasetSummary;
+import marquez.db.LineageDao.JobSummary;
+import marquez.db.LineageDao.RunSummary;
 import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
+import marquez.service.LineageService.UpstreamRunLineage;
+import marquez.service.models.DatasetData;
 import marquez.service.models.Edge;
 import marquez.service.models.Graph;
+import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
@@ -39,6 +51,11 @@ import marquez.service.models.Run;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
+
+  public record UpstreamRunLineage(List<UpstreamRun> runs) {}
+
+  public record UpstreamRun(JobSummary job, RunSummary run, List<DatasetSummary> inputs) {}
+
   private final JobDao jobDao;
 
   public LineageService(LineageDao delegate, JobDao jobDao) {
@@ -46,18 +63,38 @@ public class LineageService extends DelegatingLineageDao {
     this.jobDao = jobDao;
   }
 
-  public Lineage lineage(NodeId nodeId, int depth) {
+  // TODO make input parameters easily extendable if adding more options like 'withJobFacets'
+  public Lineage lineage(NodeId nodeId, int depth, boolean withRunFacets) {
+    log.debug("Attempting to get lineage for node '{}' with depth '{}'", nodeId.getValue(), depth);
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
-      throw new NodeIdNotFoundException("Could not find node");
+      log.warn(
+          "Failed to get job associated with node '{}', returning orphan graph...",
+          nodeId.getValue());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
     UUID job = optionalUUID.get();
-
+    log.debug("Attempting to get lineage for job '{}'", job);
     Set<JobData> jobData = getLineage(Collections.singleton(job), depth);
 
+    // Ensure job data is not empty, an empty set cannot be passed to LineageDao.getCurrentRuns() or
+    // LineageDao.getCurrentRunsWithFacets().
+    if (jobData.isEmpty()) {
+      // Log warning, then return an orphan lineage graph; a graph should contain at most one
+      // job->dataset relationship.
+      log.warn(
+          "Failed to get lineage for job '{}' associated with node '{}', returning orphan graph...",
+          job,
+          nodeId.getValue());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
+    }
+
     List<Run> runs =
-        getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
-    // todo fix runtime
+        withRunFacets
+            ? getCurrentRunsWithFacets(
+                jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()))
+            : getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
+
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
         for (Run run : runs) {
@@ -77,8 +114,24 @@ public class LineageService extends DelegatingLineageDao {
     if (!datasetIds.isEmpty()) {
       datasets.addAll(this.getDatasetData(datasetIds));
     }
+    if (nodeId.isDatasetType()
+        && datasets.stream().noneMatch(n -> n.getId().equals(nodeId.asDatasetId()))) {
+      log.warn(
+          "Found jobs {} which no longer share lineage with dataset '{}' - discarding",
+          jobData.stream().map(JobData::getId).toList(),
+          nodeId.getValue());
+      return toLineageWithOrphanDataset(nodeId.asDatasetId());
+    }
 
     return toLineage(jobData, datasets);
+  }
+
+  private Lineage toLineageWithOrphanDataset(@NonNull DatasetId datasetId) {
+    final DatasetData datasetData =
+        getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+    return new Lineage(
+        ImmutableSortedSet.of(
+            Node.dataset().data(datasetData).id(NodeId.of(datasetData.getId())).build()));
   }
 
   private Lineage toLineage(Set<JobData> jobData, Set<DatasetData> datasets) {
@@ -210,7 +263,36 @@ public class LineageService extends DelegatingLineageDao {
       return getJobFromInputOrOutput(
           datasetId.getName().getValue(), datasetId.getNamespace().getValue());
     } else {
-      throw new NodeIdNotFoundException("Node must be a dataset node or job node");
+      throw new NodeIdNotFoundException(
+          String.format("Node '%s' must be of type dataset or job!", nodeId.getValue()));
     }
+  }
+
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
+  public UpstreamRunLineage upstream(@NotNull RunId runId, int depth) {
+    List<UpstreamRunRow> upstreamRuns = getUpstreamRuns(runId.getValue(), depth);
+    Map<RunId, List<UpstreamRunRow>> collect =
+        upstreamRuns.stream().collect(groupingBy(r -> r.run().id(), LinkedHashMap::new, toList()));
+    List<UpstreamRun> runs =
+        collect.entrySet().stream()
+            .map(
+                row -> {
+                  UpstreamRunRow upstreamRunRow = row.getValue().get(0);
+                  List<DatasetSummary> inputs =
+                      row.getValue().stream()
+                          .map(UpstreamRunRow::input)
+                          .filter(i -> i != null)
+                          .collect(toList());
+                  return new UpstreamRun(upstreamRunRow.job(), upstreamRunRow.run(), inputs);
+                })
+            .collect(toList());
+    return new UpstreamRunLineage(runs);
   }
 }

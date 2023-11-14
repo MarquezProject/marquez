@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -87,8 +87,10 @@ public interface RunTransitionListener {
   class RunTransition {
     /** the unique ID of the run. */
     @NonNull RunId runId;
+
     /** The old state of the run. */
     @Nullable RunState oldState;
+
     /** The new state of the run. */
     @NonNull RunState newState;
 

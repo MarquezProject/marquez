@@ -1,7 +1,7 @@
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const webpackProd = {
@@ -13,8 +13,9 @@ const webpackProd = {
       title: 'Telescope Web',
       hash: true,
       minify: true,
-      inject: true,
-      template: 'src/index.prod.html'
+      inject: false,
+      template: 'src/index.prod.html',
+      favicon: 'src/img/favicon.png'
     }),
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(false),
@@ -28,4 +29,4 @@ const webpackProd = {
   ]
 }
 
-module.exports = merge.smart(webpackShared, webpackProd)
+module.exports = merge(webpackShared, webpackProd)

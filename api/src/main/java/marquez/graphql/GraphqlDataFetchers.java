@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -228,19 +228,6 @@ public class GraphqlDataFetchers {
       Map<String, Object> map = dataFetchingEnvironment.getSource();
 
       return dao.getCurrentOwnerByNamespace((String) map.get("currentOwnerName"));
-    };
-  }
-
-  public DataFetcher getJobContextByJobVersion() {
-    return dataFetchingEnvironment -> {
-      Map<String, Object> map = dataFetchingEnvironment.getSource();
-
-      Map jobContext = dao.getJobContext((UUID) map.get("jobContextUuid"));
-      if (jobContext == null) {
-        return null;
-      }
-      return Utils.fromJson(
-          (String) jobContext.get("context"), new TypeReference<ImmutableMap<String, String>>() {});
     };
   }
 

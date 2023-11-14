@@ -1,25 +1,27 @@
 {
-  "bumpVersion": "patch",
+  "bumpVersion": "minor",
   "extends": [
     "config:base",
     "docker:disable",
     ":gitSignOff",
     ":separateMultipleMajorReleases",
-    ":automergePatch",
     ":maintainLockFilesDisabled"
   ],
-  "schedule": ["every weekend"],
+  "schedule": ["every 3 months on the first day of the month"],
   "npm": {
     "enabled": false
   },
   "packageRules": [
     {
       "matchPackageNames": ["com.graphql-java:graphql-java"],
-      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
+      "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/",
+      "addLabels": ["dependencies", "renovate"]
     },
     {
       "matchPackagePatterns": ["^org.apache.spark:", ".css$", "^gradle$"],
-      "automerge": false
+      "automerge": false,
+      "addLabels": ["dependencies", "renovate"]
     }
-  ]
+  ],
+  "ignorePaths": ["**/chart/**", "**/dev/**"]
 }

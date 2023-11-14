@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -43,6 +43,8 @@ import marquez.client.models.JobVersion;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
 import marquez.client.models.NamespaceMeta;
+import marquez.client.models.Node;
+import marquez.client.models.NodeId;
 import marquez.client.models.Run;
 import marquez.client.models.RunMeta;
 import marquez.client.models.RunState;
@@ -57,6 +59,7 @@ import marquez.client.models.Tag;
 public class MarquezClient {
 
   static final URL DEFAULT_BASE_URL = Utils.toUrl("http://localhost:8080");
+  static final int DEFAULT_LINEAGE_GRAPH_DEPTH = 20;
 
   @VisibleForTesting static final int DEFAULT_LIMIT = 100;
   @VisibleForTesting static final int DEFAULT_OFFSET = 0;
@@ -111,6 +114,24 @@ public class MarquezClient {
     ASC("asc");
 
     @Getter public final String value;
+  }
+
+  public Lineage getLineage(NodeId nodeId) {
+    return getLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH);
+  }
+
+  public Lineage getLineage(NodeId nodeId, int depth) {
+    final String bodyAsJson = http.get(url.toLineageUrl(nodeId, depth));
+    return Lineage.fromJson(bodyAsJson);
+  }
+
+  public Lineage getColumnLineage(NodeId nodeId) {
+    return getColumnLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
+  }
+
+  public Lineage getColumnLineage(NodeId nodeId, int depth, boolean withDownstream) {
+    final String bodyAsJson = http.get(url.toColumnLineageUrl(nodeId, depth, withDownstream));
+    return Lineage.fromJson(bodyAsJson);
   }
 
   public Namespace createNamespace(
@@ -179,6 +200,10 @@ public class MarquezClient {
   public Dataset deleteDataset(@NonNull String namespaceName, @NonNull String datasetName) {
     final String bodyAsJson = http.delete(url.toDatasetUrl(namespaceName, datasetName));
     return Dataset.fromJson(bodyAsJson);
+  }
+
+  public void deleteNamespace(@NonNull String namespaceName) {
+    http.delete(url.toNamespaceUrl(namespaceName));
   }
 
   public DatasetVersion getDatasetVersion(
@@ -655,6 +680,24 @@ public class MarquezClient {
     @Getter
     @JsonProperty("description")
     String value;
+
+    String toJson() {
+      return Utils.toJson(this);
+    }
+  }
+
+  @Value
+  public static class Lineage {
+    @Getter Set<Node> graph;
+
+    @JsonCreator
+    Lineage(@JsonProperty("graph") final Set<Node> value) {
+      this.graph = ImmutableSet.copyOf(value);
+    }
+
+    static Lineage fromJson(final String json) {
+      return Utils.fromJson(json, new TypeReference<Lineage>() {});
+    }
 
     String toJson() {
       return Utils.toJson(this);

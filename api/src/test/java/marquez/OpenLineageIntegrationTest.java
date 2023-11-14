@@ -1,10 +1,13 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez;
 
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,6 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.util.Resources;
 import io.openlineage.client.OpenLineage;
@@ -38,6 +43,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import marquez.api.JdbiUtils;
 import marquez.client.MarquezClient;
 import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
@@ -47,6 +55,8 @@ import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
+import marquez.service.models.JobEvent;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -58,6 +68,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
+@Slf4j
 public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   public static String EVENT_REQUIRED = "open_lineage/event_required_only.json";
@@ -67,11 +78,18 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   public static String EVENT_LARGE = "open_lineage/event_large.json";
   public static String NULL_NOMINAL_END_TIME = "open_lineage/null_nominal_end_time.json";
   public static String EVENT_NAMESPACE_NAMING = "open_lineage/event_namespace_naming.json";
+  public static String EVENT_DATASET_EVENT = "open_lineage/event_dataset_event.json";
+  public static String EVENT_JOB_EVENT = "open_lineage/event_job_event.json";
+  public static String EVENT_WITHOUT_SCHEMA_URL = "open_lineage/event_without_schema_url.json";
+
+  public static String RUN_EVENT_SCHEMA_URL =
+      "https://openlineage.io/spec/2-0-0/OpenLineage.json#/definitions/RunEvent";
 
   public static List<String> data() {
     return Arrays.asList(
         EVENT_FULL,
         EVENT_SIMPLE,
+        EVENT_WITHOUT_SCHEMA_URL,
         EVENT_REQUIRED,
         EVENT_UNICODE,
         // FIXME: A very large event fails the test.
@@ -82,23 +100,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
   @AfterEach
   public void tearDown() {
-    Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
-        .withHandle(
-            handle -> {
-              handle.execute("DELETE FROM lineage_events");
-              handle.execute("DELETE FROM runs_input_mapping");
-              handle.execute("DELETE FROM dataset_versions_field_mapping");
-              handle.execute("DELETE FROM stream_versions");
-              handle.execute("DELETE FROM dataset_versions");
-              handle.execute("UPDATE runs SET start_run_state_uuid=NULL, end_run_state_uuid=NULL");
-              handle.execute("DELETE FROM run_states");
-              handle.execute("DELETE FROM runs");
-              handle.execute("DELETE FROM run_args");
-              handle.execute("DELETE FROM job_versions_io_mapping");
-              handle.execute("DELETE FROM job_versions");
-              handle.execute("DELETE FROM jobs");
-              return null;
-            });
+    JdbiUtils.cleanDatabase(
+        Jdbi.create(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword()));
   }
 
   @Test
@@ -107,27 +110,20 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     String badNamespace =
         "sqlserver://myhost:3342;user=auser;password=\uD83D\uDE02\uD83D\uDE02\uD83D\uDE02;database=TheDatabase";
     marquez.service.models.LineageEvent event =
-        new marquez.service.models.LineageEvent(
-            "COMPLETE",
-            Instant.now().atZone(ZoneId.systemDefault()),
-            new marquez.service.models.LineageEvent.Run(UUID.randomUUID().toString(), null),
-            new marquez.service.models.LineageEvent.Job("namespace", "job_name", null),
-            List.of(
-                new marquez.service.models.LineageEvent.Dataset(badNamespace, "the_table", null)),
-            Collections.emptyList(),
-            "the_producer");
+        marquez.service.models.LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(Instant.now().atZone(ZoneId.systemDefault()))
+            .run(new marquez.service.models.LineageEvent.Run(UUID.randomUUID().toString(), null))
+            .job(new marquez.service.models.LineageEvent.Job("namespace", "job_name", null))
+            .inputs(
+                List.of(
+                    new marquez.service.models.LineageEvent.Dataset(
+                        badNamespace, "the_table", null)))
+            .outputs(Collections.emptyList())
+            .producer("the_producer")
+            .build();
 
-    final CompletableFuture<Integer> resp =
-        this.sendLineage(Utils.toJson(event))
-            .thenApply(HttpResponse::statusCode)
-            .whenComplete(
-                (val, error) -> {
-                  if (error != null) {
-                    Assertions.fail("Could not complete request");
-                  }
-                });
-
-    // Ensure the event was correctly rejected and a proper response code returned.
+    final CompletableFuture<Integer> resp = sendEvent(event);
     assertThat(resp.join()).isEqualTo(400);
   }
 
@@ -156,6 +152,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         "{\"eventTime\": \"2021-11-03T10:53:52.427343\", \"eventType\": \"COMPLETE\", \"inputs\": [{\"facets\": {}, \"name\": \"OPEN_LINEAGE_DEMO.DEMO.SOURCE_TABLE_1\", \"namespace\": \"testing_namespace_1\"}], "
             + "\"job\": {\"facets\": {}, \"name\": \"testing_name_1\", \"namespace\": \"testing_namespace_1\"}, "
             + "\"outputs\": [], \"producer\": \"me\", \"run\": {\"facets\": {}, \"runId\": null}}",
+
+        // parent run facet has an empty {} run section
+        "{\"eventTime\": \"2021-11-03T10:53:52.427343\", \"eventType\": \"COMPLETE\", \"inputs\": [{\"facets\": {}, \"name\": \"OPEN_LINEAGE_DEMO.DEMO.SOURCE_TABLE_1\", \"namespace\": \"testing_namespace_1\"}], "
+            + "\"job\": {\"facets\": {}, \"name\": \"testing_name_1\", \"namespace\": \"testing_namespace_1\"}, "
+            + "\"outputs\": [], \"producer\": \"me\", \"run\": {\"facets\": { \"parent\": "
+            + "{ \"_producer\": \"me\", \"_schemaURL\": \"https://me\", \"run\": {}, \"job\": { \"namespace\": \"my-scheduler-namespace\", \"name\": \"myjob.mytask\"} }},"
+            + "\"runId\": \"dae0d60a-6010-4c37-980e-c5270f5a6be4\"}}",
       })
   public void testSendOpenLineageEventFailsValidation(String eventBody) throws IOException {
     final CompletableFuture<Integer> resp =
@@ -171,7 +174,26 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testGetLineageForNonExistantDataset() {
+  public void testSendOpenLineageEventFailsJsonProcessing() throws IOException {
+    String eventWithIncorrectEventTimeFormat =
+        "{\"eventTime\": \"2021-11-03\", \"eventType\": \"START\", \"inputs\": [], \"job\": {\"facets\": {}, \"name\": \"job\", \"namespace\": \"openlineage\"}, \"outputs\": [], \"run\": {\"facets\": {}, \"runId\": \"123e4567-e89b-12d3-a456-426614174000\"}}";
+
+    final CompletableFuture<String> resp =
+        this.sendLineage(eventWithIncorrectEventTimeFormat)
+            .thenApply(HttpResponse::body)
+            .whenComplete(
+                (val, err) -> {
+                  if (err != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+    assertThat(resp.join())
+        .contains(
+            "Cannot deserialize value of type `java.time.ZonedDateTime` from String \\\"2021-11-03\\\"");
+  }
+
+  @Test
+  public void testGetLineageForNonExistentDataset() {
     CompletableFuture<Integer> response =
         this.fetchLineage("dataset:Imadethisup:andthistoo")
             .thenApply(HttpResponse::statusCode)
@@ -367,6 +389,254 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         .hasFieldOrPropertyWithValue("parentJobName", null);
     List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
     assertThat(runsList).isNotEmpty().hasSize(1);
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowIntegrationWithParentOnStartEventOnly()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+    JsonNode eventOneJson = mapper.valueToTree(event1);
+    ((ObjectNode) eventOneJson).set("eventType", new TextNode("START"));
+
+    event1.getRun().getFacets().getAdditionalProperties().remove("parent");
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(eventOneJson))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event1));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(1)
+        .first()
+        .extracting("startedAt", as(InstanceOfAssertFactories.OPTIONAL))
+        .get()
+        .isNotNull();
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowMissingParentForExistingJob()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+
+    RunEvent event2 =
+        createAirflowRunEvent(
+            ol,
+            endOfHour,
+            endOfHour.plusHours(1),
+            null,
+            null,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(2)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(
+            event1.getRun().getRunId().toString(), event2.getRun().getRunId().toString());
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowAddParentForExistingJob()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    RunEvent event1 =
+        createAirflowRunEvent(
+            ol, startOfHour, endOfHour, null, null, dagName + "." + task1Name, NAMESPACE_NAME);
+    ObjectMapper mapper = Utils.newObjectMapper();
+
+    RunEvent event2 =
+        createAirflowRunEvent(
+            ol,
+            endOfHour,
+            endOfHour.plusHours(1),
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName)
+        .hasFieldOrPropertyWithValue("simpleName", task1Name);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(2)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(
+            event1.getRun().getRunId().toString(), event2.getRun().getRunId().toString());
+  }
+
+  @Test
+  public void testOpenLineageJobHierarchyAirflowHandlesParentForEventsOutOfOrder()
+      throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
+    OpenLineage ol = new OpenLineage(URI.create("http://openlineage.test.com/"));
+    ZonedDateTime startOfHour =
+        Instant.now()
+            .atZone(LineageTestUtils.LOCAL_ZONE)
+            .with(ChronoField.MINUTE_OF_HOUR, 0)
+            .with(ChronoField.SECOND_OF_MINUTE, 0);
+    ZonedDateTime endOfHour = startOfHour.plusHours(1);
+    String airflowParentRunId = UUID.randomUUID().toString();
+    String task1Name = "task1";
+    String dagName = "the_dag";
+    ObjectMapper mapper = Utils.newObjectMapper();
+    RunEvent event =
+        createAirflowRunEvent(
+            ol,
+            startOfHour,
+            endOfHour,
+            airflowParentRunId,
+            dagName,
+            dagName + "." + task1Name,
+            NAMESPACE_NAME);
+
+    // first event is the COMPLETE event and is missing the parent facet
+    JsonNode event1 = mapper.valueToTree(event);
+    ((ObjectNode) event1.get("run").get("facets")).remove("parent");
+
+    // the second event is the start
+    JsonNode event2 =
+        ((ObjectNode) mapper.valueToTree(event)).set("eventType", new TextNode("START"));
+
+    CompletableFuture.allOf(
+            sendLineage(mapper.writeValueAsString(event1))
+                .thenCompose(
+                    r -> {
+                      try {
+                        return sendLineage(mapper.writeValueAsString(event2));
+                      } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                      }
+                    }))
+        .get(5, TimeUnit.SECONDS);
+
+    Job job = client.getJob(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(job)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName + "." + task1Name))
+        .hasFieldOrPropertyWithValue("parentJobName", dagName);
+
+    Job parentJob = client.getJob(NAMESPACE_NAME, dagName);
+    assertThat(parentJob)
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("id", new JobId(NAMESPACE_NAME, dagName))
+        .hasFieldOrPropertyWithValue("parentJobName", null);
+    List<Run> runsList = client.listRuns(NAMESPACE_NAME, dagName + "." + task1Name);
+    assertThat(runsList)
+        .isNotEmpty()
+        .hasSize(1)
+        .extracting(Run::getId)
+        .containsExactlyInAnyOrder(event1.get("run").get("runId").asText());
   }
 
   @Test
@@ -655,6 +925,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testSendEventAndGetItBack() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -683,6 +954,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .eventTime(time)
             .inputs(Collections.emptyList())
             .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
@@ -698,6 +970,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventIsSortedByTime() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -722,16 +995,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
-        builder.eventTime(time).eventType("START").build();
+        builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(time.plusSeconds(10))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .eventType("COMPLETE")
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
@@ -747,6 +1025,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventIsSortedByTimeAsc() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -771,16 +1050,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
-        builder.eventTime(time).eventType("START").build();
+        builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(time.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(time.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
@@ -796,6 +1080,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
+  @SneakyThrows
   public void testFindEventBeforeAfterTime() {
     marquez.service.models.LineageEvent.Run run =
         new marquez.service.models.LineageEvent.Run(
@@ -822,7 +1107,8 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .run(run)
             .job(job)
             .inputs(Collections.emptyList())
-            .outputs(Collections.singletonList(dataset));
+            .outputs(Collections.singletonList(dataset))
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL));
 
     marquez.service.models.LineageEvent firstEvent =
         builder.eventTime(after.minus(1, ChronoUnit.YEARS)).eventType("START").build();
@@ -831,13 +1117,21 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent secondEvent =
-        builder.eventTime(after.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(after.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     resp = sendEvent(secondEvent);
     assertThat(resp.join()).isEqualTo(201);
 
     marquez.service.models.LineageEvent thirdEvent =
-        builder.eventTime(before.plusSeconds(10)).eventType("COMPLETE").build();
+        builder
+            .eventTime(before.plusSeconds(10))
+            .eventType("COMPLETE")
+            .schemaURL(new URI(RUN_EVENT_SCHEMA_URL))
+            .build();
 
     List<LineageEvent> rawEvents =
         client.listLineageEvents(MarquezClient.SortDirection.ASC, before, after, 10);
@@ -846,6 +1140,65 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     ObjectMapper mapper = Utils.getMapper();
     assertThat((JsonNode) mapper.valueToTree(secondEvent))
         .isEqualTo(mapper.valueToTree(rawEvents.get(0)));
+  }
+
+  @Test
+  public void testSendAndDeleteParentRunRelationshipFacet() {
+    marquez.service.models.LineageEvent.Run run =
+        new marquez.service.models.LineageEvent.Run(
+            UUID.randomUUID().toString(),
+            marquez.service.models.LineageEvent.RunFacet.builder()
+                .parent(
+                    marquez.service.models.LineageEvent.ParentRunFacet.builder()
+                        .run(
+                            marquez.service.models.LineageEvent.RunLink.builder()
+                                .runId(UUID.randomUUID().toString())
+                                .build())
+                        .job(
+                            marquez.service.models.LineageEvent.JobLink.builder()
+                                .name("parent")
+                                .namespace(NAMESPACE_NAME)
+                                .build())
+                        ._producer(PRODUCER_URL)
+                        ._schemaURL(SCHEMA_URL)
+                        .build())
+                .build());
+    marquez.service.models.LineageEvent.Job job =
+        marquez.service.models.LineageEvent.Job.builder()
+            .namespace(NAMESPACE_NAME)
+            .name(JOB_NAME)
+            .build();
+
+    marquez.service.models.LineageEvent event =
+        marquez.service.models.LineageEvent.builder()
+            .eventType("COMPLETE")
+            .eventTime(ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")))
+            .producer(PRODUCER_URL.toString())
+            .run(run)
+            .job(job)
+            .inputs(Collections.emptyList())
+            .outputs(Collections.emptyList())
+            .build();
+
+    CompletableFuture<Integer> resp = sendEvent(event);
+    assertThat(resp.join()).isEqualTo(201);
+
+    List<Job> jobs = client.listJobs(NAMESPACE_NAME);
+
+    String marquezJobName = String.format("parent.%s", JOB_NAME);
+
+    assertThat(jobs.size()).isEqualTo(2);
+    assertThat(jobs)
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo("parent"))
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
+
+    client.deleteJob(NAMESPACE_NAME, marquezJobName);
+
+    jobs = client.listJobs(NAMESPACE_NAME);
+    assertThat(jobs.size()).isEqualTo(1);
+    assertThat(jobs)
+        .anySatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo("parent"))
+        .noneSatisfy(returnedJob -> assertThat(returnedJob.getName()).isEqualTo(marquezJobName));
   }
 
   private CompletableFuture<Integer> sendEvent(marquez.service.models.LineageEvent event) {
@@ -925,18 +1278,19 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     // a plain old RunFact, but using the "parent" key name. To Marquez, this will look just the
     // same as a python client using the official ParentRunFacet.
     RunFacet parentRunFacet = ol.newRunFacet();
-    parentRunFacet
-        .getAdditionalProperties()
-        .putAll(
-            ImmutableMap.of(
-                "run",
-                ImmutableMap.of("runId", airflowParentRunId),
-                "job",
-                ImmutableMap.of("namespace", namespace, "name", dagName)));
     RunFacetsBuilder runFacetBuilder =
-        ol.newRunFacetsBuilder()
-            .nominalTime(ol.newNominalTimeRunFacet(startOfHour, endOfHour))
-            .put("parent", parentRunFacet);
+        ol.newRunFacetsBuilder().nominalTime(ol.newNominalTimeRunFacet(startOfHour, endOfHour));
+    if (airflowParentRunId != null) {
+      parentRunFacet
+          .getAdditionalProperties()
+          .putAll(
+              ImmutableMap.of(
+                  "run",
+                  ImmutableMap.of("runId", airflowParentRunId),
+                  "job",
+                  ImmutableMap.of("namespace", namespace, "name", dagName)));
+      runFacetBuilder.put("parent", parentRunFacet);
+    }
     airflowVersionFacet.ifPresent(facet -> runFacetBuilder.put("airflow_version", facet));
     return ol.newRunEventBuilder()
         .eventType(EventType.COMPLETE)
@@ -1018,6 +1372,87 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
     } else {
       assertThat(run.getFacets()).isEmpty();
     }
+  }
+
+  @Test
+  public void testSendDatasetEvent() throws IOException {
+    final String openLineageEventAsString =
+        Resources.toString(Resources.getResource(EVENT_DATASET_EVENT), Charset.defaultCharset());
+
+    // (2) Send OpenLineage event.
+    final CompletableFuture<Map<Integer, String>> resp =
+        this.sendLineage(openLineageEventAsString)
+            .thenApply(r -> Collections.singletonMap(r.statusCode(), r.body()))
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+
+    // Ensure the event was received.
+    Map<Integer, String> respMap = resp.join();
+
+    assertThat(respMap.containsKey(201)).isTrue();
+
+    // (3) Convert the OpenLineage event to Json.
+    final JsonNode openLineageEventAsJson =
+        Utils.fromJson(openLineageEventAsString, new TypeReference<JsonNode>() {});
+
+    // (4) Verify dataset facet associated with the OpenLineage event.
+    final JsonNode json = openLineageEventAsJson.path("dataset");
+
+    final String namespace = json.path("namespace").asText();
+    final String output = json.path("name").asText();
+    final JsonNode expectedFacets = json.path("facets");
+
+    final Dataset dataset = client.getDataset(namespace, output);
+    assertThat(Utils.getMapper().convertValue(dataset.getFacets(), JsonNode.class))
+        .isEqualTo(expectedFacets);
+
+    List<DatasetVersion> datasetVersions = client.listDatasetVersions(namespace, output);
+    assertThat(datasetVersions).isNotEmpty();
+
+    DatasetVersion latestDatasetVersion = datasetVersions.get(0);
+    assertThat(latestDatasetVersion.getNamespace()).isEqualTo(namespace);
+    assertThat(latestDatasetVersion.getName()).isEqualTo(output);
+    assertThat(Utils.getMapper().convertValue(latestDatasetVersion.getFacets(), JsonNode.class))
+        .isEqualTo(expectedFacets);
+  }
+
+  @Test
+  public void testSendJobEventIsDecoded() throws IOException {
+    final String openLineageEventAsString =
+        Resources.toString(Resources.getResource(EVENT_JOB_EVENT), Charset.defaultCharset());
+
+    // (2) Send OpenLineage event.
+    final CompletableFuture<Map<Integer, String>> resp =
+        this.sendLineage(openLineageEventAsString)
+            .thenApply(r -> Collections.singletonMap(r.statusCode(), r.body()))
+            .whenComplete(
+                (val, error) -> {
+                  if (error != null) {
+                    Assertions.fail("Could not complete request");
+                  }
+                });
+
+    // Ensure the event was received.
+    Map<Integer, String> respMap = resp.join();
+
+    assertThat(respMap.containsKey(200)).isTrue(); // Status should be 200 instead of 201
+
+    // (3) Convert the OpenLineage event to Json.
+    JobEvent jobEvent =
+        marquez.client.Utils.fromJson(respMap.get(200), new TypeReference<JobEvent>() {});
+    assertThat(jobEvent.getJob().getNamespace()).isEqualTo("my-scheduler-namespace");
+    assertThat(jobEvent.getJob().getName()).isEqualTo("myjob");
+
+    assertThat(jobEvent.getInputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
+    assertThat(jobEvent.getInputs().get(0).getName()).isEqualTo("instance.schema.input-1");
+
+    assertThat(jobEvent.getOutputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
+    assertThat(jobEvent.getOutputs().get(0).getName()).isEqualTo("instance.schema.output-1");
+    assertThat(jobEvent.getEventTime().toString()).startsWith("2020-12-28T09:52:00.001");
   }
 
   private void validateDatasetFacets(JsonNode json) {

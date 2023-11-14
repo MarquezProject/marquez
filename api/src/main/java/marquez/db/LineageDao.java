@@ -1,21 +1,28 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package marquez.db;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
 import marquez.db.mappers.DatasetDataMapper;
 import marquez.db.mappers.JobDataMapper;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.mappers.RunMapper;
-import marquez.db.models.DatasetData;
-import marquez.db.models.JobData;
+import marquez.db.mappers.UpstreamRunRowMapper;
+import marquez.service.models.DatasetData;
+import marquez.service.models.JobData;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.BindList;
@@ -25,7 +32,17 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(JobDataMapper.class)
 @RegisterRowMapper(RunMapper.class)
 @RegisterRowMapper(JobRowMapper.class)
+@RegisterRowMapper(UpstreamRunRowMapper.class)
 public interface LineageDao {
+
+  public record JobSummary(NamespaceName namespace, JobName name, UUID version) {}
+
+  public record RunSummary(RunId id, Instant start, Instant end, String status) {}
+
+  public record DatasetSummary(
+      NamespaceName namespace, DatasetName name, UUID version, RunId producedByRunId) {}
+
+  public record UpstreamRunRow(JobSummary job, RunSummary run, DatasetSummary input) {}
 
   /**
    * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
@@ -38,37 +55,44 @@ public interface LineageDao {
    */
   @SqlQuery(
       """
-    WITH RECURSIVE
-        job_io AS (
-            SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
-            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
-            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
-            FROM job_versions_io_mapping io
-            INNER JOIN job_versions v ON io.job_version_uuid=v.uuid
-            INNER JOIN jobs_view j on j.current_version_uuid = v.uuid
-            LEFT JOIN jobs_view s ON s.uuid=j.symlink_target_uuid
-            WHERE s.current_version_uuid IS NULL
-            GROUP BY COALESCE(j.symlink_target_uuid, j.uuid)
-        ),
-        lineage(job_uuid, inputs, outputs) AS (
-            SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
-                   COALESCE(inputs, Array[]::uuid[]) AS inputs,
-                   COALESCE(outputs, Array[]::uuid[]) AS outputs,
-                   0 AS depth
-            FROM jobs_view j
-            LEFT JOIN job_io io ON io.job_uuid=j.uuid OR j.symlink_target_uuid=io.job_uuid
-            WHERE j.uuid IN (<jobIds>)
-            UNION
-            SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1
-            FROM job_io io,
-                 lineage l
-            WHERE io.job_uuid != l.job_uuid AND
-            array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
-            AND depth < :depth)
-    SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids, jc.context
-    FROM lineage l2
-    INNER JOIN jobs_view j ON j.uuid=l2.job_uuid
-    LEFT JOIN job_contexts jc on jc.uuid = j.current_job_context_uuid;
+      WITH RECURSIVE
+           -- Find the current version of a job or its symlink target if the target has no
+           -- current_version_uuid. This ensures that we don't lose lineage for a job after it is
+           -- symlinked to another job but before that target job has run successfully.
+          job_current_version AS (
+              SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
+                     COALESCE(s.current_version_uuid, j.current_version_uuid) AS job_version_uuid
+              FROM jobs j
+              LEFT JOIN jobs s ON s.uuid=j.symlink_target_uuid
+              WHERE s.current_version_uuid IS NULL
+          ),
+          job_io AS (
+              SELECT j.job_uuid,
+                     ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
+                     ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
+              FROM job_versions_io_mapping io
+              INNER JOIN job_current_version j ON io.job_version_uuid=j.job_version_uuid
+              GROUP BY j.job_uuid
+          ),
+          lineage(job_uuid, inputs, outputs) AS (
+              SELECT v.job_uuid AS job_uuid,
+                     COALESCE(inputs, Array[]::uuid[]) AS inputs,
+                     COALESCE(outputs, Array[]::uuid[]) AS outputs,
+                     0 AS depth
+              FROM jobs j
+              INNER JOIN job_current_version v ON (j.symlink_target_uuid IS NULL AND j.uuid=v.job_uuid) OR v.job_uuid=j.symlink_target_uuid
+              LEFT JOIN job_io io ON io.job_uuid=v.job_uuid
+              WHERE j.uuid IN (<jobIds>) OR j.symlink_target_uuid IN (<jobIds>)
+              UNION
+              SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1
+              FROM job_io io,
+                  lineage l
+              WHERE io.job_uuid != l.job_uuid AND
+                  array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
+                AND depth < :depth)
+      SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
+      FROM lineage l2
+      INNER JOIN jobs_view j ON j.uuid=l2.job_uuid;
   """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
@@ -79,6 +103,14 @@ public interface LineageDao {
       LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
       WHERE ds.uuid IN (<dsUuids>)""")
   Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
+
+  @SqlQuery(
+      """
+      SELECT ds.*, dv.fields, dv.lifecycle_state
+      FROM datasets_view ds
+      LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
+      WHERE ds.name = :datasetName AND ds.namespace_name = :namespaceName""")
+  DatasetData getDatasetData(String namespaceName, String datasetName);
 
   @SqlQuery(
       """
@@ -100,17 +132,10 @@ public interface LineageDao {
           + "    WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)\n"
           + "    ORDER BY r.job_name, r.namespace_name, created_at DESC\n"
           + ")\n"
-          + "SELECT r.*, ra.args, ctx.context, f.facets,\n"
+          + "SELECT r.*, ra.args, f.facets,\n"
           + "  r.version AS job_version, ri.input_versions, ro.output_versions\n"
           + "  from latest_runs AS r\n"
           + "LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid\n"
-          + "LEFT JOIN job_contexts AS ctx ON r.job_context_uuid = ctx.uuid\n"
-          + "LEFT JOIN LATERAL (\n"
-          + "    SELECT le.run_uuid, JSON_AGG(event->'run'->'facets') AS facets\n"
-          + "    FROM lineage_events le\n"
-          + "    WHERE le.run_uuid=r.uuid\n"
-          + "    GROUP BY le.run_uuid\n"
-          + ") AS f ON r.uuid=f.run_uuid\n"
           + "LEFT JOIN LATERAL (\n"
           + "    SELECT im.run_uuid,\n"
           + "           JSON_AGG(json_build_object('namespace', dv.namespace_name,\n"
@@ -122,6 +147,12 @@ public interface LineageDao {
           + "    GROUP BY im.run_uuid\n"
           + ") ri ON ri.run_uuid=r.uuid\n"
           + "LEFT JOIN LATERAL (\n"
+          + "    SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets\n"
+          + "    FROM run_facets_view AS rf\n"
+          + "    WHERE rf.run_uuid=r.uuid\n"
+          + "    GROUP BY rf.run_uuid\n"
+          + ") AS f ON r.uuid=f.run_uuid\n"
+          + "LEFT JOIN LATERAL (\n"
           + "    SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,\n"
           + "                                                'name', dataset_name,\n"
           + "                                                'version', version)) AS output_versions\n"
@@ -129,5 +160,62 @@ public interface LineageDao {
           + "    WHERE run_uuid=r.uuid\n"
           + "    GROUP BY run_uuid\n"
           + ") ro ON ro.run_uuid=r.uuid")
+  List<Run> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
+
+  @SqlQuery(
+      """
+      SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version as job_version
+      FROM runs_view r
+      INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
+      INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
+      WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)
+      ORDER BY r.job_name, r.namespace_name, created_at DESC""")
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
+
+  @SqlQuery(
+      """
+      WITH RECURSIVE
+        upstream_runs(
+                r_uuid, -- run uuid
+                dataset_uuid, dataset_version_uuid, dataset_namespace, dataset_name, -- input dataset version to the run
+                u_r_uuid, -- upstream run that produced that dataset version
+                depth -- current depth of traversal
+                ) AS (
+
+          -- initial case: find the inputs of the initial runs
+          select r.uuid,
+                 dv.dataset_uuid, dv."version", dv.namespace_name, dv.dataset_name,
+                 dv.run_uuid,
+                 0 AS depth -- starts at 0
+          FROM (SELECT :runId::uuid AS uuid) r -- initial run
+          LEFT JOIN runs_input_mapping rim ON rim.run_uuid = r.uuid
+          LEFT JOIN dataset_versions dv ON dv.uuid = rim.dataset_version_uuid
+
+        UNION
+
+          -- recursion: find the inputs of the inputs found on the previous iteration and increase depth to know when to stop
+          SELECT
+                ur.u_r_uuid,
+                dv2.dataset_uuid, dv2."version", dv2.namespace_name, dv2.dataset_name,
+                dv2.run_uuid,
+                ur.depth + 1 AS depth -- increase depth to check end condition
+          FROM upstream_runs ur
+          LEFT JOIN runs_input_mapping rim2 ON rim2.run_uuid = ur.u_r_uuid
+          LEFT JOIN dataset_versions dv2 ON dv2.uuid = rim2.dataset_version_uuid
+          -- end condition of the recursion: no input or depth is over the maximum set
+          -- also avoid following cycles (ex: merge statement)
+          WHERE ur.u_r_uuid IS NOT NULL AND ur.u_r_uuid <> ur.r_uuid AND depth < :depth
+        )
+
+      -- present the result: use Distinct as we may have traversed the same edge multiple times if there are diamonds in the graph.
+      SELECT * FROM ( -- we need the extra statement to sort after the DISTINCT
+          SELECT DISTINCT ON (upstream_runs.r_uuid, upstream_runs.dataset_version_uuid, upstream_runs.u_r_uuid)
+            upstream_runs.*,
+            r.started_at, r.ended_at, r.current_run_state as state,
+            r.job_uuid, r.job_version_uuid, r.namespace_name as job_namespace, r.job_name
+          FROM upstream_runs, runs r WHERE upstream_runs.r_uuid = r.uuid
+        ) sub
+      ORDER BY depth ASC, job_name ASC;
+      """)
+  List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
 }

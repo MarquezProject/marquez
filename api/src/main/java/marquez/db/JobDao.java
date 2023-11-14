@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -23,7 +22,6 @@ import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
-import marquez.db.models.JobContextRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Job;
@@ -39,39 +37,42 @@ import org.postgresql.util.PGobject;
 public interface JobDao extends BaseDao {
 
   @SqlQuery(
-      "SELECT EXISTS (SELECT 1 FROM jobs_view AS j "
-          + "WHERE j.namespace_name= :namespaceName AND "
-          + " j.name = :jobName)")
+      """
+    SELECT EXISTS (
+      SELECT 1 FROM jobs_view AS j
+      WHERE j.namespace_name = :namespaceName AND
+      j.name = :jobName)
+  """)
   boolean exists(String namespaceName, String jobName);
 
   @SqlUpdate(
-      "UPDATE jobs "
-          + "SET updated_at = :updatedAt, "
-          + "    current_version_uuid = :currentVersionUuid "
-          + "WHERE uuid = :rowUuid")
+      """
+    UPDATE jobs
+    SET updated_at = :updatedAt,
+        current_version_uuid = :currentVersionUuid
+    WHERE uuid = :rowUuid
+  """)
   void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
 
   @SqlQuery(
       """
-          SELECT j.*, jc.context, f.facets
-          FROM jobs_view j
-          LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
-          LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid
-          LEFT OUTER JOIN (
-            SELECT run_uuid, JSON_AGG(e.facets) AS facets
-            FROM (
-              SELECT run_uuid, event->'job'->'facets' AS facets
-              FROM lineage_events AS le
-              INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid
-              INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
-              WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName
-              ORDER BY event_time ASC
-            ) e
-            GROUP BY e.run_uuid
-          ) f ON f.run_uuid=jv.latest_run_uuid
-          WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
-          AND j.symlink_target_uuid IS NULL
-          """)
+    SELECT j.*, f.facets
+    FROM jobs_view j
+    LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
+    LEFT OUTER JOIN (
+      SELECT run_uuid, JSON_AGG(e.facet) AS facets
+      FROM (
+        SELECT jf.run_uuid, jf.facet
+        FROM job_facets_view AS jf
+        INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=jf.run_uuid
+        INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
+        WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName
+        ORDER BY lineage_event_time ASC
+      ) e
+      GROUP BY e.run_uuid
+    ) f ON f.run_uuid=jv.latest_run_uuid
+    WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
+  """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
   @SqlUpdate(
@@ -80,8 +81,18 @@ public interface JobDao extends BaseDao {
     SET is_hidden = true
     WHERE namespace_name = :namespaceName
     AND name = :name
-    """)
+  """)
   void delete(String namespaceName, String name);
+
+  @SqlUpdate(
+      """
+  UPDATE jobs
+  SET is_hidden = true
+  FROM namespaces n
+  WHERE jobs.namespace_uuid = n.uuid
+  AND n.name = :namespaceName
+  """)
+  void deleteByNamespaceName(String namespaceName);
 
   default Optional<Job> findWithRun(String namespaceName, String jobName) {
     Optional<Job> job = findJobByName(namespaceName, jobName);
@@ -95,45 +106,79 @@ public interface JobDao extends BaseDao {
 
   @SqlQuery(
       """
-          SELECT j.*, n.name AS namespace_name
-          FROM jobs_view AS j
-          INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
-          WHERE j.uuid=:jobUuid
-          """)
+    SELECT j.*, n.name AS namespace_name
+    FROM jobs_view AS j
+    INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
+    WHERE j.uuid=:jobUuid
+  """)
   Optional<JobRow> findJobByUuidAsRow(UUID jobUuid);
 
   @SqlQuery(
       """
-          SELECT j.*, n.name AS namespace_name
-          FROM jobs_view AS j
-          INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
-          WHERE j.namespace_name=:namespaceName AND
-          (j.name=:jobName OR :jobName = ANY(j.aliases))
-          AND j.symlink_target_uuid IS NULL
-          """)
+    SELECT j.*, n.name AS namespace_name
+    FROM jobs_view AS j
+    INNER JOIN namespaces AS n ON j.namespace_uuid = n.uuid
+    WHERE j.namespace_name=:namespaceName AND
+      (j.name=:jobName OR :jobName = ANY(j.aliases))
+  """)
   Optional<JobRow> findJobByNameAsRow(String namespaceName, String jobName);
 
   @SqlQuery(
-      "SELECT j.*, jc.context, f.facets\n"
-          + "  FROM jobs_view AS j\n"
-          + "  LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid\n"
-          + "  LEFT OUTER JOIN job_contexts jc ON jc.uuid = j.current_job_context_uuid\n"
-          + "LEFT OUTER JOIN (\n"
-          + "      SELECT run_uuid, JSON_AGG(e.facets) AS facets\n"
-          + "      FROM (\n"
-          + "       SELECT run_uuid, event->'job'->'facets' AS facets\n"
-          + "       FROM lineage_events AS le\n"
-          + "       INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=le.run_uuid\n"
-          + "       INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid\n"
-          + "       WHERE j2.namespace_name=:namespaceName\n"
-          + "       ORDER BY event_time ASC\n"
-          + "   ) e\n"
-          + "    GROUP BY e.run_uuid\n"
-          + "  ) f ON f.run_uuid=jv.latest_run_uuid\n"
-          + "WHERE j.namespace_name = :namespaceName\n"
-          + "AND j.symlink_target_uuid IS NULL\n"
-          + "ORDER BY j.name "
-          + "LIMIT :limit OFFSET :offset")
+      """
+    WITH jobs_view_page
+    AS (
+      SELECT
+        *
+      FROM
+        jobs_view AS j
+      WHERE
+        j.namespace_name = :namespaceName
+      ORDER BY
+        j.name
+      LIMIT
+        :limit
+      OFFSET
+        :offset
+    ),
+    job_versions_temp AS (
+      SELECT
+        *
+      FROM
+        job_versions AS j
+      WHERE
+        j.namespace_name = :namespaceName
+    ),
+    facets_temp AS (
+    SELECT
+      run_uuid,
+        JSON_AGG(e.facet) AS facets
+    FROM (
+        SELECT
+          jf.run_uuid,
+            jf.facet
+        FROM
+          job_facets_view AS jf
+        INNER JOIN job_versions_temp jv2
+          ON jv2.latest_run_uuid = jf.run_uuid
+        INNER JOIN jobs_view_page j2
+          ON j2.current_version_uuid = jv2.uuid
+        ORDER BY
+          lineage_event_time ASC
+        ) e
+    GROUP BY e.run_uuid
+    )
+    SELECT
+      j.*,
+      f.facets
+    FROM
+      jobs_view_page AS j
+    LEFT OUTER JOIN job_versions_temp AS jv
+      ON jv.uuid = j.current_version_uuid
+    LEFT OUTER JOIN facets_temp AS f
+      ON f.run_uuid = jv.latest_run_uuid
+    ORDER BY
+        j.name
+  """)
   List<Job> findAll(String namespaceName, int limit, int offset);
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
@@ -192,13 +237,6 @@ public interface JobDao extends BaseDao {
         createNamespaceDao()
             .upsertNamespaceRow(
                 UUID.randomUUID(), createdAt, namespaceName.getValue(), DEFAULT_NAMESPACE_OWNER);
-    JobContextRow contextRow =
-        createJobContextDao()
-            .upsert(
-                UUID.randomUUID(),
-                createdAt,
-                Utils.toJson(jobMeta.getContext()),
-                Utils.checksumFor(jobMeta.getContext()));
     return upsertJob(
         UUID.randomUUID(),
         jobMeta.getType(),
@@ -207,7 +245,6 @@ public interface JobDao extends BaseDao {
         namespace.getName(),
         jobName.getValue(),
         jobMeta.getDescription().orElse(null),
-        contextRow.getUuid(),
         toUrlString(jobMeta.getLocation().orElse(null)),
         symlinkTargetUuid,
         toJson(jobMeta.getInputs(), mapper));
@@ -237,36 +274,34 @@ public interface JobDao extends BaseDao {
   */
   @SqlQuery(
       """
-          INSERT INTO jobs_view AS j (
-          uuid,
-          type,
-          created_at,
-          updated_at,
-          namespace_uuid,
-          namespace_name,
-          name,
-          description,
-          current_job_context_uuid,
-          current_location,
-          current_inputs,
-          symlink_target_uuid,
-          parent_job_uuid_string
-          ) VALUES (
-          :uuid,
-          :type,
-          :now,
-          :now,
-          :namespaceUuid,
-          :namespaceName,
-          :name,
-          :description,
-          :jobContextUuid,
-          :location,
-          :inputs,
-          :symlinkTargetId,
-          ''
-          ) RETURNING *
-          """)
+    INSERT INTO jobs_view AS j (
+      uuid,
+      type,
+      created_at,
+      updated_at,
+      namespace_uuid,
+      namespace_name,
+      name,
+      description,
+      current_location,
+      current_inputs,
+      symlink_target_uuid,
+      parent_job_uuid_string
+    ) VALUES (
+      :uuid,
+      :type,
+      :now,
+      :now,
+      :namespaceUuid,
+      :namespaceName,
+      :name,
+      :description,
+      :location,
+      :inputs,
+      :symlinkTargetId,
+      ''
+    ) RETURNING *
+  """)
   JobRow upsertJob(
       UUID uuid,
       JobType type,
@@ -275,7 +310,6 @@ public interface JobDao extends BaseDao {
       String namespaceName,
       String name,
       String description,
-      UUID jobContextUuid,
       String location,
       UUID symlinkTargetId,
       PGobject inputs);
@@ -286,39 +320,35 @@ public interface JobDao extends BaseDao {
   */
   @SqlQuery(
       """
-          INSERT INTO jobs_view AS j (
-          uuid,
-          parent_job_uuid,
-          parent_job_uuid_string,
-          type,
-          created_at,
-          updated_at,
-          namespace_uuid,
-          namespace_name,
-          name,
-          description,
-          current_job_context_uuid,
-          current_location,
-          current_inputs,
-          symlink_target_uuid
-          ) VALUES (
-          :uuid,
-          :parentJobUuid,
-          COALESCE(:parentJobUuid::text, ''),
-          :type,
-          :now,
-          :now,
-          :namespaceUuid,
-          :namespaceName,
-          :name,
-          :description,
-          :jobContextUuid,
-          :location,
-          :inputs,
-          :symlinkTargetId
-          )
-          RETURNING *
-          """)
+    INSERT INTO jobs_view AS j (
+      uuid,
+      parent_job_uuid,
+      type,
+      created_at,
+      updated_at,
+      namespace_uuid,
+      namespace_name,
+      name,
+      description,
+      current_location,
+      current_inputs,
+      symlink_target_uuid
+    ) VALUES (
+      :uuid,
+      :parentJobUuid,
+      :type,
+      :now,
+      :now,
+      :namespaceUuid,
+      :namespaceName,
+      :name,
+      :description,
+      :location,
+      :inputs,
+      :symlinkTargetId
+    )
+    RETURNING *
+  """)
   JobRow upsertJob(
       UUID uuid,
       UUID parentJobUuid,
@@ -328,7 +358,6 @@ public interface JobDao extends BaseDao {
       String namespaceName,
       String name,
       String description,
-      UUID jobContextUuid,
       String location,
       UUID symlinkTargetId,
       PGobject inputs);

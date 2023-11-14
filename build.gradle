@@ -21,7 +21,8 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.11.0'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.20.0'
+        classpath "io.freefair.gradle:lombok-plugin:8.4"
     }
 }
 
@@ -29,9 +30,6 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url = 'https://datakin.jfrog.io/artifactory/maven-public-libs-snapshot'
-        }
     }
 }
 
@@ -42,6 +40,7 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "com.diffplug.spotless"
     apply plugin: "pmd"
+    apply plugin: "io.freefair.lombok"
 
     project(':api') {
         apply plugin: 'application'
@@ -54,16 +53,15 @@ subprojects {
     }
 
     ext {
-        assertjVersion = '3.23.1'
-        dropwizardVersion = '2.1.2'
-        jacocoVersion = '0.8.8'
-        junit5Version = '5.9.1'
-        lombokVersion = '1.18.24'
-        mockitoVersion = '4.8.0'
-        openlineageVersion = '0.14.1'
+        assertjVersion = '3.24.2'
+        dropwizardVersion = '2.1.7'
+        jacocoVersion = '0.8.10'
+        junit5Version = '5.10.0'
+        lombokVersion = '1.18.28'
+        mockitoVersion = '5.4.0'
+        openlineageVersion = '1.4.1'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.5.0'
-        isReleaseVersion = !version.endsWith('SNAPSHOT')
+        postgresqlVersion = '42.6.0'
     }
 
     dependencies {
@@ -94,19 +92,23 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    task sourceJar(type: Jar) {
-        classifier 'sources'
+    task sourceJar(type: Jar, dependsOn: classes) {
         from sourceSets.main.allJava
+        archiveClassifier.set("sources")
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier 'javadoc'
+    task delombokJavadocs(type: Javadoc) {
+        source = delombok
+    }
+
+    task javadocJar(type: Jar, dependsOn: delombokJavadocs) {
         from javadoc.destinationDir
+        archiveClassifier.set("javadoc")
     }
 
     pmd {
         consoleOutput = true
-        toolVersion = "6.46.0"
+        toolVersion = "6.55.0"
         rulesMinimumPriority = 5
         ruleSetFiles = rootProject.files("pmd-marquez.xml")
         ruleSets = []
@@ -131,6 +133,7 @@ subprojects {
         java {
             googleJavaFormat()
             removeUnusedImports()
+            endWithNewline()
             custom 'disallowWildcardImports', disallowWildcardImports
         }
     }
@@ -145,9 +148,9 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            xml.enabled = true
-            html.enabled = true
-            html.destination = file(coverageDir)
+            xml.required = true
+            html.required = true
+            html.outputLocation = file(coverageDir)
         }
     }
 }

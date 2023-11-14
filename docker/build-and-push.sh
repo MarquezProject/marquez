@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2018-2022 contributors to the Marquez project
+# Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 #
 # Usage: $ ./build-and-push.sh <version>
@@ -17,7 +17,7 @@ cd "${project_root}"
 # Version X.Y.Z of Marquez images to build
 version="${1}"
 
-# Ensure valid version 
+# Ensure valid version
 if [[ ! "${version}" =~ ${SEMVER_REGEX} ]]; then
   echo "Version must match ${SEMVER_REGEX}"
   exit 1

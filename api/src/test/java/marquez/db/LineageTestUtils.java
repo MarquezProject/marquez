@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,6 +24,7 @@ import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
+import marquez.service.models.DatasetEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -122,14 +123,17 @@ public class LineageTestUtils {
 
     UUID runId = UUID.randomUUID();
     LineageEvent event =
-        new LineageEvent(
-            status,
-            Instant.now().atZone(LOCAL_ZONE),
-            new Run(runId.toString(), new RunFacet(nominalTimeRunFacet, parentRunFacet, runFacets)),
-            new Job(NAMESPACE, jobName, jobFacet),
-            inputs,
-            outputs,
-            PRODUCER_URL.toString());
+        LineageEvent.builder()
+            .eventType(status)
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .run(
+                new Run(
+                    runId.toString(), new RunFacet(nominalTimeRunFacet, parentRunFacet, runFacets)))
+            .job(new Job(NAMESPACE, jobName, jobFacet))
+            .inputs(inputs)
+            .outputs(outputs)
+            .producer(PRODUCER_URL.toString())
+            .build();
     // emulate an OpenLineage RunEvent
     event
         .getProperties()
@@ -170,6 +174,44 @@ public class LineageTestUtils {
     return updateLineageRow;
   }
 
+  /**
+   * Create an {@link UpdateLineageRow} from the input job details and datasets.
+   *
+   * @param dao
+   * @param dataset
+   * @return
+   */
+  public static UpdateLineageRow createLineageRow(OpenLineageDao dao, Dataset dataset) {
+
+    DatasetEvent event =
+        DatasetEvent.builder()
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .dataset(dataset)
+            .producer(PRODUCER_URL.toString())
+            .build();
+
+    // emulate an OpenLineage DatasetEvent
+    event
+        .getProperties()
+        .put(
+            "_schemaURL",
+            "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent");
+    UpdateLineageRow updateLineageRow = dao.updateMarquezModel(event, Utils.getMapper());
+    PGobject jsonObject = new PGobject();
+    jsonObject.setType("json");
+    try {
+      jsonObject.setValue(Utils.toJson(event));
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    dao.createDatasetEvent(
+        event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+        jsonObject,
+        event.getProducer());
+
+    return updateLineageRow;
+  }
+
   public static DatasetFacets newDatasetFacet(SchemaField... fields) {
     return newDatasetFacet(EMPTY_MAP, fields);
   }
@@ -182,7 +224,6 @@ public class LineageTestUtils {
         .dataSource(
             new DatasourceDatasetFacet(
                 PRODUCER_URL, SCHEMA_URL, "the source", "http://thesource.com"))
-        .description("the dataset description")
         .additional(facets)
         .build();
   }

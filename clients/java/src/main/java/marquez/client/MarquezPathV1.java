@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -176,5 +176,13 @@ class MarquezPathV1 {
 
   static String searchPath() {
     return path("/search");
+  }
+
+  static String lineagePath() {
+    return path("/lineage/");
+  }
+
+  static String columnLineagePath() {
+    return path("/column-lineage/");
   }
 }

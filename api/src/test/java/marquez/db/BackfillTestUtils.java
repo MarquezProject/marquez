@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 contributors to the Marquez project
+ * Copyright 2018-2023 contributors to the Marquez project
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,10 +63,8 @@ public class BackfillTestUtils {
             runArgsRow.getUuid(),
             now,
             now,
-            namespace.getUuid(),
             namespace.getName(),
             jobName,
-            null,
             null);
 
     NominalTimeRunFacet nominalTimeRunFacet = new NominalTimeRunFacet();
@@ -84,20 +82,23 @@ public class BackfillTestUtils {
                         new RunLink(runId),
                         new JobLink(NAMESPACE, parentJobName)));
     LineageEvent event =
-        new LineageEvent(
-            COMPLETE,
-            Instant.now().atZone(LOCAL_ZONE),
-            new Run(
-                runUuid.toString(),
-                new RunFacet(
-                    nominalTimeRunFacet,
-                    parentRun.orElse(null),
-                    ImmutableMap.of("airflow_version", ImmutableMap.of("version", "abc")))),
-            new LineageEvent.Job(
-                NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)),
-            Collections.emptyList(),
-            Collections.emptyList(),
-            PRODUCER_URL.toString());
+        LineageEvent.builder()
+            .eventType(COMPLETE)
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .run(
+                new Run(
+                    runUuid.toString(),
+                    new RunFacet(
+                        nominalTimeRunFacet,
+                        parentRun.orElse(null),
+                        ImmutableMap.of("airflow_version", ImmutableMap.of("version", "abc")))))
+            .job(
+                new LineageEvent.Job(
+                    NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)))
+            .inputs(Collections.emptyList())
+            .outputs(Collections.emptyList())
+            .producer(PRODUCER_URL.toString())
+            .build();
     PGobject eventJson = new PGobject();
     eventJson.setType("json");
     eventJson.setValue(Utils.getMapper().writeValueAsString(event));
@@ -119,23 +120,10 @@ public class BackfillTestUtils {
     pgInputs.setValue("[]");
     return jdbi.withHandle(
         h -> {
-          UUID jobContextUuid =
-              h.createQuery(
-                      """
-INSERT INTO job_contexts (uuid, created_at, context, checksum) VALUES (:uuid, :now, :context, :checksum)
-ON CONFLICT (checksum) DO UPDATE SET created_at=EXCLUDED.created_at
-RETURNING uuid
-""")
-                  .bind("uuid", UUID.randomUUID())
-                  .bind("now", now)
-                  .bind("context", "")
-                  .bind("checksum", "")
-                  .mapTo(UUID.class)
-                  .first();
           return h.createQuery(
                   """
-                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_job_context_uuid, current_inputs)
-                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentJobContextUuid, :currentInputs)
+                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_inputs)
+                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentInputs)
                   RETURNING uuid
                   """)
               .bind("uuid", UUID.randomUUID())
@@ -144,7 +132,6 @@ RETURNING uuid
               .bind("namespaceUuid", namespace.getUuid())
               .bind("name", jobName)
               .bind("namespaceName", namespace.getName())
-              .bind("currentJobContextUuid", jobContextUuid)
               .bind("currentInputs", pgInputs)
               .mapTo(UUID.class)
               .first();

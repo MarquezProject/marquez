@@ -1,11 +1,17 @@
+// Copyright 2018-2023 contributors to the Marquez project
+// SPDX-License-Identifier: Apache-2.0
+
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-require('../node_modules/react-vis/dist/style.css')
+import { createRoot } from 'react-dom/client'
 import App from './components/App'
 
 // fonts
-import './fonts/SourceCodePro-Bold.ttf'
-import './fonts/SourceCodePro-Regular.ttf'
 import './index.css'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+import './i18n/config'
+
+const container = document.getElementById('root')
+if (container) {
+  const root = createRoot(container)
+  root.render(<App />)
+}

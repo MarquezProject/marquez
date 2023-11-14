@@ -46,6 +46,15 @@ Return the proper Marquez web image name
 {{- end -}}
 
 {{/*
+Return the proper Postgresql image name for the wait-for-db initContainer
+*/}}
+{{- define "marquez.wait-for-db.image" -}}
+{{- if .Values.postgresql.enabled -}}
+  {{- include "common.images.image" (dict "imageRoot" .Values.postgresql.image "global" .Values.global) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Get the secret name
 */}}
 {{- define "marquez.secretName" -}}
