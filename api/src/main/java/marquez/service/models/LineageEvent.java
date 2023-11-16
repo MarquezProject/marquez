@@ -214,19 +214,13 @@ public class LineageEvent extends BaseEvent {
   @Setter
   @Valid
   @ToString
-  @JsonPropertyOrder({
-    "documentation",
-    "sourceCodeLocation",
-    "sql",
-    "description",
-    "processingType"
-  })
+  @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description", "jobType"})
   public static class JobFacet {
 
     @Valid private DocumentationJobFacet documentation;
     @Valid private SourceCodeLocationJobFacet sourceCodeLocation;
     @Valid private SQLJobFacet sql;
-    @Valid private ProcessingTypeJobFacet processingType;
+    @Valid private JobTypeJobFacet jobType;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
@@ -247,8 +241,8 @@ public class LineageEvent extends BaseEvent {
       return sourceCodeLocation;
     }
 
-    public ProcessingTypeJobFacet getProcessingTypeJobFacet() {
-      return processingType;
+    public JobTypeJobFacet getJobType() {
+      return jobType;
     }
 
     public SQLJobFacet getSql() {
@@ -308,21 +302,28 @@ public class LineageEvent extends BaseEvent {
     }
   }
 
-  // TODO: make it up to date with https://github.com/OpenLineage/OpenLineage/pull/2241/files
   @NoArgsConstructor
   @Getter
   @Setter
   @Valid
   @ToString
-  public static class ProcessingTypeJobFacet extends BaseFacet {
+  public static class JobTypeJobFacet extends BaseFacet {
 
     @NotNull private String processingType;
+    @NotNull private String integration;
+    @NotNull private String jobType;
 
     @Builder
-    public ProcessingTypeJobFacet(
-        @NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String processingType) {
+    public JobTypeJobFacet(
+        @NotNull URI _producer,
+        @NotNull URI _schemaURL,
+        @NotNull String processingType,
+        @NotNull String integration,
+        @NotNull String jobType) {
       super(_producer, _schemaURL);
       this.processingType = processingType;
+      this.integration = integration;
+      this.jobType = jobType;
     }
   }
 

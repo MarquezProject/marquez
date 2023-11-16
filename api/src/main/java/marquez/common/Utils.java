@@ -57,6 +57,9 @@ import marquez.common.models.Version;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.Job;
+import marquez.service.models.LineageEvent.JobFacet;
+import marquez.service.models.LineageEvent.JobTypeJobFacet;
 import marquez.service.models.LineageEvent.ParentRunFacet;
 import marquez.service.models.StreamMeta;
 import org.apache.commons.lang3.tuple.Triple;
@@ -311,6 +314,21 @@ public final class Utils {
             .runId(runId)
             .build();
     return newDatasetVersionFor(data);
+  }
+
+  /**
+   * Verifies if a job is a streaming job.
+   *
+   * @param job
+   * @return
+   */
+  public static boolean isStreamingJob(Job job) {
+    return Optional.ofNullable(job)
+        .map(Job::getFacets)
+        .map(JobFacet::getJobType)
+        .map(JobTypeJobFacet::getProcessingType)
+        .filter(type -> type.equalsIgnoreCase("STREAMING"))
+        .isPresent();
   }
 
   /**

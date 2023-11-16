@@ -34,6 +34,7 @@ import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.JobVersionDao.IoType;
+import marquez.db.JobVersionDao.JobRowRunDetails;
 import marquez.db.RunDao.RunUpsert;
 import marquez.db.RunDao.RunUpsert.RunUpsertBuilder;
 import marquez.db.mappers.LineageEventMapper;
@@ -64,7 +65,6 @@ import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.LifecycleStateChangeFacet;
 import marquez.service.models.LineageEvent.NominalTimeRunFacet;
 import marquez.service.models.LineageEvent.ParentRunFacet;
-import marquez.service.models.LineageEvent.ProcessingTypeJobFacet;
 import marquez.service.models.LineageEvent.Run;
 import marquez.service.models.LineageEvent.RunFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
@@ -168,53 +168,11 @@ public interface OpenLineageDao extends BaseDao {
   default UpdateLineageRow updateMarquezModel(LineageEvent event, ObjectMapper mapper) {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
     RunState runState = getRunState(event.getEventType());
-    if (event.getEventType() != null && runState.isDone()) {
+
+    if (Utils.isStreamingJob(event.getJob())) {
+      updateMarquezOnStreamingJob(event, updateLineageRow, runState);
+    } else if (event.getEventType() != null && runState.isDone()) {
       updateMarquezOnComplete(event, updateLineageRow, runState);
-    }
-    // TODO: add a columns: jobType, integration, processingType jobs table to determine job type ->
-    // https://github.com/OpenLineage/OpenLineage/pull/2241
-    // TODO: verify those columns in jobs' api (should be part of JobData)
-
-    // if a job is streaming job - datasets versions should be created on start
-    // TODO: make it enum, use some method for this
-    Optional<String> processingType =
-        Optional.ofNullable(event.getJob())
-            .map(Job::getFacets)
-            .map(JobFacet::getProcessingTypeJobFacet)
-            .map(ProcessingTypeJobFacet::getProcessingType);
-
-    // TODO: migrate this to separate method
-    // TODO: test streaming facet in integration test (read from facet in json file)
-    if (processingType.orElse("").equals("STREAMING")) {
-      // insert IO rows
-      ModelDaos daos = new ModelDaos();
-      daos.initBaseDao(this);
-      updateLineageRow
-          .getInputs()
-          .ifPresent(
-              l ->
-                  l.stream()
-                      .forEach(
-                          d ->
-                              daos.getJobVersionDao()
-                                  .upsertInputDatasetFor(
-                                      null, // no job version Id
-                                      d.getDatasetRow().getUuid(),
-                                      updateLineageRow.getJob().getUuid(),
-                                      updateLineageRow.getJob().getSymlinkTargetId())));
-      updateLineageRow
-          .getOutputs()
-          .ifPresent(
-              l ->
-                  l.stream()
-                      .forEach(
-                          d ->
-                              daos.getJobVersionDao()
-                                  .upsertInputDatasetFor(
-                                      null, // no job version Id
-                                      d.getDatasetRow().getUuid(),
-                                      updateLineageRow.getJob().getUuid(),
-                                      updateLineageRow.getJob().getSymlinkTargetId())));
     }
 
     return updateLineageRow;
@@ -792,14 +750,56 @@ public interface OpenLineageDao extends BaseDao {
 
   default void updateMarquezOnComplete(
       LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
+    final JobVersionDao jobVersionDao = createJobVersionDao();
+    // Link the job version to the job only if the run is marked done and has transitioned into one
+    // of the following states: COMPLETED, ABORTED, or FAILED.
+    final boolean linkJobToJobVersion = runState.isDone();
+
     BagOfJobVersionInfo bagOfJobVersionInfo =
-        createJobVersionDao()
-            .upsertJobVersionOnRunTransition(
-                updateLineageRow.getJob(),
-                updateLineageRow.getRun().getUuid(),
-                runState,
-                event.getEventTime().toInstant());
+        jobVersionDao.upsertJobVersionOnRunTransition(
+            jobVersionDao.loadJobRowRunDetails(
+                updateLineageRow.getJob(), updateLineageRow.getRun().getUuid()),
+            runState,
+            event.getEventTime().toInstant(),
+            linkJobToJobVersion);
     updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
+  }
+
+  /**
+   * A separate method is used as the logic to update Marquez model differs for streaming and batch.
+   * The assumption for batch is that the job version is created when task is done and cumulative
+   * list of input and output datasets from all the events is used to compute the job version UUID.
+   * However, this wouldn't make sense for streaming jobs, which are mostly long living and produce
+   * output before completing.
+   *
+   * <p>In this case, a job version is created based on the list of input and output datasets
+   * referenced by this job. If a job starts with inputs:{A,B} and outputs:{C}, new job version is
+   * created immediately at job start. If a following event produces inputs:{A}, outputs:{C}, then
+   * the union of all datasets registered within this job does not change, and thus job version does
+   * not get modified. In case of receiving another event with no inputs nor outputs, job version
+   * still will not get modified as its hash is evaluated based on the datasets attached to the run.
+   *
+   * <p>However, in case of event with inputs:{A,B,D} and outputs:{C}, new hash gets computed and
+   * new job version row is inserted into the table.
+   *
+   * @param event
+   * @param updateLineageRow
+   * @param runState
+   */
+  default void updateMarquezOnStreamingJob(
+      LineageEvent event, UpdateLineageRow updateLineageRow, RunState runState) {
+    final JobVersionDao jobVersionDao = createJobVersionDao();
+    JobRowRunDetails jobRowRunDetails =
+        jobVersionDao.loadJobRowRunDetails(
+            updateLineageRow.getJob(), updateLineageRow.getRun().getUuid());
+
+    if (!jobVersionDao.versionExists(jobRowRunDetails.jobVersion().getValue())) {
+      // need to insert new job version
+      BagOfJobVersionInfo bagOfJobVersionInfo =
+          jobVersionDao.upsertJobVersionOnRunTransition(
+              jobRowRunDetails, runState, event.getEventTime().toInstant(), true);
+      updateLineageRow.setJobVersionBag(bagOfJobVersionInfo);
+    }
   }
 
   default String getUrlOrNull(String uri) {
@@ -820,7 +820,7 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default JobType getJobType(Job job) {
-    return JobType.BATCH;
+    return Utils.isStreamingJob(job) ? JobType.STREAM : JobType.BATCH;
   }
 
   default DatasetRecord upsertLineageDataset(

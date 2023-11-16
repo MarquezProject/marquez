@@ -84,14 +84,14 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     runStateDao.updateRunStateFor(runId.getValue(), runState, transitionedAt);
 
     if (runState.isDone()) {
+      JobRow jobRow =
+          jobDao.findJobByNameAsRow(runRow.getNamespaceName(), runRow.getJobName()).orElseThrow();
       BagOfJobVersionInfo bagOfJobVersionInfo =
           jobVersionDao.upsertJobVersionOnRunTransition(
-              jobDao
-                  .findJobByNameAsRow(runRow.getNamespaceName(), runRow.getJobName())
-                  .orElseThrow(),
-              runRow.getUuid(),
+              jobVersionDao.loadJobRowRunDetails(jobRow, runRow.getUuid()),
               runState,
-              transitionedAt);
+              transitionedAt,
+              true);
 
       // TODO: We should also notify that the outputs have been updated when a run is in a done
       // state to be consistent with existing job versioning logic. We'll want to add testing to

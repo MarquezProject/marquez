@@ -142,7 +142,16 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
-                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                    boolean isStreaming =
+                        Optional.ofNullable(event.getJob())
+                            .map(j -> j.getFacets())
+                            .map(f -> f.getJobType())
+                            .map(p -> p.getProcessingType())
+                            .filter(t -> t.equalsIgnoreCase("STREAMING"))
+                            .stream()
+                            .findAny()
+                            .isPresent();
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
                       buildJobOutputUpdate(update).ifPresent(runService::notify);
                     }
                     buildJobInputUpdate(update).ifPresent(runService::notify);

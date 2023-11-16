@@ -6,8 +6,6 @@
 package marquez.service;
 
 import static marquez.db.LineageTestUtils.NAMESPACE;
-import static marquez.db.LineageTestUtils.PRODUCER_URL;
-import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +41,7 @@ import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
-import marquez.service.models.LineageEvent.ProcessingTypeJobFacet;
+import marquez.service.models.LineageEvent.JobTypeJobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
@@ -449,7 +447,7 @@ public class LineageServiceTest {
         "streamingjob",
         "RUNNING",
         JobFacet.builder()
-            .processingType(new ProcessingTypeJobFacet(PRODUCER_URL, SCHEMA_URL, "STREAMING"))
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
             .build(),
         Arrays.asList(input),
         Arrays.asList(output));
