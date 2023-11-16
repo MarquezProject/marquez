@@ -268,7 +268,6 @@ public interface DatasetVersionDao extends BaseDao {
       	) f ON f.dataset_version_uuid = dv.uuid
       	WHERE dv.namespace_name = :namespaceName
             AND dv.dataset_name = :datasetName
-      	ORDER BY dv.created_at DESC
       	LIMIT :limit OFFSET :offset
         )
         SELECT
@@ -280,6 +279,7 @@ public interface DatasetVersionDao extends BaseDao {
         GROUP BY type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
             created_at, version, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid
+        ORDER BY created_at DESC
   """)
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 
