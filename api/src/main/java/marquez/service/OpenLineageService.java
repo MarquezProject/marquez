@@ -46,6 +46,7 @@ import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
@@ -76,6 +77,32 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                     () ->
                         createDatasetEvent(
                             event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                            createJsonArray(event, mapper),
+                            event.getProducer()))),
+            executor);
+
+    CompletableFuture<Void> marquez =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () -> {
+                      updateMarquezModel(event, mapper);
+                    })),
+            executor);
+
+    return CompletableFuture.allOf(marquez, openLineage);
+  }
+
+  public CompletableFuture<Void> createAsync(JobEvent event) {
+    CompletableFuture<Void> openLineage =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () ->
+                        createJobEvent(
+                            event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                            event.getJob().getName(),
+                            event.getJob().getNamespace(),
                             createJsonArray(event, mapper),
                             event.getProducer()))),
             executor);

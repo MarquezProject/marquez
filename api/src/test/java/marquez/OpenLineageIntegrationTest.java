@@ -51,11 +51,11 @@ import marquez.client.models.Dataset;
 import marquez.client.models.DatasetVersion;
 import marquez.client.models.Job;
 import marquez.client.models.JobId;
+import marquez.client.models.JobVersion;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Run;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
-import marquez.service.models.JobEvent;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.jdbi.v3.core.Jdbi;
 import org.jetbrains.annotations.NotNull;
@@ -1421,11 +1421,13 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  public void testSendJobEventIsDecoded() throws IOException {
+  public void testSendJobEvent() throws IOException {
     final String openLineageEventAsString =
         Resources.toString(Resources.getResource(EVENT_JOB_EVENT), Charset.defaultCharset());
+    final JsonNode openLineageEventAsJson =
+        Utils.fromJson(openLineageEventAsString, new TypeReference<JsonNode>() {});
 
-    // (2) Send OpenLineage event.
+    // (1) Send OpenLineage event.
     final CompletableFuture<Map<Integer, String>> resp =
         this.sendLineage(openLineageEventAsString)
             .thenApply(r -> Collections.singletonMap(r.statusCode(), r.body()))
@@ -1438,21 +1440,59 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
 
     // Ensure the event was received.
     Map<Integer, String> respMap = resp.join();
+    assertThat(respMap.containsKey(201)).isTrue();
 
-    assertThat(respMap.containsKey(200)).isTrue(); // Status should be 200 instead of 201
+    // (2) Verify the job facets associated with the OpenLineage event.
+    final JsonNode jobAsJson = openLineageEventAsJson.path("job");
+    final String jobNamespace = jobAsJson.path("namespace").asText();
+    final String jobName = jobAsJson.path("name").asText();
+    final JsonNode jobFacetsAsJson = jobAsJson.path("facets");
 
-    // (3) Convert the OpenLineage event to Json.
-    JobEvent jobEvent =
-        marquez.client.Utils.fromJson(respMap.get(200), new TypeReference<JobEvent>() {});
-    assertThat(jobEvent.getJob().getNamespace()).isEqualTo("my-scheduler-namespace");
-    assertThat(jobEvent.getJob().getName()).isEqualTo("myjob");
+    final Job job = client.getJob(jobNamespace, jobName);
+    LoggerFactory.getLogger(getClass()).info("Got job from server {}", job);
+    if (!jobFacetsAsJson.isMissingNode()) {
+      final JsonNode facetsForRunAsJson =
+          Utils.getMapper().convertValue(job.getFacets(), JsonNode.class);
+      assertThat(facetsForRunAsJson).isEqualTo(jobFacetsAsJson);
+    } else {
+      assertThat(job.getFacets()).isEmpty();
+    }
 
-    assertThat(jobEvent.getInputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
-    assertThat(jobEvent.getInputs().get(0).getName()).isEqualTo("instance.schema.input-1");
+    // (3) Verify input datasets are present + verify dataset facets in extra call
+    final JsonNode inputsAsJson = openLineageEventAsJson.path("inputs");
+    final String inputNamespace = inputsAsJson.get(0).path("namespace").asText();
+    final String inputName = inputsAsJson.get(0).path("name").asText();
 
-    assertThat(jobEvent.getOutputs().get(0).getNamespace()).isEqualTo("my-datasource-namespace");
-    assertThat(jobEvent.getOutputs().get(0).getName()).isEqualTo("instance.schema.output-1");
-    assertThat(jobEvent.getEventTime().toString()).startsWith("2020-12-28T09:52:00.001");
+    assertThat(job.getInputs().stream().findAny().get())
+        .hasFieldOrPropertyWithValue("namespace", inputNamespace)
+        .hasFieldOrPropertyWithValue("name", inputName);
+    assertThat(client.getDataset(inputNamespace, inputName))
+        .hasFieldOrPropertyWithValue("description", Optional.of("input documentation"));
+
+    // (4) Verify output datasets are present + verify dataset facets in extra call
+    final JsonNode outputsAsJson = openLineageEventAsJson.path("outputs");
+    final String outputNamespace = outputsAsJson.get(0).path("namespace").asText();
+    final String outputName = outputsAsJson.get(0).path("name").asText();
+
+    assertThat(job.getOutputs().stream().findAny().get())
+        .hasFieldOrPropertyWithValue("namespace", outputNamespace)
+        .hasFieldOrPropertyWithValue("name", outputName);
+
+    assertThat(client.getDataset(outputNamespace, outputName))
+        .hasFieldOrPropertyWithValue("description", Optional.of("output documentation"));
+
+    // (5) Verify job version endpoint returns a job
+    UUID version = client.listJobVersions(jobNamespace, jobName, 1, 0).get(0).getVersion();
+
+    JobVersion jobVersion = client.getJobVersion(jobNamespace, jobName, version.toString());
+
+    assertThat(jobVersion)
+        .hasFieldOrPropertyWithValue("namespace", jobNamespace)
+        .hasFieldOrPropertyWithValue("name", jobName);
+    assertThat(jobVersion.getInputs()).isNotEmpty();
+
+    // (6) verify list lineage endpoint responds correctly with no events returned
+    assertThat(client.listLineageEvents()).hasSize(0);
   }
 
   private void validateDatasetFacets(JsonNode json) {

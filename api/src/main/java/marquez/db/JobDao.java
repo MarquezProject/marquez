@@ -20,6 +20,9 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.db.JobVersionDao.IoType;
+import marquez.db.JobVersionDao.JobDataset;
+import marquez.db.JobVersionDao.JobDatasetMapper;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
 import marquez.db.models.JobRow;
@@ -34,6 +37,7 @@ import org.postgresql.util.PGobject;
 
 @RegisterRowMapper(JobRowMapper.class)
 @RegisterRowMapper(JobMapper.class)
+@RegisterRowMapper(JobDatasetMapper.class)
 public interface JobDao extends BaseDao {
 
   @SqlQuery(
@@ -56,21 +60,14 @@ public interface JobDao extends BaseDao {
 
   @SqlQuery(
       """
-    SELECT j.*, f.facets
+    WITH job_versions_facets AS (
+        SELECT job_version_uuid, JSON_AGG(facet) as facets
+        FROM job_facets
+        GROUP BY job_version_uuid
+    )
+    SELECT j.*, facets
     FROM jobs_view j
-    LEFT OUTER JOIN job_versions AS jv ON jv.uuid = j.current_version_uuid
-    LEFT OUTER JOIN (
-      SELECT run_uuid, JSON_AGG(e.facet) AS facets
-      FROM (
-        SELECT jf.run_uuid, jf.facet
-        FROM job_facets_view AS jf
-        INNER JOIN job_versions jv2 ON jv2.latest_run_uuid=jf.run_uuid
-        INNER JOIN jobs_view j2 ON j2.current_version_uuid=jv2.uuid
-        WHERE j2.name=:jobName AND j2.namespace_name=:namespaceName
-        ORDER BY lineage_event_time ASC
-      ) e
-      GROUP BY e.run_uuid
-    ) f ON f.run_uuid=jv.latest_run_uuid
+    LEFT OUTER JOIN job_versions_facets f ON j.current_version_uuid = f.job_version_uuid
     WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
   """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
@@ -94,12 +91,18 @@ public interface JobDao extends BaseDao {
   """)
   void deleteByNamespaceName(String namespaceName);
 
-  default Optional<Job> findWithRun(String namespaceName, String jobName) {
+  default Optional<Job> findWithDatasetsAndRun(String namespaceName, String jobName) {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
           Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
-          run.ifPresent(r -> this.setJobData(r, j));
+          run.ifPresentOrElse(
+              r -> this.setJobData(r, j),
+              () ->
+                  this.setJobData(
+                      createJobVersionDao()
+                          .findCurrentInputOutputDatasetsFor(namespaceName, jobName),
+                      j));
         });
     return job;
   }
@@ -198,6 +201,28 @@ public interface JobDao extends BaseDao {
                     .findByLatestJob(namespaceName, j.getName().getValue())
                     .ifPresent(run -> this.setJobData(run, j)))
         .collect(Collectors.toList());
+  }
+
+  default void setJobData(List<JobDataset> datasets, Job j) {
+    Optional.of(
+            datasets.stream()
+                .filter(d -> d.ioType().equals(IoType.INPUT))
+                .map(
+                    ds ->
+                        new DatasetId(NamespaceName.of(ds.namespace()), DatasetName.of(ds.name())))
+                .collect(Collectors.toSet()))
+        .filter(s -> !s.isEmpty())
+        .ifPresent(s -> j.setInputs(s));
+
+    Optional.of(
+            datasets.stream()
+                .filter(d -> d.ioType().equals(IoType.OUTPUT))
+                .map(
+                    ds ->
+                        new DatasetId(NamespaceName.of(ds.namespace()), DatasetName.of(ds.name())))
+                .collect(Collectors.toSet()))
+        .filter(s -> !s.isEmpty())
+        .ifPresent(s -> j.setOutputs(s));
   }
 
   default void setJobData(Run run, Job j) {
