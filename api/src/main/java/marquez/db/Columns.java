@@ -150,9 +150,7 @@ public final class Columns {
   }
 
   public static UUID uuidOrThrow(final ResultSet results, final String column) throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getObject(column, UUID.class);
   }
 
@@ -166,9 +164,7 @@ public final class Columns {
 
   public static Instant timestampOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getTimestamp(column).toInstant();
   }
 
@@ -182,9 +178,7 @@ public final class Columns {
 
   public static String stringOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getString(column);
   }
 
@@ -199,40 +193,30 @@ public final class Columns {
 
   public static boolean booleanOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getBoolean(column);
   }
 
   public static int intOrThrow(final ResultSet results, final String column) throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getInt(column);
   }
 
   public static PGInterval pgIntervalOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return new PGInterval(results.getString(column));
   }
 
   public static BigDecimal bigDecimalOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return results.getBigDecimal(column);
   }
 
   public static List<UUID> uuidArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return Arrays.asList((UUID[]) results.getArray(column).getArray());
   }
 
@@ -246,9 +230,7 @@ public final class Columns {
 
   public static List<String> stringArrayOrThrow(final ResultSet results, final String column)
       throws SQLException {
-    if (results.getObject(column) == null) {
-      throw new IllegalArgumentException();
-    }
+    checkNotNull(results, column);
     return Arrays.asList((String[]) results.getArray(column).getArray());
   }
 
@@ -310,5 +292,12 @@ public final class Columns {
       return null;
     }
     return jsonObject;
+  }
+
+  private static void checkNotNull(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      throw new IllegalArgumentException(column + " not found in result");
+    }
   }
 }
