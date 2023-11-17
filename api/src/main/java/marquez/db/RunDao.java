@@ -153,6 +153,7 @@ public interface RunDao extends BaseDao {
                 run_uuid,
                 JSON_AGG(facet ORDER BY lineage_event_time ASC) AS facets
             FROM run_facets_view
+            -- This filter here is used for performance purpose: we only aggregate the json of run_uuid that matters
             WHERE
                 run_uuid IN (SELECT uuid FROM runs_view WHERE job_uuid IN (SELECT uuid FROM filtered_jobs))
             GROUP BY run_uuid
@@ -167,6 +168,7 @@ public interface RunDao extends BaseDao {
                    )) AS input_versions
                FROM runs_input_mapping im
                INNER JOIN dataset_versions dv ON im.dataset_version_uuid = dv.uuid
+               -- This filter here is used for performance purpose: we only aggregate the json of run_uuid that matters
                WHERE
                    im.run_uuid IN (SELECT uuid FROM runs_view WHERE job_uuid IN (SELECT uuid FROM filtered_jobs))
                GROUP BY im.run_uuid
@@ -180,6 +182,7 @@ public interface RunDao extends BaseDao {
                                        'dataset_version_uuid', uuid
                                        )) AS output_versions
               FROM dataset_versions dv
+              -- This filter here is used for performance purpose: we only aggregate the json of run_uuid that matters
               WHERE dv.run_uuid IN (SELECT uuid FROM runs_view WHERE job_uuid IN (SELECT uuid FROM filtered_jobs))
               GROUP BY dv.run_uuid
           ),
@@ -193,6 +196,7 @@ public interface RunDao extends BaseDao {
                       'facet', facet
                   ) ORDER BY created_at ASC) as dataset_facets
               FROM dataset_facets_view
+              -- This filter here is used for performance purpose: we only aggregate the json of run_uuid that matters
               WHERE run_uuid IN (SELECT uuid FROM runs_view WHERE job_uuid IN (SELECT uuid FROM filtered_jobs))
               AND (type ILIKE 'output' OR type ILIKE 'input')
               GROUP BY run_uuid
