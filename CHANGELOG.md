@@ -2,6 +2,12 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.42.0...HEAD)
 
+### Added
+* API: support `DatasetEvent` [`#2641`](https://github.com/MarquezProject/marquez/pull/2641) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
+  *Save into Marquez model datasets sent via `DatasetEvent` event type
+* API: support `JobEvent` [`#2661`](https://github.com/MarquezProject/marquez/pull/2661) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
+  *Save into Marquez model jobs and datasets sent via `JobEvent` event type.
+
 ## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-17
 ### Added
 * Client: add Java client method for dataset/job lineage [`#2623`](https://github.com/MarquezProject/marquez/pull/2623) [@davidjgoss](https://github.com/davidjgoss)  
@@ -27,10 +33,6 @@
 ### Fixed
 * Web: fix Unix epoch time display for null `endedAt` values [`#2647`](https://github.com/MarquezProject/marquez/pull/2647) [@merobi-hub](https://github.com/merobi-hub)  
     *Fixes the issue of the GUI displaying Unix epoch time (midnight on January 1, 1970) in the case of running jobs/null `endedAt` values.*
-
-### Added
-* API: support `DatasetEvent` [`#2641`](https://github.com/MarquezProject/marquez/pull/2641) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
-    *Save into Marquez model datasets sent via `DatasetEvent` event type 
 
 ## [0.41.0](https://github.com/MarquezProject/marquez/compare/0.40.0...0.41.0) - 2023-09-20
 ### Added

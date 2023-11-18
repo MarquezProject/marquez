@@ -25,6 +25,7 @@ import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -175,14 +176,13 @@ public class LineageTestUtils {
   }
 
   /**
-   * Create an {@link UpdateLineageRow} from the input job details and datasets.
+   * Create an {@link UpdateLineageRow} from dataset.
    *
    * @param dao
    * @param dataset
    * @return
    */
   public static UpdateLineageRow createLineageRow(OpenLineageDao dao, Dataset dataset) {
-
     DatasetEvent event =
         DatasetEvent.builder()
             .eventTime(Instant.now().atZone(LOCAL_ZONE))
@@ -206,6 +206,48 @@ public class LineageTestUtils {
     }
     dao.createDatasetEvent(
         event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+        jsonObject,
+        event.getProducer());
+
+    return updateLineageRow;
+  }
+
+  /**
+   * Create an {@link UpdateLineageRow} from dataset.
+   *
+   * @param dao
+   * @param job
+   * @return
+   */
+  public static UpdateLineageRow createLineageRow(
+      OpenLineageDao dao, Job job, List<Dataset> inputs, List<Dataset> outputs) {
+    JobEvent event =
+        JobEvent.builder()
+            .eventTime(Instant.now().atZone(LOCAL_ZONE))
+            .job(job)
+            .producer(PRODUCER_URL.toString())
+            .inputs(inputs)
+            .outputs(outputs)
+            .build();
+
+    // emulate an OpenLineage JobEvent
+    event
+        .getProperties()
+        .put(
+            "_schemaURL",
+            "https://openlineage.io/spec/1-0-1/OpenLineage.json#/definitions/RunEvent");
+    UpdateLineageRow updateLineageRow = dao.updateMarquezModel(event, Utils.getMapper());
+    PGobject jsonObject = new PGobject();
+    jsonObject.setType("json");
+    try {
+      jsonObject.setValue(Utils.toJson(event));
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    dao.createJobEvent(
+        event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+        event.getJob().getName(),
+        event.getJob().getNamespace(),
         jsonObject,
         event.getProducer());
 

@@ -47,6 +47,26 @@ public class BackfillTestUtils {
     RunArgsDao runArgsDao = jdbi.onDemand(RunArgsDao.class);
     RunDao runDao = jdbi.onDemand(RunDao.class);
     UUID jobUuid = writeJob(jdbi, jobName, now, namespace);
+    UUID jobVersionUuid =
+        jdbi.withHandle(
+            h -> {
+              return h.createQuery(
+                      """
+                  INSERT INTO job_versions (uuid, created_at, updated_at, job_uuid, version, location,namespace_uuid, namespace_name, job_name)
+                  VALUES (:uuid, :now, :now, :jobUuid, :version, :location, :namespaceUuid, :namespaceName, :jobName)
+                  RETURNING uuid
+                  """)
+                  .bind("uuid", UUID.randomUUID())
+                  .bind("now", now)
+                  .bind("jobUuid", jobUuid)
+                  .bind("version", UUID.randomUUID())
+                  .bind("location", "location")
+                  .bind("namespaceUuid", namespace.getUuid())
+                  .bind("namespaceName", namespace.getName())
+                  .bind("jobName", jobName)
+                  .mapTo(UUID.class)
+                  .first();
+            });
 
     RunArgsRow runArgsRow =
         runArgsDao.upsertRunArgs(
@@ -59,7 +79,7 @@ public class BackfillTestUtils {
             runUuid.toString(),
             now,
             jobUuid,
-            null,
+            jobVersionUuid,
             runArgsRow.getUuid(),
             now,
             now,
@@ -122,8 +142,8 @@ public class BackfillTestUtils {
         h -> {
           return h.createQuery(
                   """
-                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_inputs)
-                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentInputs)
+                  INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, namespace_name, current_inputs, simple_name)
+                  VALUES (:uuid, :type, :now, :now, :namespaceUuid, :name, :namespaceName, :currentInputs, :simpleName)
                   RETURNING uuid
                   """)
               .bind("uuid", UUID.randomUUID())
@@ -133,6 +153,7 @@ public class BackfillTestUtils {
               .bind("name", jobName)
               .bind("namespaceName", namespace.getName())
               .bind("currentInputs", pgInputs)
+              .bind("simpleName", jobName)
               .mapTo(UUID.class)
               .first();
         });
