@@ -77,8 +77,7 @@ public class NamespaceResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     final String namespaceFilter = Utils.getNamespaceFilter();
     final List<Namespace> allNamespaces = namespaceService.findAll(limit, offset);
-    // If the key: EXCLUDED_NAMESPACE is in the config file, excluded these
-    // namespace
+    // If the key: namespaceFilter is in the config file, exclude the corresponding namespaces
     if (namespaceFilter != null) {
       final List<Namespace> FilterNamespaces =
           namespaceService.findAllFilter(namespaceFilter, limit, offset);
