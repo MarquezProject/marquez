@@ -48,6 +48,10 @@ public class MarquezConfig extends Configuration {
   @JsonProperty("dbRetention")
   private DbRetentionConfig dbRetention; // OPTIONAL
 
+  @Getter
+  @JsonProperty("namespaceFilter")
+  private String namespaceFilter; // OPTIONAL
+
   /** Returns {@code true} if a data retention policy has been configured. */
   public boolean hasDbRetentionPolicy() {
     return (dbRetention != null);

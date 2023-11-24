@@ -139,6 +139,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
       // Add job to apply retention policy to database.
       env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }
+
+    // set namespaceFilter
+    Utils.setNamespaceFilter(config.getNamespaceFilter());
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

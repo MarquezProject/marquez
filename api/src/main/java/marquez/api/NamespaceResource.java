@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.api.exceptions.NamespaceNotFoundException;
+import marquez.common.Utils;
 import marquez.common.models.NamespaceName;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Namespace;
@@ -74,8 +75,19 @@ public class NamespaceResource extends BaseResource {
   public Response list(
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
-    final List<Namespace> namespaces = namespaceService.findAll(limit, offset);
-    return Response.ok(new Namespaces(namespaces)).build();
+    final String namespaceFilter = Utils.getNamespaceFilter();
+    final List<Namespace> allNamespaces = namespaceService.findAll(limit, offset);
+    // If the key: EXCLUDED_NAMESPACE is in the config file, excluded these
+    // namespace
+    if (namespaceFilter != null) {
+      final List<Namespace> FilterNamespaces =
+          namespaceService.findAllFilter(namespaceFilter, limit, offset);
+      return Response.ok(new Namespaces(FilterNamespaces)).build();
+    }
+    // Else return all namespace
+    else {
+      return Response.ok(new Namespaces(allNamespaces)).build();
+    }
   }
 
   @Timed
