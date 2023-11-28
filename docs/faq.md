@@ -10,7 +10,7 @@ We use [`flyway`](https://flywaydb.org) to apply migrations to the `marquez` dat
 pg_dump -d marquez --schema-only > schema.sql
 ```
 
-### How do I manually apply migrations to `marquez` database using [`flyway`](https://flywaydb.org)
+### How do I manually apply migrations to `marquez` database using [`flyway`](https://flywaydb.org)?
 
 Before you can manually apply migrations to the `marquez` database, make sure you've installed `flyway`:
 
@@ -31,7 +31,7 @@ $ brew install flyway
 To migrate the database, we'll be using the [`flyway migrate`](https://flywaydb.org/documentation/usage/commandline/migrate) command:
 
 ```bash
-$ flyway migrate \
+flyway migrate \
     -driver=org.postgresql.Driver \
     -url=jdbc:postgresql://[MARQUEZ_DB_HOST]:[MARQUEZ_DB_PORT]/marquez \
     -user=[MARQUEZ_DB_USER] \
@@ -42,7 +42,7 @@ $ flyway migrate \
 For example, to apply the migrations defined under [`marquez/db/migration/`](https://github.com/MarquezProject/marquez/tree/main/api/src/main/resources/marquez/db/migration) to the `marquez` database run:
 
 ```bash
-$ flyway migrate \
+flyway migrate \
     -driver=org.postgresql.Driver \
     -url=jdbc:postgresql://localhost:5432/marquez \
     -user=marquez \
