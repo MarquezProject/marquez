@@ -110,10 +110,6 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
     setSelectedKey(key)
   }
 
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   const selectedField = datasetFields.find((field) => field.name === selectedKey)
   const selectedFieldTags = selectedField?.tags || []
   const selectedFieldDesc = selectedField?.description || 'No Description'
@@ -171,8 +167,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             elevation={0}
             anchor='right'
             open={open}
-            onClose={handleClose}
-            sx={{ zIndex: 1300 }}
+            onClose={() => setOpen(false)}
+            sx={{ zIndex: theme.zIndex.drawer + 1 }}
             PaperProps={{
               sx: {
                 width: 400,
