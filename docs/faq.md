@@ -1,5 +1,55 @@
 # FAQ
 
+### How do I view migrations applied to the `marquez` database schema?
+
+We use [`flyway`](https://flywaydb.org) to apply migrations to the `marquez` database; migrations can be found under [`marquez/db/migration/`](https://github.com/MarquezProject/marquez/tree/main/api/src/main/resources/marquez/db/migration).
+
+### How do I view the _current_ `marquez` database schema?
+
+```bash
+pg_dump -d marquez --schema-only > schema.sql
+```
+
+### How do I manually apply migrations to the `marquez` database using [`flyway`](https://flywaydb.org)?
+
+Before you can manually apply migrations to the `marquez` database, make sure you've installed `flyway`:
+
+```bash
+$ brew install flyway
+```
+
+**You'll also need the following details about the migration:**
+
+|                                   | **Description**                  |
+|:----------------------------------|----------------------------------|
+| `[MARQUEZ_DB_HOST]`               | The db host                      |
+| `[MARQUEZ_DB_PORT]`               | The db port                      |
+| `[MARQUEZ_DB_USER]`               | The db user                      |
+| `[MARQUEZ_DB_PASSWORD]`           | The db password                  |
+| `[MARQUEZ_DB_PATH_TO_MIGRATIONS]` | The path to migrations (`*.sql`) |
+
+To migrate the database, we'll be using the [`flyway migrate`](https://flywaydb.org/documentation/usage/commandline/migrate) command:
+
+```bash
+flyway migrate \
+    -driver=org.postgresql.Driver \
+    -url=jdbc:postgresql://[MARQUEZ_DB_HOST]:[MARQUEZ_DB_PORT]/marquez \
+    -user=[MARQUEZ_DB_USER] \
+    -password=[MARQUEZ_DB_PASSWORD] \
+    -locations=filesystem:[MARQUEZ_DB_PATH_TO_MIGRATIONS]
+```
+
+For example, to apply the migrations defined under [`marquez/db/migration/`](https://github.com/MarquezProject/marquez/tree/main/api/src/main/resources/marquez/db/migration) to the `marquez` database run:
+
+```bash
+flyway migrate \
+    -driver=org.postgresql.Driver \
+    -url=jdbc:postgresql://localhost:5432/marquez \
+    -user=marquez \
+    -password=*** \
+    -locations=filesystem:path/to/marquez/db/migration
+```
+
 ### How do I configure a retention policy for metadata?
 
 By default, Marquez does not apply a retention policy on collected metadata. However, you can adjust the maximum retention days for metadata in Marquez. This allows you to better manage your storage space and comply with your organizational retention policies. Below, you'll find examples of how to change retention days in `YAML` and via the [CLI](https://github.com/MarquezProject/marquez/tree/main/api/src/main/java/marquez/cli):
