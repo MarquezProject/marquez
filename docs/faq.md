@@ -10,7 +10,7 @@ We use [`flyway`](https://flywaydb.org) to apply migrations to the `marquez` dat
 pg_dump -d marquez --schema-only > schema.sql
 ```
 
-### How do I manually apply migrations to `marquez` database using [`flyway`](https://flywaydb.org)?
+### How do I manually apply migrations to the `marquez` database using [`flyway`](https://flywaydb.org)?
 
 Before you can manually apply migrations to the `marquez` database, make sure you've installed `flyway`:
 
