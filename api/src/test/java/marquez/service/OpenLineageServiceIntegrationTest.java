@@ -52,10 +52,13 @@ import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.Dataset;
 import marquez.service.models.DatasetEvent;
 import marquez.service.models.Job;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.DatasetFacets;
 import marquez.service.models.LineageEvent.DatasourceDatasetFacet;
+import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.RunFacet;
+import marquez.service.models.LineageEvent.SQLJobFacet;
 import marquez.service.models.LineageEvent.SchemaDatasetFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Run;
@@ -76,6 +79,7 @@ public class OpenLineageServiceIntegrationTest {
   public static final String JOB_NAME = "theJob";
   public static final ZoneId TIMEZONE = ZoneId.of("America/Los_Angeles");
   public static final String DATASET_NAME = "theDataset";
+  public static final String INPUT_DATASET_NAME = "theInputDataset";
   private RunService runService;
 
   private JobService jobService;
@@ -272,7 +276,7 @@ public class OpenLineageServiceIntegrationTest {
     JobService jobService = new JobService(openLineageDao, runService);
     LineageEvent event = events.get(events.size() - 1);
     Optional<Job> job =
-        jobService.findWithRun(
+        jobService.findWithDatasetsAndRun(
             openLineageDao.formatNamespaceName(event.getJob().getNamespace()),
             event.getJob().getName());
     Assertions.assertTrue(job.isPresent(), "Job does not exist: " + event.getJob().getName());
@@ -480,6 +484,68 @@ public class OpenLineageServiceIntegrationTest {
         .first()
         .hasFieldOrPropertyWithValue("name", FieldName.of("col"))
         .hasFieldOrPropertyWithValue("type", "STRING");
+  }
+
+  @Test
+  void testJobEvent() throws ExecutionException, InterruptedException {
+    String query = "select * from table";
+    LineageEvent.Job job =
+        LineageEvent.Job.builder()
+            .name(JOB_NAME)
+            .namespace(NAMESPACE)
+            .facets(JobFacet.builder().sql(SQLJobFacet.builder().query(query).build()).build())
+            .build();
+
+    DatasourceDatasetFacet theDatasource =
+        DatasourceDatasetFacet.builder().name("theDatasource").uri("http://thedatasource").build();
+    LineageEvent.Dataset input =
+        LineageEvent.Dataset.builder()
+            .name(INPUT_DATASET_NAME)
+            .namespace(NAMESPACE)
+            .facets(DatasetFacets.builder().dataSource(theDatasource).build())
+            .build();
+
+    LineageEvent.Dataset output =
+        LineageEvent.Dataset.builder()
+            .name(DATASET_NAME)
+            .namespace(NAMESPACE)
+            .facets(DatasetFacets.builder().dataSource(theDatasource).build())
+            .build();
+
+    lineageService
+        .createAsync(
+            JobEvent.builder()
+                .eventTime(Instant.now().atZone(TIMEZONE))
+                .job(job)
+                .inputs(Collections.singletonList(input))
+                .outputs(Collections.singletonList(output))
+                .build())
+        .get();
+
+    Optional<Job> jobByName = jobDao.findJobByName(NAMESPACE, JOB_NAME);
+    assertThat(jobByName).isPresent().map(Job::getCurrentVersion).isPresent();
+    assertThat(jobByName.get().getFacets().get("sql").toString()).contains(query);
+
+    DatasetService datasetService = new DatasetService(openLineageDao, runService);
+    assertThat(
+            datasetService
+                .findDatasetByName(
+                    openLineageDao.formatNamespaceName(input.getNamespace()),
+                    openLineageDao.formatDatasetName(input.getName()))
+                .get()
+                .getSourceName()
+                .getValue())
+        .isEqualTo("theDatasource");
+
+    assertThat(
+            datasetService
+                .findDatasetByName(
+                    openLineageDao.formatNamespaceName(output.getNamespace()),
+                    openLineageDao.formatDatasetName(output.getName()))
+                .get()
+                .getSourceName()
+                .getValue())
+        .isEqualTo("theDatasource");
   }
 
   private void checkExists(LineageEvent.Dataset ds) {

@@ -244,29 +244,42 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(
       """
-      SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,
-          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
-          t.tags, f.facets
-      FROM dataset_versions dv
-      LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
-      LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
-      LEFT JOIN (
-          SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid
-          FROM tags AS t
-                   INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid
-          GROUP BY m.dataset_uuid
-      ) t ON t.dataset_uuid = dv.dataset_uuid
-      LEFT JOIN (
-          SELECT dvf.dataset_version_uuid,
-          JSONB_AGG(dvf.facet ORDER BY dvf.lineage_event_time ASC) AS facets
-          FROM dataset_facets_view dvf
-          WHERE  (type ILIKE 'dataset' OR type ILIKE 'unknown')
-          GROUP BY dataset_version_uuid
-      ) f ON f.dataset_version_uuid = dv.uuid
-      WHERE dv.namespace_name = :namespaceName
-      AND dv.dataset_name = :datasetName
-      ORDER BY dv.created_at DESC
-      LIMIT :limit OFFSET :offset
+      WITH dataset_info AS (
+	    SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,
+		dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
+		t.tags, f.facets, f.lineage_event_time, f.dataset_version_uuid, facet_name
+		FROM dataset_versions dv
+		LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
+		LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
+		LEFT JOIN (
+			SELECT ARRAY_AGG(t.name) AS tags, m.dataset_uuid
+			FROM tags AS t
+			INNER JOIN datasets_tag_mapping AS m ON m.tag_uuid = t.uuid
+			GROUP BY m.dataset_uuid
+		) t ON t.dataset_uuid = dv.dataset_uuid
+		LEFT JOIN (
+			SELECT
+				dataset_version_uuid,
+				name as facet_name,
+				facet as facets,lineage_event_time
+			FROM dataset_facets_view
+			WHERE
+				(type ILIKE 'dataset' OR type ILIKE 'unknown')
+      	) f ON f.dataset_version_uuid = dv.uuid
+      	WHERE dv.namespace_name = :namespaceName
+            AND dv.dataset_name = :datasetName
+      	LIMIT :limit OFFSET :offset
+        )
+        SELECT
+	        type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
+            created_at, version, fields, createdByRunUuid, schema_location,
+            tags, dataset_version_uuid,
+	        JSONB_AGG(facets ORDER BY lineage_event_time ASC) AS facets
+        FROM dataset_info
+        GROUP BY type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
+            created_at, version, fields, createdByRunUuid, schema_location,
+            tags, dataset_version_uuid
+        ORDER BY created_at DESC
   """)
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 

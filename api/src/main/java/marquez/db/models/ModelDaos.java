@@ -14,6 +14,7 @@ import marquez.db.DatasetSymlinkDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobDao;
 import marquez.db.JobFacetsDao;
+import marquez.db.JobVersionDao;
 import marquez.db.NamespaceDao;
 import marquez.db.RunArgsDao;
 import marquez.db.RunDao;
@@ -37,6 +38,7 @@ public final class ModelDaos {
   private ColumnLineageDao columnLineageDao = null;
   private JobDao jobDao = null;
   private JobFacetsDao jobFacetsDao = null;
+  private JobVersionDao jobVersionDao = null;
   private RunArgsDao runArgsDao = null;
   private RunStateDao runStateDao = null;
   private RunFacetsDao runFacetsDao = null;
@@ -142,5 +144,12 @@ public final class ModelDaos {
       runFacetsDao = baseDao.createRunFacetsDao();
     }
     return runFacetsDao;
+  }
+
+  public JobVersionDao getJobVersionDao() {
+    if (jobVersionDao == null) {
+      jobVersionDao = baseDao.createJobVersionDao();
+    }
+    return jobVersionDao;
   }
 }

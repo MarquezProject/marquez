@@ -53,6 +53,7 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.db.models.UpdateLineageRow.DatasetRecord;
 import marquez.service.models.BaseEvent;
 import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.DatasetFacets;
@@ -79,6 +80,12 @@ public interface OpenLineageDao extends BaseDao {
   String DEFAULT_SOURCE_NAME = "default";
   String DEFAULT_NAMESPACE_OWNER = "anonymous";
 
+  enum SpecEventType {
+    RUN_EVENT,
+    DATASET_EVENT,
+    JOB_EVENT;
+  }
+
   @SqlUpdate(
       "INSERT INTO lineage_events ("
           + "event_type, "
@@ -87,8 +94,9 @@ public interface OpenLineageDao extends BaseDao {
           + "job_name, "
           + "job_namespace, "
           + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?, ?, ?, ?, ?)")
+          + "producer, "
+          + "_event_type) "
+          + "VALUES (?, ?, ?, ?, ?, ?, ?, 'RUN_EVENT')")
   void createLineageEvent(
       String eventType,
       Instant eventTime,
@@ -102,11 +110,25 @@ public interface OpenLineageDao extends BaseDao {
       "INSERT INTO lineage_events ("
           + "event_time, "
           + "event, "
-          + "producer) "
-          + "VALUES (?, ?, ?)")
+          + "producer, "
+          + "_event_type) "
+          + "VALUES (?, ?, ?, 'DATASET_EVENT')")
   void createDatasetEvent(Instant eventTime, PGobject event, String producer);
 
-  @SqlQuery("SELECT event FROM lineage_events WHERE run_uuid = :runUuid")
+  @SqlUpdate(
+      "INSERT INTO lineage_events ("
+          + "event_time, "
+          + "job_name, "
+          + "job_namespace, "
+          + "event, "
+          + "producer, "
+          + "_event_type) "
+          + "VALUES (?, ?, ?, ?, ?, 'JOB_EVENT')")
+  void createJobEvent(
+      Instant eventTime, String jobName, String jobNamespace, PGobject event, String producer);
+
+  @SqlQuery(
+      "SELECT event FROM lineage_events WHERE run_uuid = :runUuid AND _event_type='RUN_EVENT'")
   List<LineageEvent> findLineageEventsByRunUuid(UUID runUuid);
 
   @SqlQuery(
@@ -115,6 +137,7 @@ public interface OpenLineageDao extends BaseDao {
   FROM lineage_events le
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
+  AND le._event_type='RUN_EVENT'
   ORDER BY le.event_time DESC
   LIMIT :limit OFFSET :offset""")
   List<LineageEvent> getAllLineageEventsDesc(
@@ -126,6 +149,7 @@ public interface OpenLineageDao extends BaseDao {
   FROM lineage_events le
   WHERE (le.event_time < :before
   AND le.event_time >= :after)
+  AND le._event_type='RUN_EVENT'
   ORDER BY le.event_time ASC
   LIMIT :limit OFFSET :offset""")
   List<LineageEvent> getAllLineageEventsAsc(
@@ -180,6 +204,80 @@ public interface OpenLineageDao extends BaseDao {
     return bag;
   }
 
+  default UpdateLineageRow updateMarquezModel(JobEvent event, ObjectMapper mapper) {
+    ModelDaos daos = new ModelDaos();
+    daos.initBaseDao(this);
+    Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
+
+    UpdateLineageRow bag = new UpdateLineageRow();
+    NamespaceRow namespace =
+        daos.getNamespaceDao()
+            .upsertNamespaceRow(
+                UUID.randomUUID(),
+                now,
+                formatNamespaceName(event.getJob().getNamespace()),
+                DEFAULT_NAMESPACE_OWNER);
+    bag.setNamespace(namespace);
+
+    JobRow job =
+        buildJobFromEvent(
+            event.getJob(),
+            event.getEventTime(),
+            null,
+            Collections.emptyList(),
+            mapper,
+            daos.getJobDao(),
+            now,
+            namespace,
+            null,
+            null,
+            Optional.empty());
+
+    bag.setJob(job);
+
+    List<DatasetRecord> datasetInputs = new ArrayList<>();
+    if (event.getInputs() != null) {
+      for (Dataset dataset : event.getInputs()) {
+        DatasetRecord record = upsertLineageDataset(daos, dataset, now, null, true);
+        datasetInputs.add(record);
+        insertDatasetFacets(daos, dataset, record, null, null, now);
+        insertInputDatasetFacets(daos, dataset, record, null, null, now);
+      }
+    }
+    bag.setInputs(Optional.ofNullable(datasetInputs));
+
+    List<DatasetRecord> datasetOutputs = new ArrayList<>();
+    if (event.getOutputs() != null) {
+      for (Dataset dataset : event.getOutputs()) {
+        DatasetRecord record = upsertLineageDataset(daos, dataset, now, null, false);
+        datasetOutputs.add(record);
+        insertDatasetFacets(daos, dataset, record, null, null, now);
+        insertOutputDatasetFacets(daos, dataset, record, null, null, now);
+      }
+    }
+
+    bag.setOutputs(Optional.ofNullable(datasetOutputs));
+
+    // write job versions row and link job facets to job version
+    BagOfJobVersionInfo bagOfJobVersionInfo =
+        daos.getJobVersionDao().upsertRunlessJobVersion(job, datasetInputs, datasetOutputs);
+
+    // save job facets - need to be saved after job version is upserted
+    // Add ...
+    Optional.ofNullable(event.getJob().getFacets())
+        .ifPresent(
+            jobFacet ->
+                daos.getJobFacetsDao()
+                    .insertJobFacetsFor(
+                        job.getUuid(),
+                        bagOfJobVersionInfo.getJobVersionRow().getUuid(),
+                        now,
+                        event.getJob().getFacets()));
+
+    bag.setJobVersionBag(bagOfJobVersionInfo);
+    return bag;
+  }
+
   default UpdateLineageRow updateBaseMarquezModel(LineageEvent event, ObjectMapper mapper) {
     ModelDaos daos = new ModelDaos();
     daos.initBaseDao(this);
@@ -204,7 +302,10 @@ public interface OpenLineageDao extends BaseDao {
 
     JobRow job =
         buildJobFromEvent(
-            event,
+            event.getJob(),
+            event.getEventTime(),
+            event.getEventType(),
+            event.getInputs(),
             mapper,
             daos.getJobDao(),
             now,
@@ -257,7 +358,7 @@ public interface OpenLineageDao extends BaseDao {
       }
     }
 
-    insertJobFacets(daos, event, job.getUuid(), runUuid, now);
+    insertJobFacets(daos, event.getJob(), event.getEventType(), job.getUuid(), runUuid, now);
 
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetInputs = null;
@@ -315,14 +416,13 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private void insertJobFacets(
-      ModelDaos daos, LineageEvent event, UUID jobUuid, UUID runUuid, Instant now) {
+      ModelDaos daos, Job job, String eventType, UUID jobUuid, UUID runUuid, Instant now) {
     // Add ...
-    Optional.ofNullable(event.getJob().getFacets())
+    Optional.ofNullable(job.getFacets())
         .ifPresent(
             jobFacet ->
                 daos.getJobFacetsDao()
-                    .insertJobFacetsFor(
-                        jobUuid, runUuid, now, event.getEventType(), event.getJob().getFacets()));
+                    .insertJobFacetsFor(jobUuid, runUuid, now, eventType, job.getFacets()));
   }
 
   private void insertDatasetFacets(
@@ -389,7 +489,10 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private JobRow buildJobFromEvent(
-      LineageEvent event,
+      Job job,
+      ZonedDateTime eventTime,
+      String eventType,
+      List<Dataset> inputs,
       ObjectMapper mapper,
       JobDao jobDao,
       Instant now,
@@ -399,13 +502,13 @@ public interface OpenLineageDao extends BaseDao {
       Optional<ParentRunFacet> parentRun) {
     Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
     String description =
-        Optional.ofNullable(event.getJob().getFacets())
+        Optional.ofNullable(job.getFacets())
             .map(JobFacet::getDocumentation)
             .map(DocumentationJobFacet::getDescription)
             .orElse(null);
 
     String location =
-        Optional.ofNullable(event.getJob().getFacets())
+        Optional.ofNullable(job.getFacets())
             .flatMap(f -> Optional.ofNullable(f.getSourceCodeLocation()))
             .flatMap(s -> Optional.ofNullable(s.getUrl()))
             .orElse(null);
@@ -415,7 +518,9 @@ public interface OpenLineageDao extends BaseDao {
         parentUuid.map(
             uuid ->
                 findParentJobRow(
-                    event,
+                    job,
+                    eventTime,
+                    eventType,
                     namespace,
                     location,
                     nominalStartTime,
@@ -429,17 +534,17 @@ public interface OpenLineageDao extends BaseDao {
         parentJob
             .map(
                 p -> {
-                  if (event.getJob().getName().startsWith(p.getName() + '.')) {
-                    return event.getJob().getName().substring(p.getName().length() + 1);
+                  if (job.getName().startsWith(p.getName() + '.')) {
+                    return job.getName().substring(p.getName().length() + 1);
                   } else {
-                    return event.getJob().getName();
+                    return job.getName();
                   }
                 })
-            .orElse(event.getJob().getName());
+            .orElse(job.getName());
     log.debug(
         "Calculated job name {} from job {} with parent {}",
         jobName,
-        event.getJob().getName(),
+        job.getName(),
         parentJob.map(JobRow::getName));
     return parentJob
         .map(
@@ -447,7 +552,7 @@ public interface OpenLineageDao extends BaseDao {
                 jobDao.upsertJob(
                     UUID.randomUUID(),
                     parent.getUuid(),
-                    getJobType(event.getJob()),
+                    getJobType(job),
                     now,
                     namespace.getUuid(),
                     namespace.getName(),
@@ -455,12 +560,12 @@ public interface OpenLineageDao extends BaseDao {
                     description,
                     location,
                     null,
-                    jobDao.toJson(toDatasetId(event.getInputs()), mapper)))
+                    jobDao.toJson(toDatasetId(inputs), mapper)))
         .orElseGet(
             () ->
                 jobDao.upsertJob(
                     UUID.randomUUID(),
-                    getJobType(event.getJob()),
+                    getJobType(job),
                     now,
                     namespace.getUuid(),
                     namespace.getName(),
@@ -468,11 +573,13 @@ public interface OpenLineageDao extends BaseDao {
                     description,
                     location,
                     null,
-                    jobDao.toJson(toDatasetId(event.getInputs()), mapper)));
+                    jobDao.toJson(toDatasetId(inputs), mapper)));
   }
 
   private JobRow findParentJobRow(
-      LineageEvent event,
+      Job job,
+      ZonedDateTime eventTime,
+      String eventType,
       NamespaceRow namespace,
       String location,
       Instant nominalStartTime,
@@ -491,7 +598,7 @@ public interface OpenLineageDao extends BaseDao {
               .map(
                   j -> {
                     String parentJobName =
-                        facet.getJob().getName().equals(event.getJob().getName())
+                        facet.getJob().getName().equals(job.getName())
                             ? Utils.parseParentJobName(facet.getJob().getName())
                             : facet.getJob().getName();
                     if (j.getNamespaceName().equals(facet.getJob().getNamespace())
@@ -513,7 +620,9 @@ public interface OpenLineageDao extends BaseDao {
                           facet.getJob().getName(),
                           parentRunUuid);
                       return createParentJobRunRecord(
-                          event,
+                          job,
+                          eventTime,
+                          eventType,
                           namespace,
                           location,
                           nominalStartTime,
@@ -526,7 +635,9 @@ public interface OpenLineageDao extends BaseDao {
               .orElseGet(
                   () ->
                       createParentJobRunRecord(
-                          event,
+                          job,
+                          eventTime,
+                          eventType,
                           namespace,
                           location,
                           nominalStartTime,
@@ -542,7 +653,9 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   private JobRow createParentJobRunRecord(
-      LineageEvent event,
+      Job job,
+      ZonedDateTime eventTime,
+      String eventType,
       NamespaceRow namespace,
       String location,
       Instant nominalStartTime,
@@ -550,17 +663,17 @@ public interface OpenLineageDao extends BaseDao {
       UUID uuid,
       ParentRunFacet facet,
       PGobject inputs) {
-    Instant now = event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
+    Instant now = eventTime.withZoneSameInstant(ZoneId.of("UTC")).toInstant();
     Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
     String parentJobName =
-        facet.getJob().getName().equals(event.getJob().getName())
+        facet.getJob().getName().equals(job.getName())
             ? Utils.parseParentJobName(facet.getJob().getName())
             : facet.getJob().getName();
     JobRow newParentJobRow =
         createJobDao()
             .upsertJob(
                 UUID.randomUUID(),
-                getJobType(event.getJob()),
+                getJobType(job),
                 now,
                 namespace.getUuid(),
                 namespace.getName(),
@@ -575,7 +688,7 @@ public interface OpenLineageDao extends BaseDao {
         createRunArgsDao()
             .upsertRunArgs(UUID.randomUUID(), now, "{}", Utils.checksumFor(ImmutableMap.of()));
 
-    Optional<RunState> runState = Optional.ofNullable(event.getEventType()).map(this::getRunState);
+    Optional<RunState> runState = Optional.ofNullable(eventType).map(this::getRunState);
     RunDao runDao = createRunDao();
     RunRow newRow =
         runDao.upsert(
@@ -658,6 +771,7 @@ public interface OpenLineageDao extends BaseDao {
 
   default DatasetRecord upsertLineageDataset(
       ModelDaos daos, Dataset ds, Instant now, UUID runUuid, boolean isInput) {
+    daos.initBaseDao(this);
     NamespaceRow dsNamespace =
         daos.getNamespaceDao()
             .upsertNamespaceRow(UUID.randomUUID(), now, ds.getNamespace(), DEFAULT_NAMESPACE_OWNER);
@@ -803,7 +917,7 @@ public interface OpenLineageDao extends BaseDao {
     }
     daos.getDatasetFieldDao().updateFieldMapping(datasetFieldMappings);
 
-    if (isInput) {
+    if (isInput && runUuid != null) {
       daos.getRunDao().updateInputMapping(runUuid, datasetVersionRow.getUuid());
 
       // TODO - this is a short term fix until
