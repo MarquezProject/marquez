@@ -2,8 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { Chip } from '@mui/material'
+import {
+  Accordion,
+  Box,
+  Card,
+  CardContent,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from '@mui/material'
+import { Chip, Drawer } from '@mui/material'
 import { Field, Run, Tag } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { connect, useSelector } from 'react-redux'
@@ -11,12 +22,16 @@ import { createTheme } from '@mui/material/styles'
 import { fetchJobFacets, fetchTags, resetFacets } from '../../store/actionCreators'
 import { stopWatchDuration } from '../../helpers/time'
 import { useTheme } from '@emotion/react'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
+import ReadMoreIcon from '@mui/icons-material/ReadMore'
 import RunStatus from '../jobs/RunStatus'
 
 export interface DispatchProps {
@@ -56,8 +71,9 @@ const formatColumnTags = (tags: string[], tag_desc: Tag[]) => {
               label={tag}
               size='small'
               style={{
-                display: 'inline',
+                display: 'row',
                 marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
+                marginTop: 3,
               }}
             />
           </MQTooltip>
@@ -70,6 +86,10 @@ const formatColumnTags = (tags: string[], tag_desc: Tag[]) => {
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
+
+  const [open, setOpen] = useState(false)
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
+  const theme = createTheme(useTheme())
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
@@ -85,6 +105,14 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   )
 
   const tagData = useSelector((state: IState) => state.tags.tags)
+  const handleOpen = (key: string) => {
+    setOpen(true)
+    setSelectedKey(key)
+  }
+
+  const selectedField = datasetFields.find((field) => field.name === selectedKey)
+  const selectedFieldTags = selectedField?.tags || []
+  const selectedFieldDesc = selectedField?.description || 'No Description'
 
   return (
     <Box>
@@ -95,44 +123,97 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
         />
       )}
       {datasetFields.length > 0 && (
-        <Table size='small'>
-          <TableHead>
-            <TableRow>
-              <TableCell align='left'>
-                <MqText subheading inline>
-                  {i18next.t('dataset_info_columns.name')}
+        <>
+          <Table size='small'>
+            <TableHead>
+              <TableRow>
+                <TableCell align='left'>
+                  <MqText subheading inline>
+                    {i18next.t('dataset_info_columns.name')}
+                  </MqText>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqText subheading inline>
+                    {i18next.t('dataset_info_columns.type')}
+                  </MqText>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqText subheading inline>
+                    {i18next.t('dataset_info_columns.description')}
+                  </MqText>
+                </TableCell>
+                <TableCell align='left'></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {datasetFields.map((field) => {
+                return (
+                  <TableRow key={field.name}>
+                    <TableCell align='left'>{field.name}</TableCell>
+                    <TableCell align='left'>{field.type}</TableCell>
+                    <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                    <TableCell>
+                      <ReadMoreIcon
+                        onClick={() => handleOpen(field.name)}
+                        sx={{ align: 'Right' }}
+                      ></ReadMoreIcon>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+          <Drawer
+            elevation={0}
+            anchor='right'
+            open={open}
+            onClose={() => setOpen(false)}
+            sx={{ zIndex: theme.zIndex.drawer + 1 }}
+            PaperProps={{
+              sx: {
+                width: 400,
+                backgroundColor: theme.palette.background.paper,
+                border: `2px dashed ${theme.palette.secondary.main}`,
+                p: 1,
+              },
+            }}
+          >
+            <Card>
+              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
+                <MqText heading bottomMargin>
+                  {selectedKey}
                 </MqText>
-              </TableCell>
-              <TableCell align='left'>
-                <MqText subheading inline>
-                  {i18next.t('dataset_info_columns.type')}
+              </CardContent>
+            </Card>
+            <Divider />
+            <Card>
+              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
+                <MqText bottomMargin>{selectedFieldDesc}</MqText>
+              </CardContent>
+            </Card>
+            <Accordion elevation={0}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  backgroundColor: theme.palette.background.paper,
+                }}
+              >
+                <MqText bold bottomMargin>
+                  Tags
                 </MqText>
-              </TableCell>
-              <TableCell align='left'>
-                <MqText subheading inline>
-                  {i18next.t('dataset_info_columns.description')}
-                </MqText>
-              </TableCell>
-              <TableCell align='left'>
-                <MqText subheading inline>
-                  {i18next.t('dataset_info_columns.tags')}
-                </MqText>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {datasetFields.map((field) => {
-              return (
-                <TableRow key={field.name}>
-                  <TableCell align='left'>{field.name}</TableCell>
-                  <TableCell align='left'>{field.type}</TableCell>
-                  <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                  <TableCell align='left'>{formatColumnTags(field.tags, tagData)}</TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  backgroundColor: theme.palette.background.paper,
+                }}
+              >
+                {selectedFieldTags.length > 0
+                  ? formatColumnTags(selectedFieldTags, tagData)
+                  : 'No Tags'}
+              </AccordionDetails>
+            </Accordion>
+          </Drawer>
+        </>
       )}
       {facets && (
         <Box mt={2}>
