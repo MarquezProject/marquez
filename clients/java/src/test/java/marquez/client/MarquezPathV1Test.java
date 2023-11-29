@@ -23,17 +23,26 @@ public class MarquezPathV1Test {
 
   private static Stream<Arguments> testPath_namespaceUrl() {
     return Stream.of(
-        Arguments.of("/api/v1/namespaces/s3%3A%2F%2Fbucket", "s3://bucket"),
-        Arguments.of("/api/v1/namespaces/bigquery%3A", "bigquery:"),
+        Arguments.of("/api/v1/namespaces/s3:%2F%2Fbucket", "s3://bucket"),
+        Arguments.of("/api/v1/namespaces/bigquery:", "bigquery:"),
         Arguments.of("/api/v1/namespaces/usual-namespace-name", "usual-namespace-name"),
-        Arguments.of("/api/v1/namespaces/a%3A%5C%3Aa", "a:\\:a"));
+        Arguments.of("/api/v1/namespaces/a:%5C:a", "a:\\:a"));
   }
 
-  @Test
-  void testPath_datasetUrl() {
-    Assertions.assertEquals(
-        "/api/v1/namespaces/s3%3A%2F%2Fbuckets/datasets/source-file.json",
-        MarquezPathV1.datasetPath("s3://buckets", "source-file.json"));
+  @ParameterizedTest
+  @MethodSource
+  void testPath_datasetUrl(String expected, String namespaceName, String datasetName) {
+    Assertions.assertEquals(expected, MarquezPathV1.datasetPath(namespaceName, datasetName));
+  }
+
+  private static Stream<Arguments> testPath_datasetUrl() {
+    return Stream.of(
+        Arguments.of(
+            "/api/v1/namespaces/s3:%2F%2Fbucket/datasets/source-file.json",
+            "s3://bucket", "source-file.json"),
+        Arguments.of(
+            "/api/v1/namespaces/snowflake:%2F%2Faccount/datasets/DATABASE.SCHEMA.%22Exotic%20Table%20Name!%22",
+            "snowflake://account", "DATABASE.SCHEMA.\"Exotic Table Name!\""));
   }
 
   @Test
