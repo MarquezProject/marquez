@@ -26,6 +26,8 @@ import javax.servlet.DispatcherType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
+import marquez.api.filter.exclusions.ExclusionsConfig;
+import marquez.api.filter.exclusions.ExclusionsFilter;
 import marquez.cli.DbMigrationCommand;
 import marquez.cli.DbRetentionCommand;
 import marquez.cli.MetadataCommand;
@@ -141,7 +143,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     // set namespaceFilter
-    Utils.setNamespaceFilter(config.getNamespaceFilter());
+    if (config.hasExcludingPatterns()) {
+      ExclusionsConfig exclusions = config.getExclude();
+      if (exclusions.namespaces.onRead) {
+        ExclusionsFilter.setNamespacesReadFilter(exclusions.namespaces.patterns);
+      }
+      ;
+    }
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

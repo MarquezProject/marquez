@@ -434,14 +434,4 @@ public final class Utils {
       }
     }
   }
-
-  private static String namespaceFilter;
-
-  public static void setNamespaceFilter(String filter) {
-    namespaceFilter = filter;
-  }
-
-  public static String getNamespaceFilter() {
-    return namespaceFilter;
-  }
 }
