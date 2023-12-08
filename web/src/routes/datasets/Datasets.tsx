@@ -131,6 +131,18 @@ const Datasets: React.FC<DatasetsProps> = ({
                     <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
                       <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
                     </TableCell>
+                    <TableCell key={i18next.t('datasets.column_lineage_tab')} align='left'>
+                      <MqText inline subheading>
+                        Column Level
+                      </MqText>
+                      <Chip
+                        sx={{ marginLeft: 1 }}
+                        size={'small'}
+                        variant={'outlined'}
+                        color={'warning'}
+                        label={'beta'}
+                      ></Chip>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -168,6 +180,16 @@ const Datasets: React.FC<DatasetsProps> = ({
                             ) : (
                               <MqText>N/A</MqText>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            <MqText
+                              link
+                              linkTo={`column-level/${encodeURIComponent(
+                                dataset.id.namespace
+                              )}/${encodeURIComponent(dataset.id.name)}`}
+                            >
+                              View
+                            </MqText>
                           </TableCell>
                         </TableRow>
                       )

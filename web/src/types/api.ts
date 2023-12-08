@@ -220,3 +220,7 @@ export interface Facets {
     [key: string]: object
   }
 }
+
+export interface ColumnLineageGraph {
+  graph: LineageNode[]
+}
