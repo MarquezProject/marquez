@@ -622,14 +622,14 @@ paths:
 
   /column-lineage:
     get:
-      operationId: getLineage
+      operationId: getColumnLineage
       parameters:
         - $ref: '#/components/parameters/nodeId'
         - $ref: '#/components/parameters/depth'
         - $ref: '#/components/parameters/withDownstream'
       tags:
         - Column lineage
-      summary: Get a column-lineage graph
+      summary: Get a column lineage graph
       responses:
         '200':
           description: OK

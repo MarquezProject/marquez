@@ -136,7 +136,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 label={tag}
                 size='small'
                 style={{
-                  display: 'inline',
+                  display: 'row',
                   marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
                 }}
               />
