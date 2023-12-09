@@ -210,8 +210,12 @@ public class DatasetResource extends BaseResource {
       @PathParam("tag") TagName tagName) {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
-    
-    log.info("Deleted tag '{}' from dataset '{}' on namespace '{}'", tagName.getValue(), datasetName.getValue(), namespaceName.getValue());
+
+    log.info(
+        "Deleted tag '{}' from dataset '{}' on namespace '{}'",
+        tagName.getValue(),
+        datasetName.getValue(),
+        namespaceName.getValue());
     datasetService.deleteDatasetTag(datasetName.getValue(), tagName.getValue());
     Dataset dataset =
         datasetService
