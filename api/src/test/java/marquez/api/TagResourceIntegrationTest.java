@@ -2,14 +2,13 @@ package marquez.api;
 
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newTagName;
-import static marquez.service.models.ServiceModelGenerator.newTag;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import marquez.client.models.Tag;
 import org.junit.jupiter.api.Test;
 
-public class TagResourceTest extends BaseResourceIntegrationTest {
+public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
   @Test
   public void testApp_createTag() {
     // (1) List tags.
