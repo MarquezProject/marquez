@@ -6,7 +6,7 @@
 package marquez.api;
 
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.db.DbTest.POSTGRES_12_1;
+import static marquez.db.DbTest.POSTGRES_14;
 
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
@@ -37,7 +37,7 @@ abstract class BaseResourceIntegrationTest {
   static final String ERROR_FAIL_IF_NOT_IN = "Expected '%s' in '%s'.";
 
   @Container
-  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>(POSTGRES_12_1);
+  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>(POSTGRES_14);
 
   static {
     DB_CONTAINER.start();
