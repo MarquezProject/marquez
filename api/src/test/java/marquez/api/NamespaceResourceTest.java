@@ -1,26 +1,53 @@
 package marquez.api;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
+import javax.ws.rs.core.Response;
+import marquez.api.NamespaceResource.Namespaces;
+import marquez.api.filter.exclusions.ExclusionsFilter;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
+import marquez.db.BaseDao;
 import marquez.db.NamespaceDao;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.NamespaceService;
+import marquez.service.ServiceFactory;
 import marquez.service.models.Namespace;
 import marquez.service.models.NamespaceMeta;
 import org.jdbi.v3.core.Jdbi;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
-class NamespaceResourceTest {
-  private static NamespaceDao namespaceDao;
+public class NamespaceResourceTest {
 
-  @BeforeAll
-  public static void setUpOnce(Jdbi jdbi) {
+  @Mock private ServiceFactory serviceFactory;
+
+  @Mock private BaseDao baseDao;
+
+  private static NamespaceDao namespaceDao;
+  private NamespaceService namespaceService;
+  private NamespaceResource namespaceResource;
+
+  @BeforeEach
+  public void setUp(Jdbi jdbi) {
+    MockitoAnnotations.openMocks(this);
+
     namespaceDao = jdbi.onDemand(NamespaceDao.class);
+    when(baseDao.createNamespaceDao()).thenReturn(namespaceDao);
+    namespaceService = new NamespaceService(baseDao);
+
+    when(serviceFactory.getNamespaceService()).thenReturn(namespaceService);
+    namespaceResource = new NamespaceResource(serviceFactory);
   }
 
   @Test
@@ -38,5 +65,33 @@ class NamespaceResourceTest {
     // Assert that the namespaces list does not contain the excluded namespace
     assertFalse(
         namespaces.stream().anyMatch(namespace -> namespace.getName().equals(namespaceName2)));
+  }
+
+  @Test
+  public void testListWithFilter() {
+    String filter = "excluded_.*";
+    ExclusionsFilter.setNamespacesReadFilter(filter);
+
+    NamespaceName namespaceName = NamespaceName.of("excluded_namespace");
+    OwnerName owner = new OwnerName("yannick");
+    NamespaceMeta namespaceMeta = new NamespaceMeta(owner, "description");
+
+    namespaceDao.upsertNamespaceMeta(namespaceName, namespaceMeta);
+
+    NamespaceService namespaceServiceSpy = spy(namespaceService);
+    doCallRealMethod().when(namespaceServiceSpy).findAllFilter(eq(filter), anyInt(), anyInt());
+
+    Response response = namespaceResource.list(10, 0);
+    Namespaces namespaces = (Namespaces) response.getEntity();
+
+    // Check if the returned namespaces contain a namespace with the name
+    // "excluded_namespace"
+    boolean containsExcludedNamespace =
+        namespaces.getValue().stream()
+            .anyMatch(namespace -> namespace.getName().getValue().equals("excluded_namespace"));
+
+    // Assert that the returned namespaces do not contain a namespace with the name
+    // "excluded_namespace"
+    assertFalse(containsExcludedNamespace);
   }
 }
