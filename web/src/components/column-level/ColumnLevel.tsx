@@ -1,24 +1,16 @@
 import * as Redux from 'redux'
-import { Box } from '@mui/material'
-import { ColumnLevelDatasetData, customNodesRenderers } from './ColumnLevelDatasetNode'
 import { ColumnLineageGraph } from '../../types/api'
-import { Edge as EdgeComponent } from '../../../libs/graph/src/components/Edge'
+import { Edge, Node as ElkNode, Graph } from '../../../libs/graph'
 import { IState } from '../../store/reducers'
-import { Node as NodeComponent } from '../../../libs/graph/src/components/Node'
-import { ZoomPanControls, ZoomPanSvg } from '../../../libs/graph'
+import { MultipleNodeData, MultipleNodeKind, columnLevelNodeRenderer } from './nodes'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { edges, nodes } from './nodes'
 import { fetchColumnLineage } from '../../store/actionCreators'
-import { useCallbackRef } from '@chakra-ui/react'
-import { useLayout } from '../../../libs/graph/src/layout/useLayout'
+import { theme } from '../../helpers/theme'
 import { useParams } from 'react-router-dom'
-import React, { useDeferredValue, useEffect, useRef } from 'react'
-
-interface OwnProps {
-  width: number
-  height: number
-}
+import Box from '@mui/material/Box'
+import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import React, { useEffect } from 'react'
 
 interface StateProps {
   columnLineage: ColumnLineageGraph
@@ -28,13 +20,73 @@ interface DispatchProps {
   fetchColumnLineage: typeof fetchColumnLineage
 }
 
-type ColumnLevelProps = OwnProps & StateProps & DispatchProps
+type ColumnLevelProps = StateProps & DispatchProps
 
 export const TRANSITION_DURATION = 750
 
+/*
+   Node of format dataset:food_delivery:public.categories:menu_id
+   Node of format {type}:{namespace}:{table}:{column}
+ */
+export const parseColumnLineageNode = (node: string) => {
+  const [type, namespace, dataset, column] = node.split(':')
+  return { type, namespace, dataset, column }
+}
+
+export const createElkNodes = (columnLineageGraph: ColumnLineageGraph) => {
+  const nodes: ElkNode<MultipleNodeKind, MultipleNodeData>[] = []
+  const edges: Edge[] = []
+  for (const node of columnLineageGraph.graph) {
+    const { type, namespace, dataset, column } = parseColumnLineageNode(node.id)
+
+    edges.push(
+      ...node.outEdges.map((edge) => {
+        return {
+          id: `${edge.origin}:${edge.destination}`,
+          sourceNodeId: edge.origin,
+          targetNodeId: edge.destination,
+        }
+      })
+    )
+
+    const datasetNode = nodes.find((n) => n.id === `${type}:${namespace}:${dataset}`)
+    if (!datasetNode) {
+      nodes.push({
+        id: `${type}:${namespace}:${dataset}`,
+        kind: 'dataset',
+        width: 800,
+        data: {
+          namespace,
+          dataset,
+        },
+        children: [
+          {
+            id: node.id,
+            height: 24,
+            width: 200,
+            kind: 'column',
+            data: {
+              column,
+            },
+          },
+        ],
+      })
+    } else {
+      datasetNode.children?.push({
+        id: node.id,
+        width: 200,
+        height: 24,
+        kind: 'column',
+        data: {
+          column,
+        },
+      })
+    }
+  }
+  return { nodes, edges }
+}
+
 const ColumnLevel: React.FC<ColumnLevelProps> = ({
-  width: widthPropValue,
-  height: heightPropValue,
   fetchColumnLineage: fetchColumnLineage,
   columnLineage: columnLineage,
 }: ColumnLevelProps) => {
@@ -45,78 +97,31 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     }
   }, [name, namespace])
 
-  const { layout, error, isRendering } = useLayout<'simple', ColumnLevelDatasetData>({
-    id: 'graph',
-    nodes: nodes,
-    edges: edges,
-    direction: 'right',
-    keepPreviousGraph: false,
-    webWorkerUrl: '',
-    getLayoutOptions: (node) => customNodesRenderers.get(node.kind)?.getLayoutOptions(node) || node,
-  })
+  if (!columnLineage) {
+    return <div />
+  }
 
-  const {
-    nodes: positionedNodes,
-    edges: positionedEdges,
-    width: contentWidth,
-    height: contentHeight,
-  } = layout || {}
-
-  const measurementsReady = contentWidth && contentHeight
-
-  const zoomPanControlsRef = useRef<ZoomPanControls>()
-
-  const width = useDeferredValue(widthPropValue)
-  const height = useDeferredValue(heightPropValue)
-
-  const setZoomPanControls = useCallbackRef((controls) => {
-    zoomPanControlsRef.current = controls
-    // setGraphControls({
-    //   centerOnCurrentNode: centerOnCurrentNodeRef,
-    //   centerOnNodeId: centerOnNodeIdRef,
-    //   ...controls,
-    // })
-  })
+  const { nodes, edges } = createElkNodes(columnLineage)
 
   return (
-    <Box position={'absolute'} width={width} height={height}>
-      <ZoomPanSvg
-        containerWidth={width}
-        containerHeight={height}
-        contentWidth={width}
-        contentHeight={height}
-        containerPadding={0}
-        maxScale={4}
-        animationDuration={TRANSITION_DURATION}
-        setZoomPanControls={setZoomPanControls}
-        miniMapContent={
-          <>
-            {positionedNodes?.map((node) => (
-              <NodeComponent<'simple', ColumnLevelDatasetData>
-                key={node.id}
-                node={node}
-                nodeRenderers={customNodesRenderers}
-                edges={positionedEdges}
-              />
-            ))}
-            {positionedEdges?.map((edge) => (
-              <EdgeComponent key={edge.id} edge={edge} />
-            ))}
-          </>
-        }
-      >
-        {positionedNodes?.map((node) => (
-          <NodeComponent<'simple', ColumnLevelDatasetData>
-            key={node.id}
-            node={node}
-            nodeRenderers={customNodesRenderers}
-            edges={positionedEdges}
-          />
-        ))}
-        {positionedEdges?.map((edge) => (
-          <EdgeComponent key={edge.id} edge={edge} />
-        ))}
-      </ZoomPanSvg>
+    <Box height={'calc(100vh - 98px)'}>
+      <ParentSize>
+        {(parent) => {
+          console.log(parent)
+          return (
+            <Graph<MultipleNodeKind, MultipleNodeData>
+              id='column-level-graph'
+              backgroundColor={theme.palette.background.default}
+              height={parent.height}
+              width={parent.width}
+              nodes={nodes}
+              edges={edges}
+              direction='right'
+              nodeRenderers={columnLevelNodeRenderer}
+            />
+          )
+        }}
+      </ParentSize>
     </Box>
   )
 }

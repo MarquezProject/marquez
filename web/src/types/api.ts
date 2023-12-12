@@ -222,5 +222,43 @@ export interface Facets {
 }
 
 export interface ColumnLineageGraph {
-  graph: LineageNode[]
+  graph: ColumnLineageNode[]
+}
+
+export interface ColumnLineageNode {
+  id: string
+  type: string
+  data: ColumnLineageData
+  inEdges: ColumnLineageInEdge[]
+  outEdges: ColumnLineageOutEdge[]
+}
+
+export interface ColumnLineageData {
+  namespace: string
+  dataset: string
+  datasetVersion: string
+  field: string
+  fieldType: string
+  transformationDescription: any
+  transformationType: any
+  inputFields: ColumnLineage[]
+}
+
+export interface ColumnLineage {
+  namespace: string
+  dataset: string
+  datasetVersion: string
+  field: string
+  transformationDescription: any
+  transformationType: any
+}
+
+export interface ColumnLineageInEdge {
+  origin: string
+  destination: string
+}
+
+export interface ColumnLineageOutEdge {
+  origin: string
+  destination: string
 }

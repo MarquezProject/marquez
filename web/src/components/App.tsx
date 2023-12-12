@@ -67,12 +67,7 @@ const App = (): ReactElement => {
                     <Route path={'/events'} element={<Events />} />
                     <Route
                       path={'/datasets/column-level/:namespace/:name'}
-                      element={
-                        <ColumnLevel
-                          width={window.innerWidth - 96}
-                          height={window.innerHeight - 98}
-                        />
-                      }
+                      element={<ColumnLevel />}
                     />
                     <Route
                       path={'/lineage/:nodeType/:namespace/:nodeName'}

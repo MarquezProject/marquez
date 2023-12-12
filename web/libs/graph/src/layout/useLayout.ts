@@ -99,18 +99,22 @@ export const useLayout = <K, D>({
    */
   const elkInput = useMemo(() => {
     const layoutOptions = {
-      'nodeSize.minimum': '(10.0,10.0)',
-      'nodeSize.constraints': '[NODE_LABELS, MINIMUM_SIZE]',
+      // 'nodeSize.minimum': '(10.0,10.0)',
+      // 'nodeSize.constraints': '[NODE_LABELS, MINIMUM_SIZE]',
       'nodeSize.options': '[FORCE_TABULAR_NODE_LABELS, ASYMMETRICAL]',
-      'elk.interactiveLayout': 'true',
+      'elk.interactiveLayout': 'false',
       'elk.algorithm': 'layered',
+      'elk.portConstraints': 'FIXED_SIDE',
       'elk.direction': direction.toUpperCase(),
-      'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-      'elk.layered.nodePlacement.favorStraightEdges': 'false',
-      'elk.separateConnectedComponents': 'false',
-      'elk.spacing.nodeNode': '20.0',
-      'elk.spacing.edgeLabel': '10.0',
-      'elk.layered.spacing.nodeNodeBetweenLayers': '20.0',
+      'elk.layered.nodePlacement.strategy': 'LINEAR_SEGMENTS',
+      'elk.layered.nodePlacement.favorStraightEdges': 'true',
+      'org.eclipse.elk.nodeSize.options': 'SPACE_EFFICIENT_PORT_LABELS',
+      'org.eclipse.elk.spacing.edgeEdge': '0',
+      'elk.separateConnectedComponents': 'true',
+      'org.eclipse.elk.contentAlignment': 'V_CENTER',
+      // 'elk.spacing.nodeNode': '20.0',
+      // 'elk.spacing.edgeLabel': '10.0',
+      // 'elk.layered.spacing.nodeNodeBetweenLayers': '20.0',
       hierarchyHandling: 'INCLUDE_CHILDREN',
       'nodeLabels.placement': '[H_CENTER, V_TOP, INSIDE]',
     }
@@ -163,6 +167,8 @@ export const useLayout = <K, D>({
     const elk = new ELK({
       workerUrl: webWorkerUrl,
     })
+
+    console.log(elkInput)
 
     elk
       .layout(elkInput)

@@ -362,6 +362,7 @@ export const ZoomPanSvg = ({
         zoomTransform={currentZoomState}
         miniMapScale={MINIMAP_SCALE}
         placement={miniMapPlacement}
+        backgroundColor={theme.palette.background.paper}
       >
         {miniMapContent}
       </MiniMap>
