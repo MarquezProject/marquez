@@ -20,7 +20,8 @@ public class V67_2_JobVersionsIOMappingBackfillJob implements JavaMigration {
      SET
          job_uuid = j.uuid,
          job_symlink_target_uuid = j.symlink_target_uuid,
-         is_current_job_version = (jv.uuid = j.current_version_uuid)::BOOLEAN
+         is_current_job_version = (jv.uuid = j.current_version_uuid)::BOOLEAN,
+         made_current_at = NOW()
      FROM job_versions jv
      INNER JOIN jobs_view j ON j.uuid = jv.job_uuid
      WHERE jv.uuid = job_versions_io_mapping.job_version_uuid
