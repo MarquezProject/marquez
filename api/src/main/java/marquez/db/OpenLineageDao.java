@@ -33,6 +33,7 @@ import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
 import marquez.db.DatasetFieldDao.DatasetFieldMapping;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
+import marquez.db.JobVersionDao.IoType;
 import marquez.db.RunDao.RunUpsert;
 import marquez.db.RunDao.RunUpsert.RunUpsertBuilder;
 import marquez.db.mappers.LineageEventMapper;
@@ -362,7 +363,7 @@ public interface OpenLineageDao extends BaseDao {
 
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetInputs = null;
-    if (event.getInputs() != null) {
+    if (event.getInputs() != null && !event.getInputs().isEmpty()) {
       datasetInputs = new ArrayList<>();
       for (Dataset dataset : event.getInputs()) {
         DatasetRecord record = upsertLineageDataset(daos, dataset, now, runUuid, true);
@@ -370,12 +371,15 @@ public interface OpenLineageDao extends BaseDao {
         insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
         insertInputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
+    } else {
+      // mark job_versions_io_mapping as obsolete
+      daos.getJobVersionDao().markInputOrOutputDatasetAsPreviousFor(job.getUuid(), IoType.INPUT);
     }
     bag.setInputs(Optional.ofNullable(datasetInputs));
 
     // RunInput list uses null as a sentinel value
     List<DatasetRecord> datasetOutputs = null;
-    if (event.getOutputs() != null) {
+    if (event.getOutputs() != null && !event.getOutputs().isEmpty()) {
       datasetOutputs = new ArrayList<>();
       for (Dataset dataset : event.getOutputs()) {
         DatasetRecord record = upsertLineageDataset(daos, dataset, now, runUuid, false);
@@ -383,6 +387,9 @@ public interface OpenLineageDao extends BaseDao {
         insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
         insertOutputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
+    } else {
+      // mark job_versions_io_mapping as obsolete
+      daos.getJobVersionDao().markInputOrOutputDatasetAsPreviousFor(job.getUuid(), IoType.OUTPUT);
     }
 
     bag.setOutputs(Optional.ofNullable(datasetOutputs));
