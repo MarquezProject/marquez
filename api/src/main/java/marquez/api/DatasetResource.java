@@ -216,7 +216,8 @@ public class DatasetResource extends BaseResource {
         tagName.getValue(),
         datasetName.getValue(),
         namespaceName.getValue());
-    datasetService.deleteDatasetTag(datasetName.getValue(), tagName.getValue());
+    datasetService.deleteDatasetTag(
+        namespaceName.getValue(), datasetName.getValue(), tagName.getValue());
     Dataset dataset =
         datasetService
             .findDatasetByName(namespaceName.getValue(), datasetName.getValue())

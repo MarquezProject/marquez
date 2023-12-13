@@ -10,10 +10,12 @@ import static marquez.common.models.CommonModelGenerator.newTagName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
+import marquez.client.models.Dataset;
 import marquez.client.models.Tag;
 import org.junit.jupiter.api.Test;
 
 public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
+
   @Test
   public void testApp_createTag() {
     // (1) List tags.
@@ -35,5 +37,29 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
 
     // (2) Ensure tags 'PII', 'SENSITIVE' defined in 'config.test.yml' are present.
     assertThat(tags).contains(PII, SENSITIVE);
+  }
+
+  @Test
+  public void testApp_testDatasetTagDelete() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create a source
+    createSource(DB_TABLE_SOURCE_NAME);
+    // Create Dataset
+    MARQUEZ_CLIENT.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    // Tag Dataset with TESTDATASETTAG tag
+    Dataset taggedDataset =
+        MARQUEZ_CLIENT.tagDatasetWith(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
+    assertThat(taggedDataset.getTags()).contains("TESTDATASETTAG");
+
+    // Test that the tag TESTDATASETTAG is deleted from the dataset
+    Dataset taggedDeleteDataset =
+        MARQUEZ_CLIENT.deleteDatasetTag(NAMESPACE_NAME, DB_TABLE_NAME, "TESTDATASETTAG");
+    assertThat(taggedDeleteDataset.getTags()).doesNotContain("TESTDATASETTAG");
+    // assert the number of tags should be 1
+    assertThat(taggedDeleteDataset.getTags()).hasSize(1);
+    // assert that only PII remains
+    assertThat(taggedDeleteDataset.getTags()).containsExactly("PII");
   }
 }
