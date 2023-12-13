@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import marquez.common.models.JobType;
 
 /**
  * Requires jackson serialization features: mapper.registerModule(new JavaTimeModule());
@@ -206,6 +208,25 @@ public class LineageEvent extends BaseEvent {
     @NotNull private String namespace;
     @NotNull private String name;
     @Valid private JobFacet facets;
+
+    /**
+     * Verifies if a job is a streaming job.
+     *
+     * @return
+     */
+    @JsonIgnore
+    public boolean isStreamingJob() {
+      return Optional.ofNullable(this.facets)
+          .map(JobFacet::getJobType)
+          .map(JobTypeJobFacet::getProcessingType)
+          .filter(type -> type.equalsIgnoreCase("STREAMING"))
+          .isPresent();
+    }
+
+    @JsonIgnore
+    public JobType type() {
+      return isStreamingJob() ? JobType.STREAM : JobType.BATCH;
+    }
   }
 
   @Builder

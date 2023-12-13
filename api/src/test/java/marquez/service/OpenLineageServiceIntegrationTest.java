@@ -605,7 +605,7 @@ public class OpenLineageServiceIntegrationTest {
     // (3) Assert that output is present and has dataset_version written
     assertThat(datasetRow).isPresent().flatMap(Dataset::getCurrentVersion).isPresent();
 
-    // (4) Assert that job is present although job_version entry is not
+    // (4) Assert that job is present and its current version is present
     Job job = jobDao.findJobByName(NAMESPACE, "streaming_job_name").get();
     assertThat(job.getInputs()).hasSize(1);
     assertThat(job.getCurrentVersion()).isPresent();

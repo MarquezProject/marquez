@@ -27,7 +27,6 @@ import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceType;
@@ -169,7 +168,7 @@ public interface OpenLineageDao extends BaseDao {
     UpdateLineageRow updateLineageRow = updateBaseMarquezModel(event, mapper);
     RunState runState = getRunState(event.getEventType());
 
-    if (Utils.isStreamingJob(event.getJob())) {
+    if (event.getJob() != null && event.getJob().isStreamingJob()) {
       updateMarquezOnStreamingJob(event, updateLineageRow, runState);
     } else if (event.getEventType() != null && runState.isDone()) {
       updateMarquezOnComplete(event, updateLineageRow, runState);
@@ -564,7 +563,7 @@ public interface OpenLineageDao extends BaseDao {
                 jobDao.upsertJob(
                     UUID.randomUUID(),
                     parent.getUuid(),
-                    getJobType(job),
+                    job.type(),
                     now,
                     namespace.getUuid(),
                     namespace.getName(),
@@ -577,7 +576,7 @@ public interface OpenLineageDao extends BaseDao {
             () ->
                 jobDao.upsertJob(
                     UUID.randomUUID(),
-                    getJobType(job),
+                    job.type(),
                     now,
                     namespace.getUuid(),
                     namespace.getName(),
@@ -685,7 +684,7 @@ public interface OpenLineageDao extends BaseDao {
         createJobDao()
             .upsertJob(
                 UUID.randomUUID(),
-                getJobType(job),
+                job.type(),
                 now,
                 namespace.getUuid(),
                 namespace.getName(),
@@ -817,10 +816,6 @@ public interface OpenLineageDao extends BaseDao {
 
   default String formatNamespaceName(String namespace) {
     return namespace.replaceAll("[^a-z:/A-Z0-9\\-_.@+]", "_");
-  }
-
-  default JobType getJobType(Job job) {
-    return Utils.isStreamingJob(job) ? JobType.STREAM : JobType.BATCH;
   }
 
   default DatasetRecord upsertLineageDataset(
