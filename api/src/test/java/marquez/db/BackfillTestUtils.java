@@ -17,9 +17,12 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.Utils;
+import marquez.common.models.DatasetType;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
+import marquez.db.models.SourceRow;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.LineageEvent.JobLink;
@@ -115,8 +118,14 @@ public class BackfillTestUtils {
             .job(
                 new LineageEvent.Job(
                     NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)))
-            .inputs(Collections.emptyList())
-            .outputs(Collections.emptyList())
+            .inputs(
+                Collections.singletonList(
+                    new LineageEvent.Dataset(
+                        "namespace", "dataset_a", LineageEvent.DatasetFacets.builder().build())))
+            .outputs(
+                Collections.singletonList(
+                    new LineageEvent.Dataset(
+                        "namespace", "dataset_b", LineageEvent.DatasetFacets.builder().build())))
             .producer(PRODUCER_URL.toString())
             .build();
     PGobject eventJson = new PGobject();
@@ -154,6 +163,97 @@ public class BackfillTestUtils {
               .bind("namespaceName", namespace.getName())
               .bind("currentInputs", pgInputs)
               .bind("simpleName", jobName)
+              .mapTo(UUID.class)
+              .first();
+        });
+  }
+
+  public static UUID writeJobVersion(
+      Jdbi jdbi, UUID jobUuid, String location, String jobName, NamespaceRow namespace)
+      throws SQLException {
+    return jdbi.withHandle(
+        h -> {
+          return h.createQuery(
+                  """
+                  INSERT INTO job_versions (
+                      uuid,
+                      created_at,
+                      updated_at,
+                      job_uuid,
+                      location,
+                      version,
+                      job_name,
+                      namespace_uuid,
+                      namespace_name
+                  )
+                  VALUES (
+                      :uuid,
+                      :created_at,
+                      :updated_at,
+                      :job_uuid,
+                      :location,
+                      :version,
+                      :job_name,
+                      :namespace_uuid,
+                      :namespace_name
+                  )
+                  RETURNING uuid
+                  """)
+              .bind("uuid", UUID.randomUUID())
+              .bind("created_at", Instant.now())
+              .bind("updated_at", Instant.now())
+              .bind("job_uuid", jobUuid)
+              .bind("location", location)
+              .bind("version", UUID.randomUUID())
+              .bind("job_name", jobUuid)
+              .bind("namespace_uuid", namespace.getUuid())
+              .bind("namespace_name", namespace.getName())
+              .mapTo(UUID.class)
+              .first();
+        });
+  }
+
+  public static DatasetRow writeDataset(Jdbi jdbi, NamespaceRow namespaceRow, String datasetName) {
+    DatasetDao datasetDao = jdbi.onDemand(DatasetDao.class);
+
+    SourceRow sourceRow =
+        jdbi.onDemand(SourceDao.class)
+            .upsert(UUID.randomUUID(), "type", Instant.now(), "name", "http://a");
+
+    return datasetDao.upsert(
+        UUID.randomUUID(),
+        DatasetType.DB_TABLE,
+        Instant.now(),
+        namespaceRow.getUuid(),
+        namespaceRow.getName(),
+        sourceRow.getUuid(),
+        "sourceName",
+        datasetName,
+        "",
+        "",
+        false);
+  }
+
+  public static UUID writeJobIOMapping(Jdbi jdbi, UUID jobUuid, UUID datasetUuid)
+      throws SQLException {
+    return jdbi.withHandle(
+        h -> {
+          return h.createQuery(
+                  """
+                  INSERT INTO job_versions_io_mapping (
+                      job_version_uuid,
+                      dataset_uuid,
+                      io_type,
+                      job_uuid,
+                      is_current_job_version
+                  )
+                  VALUES (:job_version_uuid, :dataset_uuid, :io_type, :job_uuid, TRUE)
+                  RETURNING uuid
+                  """)
+              .bind("job_version_uuid", UUID.randomUUID())
+              .bind("dataset_uuid", Instant.now())
+              .bind("io_type", Instant.now())
+              .bind("job_uuid", jobUuid)
               .mapTo(UUID.class)
               .first();
         });

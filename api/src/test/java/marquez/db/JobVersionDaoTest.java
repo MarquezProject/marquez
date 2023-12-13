@@ -6,12 +6,16 @@
 package marquez.db;
 
 import static marquez.Generator.newTimestamp;
+import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newJobType;
 import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newVersion;
 import static marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import static marquez.db.models.DbModelGenerator.newRowUuid;
+import static marquez.service.models.ServiceModelGenerator.newInputsWith;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
+import static marquez.service.models.ServiceModelGenerator.newOutputsWith;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,6 +56,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class JobVersionDaoTest extends BaseIntegrationTest {
   static Jdbi jdbiForTesting;
   static DatasetVersionDao datasetVersionDao;
+  static DatasetDao datasetDao;
   static JobDao jobDao;
   static RunDao runDao;
   static OpenLineageDao openLineageDao;
@@ -63,6 +68,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
   @BeforeAll
   public static void setUpOnce(final Jdbi jdbi) {
     jdbiForTesting = jdbi;
+    datasetDao = jdbiForTesting.onDemand(DatasetDao.class);
     datasetVersionDao = jdbiForTesting.onDemand(DatasetVersionDao.class);
     jobDao = jdbi.onDemand(JobDao.class);
     runDao = jdbi.onDemand(RunDao.class);
@@ -190,7 +196,11 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
               .orElseThrow(
                   () -> new IllegalStateException("Can't find test dataset " + ds.getName()));
 
-      jobVersionDao.upsertInputDatasetFor(jobVersionRow.getUuid(), dataset.getUuid());
+      jobVersionDao.upsertInputDatasetFor(
+          jobVersionRow.getUuid(),
+          dataset.getUuid(),
+          jobVersionRow.getJobUuid(),
+          jobRow.getSymlinkTargetId());
     }
     for (DatasetId ds : jobMeta.getOutputs()) {
       DatasetRow dataset =
@@ -199,7 +209,11 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
               .orElseThrow(
                   () -> new IllegalStateException("Can't find test dataset " + ds.getName()));
 
-      jobVersionDao.upsertOutputDatasetFor(jobVersionRow.getUuid(), dataset.getUuid());
+      jobVersionDao.upsertOutputDatasetFor(
+          jobVersionRow.getUuid(),
+          dataset.getUuid(),
+          jobVersionRow.getJobUuid(),
+          jobRow.getSymlinkTargetId());
     }
     Optional<JobVersion> jobVersion =
         jobVersionDao.findJobVersion(namespaceRow.getName(), jobRow.getName(), version.getValue());
@@ -424,5 +438,124 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
         .get()
         .extracting(JobVersion::getInputs, InstanceOfAssertFactories.list(UUID.class))
         .isNotEmpty();
+  }
+
+  @Test
+  public void testUpsertDatasetMarksOtherRowsObsolete() {
+    // (1) Add a new job; the input and output datasets for the job will also be added.
+    final JobMeta jobMeta =
+        new JobMeta(
+            newJobType(),
+            newInputsWith(NamespaceName.of(namespaceRow.getName()), 1),
+            newOutputsWith(NamespaceName.of(namespaceRow.getName()), 1),
+            newLocation(),
+            newDescription(),
+            null);
+
+    final JobRow jobRow =
+        DbTestUtils.newJobWith(
+            jdbiForTesting, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+
+    // (2) Get UUID of the datasets
+    DatasetId inputDatasetId = jobMeta.getInputs().stream().findFirst().get();
+    DatasetId outputDatasetId = jobMeta.getOutputs().stream().findFirst().get();
+
+    UUID inputDatasetUuid =
+        datasetDao
+            .getUuid(inputDatasetId.getNamespace().getValue(), inputDatasetId.getName().getValue())
+            .get()
+            .getUuid();
+    UUID outputDatasetUuid =
+        datasetDao
+            .getUuid(
+                outputDatasetId.getNamespace().getValue(), outputDatasetId.getName().getValue())
+            .get()
+            .getUuid();
+
+    // (3) Upsert job version row
+    UUID jobVersionUuid =
+        jobVersionDao
+            .upsertJobVersion(
+                newRowUuid(),
+                newTimestamp(),
+                jobRow.getUuid(),
+                newLocation().toString(),
+                UUID.randomUUID(),
+                jobRow.getName(),
+                namespaceRow.getUuid(),
+                namespaceRow.getName())
+            .getUuid();
+
+    // (4) upsert job_versions_io rows for each dataset
+    jobVersionDao.upsertInputDatasetFor(
+        jobVersionUuid, inputDatasetUuid, jobRow.getUuid(), jobRow.getSymlinkTargetId());
+    jobVersionDao.upsertOutputDatasetFor(
+        jobVersionUuid, outputDatasetUuid, jobRow.getUuid(), jobRow.getSymlinkTargetId());
+
+    // (5) there should be 2 rows in job_versions_io_mapping
+    assertThat(
+            jdbiForTesting
+                .withHandle(
+                    h ->
+                        h.createQuery(
+                                "SELECT count(*) as cnt FROM job_versions_io_mapping WHERE job_uuid = :jobUuid AND is_current_job_version = TRUE")
+                            .bind("jobUuid", jobRow.getUuid())
+                            .map(rv -> rv.getColumn("cnt", Integer.class))
+                            .one())
+                .intValue())
+        .isEqualTo(2);
+
+    // (2) Modify job - create a new version of it
+    UUID newJobVersion = UUID.randomUUID();
+    ExtendedJobVersionRow newVersionRow =
+        DbTestUtils.newJobVersion(
+            jdbiForTesting,
+            jobRow.getUuid(),
+            newJobVersion,
+            jobRow.getName(),
+            namespaceRow.getUuid(),
+            namespaceRow.getName());
+
+    // (4) upsert job_versions_io rows for each dataset
+    jobVersionDao.upsertInputDatasetFor(
+        newVersionRow.getUuid(),
+        inputDatasetUuid,
+        jobRow.getUuid(),
+        jobRow.getUuid()); // for testing use symlink job uuid same as job uuid
+    jobVersionDao.upsertOutputDatasetFor(
+        newVersionRow.getUuid(),
+        outputDatasetUuid,
+        jobRow.getUuid(),
+        jobRow.getUuid()); // for testing use symlink job uuid same as job uuid
+
+    // (5) Verify input and output datasets if they are the current ones
+    assertThat(
+            jdbiForTesting
+                .withHandle(
+                    h ->
+                        h.createQuery(
+                                "SELECT count(*) as cnt FROM job_versions_io_mapping WHERE job_uuid = :jobUuid")
+                            .bind("jobUuid", jobRow.getUuid())
+                            .map(rv -> rv.getColumn("cnt", Integer.class))
+                            .one())
+                .intValue())
+        .isEqualTo(4);
+
+    assertThat(
+            jdbiForTesting
+                .withHandle(
+                    h ->
+                        h.createQuery(
+                                """
+                            SELECT count(*) as cnt FROM job_versions_io_mapping
+                            WHERE job_uuid = :jobUuid AND is_current_job_version = TRUE
+                            AND job_symlink_target_uuid = :symlinkTargetId
+                            """)
+                            .bind("jobUuid", jobRow.getUuid())
+                            .bind("symlinkTargetId", jobRow.getUuid())
+                            .map(rv -> rv.getColumn("cnt", Integer.class))
+                            .one())
+                .intValue())
+        .isEqualTo(2);
   }
 }
