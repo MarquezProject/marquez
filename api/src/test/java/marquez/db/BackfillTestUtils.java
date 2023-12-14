@@ -115,9 +115,7 @@ public class BackfillTestUtils {
                         nominalTimeRunFacet,
                         parentRun.orElse(null),
                         ImmutableMap.of("airflow_version", ImmutableMap.of("version", "abc")))))
-            .job(
-                new LineageEvent.Job(
-                    NAMESPACE, jobName, new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP)))
+            .job(new LineageEvent.Job(NAMESPACE, jobName, JobFacet.builder().build()))
             .inputs(
                 Collections.singletonList(
                     new LineageEvent.Dataset(
