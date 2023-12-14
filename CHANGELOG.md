@@ -7,6 +7,8 @@
   *Save into Marquez model datasets sent via `DatasetEvent` event type
 * API: support `JobEvent` [`#2661`](https://github.com/MarquezProject/marquez/pull/2661) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
   *Save into Marquez model jobs and datasets sent via `JobEvent` event type.
+* API: support streaming jobs [`#2682`](https://github.com/MarquezProject/marquez/pull/2682) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
+  *Creates job version and reference rows at the beginning of the job instead of on complete. Updates job version within the run if anything changes.
 
 ## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-17
 ### Added

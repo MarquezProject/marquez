@@ -58,7 +58,7 @@ public class RunFacetsDaoTest {
             openLineageDao,
             "job_" + UUID.randomUUID(),
             "COMPLETE",
-            new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP),
+            JobFacet.builder().build(),
             Collections.emptyList(),
             Collections.emptyList(),
             new LineageEvent.ParentRunFacet(
@@ -112,7 +112,7 @@ public class RunFacetsDaoTest {
         openLineageDao,
         "job_" + UUID.randomUUID(),
         "COMPLETE",
-        new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP),
+        JobFacet.builder().build(),
         Collections.emptyList(),
         Collections.emptyList(),
         new ParentRunFacet(
@@ -164,12 +164,16 @@ public class RunFacetsDaoTest {
   @Test
   public void testGetFacetsByRunUuid() {
     LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(
-            new LineageEvent.DocumentationJobFacet(PRODUCER_URL, SCHEMA_URL, "some-documentation"),
-            new LineageEvent.SourceCodeLocationJobFacet(
-                PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
-            new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"),
-            null);
+        JobFacet.builder()
+            .documentation(
+                new LineageEvent.DocumentationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "some-documentation"))
+            .sourceCodeLocation(
+                new LineageEvent.SourceCodeLocationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"))
+            .sql(new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"))
+            .build();
+
     UpdateLineageRow lineageRow =
         LineageTestUtils.createLineageRow(
             openLineageDao,
