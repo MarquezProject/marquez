@@ -22,7 +22,6 @@ buildscript {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
         classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
-        classpath "io.freefair.gradle:lombok-plugin:8.4"
     }
 }
 
@@ -40,7 +39,6 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: "com.diffplug.spotless"
     apply plugin: "pmd"
-    apply plugin: "io.freefair.lombok"
 
     project(':api') {
         apply plugin: 'application'
@@ -97,11 +95,7 @@ subprojects {
         archiveClassifier.set("sources")
     }
 
-    task delombokJavadocs(type: Javadoc) {
-        source = delombok
-    }
-
-    task javadocJar(type: Jar, dependsOn: delombokJavadocs) {
+    task javadocJar(type: Jar) {
         from javadoc.destinationDir
         archiveClassifier.set("javadoc")
     }
