@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react'
 import useSize from '@react-hook/size'
 
-import { DEFAULT_MAX_SCALE, ZoomPanSvg } from './ZoomPanSvg'
+import { DEFAULT_MAX_SCALE, ZoomPanControls, ZoomPanSvg } from './ZoomPanSvg'
 import { Edge as EdgeComponent } from './Edge'
 import { Node as NodeComponent } from './Node'
 import { useLayout } from '../layout/useLayout'
@@ -43,6 +43,7 @@ interface Props<K, D> extends Omit<BoxProps, 'backgroundColor'> {
   backgroundColor?: string
   dotGridColor?: string
   disableZoomPan?: boolean
+  setZoomPanControls?: (controls: ZoomPanControls) => void
 }
 
 export const Graph = <K, D>({
@@ -63,6 +64,8 @@ export const Graph = <K, D>({
   backgroundColor,
   dotGridColor,
   disableZoomPan = false,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setZoomPanControls = () => {},
   ...otherProps
 }: Props<K, D>) => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -109,8 +112,9 @@ export const Graph = <K, D>({
           containerHeight={propHeight || containerHeight}
           contentWidth={contentWidth}
           contentHeight={contentHeight}
-          setZoomPanControls={() => {}}
+          setZoomPanControls={setZoomPanControls}
           maxScale={maxScale}
+          positionedNodes={positionedNodes}
           minScaleMinimum={minScaleMinimum}
           containerPadding={containerPadding}
           miniMapPlacement={miniMapPlacement}

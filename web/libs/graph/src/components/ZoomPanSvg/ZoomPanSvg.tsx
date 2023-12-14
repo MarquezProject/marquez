@@ -15,6 +15,7 @@ import {
   scaleToContainer,
 } from '../../utils/d3'
 import { MiniMap } from './MiniMap'
+import { PositionedNode } from '../../types'
 import { createTheme } from '@mui/material'
 import { useD3Selection } from '../../utils/useD3Selection'
 import type { MiniMapPlacement } from './MiniMap'
@@ -31,6 +32,7 @@ export interface ZoomPanControls {
   centerOnExtent(extent: Extent): void
   scaleZoom(kDelta?: number): void
   resetZoom(): void
+  centerOnPositionedNode(nodeId: string): void
 }
 
 interface Props extends BoxProps {
@@ -90,7 +92,16 @@ interface Props extends BoxProps {
    * Disable the ability to zoom and pan. Defaults to false.
    */
   disabled?: boolean
+  positionedNodes?: PositionedNode<any, any>[]
 }
+
+export const getNodeExtent = (currentNode: PositionedNode<any, any>): Extent => [
+  [currentNode.bottomLeftCorner.x, currentNode.bottomLeftCorner.y],
+  [
+    currentNode.width + currentNode.bottomLeftCorner.x,
+    currentNode.height + currentNode.bottomLeftCorner.y,
+  ],
+]
 
 export const ZoomPanSvg = ({
   containerWidth,
@@ -110,6 +121,7 @@ export const ZoomPanSvg = ({
   backgroundColor,
   dotGridColor,
   disabled = false,
+  positionedNodes = [],
   ...otherProps
 }: Props) => {
   const theme = createTheme(useTheme())
@@ -219,6 +231,14 @@ export const ZoomPanSvg = ({
     animateToZoomState(zoomIdentity)
   }
 
+  const centerOnPositionedNode = (nodeId: string) => {
+    const node = positionedNodes.find((node) => node.id === nodeId)
+    if (!node) return
+
+    const extent = getNodeExtent(node)
+    centerOnExtent(extent)
+  }
+
   const fitContent = () => {
     animateToZoomState(defaultZoom)
   }
@@ -291,6 +311,7 @@ export const ZoomPanSvg = ({
   const centerOnExtentRef = useCallbackRef(centerOnExtent)
   const scaleZoomRef = useCallbackRef(scaleZoom)
   const resetZoomRef = useCallbackRef(resetZoom)
+  const centerOnPositionedNodeRef = useCallbackRef(centerOnPositionedNode)
 
   /* ---- EFFECTS ---- */
 
@@ -327,6 +348,7 @@ export const ZoomPanSvg = ({
         centerOnExtent: centerOnExtentRef,
         scaleZoom: scaleZoomRef,
         resetZoom: resetZoomRef,
+        centerOnPositionedNode: centerOnPositionedNodeRef,
       }),
     [setZoomPanControls, fitContentRef, fitExtentRef, centerOnExtentRef, scaleZoomRef, resetZoomRef]
   )

@@ -1,9 +1,11 @@
-import { ColumnLevelDatasetData } from './ColumnLevelDatasetNode'
-import { ColumnLineageColumnNode, ColumnLineageDatasetNode } from './NodeRender'
-import { Edge, Node as ElkNode, NodeRendererMap } from '../../../libs/graph'
+import { ColumnLineageDatasetNode } from './ColumnLineageDatasetNode'
+import { NodeRendererMap } from '../../../libs/graph'
+import ColumnLineageColumnNode from './ColumnLineageColumnNode'
 
 export interface ColumnLineageColumnNodeData {
   column: string
+  namespace: string
+  dataset: string
 }
 
 export interface ColumnLineageDatasetNodeData {
@@ -16,27 +18,3 @@ export type MultipleNodeData = ColumnLineageDatasetNodeData | ColumnLineageColum
 
 export const columnLevelNodeRenderer: NodeRendererMap<MultipleNodeKind, MultipleNodeData> =
   new Map().set('dataset', ColumnLineageDatasetNode).set('column', ColumnLineageColumnNode)
-
-export const nodes: ElkNode<'simple', ColumnLevelDatasetData>[] = [
-  {
-    id: 'node1',
-    kind: 'simple',
-    data: { name: 'Node 1' },
-  },
-
-  {
-    id: 'node2',
-    kind: 'simple',
-    data: {
-      name: ' Node 2',
-    },
-  },
-]
-
-export const edges: Edge[] = [
-  {
-    id: '1 to 2',
-    sourceNodeId: 'node1',
-    targetNodeId: 'node2',
-  },
-]
