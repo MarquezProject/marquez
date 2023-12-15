@@ -35,7 +35,6 @@ import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobRowRunDetails;
 import marquez.db.RunDao.RunUpsert;
-import marquez.db.RunDao.RunUpsert.RunUpsertBuilder;
 import marquez.db.mappers.LineageEventMapper;
 import marquez.db.models.ColumnLineageRow;
 import marquez.db.models.DatasetFieldRow;
@@ -330,7 +329,7 @@ public interface OpenLineageDao extends BaseDao {
 
     final UUID runUuid = runToUuid(event.getRun().getRunId());
     RunRow run;
-    RunUpsertBuilder runUpsertBuilder =
+    RunUpsert.RunUpsertBuilder runUpsertBuilder =
         RunUpsert.builder()
             .runUuid(runUuid)
             .parentRunUuid(parentUuid.orElse(null))
