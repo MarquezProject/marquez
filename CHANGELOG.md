@@ -1,14 +1,37 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.42.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.43.0...HEAD)
 
+## [0.43.0](https://github.com/MarquezProject/marquez/compare/0.42.0...0.43.0) - 2023-12-15
 ### Added
-* API: support `DatasetEvent` [`#2641`](https://github.com/MarquezProject/marquez/pull/2641) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
-  *Save into Marquez model datasets sent via `DatasetEvent` event type
-* API: support `JobEvent` [`#2661`](https://github.com/MarquezProject/marquez/pull/2661) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
-  *Save into Marquez model jobs and datasets sent via `JobEvent` event type.
-* API: support streaming jobs [`#2682`](https://github.com/MarquezProject/marquez/pull/2682) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)
-  *Creates job version and reference rows at the beginning of the job instead of on complete. Updates job version within the run if anything changes.
+* API: refactor the `RunDao` SQL query [`#2685`](https://github.com/MarquezProject/marquez/pull/2685) [@sophiely](https://github.com/sophiely)  
+    *Improves the performance of the SQL query used for listing all runs.*
+* API: refactor dataset version query [`#2683`](https://github.com/MarquezProject/marquez/pull/2683) [@sophiely](https://github.com/sophiely)  
+    *Improves the performance of the SQL query used for the dataset version.*
+* API: add support for a `DatasetEvent` [`#2641`](https://github.com/MarquezProject/marquez/pull/2641) [`#2654`](https://github.com/MarquezProject/marquez/pull/2654) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Adds a feature for saving into the Marquez model datasets sent via the `DatasetEvent` event type. Includes optimization of the lineage query.*
+* API: add support for a `JobEvent` [`#2661`](https://github.com/MarquezProject/marquez/pull/2661) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Adds a feature for saving into the Marquez model jobs and datasets sent via the `JobEvent` event type.*
+* API: add support for streaming jobs [`#2682`](https://github.com/MarquezProject/marquez/pull/2682) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+    *Creates job version and reference rows at the beginning of the job instead of on complete. Updates the job version within the run if anything changes.*
+* API/spec: implement upstream run-level lineage [`#2658`](https://github.com/MarquezProject/marquez/pull/2658) [@julienledem](https://github.com/julienledem)  
+    *Returns the version of each job and dataset a run is depending on.*
+* API: add `DELETE` endpoint for dataset tags [`#2698`](https://github.com/MarquezProject/marquez/pull/2698) [@davidsharp7](https://github.com/davidsharp7)  
+    *Creates a new endpoint for removing the linkage between a dataset and a tag in `datasets_tag_mapping` to supply a way to delete a tag from a dataset via the API.
+* Web: add a dataset drawer [`#2672`](https://github.com/MarquezProject/marquez/pull/2672) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds a drawer to the dataset column view in the GUI.*
+
+### Fixed:
+* Client/Java: change url path encoding to match jersey decoding [`#2693`](https://github.com/MarquezProject/marquez/pull/2693) [@davidjgoss](https://github.com/davidjgoss)  
+    *Swaps out the implementation of `MarquezPathV1::encode` to use the `UrlEscapers` path segment escaper, which does proper URI encoding.*
+* Web: fix pagination in the Jobs route [`#2655`](https://github.com/MarquezProject/marquez/pull/2655) [@merobi-hub](https://github.com/merobi-hub)  
+    *Hides job pagination in the case of no jobs.*
+* Web: fix empty search experience [`#2679`](https://github.com/MarquezProject/marquez/pull/2679) [@phixMe](https://github.com/phixMe)  
+    *Use of the previous search value was resulting in a bad request for the first character of a search.*
+
+### Removed:
+* Client/Java: remove maven-archiver dependency from the Java client [`#2695`](https://github.com/MarquezProject/marquez/pull/2695) [@davidjgoss](https://github.com/davidjgoss)  
+    *Removes a dependency from `build.gradle` that was bringing some transitive vulnerabilities.*
 
 ## [0.42.0](https://github.com/MarquezProject/marquez/compare/0.41.0...0.42.0) - 2023-10-17
 ### Added
