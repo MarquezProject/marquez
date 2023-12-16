@@ -240,6 +240,12 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
+  public Dataset deleteDatasetTag(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
+    final String bodyAsJson = http.delete(url.toDatasetTagUrl(namespaceName, datasetName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
   public Dataset tagFieldWith(
       @NonNull String namespaceName,
       @NonNull String datasetName,

@@ -23,6 +23,7 @@ import marquez.db.LineageTestUtils;
 import marquez.db.OpenLineageDao;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +38,7 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   public void setup(Jdbi jdbi) {
     OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
 
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
 
     LineageEvent.Dataset dataset_A = getDatasetA();
     LineageEvent.Dataset dataset_B = getDatasetB();
