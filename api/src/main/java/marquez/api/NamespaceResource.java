@@ -12,6 +12,7 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.Consumes;
@@ -27,7 +28,8 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.api.exceptions.NamespaceNotFoundException;
-import marquez.api.filter.exclusions.ExclusionsFilter;
+import marquez.api.filter.exclusions.Exclusions;
+import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.common.models.NamespaceName;
 import marquez.service.ServiceFactory;
 import marquez.service.models.Namespace;
@@ -75,16 +77,16 @@ public class NamespaceResource extends BaseResource {
   public Response list(
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
-    final String namespaceFilter = ExclusionsFilter.getNamespacesReadFilter();
-    final List<Namespace> allNamespaces = namespaceService.findAll(limit, offset);
 
-    if (namespaceFilter != null) {
-      final List<Namespace> FilterNamespaces =
-          namespaceService.findAllFilter(namespaceFilter, limit, offset);
-      return Response.ok(new Namespaces(FilterNamespaces)).build();
-    } else {
-      return Response.ok(new Namespaces(allNamespaces)).build();
-    }
+    final List<Namespace> namespaces =
+        Optional.ofNullable(Exclusions.namespaces())
+            .map(ExclusionsConfig.NamespaceExclusions::getOnRead)
+            .filter(ExclusionsConfig.OnRead::isEnabled)
+            .map(ExclusionsConfig.OnRead::getPattern)
+            .map(pattern -> namespaceService.findAllWithExclusion(pattern, limit, offset))
+            .orElseGet(() -> namespaceService.findAll(limit, offset));
+
+    return Response.ok(new Namespaces(namespaces)).build();
   }
 
   @Timed

@@ -99,15 +99,19 @@ Here's how you can set it up:
 ```yaml
 exclude:
   namespaces:
-    onRead: true
-    patterns: "<regex_pattern0> | <regex_pattern1>"
+    onRead:
+      enabled: boolean 
+      pattern: "<pattern0>|<pattern1>|..."
+    onWrite:
+      enabled: boolean  
+      pattern: "<pattern0>|<pattern1>|..."
 ```
 In the above configuration:
 
-- `onRead: true` indicates that the exclusion should happen when reading namespaces.
-- `patterns` is a string of regular expressions. Any namespace matching any of these patterns will be excluded.
-Replace <regex_pattern0> and <regex_pattern1> with the actual regex patterns you want to use for filtering namespaces. You can add as many patterns as you need.
+- `onRead.enabled: true` indicates that the exclusion should happen when reading namespaces.
+- `pattern` is a string of regular expressions. Any namespace matching any of these patterns will be excluded.
+Replace <pattern0> and <pattern1> with the actual regex patterns you want to use for filtering namespaces. You can add as many patterns as you need.
 
 This feature provides a flexible way to manage the namespaces that are read by Marquez, allowing you to fine-tune the list of namespaces that are presented in the UI.
 
-For the moment, the exclusion only works for filtering namespaces when Marquez is querying them from its database, but we plan to expand the same logic to databases and jobs not only on read, but also on write to prevent any unwanted data to be sent to the backend.
+For the moment, the exclusion only works for filtering namespaces when Marquez is querying them from its database (onRead), but we plan to expand the same logic to databases and jobs not only on read, but also on write to prevent any unwanted data to be sent to the backend.

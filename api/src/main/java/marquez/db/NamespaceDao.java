@@ -80,7 +80,7 @@ public interface NamespaceDao extends BaseDao {
 
   @SqlQuery(
       "SELECT * FROM namespaces WHERE name !~ :excluded ORDER BY name LIMIT :limit OFFSET :offset")
-  List<Namespace> findAllFilter(String excluded, int limit, int offset);
+  List<Namespace> findAllWithExclusion(String excluded, int limit, int offset);
 
   @SqlQuery("UPDATE namespaces SET is_hidden=false WHERE name = :name RETURNING *")
   NamespaceRow undelete(String name);

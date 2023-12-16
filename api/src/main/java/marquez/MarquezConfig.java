@@ -51,15 +51,10 @@ public class MarquezConfig extends Configuration {
 
   @Getter
   @JsonProperty("exclude")
-  private ExclusionsConfig exclude; // OPTIONAL
+  private ExclusionsConfig exclude = new ExclusionsConfig();
 
   /** Returns {@code true} if a data retention policy has been configured. */
   public boolean hasDbRetentionPolicy() {
     return (dbRetention != null);
-  }
-
-  /** Returns {@code true} if an exclude pattern has been configured. */
-  public boolean hasExcludingPatterns() {
-    return (exclude != null);
   }
 }

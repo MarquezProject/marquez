@@ -1,46 +1,39 @@
 package marquez.api.filter.exclusions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import marquez.api.filter.exclusions.ExclusionsConfig.NamespaceExclusion;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ExclusionsConfigTest {
+public class ExclusionsConfigTest {
+  @Test
+  public void testNamespaceExclusionsOnRead() {
+    ExclusionsConfig exclusionsConfig = new ExclusionsConfig();
+    ExclusionsConfig.NamespaceExclusions namespaceExclusions =
+        new ExclusionsConfig.NamespaceExclusions();
+    ExclusionsConfig.OnRead onRead = new ExclusionsConfig.OnRead();
+    onRead.enabled = true;
+    onRead.pattern = "readPattern";
+    namespaceExclusions.onRead = onRead;
 
-  private ExclusionsConfig exclusionsConfig;
-  private NamespaceExclusion namespaceExclusion;
+    exclusionsConfig.namespaces = namespaceExclusions;
 
-  @BeforeEach
-  void setUp() {
-    exclusionsConfig = new ExclusionsConfig();
-    namespaceExclusion = new NamespaceExclusion();
+    assertEquals(true, exclusionsConfig.namespaces.onRead.enabled);
+    assertEquals("readPattern", exclusionsConfig.namespaces.onRead.pattern);
   }
 
   @Test
-  void testNamespaceExclusionOnRead() {
-    namespaceExclusion.onRead = true;
-    assertEquals(true, namespaceExclusion.isOnRead());
-  }
+  public void testNamespaceExclusionsOnWrite() {
+    ExclusionsConfig exclusionsConfig = new ExclusionsConfig();
+    ExclusionsConfig.NamespaceExclusions namespaceExclusions =
+        new ExclusionsConfig.NamespaceExclusions();
+    ExclusionsConfig.OnWrite onWrite = new ExclusionsConfig.OnWrite();
+    onWrite.enabled = false;
+    onWrite.pattern = "writePattern";
+    namespaceExclusions.onWrite = onWrite;
 
-  @Test
-  void testNamespaceExclusionOnWrite() {
-    namespaceExclusion.onWrite = true;
-    assertEquals(true, namespaceExclusion.isOnWrite());
-  }
+    exclusionsConfig.namespaces = namespaceExclusions;
 
-  @Test
-  void testNamespaceExclusionPatterns() {
-    String patterns = "test-pattern";
-    namespaceExclusion.patterns = patterns;
-    assertEquals(patterns, namespaceExclusion.getPatterns());
-  }
-
-  @Test
-  void testExclusionsConfigNamespaces() {
-    exclusionsConfig.namespaces = namespaceExclusion;
-    assertNotNull(exclusionsConfig.getNamespaces());
-    assertEquals(namespaceExclusion, exclusionsConfig.getNamespaces());
+    assertEquals(false, exclusionsConfig.namespaces.onWrite.enabled);
+    assertEquals("writePattern", exclusionsConfig.namespaces.onWrite.pattern);
   }
 }

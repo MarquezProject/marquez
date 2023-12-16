@@ -10,7 +10,8 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import javax.ws.rs.core.Response;
 import marquez.api.NamespaceResource.Namespaces;
-import marquez.api.filter.exclusions.ExclusionsFilter;
+import marquez.api.filter.exclusions.Exclusions;
+import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OwnerName;
 import marquez.db.BaseDao;
@@ -60,7 +61,7 @@ public class NamespaceResourceTest {
     var namespaceMeta2 = new NamespaceMeta(new OwnerName("yannick"), null);
     namespaceDao.upsertNamespaceMeta(namespaceName2, namespaceMeta2);
 
-    List<Namespace> namespaces = namespaceDao.findAllFilter("excluded.*", 10, 0);
+    List<Namespace> namespaces = namespaceDao.findAllWithExclusion("excluded.*", 10, 0);
 
     // Assert that the namespaces list does not contain the excluded namespace
     assertFalse(
@@ -70,7 +71,16 @@ public class NamespaceResourceTest {
   @Test
   public void testListWithFilter() {
     String filter = "excluded_.*";
-    ExclusionsFilter.setNamespacesReadFilter(filter);
+    ExclusionsConfig exclusionsConfig = new ExclusionsConfig();
+    ExclusionsConfig.NamespaceExclusions namespaceExclusions =
+        new ExclusionsConfig.NamespaceExclusions();
+    ExclusionsConfig.OnRead onRead = new ExclusionsConfig.OnRead();
+    onRead.enabled = true;
+    onRead.pattern = filter;
+    namespaceExclusions.onRead = onRead;
+
+    exclusionsConfig.namespaces = namespaceExclusions;
+    Exclusions.use(exclusionsConfig);
 
     NamespaceName namespaceName = NamespaceName.of("excluded_namespace");
     OwnerName owner = new OwnerName("yannick");
@@ -79,7 +89,9 @@ public class NamespaceResourceTest {
     namespaceDao.upsertNamespaceMeta(namespaceName, namespaceMeta);
 
     NamespaceService namespaceServiceSpy = spy(namespaceService);
-    doCallRealMethod().when(namespaceServiceSpy).findAllFilter(eq(filter), anyInt(), anyInt());
+    doCallRealMethod()
+        .when(namespaceServiceSpy)
+        .findAllWithExclusion(eq(filter), anyInt(), anyInt());
 
     Response response = namespaceResource.list(10, 0);
     Namespaces namespaces = (Namespaces) response.getEntity();

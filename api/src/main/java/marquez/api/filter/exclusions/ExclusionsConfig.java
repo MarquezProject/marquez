@@ -4,12 +4,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 public class ExclusionsConfig {
-  @Getter @JsonProperty public NamespaceExclusion namespaces;
+  @Getter @JsonProperty public NamespaceExclusions namespaces;
 
-  public static class NamespaceExclusion {
-    @Getter @JsonProperty public boolean onRead;
-    @Getter @JsonProperty public boolean onWrite;
-    @Getter @JsonProperty public String patterns;
+  public static class NamespaceExclusions {
+    @Getter
+    @JsonProperty("onRead")
+    public OnRead onRead;
+
+    @Getter
+    @JsonProperty("onWrite")
+    public OnWrite onWrite;
   }
-  ;
+
+  public static class OnRead {
+    @Getter
+    @JsonProperty("enabled")
+    public boolean enabled;
+
+    @Getter
+    @JsonProperty("pattern")
+    public String pattern;
+  }
+
+  public static class OnWrite {
+    @Getter
+    @JsonProperty("enabled")
+    public boolean enabled;
+
+    @Getter
+    @JsonProperty("pattern")
+    public String pattern;
+  }
 }
