@@ -1024,7 +1024,7 @@ public class MarquezClientTest {
             NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
 
     final String runAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
-    when(http.post(url)).thenReturn(runAsJson);
+    when(http.delete(url)).thenReturn(runAsJson);
 
     final Dataset dataset =
         client.deleteDatasetFieldTag(NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
