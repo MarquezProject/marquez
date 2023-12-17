@@ -9,11 +9,14 @@ import static marquez.common.models.CommonModelGenerator.newConnectionUrlFor;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
+import static marquez.common.models.CommonModelGenerator.newFieldName;
+import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
 import static marquez.db.DbTest.POSTGRES_14;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
@@ -30,6 +33,7 @@ import marquez.client.MarquezClient;
 import marquez.client.Utils;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTableMeta;
+import marquez.client.models.Field;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
@@ -91,6 +95,7 @@ abstract class BaseResourceIntegrationTest {
   static String DB_TABLE_DESCRIPTION;
   static Set<String> DB_TABLE_TAGS;
   static DbTableMeta DB_TABLE_META;
+  static ImmutableList<Field> DB_TABLE_FIELDS;
 
   static DropwizardAppExtension<MarquezConfig> MARQUEZ_APP;
   static OpenLineage OL;
@@ -117,10 +122,12 @@ abstract class BaseResourceIntegrationTest {
     DB_TABLE_DESCRIPTION = newDescription();
     DB_TABLE_TAGS = ImmutableSet.of(PII.getName());
     DB_TABLE_CONNECTION_URL = newConnectionUrlFor(SourceType.of("POSTGRESQL"));
+    DB_TABLE_FIELDS = ImmutableList.of(newFieldWith(SENSITIVE.getName()), newField());
     DB_TABLE_META =
         DbTableMeta.builder()
             .physicalName(DB_TABLE_PHYSICAL_NAME)
             .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(DB_TABLE_FIELDS)
             .tags(DB_TABLE_TAGS)
             .description(DB_TABLE_DESCRIPTION)
             .build();
@@ -156,6 +163,18 @@ abstract class BaseResourceIntegrationTest {
 
   protected static DatasetId newDatasetIdWith(final String namespaceName) {
     return new DatasetId(namespaceName, newDatasetName().getValue());
+  }
+
+  protected static Field newField() {
+    return newFieldWith(ImmutableSet.of());
+  }
+
+  protected static Field newFieldWith(final String tag) {
+    return newFieldWith(ImmutableSet.of(tag));
+  }
+
+  protected static Field newFieldWith(final ImmutableSet<String> tags) {
+    return new Field(newFieldName().getValue(), newFieldType(), tags, newDescription());
   }
 
   protected void createSource(String sourceName) {
