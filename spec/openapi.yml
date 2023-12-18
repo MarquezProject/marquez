@@ -603,6 +603,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/LineageGraph'
 
+  /runlineage/upstream:
+    get:
+      operationId: getRunLineageUpstream
+      paramteters:
+        - $ref: '#/components/parameters/runId'
+        - $ref: '#/components/parameters/depth'
+      tags:
+        - Lineage
+      summary: Get the upstream lineage for a given run
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpstreamRunLineage'
+
   /column-lineage:
     get:
       operationId: getLineage
@@ -1912,6 +1929,64 @@ components:
           type: string
       example:
         description: My first tag!
+
+    UpstreamRunLineage:
+      type: object
+      properties:
+        runs:
+          description: the list of upstream runs including the selected run in topological order upstream
+          type: array
+          items:
+            type: object
+            propoerties:
+              job:
+                type: object
+                description: identifier of the job version for this run
+                propoerties:
+                  namespace:
+                    type: string
+                  name:
+                    type: string
+                  version:
+                    type: string
+                    format: uuid
+              run:
+                description: run information
+                type: object
+                properties:
+                  id:
+                    description: the run identifier
+                    type: string
+                    format: uuid
+                  start:
+                    description: start time of the run
+                    type: string
+                    format: date-time
+                  end:
+                    description: end time of the run
+                    type: string
+                    format: date-time
+                  status:
+                    description: whether the run completed succesfully or not
+                    type: string
+              inputs:
+                description: ustream input dataset versions
+                type: array
+                items:
+                  description: identifier of the upstream dataset version consumed by this run
+                  type: object
+                  properties:
+                    namespace:
+                      type: string
+                    name:
+                      type: string
+                    version:
+                      type: string
+                      format: uuid
+                    producedByRunId:
+                      description: the run that produced this dataset version
+                      type: string
+                      format: uuid
 
     LineageEvent:
       example:
