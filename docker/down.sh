@@ -44,11 +44,7 @@ API_ADMIN_PORT=${RANDOM}
 WEB_PORT=${RANDOM}
 TAG=${RANDOM}
 
-if [[ "$OSTYPE" == "linux-gnu" ]]; then
-  docker compose ${compose_files} down ${compose_args}
-else
-  docker-compose $compose_files down $compose_args
-fi 
+docker compose $compose_files down $compose_args
 
 docker volume rm marquez_data && \
   docker volume rm marquez_db-backup && \
