@@ -4,7 +4,7 @@ import { PositionedNode } from '../../../libs/graph'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
-import { useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import React from 'react'
 
@@ -13,6 +13,8 @@ interface ColumnLineageDatasetNodeProps {
 }
 export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { namespace, name } = useParams()
+  const shine = name === node.data.dataset && namespace === node.data.namespace
   return (
     <>
       <Box
@@ -26,6 +28,7 @@ export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps
           fill: theme.palette.background.paper,
           strokeWidth: 1,
           rx: 4,
+          filter: shine ? `drop-shadow( 0 0 4px ${theme.palette.primary.main})` : 'none',
         }}
       />
       <Box

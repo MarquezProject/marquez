@@ -1,7 +1,7 @@
 import * as Redux from 'redux'
+import { ArrowBackIosRounded, CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
 import { ColumnLineageGraph } from '../../types/api'
-import { CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
-import { Drawer, Tooltip } from '@mui/material'
+import { Divider, Drawer, TextField, Tooltip } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'
 import { IState } from '../../store/reducers'
 import { MultipleNodeData, MultipleNodeKind, columnLevelNodeRenderer } from './nodes'
@@ -11,12 +11,13 @@ import { createElkNodes, parseColumnLineageNode } from './layout'
 import { fetchColumnLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useCallbackRef } from '../../helpers/hooks'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import ColumnLevelDrawer from './ColumnLevelDrawer'
 import IconButton from '@mui/material/IconButton'
+import MqText from '../core/text/MqText'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface StateProps {
   columnLineage: ColumnLineageGraph
@@ -36,15 +37,18 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   columnLineage: columnLineage,
 }: ColumnLevelProps) => {
   const { namespace, name } = useParams()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
   const graphControls = useRef<ZoomPanControls>()
 
   useEffect(() => {
     if (name && namespace) {
-      fetchColumnLineage('DATASET', namespace, name, 2)
+      fetchColumnLineage('DATASET', namespace, name, depth)
     }
-  }, [name, namespace])
+  }, [name, namespace, depth])
 
   const column = searchParams.get('column')
   useEffect(() => {
@@ -73,60 +77,114 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const { nodes, edges } = createElkNodes(columnLineage, searchParams.get('column'))
 
+  useEffect(() => {
+    setTimeout(() => {
+      graphControls.current?.fitContent()
+    }, 300)
+  }, [nodes.length])
+
   return (
-    <Box height={'calc(100vh - 98px)'}>
-      <Drawer
-        anchor={'right'}
-        open={!!searchParams.get('dataset')}
-        onClose={() => setSearchParams({})}
-      >
-        <Box sx={{ pt: '98px' }}>
-          <ColumnLevelDrawer />
-        </Box>
-      </Drawer>
+    <>
       <Box
+        sx={{
+          borderBottomWidth: 2,
+          borderTopWidth: 0,
+          borderLeftWidth: 0,
+          borderRightWidth: 0,
+          borderStyle: 'dashed',
+        }}
         display={'flex'}
-        border={1}
-        borderRadius={1}
-        flexDirection={'column'}
-        m={1}
-        position={'absolute'}
-        right={0}
-        zIndex={1}
-        borderColor={theme.palette.grey[500]}
+        height={'64px'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        px={2}
+        borderColor={theme.palette.secondary.main}
       >
-        <Tooltip title={'Zoom in'} placement={'left'}>
-          <IconButton size='small' onClick={() => handleScaleZoom('in')}>
-            <ZoomIn />
+        <Box display={'flex'} alignItems={'center'}>
+          <IconButton size={'small'} sx={{ mr: 2 }} onClick={() => navigate('/datasets')}>
+            <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
-        </Tooltip>
-        <Tooltip title={'Zoom out'} placement={'left'}>
-          <IconButton size='small' onClick={() => handleScaleZoom('out')}>
-            <ZoomOut />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={'Reset zoom'} placement={'left'}>
-          <IconButton size={'small'} onClick={handleResetZoom}>
-            <CropFree />
-          </IconButton>
-        </Tooltip>
+          <MqText heading>Column Lineage</MqText>
+          <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
+          <Box>
+            <MqText subdued>Namespace</MqText>
+            <MqText font={'mono'}>{namespace || 'Unknown namespace name'}</MqText>
+          </Box>
+          <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
+          <Box>
+            <MqText subdued>Name</MqText>
+            <MqText font={'mono'}>{name || 'Unknown dataset name'}</MqText>
+          </Box>
+        </Box>
+        <TextField
+          id='column-level-depth'
+          type='number'
+          label='Depth'
+          variant='outlined'
+          size='small'
+          sx={{ width: '80px' }}
+          value={depth}
+          onChange={(e) => {
+            setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))
+            searchParams.set('depth', e.target.value)
+            setSearchParams(searchParams)
+          }}
+        />
       </Box>
-      <ParentSize>
-        {(parent) => (
-          <Graph<MultipleNodeKind, MultipleNodeData>
-            id='column-level-graph'
-            backgroundColor={theme.palette.background.default}
-            height={parent.height}
-            width={parent.width}
-            nodes={nodes}
-            edges={edges}
-            direction='right'
-            nodeRenderers={columnLevelNodeRenderer}
-            setZoomPanControls={setGraphControls}
-          />
-        )}
-      </ParentSize>
-    </Box>
+      <Box height={'calc(100vh - 98px - 64px)'}>
+        <Drawer
+          anchor={'right'}
+          open={!!searchParams.get('dataset')}
+          onClose={() => setSearchParams({})}
+        >
+          <Box sx={{ pt: '98px' }}>
+            <ColumnLevelDrawer />
+          </Box>
+        </Drawer>
+        <Box
+          display={'flex'}
+          border={1}
+          borderRadius={1}
+          flexDirection={'column'}
+          m={1}
+          position={'absolute'}
+          right={0}
+          zIndex={1}
+          borderColor={theme.palette.grey[500]}
+        >
+          <Tooltip title={'Zoom in'} placement={'left'}>
+            <IconButton size='small' onClick={() => handleScaleZoom('in')}>
+              <ZoomIn />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={'Zoom out'} placement={'left'}>
+            <IconButton size='small' onClick={() => handleScaleZoom('out')}>
+              <ZoomOut />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={'Reset zoom'} placement={'left'}>
+            <IconButton size={'small'} onClick={handleResetZoom}>
+              <CropFree />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <ParentSize>
+          {(parent) => (
+            <Graph<MultipleNodeKind, MultipleNodeData>
+              id='column-level-graph'
+              backgroundColor={theme.palette.background.default}
+              height={parent.height}
+              width={parent.width}
+              nodes={nodes}
+              edges={edges}
+              direction='right'
+              nodeRenderers={columnLevelNodeRenderer}
+              setZoomPanControls={setGraphControls}
+            />
+          )}
+        </ParentSize>
+      </Box>
+    </>
   )
 }
 

@@ -106,7 +106,6 @@ const ColumnLevelDrawer = ({
               </TableBody>
             </Table>
           )}
-          <Divider sx={{ mt: 3 }} />
           {connectedColumns.length > 0 && column && (
             <>
               <Box p={2}>
@@ -147,7 +146,6 @@ const ColumnLevelDrawer = ({
       )}
       {dataset && dataset.columnLineage && (
         <>
-          <Divider sx={{ mt: 3 }} />
           <Box p={2}>
             <MqText subheading>Column Lineage Facets</MqText>
 
