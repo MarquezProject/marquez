@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { chakra, keyframes, useColorModeValue, usePrefersReducedMotion } from '@chakra-ui/react'
+import { chakra, keyframes, usePrefersReducedMotion } from '@chakra-ui/react'
 
 import { EdgeLabel } from './EdgeLabel'
 import { grey } from '@mui/material/colors'
@@ -11,7 +11,6 @@ const marchingAnts = keyframes({ from: { strokeDashoffset: 60 }, to: { strokeDas
 
 export const ElbowEdge = ({ edge, isMiniMap }: EdgeProps) => {
   const reducedMotion = usePrefersReducedMotion() || isMiniMap // do not animate the minimap
-  const color = useColorModeValue(grey['400'], grey['600'])
 
   const points = useMemo(() => {
     const { startPoint, bendPoints, endPoint } = edge
@@ -40,7 +39,7 @@ export const ElbowEdge = ({ edge, isMiniMap }: EdgeProps) => {
       <polyline
         id={`${edge.sourceNodeId}-${edge.targetNodeId}`}
         fill='none'
-        stroke={edge.color || color}
+        stroke={edge.color || grey['600']}
         strokeWidth={edge.strokeWidth || 2}
         strokeLinejoin='round'
         points={points.map(({ x, y }) => `${x},${y}`).join(' ')}
@@ -51,7 +50,7 @@ export const ElbowEdge = ({ edge, isMiniMap }: EdgeProps) => {
           id={`${edge.sourceNodeId}-${edge.targetNodeId}-animated`}
           fill='none'
           strokeLinecap='round'
-          stroke={edge.color || color}
+          stroke={edge.color || grey['600']}
           strokeWidth={edge.strokeWidth || 5}
           strokeLinejoin='round'
           strokeDasharray='0px 60px'

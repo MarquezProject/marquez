@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 
-import { Box, BoxProps, useColorModeValue } from '@chakra-ui/react'
+import { Box, BoxProps } from '@chakra-ui/react'
 import type { ZoomTransform } from 'd3-zoom'
 
 import { grey } from '@mui/material/colors'
@@ -37,10 +37,10 @@ export const MiniMap = ({
   children,
   ...otherProps
 }: Props) => {
-  const backgroundColor = useColorModeValue(grey['300'], grey['700'])
-  const borderColor = useColorModeValue(grey['400'], 'black')
-  const maskColor = useColorModeValue(grey['600'], 'black')
-  const maskOpacity = useColorModeValue(0.3, 0.5)
+  const backgroundColor = grey['700']
+  const borderColor = 'black'
+  const maskColor = 'black'
+  const maskOpacity = '.5'
   const width = Math.round(containerWidth * miniMapScale)
   const height = Math.round(containerHeight * miniMapScale)
 

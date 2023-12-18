@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { grey } from '@mui/material/colors'
-import { useColorModeValue } from '@chakra-ui/react'
 import type { ElkLabel } from 'elkjs'
 
 interface Props {
@@ -10,7 +9,7 @@ interface Props {
 }
 
 export const EdgeLabel = ({ label, endPointY }: Props) => {
-  const labelColor = useColorModeValue(grey['600'], grey['400'])
+  const labelColor = grey['400']
 
   if (!label || !label.y || !label.x) return null
 

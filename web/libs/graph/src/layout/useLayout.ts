@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { useCallbackRef } from '@chakra-ui/react'
 import ELK, { ElkNode } from 'elkjs'
 import isEqual from 'lodash/isEqual'
 
+import { useCallbackRef } from '../utils/hooks'
 import type { Direction, Edge, Node, NodeRenderer, PositionedEdge, PositionedNode } from '../types'
 
 export interface Props<K, D> {

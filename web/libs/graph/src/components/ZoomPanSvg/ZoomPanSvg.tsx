@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Box, BoxProps, useCallbackRef, useColorModeValue } from '@chakra-ui/react'
+import { Box, BoxProps } from '@chakra-ui/react'
 import { ZoomTransform, zoom as d3Zoom, zoomIdentity } from 'd3-zoom'
 import { useTheme } from '@emotion/react'
 
@@ -17,6 +17,7 @@ import {
 import { MiniMap } from './MiniMap'
 import { PositionedNode } from '../../types'
 import { createTheme } from '@mui/material'
+import { useCallbackRef } from '../../utils/hooks'
 import { useD3Selection } from '../../utils/useD3Selection'
 import type { MiniMapPlacement } from './MiniMap'
 
@@ -125,7 +126,7 @@ export const ZoomPanSvg = ({
   ...otherProps
 }: Props) => {
   const theme = createTheme(useTheme())
-  const fillColor = useColorModeValue(theme.palette.secondary.light, theme.palette.secondary.dark)
+  const fillColor = theme.palette.secondary.dark
 
   /* ---- MEASUREMENTS AND LIMITS ---- */
 

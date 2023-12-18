@@ -1,23 +1,17 @@
 import React from 'react'
 
-import {
-  chakra,
-  keyframes,
-  useColorModeValue,
-  usePrefersReducedMotion,
-  useTheme,
-} from '@chakra-ui/react'
+import { chakra, keyframes, usePrefersReducedMotion } from '@chakra-ui/react'
 
 import { EdgeLabel } from './EdgeLabel'
+import { grey } from '@mui/material/colors'
 import type { EdgeProps } from './Edge'
 
 const ChakraLine = chakra('line') // need to use animation prop
 const marchingAnts = keyframes({ from: { strokeDashoffset: 60 }, to: { strokeDashoffset: 0 } })
 
 export const StraightEdge = ({ edge, isMiniMap }: EdgeProps) => {
-  const { colors } = useTheme()
   const reducedMotion = usePrefersReducedMotion() || isMiniMap // do not animate the minimap
-  const color = useColorModeValue(colors.gray[400], colors.gray[600])
+  const color = grey['600']
 
   return (
     <>

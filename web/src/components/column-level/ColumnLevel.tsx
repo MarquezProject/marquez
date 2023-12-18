@@ -42,14 +42,13 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   useEffect(() => {
     if (name && namespace) {
-      fetchColumnLineage('DATASET', namespace, name, 10)
+      fetchColumnLineage('DATASET', namespace, name, 2)
     }
   }, [name, namespace])
 
   const column = searchParams.get('column')
   useEffect(() => {
     if (column) {
-      console.log(`datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`)
       graphControls.current?.centerOnPositionedNode(
         `datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`
       )

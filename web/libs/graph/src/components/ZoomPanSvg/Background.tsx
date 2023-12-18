@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { useColorModeValue } from '@chakra-ui/react'
-
 import { grey } from '@mui/material/colors'
 
 import { centerItemInContainer } from '../../utils/d3'
@@ -32,8 +30,8 @@ export const Background = ({
 }: Props) => {
   const scaledGap = findMinGap(GAP, k)
 
-  const bgColor = useColorModeValue(grey['200'], grey['800'])
-  const dotColor = useColorModeValue(grey['600'], grey['400'])
+  const bgColor = grey['800']
+  const dotColor = grey['400']
 
   // Use maxDimension to ensure converge when there are narrow contents in square containers.
   const maxDimension = Math.max(contentWidth, contentHeight)

@@ -1,27 +1,16 @@
 import React, { useRef } from 'react'
-
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  Box,
-  BoxProps,
-  Center,
-  Progress,
-} from '@chakra-ui/react'
 import useSize from '@react-hook/size'
 
 import { DEFAULT_MAX_SCALE, ZoomPanControls, ZoomPanSvg } from './ZoomPanSvg'
 import { Edge as EdgeComponent } from './Edge'
 import { Node as NodeComponent } from './Node'
 import { useLayout } from '../layout/useLayout'
+import Box from '@mui/system/Box'
+import LinearProgress from '@mui/material/LinearProgress'
 import type { Direction, Edge, Node, NodeRenderer } from '../types'
 import type { MiniMapPlacement } from './ZoomPanSvg/MiniMap'
 
-const ERROR_MESSAGE = 'The graph could not be rendered.'
-const EMPTY_MESSAGE = 'Add tasks to see the graph.'
-
-interface Props<K, D> extends Omit<BoxProps, 'backgroundColor'> {
+interface Props<K, D> {
   id: string
   nodes: Node<K, D>[]
   edges: Edge[]
@@ -56,7 +45,6 @@ export const Graph = <K, D>({
   nodeRenderers,
   width: propWidth,
   height: propHeight,
-  emptyMessage = EMPTY_MESSAGE,
   maxScale = DEFAULT_MAX_SCALE,
   minScaleMinimum,
   containerPadding,
@@ -66,7 +54,6 @@ export const Graph = <K, D>({
   disableZoomPan = false,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setZoomPanControls = () => {},
-  ...otherProps
 }: Props<K, D>) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, containerHeight] = useSize(containerRef)
@@ -88,6 +75,10 @@ export const Graph = <K, D>({
     height: contentHeight,
   } = layout || {}
 
+  if (error) {
+    console.error(error)
+  }
+
   const measurementsReady =
     (propWidth || containerWidth) &&
     (propHeight || containerHeight) &&
@@ -95,15 +86,7 @@ export const Graph = <K, D>({
     contentHeight
 
   return (
-    <Box width='100%' height='100%' ref={containerRef} position='relative' {...otherProps}>
-      {!isRendering && !positionedNodes?.length && (
-        <Center width='100%' height='100%'>
-          <Alert status={error ? 'error' : 'info'} width={500}>
-            <AlertIcon />
-            <AlertDescription>{error ? ERROR_MESSAGE : emptyMessage}</AlertDescription>
-          </Alert>
-        </Center>
-      )}
+    <Box width='100%' height='100%' ref={containerRef} position='relative'>
       {!!positionedNodes?.length && measurementsReady && (
         <ZoomPanSvg
           width={propWidth || containerWidth}
@@ -157,7 +140,9 @@ export const Graph = <K, D>({
         </ZoomPanSvg>
       )}
       {isRendering && (
-        <Progress position='absolute' bottom='0' left='0' right='0' size='xs' isIndeterminate />
+        <Box position='absolute' bottom='0' left='0' right='0'>
+          <LinearProgress />
+        </Box>
       )}
     </Box>
   )
