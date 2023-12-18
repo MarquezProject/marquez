@@ -27,22 +27,22 @@ const i18next = require('i18next')
 const INITIAL_SEARCH_FILTER = [
   {
     text: i18next.t('search.filter.all'),
-    value: 'All'
+    value: 'All',
   },
   {
     icon: faCog,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: i18next.t('search.filter.jobs'),
-    value: 'JOB'
+    value: 'JOB',
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
     text: i18next.t('search.filter.datasets'),
-    value: 'DATASET'
-  }
+    value: 'DATASET',
+  },
 ]
 
 const INITIAL_SEARCH_SORT_FILTER = [
@@ -55,12 +55,12 @@ const INITIAL_SEARCH_SORT_FILTER = [
   },
   {
     text: i18next.t('search.filter.updated'),
-    value: 'UPDATE_AT'
+    value: 'UPDATE_AT',
   },
   {
     text: i18next.t('search.filter.name'),
-    value: 'NAME'
-  }
+    value: 'NAME',
+  },
 ]
 
 interface StateProps {
@@ -97,7 +97,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     props.fetchSearch(q, filter, sort)
   }
 
-  debounce(fetchSearch, 300) // TODO check if we need to move it in a useEffect []
+  debounce(fetchSearch, 300)
 
   const location = useLocation()
   React.useEffect(() => {
@@ -107,10 +107,9 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
 
   const onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setState({ ...state, search: event.target.value, open: true })
-
-    setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
-    }, 1)
+    if (event.target.value.length > 0) {
+      fetchSearch(event.target.value, state.filter.toUpperCase(), state.sort.toUpperCase())
+    }
   }
 
   const onSelectFilter = (label: string) => {
@@ -241,7 +240,9 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                   {props.searchResults.size === 0 && (
                     <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
                       <MqText>
-                        {isSearching || !isSearchingInit ? i18next.t('search.status') : i18next.t('search.none')}
+                        {isSearching || !isSearchingInit
+                          ? i18next.t('search.status')
+                          : i18next.t('search.none')}
                       </MqText>
                     </Box>
                   )}
@@ -284,20 +285,21 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                           <Box key={result[0].group + index}>
                             {result.map((listItem) => {
                               return (
-                                <SearchListItem
-                                  key={listItem.name}
-                                  searchResult={listItem}
-                                  search={state.search}
-                                  selected={listItem.name === state.selected}
-                                  onClick={(nodeName) => {
-                                    setState({
-                                      ...state,
-                                      open: false,
-                                      search: nodeName,
-                                    })
-                                    props.setSelectedNode(listItem.nodeId)
-                                  }}
-                                />
+                                <React.Fragment key={listItem.name}>
+                                  <SearchListItem
+                                    searchResult={listItem}
+                                    search={state.search}
+                                    selected={listItem.name === state.selected}
+                                    onClick={(nodeName) => {
+                                      setState({
+                                        ...state,
+                                        open: false,
+                                        search: nodeName,
+                                      })
+                                      props.setSelectedNode(listItem.nodeId)
+                                    }}
+                                  />
+                                </React.Fragment>
                               )
                             })}
                           </Box>

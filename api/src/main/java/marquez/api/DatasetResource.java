@@ -201,6 +201,33 @@ public class DatasetResource extends BaseResource {
   @Timed
   @ResponseMetered
   @ExceptionMetered
+  @DELETE
+  @Path("/{dataset}/tags/{tag}")
+  @Produces(APPLICATION_JSON)
+  public Response deleteDatasetTag(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @PathParam("tag") TagName tagName) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, datasetName);
+
+    log.info(
+        "Deleted tag '{}' from dataset '{}' on namespace '{}'",
+        tagName.getValue(),
+        datasetName.getValue(),
+        namespaceName.getValue());
+    datasetService.deleteDatasetTag(
+        namespaceName.getValue(), datasetName.getValue(), tagName.getValue());
+    Dataset dataset =
+        datasetService
+            .findDatasetByName(namespaceName.getValue(), datasetName.getValue())
+            .orElseThrow(() -> new DatasetNotFoundException(datasetName));
+    return Response.ok(dataset).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
   @POST
   @Path("/{dataset}/fields/{field}/tags/{tag}")
   @Consumes(APPLICATION_JSON)

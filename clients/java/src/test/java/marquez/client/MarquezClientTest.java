@@ -990,6 +990,19 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testDeleteDatasetTag() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/tags/%s", NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
+    when(http.delete(url)).thenReturn(runAsJson);
+
+    final Dataset dataset = client.deleteDatasetTag(NAMESPACE_NAME, DB_TABLE_NAME, "tag_name");
+    assertThat(dataset).isEqualTo(DB_TABLE);
+  }
+
+  @Test
   public void testTagField() throws Exception {
     final URL url =
         buildUrlFor(

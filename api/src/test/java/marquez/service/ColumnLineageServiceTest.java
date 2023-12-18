@@ -41,6 +41,7 @@ import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import org.jdbi.v3.core.Jdbi;
@@ -70,7 +71,7 @@ public class ColumnLineageServiceTest {
     fieldDao = jdbi.onDemand(DatasetFieldDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
     lineageService = new ColumnLineageService(dao, fieldDao);
-    jobFacet = new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    jobFacet = JobFacet.builder().build();
   }
 
   @AfterEach

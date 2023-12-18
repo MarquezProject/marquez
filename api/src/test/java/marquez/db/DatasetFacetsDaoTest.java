@@ -20,6 +20,7 @@ import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -308,8 +309,7 @@ public class DatasetFacetsDaoTest {
 
   @Test
   public void testInsertOutputDatasetFacetsFor() {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow lineageRow =
         LineageTestUtils.createLineageRow(
@@ -340,8 +340,7 @@ public class DatasetFacetsDaoTest {
 
   @Test
   public void testInsertInputDatasetFacetsFor() {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow lineageRow =
         LineageTestUtils.createLineageRow(
@@ -372,8 +371,7 @@ public class DatasetFacetsDaoTest {
 
   private UpdateLineageRow createLineageRowWithInputDataset(
       LineageEvent.DatasetFacets.DatasetFacetsBuilder inputDatasetFacetsbuilder) {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
 
     return LineageTestUtils.createLineageRow(
         openLineageDao,
@@ -389,8 +387,7 @@ public class DatasetFacetsDaoTest {
 
   private UpdateLineageRow createLineageRowWithOutputDataset(
       LineageEvent.DatasetFacets.DatasetFacetsBuilder outputDatasetFacetsbuilder) {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
 
     return LineageTestUtils.createLineageRow(
         openLineageDao,

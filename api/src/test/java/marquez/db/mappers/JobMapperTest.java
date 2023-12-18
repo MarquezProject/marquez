@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.TimeZone;
 import java.util.UUID;
 import marquez.common.Utils;
+import marquez.common.models.JobType;
 import marquez.db.Columns;
 import marquez.service.models.Job;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -30,6 +31,11 @@ class JobMapperTest {
 
   private static ResultSet resultSet;
   private static TimeZone defaultTZ = TimeZone.getDefault();
+
+  private static String JOB_FACET =
+      """
+      [{"jobType": {"jobType": "QUERY", "integration": "FLINK", "processingType": "STREAMING"}}]
+      """;
 
   @BeforeAll
   public static void setUp() throws SQLException, MalformedURLException {
@@ -86,5 +92,26 @@ class JobMapperTest {
 
     Job actual = underTest.map(resultSet, mock(StatementContext.class));
     assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  void testMapJobTypeJobFacet() throws SQLException {
+    ResultSetMetaData resultSetMetaData = mock(ResultSetMetaData.class);
+
+    when(resultSet.getString(Columns.TYPE)).thenReturn("STREAM");
+    when(resultSet.getObject(Columns.TYPE)).thenReturn("STREAM");
+
+    when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
+    when(resultSetMetaData.getColumnCount()).thenReturn(1);
+    when(resultSetMetaData.getColumnName(1)).thenReturn(Columns.FACETS);
+
+    when(resultSet.getString(Columns.FACETS)).thenReturn(JOB_FACET);
+    when(resultSet.getObject(Columns.FACETS)).thenReturn(JOB_FACET);
+    JobMapper underTest = new JobMapper();
+
+    Job actual = underTest.map(resultSet, mock(StatementContext.class));
+
+    assertThat(actual.getType()).isEqualTo(JobType.STREAM);
+    assertThat(actual.getLabels()).containsExactly("QUERY", "FLINK");
   }
 }
