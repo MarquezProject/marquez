@@ -73,7 +73,7 @@ class OpenLineageDaoTest {
   /** When reading a dataset, the version is assumed to be the version last written */
   @Test
   void testUpdateMarquezModel() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -117,11 +117,9 @@ class OpenLineageDaoTest {
   @Test
   void testUpdateMarquezModelWithJobEvent() {
     JobFacet jobFacet =
-        new JobFacet(
-            DocumentationJobFacet.builder().description("documentation").build(),
-            null,
-            null,
-            LineageTestUtils.EMPTY_MAP);
+        JobFacet.builder()
+            .documentation(DocumentationJobFacet.builder().description("documentation").build())
+            .build();
 
     Job job = new Job(NAMESPACE, READ_JOB_NAME, jobFacet);
 
@@ -183,7 +181,7 @@ class OpenLineageDaoTest {
                         PRODUCER_URL, SCHEMA_URL, "TRUNCATE"))
                 .build());
 
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
@@ -195,7 +193,7 @@ class OpenLineageDaoTest {
 
   @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacet() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -247,7 +245,7 @@ class OpenLineageDaoTest {
 
   @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacetWhenInputFieldDoesNotExist() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -283,7 +281,7 @@ class OpenLineageDaoTest {
                                     TRANSFORMATION_TYPE)))))
                 .build());
 
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -334,7 +332,7 @@ class OpenLineageDaoTest {
                                     UPDATED_TRANSFORMATION_TYPE)))))
                 .build());
 
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob1 =
         LineageTestUtils.createLineageRow(
             dao,
@@ -385,7 +383,7 @@ class OpenLineageDaoTest {
                                 "symlinkNamespace", "symlinkName", "some-type"))))
                 .build());
 
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao, WRITE_JOB_NAME, "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
@@ -425,7 +423,7 @@ class OpenLineageDaoTest {
    */
   @Test
   void testUpdateMarquezModelWithInputOnlyDataset() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -449,7 +447,7 @@ class OpenLineageDaoTest {
    */
   @Test
   void testUpdateMarquezModelWithNonMatchingReadSchema() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -496,7 +494,7 @@ class OpenLineageDaoTest {
    */
   @Test
   void testUpdateMarquezModelWithPriorWrites() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob1 =
         LineageTestUtils.createLineageRow(
             dao,
@@ -569,7 +567,7 @@ class OpenLineageDaoTest {
 
   @Test
   void testGetOpenLineageEvents() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
             dao,
@@ -590,7 +588,7 @@ class OpenLineageDaoTest {
 
   @Test
   void testInputOutputDatasetFacets() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow lineageRow =
         LineageTestUtils.createLineageRow(
             dao,

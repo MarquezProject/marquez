@@ -14,6 +14,7 @@ import java.util.UUID;
 import marquez.api.JdbiUtils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.jdbi.v3.core.Jdbi;
 
 public class ColumnLineageTestUtils {
@@ -110,8 +111,7 @@ public class ColumnLineageTestUtils {
 
   public static UpdateLineageRow createLineage(
       OpenLineageDao openLineageDao, LineageEvent.Dataset input, LineageEvent.Dataset output) {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
     return LineageTestUtils.createLineageRow(
         openLineageDao,
         "job_" + UUID.randomUUID(),

@@ -111,6 +111,10 @@ BEGIN
                  LEFT JOIN aliases a ON a.link_target_uuid = j.uuid
              ) j
         WHERE jobs.uuid=j.uuid;
+        UPDATE job_versions_io_mapping
+        SET job_symlink_target_uuid=j.symlink_target_uuid
+        FROM jobs j
+        WHERE job_versions_io_mapping.job_uuid=j.uuid AND j.uuid = NEW.uuid;
     END IF;
     SELECT * INTO inserted_job FROM jobs_view
     WHERE uuid=job_uuid OR (new_symlink_target_uuid IS NOT NULL AND uuid=new_symlink_target_uuid);
