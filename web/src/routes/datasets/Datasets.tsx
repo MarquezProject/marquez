@@ -182,14 +182,18 @@ const Datasets: React.FC<DatasetsProps> = ({
                             )}
                           </TableCell>
                           <TableCell>
-                            <MqText
-                              link
-                              linkTo={`column-level/${encodeURIComponent(
-                                dataset.id.namespace
-                              )}/${encodeURIComponent(dataset.id.name)}`}
-                            >
-                              View
-                            </MqText>
+                            {dataset.columnLineage ? (
+                              <MqText
+                                link
+                                linkTo={`column-level/${encodeURIComponent(
+                                  dataset.id.namespace
+                                )}/${encodeURIComponent(dataset.id.name)}`}
+                              >
+                                View
+                              </MqText>
+                            ) : (
+                              <MqText>N/A</MqText>
+                            )}
                           </TableCell>
                         </TableRow>
                       )

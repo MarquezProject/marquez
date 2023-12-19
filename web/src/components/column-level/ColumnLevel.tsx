@@ -1,5 +1,5 @@
 import * as Redux from 'redux'
-import { ArrowBackIosRounded, CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
+import { ArrowBackIosRounded, CropFree, Refresh, ZoomIn, ZoomOut } from '@mui/icons-material'
 import { ColumnLineageGraph } from '../../types/api'
 import { Divider, Drawer, TextField, Tooltip } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'
@@ -101,10 +101,12 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
         borderColor={theme.palette.secondary.main}
       >
         <Box display={'flex'} alignItems={'center'}>
-          <IconButton size={'small'} sx={{ mr: 2 }} onClick={() => navigate('/datasets')}>
-            <ArrowBackIosRounded fontSize={'small'} />
-          </IconButton>
-          <MqText heading>Column Lineage</MqText>
+          <Tooltip title={'Back to datasets'}>
+            <IconButton size={'small'} sx={{ mr: 2 }} onClick={() => navigate('/datasets')}>
+              <ArrowBackIosRounded fontSize={'small'} />
+            </IconButton>
+          </Tooltip>
+          <MqText heading>Datasets</MqText>
           <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
           <Box>
             <MqText subdued>Namespace</MqText>
@@ -116,20 +118,36 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
             <MqText font={'mono'}>{name || 'Unknown dataset name'}</MqText>
           </Box>
         </Box>
-        <TextField
-          id='column-level-depth'
-          type='number'
-          label='Depth'
-          variant='outlined'
-          size='small'
-          sx={{ width: '80px' }}
-          value={depth}
-          onChange={(e) => {
-            setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))
-            searchParams.set('depth', e.target.value)
-            setSearchParams(searchParams)
-          }}
-        />
+        <Box display={'flex'} alignItems={'center'}>
+          <Tooltip title={'Refesh'}>
+            <IconButton
+              sx={{ mr: 2 }}
+              color={'primary'}
+              size={'small'}
+              onClick={() => {
+                if (namespace && name) {
+                  fetchColumnLineage('DATASET', namespace, name, depth)
+                }
+              }}
+            >
+              <Refresh fontSize={'small'} />
+            </IconButton>
+          </Tooltip>
+          <TextField
+            id='column-level-depth'
+            type='number'
+            label='Depth'
+            variant='outlined'
+            size='small'
+            sx={{ width: '80px' }}
+            value={depth}
+            onChange={(e) => {
+              setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))
+              searchParams.set('depth', e.target.value)
+              setSearchParams(searchParams)
+            }}
+          />
+        </Box>
       </Box>
       <Box height={'calc(100vh - 98px - 64px)'}>
         <Drawer
