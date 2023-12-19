@@ -55,7 +55,32 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
           transition: 'filter 0.3',
         }}
       />
-      <text x={8} y={16} textAnchor='top' fontSize={12} stroke={grey[400]}>
+      <text
+        onMouseEnter={() => {
+          setShine(true)
+          setSearchParams({
+            ...searchParams,
+            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+          })
+        }}
+        onMouseLeave={() => {
+          setShine(false)
+        }}
+        onClick={() => {
+          setSearchParams({
+            ...searchParams,
+            dataset: node.data.dataset,
+            namespace: node.data.namespace,
+            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+          })
+        }}
+        x={8}
+        y={16}
+        textAnchor='top'
+        fontSize={12}
+        cursor={'pointer'}
+        stroke={grey[400]}
+      >
         {truncateText(node.data.column, 25)}
       </text>
     </>
