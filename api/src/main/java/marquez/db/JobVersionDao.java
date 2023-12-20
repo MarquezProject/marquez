@@ -204,7 +204,7 @@ public interface JobVersionDao extends BaseDao {
     INSERT INTO job_versions_io_mapping (
       job_version_uuid, dataset_uuid, io_type, job_uuid, job_symlink_target_uuid, is_current_job_version, made_current_at)
     VALUES (:jobVersionUuid, :datasetUuid, :ioType, :jobUuid, :symlinkTargetJobUuid, TRUE, NOW())
-    ON CONFLICT (job_version_uuid, dataset_uuid, io_type, job_uuid) DO NOTHING
+    ON CONFLICT (job_version_uuid, dataset_uuid, io_type, job_uuid) DO UPDATE SET is_current_job_version = TRUE
   """)
   void upsertCurrentInputOrOutputDatasetFor(
       UUID jobVersionUuid,
