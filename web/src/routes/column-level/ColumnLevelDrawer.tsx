@@ -18,8 +18,8 @@ import { findConnectedNodes, parseColumnLineageNode } from './layout'
 import { useSearchParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
-import MqJsonView from '../core/json-view/MqJsonView'
-import MqText from '../core/text/MqText'
+import MqJsonView from '../../components/core/json-view/MqJsonView'
+import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
 
 const i18next = require('i18next')

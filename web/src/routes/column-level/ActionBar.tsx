@@ -5,7 +5,7 @@ import { theme } from '../../helpers/theme'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import MqText from '../core/text/MqText'
+import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
 interface ActionBarProps {
