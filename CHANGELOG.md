@@ -1,11 +1,13 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.43.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.43.1...HEAD)
+
+## [0.43.1](https://github.com/MarquezProject/marquez/compare/0.43.0...0.43.1) - 2023-12-20
 
 ### Fixed
 
-* API: fix broken lineage graph for multiple runs of the same job.[`#2710`](https://github.com/MarquezProject/marquez/pull/2710) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
-   *Problem: lineage graph was not available for jobs run multiple times of the same job as a result of bug introduced with recent release.
+* API: fix broken lineage graph for multiple runs of the same job [`#2710`](https://github.com/MarquezProject/marquez/pull/2710) [@pawel-big-lebowski](https://github.com/pawel-big-lebowski)  
+    *Problem: lineage graph was not available for jobs run multiple times of the same job as a result of bug introduced with recent release.
     In order to fix the inconsistent data, [this `UPDATE` query](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/db/migrations/V67_2_JobVersionsIOMappingBackfillJob.java#L19)
     should be run. This is **not** required when upgrading directly to `0.43.0`.*
 
