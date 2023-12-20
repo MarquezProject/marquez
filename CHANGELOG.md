@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.43.0...HEAD)
 
+### Fixed:
+* API: fix broken lineage graph for multiple runs of the same job.[`#2710`](https://github.com/MarquezProject/marquez/pull/2710) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski)  
+   *Problem: lineage graph was not available for jobs run multiple times of the same job as a result of bug introduced with recent release. In order to fix the inconsistent data, [this query](https://github.com/MarquezProject/marquez/blob/83608bb13bd4dc235c065f95bebf8a88dcb53c61/api/src/main/java/marquez/db/migrations/V67_2_JobVersionsIOMappingBackfillJob.java#L19) should be run. This is not required when upgrading directly to this version.*
+
 ## [0.43.0](https://github.com/MarquezProject/marquez/compare/0.42.0...0.43.0) - 2023-12-15
 ### Added
 * API: refactor the `RunDao` SQL query [`#2685`](https://github.com/MarquezProject/marquez/pull/2685) [@sophiely](https://github.com/sophiely)  

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import marquez.api.JdbiUtils;
 import marquez.common.models.DatasetId;
@@ -56,6 +57,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageServiceTest {
@@ -425,6 +427,77 @@ public class LineageServiceTest {
         .first()
         .extracting(Edge::getDestination)
         .matches(n -> n.isJobType() && n.asJobId().getName().getValue().equals("writeJob"));
+  }
+
+  @Test
+  public void testGetLineageJobRunTwice() {
+    Dataset input = Dataset.builder().name("input-dataset").namespace(NAMESPACE).build();
+    Dataset output = Dataset.builder().name("output-dataset").namespace(NAMESPACE).build();
+    UUID runId = UUID.randomUUID();
+
+    // (1) Run batch job which outputs input-dataset
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "START",
+        jobFacet,
+        Arrays.asList(input),
+        Collections.emptyList(),
+        null,
+        ImmutableMap.of());
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Arrays.asList(output),
+        null,
+        ImmutableMap.of());
+
+    // (2) Rerun it
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "START",
+        jobFacet,
+        Arrays.asList(input),
+        Collections.emptyList(),
+        null,
+        ImmutableMap.of());
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Arrays.asList(output),
+        null,
+        ImmutableMap.of());
+
+    // (4) lineage on output dataset shall be same as lineage on input dataset
+    Lineage lineageFromInput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("input-dataset"))),
+            5,
+            true);
+
+    Lineage lineageFromOutput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("output-dataset"))),
+            5,
+            true);
+
+    assertThat(lineageFromInput.getGraph()).hasSize(3); // 2 datasets + 1 job
+    assertThat(lineageFromInput.getGraph()).isEqualTo(lineageFromOutput.getGraph());
   }
 
   @Test
