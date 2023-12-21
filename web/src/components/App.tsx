@@ -22,6 +22,7 @@ import Jobs from '../routes/jobs/Jobs'
 import Lineage from './lineage/Lineage'
 import React, { ReactElement } from 'react'
 import Sidenav from './sidenav/Sidenav'
+import TableLevel from '../routes/table-level/TableLevel'
 import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
@@ -77,6 +78,10 @@ const App = (): ReactElement => {
                           <BottomBar />
                         </>
                       }
+                    />
+                    <Route
+                      path={'/lineage-v2/:nodeType/:namespace/:name'}
+                      element={<TableLevel />}
                     />
                   </Routes>
                   <Toast />

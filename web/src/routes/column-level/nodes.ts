@@ -13,8 +13,8 @@ export interface ColumnLineageDatasetNodeData {
   dataset: string
 }
 
-export type MultipleNodeKind = 'dataset' | 'column'
-export type MultipleNodeData = ColumnLineageDatasetNodeData | ColumnLineageColumnNodeData
+export type ColumnLevelNodeKinds = 'dataset' | 'column'
+export type ColumnLevelNodeData = ColumnLineageDatasetNodeData | ColumnLineageColumnNodeData
 
-export const columnLevelNodeRenderer: NodeRendererMap<MultipleNodeKind, MultipleNodeData> =
+export const columnLevelNodeRenderer: NodeRendererMap<ColumnLevelNodeKinds, ColumnLevelNodeData> =
   new Map().set('dataset', ColumnLineageDatasetNode).set('column', ColumnLineageColumnNode)

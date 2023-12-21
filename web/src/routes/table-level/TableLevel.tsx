@@ -1,29 +1,29 @@
 import * as Redux from 'redux'
 import { ActionBar } from './ActionBar'
-import {ColumnLevelNodeKinds, ColumnLineageColumnNodeData, columnLevelNodeRenderer, ColumnLevelNodeData} from './nodes'
-import { ColumnLineageGraph } from '../../types/api'
+import { Box } from '@mui/system'
 import { Drawer } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'
 import { IState } from '../../store/reducers'
-import { ZoomControls } from './ZoomControls'
+import { JobOrDataset } from '../../components/lineage/types'
+import { LineageGraph } from '../../types/api'
+import { TableLevelNodeData, tableLevelNodeRenderer } from './nodes'
+import { ZoomControls } from '../column-level/ZoomControls'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { createElkNodes, parseColumnLineageNode } from './layout'
-import { fetchColumnLineage } from '../../store/actionCreators'
+import { createElkNodes } from './layout'
+import { fetchLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
-import Box from '@mui/material/Box'
-import ColumnLevelDrawer from './ColumnLevelDrawer'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React, { useEffect, useRef, useState } from 'react'
 
 interface StateProps {
-  columnLineage: ColumnLineageGraph
+  lineage: LineageGraph
 }
 
 interface DispatchProps {
-  fetchColumnLineage: typeof fetchColumnLineage
+  fetchLineage: typeof fetchLineage
 }
 
 type ColumnLevelProps = StateProps & DispatchProps
@@ -32,10 +32,10 @@ const zoomInFactor = 1.5
 const zoomOutFactor = 1 / zoomInFactor
 
 const ColumnLevel: React.FC<ColumnLevelProps> = ({
-  fetchColumnLineage: fetchColumnLineage,
-  columnLineage: columnLineage,
+  fetchLineage: fetchLineage,
+  lineage: lineage,
 }: ColumnLevelProps) => {
-  const { namespace, name } = useParams()
+  const { nodeType, namespace, name } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
@@ -43,21 +43,12 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   const graphControls = useRef<ZoomPanControls>()
 
   useEffect(() => {
-    if (name && namespace) {
-      fetchColumnLineage('DATASET', namespace, name, depth)
+    if (name && namespace && nodeType) {
+      fetchLineage(nodeType as JobOrDataset, namespace, name, depth)
     }
   }, [name, namespace, depth])
 
-  const column = searchParams.get('column')
-  useEffect(() => {
-    if (column) {
-      graphControls.current?.centerOnPositionedNode(
-        `datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`
-      )
-    }
-  }, [column])
-
-  if (!columnLineage) {
+  if (!lineage) {
     return <div />
   }
 
@@ -73,7 +64,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     graphControls.current = zoomControls
   })
 
-  const { nodes, edges } = createElkNodes(columnLineage, searchParams.get('column'))
+  const { nodes, edges } = createElkNodes(lineage)
 
   useEffect(() => {
     setTimeout(() => {
@@ -83,21 +74,19 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   return (
     <>
-      <ActionBar fetchColumnLineage={fetchColumnLineage} depth={depth} setDepth={setDepth} />
+      <ActionBar nodeType={'JOB'} fetchLineage={fetchLineage} depth={depth} setDepth={setDepth} />
       <Box height={'calc(100vh - 98px - 64px)'}>
         <Drawer
           anchor={'right'}
           open={!!searchParams.get('dataset')}
           onClose={() => setSearchParams({})}
         >
-          <Box sx={{ pt: '98px' }}>
-            <ColumnLevelDrawer />
-          </Box>
+          <Box sx={{ pt: '98px' }}></Box>
         </Drawer>
         <ZoomControls handleScaleZoom={handleScaleZoom} handleResetZoom={handleResetZoom} />
         <ParentSize>
           {(parent) => (
-            <Graph<ColumnLevelNodeKinds, ColumnLevelNodeData>
+            <Graph<JobOrDataset, TableLevelNodeData>
               id='column-level-graph'
               backgroundColor={theme.palette.background.default}
               height={parent.height}
@@ -105,7 +94,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
               nodes={nodes}
               edges={edges}
               direction='right'
-              nodeRenderers={columnLevelNodeRenderer}
+              nodeRenderers={tableLevelNodeRenderer}
               setZoomPanControls={setGraphControls}
             />
           )}
@@ -116,13 +105,13 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 }
 
 const mapStateToProps = (state: IState) => ({
-  columnLineage: state.columnLineage.columnLineage,
+  lineage: state.lineage.lineage,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchColumnLineage: fetchColumnLineage,
+      fetchLineage: fetchLineage,
     },
     dispatch
   )

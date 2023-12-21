@@ -1,6 +1,6 @@
+import { ColumnLevelNodeData, ColumnLevelNodeKinds } from './nodes'
 import { ColumnLineageGraph, ColumnLineageNode } from '../../types/api'
 import { Edge, Node as ElkNode } from '../../../libs/graph'
-import { MultipleNodeData, MultipleNodeKind } from './nodes'
 import { Nullable } from '../../types/util/Nullable'
 import { theme } from '../../helpers/theme'
 
@@ -53,7 +53,7 @@ export const createElkNodes = (
   columnLineageGraph: ColumnLineageGraph,
   currentColumn: Nullable<string>
 ) => {
-  const nodes: ElkNode<MultipleNodeKind, MultipleNodeData>[] = []
+  const nodes: ElkNode<ColumnLevelNodeKinds, ColumnLevelNodeData>[] = []
   const edges: Edge[] = []
 
   const connectedNodes = findConnectedNodes(columnLineageGraph, currentColumn)
