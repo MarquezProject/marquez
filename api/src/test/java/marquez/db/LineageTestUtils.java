@@ -116,13 +116,48 @@ public class LineageTestUtils {
       List<Dataset> outputs,
       @Valid LineageEvent.ParentRunFacet parentRunFacet,
       ImmutableMap<String, Object> runFacets) {
+    return createLineageRow(
+        dao,
+        jobName,
+        UUID.randomUUID(),
+        status,
+        jobFacet,
+        inputs,
+        outputs,
+        parentRunFacet,
+        runFacets);
+  }
+
+  /**
+   * Create an {@link UpdateLineageRow} from the input job details and datasets.
+   *
+   * @param dao
+   * @param jobName
+   * @param runId
+   * @param status
+   * @param jobFacet
+   * @param inputs
+   * @param outputs
+   * @param parentRunFacet
+   * @param runFacets
+   * @return
+   */
+  public static UpdateLineageRow createLineageRow(
+      OpenLineageDao dao,
+      String jobName,
+      UUID runId,
+      String status,
+      JobFacet jobFacet,
+      List<Dataset> inputs,
+      List<Dataset> outputs,
+      @Valid LineageEvent.ParentRunFacet parentRunFacet,
+      ImmutableMap<String, Object> runFacets) {
     NominalTimeRunFacet nominalTimeRunFacet = new NominalTimeRunFacet();
     nominalTimeRunFacet.setNominalStartTime(
         Instant.now().atZone(LOCAL_ZONE).truncatedTo(ChronoUnit.HOURS));
     nominalTimeRunFacet.setNominalEndTime(
         nominalTimeRunFacet.getNominalStartTime().plus(1, ChronoUnit.HOURS));
 
-    UUID runId = UUID.randomUUID();
     LineageEvent event =
         LineageEvent.builder()
             .eventType(status)
