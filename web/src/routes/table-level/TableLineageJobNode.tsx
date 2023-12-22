@@ -9,7 +9,7 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { grey } from '@mui/material/colors'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import React from 'react'
@@ -28,11 +28,12 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
   const navigate = useNavigate()
   const { name, namespace } = useParams()
   const isSelected = name === node.data.job.name && namespace === node.data.job.namespace
-  const [searchParams, setSearchParams] = useSearchParams()
   const handleClick = () => {
-    navigate(`/lineage-v2/job/${node.data.job.namespace}/${node.data.job.name}`)
-    searchParams.set('tableLevelNode', node.id)
-    setSearchParams(searchParams)
+    navigate(
+      `/lineage-v2/job/${node.data.job.namespace}/${
+        node.data.job.name
+      }?tableLevelNode=${encodeURIComponent(node.id)}`
+    )
   }
 
   const addToToolTip = (job: LineageJob) => {
