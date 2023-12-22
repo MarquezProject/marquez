@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { grey } from '@mui/material/colors'
 import { truncateText } from '../../helpers/text'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import React from 'react'
@@ -27,6 +27,7 @@ const COMPACT_HEIGHT = 24
 
 const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateProps) => {
   const isCompact = node.height === COMPACT_HEIGHT
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const navigate = useNavigate()
   const { name, namespace } = useParams()
@@ -34,6 +35,9 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
 
   const handleClick = () => {
     navigate(`/lineage-v2/dataset/${node.data.dataset.namespace}/${node.data.dataset.name}`)
+
+    searchParams.set('tableLevelNode', node.id)
+    setSearchParams(searchParams)
   }
 
   const addToToolTip = (dataset: LineageDataset) => {

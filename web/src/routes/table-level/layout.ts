@@ -5,15 +5,6 @@ import { JobOrDataset, LineageDataset, LineageJob } from '../../components/linea
 import { TableLevelNodeData } from './nodes'
 import { theme } from '../../helpers/theme'
 
-/**
- Node of format dataset:food_delivery:public.categories
- Node of format {type}:{namespace}:{name}
- */
-export const parseTableLineageNode = (node: string) => {
-  const [type, namespace, dataset] = node.split(':')
-  return { type, namespace, dataset }
-}
-
 export const createElkNodes = (lineageGraph: LineageGraph, isCompact: boolean) => {
   const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
   const edges: Edge[] = []

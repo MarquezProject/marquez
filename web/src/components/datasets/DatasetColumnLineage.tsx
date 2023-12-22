@@ -33,6 +33,11 @@ type IProps = DatasetColumnLineageProps & DispatchProps & StateProps
 
 const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
   const { dataset, lineageDataset, fetchDataset, resetDataset } = props
+
+  if (!dataset) {
+    return null
+  }
+
   const columnLineage = dataset.columnLineage
 
   useEffect(() => {

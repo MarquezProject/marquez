@@ -17,6 +17,7 @@ import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React, { useEffect, useRef, useState } from 'react'
+import TableLevelDrawer from './TableLevelDrawer'
 
 interface StateProps {
   lineage: LineageGraph
@@ -87,10 +88,12 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
       <Box height={'calc(100vh - 98px - 64px)'}>
         <Drawer
           anchor={'right'}
-          open={!!searchParams.get('dataset')}
+          open={!!searchParams.get('tableLevelNode')}
           onClose={() => setSearchParams({})}
         >
-          <Box sx={{ pt: '98px' }}></Box>
+          <Box sx={{ pt: '98px' }}>
+            <TableLevelDrawer />
+          </Box>
         </Drawer>
         <ZoomControls handleScaleZoom={handleScaleZoom} handleResetZoom={handleResetZoom} />
         <ParentSize>

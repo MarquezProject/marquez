@@ -83,17 +83,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
   const tagData = useSelector((state: IState) => state.tags.tags)
 
-  useEffect(() => {
-    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
-    fetchTags()
-  }, [props.lineageDataset.name])
-
-  useEffect(() => {
-    if (datasets.deletedDatasetName) {
-      navigate('/datasets')
-    }
-  }, [datasets.deletedDatasetName])
-
   // unmounting
   useEffect(
     () => () => {
@@ -102,6 +91,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     },
     []
   )
+
+  useEffect(() => {
+    fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+    fetchTags()
+  }, [lineageDataset.name])
+
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      navigate('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   const handleChange = (_: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
@@ -124,7 +124,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    const theme = createTheme(useTheme())
     return (
       <>
         {tags.map((tag, index) => {
