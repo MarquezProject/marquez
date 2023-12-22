@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageGraph } from '../../types/api'
+import { LineageJob } from '../../components/lineage/types'
 import { PositionedNode } from '../../../libs/graph'
 import { TableLineageJobNodeData } from './nodes'
 import { connect } from 'react-redux'
@@ -8,7 +9,9 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { grey } from '@mui/material/colors'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
+import { useNavigate, useParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import React from 'react'
 
 interface StateProps {
@@ -22,36 +25,64 @@ interface TableLineageJobNodeProps {
 const ICON_SIZE = 12
 
 const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) => {
+  const navigate = useNavigate()
+  const { name, namespace } = useParams()
+  const isSelected = name === node.data.job.name && namespace === node.data.job.namespace
+  const handleClick = () => {
+    navigate(`/lineage-v2/job/${node.data.job.namespace}/${node.data.job.name}`)
+  }
+
+  const addToToolTip = (job: LineageJob) => {
+    return (
+      <>
+        <b>{'Namespace: '}</b>
+        {job.namespace}
+        <br></br>
+        <b>{'Name: '}</b>
+        {job.name}
+        <br></br>
+        <b>{'Description: '}</b>
+        {job.description === null ? 'No Description' : job.description}
+        <br></br>
+      </>
+    )
+  }
+
   return (
-    <>
-      <Box
-        component={'rect'}
-        sx={{
-          x: 0,
-          y: 0,
-          width: node.width,
-          height: node.height,
-          stroke: grey['100'],
-          rx: 4,
-          fill: grey['900'],
-          cursor: 'pointer',
-          transition: 'filter 0.3',
-        }}
-      />
-      <FontAwesomeIcon
-        aria-hidden={'true'}
-        title={'Job'}
-        icon={faCog}
-        width={ICON_SIZE}
-        height={ICON_SIZE}
-        x={4}
-        y={ICON_SIZE / 2}
-        color={theme.palette.primary.main}
-      />
-      <text fontSize='8' fill={'white'} x={20} y={14}>
-        {truncateText(node.data.job.name, 15)}
-      </text>
-    </>
+    <MQTooltip title={addToToolTip(node.data.job)}>
+      <g>
+        <Box
+          component={'rect'}
+          sx={{
+            x: 0,
+            y: 0,
+            width: node.width,
+            height: node.height,
+            stroke: isSelected ? theme.palette.primary.main : grey['100'],
+            rx: 4,
+            fill: grey['900'],
+            cursor: 'pointer',
+            transition: 'filter 0.3',
+          }}
+          onClick={handleClick}
+        />
+        <FontAwesomeIcon
+          aria-hidden={'true'}
+          title={'Job'}
+          icon={faCog}
+          width={ICON_SIZE}
+          height={ICON_SIZE}
+          x={4}
+          y={ICON_SIZE / 2}
+          color={theme.palette.primary.main}
+          cursor={'pointer'}
+          onClick={handleClick}
+        />
+        <text fontSize='8' fill={'white'} x={20} y={14} onClick={handleClick} cursor={'pointer'}>
+          {truncateText(node.data.job.name, 15)}
+        </text>
+      </g>
+    </MQTooltip>
   )
 }
 

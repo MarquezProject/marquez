@@ -49,7 +49,7 @@ export const ActionBar = ({
           <IconButton
             size={'small'}
             sx={{ mr: 2 }}
-            onClick={() => navigate(nodeType === 'JOB' ? '/jobs' : '/datasets')}
+            onClick={() => navigate(nodeType === 'JOB' ? '/' : '/datasets')}
           >
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>

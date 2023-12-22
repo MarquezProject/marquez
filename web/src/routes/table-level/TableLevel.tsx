@@ -77,7 +77,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   return (
     <>
       <ActionBar
-        nodeType={nodeType as JobOrDataset}
+        nodeType={nodeType?.toUpperCase() as JobOrDataset}
         fetchLineage={fetchLineage}
         depth={depth}
         setDepth={setDepth}

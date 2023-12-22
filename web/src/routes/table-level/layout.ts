@@ -34,7 +34,7 @@ export const createElkNodes = (lineageGraph: LineageGraph, isCompact: boolean) =
       nodes.push({
         id: node.id,
         kind: node.type,
-        width: 96,
+        width: 112,
         height: 24,
         data: {
           job: node.data as LineageJob,
@@ -45,7 +45,7 @@ export const createElkNodes = (lineageGraph: LineageGraph, isCompact: boolean) =
       nodes.push({
         id: node.id,
         kind: node.type,
-        width: 96,
+        width: 112,
         height: isCompact ? 24 : 34 + data.fields.length * 10,
         data: {
           dataset: data,
