@@ -67,7 +67,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     graphControls.current = zoomControls
   })
 
-  const { nodes, edges } = createElkNodes(lineage, isCompact)
+  const { nodes, edges } = createElkNodes(lineage, `${nodeType}:${namespace}:${name}`, isCompact)
 
   useEffect(() => {
     setTimeout(() => {

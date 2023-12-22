@@ -71,7 +71,7 @@ const App = (): ReactElement => {
                       element={<ColumnLevel />}
                     />
                     <Route
-                      path={'/lineage/:nodeType/:namespace/:nodeName'}
+                      path={'/lineage/:nodeType/:namespace/:name'}
                       element={
                         <>
                           <Lineage />
