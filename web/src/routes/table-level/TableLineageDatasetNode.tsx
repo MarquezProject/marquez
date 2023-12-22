@@ -34,7 +34,7 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
 
   const handleClick = () => {
     navigate(
-      `/lineage-v2/dataset/${node.data.dataset.namespace}/${
+      `/lineage/dataset/${node.data.dataset.namespace}/${
         node.data.dataset.name
       }?tableLevelNode=${encodeURIComponent(node.id)}`
     )

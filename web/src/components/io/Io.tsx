@@ -37,7 +37,7 @@ function determineName(node: string) {
 }
 
 export const determineLink = (current: LineageNode, edge: string) => {
-  return `/lineage-v2/${encodeNode(
+  return `/lineage/${encodeNode(
     current.type === 'JOB' ? 'DATASET' : 'JOB',
     edge.split(':')[1],
     determineName(edge)

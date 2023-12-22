@@ -72,15 +72,6 @@ const App = (): ReactElement => {
                     />
                     <Route
                       path={'/lineage/:nodeType/:namespace/:name'}
-                      element={
-                        <>
-                          <Lineage />
-                          <BottomBar />
-                        </>
-                      }
-                    />
-                    <Route
-                      path={'/lineage-v2/:nodeType/:namespace/:name'}
                       element={<TableLevel />}
                     />
                   </Routes>
