@@ -14,7 +14,7 @@ export const parseTableLineageNode = (node: string) => {
   return { type, namespace, dataset }
 }
 
-export const createElkNodes = (lineageGraph: LineageGraph) => {
+export const createElkNodes = (lineageGraph: LineageGraph, isCompact: boolean) => {
   const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
   const edges: Edge[] = []
 
@@ -34,20 +34,21 @@ export const createElkNodes = (lineageGraph: LineageGraph) => {
       nodes.push({
         id: node.id,
         kind: node.type,
-        width: 64,
-        height: 64,
+        width: 96,
+        height: 24,
         data: {
           job: node.data as LineageJob,
         },
       })
     } else if (node.type === 'DATASET') {
+      const data = node.data as LineageDataset
       nodes.push({
         id: node.id,
         kind: node.type,
-        width: 64,
-        height: 64,
+        width: 96,
+        height: isCompact ? 24 : 34 + data.fields.length * 10,
         data: {
-          dataset: node.data as LineageDataset,
+          dataset: data,
         },
       })
     }

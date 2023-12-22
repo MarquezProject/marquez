@@ -40,6 +40,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
+  const [isCompact, setIsCompact] = useState(false)
+
   const graphControls = useRef<ZoomPanControls>()
 
   useEffect(() => {
@@ -64,17 +66,24 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     graphControls.current = zoomControls
   })
 
-  const { nodes, edges } = createElkNodes(lineage)
+  const { nodes, edges } = createElkNodes(lineage, isCompact)
 
   useEffect(() => {
     setTimeout(() => {
       graphControls.current?.fitContent()
     }, 300)
-  }, [nodes.length])
+  }, [nodes.length, isCompact])
 
   return (
     <>
-      <ActionBar nodeType={'JOB'} fetchLineage={fetchLineage} depth={depth} setDepth={setDepth} />
+      <ActionBar
+        nodeType={nodeType as JobOrDataset}
+        fetchLineage={fetchLineage}
+        depth={depth}
+        setDepth={setDepth}
+        isCompact={isCompact}
+        setIsCompact={setIsCompact}
+      />
       <Box height={'calc(100vh - 98px - 64px)'}>
         <Drawer
           anchor={'right'}

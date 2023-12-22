@@ -1,5 +1,5 @@
 import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
-import { Divider, TextField, Tooltip } from '@mui/material'
+import { Divider, FormControlLabel, Switch, TextField, Tooltip } from '@mui/material'
 import { fetchLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -13,9 +13,18 @@ interface ActionBarProps {
   fetchLineage: typeof fetchLineage
   depth: number
   setDepth: (depth: number) => void
+  isCompact: boolean
+  setIsCompact: (isCompact: boolean) => void
 }
 
-export const ActionBar = ({ nodeType, fetchLineage, depth, setDepth }: ActionBarProps) => {
+export const ActionBar = ({
+  nodeType,
+  fetchLineage,
+  depth,
+  setDepth,
+  isCompact,
+  setIsCompact,
+}: ActionBarProps) => {
   const { namespace, name } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -83,13 +92,24 @@ export const ActionBar = ({ nodeType, fetchLineage, depth, setDepth }: ActionBar
           label='Depth'
           variant='outlined'
           size='small'
-          sx={{ width: '80px' }}
+          sx={{ width: '80px', mr: 2 }}
           value={depth}
           onChange={(e) => {
             setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))
             searchParams.set('depth', e.target.value)
             setSearchParams(searchParams)
           }}
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              value={isCompact}
+              onChange={(_, checked) => {
+                setIsCompact(checked)
+              }}
+            />
+          }
+          label='Compact?'
         />
       </Box>
     </Box>
