@@ -108,6 +108,38 @@ export const deleteDatasetSuccess = (datasetName: string) => ({
   },
 })
 
+export const deleteDatasetTag = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.DELETE_DATASET_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+  },
+})
+
+export const deleteDatasetTagSuccess = (datasetName: string) => ({
+  type: actionTypes.DELETE_DATASET_TAG_SUCCESS,
+  payload: {
+    datasetName,
+  },
+})
+
+export const addDatasetTag = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.ADD_DATASET_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+  },
+})
+
+export const addDatasetTagSuccess = (datasetName: string) => ({
+  type: actionTypes.ADD_DATASET_TAG_SUCCESS,
+  payload: {
+    datasetName,
+  },
+})
+
 export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS,
 })
