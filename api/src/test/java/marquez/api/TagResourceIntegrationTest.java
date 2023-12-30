@@ -62,4 +62,42 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     // assert that only PII remains
     assertThat(taggedDeleteDataset.getTags()).containsExactly("PII");
   }
+
+  @Test
+  public void testApp_testDatasetTagFieldDelete() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create a source
+    createSource(DB_TABLE_SOURCE_NAME);
+    // Create Dataset
+    MARQUEZ_CLIENT.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    // tag dataset field
+    Dataset taggedDatasetField =
+        MARQUEZ_CLIENT.tagFieldWith(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+    // assert the tag TESTFIELDTAG has been added to field at position 0
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).contains("TESTFIELDTAG");
+    // assert a total of two tags exist on the field
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).hasSize(2);
+
+    // delete the field tag TESTFIELDTAG from the dataset field at position 0
+    Dataset taggedDatasetFieldDelete =
+        MARQUEZ_CLIENT.deleteDatasetFieldTag(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+
+    // Test that the tag TESTDATASETTAG is deleted from the dataset field at position 0
+    assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags())
+        .doesNotContain("TESTFIELDTAG");
+    // assert the number of tags on the field should be 1
+    assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags()).hasSize(1);
+    // assert that only SENSITIVE remains
+    assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags()).containsExactly("SENSITIVE");
+  }
 }

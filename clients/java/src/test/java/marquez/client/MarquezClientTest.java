@@ -1017,6 +1017,21 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testDeleteTagField() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/datasets/%s/fields/%s/tags/%s",
+            NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
+    when(http.delete(url)).thenReturn(runAsJson);
+
+    final Dataset dataset =
+        client.deleteDatasetFieldTag(NAMESPACE_NAME, DB_TABLE_NAME, "field", "tag_name");
+    assertThat(dataset).isEqualTo(DB_TABLE);
+  }
+
+  @Test
   public void testListTags() throws Exception {
     ImmutableSet<Tag> expectedTags =
         ImmutableSet.of(new Tag("tag1", "a tag"), new Tag("tag2", "another tag"));

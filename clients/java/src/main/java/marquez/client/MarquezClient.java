@@ -256,6 +256,16 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
+  public Dataset deleteDatasetFieldTag(
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      @NonNull String fieldName,
+      @NonNull String tagName) {
+    final String bodyAsJson =
+        http.delete(url.toFieldTagURL(namespaceName, datasetName, fieldName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
   /**
    * @deprecated Prefer OpenLineage, see <a
    *     href="https://openlineage.io">https://openlineage.io</a>. This method is scheduled to be
