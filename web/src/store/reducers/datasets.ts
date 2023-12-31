@@ -64,13 +64,13 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case DELETE_DATASET_SUCCESS:
       return { ...state, deletedDatasetName: payload.datasetName }
     case DELETE_DATASET_TAG:
-      return { ...state, refreshTags: true }
+      return { ...state, refreshTags: false }
     case DELETE_DATASET_TAG_SUCCESS:
-      return { ...state, result: payload.datasets, refreshTags: false }
-    case ADD_DATASET_TAG:
       return { ...state, refreshTags: true }
+    case ADD_DATASET_TAG:
+      return { ...state, refreshTags: false }
     case ADD_DATASET_TAG_SUCCESS:
-      return { ...state, result: payload.datasets, refreshTags: false }
+      return { ...state, refreshTags: true }
     default:
       return state
   }
