@@ -13,13 +13,11 @@ import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from '@redux-devtools/extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
-import BottomBar from './bottom-bar/BottomBar'
 import ColumnLevel from '../routes/column-level/ColumnLevel'
 import Datasets from '../routes/datasets/Datasets'
 import Events from '../routes/events/Events'
 import Header from './header/Header'
 import Jobs from '../routes/jobs/Jobs'
-import Lineage from './lineage/Lineage'
 import React, { ReactElement } from 'react'
 import Sidenav from './sidenav/Sidenav'
 import TableLevel from '../routes/table-level/TableLevel'
@@ -70,10 +68,7 @@ const App = (): ReactElement => {
                       path={'/datasets/column-level/:namespace/:name'}
                       element={<ColumnLevel />}
                     />
-                    <Route
-                      path={'/lineage/:nodeType/:namespace/:name'}
-                      element={<TableLevel />}
-                    />
+                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
                   </Routes>
                   <Toast />
                 </Box>
