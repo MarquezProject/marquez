@@ -3,19 +3,9 @@
 
 import * as Effects from 'redux-saga/effects'
 import {
-  ColumnLineageGraph,
-  Dataset,
-  DatasetVersion,
-  Datasets,
-  Events,
-  Facets,
-  Jobs,
-  LineageGraph,
-  Namespaces,
-  Tags,
-} from '../../types/api'
-import {
+  ADD_DATASET_TAG,
   DELETE_DATASET,
+  DELETE_DATASET_TAG,
   DELETE_JOB,
   FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
@@ -29,15 +19,46 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
+import {
+  ColumnLineageGraph,
+  Dataset,
+  DatasetVersion,
+  Datasets,
+  Events,
+  Facets,
+  Jobs,
+  LineageGraph,
+  Namespaces,
+  Tags,
+} from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
 
 const call: any = Effects.call
 
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
+
 import {
+  addDatasetTag,
+  deleteDataset,
+  deleteDatasetTag,
+  deleteJob,
+  getDataset,
+  getDatasetVersions,
+  getDatasets,
+  getEvents,
+  getJobFacets,
+  getJobs,
+  getNamespaces,
+  getRunFacets,
+  getRuns,
+  getTags,
+} from '../requests'
+import {
+  addDatasetTagSuccess,
   applicationError,
   deleteDatasetSuccess,
+  deleteDatasetTagSuccess,
   deleteJobSuccess,
   fetchColumnLineageSuccess,
   fetchDatasetSuccess,
@@ -52,20 +73,6 @@ import {
   fetchSearchSuccess,
   fetchTagsSuccess,
 } from '../actionCreators'
-import {
-  deleteDataset,
-  deleteJob,
-  getDataset,
-  getDatasetVersions,
-  getDatasets,
-  getEvents,
-  getJobFacets,
-  getJobs,
-  getNamespaces,
-  getRunFacets,
-  getRuns,
-  getTags,
-} from '../requests'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
@@ -233,6 +240,40 @@ export function* deleteDatasetSaga() {
   }
 }
 
+export function* deleteDatasetTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET_TAG)
+      const dataset: Dataset = yield call(
+        deleteDatasetTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag
+      )
+      yield put(deleteDatasetTagSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from dataset'))
+    }
+  }
+}
+
+export function* addDatasetTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_DATASET_TAG)
+      const dataset: Dataset = yield call(
+        addDatasetTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag
+      )
+      yield put(addDatasetTagSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to dataset'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -289,6 +330,8 @@ export default function* rootSaga(): Generator {
     fetchSearch(),
     deleteJobSaga(),
     deleteDatasetSaga(),
+    deleteDatasetTagSaga(),
+    addDatasetTagSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

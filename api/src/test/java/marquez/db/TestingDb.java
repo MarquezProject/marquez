@@ -186,8 +186,10 @@ final class TestingDb {
             row.getJobName(),
             row.getNamespaceUuid(),
             row.getNamespaceName());
-    row.getInputUuids().forEach(in -> dao.upsertInputDatasetFor(row.getUuid(), in));
-    row.getInputUuids().forEach(out -> dao.upsertInputDatasetFor(row.getUuid(), out));
+    row.getInputUuids()
+        .forEach(in -> dao.upsertInputDatasetFor(row.getUuid(), in, row.getJobUuid(), null));
+    row.getInputUuids()
+        .forEach(out -> dao.upsertInputDatasetFor(row.getUuid(), out, row.getJobUuid(), null));
     // ...
     delegate.onDemand(JobDao.class).updateVersionFor(row.getJobUuid(), NOW, upserted.getUuid());
     return upserted;

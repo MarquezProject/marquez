@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import marquez.common.Utils;
 import marquez.common.models.FlexibleDateTimeDeserializer;
+import marquez.service.models.LineageEvent.JobTypeJobFacet;
+import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -94,5 +96,17 @@ public class LineageEventTest {
                 FlexibleDateTimeDeserializer.DATE_TIME_OPTIONAL_OFFSET.format(zonedDateTime)));
     JsonNode actualNode = mapper.readTree(serialized);
     assertThat(actualNode).isEqualTo(expectedNode);
+  }
+
+  @Test
+  public void testJobTypeJobFacetSerialization() throws IOException {
+    URL expectedResource = Resources.getResource(EVENT_FULL);
+    LineageEvent deserialized =
+        (LineageEvent) Utils.newObjectMapper().readValue(expectedResource, BaseEvent.class);
+    JobTypeJobFacet facet = deserialized.getJob().getFacets().getJobType();
+
+    assertThat(facet.getJobType()).isEqualTo("QUERY");
+    assertThat(facet.getIntegration()).isEqualTo("FLINK");
+    assertThat(facet.getProcessingType()).isEqualTo("STREAMING");
   }
 }

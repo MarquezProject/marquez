@@ -15,7 +15,6 @@ import {
   deleteDataset,
   dialogToggle,
   fetchDatasetVersions,
-  fetchTags,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
@@ -25,6 +24,7 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
+import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
@@ -50,7 +50,6 @@ interface DispatchProps {
   deleteDataset: typeof deleteDataset
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
-  fetchTags: typeof fetchTags
 }
 
 type IProps = StateProps & DispatchProps
@@ -76,7 +75,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     lineageDataset,
     tabIndex,
     setTabIndex,
-    fetchTags,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
@@ -94,9 +92,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-    fetchTags()
-  }, [lineageDataset.name])
+  }, [lineageDataset.name, datasets.refreshTags])
 
+  // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
     if (datasets.deletedDatasetName) {
       navigate('/datasets')
@@ -179,6 +177,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 {...a11yProps(3)}
                 disableRipple={true}
               />
+              <Tab
+                label={i18next.t('datasets.dataset_tags_tab')}
+                {...a11yProps(4)}
+                disableRipple={true}
+              />
             </Tabs>
           </Box>
           <Box display={'flex'} alignItems={'center'}>
@@ -238,6 +241,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       {tabIndex === 1 && <Io />}
       {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
       {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
+      {tabIndex === 4 && (
+        <DatasetTags
+          namespace={props.lineageDataset.namespace}
+          datasetName={props.lineageDataset.name}
+          datasetTags={firstVersion.tags}
+        />
+      )}
     </Box>
   )
 }
@@ -259,7 +269,6 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteDataset: deleteDataset,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
-      fetchTags: fetchTags,
     },
     dispatch
   )
