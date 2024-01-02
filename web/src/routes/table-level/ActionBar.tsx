@@ -45,7 +45,7 @@ export const ActionBar = ({
       borderColor={theme.palette.secondary.main}
     >
       <Box display={'flex'} alignItems={'center'}>
-        <Tooltip title={'Back to datasets'}>
+        <Tooltip title={`Back to ${nodeType === 'JOB' ? 'jobs' : 'datasets'}`}>
           <IconButton
             size={'small'}
             sx={{ mr: 2 }}
