@@ -28,7 +28,8 @@ export const findDownstreamNodes = (
   const queue: LineageNode[] = [currentNode]
 
   while (queue.length) {
-    const currentNode = queue.shift()!
+    const currentNode = queue.shift()
+    if (!currentNode) continue
     if (visitedNodes.includes(currentNode.id)) continue
     visitedNodes.push(currentNode.id)
     connectedNodes.push(currentNode)
@@ -53,7 +54,8 @@ export const findUpstreamNodes = (
   const queue: LineageNode[] = [currentNode]
 
   while (queue.length) {
-    const currentNode = queue.shift()!
+    const currentNode = queue.shift()
+    if (!currentNode) continue
     if (visitedNodes.includes(currentNode.id)) continue
     visitedNodes.push(currentNode.id)
     connectedNodes.push(currentNode)

@@ -1,5 +1,4 @@
-import { Dataset, Job } from '../../types/api'
-import {JobOrDataset, LineageDataset, LineageJob} from '../../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob } from '../../components/lineage/types'
 import { NodeRendererMap } from '../../../libs/graph'
 import TableLineageDatasetNode from './TableLineageDatasetNode'
 import TableLineageJobNode from './TableLineageJobNode'

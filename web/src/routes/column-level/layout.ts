@@ -30,7 +30,8 @@ export const findConnectedNodes = (
   const queue: ColumnLineageNode[] = [currentNode]
 
   while (queue.length) {
-    const currentNode = queue.shift()!
+    const currentNode = queue.shift()
+    if (!currentNode) continue
     if (visitedNodes.includes(currentNode.id)) continue
     visitedNodes.push(currentNode.id)
     connectedNodes.push(currentNode)
