@@ -36,14 +36,14 @@ export const findConnectedNodes = (
     connectedNodes.push(currentNode)
     // todo fix this broken in api edge.destination should be edge.origin
     queue.push(
-      ...currentNode.inEdges.map(
-        (edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination)!
-      )
+      ...currentNode.inEdges
+        .map((edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination))
+        .filter((item): item is ColumnLineageNode => !!item)
     )
     queue.push(
-      ...currentNode.outEdges.map(
-        (edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination)!
-      )
+      ...currentNode.outEdges
+        .map((edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination))
+        .filter((item): item is ColumnLineageNode => !!item)
     )
   }
   return connectedNodes

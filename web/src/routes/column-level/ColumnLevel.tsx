@@ -1,6 +1,6 @@
 import * as Redux from 'redux'
 import { ActionBar } from './ActionBar'
-import {ColumnLevelNodeKinds, ColumnLineageColumnNodeData, columnLevelNodeRenderer, ColumnLevelNodeData} from './nodes'
+import { ColumnLevelNodeData, ColumnLevelNodeKinds, columnLevelNodeRenderer } from './nodes'
 import { ColumnLineageGraph } from '../../types/api'
 import { Drawer } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'

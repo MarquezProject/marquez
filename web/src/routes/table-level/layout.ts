@@ -33,9 +33,9 @@ export const findDownstreamNodes = (
     visitedNodes.push(currentNode.id)
     connectedNodes.push(currentNode)
     queue.push(
-      ...currentNode.outEdges.map(
-        (edge) => lineageGraph.graph.find((n) => n.id === edge.destination)!
-      )
+      ...currentNode.outEdges
+        .map((edge) => lineageGraph.graph.find((n) => n.id === edge.destination))
+        .filter((item): item is LineageNode => !!item)
     )
   }
   return connectedNodes
@@ -58,7 +58,9 @@ export const findUpstreamNodes = (
     visitedNodes.push(currentNode.id)
     connectedNodes.push(currentNode)
     queue.push(
-      ...currentNode.inEdges.map((edge) => lineageGraph.graph.find((n) => n.id === edge.origin)!)
+      ...currentNode.inEdges
+        .map((edge) => lineageGraph.graph.find((n) => n.id === edge.origin))
+        .filter((item): item is LineageNode => !!item)
     )
   }
   return connectedNodes
