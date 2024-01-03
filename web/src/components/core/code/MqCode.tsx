@@ -1,8 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { THEME_EXTRA, theme } from '../../../helpers/theme'
-import { alpha } from '@mui/material/styles'
+import { THEME_EXTRA } from '../../../helpers/theme'
 import { ocean } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import Box from '@mui/material/Box'
 import MqText from '../text/MqText'
@@ -29,9 +28,10 @@ const MqCode: React.FC<OwnProps> = ({ code, description, language }) => {
         language={language}
         style={ocean}
         customStyle={{
-          backgroundColor: alpha(theme.palette.common.white, 0.1),
+          backgroundColor: '#191f26',
           borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,
-          padding: theme.spacing(2),
+          fontSize: '13px',
+          padding: '0 4px',
         }}
       >
         {code ? code : 'No code available'}
