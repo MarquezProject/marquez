@@ -67,6 +67,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
       return (
         <MQTooltip title={tooltipTitle} key={tag}>
           <Chip
+            color={'primary'}
             label={tag}
             size='small'
             onDelete={() => handleDelete(tag)}
@@ -91,6 +92,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
       renderTags={(value: string[]) => formatTags(value, tagData)}
       renderInput={(params) => (
         <TextField
+          placeholder={'Add a new tag...'}
           {...params}
           InputLabelProps={{
             shrink: true,

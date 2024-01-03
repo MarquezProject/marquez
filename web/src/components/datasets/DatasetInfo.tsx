@@ -14,9 +14,10 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
-import { Chip, Drawer } from '@mui/material'
+import { Chip, Drawer, IconButton } from '@mui/material'
 import { Field, Run, Tag } from '../../types/api'
 import { IState } from '../../store/reducers'
+
 import { connect, useSelector } from 'react-redux'
 import { createTheme } from '@mui/material/styles'
 import { fetchJobFacets, fetchTags, resetFacets } from '../../store/actionCreators'
@@ -153,10 +154,13 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                     <TableCell align='left'>{field.type}</TableCell>
                     <TableCell align='left'>{field.description || 'no description'}</TableCell>
                     <TableCell>
-                      <ReadMoreIcon
+                      <IconButton
+                        color={'primary'}
                         onClick={() => handleOpen(field.name)}
-                        sx={{ align: 'Right' }}
-                      ></ReadMoreIcon>
+                        size={'small'}
+                      >
+                        <ReadMoreIcon sx={{ align: 'Right' }} />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 )
