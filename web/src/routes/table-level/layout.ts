@@ -12,7 +12,7 @@ import { TableLevelNodeData } from './nodes'
 import { theme } from '../../helpers/theme'
 
 /**
- * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected column nodes
+ * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected downstream column nodes
  * @param lineageGraph
  * @param currentGraphNode
  */
@@ -41,7 +41,11 @@ export const findDownstreamNodes = (
   }
   return connectedNodes
 }
-
+/**
+ * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected upstream column nodes
+ * @param lineageGraph
+ * @param currentGraphNode
+ */
 export const findUpstreamNodes = (
   lineageGraph: LineageGraph,
   currentGraphNode: Nullable<string>

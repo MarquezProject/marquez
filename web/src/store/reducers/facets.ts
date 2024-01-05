@@ -5,7 +5,7 @@ import {
   FETCH_FACETS_SUCCESS,
   FETCH_JOB_FACETS,
   FETCH_RUN_FACETS,
-  RESET_FACETS
+  RESET_FACETS,
 } from '../actionCreators/actionTypes'
 import { Facets } from '../../types/api'
 import { fetchFacetsSuccess } from '../actionCreators'
