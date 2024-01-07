@@ -1,9 +1,15 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
 import { IState } from '../../store/reducers'
 import { Tag } from '../../types/api'
-import { addDatasetTag, deleteDatasetTag, fetchTags } from '../../store/actionCreators'
+import {
+  addDatasetFieldTag,
+  addDatasetTag,
+  deleteDatasetFieldTag,
+  deleteDatasetTag,
+  fetchTags,
+} from '../../store/actionCreators'
 import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { createTheme } from '@mui/material'
@@ -21,26 +27,35 @@ interface DatasetTagsProps {
   namespace: string
   datasetName: string
   datasetTags: string[]
+  datasetField?: string
 }
 
 interface DispatchProps {
   deleteDatasetTag: typeof deleteDatasetTag
   addDatasetTag: typeof addDatasetTag
+  deleteDatasetFieldTag: typeof deleteDatasetFieldTag
+  addDatasetFieldTag: typeof addDatasetFieldTag
   fetchTags: typeof fetchTags
 }
 
 type IProps = DatasetTagsProps & DispatchProps
 
 const DatasetTags: React.FC<IProps> = (props) => {
-  const { namespace, datasetName, datasetTags, deleteDatasetTag, addDatasetTag, fetchTags } = props
+  const {
+    namespace,
+    datasetName,
+    datasetTags,
+    deleteDatasetTag,
+    addDatasetTag,
+    deleteDatasetFieldTag,
+    addDatasetFieldTag,
+    fetchTags,
+    datasetField,
+  } = props
 
   useEffect(() => {
     fetchTags()
   }, [])
-
-  useEffect(() => {
-    fetchTags()
-  }, [deleteDatasetTag, addDatasetTag])
 
   const tagData = useSelector((state: IState) => state.tags.tags)
 
@@ -51,12 +66,16 @@ const DatasetTags: React.FC<IProps> = (props) => {
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
     if (reason === 'selectOption' && details) {
-      addDatasetTag(namespace, datasetName, details.option)
+      datasetField
+        ? addDatasetFieldTag(namespace, datasetName, details.option, datasetField)
+        : addDatasetTag(namespace, datasetName, details.option)
     }
   }
 
   const handleDelete = (deletedTag: string) => {
-    deleteDatasetTag(namespace, datasetName, deletedTag)
+    datasetField
+      ? deleteDatasetFieldTag(namespace, datasetName, deletedTag, datasetField)
+      : deleteDatasetTag(namespace, datasetName, deletedTag)
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
@@ -107,6 +126,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       fetchTags: fetchTags,
       deleteDatasetTag: deleteDatasetTag,
       addDatasetTag: addDatasetTag,
+      deleteDatasetFieldTag: deleteDatasetFieldTag,
+      addDatasetFieldTag: addDatasetFieldTag,
     },
     dispatch
   )

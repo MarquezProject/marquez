@@ -1,10 +1,12 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Effects from 'redux-saga/effects'
 import {
+  ADD_DATASET_FIELD_TAG,
   ADD_DATASET_TAG,
   DELETE_DATASET,
+  DELETE_DATASET_FIELD_TAG,
   DELETE_DATASET_TAG,
   DELETE_JOB,
   FETCH_DATASET,
@@ -36,8 +38,10 @@ const call: any = Effects.call
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
 import {
+  addDatasetFieldTag,
   addDatasetTag,
   deleteDataset,
+  deleteDatasetFieldTag,
   deleteDatasetTag,
   deleteJob,
   getDataset,
@@ -52,8 +56,10 @@ import {
   getTags,
 } from '../requests'
 import {
+  addDatasetFieldTagSuccess,
   addDatasetTagSuccess,
   applicationError,
+  deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
   deleteDatasetTagSuccess,
   deleteJobSuccess,
@@ -234,6 +240,24 @@ export function* deleteDatasetTagSaga() {
   }
 }
 
+export function* deleteDatasetFieldTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET_FIELD_TAG)
+      const dataset: Dataset = yield call(
+        deleteDatasetFieldTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag,
+        payload.field
+      )
+      yield put(deleteDatasetFieldTagSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from dataset field'))
+    }
+  }
+}
+
 export function* addDatasetTagSaga() {
   while (true) {
     try {
@@ -247,6 +271,24 @@ export function* addDatasetTagSaga() {
       yield put(addDatasetTagSuccess(dataset.name))
     } catch (e) {
       yield put(applicationError('Something went wrong while adding tag to dataset'))
+    }
+  }
+}
+
+export function* addDatasetFieldTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_DATASET_FIELD_TAG)
+      const dataset: Dataset = yield call(
+        addDatasetFieldTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag,
+        payload.field
+      )
+      yield put(addDatasetFieldTagSuccess(dataset.name))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to dataset field.'))
     }
   }
 }
@@ -308,6 +350,8 @@ export default function* rootSaga(): Generator {
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
     addDatasetTagSaga(),
+    deleteDatasetFieldTagSaga(),
+    addDatasetFieldTagSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])
