@@ -10,7 +10,6 @@ const config = {
     tagline: 'Data lineage for every pipeline.',
     favicon: 'img/favicon.ico',
 
-
     // Set the production url of your site here
     url: 'https://peppy-sprite-186812.netlify.app',
     // Set the /<baseUrl>/ pathname under which your site is served
@@ -32,6 +31,7 @@ const config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
+    
     headTags: [
         {
             tagName: 'link',
@@ -41,6 +41,7 @@ const config = {
             }
         }
     ],
+    
     presets: [
         [
             'classic',
@@ -162,6 +163,15 @@ const config = {
                 theme: lightCodeTheme,
             },
         }),
+    
+    scripts: [
+        'js/google_analytics.js',
+        {
+            src: 'https://www.googletagmanager.com/gtag/js?id=G-223DXLT48B',
+            async: true,
+        },
+    ],
+    
     plugins: [
         [
             'docusaurus-plugin-openapi-docs',
@@ -177,6 +187,7 @@ const config = {
             },
         ]
     ],
+    
     themes: ["docusaurus-theme-openapi-docs"]
 };
 
