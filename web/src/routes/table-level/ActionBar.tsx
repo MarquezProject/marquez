@@ -115,8 +115,9 @@ export const ActionBar = ({
               }}
             />
           }
-          label='Full Mode'
+          label='Complete Mode'
         />
+        <Divider orientation={'vertical'} flexItem sx={{ mr: 2 }} />
         <FormControlLabel
           control={
             <Switch
@@ -127,7 +128,7 @@ export const ActionBar = ({
               }}
             />
           }
-          label='Compact Mode'
+          label='Compact Nodes'
         />
       </Box>
     </Box>
