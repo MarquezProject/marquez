@@ -42,6 +42,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
   const [isCompact, setIsCompact] = useState(false)
+  const [isFull, setIsFull] = useState(true)
 
   const graphControls = useRef<ZoomPanControls>()
 
@@ -67,7 +68,12 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     graphControls.current = zoomControls
   })
 
-  const { nodes, edges } = createElkNodes(lineage, `${nodeType}:${namespace}:${name}`, isCompact)
+  const { nodes, edges } = createElkNodes(
+    lineage,
+    `${nodeType}:${namespace}:${name}`,
+    isCompact,
+    isFull
+  )
 
   useEffect(() => {
     setTimeout(() => {
@@ -84,6 +90,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
         setDepth={setDepth}
         isCompact={isCompact}
         setIsCompact={setIsCompact}
+        isFull={isFull}
+        setIsFull={setIsFull}
       />
       <Box height={'calc(100vh - 98px - 64px)'}>
         <Drawer

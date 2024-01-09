@@ -75,15 +75,23 @@ export const findUpstreamNodes = (
 export const createElkNodes = (
   lineageGraph: LineageGraph,
   currentGraphNode: Nullable<string>,
-  isCompact: boolean
+  isCompact: boolean,
+  isFull: boolean
 ) => {
-  const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
-  const edges: Edge[] = []
-
   const downstreamNodes = findDownstreamNodes(lineageGraph, currentGraphNode)
   const upstreamNodes = findUpstreamNodes(lineageGraph, currentGraphNode)
 
-  for (const node of lineageGraph.graph) {
+  const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
+  const edges: Edge[] = []
+
+  const filteredGraph = lineageGraph.graph.filter((node) => {
+    if (isFull) return true
+    return (
+      downstreamNodes.includes(node) || upstreamNodes.includes(node) || node.id === currentGraphNode
+    )
+  })
+
+  for (const node of filteredGraph) {
     edges.push(
       ...node.outEdges.map((edge) => {
         return {
