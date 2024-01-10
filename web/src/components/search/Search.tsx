@@ -26,7 +26,7 @@ const i18next = require('i18next')
 
 const INITIAL_SEARCH_FILTER = [
   {
-    text: i18next.t('search.filter.all'),
+    text: 'All',
     value: 'All',
   },
   {
@@ -49,16 +49,17 @@ const INITIAL_SEARCH_SORT_FILTER = [
   {
     icon: faSort,
     value: 'Sort',
+    text: 'Sort',
     foregroundColor: theme.palette.common.white,
     backgroundColor: 'transparent',
     selectable: false,
   },
   {
-    text: i18next.t('search.filter.updated'),
+    text: 'Updated at',
     value: 'UPDATE_AT',
   },
   {
-    text: i18next.t('search.filter.name'),
+    text: 'Name',
     value: 'NAME',
   },
 ]
