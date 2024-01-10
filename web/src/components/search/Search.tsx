@@ -49,7 +49,6 @@ const INITIAL_SEARCH_SORT_FILTER = [
   {
     icon: faSort,
     value: 'Sort',
-    text: 'Sort',
     foregroundColor: theme.palette.common.white,
     backgroundColor: 'transparent',
     selectable: false,
