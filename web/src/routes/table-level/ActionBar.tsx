@@ -104,32 +104,33 @@ export const ActionBar = ({
             setSearchParams(searchParams)
           }}
         />
-        <FormControlLabel
-          control={
-            <Switch
-              size={'small'}
-              defaultChecked
-              value={isFull}
-              onChange={(_, checked) => {
-                setIsFull(checked)
-              }}
-            />
-          }
-          label='Complete Mode'
-        />
-        <Divider orientation={'vertical'} flexItem sx={{ mr: 2 }} />
-        <FormControlLabel
-          control={
-            <Switch
-              size={'small'}
-              value={isCompact}
-              onChange={(_, checked) => {
-                setIsCompact(checked)
-              }}
-            />
-          }
-          label='Compact Nodes'
-        />
+        <Box display={'flex'} flexDirection={'column'}>
+          <FormControlLabel
+            control={
+              <Switch
+                size={'small'}
+                defaultChecked
+                value={isFull}
+                onChange={(_, checked) => {
+                  setIsFull(checked)
+                }}
+              />
+            }
+            label={<MqText font={'mono'}>Complete Mode</MqText>}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                size={'small'}
+                value={isCompact}
+                onChange={(_, checked) => {
+                  setIsCompact(checked)
+                }}
+              />
+            }
+            label={<MqText font={'mono'}>Compact Nodes</MqText>}
+          />
+        </Box>
       </Box>
     </Box>
   )
