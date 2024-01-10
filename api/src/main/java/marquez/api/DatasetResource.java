@@ -190,7 +190,8 @@ public class DatasetResource extends BaseResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, datasetName);
 
-    log.info("Successfully tagged dataset '{}' with '{}'.", datasetName.getValue(), tagName);
+    log.info(
+        "Successfully tagged dataset '{}' with '{}'.", datasetName.getValue(), tagName.getValue());
 
     final Dataset dataset =
         datasetService.updateTags(
@@ -242,15 +243,56 @@ public class DatasetResource extends BaseResource {
     throwIfNotExists(namespaceName, datasetName, fieldName);
     log.info(
         "Tagging field '{}' for dataset '{}' with '{}'.",
-        fieldName,
+        fieldName.getValue(),
         datasetName.getValue(),
-        tagName);
+        tagName.getValue());
     final Dataset dataset =
         datasetFieldService.updateTags(
             namespaceName.getValue(),
             datasetName.getValue(),
             fieldName.getValue(),
             tagName.getValue().toUpperCase(Locale.getDefault()));
+    return Response.ok(dataset).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @DELETE
+  @Path("/{dataset}/fields/{field}/tags/{tag}")
+  @Produces(APPLICATION_JSON)
+  public Response deleteTagField(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("dataset") DatasetName datasetName,
+      @PathParam("field") FieldName fieldName,
+      @PathParam("tag") TagName tagName) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, datasetName);
+    throwIfNotExists(namespaceName, datasetName, fieldName);
+    log.info(
+        "Deleting Tag '{}' from field '{}' on dataset '{}' in namepspace '{}'.",
+        tagName.getValue(),
+        fieldName.getValue(),
+        datasetName.getValue(),
+        namespaceName.getValue());
+
+    // delete tag from field
+    datasetFieldService.deleteDatasetFieldTag(
+        namespaceName.getValue(),
+        datasetName.getValue(),
+        fieldName.getValue(),
+        tagName.getValue().toUpperCase(Locale.getDefault()));
+    // delete tag from dataset_versions
+    datasetFieldService.deleteDatasetVersionFieldTag(
+        namespaceName.getValue(),
+        datasetName.getValue(),
+        fieldName.getValue(),
+        tagName.getValue().toUpperCase(Locale.getDefault()));
+    // return entire dataset
+    Dataset dataset =
+        datasetService
+            .findDatasetByName(namespaceName.getValue(), datasetName.getValue())
+            .orElseThrow(() -> new DatasetNotFoundException(datasetName));
     return Response.ok(dataset).build();
   }
 
