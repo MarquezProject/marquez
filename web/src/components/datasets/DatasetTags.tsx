@@ -103,6 +103,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     <Autocomplete
       multiple
       id='dataset-tags'
+      size='small'
       disableClearable
       options={tagData.map((option) => option.name)}
       defaultValue={datasetTags}
