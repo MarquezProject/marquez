@@ -17,6 +17,10 @@ interface ColumnLineageColumnNodeProps {
   node: PositionedNode<'column', ColumnLineageColumnNodeData>
 }
 
+export const encodeQueryString = (namespace: string, dataset: string, column: string) => {
+  return `datasetField:${namespace}:${dataset}:${column}`
+}
+
 const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [shine, setShine] = React.useState(false)
@@ -27,7 +31,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
           setShine(true)
           setSearchParams({
             ...searchParams,
-            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
           })
         }}
         onMouseLeave={() => {
@@ -38,7 +42,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
             ...searchParams,
             dataset: node.data.dataset,
             namespace: node.data.namespace,
-            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
           })
         }}
         component={'rect'}
@@ -60,7 +64,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
           setShine(true)
           setSearchParams({
             ...searchParams,
-            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
           })
         }}
         onMouseLeave={() => {
@@ -71,7 +75,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
             ...searchParams,
             dataset: node.data.dataset,
             namespace: node.data.namespace,
-            column: `datasetField:${node.data.namespace}:${node.data.dataset}:${node.data.column}`,
+            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
           })
         }}
         x={8}

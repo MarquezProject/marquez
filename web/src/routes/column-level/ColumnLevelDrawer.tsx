@@ -14,7 +14,7 @@ import { IState } from '../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDataset } from '../../store/actionCreators'
-import { findConnectedNodes, parseColumnLineageNode } from './layout'
+import { findConnectedNodes } from './layout'
 import { useSearchParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
@@ -54,7 +54,7 @@ const ColumnLevelDrawer = ({
   }
 
   const column = searchParams.get('column')
-  const connectedColumns = findConnectedNodes(columnLineage, column)
+  const connectedColumns = findConnectedNodes(columnLineage.graph, column)
 
   return (
     <Box width={`${WIDTH}px`}>
@@ -110,7 +110,7 @@ const ColumnLevelDrawer = ({
             <>
               <Box p={2}>
                 <MqText bold subheading>
-                  Connected Columns for {parseColumnLineageNode(column).column}
+                  Connected Columns
                 </MqText>
               </Box>
               <Table size='small'>
@@ -130,11 +130,10 @@ const ColumnLevelDrawer = ({
                 </TableHead>
                 <TableBody>
                   {connectedColumns.map((c) => {
-                    const { dataset, column } = parseColumnLineageNode(c.id)
                     return (
                       <TableRow key={c.id}>
-                        <TableCell align='left'>{dataset}</TableCell>
-                        <TableCell align='left'>{column}</TableCell>
+                        <TableCell align='left'>{c.data?.dataset || 'Unknown'}</TableCell>
+                        <TableCell align='left'>{c.data?.field || 'Unknown'}</TableCell>
                       </TableRow>
                     )
                   })}
