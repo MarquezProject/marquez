@@ -30,9 +30,9 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
   const isSelected = name === node.data.job.name && namespace === node.data.job.namespace
   const handleClick = () => {
     navigate(
-      `/lineage/job/${node.data.job.namespace}/${
+      `/lineage/job/${encodeURIComponent(node.data.job.namespace)}/${encodeURIComponent(
         node.data.job.name
-      }?tableLevelNode=${encodeURIComponent(node.id)}`
+      )}?tableLevelNode=${encodeURIComponent(node.id)}`
     )
   }
 
