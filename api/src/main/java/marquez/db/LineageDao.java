@@ -102,8 +102,10 @@ public interface LineageDao {
       """
       SELECT ds.*, dv.fields, dv.lifecycle_state
       FROM datasets_view ds
-      LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
-      WHERE ds.uuid IN (<dsUuids>)""")
+      LEFT JOIN dataset_versions dv ON dv.uuid = ds.current_version_uuid
+      LEFT JOIN dataset_symlinks dsym ON dsym.namespace_uuid = ds.namespace_uuid and dsym.name = ds.name
+      WHERE dsym.is_primary = true
+      AND ds.uuid IN (<dsUuids>)""")
   Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
 
   @SqlQuery(
@@ -111,7 +113,16 @@ public interface LineageDao {
       SELECT ds.*, dv.fields, dv.lifecycle_state
       FROM datasets_view ds
       LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
-      WHERE ds.name = :datasetName AND ds.namespace_name = :namespaceName""")
+      LEFT JOIN dataset_symlinks dsym ON dsym.namespace_uuid = ds.namespace_uuid and dsym.name = ds.name
+      INNER JOIN (
+        SELECT uuid
+        FROM datasets_view as u
+        WHERE
+            u.name = :datasetName
+            AND u.namespace_name = :namespaceName
+        ) as u
+      	on u.uuid = ds.uuid
+      WHERE dsym.is_primary is true""")
   DatasetData getDatasetData(String namespaceName, String datasetName);
 
   @SqlQuery(
