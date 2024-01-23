@@ -18,7 +18,7 @@
 
 ### Fixed
 
-* Marquez dataset symlinks facet create empty namespace: [`#2645`](https://github.com/MarquezProject/marquez/pull/2645) [@sophiely](https://github.com/sophiely)  
+* bug: marquez dataset symlinks facet create empty namespace: [`#2645`](https://github.com/MarquezProject/marquez/pull/2645) [@sophiely](https://github.com/sophiely)  
 Display symlink dataset in the previously empty namespace and link the symlink dataset lineage to the main dataset.
 
 ## [0.44.0](https://github.com/MarquezProject/marquez/compare/0.43.1...0.44.0) - 2024-01-22
