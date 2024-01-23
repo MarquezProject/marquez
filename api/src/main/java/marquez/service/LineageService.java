@@ -116,16 +116,17 @@ public class LineageService extends DelegatingLineageDao {
     }
 
     if (nodeId.isDatasetType()) {
-        DatasetId datasetId = nodeId.asDatasetId();
-        DatasetData datasetData = this.getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
+      DatasetId datasetId = nodeId.asDatasetId();
+      DatasetData datasetData =
+          this.getDatasetData(datasetId.getNamespace().getValue(), datasetId.getName().getValue());
 
-        if (!datasetIds.contains(datasetData.getUuid())) {
-            log.warn(
-                  "Found jobs {} which no longer share lineage with dataset '{}' - discarding",
-                  jobData.stream().map(JobData::getId).toList(),
-                  nodeId.getValue());
-            return toLineageWithOrphanDataset(nodeId.asDatasetId());
-        }
+      if (!datasetIds.contains(datasetData.getUuid())) {
+        log.warn(
+            "Found jobs {} which no longer share lineage with dataset '{}' - discarding",
+            jobData.stream().map(JobData::getId).toList(),
+            nodeId.getValue());
+        return toLineageWithOrphanDataset(nodeId.asDatasetId());
+      }
     }
     return toLineage(jobData, datasets);
   }
