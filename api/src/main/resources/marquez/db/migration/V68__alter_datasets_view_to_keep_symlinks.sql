@@ -1,5 +1,5 @@
 DROP VIEW IF EXISTS datasets_view;
-CREATE VIEW datasets_view
+CREATE VIEW datasets_view AS
 SELECT d.uuid,
     d.type,
     d.created_at,
