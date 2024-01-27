@@ -98,7 +98,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
       )
     })
   }
-
+  
   return (
     <Autocomplete
       multiple
@@ -106,6 +106,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
       size='small'
       disableClearable
       options={tagData.map((option) => option.name)}
+      getOptionLabel={(option) => `${option} - ${tagData.find((tagItem) => tagItem.name === option)?.description || 'No Tag Description'}`}
       defaultValue={datasetTags}
       onChange={handleTagChange}
       renderTags={(value: string[]) => formatTags(value, tagData)}
