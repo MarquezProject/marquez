@@ -14,6 +14,7 @@ import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { createTheme } from '@mui/material'
 import { useTheme } from '@emotion/react'
+import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
@@ -21,6 +22,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
+import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MenuItem from '@mui/material/MenuItem'
 import React, { useEffect, useState } from 'react'
@@ -61,6 +63,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   const openDialog = () => setDialogOpen(true)
   const closeDialog = () => setDialogOpen(false)
+  const i18next = require('i18next')
 
   useEffect(() => {
     fetchTags()
@@ -107,12 +110,16 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   return (
     <>
-      <Button onClick={openDialog} variant='outlined' color='primary' sx={{ m: 1 }}>
-        Add a Tag
-      </Button>
+      <MQTooltip placement='left' title={i18next.t('dataset_tags.tooltip')} key='tag-tooltip'>
+        <Button onClick={openDialog} size='small' variant='outlined' color='primary' sx={{ m: 1 }}>
+          <IconButton aria-label='add' size='small'>
+            <AddIcon fontSize='small' color='primary' />
+          </IconButton>
+        </Button>
+      </MQTooltip>
       {formatTags(datasetTags, tagData)}
       <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth='md'>
-        <DialogTitle>Add Tags</DialogTitle>
+        <DialogTitle>{i18next.t('dataset_tags.dialogtitle')}</DialogTitle>
         <DialogContent>
           <FormControl variant='outlined' size='small' fullWidth>
             <Select
@@ -124,7 +131,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
                 id: 'tag-select',
               }}
             >
-              <MenuItem value=''>Select a tag to add...</MenuItem>
+              <MenuItem value=''>{i18next.t('dataset_tags.selecttagtoadd')}</MenuItem>
               {tagData.map((option) => (
                 <MenuItem style={{ whiteSpace: 'normal' }} key={option.name} value={option.name}>
                   {`${option.name} - ${option.description || 'No Tag Description'}`}
@@ -135,10 +142,10 @@ const DatasetTags: React.FC<IProps> = (props) => {
         </DialogContent>
         <DialogActions>
           <Button color='primary' onClick={handleTagChange} disabled={listTag === ''}>
-            Add Tag
+            {i18next.t('dataset_tags.addatagdialog')}
           </Button>
           <Button onClick={closeDialog} color='primary'>
-            Cancel
+            {i18next.t('dataset_tags.canceltagdialog')}
           </Button>
         </DialogActions>
       </Dialog>
