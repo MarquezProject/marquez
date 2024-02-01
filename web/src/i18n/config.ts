@@ -82,7 +82,6 @@ i18next
           datasets: {
             latest_tab: 'LATEST SCHEMA',
             history_tab: 'VERSION HISTORY',
-            dataset_tags_tab: 'TAGS',
             column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?',

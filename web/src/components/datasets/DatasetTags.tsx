@@ -14,14 +14,17 @@ import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { createTheme } from '@mui/material'
 import { useTheme } from '@emotion/react'
-import Autocomplete, {
-  AutocompleteChangeDetails,
-  AutocompleteChangeReason,
-} from '@mui/material/Autocomplete'
+import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormControl from '@mui/material/FormControl'
 import MQTooltip from '../core/tooltip/MQTooltip'
-import React, { useEffect } from 'react'
-import TextField from '@mui/material/TextField'
+import MenuItem from '@mui/material/MenuItem'
+import React, { useEffect, useState } from 'react'
+import Select from '@mui/material/Select'
 
 interface DatasetTagsProps {
   namespace: string
@@ -53,23 +56,26 @@ const DatasetTags: React.FC<IProps> = (props) => {
     datasetField,
   } = props
 
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [listTag, setListTag] = useState('')
+
+  const openDialog = () => setDialogOpen(true)
+  const closeDialog = () => setDialogOpen(false)
+
   useEffect(() => {
     fetchTags()
   }, [])
 
   const tagData = useSelector((state: IState) => state.tags.tags)
 
-  const handleTagChange = (
-    _event: React.SyntheticEvent,
-    _value: string[],
-    reason: AutocompleteChangeReason,
-    details?: AutocompleteChangeDetails<string> | undefined
-  ) => {
-    if (reason === 'selectOption' && details) {
-      datasetField
-        ? addDatasetFieldTag(namespace, datasetName, details.option, datasetField)
-        : addDatasetTag(namespace, datasetName, details.option)
-    }
+  const handleTagListChange = (event: any) => {
+    setListTag(event.target.value)
+  }
+
+  const handleTagChange = () => {
+    datasetField
+      ? addDatasetFieldTag(namespace, datasetName, listTag, datasetField)
+      : addDatasetTag(namespace, datasetName, listTag)
   }
 
   const handleDelete = (deletedTag: string) => {
@@ -98,27 +104,45 @@ const DatasetTags: React.FC<IProps> = (props) => {
       )
     })
   }
-  
+
   return (
-    <Autocomplete
-      multiple
-      id='dataset-tags'
-      size='small'
-      disableClearable
-      options={tagData.map((option) => option.name)}
-      getOptionLabel={(option) => `${option} - ${tagData.find((tagItem) => tagItem.name === option)?.description || 'No Tag Description'}`}
-      defaultValue={datasetTags}
-      onChange={handleTagChange}
-      renderTags={(value: string[]) => formatTags(value, tagData)}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-      )}
-    />
+    <>
+      <Button onClick={openDialog} variant='outlined' color='primary' sx={{ m: 1 }}>
+        Add a Tag
+      </Button>
+      {formatTags(datasetTags, tagData)}
+      <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth='md'>
+        <DialogTitle>Add Tags</DialogTitle>
+        <DialogContent>
+          <FormControl variant='outlined' size='small' fullWidth>
+            <Select
+              displayEmpty
+              value={listTag}
+              onChange={handleTagListChange}
+              inputProps={{
+                name: 'tags',
+                id: 'tag-select',
+              }}
+            >
+              <MenuItem value=''>Select a tag to add...</MenuItem>
+              {tagData.map((option) => (
+                <MenuItem style={{ whiteSpace: 'normal' }} key={option.name} value={option.name}>
+                  {`${option.name} - ${option.description || 'No Tag Description'}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button color='primary' onClick={handleTagChange} disabled={listTag === ''}>
+            Add Tag
+          </Button>
+          <Button onClick={closeDialog} color='primary'>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
 

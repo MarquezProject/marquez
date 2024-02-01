@@ -126,6 +126,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         padding: `0 ${theme.spacing(2)}`,
       }}
     >
+      <DatasetTags
+        namespace={props.lineageDataset.namespace}
+        datasetName={props.lineageDataset.name}
+        datasetTags={firstVersion.tags}
+      />
       <Box>
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -149,11 +154,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
               <Tab
                 label={i18next.t('datasets.column_lineage_tab')}
                 {...a11yProps(3)}
-                disableRipple={true}
-              />
-              <Tab
-                label={i18next.t('datasets.dataset_tags_tab')}
-                {...a11yProps(4)}
                 disableRipple={true}
               />
             </Tabs>
@@ -215,13 +215,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       {tabIndex === 1 && <Io />}
       {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
       {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
-      {tabIndex === 4 && (
-        <DatasetTags
-          namespace={props.lineageDataset.namespace}
-          datasetName={props.lineageDataset.name}
-          datasetTags={firstVersion.tags}
-        />
-      )}
     </Box>
   )
 }
