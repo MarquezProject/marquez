@@ -13,6 +13,7 @@ app.use('/', express.static(path))
 app.use('/datasets', express.static(path))
 app.use('/events', express.static(path))
 app.use('/lineage/:type/:namespace/:name', express.static(path))
+app.use('/datasets/column-level/:namespace/:name', express.static(path))
 app.use(createProxyMiddleware('/api/v1', apiOptions))
 
 router.get('/healthcheck', function (req, res) {

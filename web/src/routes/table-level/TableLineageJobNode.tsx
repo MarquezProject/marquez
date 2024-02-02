@@ -63,8 +63,9 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
             width: node.width,
             height: node.height,
             stroke: isSelected ? theme.palette.primary.main : grey['100'],
+            filter: isSelected ? `drop-shadow( 0 0 4px ${theme.palette.primary.main})` : 'none',
             rx: 4,
-            fill: grey['900'],
+            fill: theme.palette.background.paper,
             cursor: 'pointer',
             transition: 'filter 0.3',
           }}
