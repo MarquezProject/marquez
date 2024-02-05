@@ -23,6 +23,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import IconButton from '@mui/material/IconButton'
+import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MenuItem from '@mui/material/MenuItem'
 import React, { useEffect, useState } from 'react'
@@ -133,8 +134,15 @@ const DatasetTags: React.FC<IProps> = (props) => {
             >
               <MenuItem value=''>{i18next.t('dataset_tags.selecttagtoadd')}</MenuItem>
               {tagData.map((option) => (
-                <MenuItem style={{ whiteSpace: 'normal' }} key={option.name} value={option.name}>
-                  {`${option.name} - ${option.description || 'No Tag Description'}`}
+                <MenuItem
+                  style={{ whiteSpace: 'normal', maxWidth: '800px' }}
+                  key={option.name}
+                  value={option.name}
+                >
+                  <div>
+                    <MQText bold>{option.name}</MQText>
+                    <MQText subdued>{option.description || 'No Tag Description'}</MQText>
+                  </div>
                 </MenuItem>
               ))}
             </Select>
