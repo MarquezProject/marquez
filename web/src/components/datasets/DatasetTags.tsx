@@ -141,7 +141,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
                 >
                   <div>
                     <MQText bold>{option.name}</MQText>
-                    <MQText subdued>{option.description || 'No Tag Description'}</MQText>
+                    <MQText subdued overflowHidden>
+                      {option.description || 'No Tag Description'}
+                    </MQText>
                   </div>
                 </MenuItem>
               ))}
