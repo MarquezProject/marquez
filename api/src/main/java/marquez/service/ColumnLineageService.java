@@ -65,6 +65,7 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
     lineageNodeData.stream()
         .forEach(
             columnLineageNodeData -> {
+              log.warn("{}", columnLineageNodeData);
               NodeId nodeId = toNodeId(columnLineageNodeData, includeVersion);
               graphNodes.put(nodeId, Node.datasetField().data(columnLineageNodeData).id(nodeId));
               columnLineageNodeData.getInputFields().stream()
@@ -82,6 +83,10 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
                                 () -> inEdges.put(nodeId, new LinkedList<>(List.of(inputNodeId))));
                       });
             });
+
+    lineageNodeData.stream()
+        .filter(data -> graphNodes.containsKey(toNodeId(data, includeVersion)))
+        .forEach(data -> graphNodes.get(toNodeId(data, includeVersion)).data(data));
 
     // add edges between the nodes
     inEdges.forEach(

@@ -138,7 +138,7 @@ public interface ColumnLineageDao extends BaseDao {
                 (node.input_dataset_field_uuid = adjacent_node.output_dataset_field_uuid) --upstream lineage
                 OR (:withDownstream AND adjacent_node.input_dataset_field_uuid = node.output_dataset_field_uuid) --optional downstream lineage
               )
-              AND node.depth < :depth - 1 -- fetching single row means fetching single edge which is size 1
+              AND node.depth < :depth
               AND NOT is_cycle
             )
             SELECT
@@ -147,18 +147,19 @@ public interface ColumnLineageDao extends BaseDao {
                 output_fields.field_name,
                 output_fields.type,
                 ARRAY_AGG(DISTINCT ARRAY[
-                  input_fields.namespace_name,
-                  input_fields.dataset_name,
-                  CAST(clr.input_dataset_version_uuid AS VARCHAR),
-                  input_fields.field_name,
-                  clr.transformation_description,
-                  clr.transformation_type
-                ]) AS inputFields,
+                        input_fields.namespace_name,
+                        input_fields.dataset_name,
+                        CAST(clr.input_dataset_version_uuid AS VARCHAR),
+                        input_fields.field_name,
+                        clr.transformation_description,
+                        clr.transformation_type
+                      ]) AS inputFields,
                 clr.output_dataset_version_uuid as dataset_version_uuid
             FROM column_lineage_recursive clr
             INNER JOIN dataset_fields_view output_fields ON clr.output_dataset_field_uuid = output_fields.uuid -- hidden datasets will be filtered
             LEFT JOIN dataset_fields_view input_fields ON clr.input_dataset_field_uuid = input_fields.uuid
             WHERE NOT clr.is_cycle
+            AND (clr.depth = 0 OR clr.depth < :depth - 1) -- fetching single row means fetching single edge which is size 1
             GROUP BY
                 output_fields.namespace_name,
                 output_fields.dataset_name,
