@@ -114,15 +114,9 @@ public interface LineageDao {
       FROM datasets_view ds
       LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
       LEFT JOIN dataset_symlinks dsym ON dsym.namespace_uuid = ds.namespace_uuid and dsym.name = ds.name
-      INNER JOIN (
-        SELECT uuid
-        FROM datasets_view as u
-        WHERE
-            u.name = :datasetName
-            AND u.namespace_name = :namespaceName
-        ) as u
-      	on u.uuid = ds.uuid
-      WHERE dsym.is_primary is true""")
+      INNER JOIN datasets_view AS d ON d.uuid = ds.uuid
+      WHERE dsym.is_primary is true
+      AND CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)""")
   DatasetData getDatasetData(String namespaceName, String datasetName);
 
   @SqlQuery(
