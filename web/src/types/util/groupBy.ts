@@ -3,12 +3,12 @@
 
 export function groupBy<T, K extends keyof T>(list: T[], key: K) {
   const map = new Map<T[K], T[]>()
-  list.forEach(item => {
+  list.forEach((item) => {
     const itemKey = item[key]
     if (!map.has(itemKey)) {
       map.set(
         itemKey,
-        list.filter(i => i[key] === item[key])
+        list.filter((i) => i[key] === item[key])
       )
     }
   })

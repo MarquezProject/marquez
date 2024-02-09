@@ -9,56 +9,56 @@ export const theme = createTheme({
       styleOverrides: {
         '@global': {
           body: {
-            color: '#fff'
+            color: '#fff',
           },
         },
         '.MuiInputBase-root': {
           paddingTop: '0',
-          paddingBottom: '0'
-        }
-      }
-    }
+          paddingBottom: '0',
+        },
+      },
+    },
   },
   typography: {
     fontFamily: 'Karla',
     h1: {
       fontSize: '2.5rem',
-      fontWeight: 600
+      fontWeight: 600,
     },
     h3: {
       fontSize: '1rem',
-      fontWeight: 600
+      fontWeight: 600,
     },
-    fontSize: 14
+    fontSize: 14,
   },
   palette: {
     mode: 'dark',
     primary: {
-      main: '#71ddbf'
+      main: '#71ddbf',
     },
     error: {
-      main: '#ee7b7b'
+      main: '#ee7b7b',
     },
     warning: {
-      main: '#7D7D7D'
+      main: '#7D7D7D',
     },
     info: {
-      main: '#FECC00'
+      main: '#FECC00',
     },
     background: {
-      default: '#191f26'
+      default: '#191f26',
     },
     secondary: {
-      main: '#454f5b'
-    }
-  }
+      main: '#454f5b',
+    },
+  },
 })
 
 export const THEME_EXTRA = {
   typography: {
     subdued: '#abb1bd',
-    disabled: '#8d9499'
-  }
+    disabled: '#8d9499',
+  },
 }
 
 // 1px for bottom border

@@ -28,7 +28,6 @@ const Header = (): ReactElement => {
         borderBottom: `2px dashed ${theme.palette.secondary.main}`,
         padding: `${theme.spacing(2)} 0`,
         left: `${DRAWER_WIDTH + 1}px`,
-        width: `calc(100% - ${DRAWER_WIDTH}px)`,
       }}
     >
       <Toolbar>
@@ -37,9 +36,7 @@ const Header = (): ReactElement => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            maxWidth: theme.breakpoints.values.lg,
-            width: theme.breakpoints.values.lg,
-            margin: '0 auto',
+            width: 'calc(100% - 97px)',
           }}
         >
           <Link to='/'>

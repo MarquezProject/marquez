@@ -4,6 +4,7 @@
 import * as actionTypes from './actionTypes'
 
 import {
+  ColumnLineageGraph,
   Dataset,
   DatasetVersion,
   Events,
@@ -287,9 +288,29 @@ export const fetchLineage = (
   },
 })
 
+export const fetchColumnLineage = (
+  nodeType: JobOrDataset,
+  namespace: string,
+  name: string,
+  depth: number
+) => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE,
+  payload: {
+    nodeType,
+    namespace,
+    name,
+    depth,
+  },
+})
+
 export const fetchLineageSuccess = (lineage: LineageGraph) => ({
   type: actionTypes.FETCH_LINEAGE_SUCCESS,
   payload: lineage,
+})
+
+export const fetchColumnLineageSuccess = (columnLineage: ColumnLineageGraph) => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE_SUCCESS,
+  payload: columnLineage,
 })
 
 export const resetLineage = () => ({
@@ -323,4 +344,9 @@ export const fetchSearch = (q: string, filter: string, sort: string) => ({
 export const fetchSearchSuccess = (search: Search) => ({
   type: actionTypes.FETCH_SEARCH_SUCCESS,
   payload: search,
+})
+
+export const setColumnLineageGraphDepth = (depth: number) => ({
+  type: actionTypes.SET_COLUMN_LINEAGE_GRAPH_DEPTH,
+  payload: depth,
 })

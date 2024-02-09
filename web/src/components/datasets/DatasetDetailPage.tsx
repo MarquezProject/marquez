@@ -19,7 +19,7 @@ import {
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
@@ -78,17 +78,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const navigate = useNavigate()
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
-
-  useEffect(() => {
-    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
-  }, [props.lineageDataset.name, datasets.refreshTags])
-
-  // if the dataset is deleted then redirect to datasets end point
-  useEffect(() => {
-    if (datasets.deletedDatasetName) {
-      navigate('/datasets')
-    }
-  }, [datasets.deletedDatasetName])
+  const [_, setSearchParams] = useSearchParams()
 
   // unmounting
   useEffect(
@@ -98,6 +88,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     },
     []
   )
+
+  useEffect(() => {
+    fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+  }, [lineageDataset.name, datasets.refreshTags])
+
+  // if the dataset is deleted then redirect to datasets end point
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      navigate('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   const handleChange = (_: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
@@ -116,7 +117,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   const firstVersion = versions[0]
-  const { name, description } = firstVersion
+  const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   return (
@@ -127,6 +128,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
+        <DatasetTags
+          datasetTags={tags}
+          datasetName={lineageDataset.name}
+          namespace={lineageDataset.namespace}
+          readonly
+        />
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
@@ -186,8 +193,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 }}
               />
             </Box>
-            <IconButton onClick={() => navigate('/datasets')}>
-              <CloseIcon />
+            <IconButton onClick={() => setSearchParams({})}>
+              <CloseIcon fontSize={'small'} />
             </IconButton>
           </Box>
         </Box>

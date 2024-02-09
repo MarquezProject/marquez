@@ -7,7 +7,7 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: typeof defaultNS
     translation: typeof translation
-    resources: typeof resources['en']
+    resources: (typeof resources)['en']
     allowObjectInHTMLChildren: true
   }
 }

@@ -17,6 +17,7 @@
   },
   "include": [
     "./src/**/*",
+    "./libs/graph/src/**/*",
     "styles.d.ts"
   ],
   "exclude": ["./src/__tests__/*"]

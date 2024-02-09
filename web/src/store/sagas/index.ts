@@ -7,6 +7,7 @@ import {
   DELETE_DATASET,
   DELETE_DATASET_TAG,
   DELETE_JOB,
+  FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
@@ -19,6 +20,7 @@ import {
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
 import {
+  ColumnLineageGraph,
   Dataset,
   DatasetVersion,
   Datasets,
@@ -35,6 +37,7 @@ const call: any = Effects.call
 
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
+
 import {
   addDatasetTag,
   deleteDataset,
@@ -57,6 +60,7 @@ import {
   deleteDatasetSuccess,
   deleteDatasetTagSuccess,
   deleteJobSuccess,
+  fetchColumnLineageSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
@@ -69,6 +73,7 @@ import {
   fetchSearchSuccess,
   fetchTagsSuccess,
 } from '../actionCreators'
+import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 
@@ -104,6 +109,24 @@ export function* fetchLineage() {
         payload.depth
       )
       yield put(fetchLineageSuccess(result))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching lineage'))
+    }
+  }
+}
+
+export function* fetchColumnLineage() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_COLUMN_LINEAGE)
+      const result: ColumnLineageGraph = yield call(
+        getColumnLineage,
+        payload.nodeType,
+        payload.namespace,
+        payload.name,
+        payload.depth
+      )
+      yield put(fetchColumnLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
     }
@@ -303,6 +326,7 @@ export default function* rootSaga(): Generator {
     fetchJobFacetsSaga(),
     fetchRunFacetsSaga(),
     fetchLineage(),
+    fetchColumnLineage(),
     fetchSearch(),
     deleteJobSaga(),
     deleteDatasetSaga(),

@@ -21,6 +21,7 @@ interface DatasetTagsProps {
   namespace: string
   datasetName: string
   datasetTags: string[]
+  readonly?: boolean
 }
 
 interface DispatchProps {
@@ -32,7 +33,15 @@ interface DispatchProps {
 type IProps = DatasetTagsProps & DispatchProps
 
 const DatasetTags: React.FC<IProps> = (props) => {
-  const { namespace, datasetName, datasetTags, deleteDatasetTag, addDatasetTag, fetchTags } = props
+  const {
+    namespace,
+    datasetName,
+    datasetTags,
+    deleteDatasetTag,
+    addDatasetTag,
+    fetchTags,
+    readonly,
+  } = props
 
   useEffect(() => {
     fetchTags()
@@ -78,6 +87,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
         </MQTooltip>
       )
     })
+  }
+  if (readonly) {
+    return <>{formatTags(datasetTags, tagData)}</>
   }
 
   return (

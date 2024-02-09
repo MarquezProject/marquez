@@ -12,7 +12,7 @@ export type ISearchState = { isLoading: boolean; data: GroupedSearchResult; init
 export const initialState: ISearchState = {
   isLoading: false,
   data: { results: new Map<string, GroupedSearch[]>(), rawResults: [] },
-  init: false
+  init: false,
 }
 
 type IJobsAction = ReturnType<typeof fetchSearchSuccess> & ReturnType<typeof fetchSearch>
@@ -24,12 +24,12 @@ export default (state = initialState, action: IJobsAction): ISearchState => {
     case FETCH_SEARCH:
       return { ...state, isLoading: true }
     case FETCH_SEARCH_SUCCESS: {
-      const groupedResult = payload.results.map(result => {
+      const groupedResult = payload.results.map((result) => {
         return {
           ...result,
           group: `${encodeURIComponent(result.namespace)}:${encodeURIComponent(
             result.name.substring(0, result.name.lastIndexOf('.'))
-          )}`
+          )}`,
         }
       })
       return {
@@ -38,8 +38,8 @@ export default (state = initialState, action: IJobsAction): ISearchState => {
         init: true,
         data: {
           results: groupBy(groupedResult, 'group'),
-          rawResults: groupedResult
-        }
+          rawResults: groupedResult,
+        },
       }
     }
     default:

@@ -23,7 +23,7 @@ const initialState: IDisplayState = {
   success: '',
   dialogIsOpen: false,
   editWarningField: '',
-  isLoading: true
+  isLoading: true,
 }
 
 export default (state = initialState, action: IToggleExpandAction) => {
