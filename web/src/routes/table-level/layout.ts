@@ -12,7 +12,7 @@ import { TableLevelNodeData } from './nodes'
 import { theme } from '../../helpers/theme'
 
 /**
- * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected column nodes
+ * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected downstream column nodes
  * @param lineageGraph
  * @param currentGraphNode
  */
@@ -41,7 +41,11 @@ export const findDownstreamNodes = (
   }
   return connectedNodes
 }
-
+/**
+ * Recursively trace the `inEdges` and `outEdges` of the current node to find all connected upstream column nodes
+ * @param lineageGraph
+ * @param currentGraphNode
+ */
 export const findUpstreamNodes = (
   lineageGraph: LineageGraph,
   currentGraphNode: Nullable<string>
@@ -71,15 +75,23 @@ export const findUpstreamNodes = (
 export const createElkNodes = (
   lineageGraph: LineageGraph,
   currentGraphNode: Nullable<string>,
-  isCompact: boolean
+  isCompact: boolean,
+  isFull: boolean
 ) => {
-  const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
-  const edges: Edge[] = []
-
   const downstreamNodes = findDownstreamNodes(lineageGraph, currentGraphNode)
   const upstreamNodes = findUpstreamNodes(lineageGraph, currentGraphNode)
 
-  for (const node of lineageGraph.graph) {
+  const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
+  const edges: Edge[] = []
+
+  const filteredGraph = lineageGraph.graph.filter((node) => {
+    if (isFull) return true
+    return (
+      downstreamNodes.includes(node) || upstreamNodes.includes(node) || node.id === currentGraphNode
+    )
+  })
+
+  for (const node of filteredGraph) {
     edges.push(
       ...node.outEdges.map((edge) => {
         return {

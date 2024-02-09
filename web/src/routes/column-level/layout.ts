@@ -19,11 +19,11 @@ export const parseColumnLineageNode = (node: string) => {
  * @param currentColumn
  */
 export const findConnectedNodes = (
-  columnLineageGraph: ColumnLineageGraph,
+  columnLineageGraph: ColumnLineageNode[],
   currentColumn: Nullable<string>
 ): ColumnLineageNode[] => {
   if (!currentColumn) return []
-  const currentNode = columnLineageGraph.graph.find((node) => node.id === currentColumn)
+  const currentNode = columnLineageGraph.find((node) => node.id === currentColumn)
   if (!currentNode) return []
   const connectedNodes: ColumnLineageNode[] = []
   const visitedNodes: string[] = []
@@ -38,12 +38,12 @@ export const findConnectedNodes = (
     // todo fix this broken in api edge.destination should be edge.origin
     queue.push(
       ...currentNode.inEdges
-        .map((edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination))
+        .map((edge) => columnLineageGraph.find((n) => n.id === edge.destination))
         .filter((item): item is ColumnLineageNode => !!item)
     )
     queue.push(
       ...currentNode.outEdges
-        .map((edge) => columnLineageGraph.graph.find((n) => n.id === edge.destination))
+        .map((edge) => columnLineageGraph.find((n) => n.id === edge.destination))
         .filter((item): item is ColumnLineageNode => !!item)
     )
   }
@@ -57,10 +57,14 @@ export const createElkNodes = (
   const nodes: ElkNode<ColumnLevelNodeKinds, ColumnLevelNodeData>[] = []
   const edges: Edge[] = []
 
-  const connectedNodes = findConnectedNodes(columnLineageGraph, currentColumn)
+  const graph = columnLineageGraph.graph.filter((node) => !!node.data)
 
-  for (const node of columnLineageGraph.graph) {
-    const { type, namespace, dataset, column } = parseColumnLineageNode(node.id)
+  const connectedNodes = findConnectedNodes(graph, currentColumn)
+
+  for (const node of graph) {
+    const namespace = node.data.namespace
+    const dataset = node.data.dataset
+    const column = node.data.field
 
     edges.push(
       ...node.outEdges.map((edge) => {
@@ -76,10 +80,10 @@ export const createElkNodes = (
       })
     )
 
-    const datasetNode = nodes.find((n) => n.id === `${type}:${namespace}:${dataset}`)
+    const datasetNode = nodes.find((n) => n.id === `datasetField:${namespace}:${dataset}`)
     if (!datasetNode) {
       nodes.push({
-        id: `${type}:${namespace}:${dataset}`,
+        id: `datasetField:${namespace}:${dataset}`,
         kind: 'dataset',
         width: 800,
         data: {

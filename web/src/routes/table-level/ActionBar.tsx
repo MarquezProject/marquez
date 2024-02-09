@@ -15,6 +15,8 @@ interface ActionBarProps {
   setDepth: (depth: number) => void
   isCompact: boolean
   setIsCompact: (isCompact: boolean) => void
+  isFull: boolean
+  setIsFull: (isFull: boolean) => void
 }
 
 export const ActionBar = ({
@@ -24,6 +26,8 @@ export const ActionBar = ({
   setDepth,
   isCompact,
   setIsCompact,
+  isFull,
+  setIsFull,
 }: ActionBarProps) => {
   const { namespace, name } = useParams()
   const navigate = useNavigate()
@@ -100,17 +104,33 @@ export const ActionBar = ({
             setSearchParams(searchParams)
           }}
         />
-        <FormControlLabel
-          control={
-            <Switch
-              value={isCompact}
-              onChange={(_, checked) => {
-                setIsCompact(checked)
-              }}
-            />
-          }
-          label='Compact?'
-        />
+        <Box display={'flex'} flexDirection={'column'}>
+          <FormControlLabel
+            control={
+              <Switch
+                size={'small'}
+                defaultChecked
+                value={isFull}
+                onChange={(_, checked) => {
+                  setIsFull(checked)
+                }}
+              />
+            }
+            label={<MqText font={'mono'}>Complete Mode</MqText>}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                size={'small'}
+                value={isCompact}
+                onChange={(_, checked) => {
+                  setIsCompact(checked)
+                }}
+              />
+            }
+            label={<MqText font={'mono'}>Compact Nodes</MqText>}
+          />
+        </Box>
       </Box>
     </Box>
   )

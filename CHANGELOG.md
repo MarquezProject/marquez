@@ -1,6 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.43.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.44.0...HEAD)
+
+## [0.44.0](https://github.com/MarquezProject/marquez/compare/0.43.1...0.44.0) - 2024-01-22
+
+### Added
+
+* Web: add dataset tags tabs for adding/deleting of tags [`#2714`](https://github.com/MarquezProject/marquez/pull/2714) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds a dataset tags component so that datasets can have tags added/deleted.*
+* API: Add endpoint to delete field-level tags [`#2705`](https://github.com/MarquezProject/marquez/pull/2705) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds delete endpoint to remove dataset field tags.*
+
+### Fixed
+
+* Web: fix dataset tag reducers bug [`#2716`](https://github.com/MarquezProject/marquez/pull/2716) [@davidsharp7](https://github.com/davidsharp7)  
+    *Removes result from dataset tags reducer to fix a sidebar bug.*
 
 ## [0.43.1](https://github.com/MarquezProject/marquez/compare/0.43.0...0.43.1) - 2023-12-20
 

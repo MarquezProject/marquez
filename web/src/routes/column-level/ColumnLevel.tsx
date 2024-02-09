@@ -8,7 +8,7 @@ import { IState } from '../../store/reducers'
 import { ZoomControls } from './ZoomControls'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { createElkNodes, parseColumnLineageNode } from './layout'
+import { createElkNodes } from './layout'
 import { fetchColumnLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useCallbackRef } from '../../helpers/hooks'
@@ -48,14 +48,14 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     }
   }, [name, namespace, depth])
 
-  const column = searchParams.get('column')
-  useEffect(() => {
-    if (column) {
-      graphControls.current?.centerOnPositionedNode(
-        `datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`
-      )
-    }
-  }, [column])
+  // const column = searchParams.get('column')
+  // useEffect(() => {
+  //   if (column) {
+  //     graphControls.current?.centerOnPositionedNode(
+  //       `datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`
+  //     )
+  //   }
+  // }, [column])
 
   if (!columnLineage) {
     return <div />

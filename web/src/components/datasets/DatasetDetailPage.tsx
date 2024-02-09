@@ -19,7 +19,7 @@ import {
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
@@ -79,7 +79,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const navigate = useNavigate()
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
-  const tagData = useSelector((state: IState) => state.tags.tags)
+  const [_, setSearchParams] = useSearchParams()
 
   // unmounting
   useEffect(
@@ -152,7 +152,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        {formatTags(tags, tagData)}
+        <DatasetTags
+          datasetTags={tags}
+          datasetName={lineageDataset.name}
+          namespace={lineageDataset.namespace}
+          readonly
+        />
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
@@ -212,8 +217,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 }}
               />
             </Box>
-            <IconButton onClick={() => navigate('/datasets')}>
-              <CloseIcon />
+            <IconButton onClick={() => setSearchParams({})}>
+              <CloseIcon fontSize={'small'} />
             </IconButton>
           </Box>
         </Box>

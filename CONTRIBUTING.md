@@ -3,14 +3,14 @@
 We're excited you're interested in contributing to Marquez! We'd love your help, and there are plenty of ways to contribute:
 
 * Give the repo a star
-* Join our [slack](http://bit.ly/Mqz_invite) channel and leave us feedback or help with answering questions from the community
+* Join our [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) channel and leave us feedback or help with answering questions from the community
 * Fix or [report](https://github.com/MarquezProject/marquez/issues/new) a bug
 * Fix or improve documentation
 * For newcomers, pick up a ["good first issue"](https://github.com/MarquezProject/marquez/labels/good%20first%20issue), then send a pull request our way (see the [resources](#resources) section below for helpful links to get started)
 
 We feel that a welcoming community is important and we ask that you follow the [Contributor Covenant Code of Conduct](https://github.com/MarquezProject/marquez/blob/main/CODE_OF_CONDUCT.md) in all interactions with the community.
 
-If you’re interested in using or learning more about Marquez, reach out to us on our [slack](http://bit.ly/Marquez_invite) channel and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates. We also encourage new comers to [join](https://lists.lfaidata.foundation/g/marquez-technical-discuss/ics/invite.ics?repeatid=32038) our monthly community meeting!
+If you’re interested in using or learning more about Marquez, reach out to us on our [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) channel and follow [@MarquezProject](https://twitter.com/MarquezProject) for updates. We also encourage new comers to [join](https://lists.lfaidata.foundation/g/marquez-technical-discuss/ics/invite.ics?repeatid=32038) our monthly community meeting!
 
 # Getting Your Changes Approved
 
