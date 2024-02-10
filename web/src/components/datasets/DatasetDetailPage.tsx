@@ -127,17 +127,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         padding: `0 ${theme.spacing(2)}`,
       }}
     >
-      <DatasetTags
-        namespace={props.lineageDataset.namespace}
-        datasetName={props.lineageDataset.name}
-        datasetTags={firstVersion.tags}
-      />
       <Box>
         <DatasetTags
           datasetTags={tags}
           datasetName={lineageDataset.name}
           namespace={lineageDataset.namespace}
-          readonly
         />
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
