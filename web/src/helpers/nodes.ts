@@ -50,7 +50,7 @@ export function isLineageDataset(
 
 const searchDelimiterMap = {
   namespace: 0,
-  group: 1
+  group: 1,
 }
 
 type SearchDelimiterMap = typeof searchDelimiterMap
@@ -96,8 +96,8 @@ export function runStateColor(state: RunState) {
 export function jobRunsStatus(runs: Run[], limit = 14) {
   runs = runs.slice(-limit)
 
-  const isAllFailed = runs.every(e => e.state === 'FAILED')
-  const isSomeFailed = runs.some(e => e.state === 'FAILED')
+  const isAllFailed = runs.every((e) => e.state === 'FAILED')
+  const isSomeFailed = runs.some((e) => e.state === 'FAILED')
 
   if (isAllFailed) {
     return theme.palette.error.main as string

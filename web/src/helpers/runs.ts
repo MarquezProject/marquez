@@ -9,5 +9,5 @@ export const runColorMap = {
   FAILED: jobRunFailed,
   COMPLETED: jobRunCompleted,
   ABORTED: jobRunAborted,
-  RUNNING: jobRunRunning
+  RUNNING: jobRunRunning,
 }
