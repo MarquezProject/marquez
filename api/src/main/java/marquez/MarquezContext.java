@@ -41,6 +41,8 @@ import marquez.db.RunStateDao;
 import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
+import marquez.db.v2.DbConfig;
+import marquez.db.v2.MetadataDb;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
 import marquez.service.ColumnLineageService;
@@ -79,6 +81,9 @@ public final class MarquezContext {
   @Getter private final ColumnLineageDao columnLineageDao;
   @Getter private final SearchDao searchDao;
   @Getter private final List<RunTransitionListener> runTransitionListeners;
+
+  // V2
+  @Getter private final marquez.api.v2.OpenLineageResource olResourceV2;
 
   @Getter private final NamespaceService namespaceService;
   @Getter private final SourceService sourceService;
@@ -166,6 +171,10 @@ public final class MarquezContext {
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
 
+    // v2
+    this.olResourceV2 =
+        new marquez.api.v2.OpenLineageResource(MetadataDb.newInstance(new DbConfig()));
+
     this.resources =
         ImmutableList.of(
             namespaceResource,
@@ -176,7 +185,8 @@ public final class MarquezContext {
             tagResource,
             jdbiException,
             jsonException,
-            openLineageResource,
+            // openLineageResource,
+            olResourceV2,
             searchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
