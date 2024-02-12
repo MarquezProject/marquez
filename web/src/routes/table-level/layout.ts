@@ -93,17 +93,19 @@ export const createElkNodes = (
 
   for (const node of filteredGraph) {
     edges.push(
-      ...node.outEdges.map((edge) => {
-        return {
-          id: `${edge.origin}:${edge.destination}`,
-          sourceNodeId: edge.origin,
-          targetNodeId: edge.destination,
-          color:
-            downstreamNodes.includes(node) || upstreamNodes.includes(node)
-              ? theme.palette.primary.main
-              : theme.palette.grey[400],
-        }
-      })
+      ...node.outEdges
+        .filter((edge) => filteredGraph.find((n) => n.id === edge.destination))
+        .map((edge) => {
+          return {
+            id: `${edge.origin}:${edge.destination}`,
+            sourceNodeId: edge.origin,
+            targetNodeId: edge.destination,
+            color:
+              downstreamNodes.includes(node) || upstreamNodes.includes(node)
+                ? theme.palette.primary.main
+                : theme.palette.grey[400],
+          }
+        })
     )
 
     if (node.type === 'JOB') {

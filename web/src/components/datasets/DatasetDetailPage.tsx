@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
+import { Box, Button, Tab, Tabs, createTheme } from '@mui/material'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion, Tag } from '../../types/api'
+import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
@@ -29,7 +29,6 @@ import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import Io from '../io/Io'
-import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
@@ -120,29 +119,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const firstVersion = versions[0]
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
-
-  const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    return (
-      <>
-        {tags.map((tag, index) => {
-          const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
-          const tooltipTitle = tagDescription?.description || 'No Tag Description'
-          return (
-            <MQTooltip title={tooltipTitle} key={tag}>
-              <Chip
-                label={tag}
-                size='small'
-                style={{
-                  display: 'inline',
-                  marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
-                }}
-              />
-            </MQTooltip>
-          )
-        })}
-      </>
-    )
-  }
 
   return (
     <Box
