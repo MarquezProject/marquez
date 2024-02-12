@@ -1,10 +1,14 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  ADD_DATASET_FIELD_TAG,
+  ADD_DATASET_FIELD_TAG_SUCCESS,
   ADD_DATASET_TAG,
   ADD_DATASET_TAG_SUCCESS,
   DELETE_DATASET,
+  DELETE_DATASET_FIELD_TAG,
+  DELETE_DATASET_FIELD_TAG_SUCCESS,
   DELETE_DATASET_SUCCESS,
   DELETE_DATASET_TAG,
   DELETE_DATASET_TAG_SUCCESS,
@@ -14,8 +18,10 @@ import {
 } from '../actionCreators/actionTypes'
 import { Dataset } from '../../types/api'
 import {
+  addDatasetFieldTag,
   addDatasetTag,
   deleteDataset,
+  deleteDatasetFieldTag,
   deleteDatasetTag,
   fetchDatasetsSuccess,
 } from '../actionCreators'
@@ -41,7 +47,9 @@ export const initialState: IDatasetsState = {
 export type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
   ReturnType<typeof deleteDataset> &
   ReturnType<typeof deleteDatasetTag> &
-  ReturnType<typeof addDatasetTag>
+  ReturnType<typeof addDatasetTag> &
+  ReturnType<typeof deleteDatasetFieldTag> &
+  ReturnType<typeof addDatasetFieldTag>
 
 export default (state: IDatasetsState = initialState, action: IDatasetsAction): IDatasetsState => {
   const { type, payload } = action
@@ -67,9 +75,17 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
       return { ...state, refreshTags: false }
     case DELETE_DATASET_TAG_SUCCESS:
       return { ...state, refreshTags: true }
+    case DELETE_DATASET_FIELD_TAG:
+      return { ...state, refreshTags: false }
+    case DELETE_DATASET_FIELD_TAG_SUCCESS:
+      return { ...state, refreshTags: true }
     case ADD_DATASET_TAG:
       return { ...state, refreshTags: false }
     case ADD_DATASET_TAG_SUCCESS:
+      return { ...state, refreshTags: true }
+    case ADD_DATASET_FIELD_TAG:
+      return { ...state, refreshTags: false }
+    case ADD_DATASET_FIELD_TAG_SUCCESS:
       return { ...state, refreshTags: true }
     default:
       return state
