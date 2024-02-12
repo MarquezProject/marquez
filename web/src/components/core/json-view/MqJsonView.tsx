@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-
-import { JSONTree } from 'react-json-tree'
-import { MqInputBase, MqInputBaseProps } from '../input-base/MqInputBase'
-import { createTheme } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box } from '@mui/system'
+import { darkTheme } from '@uiw/react-json-view/dark'
+import { theme } from '../../../helpers/theme'
+import JsonView from '@uiw/react-json-view'
 import React from 'react'
 
 interface OwnProps {
@@ -12,62 +11,19 @@ interface OwnProps {
   placeholder?: string
 }
 
-interface StateProps {
-  search: string
-}
-
 type JsonViewProps = OwnProps
 
-const InputSearchJsonView: React.FC<MqInputBaseProps> = (props) => {
-  const theme = createTheme(useTheme())
+darkTheme.background = theme.palette.background.default
+darkTheme.backgroundColor = theme.palette.background.default
+darkTheme.borderLeftWidth = 2
+darkTheme.borderLeftColor = theme.palette.grey[500]
+darkTheme.borderLeftStyle = 'dashed'
 
+const MqJsonView: React.FC<JsonViewProps> = ({ data }) => {
   return (
-    <MqInputBase
-      {...props}
-      sx={{
-        ...props.sx,
-        padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
-      }}
-    />
-  )
-}
-
-const MqJsonView: React.FC<JsonViewProps> = ({
-  data,
-  searchable = false,
-  placeholder = 'Search',
-}) => {
-  const [state, setState] = React.useState<StateProps>({
-    search: '',
-  })
-
-  const onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setState({ search: event.target.value })
-  }
-
-  const theme = createTheme(useTheme())
-
-  return (
-    <>
-      {searchable && (
-        <InputSearchJsonView
-          sx={{
-            marginBottom: theme.spacing(2),
-          }}
-          onChange={(event) => onSearch(event)}
-          value={state.search}
-          autoComplete={'off'}
-          id={'json-view'}
-          placeholder={placeholder}
-        />
-      )}
-      <JSONTree
-        data={data}
-        theme={'rjv_white'}
-        collectionLimit={2}
-        // highlightSearch={search} // TODO find a solution to do this
-      />
-    </>
+    <Box my={2}>
+      <JsonView style={darkTheme} value={data} />
+    </Box>
   )
 }
 

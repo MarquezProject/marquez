@@ -1,6 +1,7 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
+import { Box, createTheme } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Tag } from '../../types/api'
 import {
@@ -12,7 +13,6 @@ import {
 } from '../../store/actionCreators'
 import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
-import { createTheme } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
@@ -96,6 +96,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
       return (
         <MQTooltip title={tooltipTitle} key={tag}>
           <Chip
+            color={'primary'}
             label={tag}
             size='small'
             onDelete={() => handleDelete(tag)}
@@ -111,15 +112,22 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   return (
     <>
-      <MQTooltip placement='left' title={i18next.t('dataset_tags.tooltip')} key='tag-tooltip'>
-        <Button onClick={openDialog} size='small' variant='outlined' color='primary' sx={{ m: 1 }}>
-          <IconButton aria-label='add' size='small'>
+      <Box display={'flex'} alignItems={'center'}>
+        <MQText subheading>{i18next.t('dataset_tags.tags')}</MQText>
+        <MQTooltip placement='left' title={i18next.t('dataset_tags.tooltip')} key='tag-tooltip'>
+          <IconButton
+            onClick={openDialog}
+            size='small'
+            color='primary'
+            sx={{ m: 1 }}
+            aria-label='add'
+          >
             <AddIcon fontSize='small' color='primary' />
           </IconButton>
-        </Button>
-      </MQTooltip>
+        </MQTooltip>
+      </Box>
       {formatTags(datasetTags, tagData)}
-      <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth='md'>
+      <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth='sm'>
         <DialogTitle>{i18next.t('dataset_tags.dialogtitle')}</DialogTitle>
         <DialogContent>
           <FormControl variant='outlined' size='small' fullWidth>

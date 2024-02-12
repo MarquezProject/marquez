@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
+
 import { connect, useSelector } from 'react-redux'
 import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import { stopWatchDuration } from '../../helpers/time'
@@ -166,13 +167,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJsonView
-            data={facets}
-            searchable={true}
-            aria-label={i18next.t('dataset_info.facets_subhead_aria')}
-            aria-required='True'
-            placeholder='Search'
-          />
+          <MqJsonView data={facets} aria-label={i18next.t('dataset_info.facets_subhead_aria')} />
         </Box>
       )}
       {run && (
