@@ -72,6 +72,7 @@ i18next
             prompt: 'ns',
           },
           dataset_tags: {
+            tags: 'TAGS',
             tooltip: 'Add a Tag',
             dialogtitle: 'Add Tags',
             selecttagtoadd: 'Select Tag to add...',
