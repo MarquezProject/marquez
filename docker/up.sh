@@ -8,9 +8,9 @@
 set -e
 
 # Version of Marquez
-readonly VERSION=0.44.0
+readonly VERSION=0.45.0-rc.1
 # Build version of Marquez
-readonly BUILD_VERSION=0.44.0
+readonly BUILD_VERSION=0.45.0-rc.1
 
 title() {
   echo -e "\033[1m${1}\033[0m"
