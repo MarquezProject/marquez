@@ -17,10 +17,10 @@ import marquez.db.v2.MetadataDb;
 
 @Slf4j
 @Path("/api/v1")
-public class OpenLineageResource {
+public class LineageResource {
   private final MetadataDb metaDb;
 
-  public OpenLineageResource(@NonNull final MetadataDb metaDb) {
+  public LineageResource(@NonNull final MetadataDb metaDb) {
     this.metaDb = metaDb;
   }
 
@@ -29,6 +29,7 @@ public class OpenLineageResource {
   @Path("/lineage")
   public Response collect(@NotNull OpenLineage.RunEvent olRunEvent) {
     metaDb.write(olRunEvent);
+
     return Response.ok().build();
   }
 }

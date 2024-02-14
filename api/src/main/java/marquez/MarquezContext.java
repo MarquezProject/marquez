@@ -23,6 +23,7 @@ import marquez.api.SourceResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
 import marquez.api.exceptions.JsonProcessingExceptionMapper;
+import marquez.api.v2.LineageResource;
 import marquez.db.BaseDao;
 import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
@@ -83,7 +84,7 @@ public final class MarquezContext {
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
   // V2
-  @Getter private final marquez.api.v2.OpenLineageResource olResourceV2;
+  @Getter private final LineageResource olResourceV2;
 
   @Getter private final NamespaceService namespaceService;
   @Getter private final SourceService sourceService;
@@ -172,8 +173,7 @@ public final class MarquezContext {
     this.searchResource = new SearchResource(searchDao);
 
     // v2
-    this.olResourceV2 =
-        new marquez.api.v2.OpenLineageResource(MetadataDb.newInstance(new DbConfig()));
+    this.olResourceV2 = new LineageResource(MetadataDb.newInstance(new DbConfig()));
 
     this.resources =
         ImmutableList.of(
