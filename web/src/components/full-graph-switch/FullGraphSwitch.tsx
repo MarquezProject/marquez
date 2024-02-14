@@ -19,16 +19,16 @@ const FullGraphSwitch: React.FC<FullGraphSwitch> = ({ setShowFullGraph, showFull
   const FULL_GRAPH_LABEL = i18next.t('lineage.full_graph_label')
   return (
     <Box
-      sx={theme => ({
+      sx={(theme) => ({
         display: 'flex',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        zIndex: theme.zIndex.appBar
+        zIndex: theme.zIndex.appBar,
       })}
     >
       <FormControlLabel
         sx={{
-          marginLeft: 0
+          marginLeft: 0,
         }}
         labelPlacement='start'
         control={
@@ -45,13 +45,13 @@ const FullGraphSwitch: React.FC<FullGraphSwitch> = ({ setShowFullGraph, showFull
 }
 
 const mapStateToProps = (state: IState) => ({
-  showFullGraph: state.lineage.showFullGraph
+  showFullGraph: state.lineage.showFullGraph,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setShowFullGraph: setShowFullGraph
+      setShowFullGraph: setShowFullGraph,
     },
     dispatch
   )

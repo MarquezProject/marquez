@@ -10,7 +10,7 @@ import { fetchNamespacesSuccess, setSelectedNode } from '../actionCreators'
 export type INamespacesState = { result: Namespace[]; selectedNamespace: Nullable<string> }
 const initialState: INamespacesState = {
   result: [],
-  selectedNamespace: null
+  selectedNamespace: null,
 }
 
 export default (
@@ -22,16 +22,16 @@ export default (
   switch (type) {
     case FETCH_NAMESPACES_SUCCESS:
       return {
-        result: payload.namespaces.filter(namespace => !namespace.isHidden),
+        result: payload.namespaces.filter((namespace) => !namespace.isHidden),
         selectedNamespace:
           window.localStorage.getItem('selectedNamespace') &&
           action.payload.namespaces.find(
-            ns => ns.name === window.localStorage.getItem('selectedNamespace')
+            (ns) => ns.name === window.localStorage.getItem('selectedNamespace')
           )
             ? window.localStorage.getItem('selectedNamespace')
             : payload.namespaces.length > 0
             ? payload.namespaces[0].name
-            : null
+            : null,
       }
     case SELECT_NAMESPACE:
       window.localStorage.setItem('selectedNamespace', action.payload)

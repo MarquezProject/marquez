@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { History } from 'history'
+import { IColumnLineageState } from '../requests/columnlineage'
 import { Reducer, combineReducers } from 'redux'
 import { createRouterReducer } from '@lagunovsky/redux-react-router'
+import columnLineage from './columnLineage'
 import dataset, { IDatasetState } from './dataset'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
@@ -29,6 +31,7 @@ export interface IState {
   display: IDisplayState
   router: any
   lineage: ILineageState
+  columnLineage: IColumnLineageState
   search: ISearchState
   facets: IFacetsState
 }
@@ -36,6 +39,7 @@ export interface IState {
 export default (history: History): Reducer =>
   combineReducers({
     router: createRouterReducer(history),
+    columnLineage,
     dataset,
     datasets,
     datasetVersions,

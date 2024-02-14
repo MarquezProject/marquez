@@ -9,13 +9,15 @@ import Tooltip from '@mui/material/Tooltip'
 interface MqToolTipProps {
   title: string | ReactElement
   children: ReactElement
+  placement?: 'left' | 'right' | 'top'
 }
 
-const MQTooltip: React.FC<MqToolTipProps> = ({ title, children }) => {
+const MQTooltip: React.FC<MqToolTipProps> = ({ title, children, placement }) => {
   const theme = createTheme(useTheme())
   return (
     <Tooltip
       title={title}
+      placement={placement || 'bottom'}
       componentsProps={{
         tooltip: {
           sx: {

@@ -4,14 +4,15 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import { IState } from '../../store/reducers'
-import { LineageEdge, LineageNode } from '../lineage/types'
+import { LineageNode } from '../lineage/types'
 
+import { LineageGraph } from '../../types/api'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { Undefinable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { encodeNode } from '../../helpers/nodes'
 import { setSelectedNode } from '../../store/actionCreators'
+import { useParams } from 'react-router-dom'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent } from 'react'
@@ -21,9 +22,7 @@ export interface DispatchProps {
 }
 
 interface IOProps {
-  node: Undefinable<LineageNode>
-  inputs: Undefinable<LineageEdge[]>
-  outputs: Undefinable<LineageEdge[]>
+  lineageGraph: LineageGraph
 }
 
 function determineName(node: string) {
@@ -45,13 +44,14 @@ export const determineLink = (current: LineageNode, edge: string) => {
   )}`
 }
 
-const Io: FunctionComponent<IOProps & DispatchProps> = ({
-  node,
-  inputs,
-  outputs,
-  setSelectedNode,
-}) => {
+const Io: FunctionComponent<IOProps & DispatchProps> = ({ lineageGraph, setSelectedNode }) => {
   const i18next = require('i18next')
+
+  const { name, namespace, nodeType } = useParams()
+  const node = lineageGraph.graph.find((node) => node.id === `${nodeType}:${namespace}:${name}`)
+  const inputs = node?.inEdges
+  const outputs = node?.outEdges
+
   if (!node) {
     return null
   }
@@ -131,11 +131,8 @@ const Io: FunctionComponent<IOProps & DispatchProps> = ({
 }
 
 const mapStateToProps = (state: IState) => {
-  const node = state.lineage.lineage.graph.find((node) => node.id === state.lineage.selectedNode)
   return {
-    node: node,
-    inputs: node?.inEdges,
-    outputs: node?.outEdges,
+    lineageGraph: state.lineage.lineage,
   }
 }
 
