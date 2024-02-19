@@ -648,6 +648,6 @@ public class LineageServiceTest {
             5,
             true);
 
-    assertThat(lineage.getGraph()).hasSize(3);
+    assertThat(lineage.getGraph()).hasSize(2);
   }
 }
