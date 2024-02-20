@@ -22,6 +22,7 @@ readonly MARQUEZ_HOST="localhost"
 readonly MARQUEZ_ADMIN_PORT=8081
 readonly MARQUEZ_URL="http://${MARQUEZ_HOST}:${MARQUEZ_ADMIN_PORT}"
 readonly MARQUEZ_DB="marquez-db"
+readonly DB_PORT=5432
 
 readonly METADATA_FILE="api/load-testing/metadata.json"
 readonly METADATA_STATS_QUERY=$(cat <<-END

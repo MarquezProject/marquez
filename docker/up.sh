@@ -64,6 +64,7 @@ compose_files="-f docker-compose.yml"
 API_PORT=5000
 API_ADMIN_PORT=5001
 WEB_PORT=3000
+DB_PORT=5432
 NO_WEB="false"
 NO_VOLUMES="false"
 TAG="${VERSION}"

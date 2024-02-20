@@ -9,7 +9,7 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://postgres:5432/marquez
+  url: jdbc:postgresql://postgres:${DB_PORT}/marquez
   user: marquez
   password: marquez
 
