@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.api.ColumnLineageResource;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
@@ -29,6 +30,7 @@ import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.DbMigration;
 import marquez.db.JobDao;
 import marquez.db.JobFacetsDao;
 import marquez.db.JobVersionDao;
@@ -42,7 +44,7 @@ import marquez.db.RunStateDao;
 import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
-import marquez.db.v2.DbConfig;
+import marquez.db.v2.ManagedConnectionPool;
 import marquez.db.v2.MetadataDb;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
@@ -60,9 +62,11 @@ import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.models.Tag;
+import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 
 @Getter
+@Slf4j
 public final class MarquezContext {
   @Getter private final NamespaceDao namespaceDao;
   @Getter private final SourceDao sourceDao;
@@ -111,6 +115,7 @@ public final class MarquezContext {
   private MarquezContext(
       @NonNull final Jdbi jdbi,
       @NonNull final ImmutableSet<Tag> tags,
+      @NonNull final MarquezConfig config,
       List<RunTransitionListener> runTransitionListeners) {
     if (runTransitionListeners == null) {
       runTransitionListeners = new ArrayList<>();
@@ -172,8 +177,17 @@ public final class MarquezContext {
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
 
-    // v2
-    this.olResourceV2 = new LineageResource(MetadataDb.newInstance(new DbConfig()));
+    // v2;
+    final ManagedConnectionPool managedConnectionPool =
+        ManagedConnectionPool.newManagedConnectionPool(config.getConnectionPoolConfig());
+    try {
+      DbMigration.migrateDbOrError(
+          config.getFlywayFactory(), managedConnectionPool, config.isMigrateOnStartup());
+    } catch (FlywayException errorOnDbMigrate) {
+      log.error("Failed to apply migration!", errorOnDbMigrate);
+      // No-op
+    }
+    this.olResourceV2 = new LineageResource(MetadataDb.newInstance(managedConnectionPool));
 
     this.resources =
         ImmutableList.of(
@@ -186,7 +200,7 @@ public final class MarquezContext {
             jdbiException,
             jsonException,
             // openLineageResource,
-            olResourceV2,
+            this.olResourceV2,
             searchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
@@ -201,6 +215,7 @@ public final class MarquezContext {
 
     private Jdbi jdbi;
     private ImmutableSet<Tag> tags;
+    private MarquezConfig config;
     private List<RunTransitionListener> runTransitionListeners;
 
     Builder() {
@@ -218,6 +233,11 @@ public final class MarquezContext {
       return this;
     }
 
+    public Builder config(@NonNull MarquezConfig config) {
+      this.config = config;
+      return this;
+    }
+
     public Builder runTransitionListener(@NonNull RunTransitionListener runTransitionListener) {
       return runTransitionListeners(Lists.newArrayList(runTransitionListener));
     }
@@ -229,7 +249,7 @@ public final class MarquezContext {
     }
 
     public MarquezContext build() {
-      return new MarquezContext(jdbi, tags, runTransitionListeners);
+      return new MarquezContext(jdbi, tags, config, runTransitionListeners);
     }
   }
 }

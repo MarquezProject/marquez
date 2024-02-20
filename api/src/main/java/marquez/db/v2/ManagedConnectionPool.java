@@ -16,7 +16,8 @@ public class ManagedConnectionPool extends HikariDataSource implements ManagedDa
     hikariConfig.setDriverClassName(config.getDriverClassName());
     hikariConfig.setJdbcUrl(config.getJdbcUrl());
     hikariConfig.setUsername(config.getUsername());
-    hikariConfig.setUsername(config.getPassword());
+    hikariConfig.setPassword(config.getPassword());
+    hikariConfig.setPoolName(config.getPoolName());
 
     return new ManagedConnectionPool(hikariConfig);
   }

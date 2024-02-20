@@ -43,6 +43,7 @@ dependencies {
     implementation "org.jdbi:jdbi3-jackson2:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
+    implementation "org.jdbi:jdbi3-stringtemplate4:${jdbi3Version}"
     implementation 'com.google.guava:guava:32.1.2-jre'
     implementation 'org.dhatim:dropwizard-sentry:2.1.6'
     implementation "io.sentry:sentry:${sentryVersion}"

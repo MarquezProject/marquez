@@ -33,14 +33,12 @@ import marquez.cli.DbRetentionCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
 import marquez.common.Utils;
-import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
-import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.jackson2.Jackson2Config;
@@ -105,13 +103,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     log.info("Running startup actions...");
 
-    try {
+    /*try {
       DbMigration.migrateDbOrError(config.getFlywayFactory(), source, config.isMigrateOnStartup());
     } catch (FlywayException errorOnDbMigrate) {
       log.info("Stopping app...");
       // Propagate throwable up the stack.
       onFatalError(errorOnDbMigrate); // Signal app termination.
-    }
+    }*/
 
     if (isSentryEnabled(config)) {
       Sentry.init(
@@ -130,7 +128,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     final Jdbi jdbi = newJdbi(config, env, source);
     final MarquezContext marquezContext =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).config(config).build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);

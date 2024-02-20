@@ -25,7 +25,7 @@ public class NamespaceService extends DelegatingDaos.DelegatingNamespaceDao {
 
   public NamespaceService(@NonNull final BaseDao baseDao) {
     super(baseDao.createNamespaceDao());
-    init();
+    // init();
   }
 
   private void init() {

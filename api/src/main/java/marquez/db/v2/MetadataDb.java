@@ -5,6 +5,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.lifecycle.Managed;
 import io.openlineage.server.OpenLineage;
+import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -12,6 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.validation.constraints.NotNull;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
 import marquez.common.models.NamespaceName;
@@ -20,8 +22,14 @@ import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.async.JdbiExecutor;
+import org.jdbi.v3.core.statement.SqlLogger;
+import org.jdbi.v3.core.statement.StatementContext;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 
 /** ... */
+@Slf4j
 public class MetadataDb {
   private final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue;
   private final JdbiExecutor nonBlockingDbCallExecutor;
@@ -31,7 +39,11 @@ public class MetadataDb {
     this.nonBlockingDbCallQueue = new ConcurrentLinkedQueue<>();
     this.nonBlockingDbCallExecutor =
         JdbiExecutor.create(
-            Jdbi.create(connectionPool),
+            Jdbi.create(connectionPool)
+                .installPlugin(new SqlObjectPlugin())
+                .installPlugin(new PostgresPlugin())
+                .installPlugin(new Jackson2Plugin())
+                .setSqlLogger(LogDbCalls.newInstance()),
             Executors.newFixedThreadPool(connectionPool.getMaximumPoolSize()));
     ;
     // ...
@@ -44,7 +56,7 @@ public class MetadataDb {
   }
 
   /* ... */
-  public void batchWrite(@NotNull ImmutableList<OpenLineage.RunEvent> olRunEvents) {
+  public void writeBatchOf(@NotNull ImmutableList<OpenLineage.RunEvent> olRunEvents) {
     for (final OpenLineage.RunEvent olRunEvent : olRunEvents) {
       write(olRunEvent);
     }
@@ -53,6 +65,7 @@ public class MetadataDb {
   /* ... */
   public void write(@NotNull OpenLineage.RunEvent olRunEvent) {
     nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newCallFor(olRunEvent));
+    log.info("nonBlockingDbCallQueue.size(): {}", nonBlockingDbCallQueue.size());
   }
 
   public CompletableFuture<Void> listEventsOf() {
@@ -254,21 +267,29 @@ public class MetadataDb {
 
     @Override
     public void start() {
+      log.info("BatchSqlWriter.start()...");
       pollDbCallQueueScheduler.scheduleAtFixedRate(
           () -> {
             // ...
             if (isPolling.get()) {
+              log.info("BatchSqlWriter.polling...skipping");
               return;
             }
             // ...
             isPolling.set(true);
+            log.info("BatchSqlWriter.polling...attempting");
             try {
               while (true) {
                 final BatchSqlWriteCall batchSqlWriteCall = nonBlockingDbCallQueue.poll();
+                log.info("BatchSqlWriter.polled: {}", batchSqlWriteCall);
                 if (batchSqlWriteCall == null) {
                   break;
                 }
-                nonBlockingDbCall.useHandle(batchSqlWriteCall);
+                try {
+                  nonBlockingDbCall.useHandle(batchSqlWriteCall);
+                } catch (Exception e) {
+                  log.info("BatchSqlWriter.polling...error", e);
+                }
               }
             } finally {
               isPolling.set(false);
@@ -282,6 +303,29 @@ public class MetadataDb {
     @Override
     public void stop() {
       pollDbCallQueueScheduler.shutdown();
+    }
+  }
+
+  /** ... */
+  static class LogDbCalls implements SqlLogger {
+    private LogDbCalls() {}
+
+    static LogDbCalls newInstance() {
+      return new LogDbCalls();
+    }
+
+    @Override
+    public void logBeforeExecution(@NonNull StatementContext context) {
+      log.info("logBeforeExecution()");
+    }
+
+    public void logAfterExecution(StatementContext context) {
+      log.info("logAfterExecution()");
+    }
+
+    @Override
+    public void logException(@NonNull StatementContext context, SQLException e) {
+      log.info("logException()", e);
     }
   }
 }
