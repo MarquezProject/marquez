@@ -161,6 +161,8 @@ jobs:
           path: marquez
       - store_artifacts:
           path: k6
+    environment:
+      - POSTGRES_PORT=5432
 
   migrate-db:
     working_directory: ~/marquez
@@ -171,6 +173,8 @@ jobs:
       - checkout
       - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/db-migration.sh
+    environment:
+      - POSTGRES_PORT=5432
 
   publish-snapshot:
     working_directory: ~/marquez
