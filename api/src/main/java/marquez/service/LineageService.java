@@ -153,11 +153,10 @@ public class LineageService extends DelegatingLineageDao {
       Optional<JobData> parentJobData = getParentJobData(data.getParentJobUuid());
       parentJobData.ifPresent(
           parent -> {
-            log.error(
-                "--------Condition is working-------- child: {}, parent: {} with UUID: {} and data {}",
+            log.debug(
+                "child: {}, parent: {} with UUID: {}",
                 parent.getId().getName(),
                 data.getParentJobName(),
-                data.getParentJobUuid(),
                 data);
           });
 
