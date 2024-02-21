@@ -1,8 +1,8 @@
 import * as Redux from 'redux'
 import { ActionBar } from './ActionBar'
 import { Box } from '@mui/system'
+import { DEFAULT_MAX_SCALE, Graph, ZoomPanControls } from '../../../libs/graph'
 import { Drawer } from '@mui/material'
-import { Graph, ZoomPanControls } from '../../../libs/graph'
 import { IState } from '../../store/reducers'
 import { JobOrDataset } from '../../components/lineage/types'
 import { LineageGraph } from '../../types/api'
@@ -41,8 +41,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
-  const [isCompact, setIsCompact] = useState(false)
-  const [isFull, setIsFull] = useState(true)
+  const [isCompact, setIsCompact] = useState(searchParams.get('isCompact') === 'true')
+  const [isFull, setIsFull] = useState(searchParams.get('isFull') === 'true')
 
   const graphControls = useRef<ZoomPanControls>()
 
@@ -62,6 +62,13 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const handleResetZoom = () => {
     graphControls.current?.fitContent()
+  }
+
+  const handleCenterOnNode = () => {
+    graphControls.current?.centerOnPositionedNode(
+      `${nodeType}:${namespace}:${name}`,
+      DEFAULT_MAX_SCALE
+    )
   }
 
   const setGraphControls = useCallbackRef((zoomControls) => {
@@ -103,7 +110,11 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
             <TableLevelDrawer />
           </Box>
         </Drawer>
-        <ZoomControls handleScaleZoom={handleScaleZoom} handleResetZoom={handleResetZoom} />
+        <ZoomControls
+          handleCenterOnNode={handleCenterOnNode}
+          handleScaleZoom={handleScaleZoom}
+          handleResetZoom={handleResetZoom}
+        />
         <ParentSize>
           {(parent) => (
             <Graph<JobOrDataset, TableLevelNodeData>

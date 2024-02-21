@@ -33,7 +33,7 @@ export interface ZoomPanControls {
   centerOnExtent(extent: Extent): void
   scaleZoom(kDelta?: number): void
   resetZoom(): void
-  centerOnPositionedNode(nodeId: string): void
+  centerOnPositionedNode(nodeId: string, k?: number): void
 }
 
 interface Props extends BoxProps {
@@ -232,12 +232,12 @@ export const ZoomPanSvg = ({
     animateToZoomState(zoomIdentity)
   }
 
-  const centerOnPositionedNode = (nodeId: string) => {
+  const centerOnPositionedNode = (nodeId: string, k = currentZoomState.k) => {
     const node = positionedNodes.find((node) => node.id === nodeId)
     if (!node) return
 
     const extent = getNodeExtent(node)
-    centerOnExtent(extent)
+    centerOnExtent(extent, k)
   }
 
   const fitContent = () => {
