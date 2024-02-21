@@ -20,6 +20,7 @@ import marquez.db.v2.MetadataDb;
 // TODO:
 // * Add support to deserialize 'OpenLineage.BaseEvent'
 
+/** ... */
 @Slf4j
 @Path("/api/v1")
 public class LineageResource {
@@ -33,9 +34,6 @@ public class LineageResource {
   @Consumes(APPLICATION_JSON)
   @Path("/batch/lineage")
   public Response collectBatchOf(@NotNull BatchOlEvents batchOlEvents) {
-    log.debug("Received events: {}", batchOlEvents);
-
-    // Write batch of events (async), then return OK.
     metaDb.writeBatchOf(batchOlEvents.getEvents());
     return Response.ok().build();
   }
@@ -44,9 +42,6 @@ public class LineageResource {
   @Consumes(APPLICATION_JSON)
   @Path("/lineage")
   public Response collect(@NotNull OpenLineage.RunEvent olEvent) {
-    log.debug("Received event: {}", olEvent);
-
-    // Write event (async), then return OK.
     metaDb.write(olEvent);
     return Response.ok().build();
   }

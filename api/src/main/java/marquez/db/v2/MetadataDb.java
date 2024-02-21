@@ -45,7 +45,6 @@ public class MetadataDb {
                 .installPlugin(new Jackson2Plugin())
                 .setSqlLogger(LogDbCalls.newInstance()),
             Executors.newFixedThreadPool(connectionPool.getMaximumPoolSize()));
-    ;
     // ...
     new MetadataDb.BatchSqlWriter(nonBlockingDbCallQueue, nonBlockingDbCallExecutor).start();
   }

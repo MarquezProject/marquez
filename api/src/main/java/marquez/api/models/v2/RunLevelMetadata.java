@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,7 @@ import marquez.common.models.Version;
 
 @AllArgsConstructor
 @Builder
-public final class RunLevelLineageMetadata {
+public final class RunLevelMetadata {
   @Getter final RunId runId;
   @Getter final RunState runState;
   @Getter final UUID runStateUuid = UUID.randomUUID();
@@ -30,27 +31,28 @@ public final class RunLevelLineageMetadata {
   @Getter final Instant runEndedAt;
   @Getter final Instant runNominalStartTime;
   @Getter final Instant runNominalEndTime;
-  final String runExternalId;
+  @Nullable final String runExternalId;
 
   @Getter final UUID jobUuid = UUID.randomUUID();
   @Getter final UUID jobNamespaceUuid = UUID.randomUUID();
   @Getter final NamespaceName jobNamespace;
+  @Nullable final String jobNamespaceDescription;
 
   @Getter
   final Version jobVersion = Version.of(UUID.fromString("c83d94ca-9c56-499c-9dc7-85a20a411c02"));
 
   @Getter final JobName jobName;
   @Getter final JobType jobType;
-  final String jobDescription;
-  final URI jobLocation;
+  @Nullable final String jobDescription;
+  @Nullable final URI jobLocation;
 
   @Getter final String rawData;
   @Getter final URI producer;
 
-  public static RunLevelLineageMetadata newInstanceFor(@NotNull OpenLineage.RunEvent olRunEvent) {
+  public static RunLevelMetadata newInstanceFor(@NotNull OpenLineage.RunEvent olRunEvent) {
     final OpenLineage.Run run = olRunEvent.getRun();
     final OpenLineage.Job job = olRunEvent.getJob();
-    return RunLevelLineageMetadata.builder()
+    return RunLevelMetadata.builder()
         .runId(RunId.of(run.getRunId()))
         .runState(RunState.from(olRunEvent.getEventType()))
         .runTransitionedOn(
@@ -60,6 +62,7 @@ public final class RunLevelLineageMetadata {
         .runNominalEndTime(Instant.now())
         .jobType(JobType.BATCH)
         .jobNamespace(NamespaceName.of(job.getNamespace()))
+        .jobNamespaceDescription("best namespace ever!")
         .jobName(JobName.of(job.getName()))
         .rawData(toJson(olRunEvent))
         .producer(olRunEvent.getProducer())
@@ -76,6 +79,10 @@ public final class RunLevelLineageMetadata {
 
   public Optional<String> getRunExternalId() {
     return Optional.ofNullable(runExternalId);
+  }
+
+  public Optional<String> getJobNamespaceDescription() {
+    return Optional.ofNullable(jobNamespaceDescription);
   }
 
   public Optional<String> getJobDescription() {

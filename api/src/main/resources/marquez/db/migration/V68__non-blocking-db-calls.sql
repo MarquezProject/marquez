@@ -43,6 +43,7 @@ ALTER TABLE runs DROP COLUMN location;
 ALTER TABLE runs DROP COLUMN job_uuid CASCADE;
 ALTER TABLE runs DROP COLUMN job_name;
 ALTER TABLE runs DROP COLUMN namespace_name;
+ALTER TABLE runs RENAME COLUMN external_id TO "external_run_id";
 
 CREATE INDEX IF NOT EXISTS run_states_state_idx ON run_states(state);
 ALTER TABLE run_states ADD UNIQUE (run_uuid, state);
@@ -51,6 +52,7 @@ ALTER TABLE job_versions DROP COLUMN version;
 ALTER TABLE job_versions DROP COLUMN job_context_uuid CASCADE;
 ALTER TABLE job_versions ADD CONSTRAINT namespaces_pkey FOREIGN KEY (namespace_uuid) REFERENCES namespaces(uuid);
 ALTER TABLE job_versions RENAME COLUMN latest_run_uuid TO "current_run_uuid";
+ALTER TABLE job_versions RENAME COLUMN location TO "job_location";
 
 DROP INDEX IF EXISTS lineage_events_run_id_index;
 CREATE INDEX IF NOT EXISTS lineage_events_run_uuid_idx ON lineage_events(run_id);
