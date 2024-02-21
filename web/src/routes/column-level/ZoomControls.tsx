@@ -1,4 +1,4 @@
-import { CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
+import { CenterFocusStrong, CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
 import { Tooltip } from '@mui/material'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/material/Box'
@@ -8,9 +8,14 @@ import React from 'react'
 interface ZoomControlsProps {
   handleScaleZoom: (inOrOut: 'in' | 'out') => void
   handleResetZoom: () => void
+  handleCenterOnNode?: () => void
 }
 
-export const ZoomControls = ({ handleScaleZoom, handleResetZoom }: ZoomControlsProps) => {
+export const ZoomControls = ({
+  handleScaleZoom,
+  handleResetZoom,
+  handleCenterOnNode,
+}: ZoomControlsProps) => {
   return (
     <Box
       display={'flex'}
@@ -38,6 +43,13 @@ export const ZoomControls = ({ handleScaleZoom, handleResetZoom }: ZoomControlsP
           <CropFree />
         </IconButton>
       </Tooltip>
+      {handleCenterOnNode && (
+        <Tooltip title={'Center on selected node'} placement={'left'}>
+          <IconButton size={'small'} onClick={handleCenterOnNode}>
+            <CenterFocusStrong />
+          </IconButton>
+        </Tooltip>
+      )}
     </Box>
   )
 }
