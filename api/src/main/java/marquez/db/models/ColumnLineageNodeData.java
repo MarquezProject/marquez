@@ -42,6 +42,17 @@ public class ColumnLineageNodeData implements NodeData {
     this.inputFields = inputFields;
   }
 
+  public ColumnLineageNodeData(InputFieldNodeData data) {
+    this.namespace = data.namespace;
+    this.dataset = data.dataset;
+    this.datasetVersion = data.datasetVersion;
+    this.field = data.field;
+    this.fieldType = "";
+    this.transformationDescription = data.transformationDescription;
+    this.transformationType = data.transformationType;
+    this.inputFields = ImmutableList.of();
+  }
+
   /**
    * @deprecated Moved into {@link ColumnLineageInputField} to support multiple jobs writing to a
    *     single dataset. This method is scheduled to be removed in release {@code 0.30.0}.

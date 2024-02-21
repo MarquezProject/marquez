@@ -26,6 +26,6 @@ export const fileSize = (data: string) => {
   const size = encodeURI(data).split(/%..|./).length - 1
   return {
     kiloBytes: size / 1024,
-    megaBytes: size / 1024 / 1024
+    megaBytes: size / 1024 / 1024,
   }
 }

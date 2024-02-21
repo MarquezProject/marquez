@@ -68,10 +68,14 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
               NodeId nodeId = toNodeId(columnLineageNodeData, includeVersion);
               graphNodes.put(nodeId, Node.datasetField().data(columnLineageNodeData).id(nodeId));
               columnLineageNodeData.getInputFields().stream()
-                  .map(i -> toNodeId(i, includeVersion))
                   .forEach(
-                      inputNodeId -> {
-                        graphNodes.putIfAbsent(inputNodeId, Node.datasetField().id(inputNodeId));
+                      inputNode -> {
+                        NodeId inputNodeId = toNodeId(inputNode, includeVersion);
+                        graphNodes.putIfAbsent(
+                            inputNodeId,
+                            Node.datasetField()
+                                .id(inputNodeId)
+                                .data(new ColumnLineageNodeData(inputNode)));
                         Optional.ofNullable(outEdges.get(inputNodeId))
                             .ifPresentOrElse(
                                 nodeEdges -> nodeEdges.add(nodeId),

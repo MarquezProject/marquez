@@ -8,7 +8,7 @@ export const DAGRE_CONFIG = {
   align: 'UL',
   ranker: 'network-simplex',
   edgesep: 60,
-  ranksep: 140
+  ranksep: 140,
 }
 
 export const NODE_SIZE = 0
@@ -19,5 +19,5 @@ export const INITIAL_TRANSFORM = {
   translateX: 0,
   translateY: 0,
   skewX: 0,
-  skewY: 0
+  skewY: 0,
 }
