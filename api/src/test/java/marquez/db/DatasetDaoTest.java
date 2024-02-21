@@ -41,7 +41,7 @@ class DatasetDaoTest {
   private static DatasetDao datasetDao;
   private static OpenLineageDao openLineageDao;
 
-  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+  private final JobFacet jobFacet = JobFacet.builder().build();
 
   static Jdbi jdbi;
 

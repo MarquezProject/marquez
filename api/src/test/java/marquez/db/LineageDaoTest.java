@@ -67,7 +67,7 @@ public class LineageDaoTest {
               new SchemaField("firstname", "string", "the first name"),
               new SchemaField("lastname", "string", "the last name"),
               new SchemaField("birthdate", "date", "the date of birth")));
-  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+  private final JobFacet jobFacet = JobFacet.builder().build();
 
   static Jdbi jdbi;
 
@@ -393,7 +393,7 @@ public class LineageDaoTest {
   /** A failed consumer job doesn't show up in the datasets out edges */
   @Test
   public void testGetLineageWithFailedConsumer() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -513,7 +513,7 @@ public class LineageDaoTest {
   /** A failed producer job doesn't show up in the lineage */
   @Test
   public void testGetLineageWithFailedProducer() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -542,7 +542,7 @@ public class LineageDaoTest {
   /** A failed producer job doesn't show up in the lineage */
   @Test
   public void testGetLineageChangedJobVersion() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -568,7 +568,7 @@ public class LineageDaoTest {
 
   @Test
   public void testGetJobFromInputOrOutput() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
 
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -592,7 +592,7 @@ public class LineageDaoTest {
 
   @Test
   public void testGetJobFromInputOrOutputPrefersRecentOutputJob() {
-    JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    JobFacet jobFacet = JobFacet.builder().build();
 
     // add some consumer jobs prior to the write so we know that the sort isn't simply picking
     // the first job created

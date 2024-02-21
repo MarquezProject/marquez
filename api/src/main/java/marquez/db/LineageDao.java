@@ -56,43 +56,45 @@ public interface LineageDao {
   @SqlQuery(
       """
       WITH RECURSIVE
-           -- Find the current version of a job or its symlink target if the target has no
-           -- current_version_uuid. This ensures that we don't lose lineage for a job after it is
-           -- symlinked to another job but before that target job has run successfully.
-          job_current_version AS (
-              SELECT COALESCE(j.symlink_target_uuid, j.uuid) AS job_uuid,
-                     COALESCE(s.current_version_uuid, j.current_version_uuid) AS job_version_uuid
-              FROM jobs j
-              LEFT JOIN jobs s ON s.uuid=j.symlink_target_uuid
-              WHERE s.current_version_uuid IS NULL
-          ),
-          job_io AS (
-              SELECT j.job_uuid,
-                     ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
-                     ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
-              FROM job_versions_io_mapping io
-              INNER JOIN job_current_version j ON io.job_version_uuid=j.job_version_uuid
-              GROUP BY j.job_uuid
-          ),
-          lineage(job_uuid, inputs, outputs) AS (
-              SELECT v.job_uuid AS job_uuid,
-                     COALESCE(inputs, Array[]::uuid[]) AS inputs,
-                     COALESCE(outputs, Array[]::uuid[]) AS outputs,
-                     0 AS depth
-              FROM jobs j
-              INNER JOIN job_current_version v ON (j.symlink_target_uuid IS NULL AND j.uuid=v.job_uuid) OR v.job_uuid=j.symlink_target_uuid
-              LEFT JOIN job_io io ON io.job_uuid=v.job_uuid
-              WHERE j.uuid IN (<jobIds>) OR j.symlink_target_uuid IN (<jobIds>)
-              UNION
-              SELECT io.job_uuid, io.inputs, io.outputs, l.depth + 1
-              FROM job_io io,
-                  lineage l
-              WHERE io.job_uuid != l.job_uuid AND
-                  array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
-                AND depth < :depth)
-      SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
-      FROM lineage l2
-      INNER JOIN jobs_view j ON j.uuid=l2.job_uuid;
+                 job_io AS (
+                    SELECT
+                           io.job_uuid AS job_uuid,
+                           io.job_symlink_target_uuid AS job_symlink_target_uuid,
+                           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='INPUT') AS inputs,
+                           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='OUTPUT') AS outputs
+                    FROM job_versions_io_mapping io
+                    WHERE io.is_current_job_version = TRUE
+                    GROUP BY io.job_symlink_target_uuid, io.job_uuid
+                ),
+                lineage(job_uuid, job_symlink_target_uuid, inputs, outputs) AS (
+                    SELECT job_uuid,
+                           job_symlink_target_uuid,
+                           COALESCE(inputs, Array[]::uuid[]) AS inputs,
+                           COALESCE(outputs, Array[]::uuid[]) AS outputs,
+                           0 AS depth
+                    FROM job_io
+                    WHERE job_uuid IN (<jobIds>) OR job_symlink_target_uuid IN (<jobIds>)
+                    UNION
+                    SELECT io.job_uuid, io.job_symlink_target_uuid, io.inputs, io.outputs, l.depth + 1
+                    FROM job_io io, lineage l
+                    WHERE (io.job_uuid != l.job_uuid) AND
+                        array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
+                      AND depth < :depth),
+                lineage_outside_job_io(job_uuid) AS (
+                    SELECT
+                      param_jobs.param_job_uuid as job_uuid,
+                      j.symlink_target_uuid,
+                      Array[]::uuid[] AS inputs,
+                      Array[]::uuid[] AS outputs,
+                      0 AS depth
+                    FROM (SELECT unnest(ARRAY[<jobIds>]::UUID[]) AS param_job_uuid) param_jobs
+                    LEFT JOIN lineage l on param_jobs.param_job_uuid = l.job_uuid
+                    INNER JOIN jobs j ON j.uuid = param_jobs.param_job_uuid
+                    WHERE l.job_uuid IS NULL
+                )
+            SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
+            FROM (SELECT * FROM lineage UNION SELECT * FROM lineage_outside_job_io) l2
+            INNER JOIN jobs_view j ON (j.uuid=l2.job_uuid OR j.uuid=l2.job_symlink_target_uuid)
   """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 

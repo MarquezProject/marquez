@@ -13,14 +13,14 @@ import { applyMiddleware, createStore } from 'redux'
 import { composeWithDevTools } from '@redux-devtools/extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
-import BottomBar from './bottom-bar/BottomBar'
+import ColumnLevel from '../routes/column-level/ColumnLevel'
 import Datasets from '../routes/datasets/Datasets'
 import Events from '../routes/events/Events'
 import Header from './header/Header'
 import Jobs from '../routes/jobs/Jobs'
-import Lineage from './lineage/Lineage'
 import React, { ReactElement } from 'react'
 import Sidenav from './sidenav/Sidenav'
+import TableLevel from '../routes/table-level/TableLevel'
 import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
@@ -65,14 +65,10 @@ const App = (): ReactElement => {
                     <Route path={'/datasets'} element={<Datasets />} />
                     <Route path={'/events'} element={<Events />} />
                     <Route
-                      path={'/lineage/:nodeType/:namespace/:nodeName'}
-                      element={
-                        <>
-                          <Lineage />
-                          <BottomBar />
-                        </>
-                      }
+                      path={'/datasets/column-level/:namespace/:name'}
+                      element={<ColumnLevel />}
                     />
+                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
                   </Routes>
                   <Toast />
                 </Box>

@@ -18,6 +18,7 @@ import marquez.api.JdbiUtils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -63,12 +64,14 @@ public class JobFacetsDaoTest {
             openLineageDao,
             "job_" + UUID.randomUUID(),
             "COMPLETE",
-            new LineageEvent.JobFacet(
-                null,
-                new LineageEvent.SourceCodeLocationJobFacet(
-                    PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
-                null,
-                LineageTestUtils.EMPTY_MAP),
+            JobFacet.builder()
+                .sourceCodeLocation(
+                    new LineageEvent.SourceCodeLocationJobFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        "git",
+                        "git@github.com:OpenLineage/OpenLineage.git"))
+                .build(),
             Collections.emptyList(),
             Collections.emptyList());
 
@@ -88,12 +91,16 @@ public class JobFacetsDaoTest {
   @Test
   public void testGetFacetsByRunUuid() {
     LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(
-            new LineageEvent.DocumentationJobFacet(PRODUCER_URL, SCHEMA_URL, "some-documentation"),
-            new LineageEvent.SourceCodeLocationJobFacet(
-                PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
-            new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"),
-            null);
+        JobFacet.builder()
+            .documentation(
+                new LineageEvent.DocumentationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "some-documentation"))
+            .sourceCodeLocation(
+                new LineageEvent.SourceCodeLocationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"))
+            .sql(new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"))
+            .build();
+
     UpdateLineageRow lineageRow =
         LineageTestUtils.createLineageRow(
             openLineageDao,

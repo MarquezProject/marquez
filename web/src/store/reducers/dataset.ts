@@ -3,11 +3,12 @@
 
 import { Dataset } from '../../types/api'
 import { FETCH_DATASET, FETCH_DATASET_SUCCESS, RESET_DATASET } from '../actionCreators/actionTypes'
+import { Nullable } from '../../types/util/Nullable'
 import { fetchDatasetSuccess } from '../actionCreators'
 
-export type IDatasetState = { isLoading: boolean; result: Dataset; init: boolean }
+export type IDatasetState = { isLoading: boolean; result: Nullable<Dataset>; init: boolean }
 
-export const initialState: IDatasetState = { isLoading: false, init: false, result: {} as Dataset }
+export const initialState: IDatasetState = { isLoading: false, init: false, result: null }
 
 type IDatasetAction = ReturnType<typeof fetchDatasetSuccess>
 

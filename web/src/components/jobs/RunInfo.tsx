@@ -65,7 +65,6 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
           </Box>
           <MqJsonView
             data={run.facets}
-            searchable={true}
             aria-label={i18next.t('jobs.facets_subhead_aria')}
             aria-required='true'
             placeholder={i18next.t('jobs.search')}

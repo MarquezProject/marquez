@@ -1,37 +1,30 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
-
 import * as Redux from 'redux'
 import {
-  Accordion,
   Box,
   Card,
   CardContent,
-  Divider,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
 } from '@mui/material'
-import { Chip, Drawer } from '@mui/material'
-import { Field, Run, Tag } from '../../types/api'
+import { Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
+
 import { connect, useSelector } from 'react-redux'
-import { createTheme } from '@mui/material/styles'
-import { fetchJobFacets, fetchTags, resetFacets } from '../../store/actionCreators'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import { stopWatchDuration } from '../../helpers/time'
-import { useTheme } from '@emotion/react'
-import AccordionDetails from '@mui/material/AccordionDetails'
-import AccordionSummary from '@mui/material/AccordionSummary'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import MQTooltip from '../core/tooltip/MQTooltip'
+import Collapse from '@mui/material/Collapse'
+import DatasetTags from './DatasetTags'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import MqCode from '../core/code/MqCode'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect, useState } from 'react'
-import ReadMoreIcon from '@mui/icons-material/ReadMore'
 import RunStatus from '../jobs/RunStatus'
 
 export interface DispatchProps {
@@ -58,61 +51,50 @@ type DatasetInfoProps = {
 } & JobFacetsProps &
   DispatchProps
 
-const formatColumnTags = (tags: string[], tag_desc: Tag[]) => {
-  const theme = createTheme(useTheme())
-  return (
-    <>
-      {tags.map((tag, index) => {
-        const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
-        const tooltipTitle = tagDescription?.description || 'No Tag Description'
-        return (
-          <MQTooltip title={tooltipTitle} key={tag}>
-            <Chip
-              label={tag}
-              size='small'
-              style={{
-                display: 'row',
-                marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
-                marginTop: 3,
-              }}
-            />
-          </MQTooltip>
-        )
-      })}
-    </>
-  )
-}
-
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
+  const dsNamespace = useSelector(
+    (state: IState) => state.datasetVersions.result.versions[0].namespace
+  )
+  const dsName = useSelector((state: IState) => state.datasetVersions.result.versions[0].name)
 
-  const [open, setOpen] = useState(false)
-  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined)
-  const theme = createTheme(useTheme())
+  const loadCollapsedState = () => {
+    const storedState = localStorage.getItem(`dsi_${dsNamespace}_${dsName}`)
+    return storedState ? JSON.parse(storedState) : []
+  }
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
-    run && fetchTags()
   }, [run])
 
-  // unmounting
   useEffect(
     () => () => {
       resetFacets()
     },
     []
   )
+  const [expandedRows, setExpandedRows] = useState<number[]>(loadCollapsedState)
 
-  const tagData = useSelector((state: IState) => state.tags.tags)
-  const handleOpen = (key: string) => {
-    setOpen(true)
-    setSelectedKey(key)
+  const toggleRow = (index: number) => {
+    setExpandedRows((prevExpandedRows) => {
+      const newExpandedRows = prevExpandedRows.includes(index)
+        ? prevExpandedRows.filter((rowIndex) => rowIndex !== index)
+        : [...prevExpandedRows, index]
+
+      localStorage.setItem(`dsi_${dsNamespace}_${dsName}`, JSON.stringify(newExpandedRows))
+
+      return newExpandedRows
+    })
   }
 
-  const selectedField = datasetFields.find((field) => field.name === selectedKey)
-  const selectedFieldTags = selectedField?.tags || []
-  const selectedFieldDesc = selectedField?.description || 'No Description'
+  useEffect(() => {
+    for (const key in localStorage) {
+      if (key !== `dsi_${dsNamespace}_${dsName}`) {
+        localStorage.removeItem(key)
+      }
+    }
+  }, [dsNamespace, dsName])
 
   return (
     <Box>
@@ -146,73 +128,38 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {datasetFields.map((field) => {
+              {datasetFields.map((field, index) => {
                 return (
-                  <TableRow key={field.name}>
-                    <TableCell align='left'>{field.name}</TableCell>
-                    <TableCell align='left'>{field.type}</TableCell>
-                    <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                    <TableCell>
-                      <ReadMoreIcon
-                        onClick={() => handleOpen(field.name)}
-                        sx={{ align: 'Right' }}
-                      ></ReadMoreIcon>
-                    </TableCell>
-                  </TableRow>
+                  <React.Fragment key={field.name}>
+                    <TableRow onClick={() => toggleRow(index)} className='expandable-row'>
+                      <TableCell align='left'>{field.name}</TableCell>
+                      <TableCell align='left'>{field.type}</TableCell>
+                      <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                      <TableCell align='right'>
+                        <KeyboardArrowDownIcon />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell colSpan={4} style={{ padding: 0, border: 'none' }}>
+                        <Collapse in={expandedRows.includes(index)} timeout='auto'>
+                          <Card>
+                            <CardContent>
+                              <DatasetTags
+                                namespace={dsNamespace}
+                                datasetName={dsName}
+                                datasetTags={field.tags}
+                                datasetField={field.name}
+                              />
+                            </CardContent>
+                          </Card>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                 )
               })}
             </TableBody>
           </Table>
-          <Drawer
-            elevation={0}
-            anchor='right'
-            open={open}
-            onClose={() => setOpen(false)}
-            sx={{ zIndex: theme.zIndex.drawer + 1 }}
-            PaperProps={{
-              sx: {
-                width: 400,
-                backgroundColor: theme.palette.background.paper,
-                border: `2px dashed ${theme.palette.secondary.main}`,
-                p: 1,
-              },
-            }}
-          >
-            <Card>
-              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
-                <MqText heading bottomMargin>
-                  {selectedKey}
-                </MqText>
-              </CardContent>
-            </Card>
-            <Divider />
-            <Card>
-              <CardContent sx={{ backgroundColor: theme.palette.background.paper }}>
-                <MqText bottomMargin>{selectedFieldDesc}</MqText>
-              </CardContent>
-            </Card>
-            <Accordion elevation={0}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                }}
-              >
-                <MqText bold bottomMargin>
-                  Tags
-                </MqText>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                }}
-              >
-                {selectedFieldTags.length > 0
-                  ? formatColumnTags(selectedFieldTags, tagData)
-                  : 'No Tags'}
-              </AccordionDetails>
-            </Accordion>
-          </Drawer>
         </>
       )}
       {facets && (
@@ -220,13 +167,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJsonView
-            data={facets}
-            searchable={true}
-            aria-label={i18next.t('dataset_info.facets_subhead_aria')}
-            aria-required='True'
-            placeholder='Search'
-          />
+          <MqJsonView data={facets} aria-label={i18next.t('dataset_info.facets_subhead_aria')} />
         </Box>
       )}
       {run && (
@@ -260,7 +201,6 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       fetchJobFacets: fetchJobFacets,
       resetFacets: resetFacets,
-      fetchTags: fetchTags,
     },
     dispatch
   )

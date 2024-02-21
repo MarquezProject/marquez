@@ -272,6 +272,33 @@ public interface DatasetDao extends BaseDao {
       """)
   Optional<DatasetRow> delete(String namespaceName, String name);
 
+  @SqlUpdate(
+      """
+        DELETE FROM datasets_tag_mapping dtm
+        WHERE EXISTS (
+            SELECT 1
+            FROM
+              datasets d
+            JOIN
+              tags t
+            ON
+              d.uuid = dtm.dataset_uuid
+            AND
+              t.uuid = dtm.tag_uuid
+            JOIN
+              namespaces n
+            ON
+              d.namespace_uuid = n.uuid
+            WHERE
+              d.name = :datasetName
+            AND
+              t.name = :tagName
+            AND
+              n.name = :namespaceName
+        );
+      """)
+  void deleteDatasetTag(String namespaceName, String datasetName, String tagName);
+
   @Transaction
   default Dataset upsertDatasetMeta(
       NamespaceName namespaceName, DatasetName datasetName, DatasetMeta datasetMeta) {
