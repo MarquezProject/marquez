@@ -2,34 +2,33 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
+import { Box, Button, Tab, Tabs, createTheme } from '@mui/material'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion, Tag } from '../../types/api'
+import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
   fetchDatasetVersions,
-  fetchTags,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
+import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import Io from '../io/Io'
-import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
@@ -50,7 +49,6 @@ interface DispatchProps {
   deleteDataset: typeof deleteDataset
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
-  fetchTags: typeof fetchTags
 }
 
 type IProps = StateProps & DispatchProps
@@ -76,23 +74,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     lineageDataset,
     tabIndex,
     setTabIndex,
-    fetchTags,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
-  const tagData = useSelector((state: IState) => state.tags.tags)
-
-  useEffect(() => {
-    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
-    fetchTags()
-  }, [props.lineageDataset.name])
-
-  useEffect(() => {
-    if (datasets.deletedDatasetName) {
-      navigate('/datasets')
-    }
-  }, [datasets.deletedDatasetName])
+  const [_, setSearchParams] = useSearchParams()
 
   // unmounting
   useEffect(
@@ -102,6 +88,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     },
     []
   )
+
+  useEffect(() => {
+    fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+  }, [lineageDataset.name, datasets.refreshTags])
+
+  // if the dataset is deleted then redirect to datasets end point
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      navigate('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   const handleChange = (_: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
@@ -123,30 +120,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
-  const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    const theme = createTheme(useTheme())
-    return (
-      <>
-        {tags.map((tag, index) => {
-          const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
-          const tooltipTitle = tagDescription?.description || 'No Tag Description'
-          return (
-            <MQTooltip title={tooltipTitle} key={tag}>
-              <Chip
-                label={tag}
-                size='small'
-                style={{
-                  display: 'inline',
-                  marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
-                }}
-              />
-            </MQTooltip>
-          )
-        })}
-      </>
-    )
-  }
-
   return (
     <Box
       my={2}
@@ -155,7 +128,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        {formatTags(tags, tagData)}
+        <DatasetTags
+          datasetTags={tags}
+          datasetName={lineageDataset.name}
+          namespace={lineageDataset.namespace}
+        />
         <Box display={'flex'} justifyContent={'space-between'} mb={2}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
@@ -210,8 +187,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 }}
               />
             </Box>
-            <IconButton onClick={() => navigate('/datasets')}>
-              <CloseIcon />
+            <IconButton onClick={() => setSearchParams({})}>
+              <CloseIcon fontSize={'small'} />
             </IconButton>
           </Box>
         </Box>
@@ -260,7 +237,6 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteDataset: deleteDataset,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
-      fetchTags: fetchTags,
     },
     dispatch
   )

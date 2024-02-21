@@ -12,6 +12,7 @@ import io.dropwizard.db.DataSourceFactory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
 import marquez.jobs.DbRetentionConfig;
@@ -47,6 +48,10 @@ public class MarquezConfig extends Configuration {
   @Setter
   @JsonProperty("dbRetention")
   private DbRetentionConfig dbRetention; // OPTIONAL
+
+  @Getter
+  @JsonProperty("exclude")
+  private ExclusionsConfig exclude = new ExclusionsConfig();
 
   /** Returns {@code true} if a data retention policy has been configured. */
   public boolean hasDbRetentionPolicy() {

@@ -39,3 +39,6 @@ metadata.json
 
 # Dependent Helm charts
 chart/charts/
+
+# Dev
+changes.txt

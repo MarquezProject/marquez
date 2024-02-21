@@ -5,6 +5,9 @@
 
 package marquez.service;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -12,6 +15,7 @@ import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,14 +25,20 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobId;
+import marquez.common.models.RunId;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
+import marquez.db.LineageDao.DatasetSummary;
+import marquez.db.LineageDao.JobSummary;
+import marquez.db.LineageDao.RunSummary;
 import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
+import marquez.service.LineageService.UpstreamRunLineage;
 import marquez.service.models.DatasetData;
 import marquez.service.models.Edge;
 import marquez.service.models.Graph;
@@ -41,6 +51,11 @@ import marquez.service.models.Run;
 
 @Slf4j
 public class LineageService extends DelegatingLineageDao {
+
+  public record UpstreamRunLineage(List<UpstreamRun> runs) {}
+
+  public record UpstreamRun(JobSummary job, RunSummary run, List<DatasetSummary> inputs) {}
+
   private final JobDao jobDao;
 
   public LineageService(LineageDao delegate, JobDao jobDao) {
@@ -251,5 +266,33 @@ public class LineageService extends DelegatingLineageDao {
       throw new NodeIdNotFoundException(
           String.format("Node '%s' must be of type dataset or job!", nodeId.getValue()));
     }
+  }
+
+  /**
+   * Returns the upstream lineage for a given run. Recursively: run -> dataset version it read from
+   * -> the run that produced it
+   *
+   * @param runId the run to get upstream lineage from
+   * @param depth the maximum depth of the upstream lineage
+   * @return the upstream lineage for that run up to `detph` levels
+   */
+  public UpstreamRunLineage upstream(@NotNull RunId runId, int depth) {
+    List<UpstreamRunRow> upstreamRuns = getUpstreamRuns(runId.getValue(), depth);
+    Map<RunId, List<UpstreamRunRow>> collect =
+        upstreamRuns.stream().collect(groupingBy(r -> r.run().id(), LinkedHashMap::new, toList()));
+    List<UpstreamRun> runs =
+        collect.entrySet().stream()
+            .map(
+                row -> {
+                  UpstreamRunRow upstreamRunRow = row.getValue().get(0);
+                  List<DatasetSummary> inputs =
+                      row.getValue().stream()
+                          .map(UpstreamRunRow::input)
+                          .filter(i -> i != null)
+                          .collect(toList());
+                  return new UpstreamRun(upstreamRunRow.job(), upstreamRunRow.run(), inputs);
+                })
+            .collect(toList());
+    return new UpstreamRunLineage(runs);
   }
 }

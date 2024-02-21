@@ -22,14 +22,31 @@ project_root=$(git rev-parse --show-toplevel)
 cd "${project_root}/"
 
 compose_files="-f docker-compose.yml"
-args="--remove-orphans"
+compose_args="--remove-orphans"
+
+# Parse args
+while [ $# -gt 0 ]; do
+  case $1 in
+    -h|'--help')
+       usage
+       exit 0
+       ;;
+  esac
+  shift
+done
 
 # We can ignore the tag and port(s) when cleaning up running
 # containers and volumes
 TAG=any
 
-API_PORT=${RANDOM} API_ADMIN_PORT=${RANDOM} WEB_PORT=${RANDOM} TAG=${RANDOM} docker-compose $compose_files down $args && \
-  docker volume rm marquez_data && \
+API_PORT=${RANDOM}
+API_ADMIN_PORT=${RANDOM}
+WEB_PORT=${RANDOM}
+TAG=${RANDOM}
+
+docker compose $compose_files down $compose_args
+
+docker volume rm marquez_data && \
   docker volume rm marquez_db-backup && \
   docker volume rm marquez_db-conf && \
   docker volume rm marquez_db-init

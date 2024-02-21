@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import marquez.common.models.JobType;
 
 /**
  * Requires jackson serialization features: mapper.registerModule(new JavaTimeModule());
@@ -206,6 +208,25 @@ public class LineageEvent extends BaseEvent {
     @NotNull private String namespace;
     @NotNull private String name;
     @Valid private JobFacet facets;
+
+    /**
+     * Verifies if a job is a streaming job.
+     *
+     * @return
+     */
+    @JsonIgnore
+    public boolean isStreamingJob() {
+      return Optional.ofNullable(this.facets)
+          .map(JobFacet::getJobType)
+          .map(JobTypeJobFacet::getProcessingType)
+          .filter(type -> type.equalsIgnoreCase("STREAMING"))
+          .isPresent();
+    }
+
+    @JsonIgnore
+    public JobType type() {
+      return isStreamingJob() ? JobType.STREAM : JobType.BATCH;
+    }
   }
 
   @Builder
@@ -214,12 +235,13 @@ public class LineageEvent extends BaseEvent {
   @Setter
   @Valid
   @ToString
-  @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description"})
+  @JsonPropertyOrder({"documentation", "sourceCodeLocation", "sql", "description", "jobType"})
   public static class JobFacet {
 
     @Valid private DocumentationJobFacet documentation;
     @Valid private SourceCodeLocationJobFacet sourceCodeLocation;
     @Valid private SQLJobFacet sql;
+    @Valid private JobTypeJobFacet jobType;
     @Builder.Default @JsonIgnore private Map<String, Object> additional = new LinkedHashMap<>();
 
     @JsonAnySetter
@@ -238,6 +260,10 @@ public class LineageEvent extends BaseEvent {
 
     public SourceCodeLocationJobFacet getSourceCodeLocation() {
       return sourceCodeLocation;
+    }
+
+    public JobTypeJobFacet getJobType() {
+      return jobType;
     }
 
     public SQLJobFacet getSql() {
@@ -294,6 +320,31 @@ public class LineageEvent extends BaseEvent {
     public SQLJobFacet(@NotNull URI _producer, @NotNull URI _schemaURL, @NotNull String query) {
       super(_producer, _schemaURL);
       this.query = query;
+    }
+  }
+
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @Valid
+  @ToString
+  public static class JobTypeJobFacet extends BaseFacet {
+
+    @NotNull private String processingType;
+    @NotNull private String integration;
+    @NotNull private String jobType;
+
+    @Builder
+    public JobTypeJobFacet(
+        @NotNull URI _producer,
+        @NotNull URI _schemaURL,
+        @NotNull String processingType,
+        @NotNull String integration,
+        @NotNull String jobType) {
+      super(_producer, _schemaURL);
+      this.processingType = processingType;
+      this.integration = integration;
+      this.jobType = jobType;
     }
   }
 

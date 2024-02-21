@@ -21,7 +21,7 @@ import {
   setTabIndex,
 } from '../../store/actionCreators'
 import { jobRunsStatus } from '../../helpers/nodes'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
@@ -67,6 +67,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex,
   } = props
   const navigate = useNavigate()
+  const [_, setSearchParams] = useSearchParams()
 
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
@@ -154,8 +155,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
               {i18next.t('jobs.location')}
             </Button>
           </Box>
-          <IconButton onClick={() => navigate('/')} size='large'>
-            <CloseIcon />
+          <IconButton onClick={() => setSearchParams({})} size='large'>
+            <CloseIcon fontSize={'small'} />
           </IconButton>
         </Box>
       </Box>

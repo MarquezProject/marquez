@@ -15,7 +15,6 @@ import React from 'react'
 import moment from 'moment'
 
 interface OwnProps {
-  key: string | number
   searchResult: SearchResult
   search: string
   onClick: (nodeName: string) => void
@@ -30,7 +29,6 @@ const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
 type DkSearchListItemProps = OwnProps
 
 const SearchListItem: React.FC<DkSearchListItemProps> = ({
-  key,
   searchResult,
   search,
   onClick,
@@ -43,7 +41,6 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({
   const searchMatchIndex = name.toLowerCase().indexOf(search.toLowerCase())
   return (
     <RouterLink
-      key={key}
       style={{
         textDecoration: 'none',
       }}
@@ -69,7 +66,7 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({
           '&:hover, &.selected': {
             backgroundColor: darken(theme.palette.background.paper, 0.02),
           },
-          '&:nth-child(even)': {
+          '&:nth-pf-type(even)': {
             backgroundColor: darken(theme.palette.background.paper, 0.2),
             '&:hover, &.selected': {
               backgroundColor: darken(theme.palette.background.paper, 0.02),
