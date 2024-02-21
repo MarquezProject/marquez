@@ -1,3 +1,4 @@
+import { ChevronLeft } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../components/lineage/types'
@@ -6,11 +7,12 @@ import { PositionedNode } from '../../../libs/graph'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
 import { TableLineageDatasetNodeData } from './nodes'
 import { connect } from 'react-redux'
+
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
-import { grey } from '@mui/material/colors'
 import { truncateText } from '../../helpers/text'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
+import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import React from 'react'
 
@@ -31,7 +33,10 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
   const navigate = useNavigate()
   const { name, namespace } = useParams()
   const isSelected = name === node.data.dataset.name && namespace === node.data.dataset.namespace
+  const [searchParams, setSearchParams] = useSearchParams()
+  const isCollapsed = searchParams.get('collapsedNodes')?.split(',').includes(node.id)
 
+  console.log(isCollapsed)
   const handleClick = () => {
     navigate(
       `/lineage/dataset/${encodeURIComponent(node.data.dataset.namespace)}/${encodeURIComponent(
@@ -66,15 +71,22 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
             y: 0,
             width: node.width,
             height: node.height,
-            stroke: isSelected ? theme.palette.primary.main : grey['100'],
             filter: isSelected ? `drop-shadow( 0 0 4px ${theme.palette.primary.main})` : 'none',
             rx: 4,
             fill: theme.palette.background.paper,
             cursor: 'pointer',
-            transition: 'filter 0.3',
+            transition: 'all 0.3',
           }}
           cursor={'pointer'}
           onClick={handleClick}
+        />
+        <Box
+          component={'rect'}
+          x={0}
+          y={0}
+          height={24}
+          width={24}
+          sx={{ rx: 4, fill: theme.palette.info.main }}
         />
         <FontAwesomeIcon
           aria-hidden={'true'}
@@ -82,13 +94,48 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
           icon={faDatabase}
           width={ICON_SIZE}
           height={ICON_SIZE}
-          x={4}
+          x={6}
           y={ICON_SIZE / 2}
-          color={theme.palette.warning.main}
+          color={theme.palette.common.white}
           cursor={'pointer'}
           onClick={handleClick}
         />
-        <text fontSize='8' fill={'white'} x={20} y={14} cursor={'pointer'} onClick={handleClick}>
+        <foreignObject width={16} height={24} x={node.width - 18} y={0}>
+          <MQTooltip title={isCollapsed ? 'Expand' : 'Collapse'} placement={'top'}>
+            <IconButton
+              sx={{ width: 16, height: 16 }}
+              onClick={(event) => {
+                event.stopPropagation()
+                const collapsedNodes = searchParams.get('collapsedNodes')
+                if (collapsedNodes) {
+                  const collapsedNodesArray = collapsedNodes.split(',')
+                  if (collapsedNodesArray.includes(node.id)) {
+                    collapsedNodesArray.splice(collapsedNodesArray.indexOf(node.id), 1)
+                  } else {
+                    collapsedNodesArray.push(node.id)
+                  }
+                  searchParams.set('collapsedNodes', collapsedNodesArray.toString())
+                } else {
+                  searchParams.set('collapsedNodes', node.id)
+                }
+                setSearchParams(searchParams)
+              }}
+            >
+              <ChevronLeft
+                sx={{
+                  width: 16,
+                  height: 16,
+                  rotate: !isCollapsed ? '-90deg' : 0,
+                  transition: 'rotate .3s',
+                }}
+              />
+            </IconButton>
+          </MQTooltip>
+        </foreignObject>
+        <text fontSize='8' fill={'white'} x={28} y={10} onClick={handleClick} cursor={'pointer'}>
+          DATASET
+        </text>
+        <text fontSize='8' fill={'white'} x={28} y={20} cursor={'pointer'} onClick={handleClick}>
           {truncateText(node.data.dataset.name, 15)}
         </text>
         {!isCompact &&
@@ -98,10 +145,10 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
                 key={field.name}
                 fontSize='8'
                 fill={THEME_EXTRA.typography.subdued}
-                x={20}
+                x={10}
                 y={14 + 10 + 10 * (index + 1)}
               >
-                - {truncateText(field.name, 15)}
+                - {truncateText(field.name, 20)}
               </text>
             )
           })}
