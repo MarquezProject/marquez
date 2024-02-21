@@ -64,6 +64,7 @@ public interface DatasetVersionDao extends BaseDao {
             now,
             datasetUuid,
             version.getValue(),
+            null, // TODO add schema version
             datasetMeta.getRunId().map(RunId::getValue).orElse(null),
             toPgObjectFields(datasetMeta.getFields()),
             namespaceName,
@@ -302,9 +303,9 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(
       "INSERT INTO dataset_versions "
-          + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
+          + "(uuid, created_at, dataset_uuid, version, dataset_schema_version_uuid, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
           + "VALUES "
-          + "(:uuid, :now, :datasetUuid, :version, :runUuid, :fields, :namespaceName, :datasetName, :lifecycleState) "
+          + "(:uuid, :now, :datasetUuid, :version, :schemaVersionUuid, :runUuid, :fields, :namespaceName, :datasetName, :lifecycleState) "
           + "ON CONFLICT(version) "
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
@@ -314,6 +315,7 @@ public interface DatasetVersionDao extends BaseDao {
       Instant now,
       UUID datasetUuid,
       UUID version,
+      UUID schemaVersionUuid,
       UUID runUuid,
       PGobject fields,
       String namespaceName,

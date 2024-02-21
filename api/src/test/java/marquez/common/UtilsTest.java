@@ -7,6 +7,8 @@ package marquez.common;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
+import static marquez.common.models.CommonModelGenerator.newFieldName;
+import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newLifecycleState;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
@@ -47,6 +49,7 @@ import marquez.service.models.DbTableMeta;
 import marquez.service.models.JobMeta;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.StreamMeta;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
 @org.junit.jupiter.api.Tag("UnitTests")
@@ -410,6 +413,53 @@ public class UtilsTest {
     Version second =
         Utils.newDatasetVersionFor(
             namespaceName.getValue(), datasetName.getValue(), dbTableMetaUnsortedFields);
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  void testNewDatasetSchemaVersionFor_allNulls() {
+    Version version = Utils.newDatasetSchemaVersionFor(null, null, null);
+
+    assertThat(version.getValue()).isNotNull();
+  }
+
+  @Test
+  void testNewDatasetSchemaVersionFor_equalOnIdenticalInputs() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    List<Pair<String, String>> fields =
+        List.of(
+            Pair.of(newFieldName().getValue(), newFieldType()),
+            Pair.of(newFieldName().getValue(), newFieldType()),
+            Pair.of(newFieldName().getValue(), newFieldType()));
+
+    Version first =
+        Utils.newDatasetSchemaVersionFor(namespaceName.getValue(), datasetName.getValue(), fields);
+    Version second =
+        Utils.newDatasetSchemaVersionFor(namespaceName.getValue(), datasetName.getValue(), fields);
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
+  void testNewDatasetSchemaVersionFor_equalOnUnsortedFields() {
+    NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    List<Pair<String, String>> fields =
+        List.of(
+            Pair.of(newFieldName().getValue(), newFieldType()),
+            Pair.of(newFieldName().getValue(), newFieldType()),
+            Pair.of(newFieldName().getValue(), newFieldType()));
+
+    Version first =
+        Utils.newDatasetSchemaVersionFor(namespaceName.getValue(), datasetName.getValue(), fields);
+
+    List<Pair<String, String>> shuffledFields = new ArrayList<>(fields);
+    Collections.shuffle(shuffledFields);
+    Version second =
+        Utils.newDatasetSchemaVersionFor(
+            namespaceName.getValue(), datasetName.getValue(), shuffledFields);
 
     assertThat(first).isEqualTo(second);
   }

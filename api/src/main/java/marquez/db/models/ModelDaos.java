@@ -10,6 +10,7 @@ import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetFacetsDao;
 import marquez.db.DatasetFieldDao;
+import marquez.db.DatasetSchemaVersionDao;
 import marquez.db.DatasetSymlinkDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.JobDao;
@@ -32,6 +33,7 @@ public final class ModelDaos {
   private DatasetDao datasetDao = null;
   private SourceDao sourceDao = null;
   private DatasetVersionDao datasetVersionDao = null;
+  private DatasetSchemaVersionDao datasetSchemaVersionDao = null;
   private DatasetFieldDao datasetFieldDao = null;
   private RunDao runDao = null;
   private DatasetFacetsDao datasetFacetsDao = null;
@@ -81,6 +83,13 @@ public final class ModelDaos {
       datasetVersionDao = baseDao.createDatasetVersionDao();
     }
     return datasetVersionDao;
+  }
+
+  public DatasetSchemaVersionDao getDatasetSchemaVersionDao() {
+    if (datasetSchemaVersionDao == null) {
+      datasetSchemaVersionDao = baseDao.createDatasetSchemaVersionDao();
+    }
+    return datasetSchemaVersionDao;
   }
 
   public DatasetFieldDao getDatasetFieldDao() {
