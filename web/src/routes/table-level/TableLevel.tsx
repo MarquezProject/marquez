@@ -46,6 +46,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const graphControls = useRef<ZoomPanControls>()
 
+  const collapsedNodes = searchParams.get('collapsedNodes')
+
   useEffect(() => {
     if (name && namespace && nodeType) {
       fetchLineage(nodeType as JobOrDataset, namespace, name, depth)
@@ -79,7 +81,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     lineage,
     `${nodeType}:${namespace}:${name}`,
     isCompact,
-    isFull
+    isFull,
+    collapsedNodes
   )
 
   useEffect(() => {

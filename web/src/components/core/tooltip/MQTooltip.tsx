@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { createTheme } from '@mui/material/styles'
+import { grey } from '@mui/material/colors'
 import { useTheme } from '@emotion/react'
 import React, { ReactElement } from 'react'
 import Tooltip from '@mui/material/Tooltip'
@@ -21,8 +22,8 @@ const MQTooltip: React.FC<MqToolTipProps> = ({ title, children, placement }) => 
       componentsProps={{
         tooltip: {
           sx: {
-            backgroundColor: theme.palette.background.default,
-            color: theme.palette.common.white,
+            backgroundColor: `${theme.palette.common.white}`,
+            color: grey['900'],
             border: `1px solid ${theme.palette.common.white}`,
             maxWidth: '600px',
             fontSize: 14,
