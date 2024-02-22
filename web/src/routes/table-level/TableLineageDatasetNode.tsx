@@ -36,7 +36,6 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
   const [searchParams, setSearchParams] = useSearchParams()
   const isCollapsed = searchParams.get('collapsedNodes')?.split(',').includes(node.id)
 
-  console.log(isCollapsed)
   const handleClick = () => {
     navigate(
       `/lineage/dataset/${encodeURIComponent(node.data.dataset.namespace)}/${encodeURIComponent(
