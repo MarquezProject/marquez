@@ -90,7 +90,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
     const theme = createTheme(useTheme())
-    return tags.map((tag, index) => {
+    return tags.map((tag) => {
       const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
       const tooltipTitle = tagDescription?.description || 'No Tag Description'
       return (
@@ -102,7 +102,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             onDelete={() => handleDelete(tag)}
             style={{
               display: 'row',
-              marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
+              marginLeft: theme.spacing(1),
             }}
           />
         </MQTooltip>
@@ -114,7 +114,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
     <>
       <Box display={'flex'} alignItems={'center'}>
         <MQText subheading>{i18next.t('dataset_tags.tags')}</MQText>
-        <MQTooltip placement='left' title={i18next.t('dataset_tags.tooltip')} key='tag-tooltip'>
+        {formatTags(datasetTags, tagData)}
+        <MQTooltip placement='top' title={i18next.t('dataset_tags.tooltip')} key='tag-tooltip'>
           <IconButton
             onClick={openDialog}
             size='small'
@@ -126,7 +127,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
           </IconButton>
         </MQTooltip>
       </Box>
-      {formatTags(datasetTags, tagData)}
+
       <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth='sm'>
         <DialogTitle>{i18next.t('dataset_tags.dialogtitle')}</DialogTitle>
         <DialogContent>
