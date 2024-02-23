@@ -15,7 +15,11 @@ services:
       - "db:postgres"
     depends_on:
       - db
-    ENTRYPOINT /opt/marquez/wait-for-it.sh db:${POSTGRES_PORT} -- ./entrypoint.sh
+    entrypoint: 
+      - /opt/marquez/wait-for-it.sh 
+      - db:${POSTGRES_PORT}
+      - --
+      - ./entrypoint.sh
 
   db:
     image: postgres:14
