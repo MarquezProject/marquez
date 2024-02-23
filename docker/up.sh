@@ -85,6 +85,10 @@ while [ $# -gt 0 ]; do
        shift
        WEB_PORT="${1}"
        ;;
+    -p|'--pg-port')
+       shift
+       POSTGRES_PORT="${1}"
+       ;;
     -t|'--tag')
        shift
        TAG="${1}"
@@ -143,5 +147,5 @@ if [[ "${NO_VOLUMES}" = "false" ]]; then
 fi
 
 # Run docker compose cmd with overrides
-DOCKER_SCAN_SUGGEST="false" API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} TAG=${TAG} \
+DOCKER_SCAN_SUGGEST="false" API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} POSTGRES_PORT=${POSTGRES_PORT} TAG=${TAG} \
   docker --log-level ERROR compose $compose_files up $ARGS
