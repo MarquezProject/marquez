@@ -31,6 +31,7 @@ ALTER TABLE jobs RENAME COLUMN current_location TO "location";
 ALTER TABLE jobs DROP CONSTRAINT IF EXISTS unique_jobs_namespace_uuid_name_parent;
 ALTER TABLE jobs ADD UNIQUE (namespace_name, name);
 ALTER TABLE jobs ADD current_run_uuid UUID;
+ALTER TABLE jobs ADD display_name VARCHAR(255);
 
 ALTER TABLE runs DROP COLUMN run_args_uuid;
 ALTER TABLE runs DROP COLUMN job_context_uuid;
@@ -53,6 +54,9 @@ ALTER TABLE job_versions DROP COLUMN job_context_uuid CASCADE;
 ALTER TABLE job_versions ADD CONSTRAINT namespaces_pkey FOREIGN KEY (namespace_uuid) REFERENCES namespaces(uuid);
 ALTER TABLE job_versions RENAME COLUMN latest_run_uuid TO "current_run_uuid";
 ALTER TABLE job_versions RENAME COLUMN location TO "job_location";
+
+ALTER TABLE datasets DROP COLUMN physical_name;
+ALTER TABLE datasets ADD display_name VARCHAR(255);
 
 DROP INDEX IF EXISTS lineage_events_run_id_index;
 CREATE INDEX IF NOT EXISTS lineage_events_run_uuid_idx ON lineage_events(run_id);

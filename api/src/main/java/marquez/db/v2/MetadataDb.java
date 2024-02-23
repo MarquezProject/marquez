@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.models.DatasetId;
@@ -45,8 +46,17 @@ public class MetadataDb {
                 .installPlugin(new Jackson2Plugin())
                 .setSqlLogger(LogDbCalls.newInstance()),
             Executors.newFixedThreadPool(connectionPool.getMaximumPoolSize()));
+
     // ...
-    new MetadataDb.BatchSqlWriter(nonBlockingDbCallQueue, nonBlockingDbCallExecutor).start();
+    final BatchSqlWriter batchSqlWriter =
+        MetadataDb.BatchSqlWriter.builder()
+            .nonBlockingDbCallQueue(nonBlockingDbCallQueue)
+            .nonBlockingDbCall(nonBlockingDbCallExecutor)
+            .initialPollDelayMs(1000)
+            .pollIntervalMs(2000)
+            .build();
+    // ...
+    batchSqlWriter.start();
   }
 
   /* ... */
@@ -62,9 +72,8 @@ public class MetadataDb {
   }
 
   /* ... */
-  public void write(@NotNull OpenLineage.RunEvent olRunEvent) {
-    nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newCallFor(olRunEvent));
-    log.info("nonBlockingDbCallQueue.size(): {}", nonBlockingDbCallQueue.size());
+  public void write(@NotNull OpenLineage.BaseEvent event) {
+    nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newCallFor(event));
   }
 
   public CompletableFuture<Void> listEventsOf() {
@@ -243,24 +252,27 @@ public class MetadataDb {
   }
 
   /* ... */
+  @Builder
   static final class BatchSqlWriter implements Managed {
     private final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue;
     private final JdbiExecutor nonBlockingDbCall;
 
     private final ScheduledExecutorService pollDbCallQueueScheduler;
-    private final int initialPollDelayMs;
-    private final int pollPeriodMs;
+    private int initialPollDelayMs;
+    private int pollIntervalMs;
     private final AtomicBoolean isPolling;
 
     /* ... */
     public BatchSqlWriter(
         @NonNull final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue,
-        @NonNull final JdbiExecutor nonBlockingDbCall) {
+        @NonNull final JdbiExecutor nonBlockingDbCall,
+        final int initialPollDelayMs,
+        final int pollIntervalMs) {
       this.nonBlockingDbCallQueue = nonBlockingDbCallQueue;
       this.nonBlockingDbCall = nonBlockingDbCall;
       this.pollDbCallQueueScheduler = Executors.newSingleThreadScheduledExecutor();
-      this.initialPollDelayMs = 1000;
-      this.pollPeriodMs = 2000;
+      this.initialPollDelayMs = initialPollDelayMs;
+      this.pollIntervalMs = pollIntervalMs;
       this.isPolling = new AtomicBoolean(false);
     }
 
@@ -280,10 +292,10 @@ public class MetadataDb {
             try {
               while (true) {
                 final BatchSqlWriteCall batchSqlWriteCall = nonBlockingDbCallQueue.poll();
-                log.info("BatchSqlWriter.polled: {}", batchSqlWriteCall);
                 if (batchSqlWriteCall == null) {
                   break;
                 }
+                log.info("BatchSqlWriter.polled: {}", batchSqlWriteCall);
                 try {
                   nonBlockingDbCall.useHandle(batchSqlWriteCall);
                 } catch (Exception e) {
@@ -295,7 +307,7 @@ public class MetadataDb {
             }
           },
           initialPollDelayMs,
-          pollPeriodMs,
+          pollIntervalMs,
           MILLISECONDS);
     }
 

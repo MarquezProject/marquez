@@ -48,32 +48,35 @@ public interface Sql {
         ON CONFLICT (name)
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), namespaces.description)
-        )
-        INSERT INTO jobs (
-          uuid,
-          type,
-          created_at,
-          updated_at,
-          namespace_uuid,
-          description,
-          namespace_name,
-          location,
-          name
-        ) VALUES (
-          '<job_uuid>',                    -- replace with the actual event_time value
-          '<job_type>',                    -- replace with the actual event_time value
-          '<created_at>',                  -- replace with the actual event_time value
-          '<updated_at>',                  -- replace with the actual event_time value
-          '<job_namespace_uuid>',          -- replace with the actual event_time value
-          NULLIF('<job_description>', ''), -- replace with the actual event_time value
-          '<job_namespace_name>',          -- replace with the actual event_time value
-          NULLIF('<job_location>', ''),    -- replace with the actual event_time value
-          '<job_name>'                     -- replace with the actual event_time value
-        ) ON CONFLICT (namespace_name, name)
-          DO UPDATE SET updated_at  = EXCLUDED.updated_at,
-                        description = COALESCE(NULLIF(EXCLUDED.description, ''), jobs.description,
-                        location    = COALESCE(NULLIF(EXCLUDED.location, ''), jobs.location
-        """;
+        RETURNING *
+      )
+      INSERT INTO jobs (
+        uuid,
+        type,
+        created_at,
+        updated_at,
+        namespace_uuid,
+        description,
+        namespace_name,
+        location,
+        name
+      )
+      SELECT
+        '<job_uuid>',                    -- replace with the actual event_time value
+        '<job_type>',                    -- replace with the actual event_time value
+        '<created_at>',                  -- replace with the actual event_time value
+        '<updated_at>',                  -- replace with the actual event_time value
+        namespace.uuid,                  -- replace with the actual event_time value
+        NULLIF('<job_description>', ''), -- replace with the actual event_time value
+        namespace.name,                  -- replace with the actual event_time value
+        NULLIF('<job_location>', ''),    -- replace with the actual event_time value
+        '<job_name>'                     -- replace with the actual event_time value
+      FROM namespace
+      ON CONFLICT (namespace_name, name)
+      DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                    description = COALESCE(NULLIF(EXCLUDED.description, ''), jobs.description),
+                    location    = COALESCE(NULLIF(EXCLUDED.location, ''), jobs.location)
+      """;
 
   /* ... */
   String WRITE_JOB_VERSION_META =
@@ -108,7 +111,7 @@ public interface Sql {
       UPDATE jobs
          SET current_version_uuid = '<job_version_uuid>'
        WHERE uuid = '<job_uuid>'
-      """;
+     """;
 
   /* ... */
   String WRITE_RUN_META =
@@ -160,6 +163,79 @@ public interface Sql {
       """;
 
   /* ... */
-  String UPSERT_DATASET_ROW = """
+  String WRITE_DATASET_META =
+      """
+      WITH namespace AS (
+        INSERT INTO namespaces (
+          uuid,
+          created_at,
+          updated_at,
+          name,
+          description
+        ) VALUES (
+          '<dataset_namespace_uuid>',                   -- replace with the actual event_time value
+          '<created_at>',                               -- replace with the actual event_time value
+          '<updated_at>',                               -- replace with the actual event_time value
+          '<dataset_namespace_name>',                   -- replace with the actual event_time value
+          NULLIF('<dataset_namespace_description>', '') -- replace with the actual event_time value
+        )
+        ON CONFLICT (name)
+        DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                      description = COALESCE(NULLIF(EXCLUDED.description, ''), namespaces.description)
+      )
+      source AS (
+        INSERT INTO sources (
+          uuid,
+          type,
+          created_at,
+          updated_at,
+          name,
+          connection_url,
+          description
+        )
+        VALUES (
+          '<source_uuid>',                   -- replace with the actual UUID value
+          '<source_type>',                   -- replace with the actual source type value
+          '<created_at>',                    -- replace with the actual created_at value
+          '<updated_at>',                    -- replace with the actual updated_at value
+          '<source_name>',                   -- replace with the actual source name value
+          '<source_connection_url>',         -- replace with the actual connection URL value
+          NULLIF('<source_description>', '') -- replace with the actual description value
+        )
+        ON CONFLICT (name)
+        DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                      description = COALESCE(NULLIF(EXCLUDED.description, ''), sources.description)
+        RETURNING *;
+      )
+      INSERT INTO datasets (
+        uuid,
+        type,
+        created_at,
+        updated_at,
+        namespace_uuid,
+        source_uuid,
+        name,
+        description,
+        namespace_name,
+        source_name
+      ) VALUES (
+        '<dataset_uuid>',                     -- replace with the actual UUID value
+        '<dataset_type>',                     -- replace with the actual type value
+        '<created_at>',                       -- replace with the actual created_at value
+        '<updated_at>',                       -- replace with the actual updated_at value
+        '<namespace_uuid>',                   -- replace with the actual namespace_uuid value
+        '<source_uuid>',                      -- replace with the actual source_uuid value
+        '<dataset_name>',                     -- replace with the actual name value
+        NULLIF('<dataset_description>',  ''), -- replace with the actual description value
+        '<namespace_name>',                   -- replace with the actual namespace_name value
+        '<source_name>'                       -- replace with the actual source_name value
+      )
+      ON CONFLICT (namespace_name, name)
+      DO UPDATE SET type = EXCLUDED.type,
+                    updated_at  = EXCLUDED.updated_at,
+                    description = EXCLUDED.description
+      """;
+
+  String WRITE_DATASET_VERSION_META = """
           """;
 }

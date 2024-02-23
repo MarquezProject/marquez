@@ -35,6 +35,7 @@ public enum RunState {
   /* ... */
   public static RunState from(@NonNull OpenLineage.RunEvent.EventType olEventType) {
     switch (olEventType) {
+      case START:
       case RUNNING:
         return RUNNING;
       case COMPLETE:

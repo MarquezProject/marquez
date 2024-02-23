@@ -17,9 +17,6 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import marquez.db.v2.MetadataDb;
 
-// TODO:
-// * Add support to deserialize 'OpenLineage.BaseEvent'
-
 /** ... */
 @Slf4j
 @Path("/api/v1")
@@ -33,23 +30,23 @@ public class LineageResource {
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("/batch/lineage")
-  public Response collectBatchOf(@NotNull BatchOlEvents batchOlEvents) {
-    metaDb.writeBatchOf(batchOlEvents.getEvents());
+  public Response collectBatch(@NotNull BatchOfEvents batch) {
+    metaDb.writeBatchOf(batch.getEvents());
     return Response.ok().build();
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("/lineage")
-  public Response collect(@NotNull OpenLineage.RunEvent olEvent) {
-    metaDb.write(olEvent);
+  public Response collect(@NotNull OpenLineage.RunEvent event) {
+    metaDb.write(event);
     return Response.ok().build();
   }
 
   /** ... */
   @NoArgsConstructor
   @ToString
-  static class BatchOlEvents {
+  static class BatchOfEvents {
     @Getter @Setter ImmutableList<OpenLineage.RunEvent> events;
   }
 }
