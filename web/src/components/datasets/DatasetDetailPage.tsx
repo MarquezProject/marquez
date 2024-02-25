@@ -128,37 +128,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        <DatasetTags
-          datasetTags={tags}
-          datasetName={lineageDataset.name}
-          namespace={lineageDataset.namespace}
-        />
-        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              textColor='primary'
-              indicatorColor='primary'
-            >
-              <Tab
-                label={i18next.t('datasets.latest_tab')}
-                {...a11yProps(0)}
-                disableRipple={true}
-              />
-              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
-              <Tab
-                label={i18next.t('datasets.history_tab')}
-                {...a11yProps(2)}
-                disableRipple={true}
-              />
-              <Tab
-                label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(3)}
-                disableRipple={true}
-              />
-            </Tabs>
-          </Box>
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+          <DatasetTags
+            datasetTags={tags}
+            datasetName={lineageDataset.name}
+            namespace={lineageDataset.namespace}
+          />
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
               <Button
@@ -190,6 +165,33 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             <IconButton onClick={() => setSearchParams({})}>
               <CloseIcon fontSize={'small'} />
             </IconButton>
+          </Box>
+        </Box>
+        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              textColor='primary'
+              indicatorColor='primary'
+            >
+              <Tab
+                label={i18next.t('datasets.latest_tab')}
+                {...a11yProps(0)}
+                disableRipple={true}
+              />
+              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
+              <Tab
+                label={i18next.t('datasets.history_tab')}
+                {...a11yProps(2)}
+                disableRipple={true}
+              />
+              <Tab
+                label={i18next.t('datasets.column_lineage_tab')}
+                {...a11yProps(3)}
+                disableRipple={true}
+              />
+            </Tabs>
           </Box>
         </Box>
         <Box display={'flex'} alignItems={'center'}>
