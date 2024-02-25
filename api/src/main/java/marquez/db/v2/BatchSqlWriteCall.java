@@ -10,23 +10,10 @@ import marquez.api.v2.models.Metadata;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.HandleConsumer;
 import org.jdbi.v3.core.statement.Batch;
-import org.jdbi.v3.stringtemplate4.StringTemplateEngine;
 
 /** ... */
 public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
   /** ... */
-  static BatchSqlWriteCall newCallFor(@NotNull final OpenLineage.BaseEvent event) {
-    if (event instanceof OpenLineage.RunEvent) {
-      return WriteRunMetadata.newWriteCallFor((OpenLineage.RunEvent) event);
-    } else if (event instanceof OpenLineage.JobEvent) {
-      return WriteOnlyJobMetadata.newWriteCallFor((OpenLineage.JobEvent) event);
-    } else if (event instanceof OpenLineage.DatasetEvent) {
-      return WriteOnlyDatasetMetadata.newWriteCallFor((OpenLineage.DatasetEvent) event);
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
   @Slf4j
   class WriteRunMetadata implements BatchSqlWriteCall {
     final Metadata.Run runMeta;
@@ -46,8 +33,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      final Batch dbCallAsBatch =
-          dbCallHandle.createBatch().setTemplateEngine(new StringTemplateEngine());
+      final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
       final Instant now = Instant.now();
       dbCallAsBatch.define("created_at", now);
@@ -61,7 +47,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("job_namespace_name", jobMeta.getNamespace().getValue())
           .define("job_name", jobMeta.getName().getValue())
           .define("event_received_time", now)
-          .define("event", runMeta.getRawData())
+          .define("event", runMeta.getRawMeta())
           .define("producer", runMeta.getProducer())
           .define("_event_type", "RUN_EVENT");
 
@@ -103,12 +89,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
                 dbCallAsBatch.add(Sql.WRITE_DATASET_META);
               });
 
-      // EXECUTE
-      try {
-        dbCallAsBatch.execute();
-      } catch (Exception e) {
-        log.error("BatchSqlWriteCall.useHandle()", e);
-      }
+      dbCallAsBatch.execute();
     }
   }
 
@@ -127,12 +108,26 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      final Batch dbCallAsBatch =
-          dbCallHandle.createBatch().setTemplateEngine(new StringTemplateEngine());
+      final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
       final Instant now = Instant.now();
       dbCallAsBatch.define("created_at", now);
       dbCallAsBatch.define("updated_at", now);
+
+      dbCallAsBatch
+          .add(Sql.WRITE_JOB_META)
+          .define("job_uuid", UUID.randomUUID())
+          .define("job_type", jobMeta.getType())
+          .define("job_namespace_uuid", UUID.randomUUID())
+          .define("job_namespace_name", jobMeta.getNamespace().getValue())
+          .define("job_name", jobMeta.getName().getValue())
+          .define("job_description", jobMeta.getDescription().orElse(null))
+          .define("job_location", jobMeta.getLocation().orElse(null))
+          .define("job_version_uuid", jobMeta.getVersion().getValue());
+
+      dbCallAsBatch
+          .add(Sql.WRITE_JOB_VERSION_META)
+          .define("job_version_uuid", jobMeta.getVersion().getValue());
 
       dbCallAsBatch.execute();
     }
@@ -153,14 +148,26 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      final Batch dbCallAsBatch =
-          dbCallHandle.createBatch().setTemplateEngine(new StringTemplateEngine());
+      final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
       final Instant now = Instant.now();
       dbCallAsBatch.define("created_at", now);
       dbCallAsBatch.define("updated_at", now);
 
       dbCallAsBatch.execute();
+    }
+  }
+
+  /** ... */
+  static BatchSqlWriteCall newCallFor(@NotNull final OpenLineage.BaseEvent event) {
+    if (event instanceof OpenLineage.RunEvent) {
+      return WriteRunMetadata.newWriteCallFor((OpenLineage.RunEvent) event);
+    } else if (event instanceof OpenLineage.JobEvent) {
+      return WriteOnlyJobMetadata.newWriteCallFor((OpenLineage.JobEvent) event);
+    } else if (event instanceof OpenLineage.DatasetEvent) {
+      return WriteOnlyDatasetMetadata.newWriteCallFor((OpenLineage.DatasetEvent) event);
+    } else {
+      throw new IllegalArgumentException();
     }
   }
 }

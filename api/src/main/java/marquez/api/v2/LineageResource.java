@@ -30,7 +30,7 @@ public class LineageResource {
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("/batch/lineage")
-  public Response collectBatch(@NotNull BatchOfEvents batch) {
+  public Response collectBatchOf(@NotNull BatchOfEvents batch) {
     metaDb.writeBatchOf(batch.getEvents());
     return Response.ok().build();
   }

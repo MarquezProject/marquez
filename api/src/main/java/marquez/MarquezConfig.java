@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.db.FlywayFactory;
-import marquez.db.v2.ConnectionPoolConfig;
+import marquez.db.v2.ConnectionPool;
 import marquez.graphql.GraphqlConfig;
 import marquez.jobs.DbRetentionConfig;
 import marquez.service.models.Tag;
@@ -35,7 +35,7 @@ public class MarquezConfig extends Configuration {
 
   @Getter
   @JsonProperty("hikari")
-  private final ConnectionPoolConfig connectionPoolConfig = new ConnectionPoolConfig();
+  private final ConnectionPool.Config connectionPoolConfig = new ConnectionPool.Config();
 
   @Getter
   @JsonProperty("flyway")

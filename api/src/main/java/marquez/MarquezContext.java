@@ -44,7 +44,7 @@ import marquez.db.RunStateDao;
 import marquez.db.SearchDao;
 import marquez.db.SourceDao;
 import marquez.db.TagDao;
-import marquez.db.v2.ManagedConnectionPool;
+import marquez.db.v2.ConnectionPool;
 import marquez.db.v2.MetadataDb;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
@@ -178,8 +178,8 @@ public final class MarquezContext {
     this.searchResource = new SearchResource(searchDao);
 
     // v2;
-    final ManagedConnectionPool managedConnectionPool =
-        ManagedConnectionPool.newManagedConnectionPool(config.getConnectionPoolConfig());
+    final ConnectionPool managedConnectionPool =
+        ConnectionPool.newInstance(config.getConnectionPoolConfig());
     try {
       DbMigration.migrateDbOrError(
           config.getFlywayFactory(), managedConnectionPool, config.isMigrateOnStartup());

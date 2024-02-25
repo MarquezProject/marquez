@@ -1,10 +1,13 @@
 package marquez.api.v2.models;
 
+import static marquez.common.Utils.newJobVersionFor;
 import static marquez.common.Utils.toJson;
+import static marquez.common.Utils.toUrl;
 
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.server.OpenLineage;
 import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -34,21 +37,29 @@ public class Metadata {
     @Getter final Job job;
     @Getter final IO io;
 
-    @Getter final String rawData;
+    @Getter final String rawMeta;
     @Getter final URI producer;
 
     public static Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
-      return Run.builder()
-          .id(RunId.of(event.getRun().getRunId()))
-          .state(RunState.from(event.getEventType()))
-          .transitionedOn(event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant())
-          .startedAt(Instant.now())
-          .endedAt(Instant.now())
-          .nominalStartTime(Instant.now())
-          .nominalEndTime(Instant.now())
-          .rawData(toJson(event))
-          .producer(event.getProducer())
-          .build();
+      final Instant startOrEndTime = Instant.now();
+      final RunState state = RunState.forType(event.getEventType());
+      final Metadata.Run.RunBuilder builder =
+          Run.builder()
+              .id(RunId.of(event.getRun().getRunId()))
+              .state(RunState.forType(event.getEventType()))
+              .transitionedOn(
+                  event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant())
+              .nominalStartTime(Instant.now())
+              .nominalEndTime(Instant.now())
+              .rawMeta(toJson(event))
+              .producer(event.getProducer());
+      // ...
+      if (state.isDone()) {
+        builder.endedAt(startOrEndTime);
+      } else {
+        builder.startedAt(startOrEndTime);
+      }
+      return builder.build();
     }
 
     public Optional<Instant> getStartedAt() {
@@ -66,17 +77,41 @@ public class Metadata {
 
   @Builder
   public static class Job {
+    private static final String DOCUMENTATION = "documentation";
+    private static final String DESCRIPTION = "description";
+    private static final String SOURCE_CODE_LOCATION = "sourceCodeLocation";
+    private static final String URL = "url";
+
     @Getter final JobType type;
     @Getter final JobName name;
     @Getter final NamespaceName namespace;
     @Nullable final String description;
-    @Nullable final URI location;
+    @Nullable final URL location;
     @Getter final Version version;
 
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
+      final OpenLineage.Job job = event.getJob();
+      final OpenLineage.JobFacets facets = job.getFacets();
+      final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       return Job.builder()
           .name(JobName.of(event.getJob().getName()))
-          .namespace(NamespaceName.of(event.getJob().getNamespace()))
+          .namespace(namespaceName)
+          .description(
+              (String)
+                  facets
+                      .getAdditionalProperties()
+                      .get(DOCUMENTATION)
+                      .getAdditionalProperties()
+                      .get(DESCRIPTION))
+          .location(
+              toUrl(
+                  (String)
+                      facets
+                          .getAdditionalProperties()
+                          .get(SOURCE_CODE_LOCATION)
+                          .getAdditionalProperties()
+                          .get(URL)))
+          .version(newJobVersionFor())
           .build();
     }
 
@@ -84,7 +119,7 @@ public class Metadata {
       return Optional.ofNullable(description);
     }
 
-    public Optional<URI> getLocation() {
+    public Optional<URL> getLocation() {
       return Optional.ofNullable(location);
     }
   }

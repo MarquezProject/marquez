@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -146,6 +148,17 @@ public final class Utils {
       return new URL(urlString);
     } catch (MalformedURLException e) {
       final AssertionError error = new AssertionError("Malformed URL: " + urlString);
+      error.initCause(e);
+      throw error;
+    }
+  }
+
+  public static URI toUri(@NonNull final String uriString) {
+    checkNotBlank(uriString, "uriString must not be blank or empty");
+    try {
+      return new URI(uriString);
+    } catch (URISyntaxException e) {
+      final AssertionError error = new AssertionError("Malformed URI: " + uriString);
       error.initCause(e);
       throw error;
     }

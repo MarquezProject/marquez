@@ -28,6 +28,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.stringtemplate4.StringTemplateEngine;
 
 /** ... */
 @Slf4j
@@ -36,7 +37,7 @@ public class MetadataDb {
   private final JdbiExecutor nonBlockingDbCallExecutor;
 
   /* ... */
-  private MetadataDb(@NonNull final ManagedConnectionPool connectionPool) {
+  private MetadataDb(@NonNull final ConnectionPool connectionPool) {
     this.nonBlockingDbCallQueue = new ConcurrentLinkedQueue<>();
     this.nonBlockingDbCallExecutor =
         JdbiExecutor.create(
@@ -44,6 +45,7 @@ public class MetadataDb {
                 .installPlugin(new SqlObjectPlugin())
                 .installPlugin(new PostgresPlugin())
                 .installPlugin(new Jackson2Plugin())
+                .setTemplateEngine(new StringTemplateEngine())
                 .setSqlLogger(LogDbCalls.newInstance()),
             Executors.newFixedThreadPool(connectionPool.getMaximumPoolSize()));
 
@@ -60,7 +62,7 @@ public class MetadataDb {
   }
 
   /* ... */
-  public static MetadataDb newInstance(@NonNull final ManagedConnectionPool connectionPool) {
+  public static MetadataDb newInstance(@NonNull final ConnectionPool connectionPool) {
     return new MetadataDb(connectionPool);
   }
 
@@ -252,17 +254,17 @@ public class MetadataDb {
   }
 
   /* ... */
-  @Builder
   static final class BatchSqlWriter implements Managed {
     private final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue;
     private final JdbiExecutor nonBlockingDbCall;
 
     private final ScheduledExecutorService pollDbCallQueueScheduler;
-    private int initialPollDelayMs;
-    private int pollIntervalMs;
+    private final int initialPollDelayMs;
+    private final int pollIntervalMs;
     private final AtomicBoolean isPolling;
 
     /* ... */
+    @Builder
     public BatchSqlWriter(
         @NonNull final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue,
         @NonNull final JdbiExecutor nonBlockingDbCall,
@@ -330,7 +332,7 @@ public class MetadataDb {
       log.info("logBeforeExecution()");
     }
 
-    public void logAfterExecution(StatementContext context) {
+    public void logAfterExecution(@NonNull StatementContext context) {
       log.info("logAfterExecution()");
     }
 
