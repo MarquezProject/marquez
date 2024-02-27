@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
@@ -41,25 +43,29 @@ public class Metadata {
     @Getter final URI producer;
 
     public static Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
-      final Instant startOrEndTime = Instant.now();
-      final RunState state = RunState.forType(event.getEventType());
-      final Metadata.Run.RunBuilder builder =
+      final RunId runId = RunId.of(event.getRun().getRunId());
+      final RunState runState = RunState.forType(event.getEventType());
+      final Instant runStartOrEndTime = Instant.now();
+      final Metadata.Run.RunBuilder runBuilder =
           Run.builder()
-              .id(RunId.of(event.getRun().getRunId()))
-              .state(RunState.forType(event.getEventType()))
-              .transitionedOn(
-                  event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant())
-              .nominalStartTime(Instant.now())
-              .nominalEndTime(Instant.now())
+              .id(runId)
+              .state(runState)
+              .transitionedOn(toUtc(event.getEventTime()))
+              .nominalStartTime(null)
+              .nominalEndTime(null)
               .rawMeta(toJson(event))
               .producer(event.getProducer());
       // ...
-      if (state.isDone()) {
-        builder.endedAt(startOrEndTime);
+      if (runState.isDone()) {
+        runBuilder.endedAt(runStartOrEndTime);
       } else {
-        builder.startedAt(startOrEndTime);
+        runBuilder.startedAt(runStartOrEndTime);
       }
-      return builder.build();
+
+      runBuilder.job(Job.newInstanceFor(event.getJob()));
+      runBuilder.io(IO.newInstanceFor(event.getInputs(), event.getInputs()));
+
+      return runBuilder.build();
     }
 
     public Optional<Instant> getStartedAt() {
@@ -72,6 +78,11 @@ public class Metadata {
 
     public Optional<String> getExternalId() {
       return Optional.ofNullable(externalId);
+    }
+
+    /** ... */
+    static Instant toUtc(@NonNull final ZonedDateTime transitionedOn) {
+      return transitionedOn.withZoneSameInstant(ZoneId.of("UTC")).toInstant();
     }
   }
 
@@ -91,28 +102,34 @@ public class Metadata {
 
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
-      final OpenLineage.JobFacets facets = job.getFacets();
-      final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
+      final OpenLineage.JobFacets jobFacets = job.getFacets();
+      final NamespaceName jobNamespace = NamespaceName.of(job.getNamespace());
+      final JobName jobName = JobName.of(event.getJob().getName());
+      final URL jobLocation =
+          toUrl(
+              (String)
+                  jobFacets
+                      .getAdditionalProperties()
+                      .get(SOURCE_CODE_LOCATION)
+                      .getAdditionalProperties()
+                      .get(URL));
       return Job.builder()
-          .name(JobName.of(event.getJob().getName()))
-          .namespace(namespaceName)
+          .name(jobName)
+          .namespace(jobNamespace)
           .description(
               (String)
-                  facets
+                  jobFacets
                       .getAdditionalProperties()
                       .get(DOCUMENTATION)
                       .getAdditionalProperties()
                       .get(DESCRIPTION))
-          .location(
-              toUrl(
-                  (String)
-                      facets
-                          .getAdditionalProperties()
-                          .get(SOURCE_CODE_LOCATION)
-                          .getAdditionalProperties()
-                          .get(URL)))
-          .version(newJobVersionFor())
+          .location(jobLocation)
+          .version(newJobVersionFor(jobNamespace, jobName, null, null, null))
           .build();
+    }
+
+    public static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
+      return null;
     }
 
     public Optional<String> getDescription() {
@@ -127,12 +144,32 @@ public class Metadata {
   public static class IO {
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
-  }
 
-  @Builder
-  public static class Dataset {
-    public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
-      return new Dataset();
+    IO(@NonNull final ImmutableSet<Dataset> inputs, @NonNull final ImmutableSet<Dataset> outputs) {
+      this.inputs = inputs;
+      this.outputs = outputs;
+    }
+
+    @Builder
+    public static class Dataset {
+      public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
+        return new Dataset();
+      }
+    }
+
+    public static IO newInstanceFor(
+        @NonNull final List<OpenLineage.InputDataset> inputs,
+        @NonNull final List<OpenLineage.InputDataset> outputs) {
+      final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
+      for (final OpenLineage.InputDataset input : inputs) {
+        inputsBuilder.add(new Dataset());
+      }
+      final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
+      for (final OpenLineage.InputDataset output : outputs) {
+        outputsBuilder.add(new Dataset());
+      }
+
+      return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
   }
 }
