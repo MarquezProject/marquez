@@ -75,7 +75,7 @@ public class MetadataDb {
 
   /* ... */
   public void write(@NotNull OpenLineage.BaseEvent event) {
-    nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newCallFor(event));
+    nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newWriteCallFor(event));
   }
 
   public CompletableFuture<Void> listEventsOf() {

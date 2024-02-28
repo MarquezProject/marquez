@@ -9,7 +9,7 @@ import io.openlineage.server.OpenLineage;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.common.models.DatasetName;
+import marquez.common.models.DatasetType;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
@@ -27,32 +29,34 @@ import marquez.common.models.Version;
 public class Metadata {
   @Builder
   public static class Run {
-    @Getter final RunId id;
-    @Getter final RunState state;
-    @Getter final Instant transitionedOn;
-    @Nullable final Instant startedAt;
-    @Nullable final Instant endedAt;
-    @Getter final Instant nominalStartTime;
-    @Getter final Instant nominalEndTime;
-    @Nullable final String externalId;
+    @Getter private final RunId id;
+    @Getter private final RunState state;
+    @Getter private final Instant transitionedOn;
+    @Nullable private final Instant startedAt;
+    @Nullable private final Instant endedAt;
+    @Getter private final Instant nominalStartTime;
+    @Getter private final Instant nominalEndTime;
+    @Nullable private final String externalId;
 
-    @Getter final Job job;
-    @Getter final IO io;
+    @Getter private final Job job;
+    @Getter private final IO io;
 
-    @Getter final String rawMeta;
-    @Getter final URI producer;
+    @Getter private final String rawMeta;
+    @Getter private final URI producer;
 
     public static Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
+      final OpenLineage.Run run = event.getRun();
       final RunId runId = RunId.of(event.getRun().getRunId());
       final RunState runState = RunState.forType(event.getEventType());
+      final Instant runTransitionedOn = toUtc(event.getEventTime());
       final Instant runStartOrEndTime = Instant.now();
       final Metadata.Run.RunBuilder runBuilder =
           Run.builder()
               .id(runId)
               .state(runState)
-              .transitionedOn(toUtc(event.getEventTime()))
-              .nominalStartTime(null)
-              .nominalEndTime(null)
+              .transitionedOn(runTransitionedOn)
+              .nominalStartTime(Facets.nominalStartTimeFor(run).orElse(null))
+              .nominalEndTime(Facets.nominalEndTimeFor(run).orElse(null))
               .rawMeta(toJson(event))
               .producer(event.getProducer());
       // ...
@@ -62,8 +66,10 @@ public class Metadata {
         runBuilder.startedAt(runStartOrEndTime);
       }
 
-      runBuilder.job(Job.newInstanceFor(event.getJob()));
-      runBuilder.io(IO.newInstanceFor(event.getInputs(), event.getInputs()));
+      // ...
+      final Metadata.Job job = Job.newInstanceFor(event.getJob());
+      runBuilder.job(job);
+      runBuilder.io(job.getIo());
 
       return runBuilder.build();
     }
@@ -82,49 +88,34 @@ public class Metadata {
 
     /** ... */
     static Instant toUtc(@NonNull final ZonedDateTime transitionedOn) {
-      return transitionedOn.withZoneSameInstant(ZoneId.of("UTC")).toInstant();
+      return transitionedOn.withZoneSameInstant(ZoneOffset.UTC).toInstant();
     }
   }
 
   @Builder
   public static class Job {
-    private static final String DOCUMENTATION = "documentation";
-    private static final String DESCRIPTION = "description";
-    private static final String SOURCE_CODE_LOCATION = "sourceCodeLocation";
-    private static final String URL = "url";
+    @Getter private final JobType type;
+    @Getter private final JobName name;
+    @Getter private final NamespaceName namespace;
+    @Nullable private final String description;
+    @Nullable private final URL location;
+    @Getter private final Version version;
 
-    @Getter final JobType type;
-    @Getter final JobName name;
-    @Getter final NamespaceName namespace;
-    @Nullable final String description;
-    @Nullable final URL location;
-    @Getter final Version version;
+    @Getter private final IO io;
 
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
-      final OpenLineage.JobFacets jobFacets = job.getFacets();
-      final NamespaceName jobNamespace = NamespaceName.of(job.getNamespace());
+      final NamespaceName namespace = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(event.getJob().getName());
-      final URL jobLocation =
-          toUrl(
-              (String)
-                  jobFacets
-                      .getAdditionalProperties()
-                      .get(SOURCE_CODE_LOCATION)
-                      .getAdditionalProperties()
-                      .get(URL));
+      final URL location = Facets.locationFor(job).orElse(null);
+      final Metadata.IO io = IO.newInstanceFor(event.getInputs(), event.getOutputs());
       return Job.builder()
           .name(jobName)
-          .namespace(jobNamespace)
-          .description(
-              (String)
-                  jobFacets
-                      .getAdditionalProperties()
-                      .get(DOCUMENTATION)
-                      .getAdditionalProperties()
-                      .get(DESCRIPTION))
-          .location(jobLocation)
-          .version(newJobVersionFor(jobNamespace, jobName, null, null, null))
+          .namespace(namespace)
+          .description(Facets.descriptionFor(job).orElse(null))
+          .location(location)
+          .io(io)
+          .version(newJobVersionFor(namespace, jobName, io.getInputs(), io.getOutputs(), location))
           .build();
     }
 
@@ -141,6 +132,16 @@ public class Metadata {
     }
   }
 
+  @Builder
+  public static class Dataset {
+    @Getter private final DatasetType type;
+    @Getter private final DatasetName name;
+
+    public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
+      return new Dataset();
+    }
+  }
+
   public static class IO {
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
@@ -150,26 +151,59 @@ public class Metadata {
       this.outputs = outputs;
     }
 
-    @Builder
-    public static class Dataset {
-      public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
-        return new Dataset();
-      }
-    }
-
     public static IO newInstanceFor(
         @NonNull final List<OpenLineage.InputDataset> inputs,
-        @NonNull final List<OpenLineage.InputDataset> outputs) {
+        @NonNull final List<OpenLineage.OutputDataset> outputs) {
       final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
       for (final OpenLineage.InputDataset input : inputs) {
         inputsBuilder.add(new Dataset());
       }
       final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
-      for (final OpenLineage.InputDataset output : outputs) {
+      for (final OpenLineage.OutputDataset output : outputs) {
         outputsBuilder.add(new Dataset());
       }
 
       return new IO(inputsBuilder.build(), outputsBuilder.build());
+    }
+  }
+
+  static class Facets {
+    static final String DOCUMENTATION = "documentation";
+    static final String DESCRIPTION = "description";
+    static final String SOURCE_CODE_LOCATION = "sourceCodeLocation";
+    static final String URL = "url";
+    static final String NOMINAL_TIME = "nominalTime";
+    static final String NOMINAL_START_TIME = "nominalStartTime";
+    static final String NOMINAL_END_TIME = "nominalEndTime";
+
+    Facets() {}
+
+    static Optional<Instant> nominalStartTimeFor(@NonNull final OpenLineage.Run run) {
+      return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(NOMINAL_TIME))
+          .map(facets -> facets.getAdditionalProperties())
+          .map(facet -> (String) facet.get(NOMINAL_START_TIME))
+          .map(value -> ZonedDateTime.parse(value).withZoneSameInstant(ZoneOffset.UTC).toInstant());
+    }
+
+    static Optional<Instant> nominalEndTimeFor(@NonNull final OpenLineage.Run run) {
+      return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(NOMINAL_TIME))
+          .map(facets -> facets.getAdditionalProperties())
+          .map(facet -> (String) facet.get(NOMINAL_END_TIME))
+          .map(value -> ZonedDateTime.parse(value).withZoneSameInstant(ZoneOffset.UTC).toInstant());
+    }
+
+    static Optional<URL> locationFor(@NonNull final OpenLineage.Job job) {
+      return Optional.ofNullable(
+              job.getFacets().getAdditionalProperties().get(SOURCE_CODE_LOCATION))
+          .map(facets -> facets.getAdditionalProperties())
+          .map(facet -> (String) facet.get(URL))
+          .map(value -> toUrl(value));
+    }
+
+    static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {
+      return Optional.ofNullable(job.getFacets().getAdditionalProperties().get(DOCUMENTATION))
+          .map(facets -> facets.getAdditionalProperties())
+          .map(facet -> (String) facet.get(DESCRIPTION));
     }
   }
 }

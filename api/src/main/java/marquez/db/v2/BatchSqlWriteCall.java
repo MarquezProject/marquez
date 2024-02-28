@@ -101,7 +101,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       this.jobMeta = jobMeta;
     }
 
-    static WriteOnlyJobMetadata newWriteCallFor(@NotNull final OpenLineage.JobEvent event) {
+    static WriteOnlyJobMetadata newWriteOnlyCallFor(@NotNull final OpenLineage.JobEvent event) {
       return new WriteOnlyJobMetadata(Metadata.Job.newInstanceFor(event));
     }
 
@@ -141,7 +141,8 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       this.datasetMeta = datasetMeta;
     }
 
-    static WriteOnlyDatasetMetadata newWriteCallFor(@NotNull final OpenLineage.DatasetEvent event) {
+    static WriteOnlyDatasetMetadata newWriteOnlyCallFor(
+        @NotNull final OpenLineage.DatasetEvent event) {
       return new WriteOnlyDatasetMetadata(Metadata.Dataset.newInstanceFor(event));
     }
 
@@ -159,13 +160,13 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
   }
 
   /** ... */
-  static BatchSqlWriteCall newCallFor(@NotNull final OpenLineage.BaseEvent event) {
+  static BatchSqlWriteCall newWriteCallFor(@NotNull final OpenLineage.BaseEvent event) {
     if (event instanceof OpenLineage.RunEvent) {
       return WriteRunMetadata.newWriteCallFor((OpenLineage.RunEvent) event);
     } else if (event instanceof OpenLineage.JobEvent) {
-      return WriteOnlyJobMetadata.newWriteCallFor((OpenLineage.JobEvent) event);
+      return WriteOnlyJobMetadata.newWriteOnlyCallFor((OpenLineage.JobEvent) event);
     } else if (event instanceof OpenLineage.DatasetEvent) {
-      return WriteOnlyDatasetMetadata.newWriteCallFor((OpenLineage.DatasetEvent) event);
+      return WriteOnlyDatasetMetadata.newWriteOnlyCallFor((OpenLineage.DatasetEvent) event);
     } else {
       throw new IllegalArgumentException();
     }
