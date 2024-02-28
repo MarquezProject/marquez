@@ -25,11 +25,17 @@
     justify-content: center;
 }
 
+.headerContainer {
+    display: flex;
+    width: 100%;
+}
+
 .flexContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     overflow: hidden;
+    margin: 0 auto;
 }
 
 .imageContainer {
@@ -40,5 +46,5 @@
 
 .image {
     height: auto;
-    width: 100%;
+    width: 75%;
 }

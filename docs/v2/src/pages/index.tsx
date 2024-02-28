@@ -12,11 +12,9 @@ function HomepageHeader() {
     const {siteConfig} = useDocusaurusContext();
     return (
         <header className={clsx('hero', 'dashed', styles.heroBanner)}>
-            <div className="container">
+            <div className={styles.headerContainer}>
                 <div className={styles.flexContainer}>
-                    <div className={styles.imageContainer}>
-                        <img className={styles.image} src="img/screenshot.svg" alt="Lineage Diagram"/>
-                    </div>
+                    
                     <div>
                         <h1 className="hero__title">{siteConfig.title}</h1>
                         <p className="hero__subtitle">{siteConfig.tagline}</p>
@@ -38,6 +36,9 @@ function HomepageHeader() {
                             </Link>
                         </div>
                     </div>
+                    {/* <div className={styles.imageContainer}>
+                        <img className={styles.image} src="img/marquez_graph_screencap.png" alt="Lineage Diagram"/>
+                    </div> */}
                 </div>
             </div>
         </header>
