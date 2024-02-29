@@ -6,8 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'The Marquez Project',
-    tagline: 'The most complete OpenLineage suite.',
+    title: 'Marquez Project',
+    tagline: 'The complete OpenLineage solution.',
     favicon: 'img/favicon.ico',
 
     // Set the production url of your site here

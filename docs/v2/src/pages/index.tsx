@@ -12,33 +12,43 @@ function HomepageHeader() {
     const {siteConfig} = useDocusaurusContext();
     return (
         <header className={clsx('hero', 'dashed', styles.heroBanner)}>
-            <div className={styles.headerContainer}>
+            <div>
                 <div className={styles.flexContainer}>
                     
-                    <div>
-                        <h1 className="hero__title">{siteConfig.title}</h1>
+                    <div className={styles.titleContainer}>
+                        <img className={styles.logo} src="img/logo_txt.png"/>
                         <p className="hero__subtitle">{siteConfig.tagline}</p>
                         <div className={styles.buttons}>
                             <Link
-                                className="button button--secondary button--md"
+                                className="button button--primary button--md"
                                 href="https://github.com/MarquezProject/marquez">
                                 Quickstart
                             </Link>
                             <Link
-                                className="button button--secondary button--md margin-left--md"
+                                className="button button--primary button--md margin-left--md"
                                 href="https://github.com/MarquezProject/marquez">
-                                GitHub
+                                <img 
+                                    className={styles.btn_logos} 
+                                    src="img/github.svg" 
+                                    alt="GitHub logo" 
+                                />
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GitHub
                             </Link>
                             <Link
-                                className="button button--secondary button--md margin-left--md"
+                                className="button button--primary button--md margin-left--md"
                                 href="https://bit.ly/Mqz_invite">
-                                Slack
+                                <img 
+                                    className={styles.btn_logos} 
+                                    src="img/slack.svg" 
+                                    alt="Slack logo" 
+                                />
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slack
                             </Link>
                         </div>
                     </div>
-                    {/* <div className={styles.imageContainer}>
-                        <img className={styles.image} src="img/marquez_graph_screencap.png" alt="Lineage Diagram"/>
-                    </div> */}
+                    <div className={styles.imageContainer}>
+                        <img className={styles.image} src="img/marquez_caps_triplet.png" alt="Lineage Diagram"/>
+                    </div>
                 </div>
             </div>
         </header>

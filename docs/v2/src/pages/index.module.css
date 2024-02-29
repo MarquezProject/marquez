@@ -25,9 +25,9 @@
     justify-content: center;
 }
 
-.headerContainer {
-    display: flex;
-    width: 100%;
+.titleContainer {
+    width: 30%;
+    margin-left: 15rem;
 }
 
 .flexContainer {
@@ -35,16 +35,30 @@
     justify-content: space-between;
     align-items: center;
     overflow: hidden;
-    margin: 0 auto;
 }
 
 .imageContainer {
-    flex: 1 1 0;
+    display: flex;
     height: 100%;
-    width: 100%;
+    width: 70%;
+    justify-content: center;
+    margin-bottom: 0;
+    margin-right: 5rem;
 }
 
 .image {
     height: auto;
-    width: 75%;
+    width: 65%;
+}
+
+.logo {
+    height: auto;
+    width: 25rem;
+}
+
+.btn_logos {
+    height: 1rem;
+    margin-top: 0.15rem;
+    margin-left: 0rem;
+    position: absolute;
 }
