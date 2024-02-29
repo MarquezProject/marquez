@@ -288,6 +288,18 @@ export const fetchTagsSuccess = (tags: Tag[]) => ({
   },
 })
 
+export const addTags = (tag: string, description: string) => ({
+  type: actionTypes.ADD_TAGS,
+  payload: {
+    tag,
+    description,
+  },
+})
+
+export const addTagsSuccess = () => ({
+  type: actionTypes.ADD_TAGS_SUCCESS,
+})
+
 export const applicationError = (message: string) => ({
   type: actionTypes.APPLICATION_ERROR,
   payload: {

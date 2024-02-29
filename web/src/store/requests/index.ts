@@ -11,6 +11,7 @@ export const genericErrorMessageConstructor = (functionName: string, error: APIE
 export interface IParams {
   method: HttpMethod
   body?: string
+  headers?: Record<string, string>
 }
 
 export const parseResponse = async (response: Response, functionName: string) => {
