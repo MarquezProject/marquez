@@ -16,16 +16,16 @@ function HomepageHeader() {
                 <div className={styles.flexContainer}>
                     
                     <div className={styles.titleContainer}>
-                        <img className={styles.logo} src="img/logo_txt.png"/>
+                        <img className={styles.logo} src="img/logo_txt_grn.png"/>
                         <p className="hero__subtitle">{siteConfig.tagline}</p>
                         <div className={styles.buttons}>
                             <Link
-                                className="button button--primary button--md"
+                                className="button button--secondary button--md"
                                 href="https://github.com/MarquezProject/marquez">
                                 Quickstart
                             </Link>
                             <Link
-                                className="button button--primary button--md margin-left--md"
+                                className="button button--secondary button--md margin-left--md"
                                 href="https://github.com/MarquezProject/marquez">
                                 <img 
                                     className={styles.btn_logos} 
@@ -35,7 +35,7 @@ function HomepageHeader() {
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GitHub
                             </Link>
                             <Link
-                                className="button button--primary button--md margin-left--md"
+                                className="button button--secondary button--md margin-left--md"
                                 href="https://bit.ly/Mqz_invite">
                                 <img 
                                     className={styles.btn_logos} 
