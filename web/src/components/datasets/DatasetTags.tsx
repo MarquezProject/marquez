@@ -82,6 +82,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     options[selectedIndex] === 'Add a Tag' ? setDialogOpen(true) : setOpenTagDesc(true)
   }
   const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const theme = createTheme(useTheme())
 
   const handleMenuItemClick = (
     _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -145,7 +146,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    const theme = createTheme(useTheme())
     return tags.map((tag) => {
       const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
       const tooltipTitle = tagDescription?.description || 'No Tag Description'
@@ -170,8 +170,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
     <>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={500}
-        style={{ zIndex: 9999 }}
+        autoHideDuration={1000}
+        style={{ zIndex: theme.zIndex.snackbar }}
         onClose={() => setSnackbarOpen(false)}
         message={'Tag updated.'}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
@@ -182,13 +182,13 @@ const DatasetTags: React.FC<IProps> = (props) => {
         <ButtonGroup
           variant='contained'
           ref={anchorRef}
-          aria-label='Tags Nested Menu'
-          sx={{ height: '30px', width: '20px', marginLeft: '5px' }}
+          aria-label='tags-nested-menu'
+          sx={{ height: '32px', width: '20px', marginLeft: '8px' }}
         >
           <MQTooltip placement='left' title={options[selectedIndex]}>
             <Button
               variant='outlined'
-              sx={{ height: '30px', width: '20px' }}
+              sx={{ height: '32px', width: '20px' }}
               onClick={handleButtonClick}
             >
               {selectedIndex === 0 ? <AddIcon /> : <EditNoteIcon />}
@@ -199,7 +199,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             size='small'
             aria-controls={openDropDown ? 'split-button-menu' : undefined}
             aria-expanded={openDropDown ? 'true' : undefined}
-            aria-label='Tags Menu'
+            aria-label='tags-menu'
             aria-haspopup='menu'
             onClick={handleDropDownToggle}
           >
