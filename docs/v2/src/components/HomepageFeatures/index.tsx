@@ -23,7 +23,7 @@ const featureList: FeatureItem[] = [
     },
     {
         subTitle: 'Unified visual graph',
-        imgSrc: 'img/screenshot_sm.png',
+        imgSrc: 'img/unified_graph.png',
         side: 'right',
         description: <>
             <p>
