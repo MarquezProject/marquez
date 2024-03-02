@@ -16,7 +16,7 @@ function HomepageHeader() {
                 <div className={styles.flexContainer}>
                     
                     <div className={styles.titleContainer}>
-                        <img className={styles.logo} src="img/logo_txt_grn.png"/>
+                        <img className={styles.logo} src="img/logo_txt_grn.svg"/>
                         <p className="hero__subtitle">{siteConfig.tagline}</p>
                         <div className={styles.buttons}>
                             <Link
