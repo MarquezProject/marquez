@@ -4,18 +4,24 @@
  */
 
 .heroBanner {
+    display: flex;
+    width: 100%;
     padding: 4rem 0;
-    text-align: center;
     position: relative;
     overflow: hidden;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: row;
 }
 
-@media screen and (max-width: 996px) {
+@media screen and (max-width: 767px) {
     .heroBanner {
         padding: 2rem;
-    }
-    .flexContainer {
         flex-direction: column;
+    }
+    
+    .titleContainer {
+        max-width: 100% !important;
     }
 }
 
@@ -26,29 +32,24 @@
 }
 
 .titleContainer {
-    width: 30%;
-    margin-left: 15rem;
+    text-align: center;
+    max-width: 30%;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 
-.flexContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    overflow: hidden;
-}
-
-.imageContainer {
-    display: flex;
-    height: 100%;
-    width: 70%;
-    justify-content: center;
-    margin-bottom: 0;
-    margin-right: 5rem;
+.imageSubDiv {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 5%;
 }
 
 .image {
-    height: auto;
-    width: 65%;
+    margin: 0 auto;
+    height: 35rem;
+    width: auto;
 }
 
 .logo {
