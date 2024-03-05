@@ -25,31 +25,33 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ setDepth, depth }) => {
         display: 'flex',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        zIndex: theme.zIndex.appBar
+        zIndex: theme.zIndex.appBar,
       }}
     >
       <FormControlLabel
         sx={{
           marginLeft: 0,
           '& .MuiFormControlLabel-label': {
-            marginRight: '.5rem'
-          }
+            marginRight: '.5rem',
+          },
         }}
         labelPlacement='start'
         control={
           <TextField
             type='number'
             value={depth}
-            onChange={e => setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))}
+            onChange={(e) =>
+              setDepth(isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value))
+            }
             variant='outlined'
             size='small'
             aria-label={GRAPH_TITLE}
             sx={{
-              textAlign: 'center'
+              textAlign: 'center',
             }}
             inputProps={{
               min: 0,
-              max: 100
+              max: 100,
             }}
           />
         }
@@ -62,7 +64,7 @@ const DepthConfig: React.FC<DepthConfigProps> = ({ setDepth, depth }) => {
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      setDepth: setLineageGraphDepth
+      setDepth: setLineageGraphDepth,
     },
     dispatch
   )

@@ -1,0 +1,46 @@
+{
+  "name": "graph",
+  "version": "0.0.1",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "lint": "cd .. && yarn lint",
+    "test": "jest",
+    "test:silent": "yarn test --silent",
+    "test:ci": "yarn test:silent --coverage --runInBand",
+    "test:watch": "yarn test --watch",
+    "tsc:validate": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-hook/size": "^2.1.2",
+    "lodash": "^4.17.21"
+  },
+  "peerDependencies": {
+    "@chakra-ui/react": "^2",
+    "elkjs": "^0.8.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-router-dom": "^6"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/jest": "^27.5.2",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "d3-interpolate": "^2.0.1",
+    "d3-selection": "^2.0.0",
+    "d3-transition": "^2.0.0",
+    "d3-zoom": "^2.0.0",
+    "elkjs": "^0.8.2",
+    "jest": "^27.5.1",
+    "prettier": "^2.8.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
+    "typescript": "^5.1.3",
+    "web-worker": "^1.2.0"
+  }
+}

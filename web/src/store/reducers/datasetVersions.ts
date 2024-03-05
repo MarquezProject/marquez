@@ -5,7 +5,7 @@ import { DatasetVersions } from '../../types/api'
 import {
   FETCH_DATASET_VERSIONS,
   FETCH_DATASET_VERSIONS_SUCCESS,
-  RESET_DATASET_VERSIONS
+  RESET_DATASET_VERSIONS,
 } from '../actionCreators/actionTypes'
 import { fetchDatasetVersionsSuccess } from '../actionCreators'
 
@@ -14,7 +14,7 @@ export type IDatasetVersionsState = { isLoading: boolean; result: DatasetVersion
 export const initialState: IDatasetVersionsState = {
   isLoading: false,
   init: false,
-  result: { versions: [] }
+  result: { versions: [] },
 }
 
 type IDatasetVersionAction = ReturnType<typeof fetchDatasetVersionsSuccess>

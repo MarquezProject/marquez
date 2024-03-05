@@ -7,8 +7,7 @@ import MqText from '../core/text/MqText'
 import React from 'react'
 
 const importI18next = () => {
-  const i18next = require('i18next')
-  return i18next
+  return require('i18next')
 }
 
 interface SearchPlaceholderProps {}
@@ -29,7 +28,13 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
       }}
     >
       <Box display={'inline'}>
-        <MqText disabled inline font={'mono'} aria-label={i18next.t('search.search_aria')} aria-required='true'>
+        <MqText
+          disabled
+          inline
+          font={'mono'}
+          aria-label={i18next.t('search.search_aria')}
+          aria-required='true'
+        >
           {i18next.t('search.search')}
         </MqText>
         <MqText bold inline font={'mono'} color={theme.palette.common.white}>

@@ -68,6 +68,6 @@ public class JobService extends DelegatingDaos.DelegatingJobDao {
 
     JobMetrics.emitJobCreationMetric(namespaceName.getValue(), jobMeta.getType().toString());
 
-    return findWithRun(jobRow.getNamespaceName(), jobRow.getName()).get();
+    return this.findWithDatasetsAndRun(jobRow.getNamespaceName(), jobRow.getName()).get();
   }
 }

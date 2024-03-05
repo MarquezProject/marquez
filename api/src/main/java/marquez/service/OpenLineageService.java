@@ -46,6 +46,7 @@ import marquez.service.RunTransitionListener.RunInput;
 import marquez.service.RunTransitionListener.RunOutput;
 import marquez.service.RunTransitionListener.RunTransition;
 import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.RunMeta;
 
@@ -92,6 +93,32 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     return CompletableFuture.allOf(marquez, openLineage);
   }
 
+  public CompletableFuture<Void> createAsync(JobEvent event) {
+    CompletableFuture<Void> openLineage =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () ->
+                        createJobEvent(
+                            event.getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant(),
+                            event.getJob().getName(),
+                            event.getJob().getNamespace(),
+                            createJsonArray(event, mapper),
+                            event.getProducer()))),
+            executor);
+
+    CompletableFuture<Void> marquez =
+        CompletableFuture.runAsync(
+            withSentry(
+                withMdc(
+                    () -> {
+                      updateMarquezModel(event, mapper);
+                    })),
+            executor);
+
+    return CompletableFuture.allOf(marquez, openLineage);
+  }
+
   public CompletableFuture<Void> createAsync(LineageEvent event) {
     UUID runUuid = runUuidFromEvent(event.getRun());
     CompletableFuture<Void> openLineage =
@@ -115,7 +142,11 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             .thenAccept(
                 (update) -> {
                   if (event.getEventType() != null) {
-                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                    boolean isStreaming =
+                        Optional.ofNullable(event.getJob())
+                            .map(j -> j.isStreamingJob())
+                            .orElse(false);
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
                       buildJobOutputUpdate(update).ifPresent(runService::notify);
                     }
                     buildJobInputUpdate(update).ifPresent(runService::notify);

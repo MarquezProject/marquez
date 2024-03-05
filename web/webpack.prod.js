@@ -3,6 +3,11 @@ const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require("copy-webpack-plugin");
+const path = require("path");
+
+// look for elkjs package folder
+const elkjsRoot = path.dirname(require.resolve('elkjs/package.json'));
 
 const webpackProd = {
   mode: 'production',
@@ -25,7 +30,12 @@ const webpackProd = {
       __ROLLBAR__: JSON.stringify(true),
       __FEEDBACK_FORM_URL__: JSON.stringify('https://forms.gle/f3tTSrZ8wPj3sHTA7'),
       __API_DOCS_URL__: JSON.stringify('https://marquezproject.github.io/marquez/openapi.html')
-    })
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: path.join(elkjsRoot, 'lib/elk-worker.min.js'), to: 'elk-worker.min.js' },
+      ],
+    }),
   ]
 }
 

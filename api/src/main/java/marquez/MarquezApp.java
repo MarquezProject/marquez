@@ -26,6 +26,8 @@ import javax.servlet.DispatcherType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
+import marquez.api.filter.exclusions.Exclusions;
+import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.cli.DbMigrationCommand;
 import marquez.cli.DbRetentionCommand;
 import marquez.cli.MetadataCommand;
@@ -139,6 +141,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
       // Add job to apply retention policy to database.
       env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }
+
+    // set namespaceFilter
+    ExclusionsConfig exclusions = config.getExclude();
+    Exclusions.use(exclusions);
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

@@ -66,9 +66,9 @@ const Jobs: React.FC<JobsProps> = ({
     page: 0,
   }
   const [state, setState] = React.useState<JobsState>(defaultState)
-  
+
   const theme = createTheme(useTheme())
-  
+
   React.useEffect(() => {
     if (selectedNamespace) {
       fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
@@ -172,42 +172,42 @@ const Jobs: React.FC<JobsProps> = ({
                   })}
                 </TableBody>
               </Table>
-			  <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
-				<MqText subdued>
-				  <>
-					{PAGE_SIZE * state.page + 1} -{' '}
-					{Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
-				  </>
-				</MqText>
-				<Tooltip title={i18next.t('events_route.previous_page')}>
-				  <span>
-					<IconButton
-					  sx={{
-						marginLeft: theme.spacing(2),
-					  }}
-					  color='primary'
-					  disabled={state.page === 0}
-					  onClick={() => handleClickPage('prev')}
-					  size='large'
-					>
-					  <ChevronLeftRounded />
-					</IconButton>
-				  </span>
-				</Tooltip>
-				<Tooltip title={i18next.t('events_route.next_page')}>
-				  <span>
-					<IconButton
-					  color='primary'
-					  onClick={() => handleClickPage('next')}
-					  size='large'
-					  disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
-					>
-					  <ChevronRightRounded />
-					</IconButton>
-				  </span>
-				</Tooltip>
-			  </Box>
-			</>
+              <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+                <MqText subdued>
+                  <>
+                    {PAGE_SIZE * state.page + 1} -{' '}
+                    {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
+                  </>
+                </MqText>
+                <Tooltip title={i18next.t('events_route.previous_page')}>
+                  <span>
+                    <IconButton
+                      sx={{
+                        marginLeft: theme.spacing(2),
+                      }}
+                      color='primary'
+                      disabled={state.page === 0}
+                      onClick={() => handleClickPage('prev')}
+                      size='large'
+                    >
+                      <ChevronLeftRounded />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title={i18next.t('events_route.next_page')}>
+                  <span>
+                    <IconButton
+                      color='primary'
+                      onClick={() => handleClickPage('next')}
+                      size='large'
+                      disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
+                    >
+                      <ChevronRightRounded />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
+            </>
           )}
         </>
       </MqScreenLoad>

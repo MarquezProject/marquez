@@ -20,7 +20,8 @@ describe('datasets reducer', () => {
       isLoading: false,
       result: datasets,
       totalCount: 16,
-      deletedDatasetName: ''
+      deletedDatasetName: '',
+      refreshTags: false
     })
   })
 

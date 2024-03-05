@@ -96,7 +96,7 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
         </TableHead>
         <TableBody>
           {runs.map((run) => {
-            return ( run.durationMs > 0 ?
+            return run.durationMs > 0 ? (
               <TableRow
                 key={run.id}
                 sx={{
@@ -119,30 +119,31 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
                 <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.endedAt)}</TableCell>
                 <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
-              </TableRow> :
+              </TableRow>
+            ) : (
               <TableRow
-              key={run.id}
-              sx={{
-                cursor: 'pointer',
-                transition: theme.transitions.create(['background-color']),
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.common.white, 0.1),
-                },
-              }}
-              onClick={() => handleClick(run)}
-            >
-              <TableCell align='left'>{run.id}</TableCell>
-              <TableCell align='left'>
-                <Box display={'flex'} alignItems={'center'}>
-                  <RunStatus run={run} />
-                  <MqText>{run.state}</MqText>
-                </Box>
-              </TableCell>
-              <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
-              <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
-              <TableCell align='left'>N/A</TableCell>
-              <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
-            </TableRow>
+                key={run.id}
+                sx={{
+                  cursor: 'pointer',
+                  transition: theme.transitions.create(['background-color']),
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.common.white, 0.1),
+                  },
+                }}
+                onClick={() => handleClick(run)}
+              >
+                <TableCell align='left'>{run.id}</TableCell>
+                <TableCell align='left'>
+                  <Box display={'flex'} alignItems={'center'}>
+                    <RunStatus run={run} />
+                    <MqText>{run.state}</MqText>
+                  </Box>
+                </TableCell>
+                <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
+                <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
+                <TableCell align='left'>N/A</TableCell>
+                <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
+              </TableRow>
             )
           })}
         </TableBody>
