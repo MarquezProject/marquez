@@ -1,5 +1,6 @@
 package marquez.api.v2.models;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.Utils.newJobVersionFor;
 import static marquez.common.Utils.toJson;
 import static marquez.common.Utils.toUrl;
@@ -17,6 +18,7 @@ import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobName;
@@ -48,22 +50,22 @@ public class Metadata {
       final OpenLineage.Run run = event.getRun();
       final RunId runId = RunId.of(event.getRun().getRunId());
       final RunState runState = RunState.forType(event.getEventType());
-      final Instant runTransitionedOn = toUtc(event.getEventTime());
-      final Instant runStartOrEndTime = Instant.now();
+      final Instant runTransitionedOnAsUtc = toUtc(event.getEventTime());
+      final Instant runStartOrEndTimeAsUtc = Instant.now();
       final Metadata.Run.RunBuilder runBuilder =
           Run.builder()
               .id(runId)
               .state(runState)
-              .transitionedOn(runTransitionedOn)
+              .transitionedOn(runTransitionedOnAsUtc)
               .nominalStartTime(Facets.nominalStartTimeFor(run).orElse(null))
               .nominalEndTime(Facets.nominalEndTimeFor(run).orElse(null))
               .rawMeta(toJson(event))
               .producer(event.getProducer());
       // ...
       if (runState.isDone()) {
-        runBuilder.endedAt(runStartOrEndTime);
+        runBuilder.endedAt(runStartOrEndTimeAsUtc);
       } else {
-        runBuilder.startedAt(runStartOrEndTime);
+        runBuilder.startedAt(runStartOrEndTimeAsUtc);
       }
 
       // ...
@@ -105,25 +107,31 @@ public class Metadata {
 
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
-      final NamespaceName namespace = NamespaceName.of(job.getNamespace());
+      final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(event.getJob().getName());
       final URL location = Facets.locationFor(job).orElse(null);
       final Metadata.IO io = IO.newInstanceFor(event.getInputs(), event.getOutputs());
       return Job.builder()
           .name(jobName)
-          .namespace(namespace)
+          .namespace(namespaceName)
           .description(Facets.descriptionFor(job).orElse(null))
           .location(location)
           .io(io)
-          .version(newJobVersionFor(namespace, jobName, io.getInputs(), io.getOutputs(), location))
+          .version(
+              newJobVersionFor(
+                  namespaceName,
+                  jobName,
+                  io.getInputs().stream().map(Dataset::getId).collect(toImmutableSet()),
+                  io.getOutputs().stream().map(Dataset::getId).collect(toImmutableSet()),
+                  location))
           .build();
     }
 
-    public static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
+    static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
       return null;
     }
 
-    public Optional<String> getDescription() {
+    public static Optional<String> getDescription() {
       return Optional.ofNullable(description);
     }
 
@@ -134,8 +142,10 @@ public class Metadata {
 
   @Builder
   public static class Dataset {
+    @Getter private final DatasetId id;
     @Getter private final DatasetType type;
     @Getter private final DatasetName name;
+    @Getter private final NamespaceName namespaceName;
 
     public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
       return new Dataset();

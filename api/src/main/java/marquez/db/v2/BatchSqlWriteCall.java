@@ -35,9 +35,9 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     public void useHandle(@NonNull Handle dbCallHandle) {
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
-      final Instant now = Instant.now();
-      dbCallAsBatch.define("created_at", now);
-      dbCallAsBatch.define("updated_at", now);
+      final Instant nowAsUtc = Instant.now();
+      dbCallAsBatch.define("created_at", nowAsUtc);
+      dbCallAsBatch.define("updated_at", nowAsUtc);
 
       dbCallAsBatch
           .add(Sql.WRITE_LINEAGE_EVENT)
@@ -46,7 +46,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_transitioned_at", runMeta.getTransitionedOn())
           .define("job_namespace_name", jobMeta.getNamespace().getValue())
           .define("job_name", jobMeta.getName().getValue())
-          .define("event_received_time", now)
+          .define("event_received_time", nowAsUtc)
           .define("event", runMeta.getRawMeta())
           .define("producer", runMeta.getProducer())
           .define("_event_type", "RUN_EVENT");
@@ -110,9 +110,9 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     public void useHandle(@NonNull Handle dbCallHandle) {
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
-      final Instant now = Instant.now();
-      dbCallAsBatch.define("created_at", now);
-      dbCallAsBatch.define("updated_at", now);
+      final Instant nowAsUtc = Instant.now();
+      dbCallAsBatch.define("created_at", nowAsUtc);
+      dbCallAsBatch.define("updated_at", nowAsUtc);
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_META)
@@ -151,9 +151,9 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     public void useHandle(@NonNull Handle dbCallHandle) {
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
-      final Instant now = Instant.now();
-      dbCallAsBatch.define("created_at", now);
-      dbCallAsBatch.define("updated_at", now);
+      final Instant nowAsUtc = Instant.now();
+      dbCallAsBatch.define("created_at", nowAsUtc);
+      dbCallAsBatch.define("updated_at", nowAsUtc);
 
       dbCallAsBatch.execute();
     }
