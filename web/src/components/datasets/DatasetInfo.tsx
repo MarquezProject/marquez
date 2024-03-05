@@ -131,12 +131,21 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               {datasetFields.map((field, index) => {
                 return (
                   <React.Fragment key={field.name}>
-                    <TableRow onClick={() => toggleRow(index)} className='expandable-row'>
+                    <TableRow
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => toggleRow(index)}
+                      className='expandable-row'
+                    >
                       <TableCell align='left'>{field.name}</TableCell>
                       <TableCell align='left'>{field.type}</TableCell>
                       <TableCell align='left'>{field.description || 'no description'}</TableCell>
                       <TableCell align='right'>
-                        <KeyboardArrowDownIcon />
+                        <KeyboardArrowDownIcon
+                          sx={{
+                            rotate: expandedRows.includes(index) ? '180deg' : 0,
+                            transition: 'rotate .3s',
+                          }}
+                        />
                       </TableCell>
                     </TableRow>
                     <TableRow>
