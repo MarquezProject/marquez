@@ -52,6 +52,9 @@ export const theme = createTheme({
       main: '#454f5b',
     },
   },
+  zIndex: {
+    snackbar: 9999,
+  },
 })
 
 export const THEME_EXTRA = {

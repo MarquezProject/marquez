@@ -71,6 +71,8 @@ export const RESET_FACETS = 'RESET_FACETS'
 // tags
 export const FETCH_TAGS = 'FETCH_TAGS'
 export const FETCH_TAGS_SUCCESS = 'FETCH_TAGS_SUCCESS'
+export const ADD_TAGS = 'ADD_TAGS'
+export const ADD_TAGS_SUCCESS = 'ADD_TAGS_SUCCESS'
 
 // column lineage
 export const FETCH_COLUMN_LINEAGE = 'FETCH_COLUMN_LINEAGE'
