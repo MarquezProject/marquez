@@ -16,6 +16,11 @@
 * Web: minor UI enhancements [`#2727`](https://github.com/MarquezProject/marquez/pull/2727) [@phixMe](https://github.com/phixMe)  
     *Hygienic cleanup of project as a follow-up to [`#2725`](https://github.com/MarquezProject/marquez/pull/2725), including a fix for [`#2747`](https://github.com/MarquezProject/marquez/issues/2747).*
 
+### Fixed
+
+* bug: marquez dataset symlinks facet create empty namespace: [`#2645`](https://github.com/MarquezProject/marquez/pull/2645) [@sophiely](https://github.com/sophiely)  
+Display symlink dataset in the previously empty namespace and link the symlink dataset lineage to the main dataset.
+
 ## [0.44.0](https://github.com/MarquezProject/marquez/compare/0.43.1...0.44.0) - 2024-01-22
 
 ### Added

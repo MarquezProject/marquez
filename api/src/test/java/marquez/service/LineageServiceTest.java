@@ -13,8 +13,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -587,5 +589,65 @@ public class LineageServiceTest {
 
   private boolean jobNameEquals(Node node, String writeJob) {
     return node.getId().asJobId().getName().getValue().equals(writeJob);
+  }
+
+  @Test
+  public void testSymlinkDatasetLineage() {
+    // (1) Create symlink facet for our main dataset
+    Map<String, Object> symlink = new HashMap<>();
+    Map<String, Object> symlinkInfo = new HashMap<>();
+    Map<String, Object> symlinkIdentifiers = new HashMap<>();
+    symlinkIdentifiers.put("name", "symlinkDataset");
+    symlinkIdentifiers.put("namespace", NAMESPACE);
+    symlinkIdentifiers.put("type", "DB_TABLE");
+    symlinkInfo.put("producer", "https://github.com/OpenLineage/producer/");
+    symlinkInfo.put("schemaURL", "https://openlineage.io/schema/url/");
+    symlinkInfo.put("identifiers", symlinkIdentifiers);
+    symlink.put("symlinks", symlinkInfo);
+
+    // (2) Create main dataset with a symlink
+    Dataset mainDataset =
+        new Dataset(
+            NAMESPACE,
+            "mainDataset",
+            newDatasetFacet(symlink, new SchemaField("firstname", "string", "the first name")));
+
+    // (3) Create the symlink dataset
+    Dataset symlinkDataset =
+        new Dataset(
+            NAMESPACE,
+            "symlinkDataset",
+            newDatasetFacet(new SchemaField("firstname", "string", "the first name")));
+
+    // (3) Create a job with the main dataset
+    UpdateLineageRow firstJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "firstJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(mainDataset),
+            Arrays.asList());
+
+    // (4) Create a job with the symlink dataset
+    UpdateLineageRow secondJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "secondJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(symlinkDataset),
+            Arrays.asList());
+
+    // (5) We expect the first and second job linked together because the main
+    // and symlink dataset are in fact the same dataset
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("symlinkDataset"))),
+            5,
+            true);
+
+    assertThat(lineage.getGraph()).hasSize(2);
   }
 }
