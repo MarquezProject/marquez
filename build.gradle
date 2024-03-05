@@ -54,7 +54,7 @@ subprojects {
         assertjVersion = '3.24.2'
         dropwizardVersion = '2.1.12'
         jacocoVersion = '0.8.11'
-        junit5Version = '5.10.0'
+        junit5Version = '5.10.2'
         lombokVersion = '1.18.30'
         mockitoVersion = '5.4.0'
         openlineageVersion = '1.5.0'
