@@ -15,13 +15,17 @@ services:
       - "db:postgres"
     depends_on:
       - db
-    entrypoint: ["/opt/marquez/wait-for-it.sh", "db:5432", "--", "./entrypoint.sh"]
+    entrypoint: 
+      - /opt/marquez/wait-for-it.sh 
+      - db:${POSTGRES_PORT}
+      - --
+      - ./entrypoint.sh
 
   db:
     image: postgres:14
     container_name: marquez-db
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
