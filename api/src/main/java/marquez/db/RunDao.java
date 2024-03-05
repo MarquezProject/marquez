@@ -222,6 +222,9 @@ public interface RunDao extends BaseDao {
       """)
   List<Run> findAll(String namespace, String jobName, int limit, int offset);
 
+  @SqlQuery("SELECT count(*) FROM runs_view AS r WHERE r.job_name = :jobName")
+  int countFor(String jobName);
+
   @SqlQuery(
       "INSERT INTO runs ( "
           + "uuid, "

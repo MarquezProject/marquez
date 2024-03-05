@@ -11,6 +11,7 @@ import static marquez.db.DbTestUtils.createJobWithoutSymlinkTarget;
 import static marquez.db.DbTestUtils.newJobWith;
 import static marquez.service.models.ServiceModelGenerator.newJobMetaWith;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
@@ -127,6 +128,20 @@ class RunDaoTest {
         .map(Run::getId)
         .map(RunId::getValue)
         .containsAll(expectedRuns.stream().map(RunRow::getUuid).collect(Collectors.toSet()));
+  }
+
+  @Test
+  public void getCountFor() {
+
+    final JobMeta jobMeta = newJobMetaWith(NamespaceName.of(namespaceRow.getName()));
+    final JobRow jobRow =
+        newJobWith(jdbi, namespaceRow.getName(), newJobName().getValue(), jobMeta);
+    
+    Set<RunRow> expectedRuns =
+        createRunsForJob(jobRow, 5, jobMeta.getOutputs()).collect(Collectors.toSet());
+    Integer count = runDao.countFor(jobRow.getName());
+    assertThat(count)
+        .isEqualTo(expectedRuns.size());
   }
 
   @Test

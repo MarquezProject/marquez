@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { Jobs } from '../../types/api'
+import { Jobs, Runs } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const getJobs = async (namespace: string, limit = 25, offset = 0) => {
+export const getJobs = async (namespace: string, limit = 20, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(
     namespace
   )}/jobs?limit=${limit}&offset=${offset}`
@@ -19,9 +19,14 @@ export const deleteJob = async (jobName: string, namespace: string) => {
   return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteJob')
 }
 
-export const getRuns = async (jobName: string, namespace: string, limit = 100, offset = 0) => {
+export const getRuns = async (namespace: string, jobName: string, limit = 20, offset = 0) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${encodeURIComponent(
     jobName
   )}/runs?limit=${limit}&offset=${offset}`
-  return genericFetchWrapper(url, { method: 'GET' }, 'fetchRuns')
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchRuns').then((r: Runs) => {
+    return { 
+      runs: r.runs.map((n) => ({ ...n, jobName: jobName })),
+      totalCount: r.totalCount 
+    }
+  })
 }

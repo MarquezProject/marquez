@@ -237,7 +237,8 @@ public class JobResource extends BaseResource {
 
     final List<Run> runs =
         runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    return Response.ok(new Runs(runs)).build();
+    final int totalCount = runService.countFor(jobName.getValue());
+    return Response.ok(new ResultsPage<>("runs", runs, totalCount)).build();
   }
 
   @Path("/jobs/runs/{id}")
