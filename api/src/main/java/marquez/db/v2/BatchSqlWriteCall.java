@@ -59,12 +59,11 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("job_namespace_name", jobMeta.getNamespace().getValue())
           .define("job_name", jobMeta.getName().getValue())
           .define("job_description", jobMeta.getDescription().orElse(null))
-          .define("job_location", jobMeta.getLocation().orElse(null))
-          .define("job_version_uuid", jobMeta.getVersion().getValue());
+          .define("job_location", jobMeta.getLocation().orElse(null));
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getVersion().getValue());
+          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
 
       dbCallAsBatch
           .add(Sql.WRITE_RUN_META)
@@ -122,12 +121,11 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("job_namespace_name", jobMeta.getNamespace().getValue())
           .define("job_name", jobMeta.getName().getValue())
           .define("job_description", jobMeta.getDescription().orElse(null))
-          .define("job_location", jobMeta.getLocation().orElse(null))
-          .define("job_version_uuid", jobMeta.getVersion().getValue());
+          .define("job_location", jobMeta.getLocation().orElse(null));
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getVersion().getValue());
+          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
 
       dbCallAsBatch.execute();
     }
