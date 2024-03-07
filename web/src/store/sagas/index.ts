@@ -5,6 +5,7 @@ import * as Effects from 'redux-saga/effects'
 import {
   ADD_DATASET_FIELD_TAG,
   ADD_DATASET_TAG,
+  ADD_TAGS,
   DELETE_DATASET,
   DELETE_DATASET_FIELD_TAG,
   DELETE_DATASET_TAG,
@@ -43,6 +44,7 @@ import { Search } from '../../types/api'
 import {
   addDatasetFieldTag,
   addDatasetTag,
+  addTags,
   deleteDataset,
   deleteDatasetFieldTag,
   deleteDatasetTag,
@@ -61,6 +63,7 @@ import {
 import {
   addDatasetFieldTagSuccess,
   addDatasetTagSuccess,
+  addTagsSuccess,
   applicationError,
   deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
@@ -316,6 +319,19 @@ export function* addDatasetFieldTagSaga() {
   }
 }
 
+export function* addTagsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_TAGS)
+      yield call(addTags, payload.tag, payload.description)
+      yield put(addTagsSuccess())
+      yield call(fetchTags)
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding a tag.'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -376,6 +392,7 @@ export default function* rootSaga(): Generator {
     addDatasetTagSaga(),
     deleteDatasetFieldTagSaga(),
     addDatasetFieldTagSaga(),
+    addTagsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])
