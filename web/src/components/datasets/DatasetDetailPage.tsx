@@ -91,7 +91,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name, datasets.refreshTags === true])
+  }, [lineageDataset.name, datasets.refreshTags])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
