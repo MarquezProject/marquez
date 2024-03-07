@@ -1,25 +1,33 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.45.0-rc.1...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.45.0...HEAD)
 
-## [0.45.0-rc.1](https://github.com/MarquezProject/marquez/compare/0.44.0...0.45.0-rc.1) - 2024-02-13
+## [0.45.0](https://github.com/MarquezProject/marquez/compare/0.44.0...0.45.0) - 2024-03-07
 
 ### Added
 
-* Web: updates for Table and Column Lineage [`#2725`](https://github.com/MarquezProject/marquez/pull/2725) [@phixMe](https://github.com/phixMe)  
-    *Creates a new page for column lineage and an updated view for lineage with a common set of shared principles.*
+* * * 
+#### Redesigned Web UI Featuring Column Lineage
+* Web: updates to Table and Column Lineage [`#2725`](https://github.com/MarquezProject/marquez/pull/2725) [@phixMe](https://github.com/phixMe)  
+    *A new page for column lineage and an updated view for lineage with a common set of shared principles.*
+* Web: quality of life updates for new lineage graph display [`#2750`](https://github.com/MarquezProject/marquez/pull/2750) [@phixMe](https://github.com/phixMe)  
+    *Visual updates from early feedback on lineage graph navigation, including a zoom button to center on the selected node.*
+* Web: improve visual display of lineage [`#2753`](https://github.com/MarquezProject/marquez/pull/2753) [@phixMe](https://github.com/phixMe)  
+    *Visual improvements to nodes including the addition of more detail and the ability to collapse dataset nodes manually.*  
+* * * * 
 * Web: add dataset field level tags to UI [`#2729`](https://github.com/MarquezProject/marquez/pull/2729) [@davidsharp7](https://github.com/davidsharp7)  
-    *Updates the `DatasetTags` component to allow for field-level tagging/deletion and adds this to the `DatasetInfo` component.*
+    *Updates to the `DatasetTags` component to allow for field-level tagging/deletion and addition of this to the `DatasetInfo` component.*
+* Web: update dataset tags to allow editing/addition of tags [`#2759`](https://github.com/MarquezProject/marquez/pull/2759) [@davidsharp7](https://github.com/davidsharp7)   
+    *Updates to `DatasetTags` to include a split button menu and a new dialog/reducer for adding new tags.*
+* Web: minor dataset tags revisions [`#2754`](https://github.com/MarquezProject/marquez/pull/2754) [@phixMe](https://github.com/phixMe)  
+    *Minor cleanup of the dataset tags feature including a pointer on the expandable row and a transition on row expansion, plus some new CSS elements.*
 
 ### Fixed
 
 * Web: minor UI enhancements [`#2727`](https://github.com/MarquezProject/marquez/pull/2727) [@phixMe](https://github.com/phixMe)  
     *Hygienic cleanup of project as a follow-up to [`#2725`](https://github.com/MarquezProject/marquez/pull/2725), including a fix for [`#2747`](https://github.com/MarquezProject/marquez/issues/2747).*
-
-### Fixed
-
-* bug: marquez dataset symlinks facet create empty namespace: [`#2645`](https://github.com/MarquezProject/marquez/pull/2645) [@sophiely](https://github.com/sophiely)  
-Display symlink dataset in the previously empty namespace and link the symlink dataset lineage to the main dataset.
+* Web: fix symlink display [`#2736`](https://github.com/MarquezProject/marquez/pull/2736) [@sophiely](https://github.com/sophiely)  
+    *Changed behavior to display the symlink dataset in the previously empty namespace and link the symlink dataset lineage to the main dataset.*
 
 ## [0.44.0](https://github.com/MarquezProject/marquez/compare/0.43.1...0.44.0) - 2024-01-22
 
