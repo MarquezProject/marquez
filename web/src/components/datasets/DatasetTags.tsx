@@ -129,6 +129,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     datasetField
       ? addDatasetFieldTag(namespace, datasetName, listTag, datasetField)
       : addDatasetTag(namespace, datasetName, listTag)
+    setDialogOpen(false)
   }
 
   const handleDelete = (deletedTag: string) => {

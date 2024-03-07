@@ -253,12 +253,7 @@ export function* deleteDatasetTagSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_DATASET_TAG)
-      yield call(
-        deleteDatasetTag,
-        payload.namespace,
-        payload.datasetName,
-        payload.tag
-      )
+      yield call(deleteDatasetTag, payload.namespace, payload.datasetName, payload.tag)
       yield put(deleteDatasetTagSuccess(payload.namespace, payload.datasetName, payload.tag))
     } catch (e) {
       yield put(applicationError('Something went wrong while removing tag from dataset'))
@@ -270,14 +265,21 @@ export function* deleteDatasetFieldTagSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_DATASET_FIELD_TAG)
-       yield call(
+      yield call(
         deleteDatasetFieldTag,
         payload.namespace,
         payload.datasetName,
         payload.tag,
         payload.field
       )
-      yield put(deleteDatasetFieldTagSuccess(payload.namespace, payload.datasetName, payload.field, payload.tag))
+      yield put(
+        deleteDatasetFieldTagSuccess(
+          payload.namespace,
+          payload.datasetName,
+          payload.field,
+          payload.tag
+        )
+      )
     } catch (e) {
       yield put(applicationError('Something went wrong while removing tag from dataset field'))
     }
@@ -288,12 +290,7 @@ export function* addDatasetTagSaga() {
   while (true) {
     try {
       const { payload } = yield take(ADD_DATASET_TAG)
-      yield call(
-        addDatasetTag,
-        payload.namespace,
-        payload.datasetName,
-        payload.tag
-      )
+      yield call(addDatasetTag, payload.namespace, payload.datasetName, payload.tag)
       yield put(addDatasetTagSuccess(payload.namespace, payload.datasetName, payload.tag))
     } catch (e) {
       yield put(applicationError('Something went wrong while adding tag to dataset'))
@@ -312,7 +309,14 @@ export function* addDatasetFieldTagSaga() {
         payload.tag,
         payload.field
       )
-      yield put(addDatasetFieldTagSuccess(payload.namespace, payload.datasetName , payload.field, payload.tag))
+      yield put(
+        addDatasetFieldTagSuccess(
+          payload.namespace,
+          payload.datasetName,
+          payload.field,
+          payload.tag
+        )
+      )
     } catch (e) {
       yield put(applicationError('Something went wrong while adding tag to dataset field.'))
     }
