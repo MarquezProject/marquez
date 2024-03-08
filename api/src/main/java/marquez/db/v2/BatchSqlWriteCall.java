@@ -125,7 +125,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
+          .define("job_version_uuid", jobMeta.getVersionId().getVersion().getValue());
 
       dbCallAsBatch.execute();
     }

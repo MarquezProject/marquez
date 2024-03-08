@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
@@ -30,6 +31,7 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.common.models.Version;
 
 public class Metadata {
   @Builder
@@ -43,7 +45,7 @@ public class Metadata {
     @Getter private final Instant nominalEndTime;
     @Nullable private final String externalId;
 
-    @Getter private final Metadata.Job job;
+    @Getter private final Job job;
     @Getter private final Metadata.IO io;
 
     @Getter private final String rawMeta;
@@ -54,7 +56,6 @@ public class Metadata {
       final RunId runId = RunId.of(event.getRun().getRunId());
       final RunState runState = RunState.forType(event.getEventType());
       final Instant runTransitionedOnAsUtc = toUtc(event.getEventTime());
-      final Instant runStartOrEndTimeAsUtc = Instant.now();
       final Metadata.Run.RunBuilder runBuilder =
           Run.builder()
               .id(runId)
@@ -64,14 +65,12 @@ public class Metadata {
               .nominalEndTime(Facets.nominalEndTimeFor(run).orElse(null))
               .rawMeta(toJson(event))
               .producer(event.getProducer());
-
       // ...
       if (runState.isDone()) {
-        runBuilder.endedAt(runStartOrEndTimeAsUtc);
+        runBuilder.endedAt(runTransitionedOnAsUtc);
       } else {
-        runBuilder.startedAt(runStartOrEndTimeAsUtc);
+        runBuilder.startedAt(runTransitionedOnAsUtc);
       }
-
       // ...
       runBuilder.job(Job.newInstanceFor(event.getJob()));
       runBuilder.io(IO.newInstanceFor(event.getInputs(), event.getOutputs()));
@@ -99,67 +98,59 @@ public class Metadata {
 
   @Builder
   public static class Job {
-    static final ImmutableSet<DatasetId> NO_INPUTS = ImmutableSet.of();
-    static final ImmutableSet<DatasetId> NO_OUTPUTS = ImmutableSet.of();
-
     @Getter private final JobType type;
     @Getter private final JobName name;
     @Getter private final NamespaceName namespace;
+    @Getter private final JobVersionId versionId;
     @Nullable private final String description;
     @Nullable private final URL location;
-    @Getter private final JobVersionId versionId;
     @Nullable private final Metadata.IO io;
 
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
-      final Optional<URL> locationOrNull = Facets.locationFor(job);
+      // ...
       final Metadata.IO io = IO.newInstanceFor(event.getInputs(), event.getOutputs());
+      final ImmutableSet<DatasetVersionId> inputs = IO.onlyVersionIdsFor(io.getInputs());
+      final ImmutableSet<DatasetVersionId> outputs = IO.onlyVersionIdsFor(io.getOutputs());
+      // ...
+      final Optional<URL> location = Facets.locationFor(job);
+      final Version jobVersion =
+          Version.forJob(
+              namespaceName, jobName, inputs, outputs, location.map(URL::toString).orElse(null));
+      final JobVersionId jobVersionId = JobVersionId.of(namespaceName, jobName, jobVersion);
+
       return Job.builder()
+          .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
+          .versionId(jobVersionId)
           .description(Facets.descriptionFor(job).orElse(null))
-          .location(locationOrNull.orElse(null))
+          .location(location.orElse(null))
           .io(io)
-          .versionId(
-              JobVersionId.of(
-                  namespaceName,
-                  jobName,
-                  newJobVersionFor(
-                          namespaceName,
-                          jobName,
-                          io.getInputs().stream()
-                              .map(Dataset::getVersionId)
-                              .collect(toImmutableSet()),
-                          io.getOutputs().stream()
-                              .map(Dataset::getVersionId)
-                              .collect(toImmutableSet()),
-                          locationOrNull.map(URL::toString).orElse(null))
-                      .getValue()))
           .build();
     }
 
     static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
-      final Optional<URL> locationOrNull = Facets.locationFor(job);
+      final Optional<URL> location = Facets.locationFor(job);
       return Job.builder()
           .name(jobName)
           .namespace(namespaceName)
           .description(Facets.descriptionFor(job).orElse(null))
-          .location(locationOrNull.orElse(null))
+          .location(location.orElse(null))
           .versionId(
               JobVersionId.of(
                   namespaceName,
                   jobName,
                   newJobVersionFor(
-                          namespaceName,
-                          jobName,
-                          NO_INPUTS,
-                          NO_OUTPUTS,
-                          locationOrNull.map(URL::toString).orElse(null))
-                      .getValue()))
+                      namespaceName,
+                      jobName,
+                      IO.EMPTY,
+                      IO.EMPTY,
+                      location.map(URL::toString).orElse(null))))
           .build();
     }
 
@@ -182,7 +173,7 @@ public class Metadata {
     @Getter private final DatasetName name;
     @Getter private final NamespaceName namespace;
     @Getter private final DatasetVersionId versionId;
-    @Getter private final Schema schema;
+    @Nullable private final Schema schema;
 
     public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
       OpenLineage.Dataset dataset = event.getDataset();
@@ -192,8 +183,12 @@ public class Metadata {
           .type(DB_TABLE)
           .name(datasetName)
           .namespace(namespaceName)
-          .schema(F)
+          .schema(Facets.schemaFor(dataset).orElse(null))
           .build();
+    }
+
+    public Optional<Metadata.Dataset.Schema> getSchema() {
+      return Optional.ofNullable(schema);
     }
 
     @Builder
@@ -201,11 +196,21 @@ public class Metadata {
       @Getter private final ImmutableSet<Metadata.Dataset.Schema.Field> fields;
 
       @Builder
-      public static class Field {}
+      public static class Field {
+        @Getter private final String name;
+        @Getter private final String type;
+        @Nullable private final String description;
+
+        public Optional<String> getDescription() {
+          return Optional.ofNullable(description);
+        }
+      }
     }
   }
 
   public static class IO {
+    static final ImmutableSet<DatasetId> EMPTY = ImmutableSet.of();
+
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
 
@@ -228,6 +233,11 @@ public class Metadata {
 
       return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
+
+    static ImmutableSet<DatasetVersionId> onlyVersionIdsFor(
+        @NonNull final ImmutableSet<Dataset> datasets) {
+      return datasets.stream().map(Dataset::getVersionId).collect(toImmutableSet());
+    }
   }
 
   static class Facets {
@@ -243,45 +253,54 @@ public class Metadata {
 
     static final String SCHEMA = "schema";
     static final String SCHEMA_FIELDS = "fields";
+    static final String SCHEMA_FIELD_TYPE = "type";
+    static final String SCHEMA_FIELD_NAME = "name";
+    static final String SCHEMA_FIELD_DESCRIPTION = "description";
 
     Facets() {}
 
     static Optional<Instant> nominalStartTimeFor(@NonNull final OpenLineage.Run run) {
       return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(RUN_NOMINAL_TIME))
-          .map(facets -> facets.getAdditionalProperties())
-          .map(facet -> (String) facet.get(RUN_NOMINAL_START_TIME))
-          .map(value -> ZonedDateTime.parse(value).withZoneSameInstant(ZoneOffset.UTC).toInstant());
+          .map(facets -> (String) facets.getAdditionalProperties().get(RUN_NOMINAL_START_TIME))
+          .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
     static Optional<Instant> nominalEndTimeFor(@NonNull final OpenLineage.Run run) {
       return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(RUN_NOMINAL_TIME))
-          .map(facets -> facets.getAdditionalProperties())
-          .map(facet -> (String) facet.get(RUN_NOMINAL_END_TIME))
-          .map(value -> ZonedDateTime.parse(value).withZoneSameInstant(ZoneOffset.UTC).toInstant());
+          .map(facets -> (String) facets.getAdditionalProperties().get(RUN_NOMINAL_END_TIME))
+          .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
     static Optional<URL> locationFor(@NonNull final OpenLineage.Job job) {
       return Optional.ofNullable(
               job.getFacets().getAdditionalProperties().get(SOURCE_CODE_LOCATION))
-          .map(facets -> facets.getAdditionalProperties())
-          .map(facet -> (String) facet.get(URL))
-          .map(value -> toUrl(value));
+          .map(facets -> (String) facets.getAdditionalProperties().get(URL))
+          .map(facet -> toUrl(facet));
     }
 
     static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {
       return Optional.ofNullable(job.getFacets().getAdditionalProperties().get(DOCUMENTATION))
-          .map(facets -> facets.getAdditionalProperties())
-          .map(facet -> (String) facet.get(DESCRIPTION));
+          .map(facet -> (String) facet.getAdditionalProperties().get(DESCRIPTION));
     }
 
-    static Optional<Metadata.Dataset.Schema> schemaFor(@NonNull final OpenLineage.Dataset dataset) {
-      return Optional.ofNullable(dataset.getFacets().getAdditionalProperties().get(SCHEMA))
-          .map(facets -> facets.getAdditionalProperties())
-          .stream()
-          .findFirst()
-          .map(facet -> Collections.singletonList(facet.get(SCHEMA_FIELDS)))
-          .stream()
-          .forEach(value -> value.get);
+    static Metadata.Dataset.Schema schemaFor(@NonNull final OpenLineage.Dataset dataset) {
+      return Dataset.Schema.builder()
+          .fields(
+              Optional.ofNullable(dataset.getFacets())
+                  .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
+                  .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
+                  .map(facets -> Collections.singletonList(facets))
+                  .stream()
+                  .map(facet -> (Map<?, ?>) facet)
+                  .map(
+                      facet ->
+                          Dataset.Schema.Field.builder()
+                              .type((String) facet.get(SCHEMA_FIELD_NAME))
+                              .name((String) facet.get(SCHEMA_FIELD_TYPE))
+                              .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
+                              .build())
+                  .collect(toImmutableSet()))
+          .build();
     }
   }
 }
