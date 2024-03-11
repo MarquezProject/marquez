@@ -5,6 +5,7 @@
 
 package marquez.common.models;
 
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
@@ -17,10 +18,10 @@ import lombok.Value;
 public class JobVersionId {
   @NonNull NamespaceName namespace;
   @NonNull JobName name;
-  @NonNull Version version;
+  @NonNull UUID version;
 
   public static JobVersionId of(
-      final NamespaceName namespaceName, final JobName jobName, final Version version) {
+      final NamespaceName namespaceName, final JobName jobName, final UUID version) {
     return new JobVersionId(namespaceName, jobName, version);
   }
 }

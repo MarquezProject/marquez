@@ -128,15 +128,15 @@ public interface Sql {
           started_at,
           ended_at
         ) VALUES (
-          '<run_id>',                               -- replace with the actual UUID value
-          '<job_version_uuid>',                     -- replace with the actual job version UUID value
-          '<run_nominal_start_time>',               -- replace with the actual nominal start time value
-          '<run_nominal_end_time>',                 -- replace with the actual nominal end time value
-          '<run_state>',                            -- replace with the actual nominal end time value
-          NULLIF('<run_external_id>',''),           -- replace with the actual transitioned at value
-          '<run_transitioned_at>',                  -- replace with the actual transitioned at value
-          NULLIF('<run_started_at>','')::timestamp, -- replace with the actual transitioned at value
-          NULLIF('<run_ended_at>','')::timestamp    -- replace with the actual transitioned at value
+          '<run_id>',                                       -- replace with the actual UUID value
+          '<job_version_uuid>',                             -- replace with the actual job version UUID value
+          NULLIF('<run_nominal_start_time>','')::timestamp, -- replace with the actual nominal start time value
+          NULLIF('<run_nominal_end_time>','')::timestamp,   -- replace with the actual nominal end time value
+          '<run_state>',                                    -- replace with the actual nominal end time value
+          NULLIF('<run_external_id>',''),                   -- replace with the actual transitioned at value
+          '<run_transitioned_at>',                          -- replace with the actual transitioned at value
+          NULLIF('<run_started_at>','')::timestamp,         -- replace with the actual transitioned at value
+          NULLIF('<run_ended_at>','')::timestamp            -- replace with the actual transitioned at value
         ) ON CONFLICT (uuid) DO NOTHING
       ),
       current_run_uuid_for_job_versions AS (

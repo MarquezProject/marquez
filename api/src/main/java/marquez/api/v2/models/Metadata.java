@@ -13,7 +13,6 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -126,7 +125,8 @@ public final class Metadata {
       final Version jobVersion =
           Version.forJob(
               namespaceName, jobName, inputs, outputs, location.map(URL::toString).orElse(null));
-      final JobVersionId jobVersionId = JobVersionId.of(namespaceName, jobName, jobVersion);
+      final JobVersionId jobVersionId =
+          JobVersionId.of(namespaceName, jobName, jobVersion.getValue());
 
       return Job.builder()
           .type(JobType.BATCH)
@@ -154,11 +154,12 @@ public final class Metadata {
                   namespaceName,
                   jobName,
                   newJobVersionFor(
-                      namespaceName,
-                      jobName,
-                      IO.EMPTY,
-                      IO.EMPTY,
-                      location.map(URL::toString).orElse(null))))
+                          namespaceName,
+                          jobName,
+                          IO.EMPTY,
+                          IO.EMPTY,
+                          location.map(URL::toString).orElse(null))
+                      .getValue()))
           .build();
     }
 
@@ -271,26 +272,29 @@ public final class Metadata {
     Facets() {}
 
     static Optional<Instant> nominalStartTimeFor(@NonNull final OpenLineage.Run run) {
-      return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(RUN_NOMINAL_TIME))
+      return Optional.ofNullable(run.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(RUN_NOMINAL_TIME))
           .map(facets -> (String) facets.getAdditionalProperties().get(RUN_NOMINAL_START_TIME))
           .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
     static Optional<Instant> nominalEndTimeFor(@NonNull final OpenLineage.Run run) {
-      return Optional.ofNullable(run.getFacets().getAdditionalProperties().get(RUN_NOMINAL_TIME))
+      return Optional.ofNullable(run.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(RUN_NOMINAL_TIME))
           .map(facets -> (String) facets.getAdditionalProperties().get(RUN_NOMINAL_END_TIME))
           .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
     static Optional<URL> locationFor(@NonNull final OpenLineage.Job job) {
-      return Optional.ofNullable(
-              job.getFacets().getAdditionalProperties().get(SOURCE_CODE_LOCATION))
+      return Optional.ofNullable(job.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(SOURCE_CODE_LOCATION))
           .map(facets -> (String) facets.getAdditionalProperties().get(URL))
           .map(facet -> toUrl(facet));
     }
 
     static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {
-      return Optional.ofNullable(job.getFacets().getAdditionalProperties().get(DOCUMENTATION))
+      return Optional.ofNullable(job.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(DOCUMENTATION))
           .map(facet -> (String) facet.getAdditionalProperties().get(DESCRIPTION));
     }
 
@@ -300,7 +304,7 @@ public final class Metadata {
               Optional.ofNullable(dataset.getFacets())
                   .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
                   .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
-                  .map(facets -> Collections.singletonList((Map<?, ?>) facets))
+                  .map(facets -> (List<Map<?, ?>>) facets)
                   .map(
                       facets ->
                           facets.stream()
