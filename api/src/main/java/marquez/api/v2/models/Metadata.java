@@ -30,6 +30,7 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.common.models.SourceName;
 import marquez.common.models.Version;
 
 /** ... */
@@ -183,6 +184,7 @@ public final class Metadata {
     @Getter private final NamespaceName namespace;
     @Getter private final DatasetVersionId versionId;
     @Getter private final Schema schema;
+    @Getter private final Source source;
 
     public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
       return newInstanceFor(event.getDataset());
@@ -196,6 +198,7 @@ public final class Metadata {
           .name(datasetName)
           .namespace(namespaceName)
           .schema(Facets.schemaFor(dataset))
+          .source(Facets.sourceFor(dataset))
           .build();
     }
 
@@ -217,6 +220,12 @@ public final class Metadata {
           return Optional.ofNullable(description);
         }
       }
+    }
+
+    @Builder
+    public static class Source {
+      @Getter private final SourceName name;
+      @Getter private final URL connectionUrl;
     }
   }
 
@@ -269,6 +278,10 @@ public final class Metadata {
     static final String SCHEMA_FIELD_NAME = "name";
     static final String SCHEMA_FIELD_DESCRIPTION = "description";
 
+    static final String SOURCE = "dataSource";
+    static final String SOURCE_NAME = "name";
+    static final String SOURCE_CONNECTION_URL = "uri";
+
     Facets() {}
 
     static Optional<Instant> nominalStartTimeFor(@NonNull final OpenLineage.Run run) {
@@ -318,6 +331,23 @@ public final class Metadata {
                               .collect(toImmutableSet()))
                   .orElse(null))
           .build();
+    }
+
+    static Dataset.Source sourceFor(@NonNull final OpenLineage.Dataset dataset) {
+      final SourceName sourceName =
+          Optional.ofNullable(dataset.getFacets())
+              .map(facets -> facets.getAdditionalProperties().get(SOURCE))
+              .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_NAME))
+              .map(facet -> SourceName.of(facet))
+              .orElseThrow();
+      final URL connectionUrl =
+          Optional.ofNullable(dataset.getFacets())
+              .map(facets -> facets.getAdditionalProperties().get(SOURCE))
+              .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_CONNECTION_URL))
+              .map(facet -> toUrl(facet))
+              .orElseThrow();
+
+      return Dataset.Source.builder().name(sourceName).connectionUrl(connectionUrl).build();
     }
   }
 }
