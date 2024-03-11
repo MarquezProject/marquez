@@ -119,7 +119,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setTagDescription(event.target.value)
   }
 
-  const tagData = useSelector((state: IState) => state.tags.tags)
+  const tagData = useSelector((state: IState) => state.tags.tags.sort((a,b) => a.name.localeCompare(b.name)))
 
   const handleTagListChange = (event: any) => {
     setListTag(event.target.value)
