@@ -5,7 +5,6 @@
 
 package marquez.common.models;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
@@ -18,5 +17,10 @@ import lombok.Value;
 public class DatasetVersionId {
   @NonNull NamespaceName namespace;
   @NonNull DatasetName name;
-  @NonNull UUID version;
+  @NonNull Version version;
+
+  public static DatasetVersionId of(
+      final NamespaceName namespaceName, final DatasetName jobName, final Version version) {
+    return new DatasetVersionId(namespaceName, jobName, version);
+  }
 }

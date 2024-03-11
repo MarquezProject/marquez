@@ -33,7 +33,11 @@ import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.Version;
 
-public class Metadata {
+/** ... */
+public final class Metadata {
+  private Metadata() {}
+
+  /** ... */
   @Builder
   public static class Run {
     @Getter private final RunId id;
@@ -46,17 +50,18 @@ public class Metadata {
     @Nullable private final String externalId;
 
     @Getter private final Job job;
-    @Getter private final Metadata.IO io;
+    @Getter private final IO io;
 
     @Getter private final String rawMeta;
     @Getter private final URI producer;
 
+    /* ... */
     public static Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
       final OpenLineage.Run run = event.getRun();
       final RunId runId = RunId.of(event.getRun().getRunId());
       final RunState runState = RunState.forType(event.getEventType());
       final Instant runTransitionedOnAsUtc = toUtc(event.getEventTime());
-      final Metadata.Run.RunBuilder runBuilder =
+      final Run.RunBuilder runBuilder =
           Run.builder()
               .id(runId)
               .state(runState)
@@ -96,6 +101,7 @@ public class Metadata {
     }
   }
 
+  /** ... */
   @Builder
   public static class Job {
     @Getter private final JobType type;
@@ -104,14 +110,15 @@ public class Metadata {
     @Getter private final JobVersionId versionId;
     @Nullable private final String description;
     @Nullable private final URL location;
-    @Nullable private final Metadata.IO io;
+    @Nullable private final IO io;
 
+    /* ... */
     public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       // ...
-      final Metadata.IO io = IO.newInstanceFor(event.getInputs(), event.getOutputs());
+      final IO io = IO.newInstanceFor(event.getInputs(), event.getOutputs());
       final ImmutableSet<DatasetVersionId> inputs = IO.onlyVersionIdsFor(io.getInputs());
       final ImmutableSet<DatasetVersionId> outputs = IO.onlyVersionIdsFor(io.getOutputs());
       // ...
@@ -132,7 +139,8 @@ public class Metadata {
           .build();
     }
 
-    static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
+    /* ... */
+    public static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       final Optional<URL> location = Facets.locationFor(job);
@@ -162,7 +170,7 @@ public class Metadata {
       return Optional.ofNullable(location);
     }
 
-    public Optional<Metadata.IO> getIo() {
+    public Optional<IO> getIo() {
       return Optional.ofNullable(io);
     }
   }
@@ -173,27 +181,30 @@ public class Metadata {
     @Getter private final DatasetName name;
     @Getter private final NamespaceName namespace;
     @Getter private final DatasetVersionId versionId;
-    @Nullable private final Schema schema;
+    @Getter private final Schema schema;
 
     public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
-      OpenLineage.Dataset dataset = event.getDataset();
+      return newInstanceFor(event.getDataset());
+    }
+
+    static Dataset newInstanceFor(@NonNull final OpenLineage.Dataset dataset) {
       final DatasetName datasetName = DatasetName.of(dataset.getName());
       final NamespaceName namespaceName = NamespaceName.of(dataset.getNamespace());
       return Dataset.builder()
           .type(DB_TABLE)
           .name(datasetName)
           .namespace(namespaceName)
-          .schema(Facets.schemaFor(dataset).orElse(null))
+          .schema(Facets.schemaFor(dataset))
           .build();
-    }
-
-    public Optional<Metadata.Dataset.Schema> getSchema() {
-      return Optional.ofNullable(schema);
     }
 
     @Builder
     public static class Schema {
-      @Getter private final ImmutableSet<Metadata.Dataset.Schema.Field> fields;
+      @Nullable private final ImmutableSet<Dataset.Schema.Field> fields;
+
+      public Optional<ImmutableSet<Dataset.Schema.Field>> getFields() {
+        return Optional.ofNullable(fields);
+      }
 
       @Builder
       public static class Field {
@@ -224,11 +235,11 @@ public class Metadata {
         @NonNull final List<OpenLineage.OutputDataset> outputs) {
       final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
       for (final OpenLineage.InputDataset input : inputs) {
-        inputsBuilder.add(new Dataset());
+        inputsBuilder.add(Dataset.newInstanceFor(input));
       }
       final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
       for (final OpenLineage.OutputDataset output : outputs) {
-        outputsBuilder.add(new Dataset());
+        outputsBuilder.add(Dataset.newInstanceFor(output));
       }
 
       return new IO(inputsBuilder.build(), outputsBuilder.build());
@@ -283,23 +294,25 @@ public class Metadata {
           .map(facet -> (String) facet.getAdditionalProperties().get(DESCRIPTION));
     }
 
-    static Metadata.Dataset.Schema schemaFor(@NonNull final OpenLineage.Dataset dataset) {
+    static Dataset.Schema schemaFor(@NonNull final OpenLineage.Dataset dataset) {
       return Dataset.Schema.builder()
           .fields(
               Optional.ofNullable(dataset.getFacets())
                   .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
                   .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
-                  .map(facets -> Collections.singletonList(facets))
-                  .stream()
-                  .map(facet -> (Map<?, ?>) facet)
+                  .map(facets -> Collections.singletonList((Map<?, ?>) facets))
                   .map(
-                      facet ->
-                          Dataset.Schema.Field.builder()
-                              .type((String) facet.get(SCHEMA_FIELD_NAME))
-                              .name((String) facet.get(SCHEMA_FIELD_TYPE))
-                              .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
-                              .build())
-                  .collect(toImmutableSet()))
+                      facets ->
+                          facets.stream()
+                              .map(
+                                  facet ->
+                                      Dataset.Schema.Field.builder()
+                                          .type((String) facet.get(SCHEMA_FIELD_NAME))
+                                          .name((String) facet.get(SCHEMA_FIELD_TYPE))
+                                          .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
+                                          .build())
+                              .collect(toImmutableSet()))
+                  .orElse(null))
           .build();
     }
   }
