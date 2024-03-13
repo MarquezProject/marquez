@@ -1,5 +1,6 @@
 package marquez.db.v2;
 
+import com.google.common.collect.Iterables;
 import io.openlineage.server.OpenLineage;
 import java.time.Instant;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      log.info("Writing metadata: {}", runMeta);
+      log.debug("Writing metadata: {}", runMeta);
 
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
@@ -70,28 +71,43 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       dbCallAsBatch
           .add(Sql.WRITE_RUN_META)
           .define("run_state_uuid", UUID.randomUUID())
-          .define("run_nominal_start_time", runMeta.getNominalStartTime())
-          .define("run_nominal_end_time", runMeta.getNominalEndTime())
+          .define("run_nominal_start_time", runMeta.getNominalStartTime().orElse(null))
+          .define("run_nominal_end_time", runMeta.getNominalEndTime().orElse(null))
           .define("run_external_id", runMeta.getExternalId().orElse(null))
           .define("run_started_at", runMeta.getStartedAt().orElse(null))
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
-      ioMeta
-          .getInputs()
+      Iterables.concat(ioMeta.getInputs(), ioMeta.getOutputs())
           .forEach(
-              inputMeta -> {
+              ioMeta -> {
                 dbCallAsBatch
                     .add(Sql.WRITE_DATASET_META)
                     .define("dataset_namespace_uuid", UUID.randomUUID())
-                    .define("dataset_namespace_name", inputMeta.getNamespace().getValue())
-                    .define("dataset_namespace_description", inputMeta.getNamespace());
-              });
-
-      ioMeta
-          .getInputs()
-          .forEach(
-              outputMeta -> {
-                dbCallAsBatch.add(Sql.WRITE_DATASET_META);
+                    .define("dataset_namespace_name", ioMeta.getNamespace().getValue())
+                    .define("dataset_namespace_description", null)
+                    .define("source_uuid", UUID.randomUUID())
+                    .define("source_type", "DB")
+                    .define("source_name", ioMeta.getSource().getName().getValue())
+                    .define(
+                        "source_connection_url",
+                        ioMeta.getSource().getConnectionUrl().toASCIIString())
+                    .define("source_description", null)
+                    .define("dataset_uuid", UUID.randomUUID())
+                    .define("dataset_type", ioMeta.getType());
+                ioMeta
+                    .getSchema()
+                    .getFields()
+                    .forEach(
+                        fieldMeta -> {
+                          dbCallAsBatch
+                              .add(Sql.WRITE_DATASET_FIELDS_META)
+                              .define("dataset_field_uuid", UUID.randomUUID())
+                              .define("dataset_field_type", fieldMeta.getType())
+                              .define("dataset_field_name", fieldMeta.getName())
+                              .define(
+                                  "dataset_field_description",
+                                  fieldMeta.getDescription().orElse(null));
+                        });
               });
 
       dbCallAsBatch.execute();

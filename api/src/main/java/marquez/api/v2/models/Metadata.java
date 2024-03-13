@@ -217,11 +217,7 @@ public final class Metadata {
     @Builder
     @ToString
     public static class Schema {
-      @Nullable private final ImmutableSet<Dataset.Schema.Field> fields;
-
-      public Optional<ImmutableSet<Dataset.Schema.Field>> getFields() {
-        return Optional.ofNullable(fields);
-      }
+      @Getter private final ImmutableSet<Dataset.Schema.Field> fields;
 
       @Builder
       @ToString
@@ -333,7 +329,7 @@ public final class Metadata {
 
     static Dataset.Schema schemaFor(@NonNull final OpenLineage.Dataset dataset) {
       // ...
-      final ImmutableSet<Dataset.Schema.Field> fieldsOrNull =
+      final ImmutableSet<Dataset.Schema.Field> fields =
           Optional.ofNullable(dataset.getFacets())
               .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
               .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
@@ -349,9 +345,9 @@ public final class Metadata {
                                       .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
                                       .build())
                           .collect(toImmutableSet()))
-              .orElse(null);
+              .orElse(ImmutableSet.of());
 
-      return Dataset.Schema.builder().fields(fieldsOrNull).build();
+      return Dataset.Schema.builder().fields(fields).build();
     }
 
     static Dataset.Source sourceFor(@NonNull final OpenLineage.Dataset dataset) {

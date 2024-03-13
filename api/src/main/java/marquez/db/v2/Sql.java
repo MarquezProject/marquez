@@ -137,7 +137,11 @@ public interface Sql {
           '<run_transitioned_at>',                          -- replace with the actual transitioned at value
           NULLIF('<run_started_at>','')::timestamp,         -- replace with the actual transitioned at value
           NULLIF('<run_ended_at>','')::timestamp            -- replace with the actual transitioned at value
-        ) ON CONFLICT (uuid) DO NOTHING
+        )
+        ON CONFLICT (uuid)
+        DO UPDATE SET current_run_state  = EXCLUDED.current_run_state,
+                      started_at         = COALESCE(EXCLUDED.started_at, runs.started_at),
+                      ended_at           = COALESCE(EXCLUDED.ended_at, runs.ended_at)
       ),
       current_run_uuid_for_job_versions AS (
         UPDATE job_versions
@@ -182,7 +186,8 @@ public interface Sql {
         ON CONFLICT (name)
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), namespaces.description)
-      )
+        RETURNING *
+      ),
       source AS (
         INSERT INTO sources (
           uuid,
@@ -205,7 +210,7 @@ public interface Sql {
         ON CONFLICT (name)
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), sources.description)
-        RETURNING *;
+        RETURNING *
       )
       INSERT INTO datasets (
         uuid,
@@ -218,22 +223,44 @@ public interface Sql {
         description,
         namespace_name,
         source_name
-      ) VALUES (
+      )
+      SELECT
         '<dataset_uuid>',                     -- replace with the actual UUID value
         '<dataset_type>',                     -- replace with the actual type value
         '<created_at>',                       -- replace with the actual created_at value
         '<updated_at>',                       -- replace with the actual updated_at value
-        '<namespace_uuid>',                   -- replace with the actual namespace_uuid value
-        '<source_uuid>',                      -- replace with the actual source_uuid value
+        namespace.uuid,                       -- replace with the actual namespace_uuid value
+        source.uuid,                          -- replace with the actual source_uuid value
         '<dataset_name>',                     -- replace with the actual name value
         NULLIF('<dataset_description>',  ''), -- replace with the actual description value
-        '<namespace_name>',                   -- replace with the actual namespace_name value
-        '<source_name>'                       -- replace with the actual source_name value
-      )
+        namespace.name,                       -- replace with the actual namespace_name value
+        source.name                           -- replace with the actual source_name value
+      FROM namespace, source
       ON CONFLICT (namespace_name, name)
       DO UPDATE SET type = EXCLUDED.type,
                     updated_at  = EXCLUDED.updated_at,
                     description = EXCLUDED.description
+      """;
+
+  String WRITE_DATASET_FIELDS_META =
+      """
+      INSERT INTO dataset_fields (
+        uuid,
+        type,
+        created_at,
+        updated_at,
+        dataset_uuid,
+        name,
+        description
+      ) VALUES (
+        '<dataset_field_uuid>',       -- replace with the actual UUID value
+        '<dataset_field_type>',       -- replace with the actual UUID value
+        '<created_at>',               -- replace with the actual UUID value
+        '<updated_at>',               -- replace with the actual UUID value
+        '<dataset_uuid>',             -- replace with the actual UUID value
+        '<dataset_field_name>',       -- replace with the actual UUID value
+        '<dataset_field_description>' -- replace with the actual UUID value
+      ) ON CONFLICT (dataset_uuid, name, type) DO NOTHING
       """;
 
   String WRITE_DATASET_VERSION_META = """
