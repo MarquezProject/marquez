@@ -3,13 +3,11 @@ package marquez.api.v2.models;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.Utils.newJobVersionFor;
 import static marquez.common.Utils.toJson;
-import static marquez.common.Utils.toUrl;
 import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.server.OpenLineage;
 import java.net.URI;
-import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -18,8 +16,10 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
@@ -39,14 +39,15 @@ public final class Metadata {
 
   /** ... */
   @Builder
+  @ToString
   public static class Run {
     @Getter private final RunId id;
     @Getter private final RunState state;
     @Getter private final Instant transitionedOn;
     @Nullable private final Instant startedAt;
     @Nullable private final Instant endedAt;
-    @Getter private final Instant nominalStartTime;
-    @Getter private final Instant nominalEndTime;
+    @Nullable private final Instant nominalStartTime;
+    @Nullable private final Instant nominalEndTime;
     @Nullable private final String externalId;
 
     @Getter private final Job job;
@@ -83,6 +84,14 @@ public final class Metadata {
       return runBuilder.build();
     }
 
+    public Optional<Instant> getNominalStartTime() {
+      return Optional.ofNullable(nominalStartTime);
+    }
+
+    public Optional<Instant> getNominalEndTime() {
+      return Optional.ofNullable(nominalEndTime);
+    }
+
     public Optional<Instant> getStartedAt() {
       return Optional.ofNullable(startedAt);
     }
@@ -103,13 +112,14 @@ public final class Metadata {
 
   /** ... */
   @Builder
+  @ToString
   public static class Job {
     @Getter private final JobType type;
     @Getter private final JobName name;
     @Getter private final NamespaceName namespace;
     @Getter private final JobVersionId versionId;
     @Nullable private final String description;
-    @Nullable private final URL location;
+    @Nullable private final URI location;
     @Nullable private final IO io;
 
     /* ... */
@@ -122,10 +132,10 @@ public final class Metadata {
       final ImmutableSet<DatasetVersionId> inputs = IO.onlyVersionIdsFor(io.getInputs());
       final ImmutableSet<DatasetVersionId> outputs = IO.onlyVersionIdsFor(io.getOutputs());
       // ...
-      final Optional<URL> location = Facets.locationFor(job);
+      final Optional<URI> location = Facets.locationFor(job);
       final Version jobVersion =
           Version.forJob(
-              namespaceName, jobName, inputs, outputs, location.map(URL::toString).orElse(null));
+              namespaceName, jobName, inputs, outputs, location.map(URI::toString).orElse(null));
       final JobVersionId jobVersionId =
           JobVersionId.of(namespaceName, jobName, jobVersion.getValue());
 
@@ -144,7 +154,7 @@ public final class Metadata {
     public static Job newInstanceFor(@NonNull final OpenLineage.Job job) {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
-      final Optional<URL> location = Facets.locationFor(job);
+      final Optional<URI> location = Facets.locationFor(job);
       return Job.builder()
           .name(jobName)
           .namespace(namespaceName)
@@ -159,7 +169,7 @@ public final class Metadata {
                           jobName,
                           IO.EMPTY,
                           IO.EMPTY,
-                          location.map(URL::toString).orElse(null))
+                          location.map(URI::toString).orElse(null))
                       .getValue()))
           .build();
     }
@@ -168,7 +178,7 @@ public final class Metadata {
       return Optional.ofNullable(description);
     }
 
-    public Optional<URL> getLocation() {
+    public Optional<URI> getLocation() {
       return Optional.ofNullable(location);
     }
 
@@ -178,6 +188,8 @@ public final class Metadata {
   }
 
   @Builder
+  @ToString
+  @EqualsAndHashCode
   public static class Dataset {
     @Getter private final DatasetType type;
     @Getter private final DatasetName name;
@@ -203,6 +215,7 @@ public final class Metadata {
     }
 
     @Builder
+    @ToString
     public static class Schema {
       @Nullable private final ImmutableSet<Dataset.Schema.Field> fields;
 
@@ -211,6 +224,8 @@ public final class Metadata {
       }
 
       @Builder
+      @ToString
+      @EqualsAndHashCode
       public static class Field {
         @Getter private final String name;
         @Getter private final String type;
@@ -223,9 +238,10 @@ public final class Metadata {
     }
 
     @Builder
+    @ToString
     public static class Source {
       @Getter private final SourceName name;
-      @Getter private final URL connectionUrl;
+      @Getter private final URI connectionUrl;
     }
   }
 
@@ -241,15 +257,19 @@ public final class Metadata {
     }
 
     public static IO newInstanceFor(
-        @NonNull final List<OpenLineage.InputDataset> inputs,
-        @NonNull final List<OpenLineage.OutputDataset> outputs) {
+        @Nullable final List<OpenLineage.InputDataset> inputs,
+        @Nullable final List<OpenLineage.OutputDataset> outputs) {
       final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
-      for (final OpenLineage.InputDataset input : inputs) {
-        inputsBuilder.add(Dataset.newInstanceFor(input));
+      if (inputs != null) {
+        for (final OpenLineage.InputDataset input : inputs) {
+          inputsBuilder.add(Dataset.newInstanceFor(input));
+        }
       }
       final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
-      for (final OpenLineage.OutputDataset output : outputs) {
-        outputsBuilder.add(Dataset.newInstanceFor(output));
+      if (outputs != null) {
+        for (final OpenLineage.OutputDataset output : outputs) {
+          outputsBuilder.add(Dataset.newInstanceFor(output));
+        }
       }
 
       return new IO(inputsBuilder.build(), outputsBuilder.build());
@@ -298,11 +318,11 @@ public final class Metadata {
           .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
-    static Optional<URL> locationFor(@NonNull final OpenLineage.Job job) {
+    static Optional<URI> locationFor(@NonNull final OpenLineage.Job job) {
       return Optional.ofNullable(job.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(SOURCE_CODE_LOCATION))
           .map(facets -> (String) facets.getAdditionalProperties().get(URL))
-          .map(facet -> toUrl(facet));
+          .map(facet -> URI.create(facet));
     }
 
     static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {
@@ -312,25 +332,26 @@ public final class Metadata {
     }
 
     static Dataset.Schema schemaFor(@NonNull final OpenLineage.Dataset dataset) {
-      return Dataset.Schema.builder()
-          .fields(
-              Optional.ofNullable(dataset.getFacets())
-                  .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
-                  .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
-                  .map(facets -> (List<Map<?, ?>>) facets)
-                  .map(
-                      facets ->
-                          facets.stream()
-                              .map(
-                                  facet ->
-                                      Dataset.Schema.Field.builder()
-                                          .type((String) facet.get(SCHEMA_FIELD_NAME))
-                                          .name((String) facet.get(SCHEMA_FIELD_TYPE))
-                                          .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
-                                          .build())
-                              .collect(toImmutableSet()))
-                  .orElse(null))
-          .build();
+      // ...
+      final ImmutableSet<Dataset.Schema.Field> fieldsOrNull =
+          Optional.ofNullable(dataset.getFacets())
+              .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
+              .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
+              .map(facets -> (List<Map<?, ?>>) facets)
+              .map(
+                  facets ->
+                      facets.stream()
+                          .map(
+                              facet ->
+                                  Dataset.Schema.Field.builder()
+                                      .type((String) facet.get(SCHEMA_FIELD_NAME))
+                                      .name((String) facet.get(SCHEMA_FIELD_TYPE))
+                                      .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
+                                      .build())
+                          .collect(toImmutableSet()))
+              .orElse(null);
+
+      return Dataset.Schema.builder().fields(fieldsOrNull).build();
     }
 
     static Dataset.Source sourceFor(@NonNull final OpenLineage.Dataset dataset) {
@@ -340,11 +361,11 @@ public final class Metadata {
               .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_NAME))
               .map(facet -> SourceName.of(facet))
               .orElseThrow();
-      final URL connectionUrl =
+      final URI connectionUrl =
           Optional.ofNullable(dataset.getFacets())
               .map(facets -> facets.getAdditionalProperties().get(SOURCE))
               .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_CONNECTION_URL))
-              .map(facet -> toUrl(facet))
+              .map(facet -> URI.create(facet))
               .orElseThrow();
 
       return Dataset.Source.builder().name(sourceName).connectionUrl(connectionUrl).build();

@@ -33,6 +33,8 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
+      log.info("Writing metadata: {}", runMeta);
+
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
       final Instant nowAsUtc = Instant.now();
@@ -77,14 +79,18 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       ioMeta
           .getInputs()
           .forEach(
-              datasetMeta -> {
-                dbCallAsBatch.add(Sql.WRITE_DATASET_META);
+              inputMeta -> {
+                dbCallAsBatch
+                    .add(Sql.WRITE_DATASET_META)
+                    .define("dataset_namespace_uuid", UUID.randomUUID())
+                    .define("dataset_namespace_name", inputMeta.getNamespace().getValue())
+                    .define("dataset_namespace_description", inputMeta.getNamespace());
               });
 
       ioMeta
           .getInputs()
           .forEach(
-              datasetMeta -> {
+              outputMeta -> {
                 dbCallAsBatch.add(Sql.WRITE_DATASET_META);
               });
 
