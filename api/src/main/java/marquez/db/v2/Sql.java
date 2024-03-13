@@ -84,7 +84,8 @@ public interface Sql {
       WITH job AS (
         SELECT uuid, namespace_uuid, namespace_name, name, location
           FROM jobs
-         WHERE name = '<job_name>'
+         WHERE namespace_name = '<job_namespace_name>'
+           AND name = '<job_name>'
       ),
       job_version AS (
         INSERT INTO job_versions (
@@ -211,39 +212,44 @@ public interface Sql {
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), sources.description)
         RETURNING *
-      )
-      INSERT INTO datasets (
-        uuid,
-        type,
-        created_at,
-        updated_at,
-        namespace_uuid,
-        source_uuid,
-        name,
-        description,
-        namespace_name,
-        source_name
-      )
-      SELECT
-        '<dataset_uuid>',                     -- replace with the actual UUID value
-        '<dataset_type>',                     -- replace with the actual type value
-        '<created_at>',                       -- replace with the actual created_at value
-        '<updated_at>',                       -- replace with the actual updated_at value
-        namespace.uuid,                       -- replace with the actual namespace_uuid value
-        source.uuid,                          -- replace with the actual source_uuid value
-        '<dataset_name>',                     -- replace with the actual name value
-        NULLIF('<dataset_description>',  ''), -- replace with the actual description value
-        namespace.name,                       -- replace with the actual namespace_name value
-        source.name                           -- replace with the actual source_name value
-      FROM namespace, source
-      ON CONFLICT (namespace_name, name)
-      DO UPDATE SET type = EXCLUDED.type,
-                    updated_at  = EXCLUDED.updated_at,
-                    description = EXCLUDED.description
+      ),
+        INSERT INTO datasets (
+          uuid,
+          type,
+          created_at,
+          updated_at,
+          namespace_uuid,
+          source_uuid,
+          name,
+          description,
+          namespace_name,
+          source_name
+        )
+        SELECT
+          '<dataset_uuid>',                     -- replace with the actual UUID value
+          '<dataset_type>',                     -- replace with the actual type value
+          '<created_at>',                       -- replace with the actual created_at value
+          '<updated_at>',                       -- replace with the actual updated_at value
+          namespace.uuid,                       -- replace with the actual namespace_uuid value
+          source.uuid,                          -- replace with the actual source_uuid value
+          '<dataset_name>',                     -- replace with the actual name value
+          NULLIF('<dataset_description>',  ''), -- replace with the actual description value
+          namespace.name,                       -- replace with the actual namespace_name value
+          source.name                           -- replace with the actual source_name value
+        FROM namespace, source
+        ON CONFLICT (namespace_name, name)
+        DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                      description = COALESCE(NULLIF(EXCLUDED.description, ''), datasets.description)
       """;
 
   String WRITE_DATASET_FIELDS_META =
       """
+      WITH dataset AS (
+        SELECT uuid
+          FROM datasets
+         WHERE namespace_name = '<dataset_namespace_name>'
+           AND name = '<dataset_name>'
+      )
       INSERT INTO dataset_fields (
         uuid,
         type,
@@ -252,15 +258,17 @@ public interface Sql {
         dataset_uuid,
         name,
         description
-      ) VALUES (
+      )
+      SELECT
         '<dataset_field_uuid>',       -- replace with the actual UUID value
         '<dataset_field_type>',       -- replace with the actual UUID value
         '<created_at>',               -- replace with the actual UUID value
         '<updated_at>',               -- replace with the actual UUID value
-        '<dataset_uuid>',             -- replace with the actual UUID value
+        dataset.uuid,             -- replace with the actual UUID value
         '<dataset_field_name>',       -- replace with the actual UUID value
         '<dataset_field_description>' -- replace with the actual UUID value
-      ) ON CONFLICT (dataset_uuid, name, type) DO NOTHING
+      FROM dataset
+      ON CONFLICT (dataset_uuid, name, type) DO NOTHING
       """;
 
   String WRITE_DATASET_VERSION_META = """

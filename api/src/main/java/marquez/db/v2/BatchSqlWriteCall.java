@@ -94,6 +94,9 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
                     .define("source_description", null)
                     .define("dataset_uuid", UUID.randomUUID())
                     .define("dataset_type", ioMeta.getType());
+
+                // ...
+                dbCallAsBatch.add(Sql.WRITE_DATASET_VERSION_META);
                 ioMeta
                     .getSchema()
                     .getFields()
