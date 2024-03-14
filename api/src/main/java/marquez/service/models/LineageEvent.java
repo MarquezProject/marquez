@@ -52,6 +52,20 @@ public class LineageEvent extends BaseEvent {
   @Valid @NotNull private String producer;
   @Valid private URI schemaURL;
 
+  @JsonIgnore
+  public boolean isTerminalEvent() {
+    return (eventType != null)
+        && (eventType.equalsIgnoreCase("COMPLETE") || eventType.equalsIgnoreCase("FAIL"));
+  }
+
+  @JsonIgnore
+  public boolean isTerminalEventForStreamingJobWithNoDatasets() {
+    return isTerminalEvent()
+        && (job != null && job.isStreamingJob())
+        && (outputs == null || outputs.isEmpty())
+        && (inputs == null || inputs.isEmpty());
+  }
+
   @AllArgsConstructor
   @NoArgsConstructor
   @Setter
