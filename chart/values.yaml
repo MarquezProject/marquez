@@ -198,3 +198,5 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+  # TEST CI BUILD FOR CHART
