@@ -340,8 +340,8 @@ public final class Metadata {
                           .map(
                               facet ->
                                   Dataset.Schema.Field.builder()
-                                      .type((String) facet.get(SCHEMA_FIELD_NAME))
-                                      .name((String) facet.get(SCHEMA_FIELD_TYPE))
+                                      .name((String) facet.get(SCHEMA_FIELD_NAME))
+                                      .type((String) facet.get(SCHEMA_FIELD_TYPE))
                                       .description((String) facet.get(SCHEMA_FIELD_DESCRIPTION))
                                       .build())
                           .collect(toImmutableSet()))

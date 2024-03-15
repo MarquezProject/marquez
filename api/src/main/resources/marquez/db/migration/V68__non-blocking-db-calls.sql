@@ -58,6 +58,8 @@ ALTER TABLE job_versions RENAME COLUMN location TO "job_location";
 ALTER TABLE datasets DROP COLUMN physical_name;
 ALTER TABLE datasets ADD display_name VARCHAR(255);
 
+ALTER TABLE sources ADD display_name VARCHAR(255);
+
 DROP INDEX IF EXISTS lineage_events_run_id_index;
 CREATE INDEX IF NOT EXISTS lineage_events_run_uuid_idx ON lineage_events(run_id);
 

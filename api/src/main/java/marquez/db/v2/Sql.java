@@ -107,11 +107,15 @@ public interface Sql {
           job.namespace_uuid,   -- replace with the actual event_time value
           job.namespace_name,   -- replace with the actual event_time value
           job.name              -- replace with the actual event_time value
-        FROM job ON CONFLICT (uuid) DO NOTHING
+        FROM job
+        ON CONFLICT (uuid)
+        DO UPDATE SET updated_at  = EXCLUDED.updated_at
+        RETURNING *
       )
       UPDATE jobs
-         SET current_version_uuid = '<job_version_uuid>'
-       WHERE uuid = '<job_uuid>'
+         SET current_version_uuid = job_version.uuid
+        FROM job, job_version
+       WHERE jobs.uuid = job.uuid
      """;
 
   /* ... */
@@ -198,8 +202,7 @@ public interface Sql {
           name,
           connection_url,
           description
-        )
-        VALUES (
+        ) VALUES (
           '<source_uuid>',                   -- replace with the actual UUID value
           '<source_type>',                   -- replace with the actual source type value
           '<created_at>',                    -- replace with the actual created_at value
@@ -212,34 +215,34 @@ public interface Sql {
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), sources.description)
         RETURNING *
-      ),
-        INSERT INTO datasets (
-          uuid,
-          type,
-          created_at,
-          updated_at,
-          namespace_uuid,
-          source_uuid,
-          name,
-          description,
-          namespace_name,
-          source_name
-        )
-        SELECT
-          '<dataset_uuid>',                     -- replace with the actual UUID value
-          '<dataset_type>',                     -- replace with the actual type value
-          '<created_at>',                       -- replace with the actual created_at value
-          '<updated_at>',                       -- replace with the actual updated_at value
-          namespace.uuid,                       -- replace with the actual namespace_uuid value
-          source.uuid,                          -- replace with the actual source_uuid value
-          '<dataset_name>',                     -- replace with the actual name value
-          NULLIF('<dataset_description>',  ''), -- replace with the actual description value
-          namespace.name,                       -- replace with the actual namespace_name value
-          source.name                           -- replace with the actual source_name value
-        FROM namespace, source
-        ON CONFLICT (namespace_name, name)
-        DO UPDATE SET updated_at  = EXCLUDED.updated_at,
-                      description = COALESCE(NULLIF(EXCLUDED.description, ''), datasets.description)
+      )
+      INSERT INTO datasets (
+        uuid,
+        type,
+        created_at,
+        updated_at,
+        namespace_uuid,
+        source_uuid,
+        name,
+        description,
+        namespace_name,
+        source_name
+      )
+      SELECT
+        '<dataset_uuid>',                     -- replace with the actual UUID value
+        '<dataset_type>',                     -- replace with the actual type value
+        '<created_at>',                       -- replace with the actual created_at value
+        '<updated_at>',                       -- replace with the actual updated_at value
+        namespace.uuid,                       -- replace with the actual namespace_uuid value
+        source.uuid,                          -- replace with the actual source_uuid value
+        '<dataset_name>',                     -- replace with the actual name value
+        NULLIF('<dataset_description>',  ''), -- replace with the actual description value
+        namespace.name,                       -- replace with the actual namespace_name value
+        source.name                           -- replace with the actual source_name value
+      FROM namespace, source
+      ON CONFLICT (namespace_name, name)
+      DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                    description = COALESCE(NULLIF(EXCLUDED.description, ''), datasets.description)
       """;
 
   String WRITE_DATASET_FIELDS_META =
@@ -260,17 +263,49 @@ public interface Sql {
         description
       )
       SELECT
-        '<dataset_field_uuid>',       -- replace with the actual UUID value
-        '<dataset_field_type>',       -- replace with the actual UUID value
-        '<created_at>',               -- replace with the actual UUID value
-        '<updated_at>',               -- replace with the actual UUID value
-        dataset.uuid,             -- replace with the actual UUID value
-        '<dataset_field_name>',       -- replace with the actual UUID value
-        '<dataset_field_description>' -- replace with the actual UUID value
+        '<dataset_field_uuid>',                    -- replace with the actual UUID value
+        '<dataset_field_type>',                    -- replace with the actual UUID value
+        '<created_at>',                            -- replace with the actual UUID value
+        '<updated_at>',                            -- replace with the actual UUID value
+        dataset.uuid,                              -- replace with the actual UUID value
+        '<dataset_field_name>',                    -- replace with the actual UUID value
+        NULLIF('<dataset_field_description>',  '') -- replace with the actual UUID value
       FROM dataset
       ON CONFLICT (dataset_uuid, name, type) DO NOTHING
       """;
 
-  String WRITE_DATASET_VERSION_META = """
+  String WRITE_DATASET_VERSION_META =
+      """
+      WITH dataset AS (
+        SELECT uuid
+          FROM datasets
+         WHERE namespace_name = '<dataset_namespace_name>'
+           AND name = '<dataset_name>'
+      ),
+      dataset_version AS (
+        INSERT INTO dataset_versions (
+          uuid,
+          created_at,
+          updated_at,
+          job_uuid,
+          job_location,
+          namespace_uuid,
+          namespace_name,
+          job_name
+        )
+        SELECT
+          '<job_version_uuid>', -- replace with the actual event_time value
+          '<created_at>',       -- replace with the actual event_time value
+          '<updated_at>',       -- replace with the actual event_time value
+          job.uuid,             -- replace with the actual event_time value
+          job.location,         -- replace with the actual event_time value
+          job.namespace_uuid,   -- replace with the actual event_time value
+          job.namespace_name,   -- replace with the actual event_time value
+          job.name              -- replace with the actual event_time value
+        FROM job ON CONFLICT (uuid) DO NOTHING
+      )
+      UPDATE datasets
+         SET current_version_uuid = '<dataset_version_uuid>'
+       WHERE uuid = '<dataset_uuid>'
           """;
 }

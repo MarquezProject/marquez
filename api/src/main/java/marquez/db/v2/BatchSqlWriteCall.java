@@ -34,7 +34,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      log.debug("Writing metadata: {}", runMeta);
+      log.info("Writing metadata: {}", runMeta);
 
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
@@ -93,18 +93,21 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
                         ioMeta.getSource().getConnectionUrl().toASCIIString())
                     .define("source_description", null)
                     .define("dataset_uuid", UUID.randomUUID())
-                    .define("dataset_type", ioMeta.getType());
+                    .define("dataset_type", ioMeta.getType())
+                    .define("dataset_name", ioMeta.getName().getValue());
 
                 // ...
-                dbCallAsBatch.add(Sql.WRITE_DATASET_VERSION_META);
+                // dbCallAsBatch.add(Sql.WRITE_DATASET_VERSION_META);
                 ioMeta
                     .getSchema()
                     .getFields()
                     .forEach(
                         fieldMeta -> {
+                          UUID uuid = UUID.randomUUID();
+                          log.info("fieldMeta ('{}') for dataset '{}': {}", uuid, fieldMeta);
                           dbCallAsBatch
                               .add(Sql.WRITE_DATASET_FIELDS_META)
-                              .define("dataset_field_uuid", UUID.randomUUID())
+                              .define("dataset_field_uuid", uuid)
                               .define("dataset_field_type", fieldMeta.getType())
                               .define("dataset_field_name", fieldMeta.getName())
                               .define(
