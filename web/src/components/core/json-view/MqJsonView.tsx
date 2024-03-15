@@ -22,7 +22,7 @@ darkTheme.borderLeftStyle = 'dashed'
 const MqJsonView: React.FC<JsonViewProps> = ({ data }) => {
   return (
     <Box my={2}>
-      <JsonView style={darkTheme} value={data} />
+      <JsonView style={darkTheme} collapsed={2} value={data} />
     </Box>
   )
 }
