@@ -1,8 +1,6 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import {
-  Card,
-  CardContent,
   CircularProgress,
   Divider,
   Table,
@@ -16,14 +14,9 @@ import { IState } from '../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDataset } from '../../store/actionCreators'
-import { findConnectedNodes } from './layout'
 import { useSearchParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
-import Collapse from '@mui/material/Collapse'
-import DatasetTags from '../../components/datasets/DatasetTags'
 import IconButton from '@mui/material/IconButton'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import MqChip from '../../components/core/chip/MqChip'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'

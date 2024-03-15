@@ -1,16 +1,7 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
-import {
-  Box,
-  Card,
-  CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
 
