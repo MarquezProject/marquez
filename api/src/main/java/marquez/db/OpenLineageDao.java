@@ -374,7 +374,7 @@ public interface OpenLineageDao extends BaseDao {
         insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
         insertInputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
-    } else {
+    } else if (!event.isTerminalEventForStreamingJobWithNoDatasets()) {
       // mark job_versions_io_mapping as obsolete
       daos.getJobVersionDao().markInputOrOutputDatasetAsPreviousFor(job.getUuid(), IoType.INPUT);
     }
@@ -390,7 +390,7 @@ public interface OpenLineageDao extends BaseDao {
         insertDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
         insertOutputDatasetFacets(daos, dataset, record, runUuid, event.getEventType(), now);
       }
-    } else {
+    } else if (!event.isTerminalEventForStreamingJobWithNoDatasets()) {
       // mark job_versions_io_mapping as obsolete
       daos.getJobVersionDao().markInputOrOutputDatasetAsPreviousFor(job.getUuid(), IoType.OUTPUT);
     }
@@ -790,6 +790,10 @@ public interface OpenLineageDao extends BaseDao {
     JobRowRunDetails jobRowRunDetails =
         jobVersionDao.loadJobRowRunDetails(
             updateLineageRow.getJob(), updateLineageRow.getRun().getUuid());
+
+    if (event.isTerminalEventForStreamingJobWithNoDatasets()) {
+      return;
+    }
 
     if (!jobVersionDao.versionExists(jobRowRunDetails.jobVersion().getValue())) {
       // need to insert new job version
