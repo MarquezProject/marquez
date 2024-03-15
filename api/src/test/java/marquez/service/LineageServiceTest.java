@@ -556,6 +556,41 @@ public class LineageServiceTest {
   }
 
   @Test
+  public void testGetLineageForCompleteStreamingJob() {
+    Dataset input = Dataset.builder().name("input-dataset").namespace(NAMESPACE).build();
+    Dataset output = Dataset.builder().name("output-dataset").namespace(NAMESPACE).build();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "streamingjob",
+        "RUNNING",
+        JobFacet.builder()
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
+            .build(),
+        Arrays.asList(input),
+        Arrays.asList(output));
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "streamingjob",
+        "COMPLETE",
+        JobFacet.builder()
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
+            .build(),
+        Collections.emptyList(),
+        Collections.emptyList());
+
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("output-dataset"))),
+            5,
+            true);
+
+    assertThat(lineage.getGraph()).hasSize(3); // 1 job + 2 datasets
+  }
+
+  @Test
   public void testLineageForOrphanedDataset() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
