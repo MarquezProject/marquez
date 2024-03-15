@@ -32,6 +32,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
           setSearchParams({
             ...searchParams,
             column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+            columnName: node.data.column,
           })
         }}
         onMouseLeave={() => {
@@ -43,6 +44,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
             dataset: node.data.dataset,
             namespace: node.data.namespace,
             column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+            columnName: node.data.column,
           })
         }}
         component={'rect'}
@@ -65,6 +67,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
           setSearchParams({
             ...searchParams,
             column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+            columnName: node.data.column,
           })
         }}
         onMouseLeave={() => {
@@ -76,6 +79,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
             dataset: node.data.dataset,
             namespace: node.data.namespace,
             column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+            columnName: node.data.column,
           })
         }}
         x={8}
