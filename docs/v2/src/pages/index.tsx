@@ -30,7 +30,7 @@ function HomepageHeader() {
                             src="img/github.svg" 
                             alt="GitHub logo" 
                         />
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GitHub
+                        <span className={styles.btn_text}>GitHub</span>
                     </Link>
                     <Link
                         className="button button--secondary button--md margin-left--md"
@@ -40,7 +40,7 @@ function HomepageHeader() {
                             src="img/slack.svg" 
                             alt="Slack logo" 
                         />
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Slack
+                        <span className={styles.btn_text}>Slack</span>
                     </Link>
                 </div>
             </div>
