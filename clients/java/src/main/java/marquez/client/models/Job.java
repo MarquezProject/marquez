@@ -7,6 +7,8 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.net.URL;
 import java.time.Instant;
 import java.util.Map;
@@ -33,6 +35,7 @@ public final class Job extends JobMeta {
   @Nullable private final Run latestRun;
   @Getter private final Map<String, Object> facets;
   @Nullable private final UUID currentVersion;
+  @Getter @NonNull private final Set<String> tags;
 
   public Job(
       @NonNull final JobId id,
@@ -49,8 +52,9 @@ public final class Job extends JobMeta {
       final String description,
       @Nullable final Run latestRun,
       @Nullable final Map<String, Object> facets,
-      @Nullable UUID currentVersion) {
-    super(type, inputs, outputs, location, description, null);
+      @Nullable UUID currentVersion,
+      @Nullable final Set<String> tags) {
+    super(type, inputs, outputs, location, description, null, null);
     this.id = id;
     this.name = name;
     this.simpleName = simpleName;
@@ -61,6 +65,7 @@ public final class Job extends JobMeta {
     this.latestRun = latestRun;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
     this.currentVersion = currentVersion;
+    this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
   }
 
   public Optional<Run> getLatestRun() {

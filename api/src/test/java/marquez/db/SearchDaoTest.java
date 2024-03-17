@@ -97,7 +97,7 @@ public class SearchDaoTest {
                             ImmutableSet.of(),
                             new URL(j.getLocation()),
                             j.getDescription().orElse(null),
-                            null));
+                            null, null));
                 PGobject inputs = new PGobject();
                 inputs.setType("json");
                 inputs.setValue(Utils.getMapper().writeValueAsString(j.getInputs()));

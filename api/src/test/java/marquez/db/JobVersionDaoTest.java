@@ -456,7 +456,7 @@ public class JobVersionDaoTest extends BaseIntegrationTest {
             newOutputsWith(NamespaceName.of(namespaceRow.getName()), 1),
             newLocation(),
             newDescription(),
-            null);
+            null, null);
 
     final JobRow jobRow =
         DbTestUtils.newJobWith(

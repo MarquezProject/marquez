@@ -57,18 +57,57 @@ public interface JobDao extends BaseDao {
     WHERE uuid = :rowUuid
   """)
   void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
-
+  // change this to include tags as an arrary
   @SqlQuery(
       """
     WITH job_versions_facets AS (
-        SELECT job_version_uuid, JSON_AGG(facet) as facets
-        FROM job_facets
-        GROUP BY job_version_uuid
+        SELECT 
+            job_version_uuid
+        ,   JSON_AGG(facet) as facets
+        FROM 
+            job_facets
+        GROUP BY 
+            job_version_uuid
+    ),
+    job_tags as (
+    SELECT 
+        j.uuid
+    ,   ARRAY_AGG(t.name) as tags
+    FROM 
+        jobs j 
+    INNER JOIN
+        jobs_tag_mapping jtm
+    ON 
+        jtm.job_uuid = j.uuid
+    AND 
+        j.simple_name = :jobName
+    AND 
+        j.namespace_name = :namespaceName
+    INNER JOIN 
+        tags t 
+    ON 
+        jtm.tag_uuid = t.uuid 
+    GROUP BY 
+      j.uuid
     )
-    SELECT j.*, facets
-    FROM jobs_view j
-    LEFT OUTER JOIN job_versions_facets f ON j.current_version_uuid = f.job_version_uuid
-    WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
+    SELECT 
+        j.*
+    ,   facets
+    ,   jt.tags as tags
+    FROM 
+        jobs_view j
+    LEFT OUTER JOIN 
+        job_versions_facets f 
+    ON 
+        j.current_version_uuid = f.job_version_uuid
+    LEFT OUTER JOIN 
+        job_tags jt
+    ON
+        j.uuid = jt.uuid
+    WHERE 
+        j.namespace_name = :namespaceName
+    AND 
+        (j.name = :jobName OR :jobName = ANY(j.aliases))
   """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 
@@ -386,4 +425,62 @@ public interface JobDao extends BaseDao {
       String location,
       UUID symlinkTargetId,
       PGobject inputs);
+
+  @SqlUpdate("""
+    WITH new_tag AS (
+    INSERT INTO tags (uuid, created_at, updated_at, name, description)
+    SELECT 
+      gen_random_uuid(), 
+      NOW(),
+      NOW(),
+      :tagName, 
+      'No Description'
+    WHERE 
+        NOT EXISTS (SELECT 1 FROM tags WHERE name = :tagName)
+    RETURNING uuid
+    ),
+    existing_tag AS (
+        SELECT uuid FROM tags WHERE name = :tagName
+    ),
+    job AS (
+      SELECT 
+        uuid 
+      FROM 
+        jobs 
+      WHERE 
+        simple_name = :jobName
+      and 
+        namespace_name = :namespaceName
+    )
+    INSERT INTO jobs_tag_mapping (job_uuid, tag_uuid, tagged_at)
+    SELECT 
+        (SELECT uuid FROM job)
+    ,   COALESCE((SELECT uuid FROM new_tag), (SELECT uuid FROM existing_tag)) 
+    ,   NOW()
+    ON CONFLICT DO NOTHING
+    ;
+    """)
+    void updateJobTags(String namespaceName, String jobName,  String tagName);
+
+    @SqlUpdate("""
+      DELETE FROM jobs_tag_mapping jtm
+      WHERE EXISTS (
+            SELECT 1
+            FROM
+                jobs j
+            JOIN
+                tags t
+            ON
+                j.uuid = jtm.job_uuid
+            AND
+                t.uuid = jtm.tag_uuid
+            WHERE
+                t.name = :tagName
+            AND
+                j.simple_name = :jobName
+            AND 
+                j.namespace_name = :namespaceName
+            );
+      """)
+      void deleteJobTags(String namespaceName, String jobName,  String tagName);
 }

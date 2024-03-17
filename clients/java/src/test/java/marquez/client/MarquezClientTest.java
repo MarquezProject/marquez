@@ -977,6 +977,32 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testTagJob() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/jobs/%s/tags/%s", NAMESPACE_NAME, JOB_NAME, "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(JOB);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Job job = client.tagJobWith(NAMESPACE_NAME, JOB_NAME, "tag_name");
+    assertThat(job).isEqualTo(JOB);
+  }
+
+  @Test
+  public void testDeleteJobTag() throws Exception {
+    final URL url =
+        buildUrlFor(
+            "/namespaces/%s/jobs/%s/tags/%s", NAMESPACE_NAME, JOB_NAME, "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(JOB);
+    when(http.delete(url)).thenReturn(runAsJson);
+
+    final Job job = client.deleteJobTag(NAMESPACE_NAME, JOB_NAME, "tag_name");
+    assertThat(job).isEqualTo(JOB);
+  }
+
+  @Test
   public void testTagDataset() throws Exception {
     final URL url =
         buildUrlFor(

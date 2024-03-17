@@ -14,6 +14,9 @@ import static marquez.common.models.CommonModelGenerator.newFieldType;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
+
 import static marquez.db.DbTest.POSTGRES_14;
 
 import com.google.common.collect.ImmutableList;
@@ -34,6 +37,9 @@ import marquez.client.Utils;
 import marquez.client.models.DatasetId;
 import marquez.client.models.DbTableMeta;
 import marquez.client.models.Field;
+import marquez.client.models.JobId;
+import marquez.client.models.JobMeta;
+import marquez.client.models.JobType;
 import marquez.client.models.NamespaceMeta;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
@@ -97,6 +103,15 @@ abstract class BaseResourceIntegrationTest {
   static DbTableMeta DB_TABLE_META;
   static ImmutableList<Field> DB_TABLE_FIELDS;
 
+  //Job
+  static String JOB_NAME;
+  static JobId JOB_ID;
+  static JobType JOB_TYPE;
+  static URL JOB_LOCATION;
+  static String JOB_DESCRIPTION;
+  static JobMeta JOB_META;
+  static Set<String> JOB_TAGS;
+  
   static DropwizardAppExtension<MarquezConfig> MARQUEZ_APP;
   static OpenLineage OL;
   static OpenLineageClient OL_CLIENT;
@@ -130,6 +145,22 @@ abstract class BaseResourceIntegrationTest {
             .fields(DB_TABLE_FIELDS)
             .tags(DB_TABLE_TAGS)
             .description(DB_TABLE_DESCRIPTION)
+            .build();
+
+    JOB_NAME = newJobName().getValue();
+    JOB_ID = new JobId(NAMESPACE_NAME, JOB_NAME);
+    JOB_TYPE = JobType.BATCH;
+    JOB_LOCATION = newLocation();
+    JOB_DESCRIPTION = newDescription();
+    JOB_TAGS = ImmutableSet.of(PII.getName());
+    JOB_META =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(ImmutableSet.of())
+            .outputs(ImmutableSet.of())
+            .location(JOB_LOCATION)
+            .description(JOB_DESCRIPTION)
+            .tags(JOB_TAGS)
             .build();
 
     // (2) Configure Marquez application using test configuration and database.

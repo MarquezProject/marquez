@@ -120,7 +120,7 @@ public final class ServiceModelGenerator extends Generator {
         newOutputsWith(namespaceName, numOfOutputs),
         newLocation(),
         newDescription(),
-        null);
+        null,null);
   }
 
   /** Returns a new {@link RunMeta} object. */
