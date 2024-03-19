@@ -5,6 +5,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringArrayOrThrow;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
@@ -19,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -43,7 +41,6 @@ import marquez.service.models.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.postgresql.util.PGobject;
-import static marquez.db.Columns.stringArrayOrThrow;
 
 @Slf4j
 public final class JobMapper implements RowMapper<Job> {
@@ -76,8 +73,7 @@ public final class JobMapper implements RowMapper<Job> {
             facetsOrNull,
             uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
             getLabels(facetsOrNull),
-            toTags(results, "tags")
-            );
+            toTags(results, "tags"));
     return job;
   }
 

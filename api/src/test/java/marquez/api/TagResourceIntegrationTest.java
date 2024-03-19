@@ -108,13 +108,13 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     createNamespace(NAMESPACE_NAME);
     // create a job
     MARQUEZ_CLIENT.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+
     // Tag Dataset with TESTDATASETTAG tag
-    Job taggedJob =
-        MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    Job taggedJob = MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    System.out.println(taggedJob);
     assertThat(taggedJob.getTags()).contains("TESTDATASETTAG");
     // assert the number of tags should be 1
-    assertThat(taggedJob.getTags()).hasSize(2);
-    
+    assertThat(taggedJob.getTags()).hasSize(1);
   }
 
   @Test
@@ -124,18 +124,15 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     // create job
     MARQUEZ_CLIENT.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
     // Tag Dataset with TESTDATASETTAG tag
-    Job taggedJob =
-        MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    Job taggedJob = MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
     assertThat(taggedJob.getTags()).contains("TESTDATASETTAG");
     // assert the number of tags should be 1
-    assertThat(taggedJob.getTags()).hasSize(2);
+    assertThat(taggedJob.getTags()).hasSize(1);
 
     // Test that the tag TESTDATASETTAG is deleted from the dataset
-    Job taggedDeleteJob =
-        MARQUEZ_CLIENT.deleteJobTag(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    Job taggedDeleteJob = MARQUEZ_CLIENT.deleteJobTag(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
     assertThat(taggedDeleteJob.getTags()).doesNotContain("TESTDATASETTAG");
     // assert the number of tags should be 0
-    assertThat(taggedDeleteJob.getTags()).hasSize(1);
+    assertThat(taggedDeleteJob.getTags()).hasSize(0);
   }
-
 }

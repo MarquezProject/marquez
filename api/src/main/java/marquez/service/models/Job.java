@@ -8,7 +8,6 @@ package marquez.service.models;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
@@ -64,8 +63,7 @@ public final class Job {
       @Nullable final ImmutableMap<String, Object> facets,
       @Nullable UUID currentVersion,
       @Nullable ImmutableList<String> labels,
-      @Nullable final ImmutableSet<TagName> tags
-      ) {
+      @Nullable final ImmutableSet<TagName> tags) {
     this.id = id;
     this.type = type;
     this.name = name;

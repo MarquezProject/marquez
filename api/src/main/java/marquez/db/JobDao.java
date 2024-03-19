@@ -57,56 +57,56 @@ public interface JobDao extends BaseDao {
     WHERE uuid = :rowUuid
   """)
   void updateVersionFor(UUID rowUuid, Instant updatedAt, UUID currentVersionUuid);
-  // change this to include tags as an arrary
+
   @SqlQuery(
       """
     WITH job_versions_facets AS (
-        SELECT 
+        SELECT
             job_version_uuid
         ,   JSON_AGG(facet) as facets
-        FROM 
+        FROM
             job_facets
-        GROUP BY 
+        GROUP BY
             job_version_uuid
     ),
     job_tags as (
-    SELECT 
+    SELECT
         j.uuid
     ,   ARRAY_AGG(t.name) as tags
-    FROM 
-        jobs j 
+    FROM
+        jobs j
     INNER JOIN
         jobs_tag_mapping jtm
-    ON 
+    ON
         jtm.job_uuid = j.uuid
-    AND 
+    AND
         j.simple_name = :jobName
-    AND 
+    AND
         j.namespace_name = :namespaceName
-    INNER JOIN 
-        tags t 
-    ON 
-        jtm.tag_uuid = t.uuid 
-    GROUP BY 
+    INNER JOIN
+        tags t
+    ON
+        jtm.tag_uuid = t.uuid
+    GROUP BY
       j.uuid
     )
-    SELECT 
+    SELECT
         j.*
     ,   facets
     ,   jt.tags as tags
-    FROM 
+    FROM
         jobs_view j
-    LEFT OUTER JOIN 
-        job_versions_facets f 
-    ON 
+    LEFT OUTER JOIN
+        job_versions_facets f
+    ON
         j.current_version_uuid = f.job_version_uuid
-    LEFT OUTER JOIN 
+    LEFT OUTER JOIN
         job_tags jt
     ON
         j.uuid = jt.uuid
-    WHERE 
+    WHERE
         j.namespace_name = :namespaceName
-    AND 
+    AND
         (j.name = :jobName OR :jobName = ANY(j.aliases))
   """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
@@ -208,16 +208,38 @@ public interface JobDao extends BaseDao {
           lineage_event_time ASC
         ) e
     GROUP BY e.run_uuid
-    )
+    ),
+    job_tags as (
+      SELECT
+          j.uuid
+      ,   ARRAY_AGG(t.name) as tags
+      FROM
+          jobs j
+      INNER JOIN
+          jobs_tag_mapping jtm
+      ON
+          jtm.job_uuid = j.uuid
+      AND
+          j.namespace_name = :namespaceName
+      INNER JOIN
+          tags t
+      ON
+          jtm.tag_uuid = t.uuid
+      GROUP BY
+      j.uuid
+  )
     SELECT
       j.*,
-      f.facets
+      f.facets,
+      COALESCE(jt.tags, ARRAY[]::VARCHAR[]) AS tags
     FROM
       jobs_view_page AS j
     LEFT OUTER JOIN job_versions_temp AS jv
       ON jv.uuid = j.current_version_uuid
     LEFT OUTER JOIN facets_temp AS f
       ON f.run_uuid = jv.latest_run_uuid
+    LEFT OUTER JOIN job_tags jt
+      ON j.uuid  = jt.uuid
     ORDER BY
         j.name
   """)
@@ -426,16 +448,17 @@ public interface JobDao extends BaseDao {
       UUID symlinkTargetId,
       PGobject inputs);
 
-  @SqlUpdate("""
+  @SqlUpdate(
+      """
     WITH new_tag AS (
     INSERT INTO tags (uuid, created_at, updated_at, name, description)
-    SELECT 
-      gen_random_uuid(), 
+    SELECT
+      gen_random_uuid(),
       NOW(),
       NOW(),
-      :tagName, 
+      :tagName,
       'No Description'
-    WHERE 
+    WHERE
         NOT EXISTS (SELECT 1 FROM tags WHERE name = :tagName)
     RETURNING uuid
     ),
@@ -443,26 +466,27 @@ public interface JobDao extends BaseDao {
         SELECT uuid FROM tags WHERE name = :tagName
     ),
     job AS (
-      SELECT 
-        uuid 
-      FROM 
-        jobs 
-      WHERE 
+      SELECT
+        uuid
+      FROM
+        jobs
+      WHERE
         simple_name = :jobName
-      and 
+      and
         namespace_name = :namespaceName
     )
     INSERT INTO jobs_tag_mapping (job_uuid, tag_uuid, tagged_at)
-    SELECT 
+    SELECT
         (SELECT uuid FROM job)
-    ,   COALESCE((SELECT uuid FROM new_tag), (SELECT uuid FROM existing_tag)) 
+    ,   COALESCE((SELECT uuid FROM new_tag), (SELECT uuid FROM existing_tag))
     ,   NOW()
     ON CONFLICT DO NOTHING
     ;
     """)
-    void updateJobTags(String namespaceName, String jobName,  String tagName);
+  void updateJobTags(String namespaceName, String jobName, String tagName);
 
-    @SqlUpdate("""
+  @SqlUpdate(
+      """
       DELETE FROM jobs_tag_mapping jtm
       WHERE EXISTS (
             SELECT 1
@@ -478,9 +502,9 @@ public interface JobDao extends BaseDao {
                 t.name = :tagName
             AND
                 j.simple_name = :jobName
-            AND 
+            AND
                 j.namespace_name = :namespaceName
             );
       """)
-      void deleteJobTags(String namespaceName, String jobName,  String tagName);
+  void deleteJobTags(String namespaceName, String jobName, String tagName);
 }

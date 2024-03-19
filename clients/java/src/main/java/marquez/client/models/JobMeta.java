@@ -26,7 +26,7 @@ public class JobMeta {
   @Nullable private final URL location;
   @Nullable String description;
   @Nullable String runId;
-  
+
   public JobMeta(
       @NonNull final JobType type,
       @NonNull final Set<DatasetId> inputs,
@@ -141,7 +141,7 @@ public class JobMeta {
     }
 
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, description, runId,tags);
+      return new JobMeta(type, inputs, outputs, location, description, runId, tags);
     }
   }
 }

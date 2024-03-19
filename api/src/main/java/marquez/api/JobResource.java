@@ -38,7 +38,6 @@ import marquez.api.exceptions.JobNotFoundException;
 import marquez.api.exceptions.JobVersionNotFoundException;
 import marquez.api.models.JobVersion;
 import marquez.api.models.ResultsPage;
-import marquez.common.models.DatasetName;
 import marquez.common.models.FacetType;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -50,7 +49,6 @@ import marquez.db.JobVersionDao;
 import marquez.db.RunFacetsDao;
 import marquez.db.models.JobRow;
 import marquez.service.ServiceFactory;
-import marquez.service.models.Dataset;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
@@ -289,12 +287,11 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
-    jobService.updateJobTags(
-            namespaceName.getValue(), jobName.getValue(), tagName.getValue());
+    jobService.updateJobTags(namespaceName.getValue(), jobName.getValue(), tagName.getValue());
     Job job =
-            jobService
-                .findJobByName(namespaceName.getValue(), jobName.getValue())
-                .orElseThrow(() -> new JobNotFoundException(jobName));
+        jobService
+            .findJobByName(namespaceName.getValue(), jobName.getValue())
+            .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }
 
@@ -310,12 +307,11 @@ public class JobResource extends BaseResource {
     throwIfNotExists(namespaceName);
     throwIfNotExists(namespaceName, jobName);
 
-    jobService.deleteJobTags(
-            namespaceName.getValue(), jobName.getValue(), tagName.getValue());
+    jobService.deleteJobTags(namespaceName.getValue(), jobName.getValue(), tagName.getValue());
     Job job =
-            jobService
-                .findJobByName(namespaceName.getValue(), jobName.getValue())
-                .orElseThrow(() -> new JobNotFoundException(jobName));
+        jobService
+            .findJobByName(namespaceName.getValue(), jobName.getValue())
+            .orElseThrow(() -> new JobNotFoundException(jobName));
     return Response.ok(job).build();
   }
 

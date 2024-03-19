@@ -12,10 +12,10 @@ import static marquez.client.MarquezPathV1.createRunPath;
 import static marquez.client.MarquezPathV1.createTagPath;
 import static marquez.client.MarquezPathV1.datasetPath;
 import static marquez.client.MarquezPathV1.datasetTagPath;
-import static marquez.client.MarquezPathV1.jobTagPath;
 import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
+import static marquez.client.MarquezPathV1.jobTagPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
 import static marquez.client.MarquezPathV1.lineagePath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
@@ -184,8 +184,7 @@ class MarquezUrl {
     return from(datasetTagPath(namespaceName, datasetName, tagName));
   }
 
-  URL toJobTagUrl(
-      @NonNull String namespaceName, @NonNull String jobName, @NonNull String tagName) {
+  URL toJobTagUrl(@NonNull String namespaceName, @NonNull String jobName, @NonNull String tagName) {
     return from(jobTagPath(namespaceName, jobName, tagName));
   }
 

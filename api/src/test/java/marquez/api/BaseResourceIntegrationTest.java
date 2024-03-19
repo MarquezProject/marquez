@@ -11,12 +11,11 @@ import static marquez.common.models.CommonModelGenerator.newDbSourceType;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newFieldName;
 import static marquez.common.models.CommonModelGenerator.newFieldType;
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
-import static marquez.common.models.CommonModelGenerator.newJobName;
-import static marquez.common.models.CommonModelGenerator.newLocation;
-
 import static marquez.db.DbTest.POSTGRES_14;
 
 import com.google.common.collect.ImmutableList;
@@ -103,7 +102,7 @@ abstract class BaseResourceIntegrationTest {
   static DbTableMeta DB_TABLE_META;
   static ImmutableList<Field> DB_TABLE_FIELDS;
 
-  //Job
+  // Job
   static String JOB_NAME;
   static JobId JOB_ID;
   static JobType JOB_TYPE;
@@ -111,7 +110,7 @@ abstract class BaseResourceIntegrationTest {
   static String JOB_DESCRIPTION;
   static JobMeta JOB_META;
   static Set<String> JOB_TAGS;
-  
+
   static DropwizardAppExtension<MarquezConfig> MARQUEZ_APP;
   static OpenLineage OL;
   static OpenLineageClient OL_CLIENT;
@@ -162,7 +161,7 @@ abstract class BaseResourceIntegrationTest {
             .description(JOB_DESCRIPTION)
             .tags(JOB_TAGS)
             .build();
-
+    System.out.println(JOB_META);
     // (2) Configure Marquez application using test configuration and database.
     MARQUEZ_APP =
         new DropwizardAppExtension<>(
