@@ -89,6 +89,9 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
           anchor={'right'}
           open={!!searchParams.get('dataset')}
           onClose={() => setSearchParams({})}
+          PaperProps={{
+            sx: { backgroundColor: theme.palette.background.default, backgroundImage: 'none' },
+          }}
         >
           <Box sx={{ pt: '98px' }}>
             <ColumnLevelDrawer />

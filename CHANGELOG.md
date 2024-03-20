@@ -1,11 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.45.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.46.0...HEAD)
+
+## [0.46.0](https://github.com/MarquezProject/marquez/compare/0.45.0...0.46.0) - 2024-03-15
+
+### Changed
+
+* Web: various revisions [`#2770`](https://github.com/MarquezProject/marquez/pull/2768) [@phixMe](https://github.com/phixMe)  
+    *Includes clean up of issues in the UI and removal of non-useful elements.*
 
 ### Fixed
 
 * Streaming API: fix behaviour for `COMPLETE`/`FAIL` events within streaming jobs [`#2768`](https://github.com/MarquezProject/marquez/pull/2768) [@pawel-big-lebowski]( https://github.com/pawel-big-lebowski) 
-  *New `job_version` is not created for a streaming job terminal event with no dataset information and existing version is kept.*
+    *New `job_version` is not created for a streaming job terminal event with no dataset information and existing version is kept.*
 
 ## [0.45.0](https://github.com/MarquezProject/marquez/compare/0.44.0...0.45.0) - 2024-03-07
 
