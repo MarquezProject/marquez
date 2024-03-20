@@ -63,7 +63,7 @@ marquez:
   ##   value:
   ##
   ## Allowing passing in of extra container definitions to be run inside the marquez deployment - for example to allow cloud-sql-proxy container
-  extraContaiers: []
+  extraContainers: []
 
 ## Properties related to Marquez frontend functionality
 ##
