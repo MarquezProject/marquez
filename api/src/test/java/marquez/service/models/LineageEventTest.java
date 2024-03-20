@@ -6,6 +6,8 @@
 package marquez.service.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,10 +23,12 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import marquez.common.Utils;
 import marquez.common.models.FlexibleDateTimeDeserializer;
 import marquez.service.models.LineageEvent.JobTypeJobFacet;
+import marquez.service.models.LineageEvent.LineageEventBuilder;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -108,5 +112,81 @@ public class LineageEventTest {
     assertThat(facet.getJobType()).isEqualTo("QUERY");
     assertThat(facet.getIntegration()).isEqualTo("FLINK");
     assertThat(facet.getProcessingType()).isEqualTo("STREAMING");
+  }
+
+  @Test
+  public void testIsTerminalEvent() {
+    LineageEventBuilder builder = LineageEvent.builder();
+
+    assertThat(builder.eventType("compleTe").build().isTerminalEvent()).isTrue();
+    assertThat(builder.eventType("Fail").build().isTerminalEvent()).isTrue();
+    assertThat(builder.eventType("start").build().isTerminalEvent()).isFalse();
+  }
+
+  @Test
+  public void testIsTerminalEventForStreamingJobWithNoDatasets() {
+    LineageEvent.Job streamingJob = mock(LineageEvent.Job.class);
+    when(streamingJob.isStreamingJob()).thenReturn(true);
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isTrue();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("start")
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isFalse();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .inputs(Collections.emptyList())
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isTrue();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .inputs(Collections.singletonList(mock(LineageEvent.Dataset.class)))
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isFalse();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .outputs(Collections.emptyList())
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isTrue();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .outputs(Collections.singletonList(mock(LineageEvent.Dataset.class)))
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isFalse();
+
+    assertThat(
+            LineageEvent.builder()
+                .job(streamingJob)
+                .eventType("complete")
+                .job(mock(LineageEvent.Job.class))
+                .build()
+                .isTerminalEventForStreamingJobWithNoDatasets())
+        .isFalse();
   }
 }
