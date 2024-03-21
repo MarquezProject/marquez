@@ -249,6 +249,7 @@ public final class JsonGenerator {
     obj.put("type", meta.getType().toString());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
+    obj.putArray("tags");
     obj.put("location", meta.getLocation().map(URL::toString).orElse(null));
     obj.put("description", meta.getDescription().orElse(null));
     obj.put("runId", meta.getRunId().orElse(null));
@@ -275,6 +276,7 @@ public final class JsonGenerator {
     obj.put("namespace", job.getNamespace());
     obj.putArray("inputs").addAll(inputs);
     obj.putArray("outputs").addAll(outputs);
+    obj.putArray("tags");
     obj.put("location", job.getLocation().map(URL::toString).orElse(null));
     obj.put("description", job.getDescription().orElse(null));
     obj.set("latestRun", toObj(job.getLatestRun().orElse(null)));
