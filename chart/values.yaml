@@ -8,6 +8,9 @@
 ## Properties related to core Marquez backend functionality and API usage
 ##
 marquez:
+  ## Kubernetes service account used for deployment
+  ##
+  serviceAccount: "default"
   ## Number of desired replicas
   ##
   replicaCount: 1
@@ -59,6 +62,8 @@ marquez:
   ## - name:
   ##   value:
   ##
+  ## Allowing passing in of extra container definitions to be run inside the marquez deployment - for example to allow cloud-sql-proxy container
+  extraContainers: []
 
 ## Properties related to Marquez frontend functionality
 ##
