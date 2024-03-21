@@ -410,6 +410,7 @@ public interface RunDao extends BaseDao {
                   Instant.now(),
                   dsRow.get().getUuid(),
                   version,
+                  null, // TODO add schema version
                   runUuid,
                   datasetVersionDao.toPgObjectFields(d.getFields()),
                   d.getNamespace().getValue(),

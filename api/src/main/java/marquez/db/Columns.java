@@ -49,6 +49,7 @@ public final class Columns {
   public static final String NAMESPACE_UUID = "namespace_uuid";
   public static final String DATASET_UUID = "dataset_uuid";
   public static final String DATASET_VERSION_UUID = "dataset_version_uuid";
+  public static final String DATASET_SCHEMA_VERSION_UUID = "dataset_schema_version_uuid";
   public static final String JOB_VERSION_UUID = "job_version_uuid";
   public static final String CURRENT_VERSION_UUID = "current_version_uuid";
   public static final String CHECKSUM = "checksum";
