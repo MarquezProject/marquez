@@ -119,7 +119,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setTagDescription(event.target.value)
   }
 
-  const tagData = useSelector((state: IState) => state.tags.tags)
+  const tagData = useSelector((state: IState) => state.tags.tags.sort((a,b) => a.name.localeCompare(b.name)))
 
   const handleTagListChange = (event: any) => {
     setListTag(event.target.value)
@@ -129,6 +129,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     datasetField
       ? addDatasetFieldTag(namespace, datasetName, listTag, datasetField)
       : addDatasetTag(namespace, datasetName, listTag)
+    setDialogOpen(false)
   }
 
   const handleDelete = (deletedTag: string) => {
@@ -243,7 +244,17 @@ const DatasetTags: React.FC<IProps> = (props) => {
           </Grow>
         )}
       </Popper>
-      <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth='sm'>
+      <Dialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        fullWidth
+        maxWidth='sm'
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            closeDialog()
+          }
+        }}
+      >
         <DialogTitle>{i18next.t('dataset_tags.dialogtitle')}</DialogTitle>
         <DialogContent>
           <FormControl variant='outlined' size='small' fullWidth>
@@ -283,7 +294,16 @@ const DatasetTags: React.FC<IProps> = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={openTagDesc} fullWidth maxWidth='sm'>
+      <Dialog
+        open={openTagDesc}
+        fullWidth
+        maxWidth='sm'
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            handleTagDescClose()
+          }
+        }}
+      >
         <DialogTitle>Select a Tag to change</DialogTitle>
         <DialogContent>
           <MQText subheading>Tag</MQText>
