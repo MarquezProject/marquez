@@ -24,6 +24,9 @@ spec:
       labels: {{- include "common.labels.standard" . | nindent 8 }}
         app.kubernetes.io/component: marquez
     spec:
+      {{- if .Values.marquez.serviceAccount }}
+      serviceAccountName: {{ .Values.marquez.serviceAccount }}
+      {{- end }}
       {{- if .Values.postgresql.enabled }}
       # This init container is for avoiding CrashLoopback errors in the Marquez container because the PostgreSQL container is not ready
       initContainers:
@@ -91,6 +94,9 @@ spec:
           {{- if .Values.marquez.resources }}
           resources: {{- toYaml .Values.marquez.resources | nindent 12 }}
           {{- end }}
+        {{- if .Values.marquez.extraContainers }}
+        {{- toYaml .Values.marquez.extraContainers | nindent 8 }}
+        {{- end }}
       volumes:
         - name: marquez-volume
           configMap:
