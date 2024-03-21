@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import marquez.api.models.SortDirection;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
@@ -31,6 +32,7 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.Define;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
@@ -136,8 +138,9 @@ public interface JobDao extends BaseDao {
         jobs_view AS j
       WHERE
         j.namespace_name = :namespaceName
-      ORDER BY
-        j.name
+      AND
+        j.name ILIKE '%' || :search || '%'
+      ORDER BY <order_by> <sort_direction>
       LIMIT
         :limit
       OFFSET
@@ -179,10 +182,15 @@ public interface JobDao extends BaseDao {
       ON jv.uuid = j.current_version_uuid
     LEFT OUTER JOIN facets_temp AS f
       ON f.run_uuid = jv.latest_run_uuid
-    ORDER BY
-        j.name
+    ORDER BY <order_by> <sort_direction>
   """)
-  List<Job> findAll(String namespaceName, int limit, int offset);
+  List<Job> findAll(
+      String namespaceName,
+      String search,
+      @Define("order_by") String orderBy,
+      @Define("sort_direction") SortDirection sortDirection,
+      int limit,
+      int offset);
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
@@ -192,9 +200,15 @@ public interface JobDao extends BaseDao {
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
-  default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
+  default List<Job> findAllWithRun(
+      String namespaceName,
+      String search,
+      String orderBy,
+      SortDirection sortDirection,
+      int limit,
+      int offset) {
     RunDao runDao = createRunDao();
-    return findAll(namespaceName, limit, offset).stream()
+    return findAll(namespaceName, search, orderBy, sortDirection, limit, offset).stream()
         .peek(
             j ->
                 runDao

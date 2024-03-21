@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import marquez.api.models.SortDirection;
 import marquez.common.models.JobType;
 import marquez.db.models.DbModelGenerator;
 import marquez.db.models.JobRow;
@@ -99,23 +100,30 @@ public class JobDaoTest {
   @Test
   public void testFindAll() {
     JobRow targetJob =
-        createJobWithoutSymlinkTarget(jdbi, namespace, "targetJob", "the target of the symlink");
+        createJobWithoutSymlinkTarget(
+            jdbi, namespace, "targetJobInPair", "the target of the symlink");
     JobRow symlinkJob =
         createJobWithSymlinkTarget(
             jdbi, namespace, "symlinkJob", targetJob.getUuid(), "the symlink job");
     JobRow anotherJobSameNamespace =
-        createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJob", "a random other job");
+        createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJobInPair", "a random other job");
 
-    List<Job> jobs = jobDao.findAll(namespace.getName(), 10, 0);
+    List<Job> inPairJobs =
+        jobDao.findAll(namespace.getName(), "inpair", "name", SortDirection.DESC, 10, 0);
 
     // the symlinked job isn't present in the response - only the symlink target and the job with
     // no symlink
-    assertThat(jobs)
+    assertThat(inPairJobs)
         .hasSize(2)
         .map(Job::getId)
-        .containsExactlyInAnyOrder(
-            DbModelGenerator.jobIdFor(namespace.getName(), targetJob.getName()),
+        .containsExactly(
+            DbModelGenerator.jobIdFor(
+                namespace.getName(), targetJob.getName()), // t comes before a since we sort desc
             DbModelGenerator.jobIdFor(namespace.getName(), anotherJobSameNamespace.getName()));
+
+    List<Job> emptyJobs =
+        jobDao.findAll(namespace.getName(), "notHere", "name", SortDirection.ASC, 10, 0);
+    assertThat(emptyJobs).hasSize(0);
   }
 
   @Test
