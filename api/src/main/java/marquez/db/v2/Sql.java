@@ -182,11 +182,11 @@ public interface Sql {
           name,
           description
         ) VALUES (
-          '<dataset_namespace_uuid>',                   -- replace with the actual event_time value
-          '<created_at>',                               -- replace with the actual event_time value
-          '<updated_at>',                               -- replace with the actual event_time value
-          '<dataset_namespace_name>',                   -- replace with the actual event_time value
-          NULLIF('<dataset_namespace_description>', '') -- replace with the actual event_time value
+          '<dataset_namespace_uuid_%1$d>',                   -- replace with the actual event_time value
+          '<created_at>',                                    -- replace with the actual event_time value
+          '<updated_at>',                                    -- replace with the actual event_time value
+          '<dataset_namespace_name_%1$d>',                   -- replace with the actual event_time value
+          NULLIF('<dataset_namespace_description_%1$d>', '') -- replace with the actual event_time value
         )
         ON CONFLICT (name)
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
@@ -203,13 +203,13 @@ public interface Sql {
           connection_url,
           description
         ) VALUES (
-          '<source_uuid>',                   -- replace with the actual UUID value
-          '<source_type>',                   -- replace with the actual source type value
-          '<created_at>',                    -- replace with the actual created_at value
-          '<updated_at>',                    -- replace with the actual updated_at value
-          '<source_name>',                   -- replace with the actual source name value
-          '<source_connection_url>',         -- replace with the actual connection URL value
-          NULLIF('<source_description>', '') -- replace with the actual description value
+          '<source_uuid_%1$d>',                   -- replace with the actual UUID value
+          '<source_type_%1$d>',                   -- replace with the actual source type value
+          '<created_at>',                         -- replace with the actual created_at value
+          '<updated_at>',                         -- replace with the actual updated_at value
+          '<source_name>',                        -- replace with the actual source name value
+          '<source_connection_url_%1$d>',         -- replace with the actual connection URL value
+          NULLIF('<source_description_%1$d>', '') -- replace with the actual description value
         )
         ON CONFLICT (name)
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
@@ -229,16 +229,16 @@ public interface Sql {
         source_name
       )
       SELECT
-        '<dataset_uuid>',                     -- replace with the actual UUID value
-        '<dataset_type>',                     -- replace with the actual type value
-        '<created_at>',                       -- replace with the actual created_at value
-        '<updated_at>',                       -- replace with the actual updated_at value
-        namespace.uuid,                       -- replace with the actual namespace_uuid value
-        source.uuid,                          -- replace with the actual source_uuid value
-        '<dataset_name>',                     -- replace with the actual name value
-        NULLIF('<dataset_description>',  ''), -- replace with the actual description value
-        namespace.name,                       -- replace with the actual namespace_name value
-        source.name                           -- replace with the actual source_name value
+        '<dataset_uuid_%1$d>',                     -- replace with the actual UUID value
+        '<dataset_type_%1$d>',                     -- replace with the actual type value
+        '<created_at>',                            -- replace with the actual created_at value
+        '<updated_at>',                            -- replace with the actual updated_at value
+        namespace.uuid,                            -- replace with the actual namespace_uuid value
+        source.uuid,                               -- replace with the actual source_uuid value
+        '<dataset_name_%1$d>',                     -- replace with the actual name value
+        NULLIF('<dataset_description_%1$d>',  ''), -- replace with the actual description value
+        namespace.name,                            -- replace with the actual namespace_name value
+        source.name                                -- replace with the actual source_name value
       FROM namespace, source
       ON CONFLICT (namespace_name, name)
       DO UPDATE SET updated_at  = EXCLUDED.updated_at,
@@ -263,15 +263,14 @@ public interface Sql {
         description
       )
       SELECT
-        '<dataset_field_uuid>',                    -- replace with the actual UUID value
-        '<dataset_field_type>',                    -- replace with the actual UUID value
-        '<created_at>',                            -- replace with the actual UUID value
-        '<updated_at>',                            -- replace with the actual UUID value
-        dataset.uuid,                              -- replace with the actual UUID value
-        '<dataset_field_name>',                    -- replace with the actual UUID value
-        NULLIF('<dataset_field_description>',  '') -- replace with the actual UUID value
+        '<dataset_field_uuid_%1$d>',                    -- replace with the actual UUID value
+        '<dataset_field_type_%1$d>',                    -- replace with the actual UUID value
+        '<created_at>',                                 -- replace with the actual UUID value
+        '<updated_at>',                                 -- replace with the actual UUID value
+        dataset.uuid,                                   -- replace with the actual UUID value
+        '<dataset_field_name_%1$d>',                    -- replace with the actual UUID value
+        NULLIF('<dataset_field_description_%1$d>',  '') -- replace with the actual UUID value
       FROM dataset
-      ON CONFLICT (dataset_uuid, name, type) DO NOTHING
       """;
 
   String WRITE_DATASET_VERSION_META =
