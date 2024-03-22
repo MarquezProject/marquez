@@ -106,7 +106,7 @@ public interface ColumnLineageDao extends BaseDao {
                 ORDER BY output_dataset_field_uuid, input_dataset_field_uuid, updated_at DESC, updated_at
             ),
             dataset_fields_view AS (
-              SELECT d.namespace_name as namespace_name, d.name as dataset_name, df.name as field_name, df.type, df.uuid
+              SELECT d.namespace_name as namespace_name, d.name as dataset_name, df.name as field_name, df.type, df.uuid, d.namespace_uuid
               FROM dataset_fields df
               INNER JOIN datasets_view d ON d.uuid = df.dataset_uuid
             ),
@@ -157,8 +157,10 @@ public interface ColumnLineageDao extends BaseDao {
                 clr.output_dataset_version_uuid as dataset_version_uuid
             FROM column_lineage_recursive clr
             INNER JOIN dataset_fields_view output_fields ON clr.output_dataset_field_uuid = output_fields.uuid -- hidden datasets will be filtered
+            INNER JOIN dataset_symlinks ds_output ON ds_output.namespace_uuid = output_fields.namespace_uuid AND ds_output.name = output_fields.dataset_name
             LEFT JOIN dataset_fields_view input_fields ON clr.input_dataset_field_uuid = input_fields.uuid
-            WHERE NOT clr.is_cycle
+            INNER JOIN dataset_symlinks ds_input ON ds_input.namespace_uuid = input_fields.namespace_uuid AND ds_input.name = input_fields.dataset_name
+            WHERE NOT clr.is_cycle AND ds_output.is_primary is true AND ds_input.is_primary
             GROUP BY
                 output_fields.namespace_name,
                 output_fields.dataset_name,
@@ -175,7 +177,7 @@ public interface ColumnLineageDao extends BaseDao {
   @SqlQuery(
       """
         WITH selected_column_lineage AS (
-          SELECT DISTINCT ON (cl.output_dataset_field_uuid, cl.input_dataset_field_uuid) cl.*
+          SELECT DISTINCT ON (cl.output_dataset_field_uuid, cl.input_dataset_field_uuid) cl.*, dv.namespace_uuid
           FROM column_lineage cl
           JOIN dataset_fields df ON df.uuid = cl.output_dataset_field_uuid
           JOIN datasets_view dv ON dv.uuid = df.dataset_uuid
@@ -203,7 +205,9 @@ public interface ColumnLineageDao extends BaseDao {
           null as dataset_version_uuid
         FROM selected_column_lineage c
         INNER JOIN dataset_fields_view output_fields ON c.output_dataset_field_uuid = output_fields.uuid
+        INNER JOIN dataset_symlinks ds ON ds.namespace_uuid = c.namespace_uuid and ds.name=output_fields.dataset_name
         LEFT JOIN dataset_fields_view input_fields ON c.input_dataset_field_uuid = input_fields.uuid
+        WHERE ds.is_primary is true
         GROUP BY
           output_fields.namespace_name,
           output_fields.dataset_name,
