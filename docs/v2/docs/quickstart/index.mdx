@@ -49,14 +49,14 @@ To checkout the Marquez source code, run:
 <Tabs groupId="get">
 <TabItem value="macos" label="MacOS/Linux">
 
-```sh
+```bash
 $ git clone https://github.com/MarquezProject/marquez && cd marquez
 ```
 
 </TabItem>
 <TabItem value="windows" label="Windows">
 
-```sh
+```bash
 $ git config --global core.autocrlf false
 $ git clone https://github.com/MarquezProject/marquez && cd marquez
 ```
@@ -93,7 +93,7 @@ To start Marquez with sample metadata that will be used and referenced in later 
 <Tabs groupId="start">
 <TabItem value="macos" label="MacOS/Linux">
 
-```sh
+```bash
 $ ./docker/up.sh --seed
 ```
 
@@ -102,8 +102,8 @@ $ ./docker/up.sh --seed
 
 Verify that Postgres and Bash are in your `PATH`, then run:
 
-```sh
-$ sh .\docker\up.sh --seed
+```bash
+$ sh ./docker/up.sh --seed
 ```
 
 </TabItem>
@@ -123,7 +123,7 @@ To view lineage metadata collected by Marquez, browse to the UI by visiting [htt
 
 ### View Job Metadata
 
-You should see the job `namespace`, `name`, the query, and a tab containing its run history: 
+You should see the job `namespace`, `name`, the query, and a tab containing its run history:
 
 ![](tab-view-job-metadata.png)
 
@@ -150,4 +150,4 @@ In this simple example, we showed you how to write sample lineage metadata to a 
 
 ## Feedback {#feedback}
 
-What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!  
+What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
