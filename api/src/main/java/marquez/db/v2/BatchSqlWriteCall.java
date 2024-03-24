@@ -91,43 +91,54 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
         @NonNull ImmutableList<Metadata.Dataset> ioMeta, @NonNull Batch dbCallAsBatch) {
       IntStream.range(0, ioMeta.size())
           .forEachOrdered(
-              i -> {
-                final Metadata.Dataset datasetMeta = ioMeta.get(i);
+              posOfDatasetMeta -> {
+                final Metadata.Dataset datasetMeta = ioMeta.get(posOfDatasetMeta);
                 dbCallAsBatch
-                    .add(format(Sql.WRITE_DATASET_META, i))
-                    .define(format("dataset_namespace_uuid_%d", i), UUID.randomUUID())
+                    .add(format(Sql.WRITE_DATASET_META, posOfDatasetMeta))
                     .define(
-                        format("dataset_namespace_name_%d", i),
+                        format("dataset_namespace_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+                    .define(
+                        format("dataset_namespace_name_%d", posOfDatasetMeta),
                         datasetMeta.getNamespace().getValue())
-                    .define(format("dataset_namespace_description_%d", i), null)
-                    .define(format("source_uuid_%d", i), UUID.randomUUID())
-                    .define(format("source_type_%d", i), "DB")
+                    .define(format("dataset_namespace_description_%d", posOfDatasetMeta), null)
+                    .define(format("source_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+                    .define(format("source_type_%d", posOfDatasetMeta), "DB")
                     .define(
-                        format("source_name_%d", i), datasetMeta.getSource().getName().getValue())
+                        format("source_name_%d", posOfDatasetMeta),
+                        datasetMeta.getSource().getName().getValue())
                     .define(
-                        format("source_connection_url_%d", i),
+                        format("source_connection_url_%d", posOfDatasetMeta),
                         datasetMeta.getSource().getConnectionUrl().toASCIIString())
-                    .define(format("source_description_%d", i), null)
-                    .define(format("dataset_uuid_%d", i), UUID.randomUUID())
-                    .define(format("dataset_type_%d", i), datasetMeta.getType())
-                    .define(format("dataset_name_%d", i), datasetMeta.getName().getValue());
+                    .define(format("source_description_%d", posOfDatasetMeta), null)
+                    .define(format("dataset_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+                    .define(format("dataset_type_%d", posOfDatasetMeta), datasetMeta.getType())
+                    .define(
+                        format("dataset_name_%d", posOfDatasetMeta),
+                        datasetMeta.getName().getValue());
                 // ...
                 final ImmutableList<Metadata.Dataset.Schema.Field> fieldsMeta =
                     datasetMeta.getSchema().getFields().asList();
                 IntStream.range(0, fieldsMeta.size())
                     .forEachOrdered(
-                        k -> {
-                          final Metadata.Dataset.Schema.Field fieldMeta = fieldsMeta.get(k);
+                        posOfFieldMeta -> {
+                          final Metadata.Dataset.Schema.Field fieldMeta =
+                              fieldsMeta.get(posOfFieldMeta);
                           dbCallAsBatch
-                              .add(format(Sql.WRITE_DATASET_FIELDS_META, k))
+                              .add(format(Sql.WRITE_DATASET_FIELDS_META, posOfFieldMeta))
                               .define(
                                   "dataset_namespace_name", datasetMeta.getNamespace().getValue())
                               .define("dataset_name", datasetMeta.getName().getValue())
-                              .define(format("dataset_field_uuid_%d", k), UUID.randomUUID())
-                              .define(format("dataset_field_type_%d", k), fieldMeta.getType())
-                              .define(format("dataset_field_name_%d", k), fieldMeta.getName())
                               .define(
-                                  format("dataset_field_description_%d", k),
+                                  format("dataset_field_uuid_%d", posOfFieldMeta),
+                                  UUID.randomUUID())
+                              .define(
+                                  format("dataset_field_type_%d", posOfFieldMeta),
+                                  fieldMeta.getType())
+                              .define(
+                                  format("dataset_field_name_%d", posOfFieldMeta),
+                                  fieldMeta.getName())
+                              .define(
+                                  format("dataset_field_description_%d", posOfFieldMeta),
                                   fieldMeta.getDescription().orElse(null));
                         });
               });
