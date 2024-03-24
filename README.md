@@ -40,8 +40,26 @@ Want to be added? Send a pull request our way!
 
 Marquez provides a simple way to collect and view _dataset_, _job_, and _run_ metadata using [OpenLineage](https://openlineage.io). The easiest way to get up and running is with Docker. From the base of the Marquez repository, run:
 
+### MacOS and Linux users:
+
 ```
 $ ./docker/up.sh
+```
+
+### Windows users:
+
+Before cloning Marquez, configure Git to check out files with Unix-style file endings:
+
+```
+$ git config --global core.autocrlf false
+```
+
+Verify that Bash and PostgreSQL have been installed and added to the PATH variable (Git Bash is recommended).
+
+Start all services:
+
+```
+$ sh .\docker\up.sh
 ```
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide.
