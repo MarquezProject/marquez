@@ -81,7 +81,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
       dbCallAsBatchAdd(ioMeta.getInputs().asList(), dbCallAsBatch);
-      dbCallAsBatchAdd(ioMeta.getInputs().asList(), dbCallAsBatch);
+      dbCallAsBatchAdd(ioMeta.getOutputs().asList(), dbCallAsBatch);
 
       dbCallAsBatch.execute();
     }
