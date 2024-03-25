@@ -118,7 +118,7 @@ export const ActionBar = ({
                 }}
               />
             }
-            label={<MqText font={'mono'}>Complete Mode</MqText>}
+            label={<MqText font={'mono'}>Full Graph</MqText>}
           />
           <FormControlLabel
             control={
