@@ -80,68 +80,10 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_started_at", runMeta.getStartedAt().orElse(null))
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
-      dbCallAsBatchAdd(ioMeta.getInputs().asList(), dbCallAsBatch);
-      dbCallAsBatchAdd(ioMeta.getOutputs().asList(), dbCallAsBatch);
+      dbCallAsBatchAddAll(ioMeta.getInputs().asList(), dbCallAsBatch);
+      dbCallAsBatchAddAll(ioMeta.getOutputs().asList(), dbCallAsBatch);
 
       dbCallAsBatch.execute();
-    }
-
-    /** ... */
-    void dbCallAsBatchAdd(
-        @NonNull ImmutableList<Metadata.Dataset> ioMeta, @NonNull Batch dbCallAsBatch) {
-      IntStream.range(0, ioMeta.size())
-          .forEachOrdered(
-              posOfDatasetMeta -> {
-                final Metadata.Dataset datasetMeta = ioMeta.get(posOfDatasetMeta);
-                dbCallAsBatch
-                    .add(format(Sql.WRITE_DATASET_META, posOfDatasetMeta))
-                    .define(
-                        format("dataset_namespace_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
-                    .define(
-                        format("dataset_namespace_name_%d", posOfDatasetMeta),
-                        datasetMeta.getNamespace().getValue())
-                    .define(format("dataset_namespace_description_%d", posOfDatasetMeta), null)
-                    .define(format("source_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
-                    .define(format("source_type_%d", posOfDatasetMeta), "DB")
-                    .define(
-                        format("source_name_%d", posOfDatasetMeta),
-                        datasetMeta.getSource().getName().getValue())
-                    .define(
-                        format("source_connection_url_%d", posOfDatasetMeta),
-                        datasetMeta.getSource().getConnectionUrl().toASCIIString())
-                    .define(format("source_description_%d", posOfDatasetMeta), null)
-                    .define(format("dataset_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
-                    .define(format("dataset_type_%d", posOfDatasetMeta), datasetMeta.getType())
-                    .define(
-                        format("dataset_name_%d", posOfDatasetMeta),
-                        datasetMeta.getName().getValue());
-                // ...
-                final ImmutableList<Metadata.Dataset.Schema.Field> fieldsMeta =
-                    datasetMeta.getSchema().getFields().asList();
-                IntStream.range(0, fieldsMeta.size())
-                    .forEachOrdered(
-                        posOfFieldMeta -> {
-                          final Metadata.Dataset.Schema.Field fieldMeta =
-                              fieldsMeta.get(posOfFieldMeta);
-                          dbCallAsBatch
-                              .add(format(Sql.WRITE_DATASET_FIELDS_META, posOfFieldMeta))
-                              .define(
-                                  "dataset_namespace_name", datasetMeta.getNamespace().getValue())
-                              .define("dataset_name", datasetMeta.getName().getValue())
-                              .define(
-                                  format("dataset_field_uuid_%d", posOfFieldMeta),
-                                  UUID.randomUUID())
-                              .define(
-                                  format("dataset_field_type_%d", posOfFieldMeta),
-                                  fieldMeta.getType())
-                              .define(
-                                  format("dataset_field_name_%d", posOfFieldMeta),
-                                  fieldMeta.getName())
-                              .define(
-                                  format("dataset_field_description_%d", posOfFieldMeta),
-                                  fieldMeta.getDescription().orElse(null));
-                        });
-              });
     }
   }
 
@@ -206,6 +148,8 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       dbCallAsBatch.define("created_at", nowAsUtc);
       dbCallAsBatch.define("updated_at", nowAsUtc);
 
+      dbCallAsBatchAdd(datasetMeta, dbCallAsBatch);
+
       dbCallAsBatch.execute();
     }
   }
@@ -221,5 +165,65 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     } else {
       throw new IllegalArgumentException();
     }
+  }
+
+  /** ... */
+  static void dbCallAsBatchAddAll(
+      @NonNull ImmutableList<Metadata.Dataset> ioMeta, @NonNull Batch dbCallAsBatch) {
+    IntStream.range(0, ioMeta.size())
+        .forEachOrdered(
+            i -> {
+              dbCallAsBatchAddWith(i, ioMeta.get(i), dbCallAsBatch);
+            });
+  }
+
+  /** ... */
+  static void dbCallAsBatchAdd(
+      @NonNull Metadata.Dataset datasetMeta, @NonNull Batch dbCallAsBatch) {
+    dbCallAsBatchAddWith(0, datasetMeta, dbCallAsBatch);
+  }
+
+  /** ... */
+  static void dbCallAsBatchAddWith(
+      final int posOfDatasetMeta,
+      @NonNull final Metadata.Dataset datasetMeta,
+      @NonNull final Batch dbCallAsBatch) {
+    dbCallAsBatch
+        .add(format(Sql.WRITE_DATASET_META, posOfDatasetMeta))
+        .define(format("dataset_namespace_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+        .define(
+            format("dataset_namespace_name_%d", posOfDatasetMeta),
+            datasetMeta.getNamespace().getValue())
+        .define(format("dataset_namespace_description_%d", posOfDatasetMeta), null)
+        .define(format("source_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+        .define(format("source_type_%d", posOfDatasetMeta), "DB")
+        .define(
+            format("source_name_%d", posOfDatasetMeta),
+            datasetMeta.getSource().getName().getValue())
+        .define(
+            format("source_connection_url_%d", posOfDatasetMeta),
+            datasetMeta.getSource().getConnectionUrl().toASCIIString())
+        .define(format("source_description_%d", posOfDatasetMeta), null)
+        .define(format("dataset_uuid_%d", posOfDatasetMeta), UUID.randomUUID())
+        .define(format("dataset_type_%d", posOfDatasetMeta), datasetMeta.getType())
+        .define(format("dataset_name_%d", posOfDatasetMeta), datasetMeta.getName().getValue());
+    // ...
+    final ImmutableList<Metadata.Dataset.Schema.Field> fieldsMeta =
+        datasetMeta.getSchema().getFields().asList();
+    IntStream.range(0, fieldsMeta.size())
+        .forEachOrdered(
+            posOfFieldMeta -> {
+              final Metadata.Dataset.Schema.Field fieldMeta = fieldsMeta.get(posOfFieldMeta);
+              dbCallAsBatch
+                  .add(format(Sql.WRITE_DATASET_FIELDS_META, posOfFieldMeta))
+                  .define("dataset_namespace_name", datasetMeta.getNamespace().getValue())
+                  .define("dataset_name", datasetMeta.getName().getValue())
+                  .define(format("dataset_field_uuid_%d", posOfFieldMeta), UUID.randomUUID())
+                  .define(format("dataset_field_type_%d", posOfFieldMeta), fieldMeta.getType())
+                  .define(format("dataset_field_name_%d", posOfFieldMeta), fieldMeta.getName())
+                  .define(
+                      format("dataset_field_description_%d", posOfFieldMeta),
+                      fieldMeta.getDescription().orElse(null));
+            });
   }
 }
