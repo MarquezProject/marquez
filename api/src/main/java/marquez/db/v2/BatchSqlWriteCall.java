@@ -1,5 +1,6 @@
 package marquez.db.v2;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.lang.String.format;
 
 import com.google.common.collect.ImmutableList;
@@ -7,6 +8,7 @@ import io.openlineage.server.OpenLineage;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
     /** ... */
     @Override
     public void useHandle(@NonNull Handle dbCallHandle) {
-      log.debug("Writing metadata: {}", runMeta);
+      log.info("Writing metadata: {}", runMeta);
 
       final Batch dbCallAsBatch = dbCallHandle.createBatch();
 
@@ -69,7 +71,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
+          .define("job_version_uuid", jobMeta.getId().getVersion());
 
       dbCallAsBatch
           .add(Sql.WRITE_RUN_META)
@@ -80,8 +82,11 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_started_at", runMeta.getStartedAt().orElse(null))
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
-      dbCallAsBatchAddAll(ioMeta.getInputs().asList(), dbCallAsBatch);
-      dbCallAsBatchAddAll(ioMeta.getOutputs().asList(), dbCallAsBatch);
+      // ...
+      batchSqlAddAll(
+          Stream.concat(ioMeta.getInputs().asList().stream(), ioMeta.getOutputs().asList().stream())
+              .collect(toImmutableList()),
+          dbCallAsBatch);
 
       dbCallAsBatch.execute();
     }
@@ -120,7 +125,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
+          .define("job_version_uuid", jobMeta.getId().getVersion());
 
       dbCallAsBatch.execute();
     }
@@ -148,7 +153,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
       dbCallAsBatch.define("created_at", nowAsUtc);
       dbCallAsBatch.define("updated_at", nowAsUtc);
 
-      dbCallAsBatchAdd(datasetMeta, dbCallAsBatch);
+      batchSqlAdd(datasetMeta, dbCallAsBatch);
 
       dbCallAsBatch.execute();
     }
@@ -168,23 +173,23 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
   }
 
   /** ... */
-  static void dbCallAsBatchAddAll(
+  static void batchSqlAddAll(
       @NonNull final ImmutableList<Metadata.Dataset> ioMeta, @NonNull final Batch dbCallAsBatch) {
     IntStream.range(0, ioMeta.size())
         .forEachOrdered(
             idx -> {
-              dbCallAsBatchAddWithIdx(idx, ioMeta.get(idx), dbCallAsBatch);
+              batchSqlAddWithIdx(idx, ioMeta.get(idx), dbCallAsBatch);
             });
   }
 
   /** ... */
-  static void dbCallAsBatchAdd(
+  static void batchSqlAdd(
       @NonNull final Metadata.Dataset datasetMeta, @NonNull final Batch dbCallAsBatch) {
-    dbCallAsBatchAddWithIdx(0, datasetMeta, dbCallAsBatch);
+    batchSqlAddWithIdx(0, datasetMeta, dbCallAsBatch);
   }
 
   /** ... */
-  static void dbCallAsBatchAddWithIdx(
+  static void batchSqlAddWithIdx(
       final int idx,
       @NonNull final Metadata.Dataset datasetMeta,
       @NonNull final Batch dbCallAsBatch) {
@@ -204,11 +209,11 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
         .define(format("dataset_type_%d", idx), datasetMeta.getType())
         .define(format("dataset_name_%d", idx), datasetMeta.getName().getValue());
 
-    dbCallAsBatchAddAll(datasetMeta.getSchema().getFields().asList(), datasetMeta, dbCallAsBatch);
+    batchSqlAddAll(datasetMeta.getSchema().getFields().asList(), datasetMeta, dbCallAsBatch);
   }
 
   /** ... */
-  static void dbCallAsBatchAddAll(
+  static void batchSqlAddAll(
       @NonNull final ImmutableList<Metadata.Dataset.Schema.Field> fieldsMeta,
       @NonNull final Metadata.Dataset datasetMeta,
       @NonNull final Batch dbCallAsBatch) {

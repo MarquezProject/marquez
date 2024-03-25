@@ -114,10 +114,10 @@ public final class Metadata {
   @Builder
   @ToString
   public static class Job {
+    @Getter private final JobVersionId id;
     @Getter private final JobType type;
     @Getter private final JobName name;
     @Getter private final NamespaceName namespace;
-    @Getter private final JobVersionId versionId;
     @Nullable private final String description;
     @Nullable private final URI location;
     @Nullable private final IO io;
@@ -133,6 +133,7 @@ public final class Metadata {
       final ImmutableSet<DatasetVersionId> outputs = IO.onlyVersionIdsFor(io.getOutputs());
       // ...
       final Optional<URI> location = Facets.locationFor(job);
+
       final Version jobVersion =
           Version.forJob(
               namespaceName, jobName, inputs, outputs, location.map(URI::toString).orElse(null));
@@ -143,7 +144,7 @@ public final class Metadata {
           .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
-          .versionId(jobVersionId)
+          .id(jobVersionId)
           .description(Facets.descriptionFor(job).orElse(null))
           .location(location.orElse(null))
           .io(io)
@@ -160,7 +161,7 @@ public final class Metadata {
           .namespace(namespaceName)
           .description(Facets.descriptionFor(job).orElse(null))
           .location(location.orElse(null))
-          .versionId(
+          .id(
               JobVersionId.of(
                   namespaceName,
                   jobName,
