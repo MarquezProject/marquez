@@ -4,30 +4,30 @@ import styles from './styles.module.css';
 
 const featureList: FeatureItem[] = [
     {
-        title: 'What does Marquez do?',
-        subTitle: 'Real-time metadata collection',
+        title: 'One Service for Lineage',
+        subTitle: 'Real-time metadata server',
         imgSrc: 'img/stack.svg',
         description: <>
             <p>
-                Marquez is a metadata server, offering an OpenLineage-compatible endpoint for real-time
+                Marquez includes a metadata server offering an OpenLineage-compatible endpoint for real-time
                 collection of information from running jobs and applications.
             </p>
             <p>
                 As the reference implementation of
-                OpenLineage, the Marquez API server already works with all of its integrations developed by the
-                community.
-                This includes Apache Airflow, Apache Spark, dbt, Dagster, and Great Expectations.
+                OpenLineage, the Marquez API server already works with all the integrations developed by the
+                OpenLineage community.
+                This includes Apache Airflow, Apache Spark, Apache Flink, dbt, and Dagster.
             </p>
         </>,
         side: 'left',
     },
     {
         subTitle: 'Unified visual graph',
-        imgSrc: 'img/screenshot.png',
+        imgSrc: 'img/unified_graph.png',
         side: 'right',
         description: <>
             <p>
-                Through a web user interface, Marquez can provide a visual map that shows complex interdependencies
+                Through a web user interface, Marquez provides a visual map that shows complex interdependencies
                 within your data ecosystem.
             </p>
             <p>
@@ -43,7 +43,7 @@ const featureList: FeatureItem[] = [
         side: 'left',
         description: <>
             <p>
-                Lineage metadata can be queried using the lineage API, allowing for automation of key tasks like
+                Through a lineage API, metadata can be queried for automation of key tasks like
                 backfills and root cause analysis.
             </p>
             <p>

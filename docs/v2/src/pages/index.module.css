@@ -4,41 +4,62 @@
  */
 
 .heroBanner {
+    display: flex;
+    width: 100%;
     padding: 4rem 0;
-    text-align: center;
     position: relative;
     overflow: hidden;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: row;
 }
 
-@media screen and (max-width: 996px) {
+@media screen and (max-width: 767px) {
     .heroBanner {
+        margin-top: 4rem;
         padding: 2rem;
-    }
-    .flexContainer {
         flex-direction: column;
     }
+    
+    .titleContainer {
+        max-width: 100% !important;
+    }
 }
 
-.buttons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.heroBanner {
+    max-width: 100%;
 }
 
-.flexContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    overflow: hidden;
+.titleContainer {
+    text-align: center;
+    max-width: 100%;
+    margin: auto;
 }
 
-.imageContainer {
-    flex: 1 1 0;
-    height: 100%;
-    width: 100%;
+.imageSubDiv {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 5%;
 }
 
 .image {
+    margin: 0 auto;
+    height: 35rem;
+    width: auto;
+}
+
+.logo {
     height: auto;
-    width: 100%;
+    width: 25rem;
+}
+
+.btn_logos {
+    height: 1rem;
+    margin-top: 0.15rem;
+    margin-right: 0.4rem;
+    position: absolute;
+}
+
+.btn_text {
+    margin-left: 1.4rem;
 }

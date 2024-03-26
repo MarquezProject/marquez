@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'Marquez Project',
-    tagline: 'Data lineage for every pipeline.',
+    tagline: 'The complete OpenLineage solution',
     favicon: 'img/favicon.ico',
 
     // Set the production url of your site here
@@ -115,6 +115,11 @@ const config = {
                         label: 'GitHub',
                         position: 'right',
                     },
+                    {
+                        href: 'https://openlineage.io',
+                        label: 'OpenLineage',
+                        position: 'right',
+                    },
                 ],
             },
             footer: {
@@ -144,6 +149,10 @@ const config = {
                                 label: 'Twitter/X',
                                 href: 'https://twitter.com/marquezproject',
                             },
+                            {
+                                label: 'OpenLineage',
+                                href: 'https://openlineage.io',
+                            }
                         ],
                     },
                     {
