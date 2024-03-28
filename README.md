@@ -53,7 +53,7 @@ $ ./docker/up.sh
 You can open [http://localhost:3000](http://localhost:3000) to begin exploring the Marquez Web UI. The UI enables you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run metadata of current and previous job runs, and much more!
 
 <p align="center">
-  <img src="https://github.com/OpenLineage/docs/blob/main/static/img/demo-rev.gif">
+  <img src="./web/docs/demo.gif">
 </p>
 
 **`HTTP API`**
