@@ -210,6 +210,11 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
         .define(format("dataset_name_%d", idx), datasetMeta.getName().getValue());
 
     batchSqlAddAll(datasetMeta.getSchema().getFields().asList(), datasetMeta, dbCallAsBatch);
+
+    dbCallAsBatch
+        .add(Sql.WRITE_DATASET_VERSION_META)
+        .define("dataset_namespace_name", datasetMeta.getNamespace().getValue())
+        .define("dataset_name", datasetMeta.getName().getValue());
   }
 
   /** ... */

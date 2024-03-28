@@ -293,14 +293,14 @@ public interface Sql {
           job_name
         )
         SELECT
-          '<job_version_uuid>', -- replace with the actual event_time value
-          '<created_at>',       -- replace with the actual event_time value
-          '<updated_at>',       -- replace with the actual event_time value
-          job.uuid,             -- replace with the actual event_time value
-          job.location,         -- replace with the actual event_time value
-          job.namespace_uuid,   -- replace with the actual event_time value
-          job.namespace_name,   -- replace with the actual event_time value
-          job.name              -- replace with the actual event_time value
+          '<dataset_version_uuid>', -- replace with the actual event_time value
+          '<created_at>',           -- replace with the actual event_time value
+          '<updated_at>',           -- replace with the actual event_time value
+          job.uuid,                 -- replace with the actual event_time value
+          job.location,             -- replace with the actual event_time value
+          job.namespace_uuid,       -- replace with the actual event_time value
+          job.namespace_name,       -- replace with the actual event_time value
+          job.name                  -- replace with the actual event_time value
         FROM job ON CONFLICT (uuid) DO NOTHING
       )
       UPDATE datasets
