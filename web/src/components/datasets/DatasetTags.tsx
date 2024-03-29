@@ -4,7 +4,7 @@ import * as Redux from 'redux'
 import { Autocomplete, TextField } from '@mui/material'
 import { Box, createTheme } from '@mui/material'
 import { IState } from '../../store/reducers'
-import { Tag } from '../../types/api'
+import { LocalOffer } from '@mui/icons-material'
 import {
   addDatasetFieldTag,
   addDatasetTag,
@@ -16,18 +16,16 @@ import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { useTheme } from '@emotion/react'
 import AddIcon from '@mui/icons-material/Add'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
 import Chip from '@mui/material/Chip'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import EditNoteIcon from '@mui/icons-material/EditNote'
 import FormControl from '@mui/material/FormControl'
 import Grow from '@mui/material/Grow'
+import IconButton from '@mui/material/IconButton'
 import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MenuItem from '@mui/material/MenuItem'
@@ -39,6 +37,7 @@ import Select from '@mui/material/Select'
 import Snackbar from '@mui/material/Snackbar'
 
 interface DatasetTagsProps {
+  fieldTag: boolean
   namespace: string
   datasetName: string
   datasetTags: string[]
@@ -57,6 +56,7 @@ type IProps = DatasetTagsProps & DispatchProps
 
 const DatasetTags: React.FC<IProps> = (props) => {
   const {
+    fieldTag,
     namespace,
     datasetName,
     datasetTags,
@@ -68,19 +68,18 @@ const DatasetTags: React.FC<IProps> = (props) => {
     addTags,
   } = props
 
-  const [isDialogOpen, setDialogOpen] = useState(false)
-  const [listTag, setListTag] = useState('')
   const closeDialog = () => setDialogOpen(false)
   const i18next = require('i18next')
+
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [listTag, setListTag] = useState('')
+
   const options = ['Add a Tag', 'Edit a Tag Description']
   const [openDropDown, setOpenDropDown] = useState(false)
   const [openTagDesc, setOpenTagDesc] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [tagDescription, setTagDescription] = useState('No Description')
-  const handleButtonClick = () => {
-    options[selectedIndex] === 'Add a Tag' ? setDialogOpen(true) : setOpenTagDesc(true)
-  }
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const theme = createTheme(useTheme())
 
@@ -90,10 +89,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
   ) => {
     setSelectedIndex(index)
     setOpenDropDown(false)
-  }
-
-  const handleDropDownToggle = () => {
-    setOpenDropDown((prevprevOpenDropDown) => !prevprevOpenDropDown)
   }
 
   const handleTagDescClose = () => {
@@ -145,27 +140,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setTagDescription('No Description')
   }
 
-  const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    return tags.map((tag) => {
-      const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
-      const tooltipTitle = tagDescription?.description || 'No Tag Description'
-      return (
-        <MQTooltip title={tooltipTitle} key={tag}>
-          <Chip
-            color={'primary'}
-            label={tag}
-            size='small'
-            onDelete={() => handleDelete(tag)}
-            style={{
-              display: 'row',
-              marginLeft: theme.spacing(1),
-            }}
-          />
-        </MQTooltip>
-      )
-    })
-  }
-
   return (
     <>
       <Snackbar
@@ -177,35 +151,67 @@ const DatasetTags: React.FC<IProps> = (props) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       />
       <Box display={'flex'} alignItems={'center'}>
-        <MQText subheading>{i18next.t('dataset_tags.tags')}</MQText>
-        {formatTags(datasetTags, tagData)}
-        <ButtonGroup
-          variant='contained'
-          ref={anchorRef}
-          aria-label='tags-nested-menu'
-          sx={{ height: '32px', width: '20px', marginLeft: '8px' }}
-        >
-          <MQTooltip placement='left' title={options[selectedIndex]}>
-            <Button
-              variant='outlined'
-              sx={{ height: '32px', width: '20px' }}
-              onClick={handleButtonClick}
-            >
-              {selectedIndex === 0 ? <AddIcon /> : <EditNoteIcon />}
-            </Button>
+        {!fieldTag && <LocalOffer sx={{ mr: 1 }} fontSize={'small'} color={'primary'} />}
+        <Autocomplete
+          size={'small'}
+          multiple
+          disableClearable={true}
+          onChange={(_, value) => {
+            value
+              .filter((tag) => !datasetTags.includes(tag))
+              .forEach((tag) => {
+                datasetField
+                  ? addDatasetFieldTag(namespace, datasetName, tag, datasetField)
+                  : addDatasetTag(namespace, datasetName, tag)
+              })
+          }}
+          renderTags={(value) =>
+            value.map((option) => (
+              <Chip
+                key={option}
+                onDelete={() => {
+                  handleDelete(option)
+                }}
+                sx={{ mr: 1 }}
+                color={'primary'}
+                variant='outlined'
+                label={option}
+                size='small'
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              InputLabelProps={{
+                ...params.InputProps,
+              }}
+              placeholder={datasetTags.length === 0 ? 'Tags' : ''}
+              autoFocus
+              size={'small'}
+              color={'secondary'}
+              variant={'outlined'}
+              id='tag'
+              fullWidth
+              sx={{
+                ml: 1,
+                minWidth: 140,
+                maxWidth: 480,
+                borderWidth: 0,
+                '& fieldset': { border: 'none' },
+              }}
+            />
+          )}
+          options={tagData.map((option) => option.name)}
+          value={datasetTags}
+        />
+        {!fieldTag && (
+          <MQTooltip title={'Add a tag to the system'}>
+            <IconButton sx={{ ml: 2 }}>
+              <AddIcon />
+            </IconButton>
           </MQTooltip>
-          <Button
-            variant='outlined'
-            size='small'
-            aria-controls={openDropDown ? 'split-button-menu' : undefined}
-            aria-expanded={openDropDown ? 'true' : undefined}
-            aria-label='tags-menu'
-            aria-haspopup='menu'
-            onClick={handleDropDownToggle}
-          >
-            <ArrowDropDownIcon />
-          </Button>
-        </ButtonGroup>
+        )}
       </Box>
       <Popper
         sx={{

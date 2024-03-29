@@ -104,7 +104,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (versionsLoading) {
+  if (versionsLoading && versions.length === 0) {
     return (
       <Box display={'flex'} justifyContent={'center'}>
         <CircularProgress color='primary' />
@@ -130,6 +130,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       <Box>
         <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <DatasetTags
+            fieldTag={false}
             datasetTags={tags}
             datasetName={lineageDataset.name}
             namespace={lineageDataset.namespace}
@@ -137,6 +138,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
               <Button
+                size={'small'}
                 variant='outlined'
                 sx={{
                   borderColor: theme.palette.error.main,
