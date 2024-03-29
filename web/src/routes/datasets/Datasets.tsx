@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import {
+  Button,
   Chip,
   Container,
   Table,
@@ -14,6 +14,7 @@ import {
   Tooltip,
   createTheme,
 } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -98,20 +99,48 @@ const Datasets: React.FC<DatasetsProps> = ({
           {datasets.length === 0 ? (
             <Box p={2}>
               <MqEmpty title={i18next.t('datasets_route.empty_title')}>
-                <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
+                <>
+                  <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
+                  <Button
+                    color={'primary'}
+                    size={'small'}
+                    onClick={() => {
+                      if (selectedNamespace) {
+                        fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                      }
+                    }}
+                  >
+                    Refresh
+                  </Button>
+                </>
               </MqEmpty>
             </Box>
           ) : (
             <>
-              <Box p={2} display={'flex'}>
-                <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
-                <Chip
-                  size={'small'}
-                  variant={'outlined'}
-                  color={'primary'}
-                  sx={{ marginLeft: 1 }}
-                  label={totalCount + ' total'}
-                ></Chip>
+              <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                <Box display={'flex'}>
+                  <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
+                  <Chip
+                    size={'small'}
+                    variant={'outlined'}
+                    color={'primary'}
+                    sx={{ marginLeft: 1 }}
+                    label={totalCount + ' total'}
+                  ></Chip>
+                </Box>
+                <Tooltip title={'Refresh'}>
+                  <IconButton
+                    color={'primary'}
+                    size={'small'}
+                    onClick={() => {
+                      if (selectedNamespace) {
+                        fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                      }
+                    }}
+                  >
+                    <Refresh fontSize={'small'} />
+                  </IconButton>
+                </Tooltip>
               </Box>
               <Table size='small'>
                 <TableHead>
