@@ -232,7 +232,7 @@ const Events: React.FC<EventsProps> = ({
                     color={'primary'}
                     size={'small'}
                     onClick={() => {
-                      fetchEvents(state.dateFrom, state.dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+                      refresh()
                     }}
                   >
                     Refresh
