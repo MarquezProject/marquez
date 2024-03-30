@@ -131,7 +131,12 @@ const Events: React.FC<EventsProps> = ({
     const params: { [key: string]: string } = {}
     searchParams.forEach((value, key) => (params[key] = value))
     setSearchParams({ ...params, [keyDate]: formatDateAPIQuery(e.toDate()) })
-    setState({ [keyDate]: formatDatePicker(e.toDate()), page: 0, rowExpanded: null } as any)
+    setState({
+      ...state,
+      [keyDate]: formatDatePicker(e.toDate()),
+      page: 0,
+      rowExpanded: null,
+    } as any)
   }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
@@ -152,6 +157,14 @@ const Events: React.FC<EventsProps> = ({
     const title = `${data.job.name}-${data.eventType}-${data.run.runId}`
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
     saveAs(blob, `${title}.json`)
+  }
+
+  const refresh = () => {
+    const dateFrom =
+      searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
+    const dateTo =
+      searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
+    fetchEvents(dateFrom, dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
   }
 
   const i18next = require('i18next')
@@ -179,7 +192,7 @@ const Events: React.FC<EventsProps> = ({
                 color={'primary'}
                 size={'small'}
                 onClick={() => {
-                  fetchEvents(state.dateFrom, state.dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+                  refresh()
                 }}
               >
                 <Refresh fontSize={'small'} />
