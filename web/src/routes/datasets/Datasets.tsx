@@ -209,7 +209,10 @@ const Datasets: React.FC<DatasetsProps> = ({
                           <TableCell align='left'>
                             {datasetFacetsStatus(dataset.facets) ? (
                               <>
-                                <MqStatus color={datasetFacetsStatus(dataset.facets)} />
+                                <MqStatus
+                                  label={'Quality'}
+                                  color={datasetFacetsStatus(dataset.facets)}
+                                />
                               </>
                             ) : (
                               <MqText>N/A</MqText>
