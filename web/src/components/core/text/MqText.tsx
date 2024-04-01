@@ -117,6 +117,7 @@ const MqText: React.FC<MqTextProps> = ({
     },
     small: {
       fontSize: '.625rem',
+      lineHeight: 'inherit',
     },
     paragraph: {
       marginBottom: theme.spacing(2),
