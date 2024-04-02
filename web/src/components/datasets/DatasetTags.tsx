@@ -231,6 +231,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
           <Autocomplete
             options={tagData.map((option) => option.name)}
             autoSelect
+            freeSolo
             onChange={handleTagDescChange}
             renderInput={(params) => (
               <TextField
