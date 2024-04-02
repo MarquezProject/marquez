@@ -76,14 +76,12 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case DELETE_DATASET_TAG_SUCCESS:
       return {
         ...state,
-        refreshTags: `${payload.namespace}#${payload.datasetName}#${payload.tag}#d`,
       }
     case DELETE_DATASET_FIELD_TAG:
       return { ...state }
     case DELETE_DATASET_FIELD_TAG_SUCCESS:
       return {
         ...state,
-        refreshTags: `${payload.namespace}#${payload.datasetName}#${payload.field}#${payload.tag}#d`,
       }
     case ADD_DATASET_TAG:
       return { ...state }
