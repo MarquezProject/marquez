@@ -128,7 +128,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    return tags.map((tag) => {
+    return tags.map((tag, index) => {
       const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
       const tooltipTitle = tagDescription?.description || 'No Tag Description'
       return (
@@ -141,7 +141,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             onDelete={() => handleDelete(tag)}
             style={{
               display: 'row',
-              marginLeft: theme.spacing(1),
+              marginLeft: index === 0 ? theme.spacing(0) : theme.spacing(1),
             }}
           />
         </MQTooltip>
@@ -179,8 +179,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
         <Autocomplete
           multiple
           id='dataset-tags'
-          sx={{ width: datasetField ? 200 : 516, flex: 1 }}
-          limitTags={!datasetField ? 5 : 1}
+          sx={{ width: 516, flex: 1 }}
+          limitTags={!datasetField ? 5 : 4}
           disableClearable
           disablePortal
           options={tagData.map((option) => option.name)}

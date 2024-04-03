@@ -33,11 +33,12 @@ type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
   run?: Run
+  showTags?: boolean
 } & JobFacetsProps &
   DispatchProps
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
-  const { datasetFields, facets, run, fetchJobFacets, resetFacets } = props
+  const { datasetFields, facets, run, fetchJobFacets, resetFacets, showTags } = props
   const i18next = require('i18next')
   const dsNamespace = useSelector(
     (state: IState) => state.datasetVersions.result.versions[0].namespace
@@ -73,21 +74,27 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                     {i18next.t('dataset_info_columns.name')}
                   </MqText>
                 </TableCell>
-                <TableCell align='left'>
-                  <MqText subheading inline>
-                    {i18next.t('dataset_info_columns.type')}
-                  </MqText>
-                </TableCell>
-                <TableCell align='left'>
-                  <MqText subheading inline>
-                    {i18next.t('dataset_info_columns.description')}
-                  </MqText>
-                </TableCell>
-                <TableCell align='left'>
-                  <MqText subheading inline>
-                    {i18next.t('dataset_tags.tags')}
-                  </MqText>
-                </TableCell>
+                {!showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_info_columns.type')}
+                    </MqText>
+                  </TableCell>
+                )}
+                {!showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_info_columns.description')}
+                    </MqText>
+                  </TableCell>
+                )}
+                {showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_tags.tags')}
+                    </MqText>
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -96,16 +103,20 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                   <React.Fragment key={field.name}>
                     <TableRow sx={{ cursor: 'pointer' }}>
                       <TableCell align='left'>{field.name}</TableCell>
-                      <TableCell align='left'>{field.type}</TableCell>
-                      <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                      <TableCell align='left'>
-                        <DatasetTags
-                          namespace={dsNamespace}
-                          datasetName={dsName}
-                          datasetTags={field.tags}
-                          datasetField={field.name}
-                        />
-                      </TableCell>
+                      {!showTags && <TableCell align='left'>{field.type}</TableCell>}
+                      {!showTags && (
+                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                      )}
+                      {showTags && (
+                        <TableCell align='left'>
+                          <DatasetTags
+                            namespace={dsNamespace}
+                            datasetName={dsName}
+                            datasetTags={field.tags}
+                            datasetField={field.name}
+                          />
+                        </TableCell>
+                      )}
                     </TableRow>
                   </React.Fragment>
                 )
