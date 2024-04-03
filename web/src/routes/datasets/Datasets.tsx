@@ -167,7 +167,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                     </TableCell>
                     <TableCell key={i18next.t('datasets.column_lineage_tab')} align='left'>
                       <MqText inline subheading>
-                        Column Level
+                        COLUMN LINEAGE
                       </MqText>
                       <Chip
                         sx={{ marginLeft: 1 }}
@@ -209,7 +209,10 @@ const Datasets: React.FC<DatasetsProps> = ({
                           <TableCell align='left'>
                             {datasetFacetsStatus(dataset.facets) ? (
                               <>
-                                <MqStatus color={datasetFacetsStatus(dataset.facets)} />
+                                <MqStatus
+                                  label={'Quality'}
+                                  color={datasetFacetsStatus(dataset.facets)}
+                                />
                               </>
                             ) : (
                               <MqText>N/A</MqText>
