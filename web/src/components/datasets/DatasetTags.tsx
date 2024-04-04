@@ -5,6 +5,7 @@ import {
   Autocomplete,
   AutocompleteChangeDetails,
   AutocompleteChangeReason,
+  Checkbox,
   TextField,
 } from '@mui/material'
 import { Box, createTheme } from '@mui/material'
@@ -21,6 +22,8 @@ import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { useTheme } from '@emotion/react'
 import Button from '@mui/material/Button'
+import CheckBoxIcon from '@mui/icons-material/CheckBox'
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
@@ -70,6 +73,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
   const handleButtonClick = () => {
     setOpenTagDesc(true)
   }
+
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const theme = createTheme(useTheme())
 
@@ -99,15 +103,20 @@ const DatasetTags: React.FC<IProps> = (props) => {
     reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
-    if (reason === 'selectOption' && details) {
+    if (details && reason === 'selectOption') {
+      const newTag = details.option
+      const newSelectedTags = [...selectedTags, newTag]
+      setSelectedTags(newSelectedTags)
+
       datasetField
-        ? addDatasetFieldTag(namespace, datasetName, details.option, datasetField)
-        : addDatasetTag(namespace, datasetName, details.option)
+        ? addDatasetFieldTag(namespace, datasetName, newTag, datasetField)
+        : addDatasetTag(namespace, datasetName, newTag)
     }
   }
 
   const handleDelete = (deletedTag: string) => {
     const index = selectedTags.indexOf(deletedTag)
+
     if (index !== -1) {
       const newSelectedTags = [...selectedTags]
       newSelectedTags.splice(index, 1)
@@ -149,8 +158,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
     })
   }
 
-  const renderTags = (value: string[]) => formatTags(value, tagData)
-
   return (
     <>
       <Snackbar
@@ -178,6 +185,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
         )}
         <Autocomplete
           multiple
+          disableCloseOnSelect
           id='dataset-tags'
           sx={{ width: 516, flex: 1 }}
           limitTags={!datasetField ? 5 : 4}
@@ -186,9 +194,15 @@ const DatasetTags: React.FC<IProps> = (props) => {
           options={tagData.map((option) => option.name)}
           value={selectedTags}
           onChange={handleTagChange}
-          renderTags={renderTags}
-          renderOption={(props, option) => (
+          renderTags={(value: string[]) => formatTags(value, tagData)}
+          renderOption={(props, option, { selected }) => (
             <li {...props}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                checkedIcon={<CheckBoxIcon fontSize='small' />}
+                style={{ marginRight: 4 }}
+                checked={selected}
+              />
               <div>
                 <MQText bold>{option}</MQText>
                 <MQText subdued overflowHidden>

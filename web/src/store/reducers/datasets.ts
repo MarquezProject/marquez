@@ -32,7 +32,7 @@ export type IDatasetsState = {
   totalCount: number
   init: boolean
   deletedDatasetName: string
-  refreshTags: string
+  refreshTags: boolean
 }
 
 export const initialState: IDatasetsState = {
@@ -41,7 +41,7 @@ export const initialState: IDatasetsState = {
   result: [],
   totalCount: 0,
   deletedDatasetName: '',
-  refreshTags: '',
+  refreshTags: false,
 }
 
 export type IDatasetsAction = ReturnType<typeof fetchDatasetsSuccess> &
@@ -86,13 +86,13 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case ADD_DATASET_TAG:
       return { ...state }
     case ADD_DATASET_TAG_SUCCESS:
-      return { ...state, refreshTags: `${payload.namespace}#${payload.datasetName}#${payload.tag}` }
+      return { ...state, refreshTags: true }
     case ADD_DATASET_FIELD_TAG:
       return { ...state }
     case ADD_DATASET_FIELD_TAG_SUCCESS:
       return {
         ...state,
-        refreshTags: `${payload.namespace}#${payload.datasetName}#${payload.field}#${payload.tag}`,
+        refreshTags: true,
       }
     default:
       return state
