@@ -31,6 +31,9 @@ const MqDatePicker: React.FC<DatePickerProps> = ({
         label: {
           left: theme.spacing(2),
         },
+        '.MuiOutlinedInput-input': {
+          padding: '6.5px 14px',
+        },
         '&:hover': {
           '.MuiOutlinedInput-notchedOutline': {
             borderColor: `${theme.palette.primary.main} !important`,

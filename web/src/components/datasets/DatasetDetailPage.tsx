@@ -197,7 +197,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         <Box display={'flex'} alignItems={'center'}>
           {facetsStatus && (
             <Box mr={1}>
-              <MqStatus color={facetsStatus} />
+              <MqStatus label={'Quality'} color={facetsStatus} />
             </Box>
           )}
           <MqText heading font={'mono'}>

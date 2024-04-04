@@ -94,7 +94,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
 
   if (runsLoading) {
     return (
-      <Box display={'flex'} justifyContent={'center'}>
+      <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
       </Box>
     )
@@ -110,7 +110,13 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         padding: theme.spacing(2),
       }}
     >
-      <Box mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+      <Box
+        mb={2}
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+      >
         <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
           <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
           <Tab label={'I/O'} disableRipple={true} />
@@ -120,6 +126,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <Box mr={1}>
             <Button
               variant='outlined'
+              size={'small'}
               sx={{
                 borderColor: theme.palette.error.main,
                 color: theme.palette.error.main,
@@ -146,6 +153,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           </Box>
           <Box mr={1}>
             <Button
+              size={'small'}
               variant='outlined'
               color='primary'
               target={'_blank'}
@@ -163,7 +171,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       <Box display={'flex'} alignItems={'center'}>
         {runs.length && (
           <Box mr={1}>
-            <MqStatus color={jobRunsStatus(runs)} />
+            <MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />
           </Box>
         )}
         <MqText font={'mono'} heading>
