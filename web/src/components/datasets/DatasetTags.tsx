@@ -219,7 +219,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
               placeholder={selectedTags.length > 0 ? '' : 'Add some Tags.'}
               InputProps={{
                 ...params.InputProps,
-                disableUnderline: !!datasetField,
+                ...(datasetField ? { disableUnderline: true } : {}),
               }}
               InputLabelProps={{
                 shrink: true,
