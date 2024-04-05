@@ -21,7 +21,7 @@ describe('datasets reducer', () => {
       result: datasets,
       totalCount: 16,
       deletedDatasetName: '',
-      refreshTags: ''
+      refreshTags: false
     })
   })
 
