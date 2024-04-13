@@ -100,10 +100,11 @@ const DatasetTags: React.FC<IProps> = (props) => {
   const handleTagChange = (
     _event: React.SyntheticEvent,
     _value: string[],
-    reason: AutocompleteChangeReason,
+    _reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
-    if (details && reason === 'selectOption') {
+    
+    if (details) {
       const newTag = details.option
       const newSelectedTags = [...selectedTags, newTag]
       setSelectedTags(newSelectedTags)
