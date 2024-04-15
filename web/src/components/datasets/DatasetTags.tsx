@@ -190,6 +190,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
           id='dataset-tags'
           sx={{ width: 516, flex: 1 }}
           limitTags={!datasetField ? 5 : 4}
+          autoHighlight
           disableClearable
           disablePortal
           options={tagData.map((option) => option.name)}
