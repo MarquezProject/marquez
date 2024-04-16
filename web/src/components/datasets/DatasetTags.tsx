@@ -116,13 +116,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
   }
 
   const handleDelete = (deletedTag: string) => {
-    const index = selectedTags.indexOf(deletedTag)
-
-    if (index !== -1) {
-      const newSelectedTags = [...selectedTags]
-      newSelectedTags.splice(index, 1)
-      setSelectedTags(newSelectedTags)
-    }
+    const newSelectedTags = selectedTags.filter((tag) => deletedTag !== tag)
+    
+    setSelectedTags(newSelectedTags)
 
     datasetField
       ? deleteDatasetFieldTag(namespace, datasetName, deletedTag, datasetField)
