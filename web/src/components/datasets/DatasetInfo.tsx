@@ -4,16 +4,13 @@ import * as Redux from 'redux'
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
-
 import { connect, useSelector } from 'react-redux'
 import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
-import Collapse from '@mui/material/Collapse'
 import DatasetTags from './DatasetTags'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -36,21 +33,17 @@ type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
   run?: Run
+  showTags?: boolean
 } & JobFacetsProps &
   DispatchProps
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
-  const { datasetFields, facets, run, fetchJobFacets, resetFacets } = props
+  const { datasetFields, facets, run, fetchJobFacets, resetFacets, showTags } = props
   const i18next = require('i18next')
   const dsNamespace = useSelector(
     (state: IState) => state.datasetVersions.result.versions[0].namespace
   )
   const dsName = useSelector((state: IState) => state.datasetVersions.result.versions[0].name)
-
-  const loadCollapsedState = () => {
-    const storedState = localStorage.getItem(`dsi_${dsNamespace}_${dsName}`)
-    return storedState ? JSON.parse(storedState) : []
-  }
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
@@ -62,27 +55,6 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
     },
     []
   )
-  const [expandedRows, setExpandedRows] = useState<number[]>(loadCollapsedState)
-
-  const toggleRow = (index: number) => {
-    setExpandedRows((prevExpandedRows) => {
-      const newExpandedRows = prevExpandedRows.includes(index)
-        ? prevExpandedRows.filter((rowIndex) => rowIndex !== index)
-        : [...prevExpandedRows, index]
-
-      localStorage.setItem(`dsi_${dsNamespace}_${dsName}`, JSON.stringify(newExpandedRows))
-
-      return newExpandedRows
-    })
-  }
-
-  useEffect(() => {
-    for (const key in localStorage) {
-      if (key !== `dsi_${dsNamespace}_${dsName}`) {
-        localStorage.removeItem(key)
-      }
-    }
-  }, [dsNamespace, dsName])
 
   return (
     <Box>
@@ -102,53 +74,49 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                     {i18next.t('dataset_info_columns.name')}
                   </MqText>
                 </TableCell>
-                <TableCell align='left'>
-                  <MqText subheading inline>
-                    {i18next.t('dataset_info_columns.type')}
-                  </MqText>
-                </TableCell>
-                <TableCell align='left'>
-                  <MqText subheading inline>
-                    {i18next.t('dataset_info_columns.description')}
-                  </MqText>
-                </TableCell>
-                <TableCell align='left'></TableCell>
+                {!showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_info_columns.type')}
+                    </MqText>
+                  </TableCell>
+                )}
+                {!showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_info_columns.description')}
+                    </MqText>
+                  </TableCell>
+                )}
+                {showTags && (
+                  <TableCell align='left'>
+                    <MqText subheading inline>
+                      {i18next.t('dataset_tags.tags')}
+                    </MqText>
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
-              {datasetFields.map((field, index) => {
+              {datasetFields.map((field) => {
                 return (
                   <React.Fragment key={field.name}>
-                    <TableRow
-                      sx={{ cursor: 'pointer' }}
-                      onClick={() => toggleRow(index)}
-                      className='expandable-row'
-                    >
+                    <TableRow sx={{ cursor: 'pointer' }}>
                       <TableCell align='left'>{field.name}</TableCell>
-                      <TableCell align='left'>{field.type}</TableCell>
-                      <TableCell align='left'>{field.description || 'no description'}</TableCell>
-                      <TableCell align='right'>
-                        <KeyboardArrowDownIcon
-                          sx={{
-                            rotate: expandedRows.includes(index) ? '180deg' : 0,
-                            transition: 'rotate .3s',
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell colSpan={4} style={{ padding: 0, border: 'none' }}>
-                        <Collapse in={expandedRows.includes(index)} timeout='auto'>
-                          <Box p={2}>
-                            <DatasetTags
-                              namespace={dsNamespace}
-                              datasetName={dsName}
-                              datasetTags={field.tags}
-                              datasetField={field.name}
-                            />
-                          </Box>
-                        </Collapse>
-                      </TableCell>
+                      {!showTags && <TableCell align='left'>{field.type}</TableCell>}
+                      {!showTags && (
+                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                      )}
+                      {showTags && (
+                        <TableCell align='left'>
+                          <DatasetTags
+                            namespace={dsNamespace}
+                            datasetName={dsName}
+                            datasetTags={field.tags}
+                            datasetField={field.name}
+                          />
+                        </TableCell>
+                      )}
                     </TableRow>
                   </React.Fragment>
                 )
