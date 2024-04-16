@@ -28,7 +28,6 @@ import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
-import Io from '../io/Io'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
@@ -138,6 +137,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             <Box mr={1}>
               <Button
                 variant='outlined'
+                size={'small'}
                 sx={{
                   borderColor: theme.palette.error.main,
                   color: theme.palette.error.main,
@@ -180,7 +180,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 {...a11yProps(0)}
                 disableRipple={true}
               />
-              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
               <Tab
                 label={i18next.t('datasets.history_tab')}
                 {...a11yProps(2)}
@@ -215,9 +214,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           run={firstVersion.createdByRun}
         />
       )}
-      {tabIndex === 1 && <Io />}
-      {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
-      {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
+      {tabIndex === 1 && <DatasetVersions versions={props.versions} />}
+      {tabIndex === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }

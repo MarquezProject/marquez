@@ -21,6 +21,7 @@ const RunStatus: FunctionComponent<RunStatusProps> = (props) => {
       <Box
         mr={1}
         sx={{
+          minWidth: theme.spacing(2),
           width: theme.spacing(2),
           height: theme.spacing(2),
           borderRadius: '50%',

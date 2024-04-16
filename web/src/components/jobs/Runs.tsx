@@ -15,10 +15,13 @@ import {
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { formatUpdatedAt } from '../../helpers'
+import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
 import { useTheme } from '@emotion/react'
 import MqCode from '../core/code/MqCode'
+import MqCopy from '../core/copy/MqCopy'
 import MqEmpty from '../core/empty/MqEmpty'
+import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
@@ -47,8 +50,8 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
     return (
       <>
         <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-          <Chip label={infoView.id} />
-          <IconButton onClick={() => handleClick(null)} size='large'>
+          <Chip size={'small'} variant={'outlined'} label={infoView.id} />
+          <IconButton onClick={() => handleClick(null)} size='small'>
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
@@ -108,12 +111,14 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
                 }}
                 onClick={() => handleClick(run)}
               >
-                <TableCell align='left'>{run.id}</TableCell>
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
-                    <RunStatus run={run} />
-                    <MqText>{run.state}</MqText>
+                    {run.id.substring(0, 8)}...
+                    <MqCopy string={run.id} />
                   </Box>
+                </TableCell>
+                <TableCell align='left'>
+                  <MqStatus color={runStateColor(run.state)} label={run.state} />
                 </TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>

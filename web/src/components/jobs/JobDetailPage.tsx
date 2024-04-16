@@ -26,7 +26,6 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
-import Io from '../io/Io'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
@@ -119,7 +118,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       >
         <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
           <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
-          <Tab label={'I/O'} disableRipple={true} />
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
         <Box display={'flex'} alignItems={'center'}>
@@ -191,8 +189,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Io />}
-      {tabIndex === 2 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Runs runs={runs} />}
     </Box>
   )
 }
