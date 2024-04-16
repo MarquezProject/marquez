@@ -14,7 +14,7 @@ import {
   Tooltip,
   createTheme,
 } from '@mui/material'
-import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
+import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Event } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -131,7 +131,12 @@ const Events: React.FC<EventsProps> = ({
     const params: { [key: string]: string } = {}
     searchParams.forEach((value, key) => (params[key] = value))
     setSearchParams({ ...params, [keyDate]: formatDateAPIQuery(e.toDate()) })
-    setState({ [keyDate]: formatDatePicker(e.toDate()), page: 0, rowExpanded: null } as any)
+    setState({
+      ...state,
+      [keyDate]: formatDatePicker(e.toDate()),
+      page: 0,
+      rowExpanded: null,
+    } as any)
   }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
@@ -154,6 +159,14 @@ const Events: React.FC<EventsProps> = ({
     saveAs(blob, `${title}.json`)
   }
 
+  const refresh = () => {
+    const dateFrom =
+      searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
+    const dateTo =
+      searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
+    fetchEvents(dateFrom, dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+  }
+
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
 
@@ -174,6 +187,17 @@ const Events: React.FC<EventsProps> = ({
                 ></Chip>
               </Box>
             </Box>
+            <Tooltip title={'Refresh'}>
+              <IconButton
+                color={'primary'}
+                size={'small'}
+                onClick={() => {
+                  refresh()
+                }}
+              >
+                <Refresh fontSize={'small'} />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box
             p={2}
@@ -202,7 +226,18 @@ const Events: React.FC<EventsProps> = ({
           {state.events?.length === 0 ? (
             <Box p={2}>
               <MqEmpty title={i18next.t('events_route.empty_title')}>
-                <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
+                <>
+                  <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
+                  <Button
+                    color={'primary'}
+                    size={'small'}
+                    onClick={() => {
+                      refresh()
+                    }}
+                  >
+                    Refresh
+                  </Button>
+                </>
               </MqEmpty>
             </Box>
           ) : (
