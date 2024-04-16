@@ -94,7 +94,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   }, [lineageDataset.name])
 
   useEffect(() => {
-    if (showTags === true) {
+    if (showTags) {
       fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
     }
   }, [showTags])
@@ -110,9 +110,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (versionsLoading) {
+  if (versionsLoading && versions.length === 0) {
     return (
-      <Box display={'flex'} justifyContent={'center'}>
+      <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
       </Box>
     )
