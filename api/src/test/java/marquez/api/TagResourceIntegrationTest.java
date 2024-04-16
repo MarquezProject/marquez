@@ -100,4 +100,38 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     // assert that only SENSITIVE remains
     assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags()).containsExactly("SENSITIVE");
   }
+
+  @Test
+  public void testApp_testDatasetTagFieldConflict() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create a source
+    createSource(DB_TABLE_SOURCE_NAME);
+    // Create Dataset
+    MARQUEZ_CLIENT.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    // tag dataset field
+    Dataset taggedDatasetField =
+        MARQUEZ_CLIENT.tagFieldWith(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+    // assert the tag TESTFIELDTAG has been added to field at position 0
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).contains("TESTFIELDTAG");
+    // assert a total of two tags exist on the field
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).hasSize(2);
+
+    // tag dataset field again to test ON CONFLICT DO NOTHING
+    Dataset taggedDatasetField2 =
+        MARQUEZ_CLIENT.tagFieldWith(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+    // assert the tag TESTFIELDTAG has been added to field at position 0
+    assertThat(taggedDatasetField2.getFields().get(0).getTags()).contains("TESTFIELDTAG");
+    // assert a total of two tags exist on the field
+    assertThat(taggedDatasetField2.getFields().get(0).getTags()).hasSize(2);
+  }
 }

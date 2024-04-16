@@ -129,7 +129,7 @@ public interface DatasetFieldDao extends BaseDao {
 
   @SqlUpdate(
       "INSERT INTO dataset_fields_tag_mapping (dataset_field_uuid, tag_uuid, tagged_at) "
-          + "VALUES (:rowUuid, :tagUuid, :taggedAt)")
+          + "VALUES (:rowUuid, :tagUuid, :taggedAt) ON CONFLICT DO NOTHING")
   void updateTags(UUID rowUuid, UUID tagUuid, Instant taggedAt);
 
   @SqlBatch(

@@ -118,10 +118,12 @@ export const deleteDatasetTag = (namespace: string, datasetName: string, tag: st
   },
 })
 
-export const deleteDatasetTagSuccess = (datasetName: string) => ({
+export const deleteDatasetTagSuccess = (namespace: string, datasetName: string, tag: string) => ({
   type: actionTypes.DELETE_DATASET_TAG_SUCCESS,
   payload: {
     datasetName,
+    namespace,
+    tag,
   },
 })
 
@@ -140,10 +142,18 @@ export const deleteDatasetFieldTag = (
   },
 })
 
-export const deleteDatasetFieldTagSuccess = (datasetName: string) => ({
+export const deleteDatasetFieldTagSuccess = (
+  namespace: string,
+  datasetName: string,
+  field: string,
+  tag: string
+) => ({
   type: actionTypes.DELETE_DATASET_FIELD_TAG_SUCCESS,
   payload: {
     datasetName,
+    namespace,
+    tag,
+    field,
   },
 })
 
@@ -156,10 +166,12 @@ export const addDatasetTag = (namespace: string, datasetName: string, tag: strin
   },
 })
 
-export const addDatasetTagSuccess = (datasetName: string) => ({
+export const addDatasetTagSuccess = (namespace: string, datasetName: string, tag: string) => ({
   type: actionTypes.ADD_DATASET_TAG_SUCCESS,
   payload: {
     datasetName,
+    namespace,
+    tag,
   },
 })
 
@@ -178,10 +190,18 @@ export const addDatasetFieldTag = (
   },
 })
 
-export const addDatasetFieldTagSuccess = (datasetName: string) => ({
+export const addDatasetFieldTagSuccess = (
+  namespace: string,
+  datasetName: string,
+  field: string,
+  tag: string
+) => ({
   type: actionTypes.ADD_DATASET_FIELD_TAG_SUCCESS,
   payload: {
     datasetName,
+    namespace,
+    field,
+    tag,
   },
 })
 

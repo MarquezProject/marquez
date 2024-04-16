@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Tab, Tabs, createTheme } from '@mui/material'
+import { Box, Button, Switch, Tab, Tabs, createTheme } from '@mui/material'
 import { CircularProgress } from '@mui/material'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
@@ -30,7 +30,7 @@ import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
+import React, { ChangeEvent, FunctionComponent, useEffect, useState } from 'react'
 
 interface StateProps {
   lineageDataset: LineageDataset
@@ -78,6 +78,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
   const [_, setSearchParams] = useSearchParams()
+  const [showTags, setShowTags] = useState(false)
 
   // unmounting
   useEffect(
@@ -90,7 +91,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name, datasets.refreshTags])
+  }, [lineageDataset.name])
+
+  useEffect(() => {
+    if (showTags === true) {
+      fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+    }
+  }, [showTags])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
@@ -193,7 +200,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </Tabs>
           </Box>
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           {facetsStatus && (
             <Box mr={1}>
               <MqStatus label={'Quality'} color={facetsStatus} />
@@ -202,6 +209,14 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           <MqText heading font={'mono'}>
             {name}
           </MqText>
+          <Box ml={1} display={'flex'} alignItems={'center'}>
+            <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
+            <Switch
+              checked={showTags}
+              onChange={() => setShowTags(!showTags)}
+              inputProps={{ 'aria-label': 'toggle show tags' }}
+            />
+          </Box>
         </Box>
         <Box mb={2}>
           <MqText subdued>{description}</MqText>
@@ -212,6 +227,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           datasetFields={firstVersion.fields}
           facets={firstVersion.facets}
           run={firstVersion.createdByRun}
+          showTags={showTags}
         />
       )}
       {tabIndex === 1 && <DatasetVersions versions={props.versions} />}
