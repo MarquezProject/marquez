@@ -103,11 +103,17 @@ const DatasetTags: React.FC<IProps> = (props) => {
     _reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
-    if (details) {
+    if (details && _reason === 'removeOption') {
+      const newTag = details.option
+      const newSelectedTags = selectedTags.filter((tag) => newTag !== tag)
+      setSelectedTags(newSelectedTags)
+      datasetField
+        ? deleteDatasetFieldTag(namespace, datasetName, newTag, datasetField)
+        : deleteDatasetTag(namespace, datasetName, newTag)
+    } else if (details && !selectedTags.includes(details.option)) {
       const newTag = details.option
       const newSelectedTags = [...selectedTags, newTag]
       setSelectedTags(newSelectedTags)
-
       datasetField
         ? addDatasetFieldTag(namespace, datasetName, newTag, datasetField)
         : addDatasetTag(namespace, datasetName, newTag)
