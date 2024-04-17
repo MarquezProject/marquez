@@ -103,7 +103,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
     _reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
-    
     if (details) {
       const newTag = details.option
       const newSelectedTags = [...selectedTags, newTag]
@@ -117,7 +116,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   const handleDelete = (deletedTag: string) => {
     const newSelectedTags = selectedTags.filter((tag) => deletedTag !== tag)
-    
+
     setSelectedTags(newSelectedTags)
 
     datasetField
@@ -228,6 +227,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
         />
       </Box>
       <Dialog
+        PaperProps={{
+          sx: { backgroundColor: theme.palette.background.default, backgroundImage: 'none' },
+        }}
         open={openTagDesc}
         fullWidth
         maxWidth='sm'

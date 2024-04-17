@@ -6,15 +6,12 @@ import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mu
 import { DatasetVersion } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { formatUpdatedAt } from '../../helpers'
-import { jobRunsStatus } from '../../helpers/nodes'
 import { useTheme } from '@emotion/react'
 import DatasetInfo from './DatasetInfo'
 import IconButton from '@mui/material/IconButton'
 import MqCopy from '../core/copy/MqCopy'
-import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
-import RunStatus from '../jobs/RunStatus'
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -97,7 +94,8 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
             >
               <TableCell align='left'>
                 <Box display={'flex'} alignItems={'center'}>
-                  {version.version.substring(0, 8)}... <MqCopy string={version.version} />
+                  {version.version.substring(0, 8)}...
+                  <MqCopy string={version.version} />
                 </Box>
               </TableCell>
               <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
@@ -114,7 +112,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
                   )}
                 </Box>
               </TableCell>
-              <TableCell align='left'>{version.lifecycleState}</TableCell>
+              <TableCell align='left'>{version.lifecycleState || 'N/A'}</TableCell>
             </TableRow>
           )
         })}

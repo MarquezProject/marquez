@@ -22,7 +22,6 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
-import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
@@ -192,11 +191,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 {...a11yProps(2)}
                 disableRipple={true}
               />
-              <Tab
-                label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(3)}
-                disableRipple={true}
-              />
             </Tabs>
           </Box>
         </Box>
@@ -206,17 +200,31 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
               <MqStatus label={'Quality'} color={facetsStatus} />
             </Box>
           )}
-          <MqText heading font={'mono'}>
-            {name}
-          </MqText>
-          <Box ml={1} display={'flex'} alignItems={'center'}>
-            <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
-            <Switch
-              checked={showTags}
-              onChange={() => setShowTags(!showTags)}
-              inputProps={{ 'aria-label': 'toggle show tags' }}
-            />
+          <Box display={'flex'} alignItems={'center'}>
+            <MqText heading font={'mono'}>
+              {name}
+            </MqText>
+            <Box ml={1}>
+              <MqText
+                link
+                linkTo={`/datasets/column-level/${encodeURIComponent(
+                  encodeURIComponent(firstVersion.id.namespace)
+                )}/${encodeURIComponent(firstVersion.id.name)}`}
+              >
+                COLUMN LEVEL
+              </MqText>
+            </Box>
           </Box>
+          {tabIndex === 0 && (
+            <Box ml={1} display={'flex'} alignItems={'center'}>
+              <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
+              <Switch
+                checked={showTags}
+                onChange={() => setShowTags(!showTags)}
+                inputProps={{ 'aria-label': 'toggle show tags' }}
+              />
+            </Box>
+          )}
         </Box>
         <Box mb={2}>
           <MqText subdued>{description}</MqText>
@@ -231,7 +239,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         />
       )}
       {tabIndex === 1 && <DatasetVersions versions={props.versions} />}
-      {tabIndex === 2 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
     </Box>
   )
 }
