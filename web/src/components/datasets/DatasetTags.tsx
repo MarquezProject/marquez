@@ -213,7 +213,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             <TextField
               variant={!datasetField ? 'outlined' : 'standard'}
               {...params}
-              placeholder={selectedTags.length > 0 ? '' : 'Add some Tags.'}
+              placeholder={selectedTags.length > 0 ? '' : 'Search Tags'}
               InputProps={{
                 ...params.InputProps,
                 ...(datasetField ? { disableUnderline: true } : {}),
