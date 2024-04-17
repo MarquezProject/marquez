@@ -194,7 +194,12 @@ const Jobs: React.FC<JobsProps> = ({
                           </MqText>
                         </TableCell>
                         <TableCell key={i18next.t('jobs_route.latest_run_col')} align='left'>
-       sta
+                          <MqStatus
+                            color={job.latestRun && runStateColor(job.latestRun.state || 'NEW')}
+                            label={
+                              job.latestRun && job.latestRun.state ? job.latestRun.state : 'N/A'
+                            }
+                          />
                         </TableCell>
                       </TableRow>
                     )
