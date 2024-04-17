@@ -7,10 +7,10 @@ import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
+import { DirectionsRun, Pause, Start } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../lineage/types'
 import { MqInfo } from '../core/info/MqInfo'
-import { Pause, Start } from '@mui/icons-material'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
@@ -162,7 +162,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Grid>
         <Grid item xs={4}>
           <MqInfo
-            icon={<Pause color={'disabled'} />}
+            icon={<DirectionsRun color={'disabled'} />}
             label={'State'}
             value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
           />
