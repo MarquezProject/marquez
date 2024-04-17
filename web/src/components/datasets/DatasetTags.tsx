@@ -1,7 +1,13 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
-import { Autocomplete, TextField } from '@mui/material'
+import {
+  Autocomplete,
+  AutocompleteChangeDetails,
+  AutocompleteChangeReason,
+  Checkbox,
+  TextField,
+} from '@mui/material'
 import { Box, createTheme } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Tag } from '../../types/api'
@@ -15,27 +21,18 @@ import {
 import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { useTheme } from '@emotion/react'
-import AddIcon from '@mui/icons-material/Add'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
+import CheckBoxIcon from '@mui/icons-material/CheckBox'
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank'
 import Chip from '@mui/material/Chip'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import EditNoteIcon from '@mui/icons-material/EditNote'
-import FormControl from '@mui/material/FormControl'
-import Grow from '@mui/material/Grow'
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
-import MenuItem from '@mui/material/MenuItem'
-import MenuList from '@mui/material/MenuList'
-import Paper from '@mui/material/Paper'
-import Popper from '@mui/material/Popper'
-import React, { useRef, useState } from 'react'
-import Select from '@mui/material/Select'
+import React, { useState } from 'react'
 import Snackbar from '@mui/material/Snackbar'
 
 interface DatasetTagsProps {
@@ -68,45 +65,22 @@ const DatasetTags: React.FC<IProps> = (props) => {
     addTags,
   } = props
 
-  const [isDialogOpen, setDialogOpen] = useState(false)
   const [listTag, setListTag] = useState('')
-  const closeDialog = () => setDialogOpen(false)
-  const i18next = require('i18next')
-  const options = ['Add a Tag', 'Edit a Tag Description']
-  const [openDropDown, setOpenDropDown] = useState(false)
   const [openTagDesc, setOpenTagDesc] = useState(false)
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const [selectedIndex, setSelectedIndex] = useState(0)
   const [tagDescription, setTagDescription] = useState('No Description')
+  const [selectedTags, setSelectedTags] = useState<string[]>(datasetTags)
+
   const handleButtonClick = () => {
-    options[selectedIndex] === 'Add a Tag' ? setDialogOpen(true) : setOpenTagDesc(true)
+    setOpenTagDesc(true)
   }
+
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const theme = createTheme(useTheme())
-
-  const handleMenuItemClick = (
-    _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-    index: number
-  ) => {
-    setSelectedIndex(index)
-    setOpenDropDown(false)
-  }
-
-  const handleDropDownToggle = () => {
-    setOpenDropDown((prevprevOpenDropDown) => !prevprevOpenDropDown)
-  }
 
   const handleTagDescClose = () => {
     setOpenTagDesc(false)
     setListTag('')
     setTagDescription('No Description')
-  }
-
-  const handleDropDownClose = (event: Event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return
-    }
-    setOpenDropDown(false)
   }
 
   const handleTagDescChange = (_event: any, value: string) => {
@@ -119,19 +93,33 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setTagDescription(event.target.value)
   }
 
-  const tagData = useSelector((state: IState) => state.tags.tags)
+  const tagData = useSelector((state: IState) =>
+    state.tags.tags.sort((a, b) => a.name.localeCompare(b.name))
+  )
 
-  const handleTagListChange = (event: any) => {
-    setListTag(event.target.value)
-  }
+  const handleTagChange = (
+    _event: React.SyntheticEvent,
+    _value: string[],
+    _reason: AutocompleteChangeReason,
+    details?: AutocompleteChangeDetails<string> | undefined
+  ) => {
+    
+    if (details) {
+      const newTag = details.option
+      const newSelectedTags = [...selectedTags, newTag]
+      setSelectedTags(newSelectedTags)
 
-  const handleTagChange = () => {
-    datasetField
-      ? addDatasetFieldTag(namespace, datasetName, listTag, datasetField)
-      : addDatasetTag(namespace, datasetName, listTag)
+      datasetField
+        ? addDatasetFieldTag(namespace, datasetName, newTag, datasetField)
+        : addDatasetTag(namespace, datasetName, newTag)
+    }
   }
 
   const handleDelete = (deletedTag: string) => {
+    const newSelectedTags = selectedTags.filter((tag) => deletedTag !== tag)
+    
+    setSelectedTags(newSelectedTags)
+
     datasetField
       ? deleteDatasetFieldTag(namespace, datasetName, deletedTag, datasetField)
       : deleteDatasetTag(namespace, datasetName, deletedTag)
@@ -146,19 +134,20 @@ const DatasetTags: React.FC<IProps> = (props) => {
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    return tags.map((tag) => {
+    return tags.map((tag, index) => {
       const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
       const tooltipTitle = tagDescription?.description || 'No Tag Description'
       return (
         <MQTooltip title={tooltipTitle} key={tag}>
           <Chip
             color={'primary'}
+            variant='outlined'
             label={tag}
             size='small'
             onDelete={() => handleDelete(tag)}
             style={{
               display: 'row',
-              marginLeft: theme.spacing(1),
+              marginLeft: index === 0 ? theme.spacing(0) : theme.spacing(1),
             }}
           />
         </MQTooltip>
@@ -176,121 +165,85 @@ const DatasetTags: React.FC<IProps> = (props) => {
         message={'Tag updated.'}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       />
-      <Box display={'flex'} alignItems={'center'}>
-        <MQText subheading>{i18next.t('dataset_tags.tags')}</MQText>
-        {formatTags(datasetTags, tagData)}
-        <ButtonGroup
-          variant='contained'
-          ref={anchorRef}
-          aria-label='tags-nested-menu'
-          sx={{ height: '32px', width: '20px', marginLeft: '8px' }}
-        >
-          <MQTooltip placement='left' title={options[selectedIndex]}>
+      <Box display={'flex'} alignItems='center' justifyContent='center'>
+        {!datasetField && (
+          <MQTooltip title='Edit a Tag' key='edit-tag'>
             <Button
               variant='outlined'
-              sx={{ height: '32px', width: '20px' }}
               onClick={handleButtonClick}
+              color='primary'
+              size='medium'
+              sx={{ marginRight: '8px' }}
+              startIcon={<LocalOfferIcon />}
             >
-              {selectedIndex === 0 ? <AddIcon /> : <EditNoteIcon />}
+              Edit Tag
             </Button>
           </MQTooltip>
-          <Button
-            variant='outlined'
-            size='small'
-            aria-controls={openDropDown ? 'split-button-menu' : undefined}
-            aria-expanded={openDropDown ? 'true' : undefined}
-            aria-label='tags-menu'
-            aria-haspopup='menu'
-            onClick={handleDropDownToggle}
-          >
-            <ArrowDropDownIcon />
-          </Button>
-        </ButtonGroup>
-      </Box>
-      <Popper
-        sx={{
-          zIndex: 1,
-        }}
-        open={openDropDown}
-        anchorEl={anchorRef.current}
-        role={undefined}
-        transition
-        disablePortal
-      >
-        {({ TransitionProps, placement }) => (
-          <Grow
-            {...TransitionProps}
-            style={{
-              transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
-            }}
-          >
-            <Paper>
-              <ClickAwayListener onClickAway={handleDropDownClose}>
-                <MenuList id='split-button-menu' autoFocusItem>
-                  {options.map((option, index) => (
-                    <MenuItem
-                      key={option}
-                      selected={index === selectedIndex}
-                      disabled={index === 1 && !!datasetField}
-                      onClick={(event) => handleMenuItemClick(event, index)}
-                    >
-                      {option}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
         )}
-      </Popper>
-      <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth maxWidth='sm'>
-        <DialogTitle>{i18next.t('dataset_tags.dialogtitle')}</DialogTitle>
-        <DialogContent>
-          <FormControl variant='outlined' size='small' fullWidth>
-            <Select
-              displayEmpty
-              value={listTag}
-              onChange={handleTagListChange}
-              inputProps={{
-                name: 'tags',
-                id: 'tag-select',
+        <Autocomplete
+          multiple
+          disableCloseOnSelect
+          id='dataset-tags'
+          sx={{ width: 516, flex: 1 }}
+          limitTags={!datasetField ? 5 : 4}
+          autoHighlight
+          disableClearable
+          disablePortal
+          options={tagData.map((option) => option.name)}
+          value={selectedTags}
+          onChange={handleTagChange}
+          renderTags={(value: string[]) => formatTags(value, tagData)}
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox
+                icon={<CheckBoxOutlineBlankIcon fontSize='small' />}
+                checkedIcon={<CheckBoxIcon fontSize='small' />}
+                style={{ marginRight: 4 }}
+                checked={selected}
+              />
+              <div>
+                <MQText bold>{option}</MQText>
+                <MQText subdued overflowHidden>
+                  {tagData.find((tagItem) => tagItem.name === option)?.description ||
+                    'No Tag Description'}
+                </MQText>
+              </div>
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              variant={!datasetField ? 'outlined' : 'standard'}
+              {...params}
+              placeholder={selectedTags.length > 0 ? '' : 'Add some Tags.'}
+              InputProps={{
+                ...params.InputProps,
+                ...(datasetField ? { disableUnderline: true } : {}),
               }}
-            >
-              <MenuItem value=''>{i18next.t('dataset_tags.selecttagtoadd')}</MenuItem>
-              {tagData.map((option) => (
-                <MenuItem
-                  style={{ whiteSpace: 'normal', maxWidth: '800px' }}
-                  key={option.name}
-                  value={option.name}
-                >
-                  <div>
-                    <MQText bold>{option.name}</MQText>
-                    <MQText subdued overflowHidden>
-                      {option.description || 'No Tag Description'}
-                    </MQText>
-                  </div>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button color='primary' onClick={handleTagChange} disabled={listTag === ''}>
-            {i18next.t('dataset_tags.addatagdialog')}
-          </Button>
-          <Button onClick={closeDialog} color='primary'>
-            {i18next.t('dataset_tags.canceltagdialog')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openTagDesc} fullWidth maxWidth='sm'>
+              InputLabelProps={{
+                shrink: true,
+              }}
+              size='small'
+            />
+          )}
+        />
+      </Box>
+      <Dialog
+        open={openTagDesc}
+        fullWidth
+        maxWidth='sm'
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            handleTagDescClose()
+          }
+        }}
+      >
         <DialogTitle>Select a Tag to change</DialogTitle>
         <DialogContent>
           <MQText subheading>Tag</MQText>
           <Autocomplete
             options={tagData.map((option) => option.name)}
-            freeSolo
             autoSelect
+            freeSolo
             onChange={handleTagDescChange}
             renderInput={(params) => (
               <TextField
