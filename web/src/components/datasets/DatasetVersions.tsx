@@ -9,9 +9,9 @@ import { formatUpdatedAt } from '../../helpers'
 import { useTheme } from '@emotion/react'
 import DatasetInfo from './DatasetInfo'
 import IconButton from '@mui/material/IconButton'
+import MqCopy from '../core/copy/MqCopy'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
-import RunStatus from '../jobs/RunStatus'
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -34,8 +34,8 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
     return (
       <>
         <Box display={'flex'} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-          <Chip label={infoView.version} />
-          <IconButton onClick={() => handleClick(null)} size='large'>
+          <Chip size={'small'} variant={'outlined'} label={infoView.version} />
+          <IconButton onClick={() => handleClick(null)} size='small'>
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
@@ -92,22 +92,27 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
               key={version.createdAt}
               onClick={() => handleClick(version)}
             >
-              <TableCell align='left'>{version.version}</TableCell>
+              <TableCell align='left'>
+                <Box display={'flex'} alignItems={'center'}>
+                  {version.version.substring(0, 8)}...
+                  <MqCopy string={version.version} />
+                </Box>
+              </TableCell>
               <TableCell align='left'>{formatUpdatedAt(version.createdAt)}</TableCell>
               <TableCell align='left'>{version.fields.length}</TableCell>
               <TableCell align='left'>
                 <Box display={'flex'} alignItems={'center'}>
                   {version.createdByRun ? (
                     <>
-                      <RunStatus run={version.createdByRun} />
-                      {version.createdByRun ? version.createdByRun.id : 'N/A'}
+                      {version.createdByRun.id.substring(0, 8)}...
+                      <MqCopy string={version.createdByRun.id} />
                     </>
                   ) : (
                     'N/A'
                   )}
                 </Box>
               </TableCell>
-              <TableCell align='left'>{version.lifecycleState}</TableCell>
+              <TableCell align='left'>{version.lifecycleState || 'N/A'}</TableCell>
             </TableRow>
           )
         })}

@@ -169,13 +169,6 @@ const Datasets: React.FC<DatasetsProps> = ({
                       <MqText inline subheading>
                         COLUMN LINEAGE
                       </MqText>
-                      <Chip
-                        sx={{ marginLeft: 1 }}
-                        size={'small'}
-                        variant={'outlined'}
-                        color={'warning'}
-                        label={'beta'}
-                      ></Chip>
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -226,7 +219,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                   encodeURIComponent(dataset.id.namespace)
                                 )}/${encodeURIComponent(dataset.id.name)}`}
                               >
-                                View
+                                VIEW
                               </MqText>
                             ) : (
                               <MqText>N/A</MqText>
