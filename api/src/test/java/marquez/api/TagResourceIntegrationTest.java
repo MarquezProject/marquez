@@ -135,7 +135,7 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     // assert the number of tags should be 0
     assertThat(taggedDeleteJob.getTags()).hasSize(0);
   }
-  
+
   public void testApp_testDatasetTagFieldConflict() {
     // Create Namespace
     createNamespace(NAMESPACE_NAME);
