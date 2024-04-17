@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Switch, Tab, Tabs, createTheme } from '@mui/material'
+import { Box, Button, Divider, Grid, Switch, Tab, Tabs, createTheme } from '@mui/material'
+import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
 import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
+import { MqInfo } from '../core/info/MqInfo'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -19,6 +21,7 @@ import {
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
+import { formatUpdatedAt } from '../../helpers'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
@@ -27,9 +30,11 @@ import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import ListIcon from '@mui/icons-material/List'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, useEffect, useState } from 'react'
+import StorageIcon from '@mui/icons-material/Storage'
 
 interface StateProps {
   lineageDataset: LineageDataset
@@ -173,28 +178,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </IconButton>
           </Box>
         </Box>
-        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              textColor='primary'
-              indicatorColor='primary'
-            >
-              <Tab
-                label={i18next.t('datasets.latest_tab')}
-                {...a11yProps(0)}
-                disableRipple={true}
-              />
-              <Tab
-                label={i18next.t('datasets.history_tab')}
-                {...a11yProps(2)}
-                disableRipple={true}
-              />
-            </Tabs>
-          </Box>
-        </Box>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} my={2}>
           {facetsStatus && (
             <Box mr={1}>
               <MqStatus label={'Quality'} color={facetsStatus} />
@@ -206,6 +190,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </MqText>
             <Box ml={1}>
               <MqText
+                small
                 link
                 linkTo={`/datasets/column-level/${encodeURIComponent(
                   encodeURIComponent(firstVersion.id.namespace)
@@ -219,6 +204,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             <Box ml={1} display={'flex'} alignItems={'center'}>
               <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
               <Switch
+                size={'small'}
                 checked={showTags}
                 onChange={() => setShowTags(!showTags)}
                 inputProps={{ 'aria-label': 'toggle show tags' }}
@@ -226,8 +212,46 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </Box>
           )}
         </Box>
-        <Box mb={2}>
+        <Box>
           <MqText subdued>{description}</MqText>
+        </Box>
+      </Box>
+      <Divider sx={{ my: 1 }} />
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Updated at'}
+            value={formatUpdatedAt(firstVersion.createdAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<StorageIcon color={'disabled'} />}
+            label={'Dataset Type'}
+            value={firstVersion.type}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<ListIcon color={'disabled'} />}
+            label={'Fields'}
+            value={`${firstVersion.fields.length} columns`}
+          />
+        </Grid>
+      </Grid>
+      <Divider sx={{ mt: 1 }} />
+      <Box display={'flex'} justifyContent={'space-between'} mb={2}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+          <Tabs
+            value={tabIndex}
+            onChange={handleChange}
+            textColor='primary'
+            indicatorColor='primary'
+          >
+            <Tab label={i18next.t('datasets.latest_tab')} {...a11yProps(0)} disableRipple={true} />
+            <Tab label={i18next.t('datasets.history_tab')} {...a11yProps(2)} disableRipple={true} />
+          </Tabs>
         </Box>
       </Box>
       {tabIndex === 0 && (

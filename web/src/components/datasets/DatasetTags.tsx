@@ -171,8 +171,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
               variant='outlined'
               onClick={handleButtonClick}
               color='primary'
-              size='medium'
               sx={{ marginRight: '8px' }}
+              style={{ paddingTop: '6.75px', paddingBottom: '6.75px' }}
               startIcon={<LocalOfferIcon />}
             >
               Edit Tag

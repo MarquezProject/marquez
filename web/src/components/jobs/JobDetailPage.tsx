@@ -109,6 +109,19 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         padding: theme.spacing(2),
       }}
     >
+      <Box display={'flex'} alignItems={'center'}>
+        {runs.length && (
+          <Box mr={1}>
+            <MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />
+          </Box>
+        )}
+        <MqText font={'mono'} heading>
+          {job.name}
+        </MqText>
+      </Box>
+      <Box mt={1}>
+        <MqText subdued>{job.description}</MqText>
+      </Box>
       <Box
         mb={2}
         display={'flex'}
@@ -165,20 +178,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
             <CloseIcon fontSize={'small'} />
           </IconButton>
         </Box>
-      </Box>
-      <Box display={'flex'} alignItems={'center'}>
-        {runs.length && (
-          <Box mr={1}>
-            <MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />
-          </Box>
-        )}
-        <MqText font={'mono'} heading>
-          {job.name}
-        </MqText>
-      </Box>
-
-      <Box mt={1}>
-        <MqText subdued>{job.description}</MqText>
       </Box>
       {tabIndex === 0 ? (
         job.latestRun ? (
