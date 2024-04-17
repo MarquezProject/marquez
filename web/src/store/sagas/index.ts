@@ -1,10 +1,16 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Effects from 'redux-saga/effects'
 import {
+  ADD_DATASET_FIELD_TAG,
+  ADD_DATASET_TAG,
+  ADD_TAGS,
   DELETE_DATASET,
+  DELETE_DATASET_FIELD_TAG,
+  DELETE_DATASET_TAG,
   DELETE_JOB,
+  FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
@@ -17,6 +23,7 @@ import {
   FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
 import {
+  ColumnLineageGraph,
   Dataset,
   DatasetVersion,
   Datasets,
@@ -34,24 +41,14 @@ const call: any = Effects.call
 
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
+
 import {
-  applicationError,
-  deleteDatasetSuccess,
-  deleteJobSuccess,
-  fetchDatasetSuccess,
-  fetchDatasetVersionsSuccess,
-  fetchDatasetsSuccess,
-  fetchEventsSuccess,
-  fetchFacetsSuccess,
-  fetchJobsSuccess,
-  fetchLineageSuccess,
-  fetchNamespacesSuccess,
-  fetchRunsSuccess,
-  fetchSearchSuccess,
-  fetchTagsSuccess,
-} from '../actionCreators'
-import {
+  addDatasetFieldTag,
+  addDatasetTag,
+  addTags,
   deleteDataset,
+  deleteDatasetFieldTag,
+  deleteDatasetTag,
   deleteJob,
   getDataset,
   getDatasetVersions,
@@ -64,6 +61,29 @@ import {
   getRuns,
   getTags,
 } from '../requests'
+import {
+  addDatasetFieldTagSuccess,
+  addDatasetTagSuccess,
+  addTagsSuccess,
+  applicationError,
+  deleteDatasetFieldTagSuccess,
+  deleteDatasetSuccess,
+  deleteDatasetTagSuccess,
+  deleteJobSuccess,
+  fetchColumnLineageSuccess,
+  fetchDatasetSuccess,
+  fetchDatasetVersionsSuccess,
+  fetchDatasetsSuccess,
+  fetchEventsSuccess,
+  fetchFacetsSuccess,
+  fetchJobsSuccess,
+  fetchLineageSuccess,
+  fetchNamespacesSuccess,
+  fetchRunsSuccess,
+  fetchSearchSuccess,
+  fetchTagsSuccess,
+} from '../actionCreators'
+import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getSearch } from '../requests/search'
 
@@ -99,6 +119,24 @@ export function* fetchLineage() {
         payload.depth
       )
       yield put(fetchLineageSuccess(result))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching lineage'))
+    }
+  }
+}
+
+export function* fetchColumnLineage() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_COLUMN_LINEAGE)
+      const result: ColumnLineageGraph = yield call(
+        getColumnLineage,
+        payload.nodeType,
+        payload.namespace,
+        payload.name,
+        payload.depth
+      )
+      yield put(fetchColumnLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
     }
@@ -223,6 +261,93 @@ export function* deleteDatasetSaga() {
   }
 }
 
+export function* deleteDatasetTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET_TAG)
+      yield call(deleteDatasetTag, payload.namespace, payload.datasetName, payload.tag)
+      yield put(deleteDatasetTagSuccess(payload.namespace, payload.datasetName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from dataset'))
+    }
+  }
+}
+
+export function* deleteDatasetFieldTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_DATASET_FIELD_TAG)
+      yield call(
+        deleteDatasetFieldTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag,
+        payload.field
+      )
+      yield put(
+        deleteDatasetFieldTagSuccess(
+          payload.namespace,
+          payload.datasetName,
+          payload.field,
+          payload.tag
+        )
+      )
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from dataset field'))
+    }
+  }
+}
+
+export function* addDatasetTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_DATASET_TAG)
+      yield call(addDatasetTag, payload.namespace, payload.datasetName, payload.tag)
+      yield put(addDatasetTagSuccess(payload.namespace, payload.datasetName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to dataset'))
+    }
+  }
+}
+
+export function* addDatasetFieldTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_DATASET_FIELD_TAG)
+      yield call(
+        addDatasetFieldTag,
+        payload.namespace,
+        payload.datasetName,
+        payload.tag,
+        payload.field
+      )
+      yield put(
+        addDatasetFieldTagSuccess(
+          payload.namespace,
+          payload.datasetName,
+          payload.field,
+          payload.tag
+        )
+      )
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to dataset field.'))
+    }
+  }
+}
+
+export function* addTagsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_TAGS)
+      yield call(addTags, payload.tag, payload.description)
+      yield put(addTagsSuccess())
+      yield call(fetchTags)
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding a tag.'))
+    }
+  }
+}
+
 export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
@@ -275,9 +400,15 @@ export default function* rootSaga(): Generator {
     fetchJobFacetsSaga(),
     fetchRunFacetsSaga(),
     fetchLineage(),
+    fetchColumnLineage(),
     fetchSearch(),
     deleteJobSaga(),
     deleteDatasetSaga(),
+    deleteDatasetTagSaga(),
+    addDatasetTagSaga(),
+    deleteDatasetFieldTagSaga(),
+    addDatasetFieldTagSaga(),
+    addTagsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

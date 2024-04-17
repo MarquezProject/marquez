@@ -22,6 +22,7 @@ interface OwnProps {
   inverse?: boolean
   highlight?: boolean
   paragraph?: boolean
+  overflowHidden?: boolean
   color?: string
   link?: boolean
   href?: string
@@ -48,6 +49,7 @@ const MqText: React.FC<MqTextProps> = ({
   link,
   linkTo,
   paragraph,
+  overflowHidden,
   href,
   inverse,
   inline,
@@ -115,9 +117,13 @@ const MqText: React.FC<MqTextProps> = ({
     },
     small: {
       fontSize: '.625rem',
+      lineHeight: 'inherit',
     },
     paragraph: {
       marginBottom: theme.spacing(2),
+    },
+    overflowHidden: {
+      overflow: 'hidden',
     },
   }
 
@@ -135,7 +141,8 @@ const MqText: React.FC<MqTextProps> = ({
     small ? classesObject.small : {},
     link ? classesObject.link : {},
     paragraph ? classesObject.paragraph : {},
-    subheading ? classesObject.subheading : {}
+    subheading ? classesObject.subheading : {},
+    overflowHidden ? classesObject.overflowHidden : {}
   )
 
   const style = {

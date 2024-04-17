@@ -7,9 +7,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
     title: 'Marquez Project',
-    tagline: 'Data lineage for every pipeline.',
+    tagline: 'The complete OpenLineage solution',
     favicon: 'img/favicon.ico',
-
 
     // Set the production url of your site here
     url: 'https://peppy-sprite-186812.netlify.app',
@@ -32,6 +31,7 @@ const config = {
         defaultLocale: 'en',
         locales: ['en'],
     },
+    
     headTags: [
         {
             tagName: 'link',
@@ -41,6 +41,7 @@ const config = {
             }
         }
     ],
+    
     presets: [
         [
             'classic',
@@ -114,6 +115,11 @@ const config = {
                         label: 'GitHub',
                         position: 'right',
                     },
+                    {
+                        href: 'https://openlineage.io',
+                        label: 'OpenLineage',
+                        position: 'right',
+                    },
                 ],
             },
             footer: {
@@ -143,6 +149,10 @@ const config = {
                                 label: 'Twitter/X',
                                 href: 'https://twitter.com/marquezproject',
                             },
+                            {
+                                label: 'OpenLineage',
+                                href: 'https://openlineage.io',
+                            }
                         ],
                     },
                     {
@@ -162,6 +172,15 @@ const config = {
                 theme: lightCodeTheme,
             },
         }),
+    
+    scripts: [
+        'js/google_analytics.js',
+        {
+            src: 'https://www.googletagmanager.com/gtag/js?id=G-223DXLT48B',
+            async: true,
+        },
+    ],
+    
     plugins: [
         [
             'docusaurus-plugin-openapi-docs',
@@ -177,6 +196,7 @@ const config = {
             },
         ]
     ],
+    
     themes: ["docusaurus-theme-openapi-docs"]
 };
 

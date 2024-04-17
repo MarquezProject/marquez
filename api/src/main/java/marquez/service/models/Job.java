@@ -5,6 +5,7 @@
 
 package marquez.service.models;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.net.URL;
 import java.time.Instant;
@@ -41,6 +42,7 @@ public final class Job {
   @Nullable @Setter private Run latestRun;
   @Getter private final ImmutableMap<String, Object> facets;
   @Nullable private UUID currentVersion;
+  @Getter @Nullable private ImmutableList<String> labels;
 
   public Job(
       @NonNull final JobId id,
@@ -56,7 +58,8 @@ public final class Job {
       @Nullable final String description,
       @Nullable final Run latestRun,
       @Nullable final ImmutableMap<String, Object> facets,
-      @Nullable UUID currentVersion) {
+      @Nullable UUID currentVersion,
+      @Nullable ImmutableList<String> labels) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -72,6 +75,7 @@ public final class Job {
     this.latestRun = latestRun;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
     this.currentVersion = currentVersion;
+    this.labels = (labels == null) ? ImmutableList.of() : labels;
   }
 
   public Optional<URL> getLocation() {

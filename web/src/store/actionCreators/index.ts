@@ -1,9 +1,10 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as actionTypes from './actionTypes'
 
 import {
+  ColumnLineageGraph,
   Dataset,
   DatasetVersion,
   Events,
@@ -105,6 +106,102 @@ export const deleteDatasetSuccess = (datasetName: string) => ({
   type: actionTypes.DELETE_DATASET_SUCCESS,
   payload: {
     datasetName,
+  },
+})
+
+export const deleteDatasetTag = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.DELETE_DATASET_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+  },
+})
+
+export const deleteDatasetTagSuccess = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.DELETE_DATASET_TAG_SUCCESS,
+  payload: {
+    datasetName,
+    namespace,
+    tag,
+  },
+})
+
+export const deleteDatasetFieldTag = (
+  namespace: string,
+  datasetName: string,
+  tag: string,
+  field: string
+) => ({
+  type: actionTypes.DELETE_DATASET_FIELD_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+    field,
+  },
+})
+
+export const deleteDatasetFieldTagSuccess = (
+  namespace: string,
+  datasetName: string,
+  field: string,
+  tag: string
+) => ({
+  type: actionTypes.DELETE_DATASET_FIELD_TAG_SUCCESS,
+  payload: {
+    datasetName,
+    namespace,
+    tag,
+    field,
+  },
+})
+
+export const addDatasetTag = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.ADD_DATASET_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+  },
+})
+
+export const addDatasetTagSuccess = (namespace: string, datasetName: string, tag: string) => ({
+  type: actionTypes.ADD_DATASET_TAG_SUCCESS,
+  payload: {
+    datasetName,
+    namespace,
+    tag,
+  },
+})
+
+export const addDatasetFieldTag = (
+  namespace: string,
+  datasetName: string,
+  tag: string,
+  field: string
+) => ({
+  type: actionTypes.ADD_DATASET_FIELD_TAG,
+  payload: {
+    namespace,
+    datasetName,
+    tag,
+    field,
+  },
+})
+
+export const addDatasetFieldTagSuccess = (
+  namespace: string,
+  datasetName: string,
+  field: string,
+  tag: string
+) => ({
+  type: actionTypes.ADD_DATASET_FIELD_TAG_SUCCESS,
+  payload: {
+    datasetName,
+    namespace,
+    field,
+    tag,
   },
 })
 
@@ -213,6 +310,18 @@ export const fetchTagsSuccess = (tags: Tag[]) => ({
   },
 })
 
+export const addTags = (tag: string, description: string) => ({
+  type: actionTypes.ADD_TAGS,
+  payload: {
+    tag,
+    description,
+  },
+})
+
+export const addTagsSuccess = () => ({
+  type: actionTypes.ADD_TAGS_SUCCESS,
+})
+
 export const applicationError = (message: string) => ({
   type: actionTypes.APPLICATION_ERROR,
   payload: {
@@ -257,9 +366,29 @@ export const fetchLineage = (
   },
 })
 
+export const fetchColumnLineage = (
+  nodeType: JobOrDataset,
+  namespace: string,
+  name: string,
+  depth: number
+) => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE,
+  payload: {
+    nodeType,
+    namespace,
+    name,
+    depth,
+  },
+})
+
 export const fetchLineageSuccess = (lineage: LineageGraph) => ({
   type: actionTypes.FETCH_LINEAGE_SUCCESS,
   payload: lineage,
+})
+
+export const fetchColumnLineageSuccess = (columnLineage: ColumnLineageGraph) => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE_SUCCESS,
+  payload: columnLineage,
 })
 
 export const resetLineage = () => ({
@@ -293,4 +422,9 @@ export const fetchSearch = (q: string, filter: string, sort: string) => ({
 export const fetchSearchSuccess = (search: Search) => ({
   type: actionTypes.FETCH_SEARCH_SUCCESS,
   payload: search,
+})
+
+export const setColumnLineageGraphDepth = (depth: number) => ({
+  type: actionTypes.SET_COLUMN_LINEAGE_GRAPH_DEPTH,
+  payload: depth,
 })

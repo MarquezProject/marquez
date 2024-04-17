@@ -1,4 +1,4 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
@@ -41,4 +41,42 @@ export const getDataset = async (namespace: string, dataset: string) => {
 export const deleteDataset = async (datasetName: string, namespace: string) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/datasets/${datasetName}`
   return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteDataset')
+}
+
+export const deleteDatasetTag = async (namespace: string, datasetName: string, tag: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/datasets/${datasetName}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteDatasetTag')
+}
+
+export const addDatasetTag = async (namespace: string, datasetName: string, tag: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/datasets/${datasetName}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'POST' }, 'addDatasetTag')
+}
+
+export const deleteDatasetFieldTag = async (
+  namespace: string,
+  datasetName: string,
+  tag: string,
+  field: string
+) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/datasets/${datasetName}/fields/${field}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteDatasetFieldTag')
+}
+
+export const addDatasetFieldTag = async (
+  namespace: string,
+  datasetName: string,
+  tag: string,
+  field: string
+) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(
+    namespace
+  )}/datasets/${datasetName}/fields/${field}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'POST' }, 'addDatasetFieldTag')
 }

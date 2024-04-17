@@ -11,6 +11,7 @@ export const genericErrorMessageConstructor = (functionName: string, error: APIE
 export interface IParams {
   method: HttpMethod
   body?: string
+  headers?: Record<string, string>
 }
 
 export const parseResponse = async (response: Response, functionName: string) => {
@@ -27,7 +28,7 @@ export const parseResponse = async (response: Response, functionName: string) =>
       const errorMessage = json || {
         code: response.status,
         message: 'Unknown error occurred',
-        details: body
+        details: body,
       }
       const error = genericErrorMessageConstructor(functionName, errorMessage)
       throw new Error(error)

@@ -71,6 +71,14 @@ i18next
           namespace_select: {
             prompt: 'ns',
           },
+          dataset_tags: {
+            tags: 'TAGS',
+            tooltip: 'Add a Tag',
+            dialogtitle: 'Add Tags',
+            selecttagtoadd: 'Select Tag to add...',
+            addatagdialog: 'Add Tag',
+            canceltagdialog: 'Cancel',
+          },
           dataset_info: {
             empty_title: 'No Fields',
             empty_body: 'Try adding dataset fields.',
@@ -85,6 +93,7 @@ i18next
             column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?',
+            show_field_tags: 'Show Field Tags',
           },
           datasets_route: {
             empty_title: 'No datasets found',
@@ -122,7 +131,6 @@ i18next
             name: 'NAME',
             type: 'TYPE',
             description: 'DESCRIPTION',
-            tags: 'TAGS',
           },
           dataset_versions_columns: {
             version: 'VERSION',
@@ -196,6 +204,13 @@ i18next
           namespace_select: {
             prompt: 'en',
           },
+          dataset_tags: {
+            tooltip: 'Ajouter une balise',
+            dialogtitle: 'Ajouter des balises',
+            selecttagtoadd: 'Sélectionnez la balise à ajouter',
+            addatagdialog: 'Ajouter une étiquette',
+            canceltagdialog: 'Annuler',
+          },
           dataset_info: {
             empty_title: 'Aucun jeu de données trouvé',
             empty_body: "Essayez d'ajouter des champs de jeu de données.",
@@ -249,7 +264,6 @@ i18next
             name: 'NOM',
             type: 'TAPER',
             description: 'DESCRIPTION',
-            tags: 'MOTS CLÉS',
           },
           dataset_versions_columns: {
             version: 'VERSION',
@@ -324,6 +338,13 @@ i18next
           namespace_select: {
             prompt: 'en',
           },
+          dataset_tags: {
+            tooltip: 'Añadir una etiqueta',
+            dialogtitle: 'Agregar etiquetas',
+            selecttagtoadd: 'Seleccione Etiqueta para agregar',
+            addatagdialog: 'Añadir etiqueta',
+            canceltagdialog: 'Cancelar',
+          },
           dataset_info: {
             empty_title: 'No se encontraron conjuntos de datos',
             empty_body: 'Intente agregar campos de conjuntos de datos.',
@@ -377,7 +398,6 @@ i18next
             name: 'NOMBRE',
             type: 'ESCRIBE',
             description: 'DESCRIPCIÓN',
-            tags: 'ETIQUETAS',
           },
           dataset_versions_columns: {
             version: 'VERSIÓN',
@@ -452,6 +472,13 @@ i18next
           namespace_select: {
             prompt: 'pn',
           },
+          dataset_tags: {
+            tooltip: 'Dodać etykietę',
+            dialogtitle: 'Dodaj tagi',
+            selecttagtoadd: 'Wybierz opcję Tag, który chcesz dodać',
+            addatagdialog: 'Dodaj znacznik',
+            canceltagdialog: 'anulować',
+          },
           dataset_info: {
             empty_title: 'Nie znaleziono zbiorów danych',
             empty_body: 'Spróbuj dodać pola zbiory danych.',
@@ -505,7 +532,6 @@ i18next
             name: 'NAZWA',
             type: 'RODZAJ',
             description: 'OPIS',
-            tags: 'TAGI',
           },
           dataset_versions_columns: {
             version: 'WERSJA',

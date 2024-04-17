@@ -111,7 +111,7 @@ In this simple example, we showed you how to write sample lineage metadata to a 
 
 ## Feedback
 
-What did you think of this guide? You can reach out to us on [slack](http://bit.ly/Mqz_invite) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
+What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
 
 ----
 SPDX-License-Identifier: Apache-2.0

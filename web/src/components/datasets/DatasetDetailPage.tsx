@@ -2,37 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Chip, Tab, Tabs, createTheme } from '@mui/material'
+import { Box, Button, Switch, Tab, Tabs, createTheme } from '@mui/material'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion, Tag } from '../../types/api'
+import { DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../lineage/types'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
   fetchDatasetVersions,
-  fetchTags,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
+import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import Io from '../io/Io'
-import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
+import React, { ChangeEvent, FunctionComponent, useEffect, useState } from 'react'
 
 interface StateProps {
   lineageDataset: LineageDataset
@@ -50,7 +49,6 @@ interface DispatchProps {
   deleteDataset: typeof deleteDataset
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
-  fetchTags: typeof fetchTags
 }
 
 type IProps = StateProps & DispatchProps
@@ -76,23 +74,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     lineageDataset,
     tabIndex,
     setTabIndex,
-    fetchTags,
   } = props
   const navigate = useNavigate()
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
-  const tagData = useSelector((state: IState) => state.tags.tags)
-
-  useEffect(() => {
-    fetchDatasetVersions(props.lineageDataset.namespace, props.lineageDataset.name)
-    fetchTags()
-  }, [props.lineageDataset.name])
-
-  useEffect(() => {
-    if (datasets.deletedDatasetName) {
-      navigate('/datasets')
-    }
-  }, [datasets.deletedDatasetName])
+  const [_, setSearchParams] = useSearchParams()
+  const [showTags, setShowTags] = useState(false)
 
   // unmounting
   useEffect(
@@ -102,6 +89,23 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     },
     []
   )
+
+  useEffect(() => {
+    fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+  }, [lineageDataset.name])
+
+  useEffect(() => {
+    if (showTags === true) {
+      fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+    }
+  }, [showTags])
+
+  // if the dataset is deleted then redirect to datasets end point
+  useEffect(() => {
+    if (datasets.deletedDatasetName) {
+      navigate('/datasets')
+    }
+  }, [datasets.deletedDatasetName])
 
   const handleChange = (_: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
@@ -123,30 +127,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
-  const formatTags = (tags: string[], tag_desc: Tag[]) => {
-    const theme = createTheme(useTheme())
-    return (
-      <>
-        {tags.map((tag, index) => {
-          const tagDescription = tag_desc.find((tagItem) => tagItem.name === tag)
-          const tooltipTitle = tagDescription?.description || 'No Tag Description'
-          return (
-            <MQTooltip title={tooltipTitle} key={tag}>
-              <Chip
-                label={tag}
-                size='small'
-                style={{
-                  display: 'inline',
-                  marginRight: index < tags.length - 1 ? theme.spacing(1) : 0,
-                }}
-              />
-            </MQTooltip>
-          )
-        })}
-      </>
-    )
-  }
-
   return (
     <Box
       my={2}
@@ -155,33 +135,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        {formatTags(tags, tagData)}
-        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              textColor='primary'
-              indicatorColor='primary'
-            >
-              <Tab
-                label={i18next.t('datasets.latest_tab')}
-                {...a11yProps(0)}
-                disableRipple={true}
-              />
-              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
-              <Tab
-                label={i18next.t('datasets.history_tab')}
-                {...a11yProps(2)}
-                disableRipple={true}
-              />
-              <Tab
-                label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(3)}
-                disableRipple={true}
-              />
-            </Tabs>
-          </Box>
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+          <DatasetTags
+            datasetTags={tags}
+            datasetName={lineageDataset.name}
+            namespace={lineageDataset.namespace}
+          />
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
               <Button
@@ -210,20 +169,55 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                 }}
               />
             </Box>
-            <IconButton onClick={() => navigate('/datasets')}>
-              <CloseIcon />
+            <IconButton onClick={() => setSearchParams({})}>
+              <CloseIcon fontSize={'small'} />
             </IconButton>
           </Box>
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
+        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+            <Tabs
+              value={tabIndex}
+              onChange={handleChange}
+              textColor='primary'
+              indicatorColor='primary'
+            >
+              <Tab
+                label={i18next.t('datasets.latest_tab')}
+                {...a11yProps(0)}
+                disableRipple={true}
+              />
+              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
+              <Tab
+                label={i18next.t('datasets.history_tab')}
+                {...a11yProps(2)}
+                disableRipple={true}
+              />
+              <Tab
+                label={i18next.t('datasets.column_lineage_tab')}
+                {...a11yProps(3)}
+                disableRipple={true}
+              />
+            </Tabs>
+          </Box>
+        </Box>
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           {facetsStatus && (
             <Box mr={1}>
-              <MqStatus color={facetsStatus} />
+              <MqStatus label={'Quality'} color={facetsStatus} />
             </Box>
           )}
           <MqText heading font={'mono'}>
             {name}
           </MqText>
+          <Box ml={1} display={'flex'} alignItems={'center'}>
+            <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
+            <Switch
+              checked={showTags}
+              onChange={() => setShowTags(!showTags)}
+              inputProps={{ 'aria-label': 'toggle show tags' }}
+            />
+          </Box>
         </Box>
         <Box mb={2}>
           <MqText subdued>{description}</MqText>
@@ -234,6 +228,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           datasetFields={firstVersion.fields}
           facets={firstVersion.facets}
           run={firstVersion.createdByRun}
+          showTags={showTags}
         />
       )}
       {tabIndex === 1 && <Io />}
@@ -260,7 +255,6 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteDataset: deleteDataset,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
-      fetchTags: fetchTags,
     },
     dispatch
   )
