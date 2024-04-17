@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import Box from '@mui/material/Box/Box'
+import Box from '@mui/material/Box'
 import MqText from '../text/MqText'
 import React, { ReactElement } from 'react'
 
