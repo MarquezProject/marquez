@@ -103,12 +103,17 @@ const DatasetTags: React.FC<IProps> = (props) => {
     _reason: AutocompleteChangeReason,
     details?: AutocompleteChangeDetails<string> | undefined
   ) => {
-    
-    if (details) {
+    if (details && _reason === 'removeOption') {
+      const newTag = details.option
+      const newSelectedTags = selectedTags.filter((tag) => newTag !== tag)
+      setSelectedTags(newSelectedTags)
+      datasetField
+        ? deleteDatasetFieldTag(namespace, datasetName, newTag, datasetField)
+        : deleteDatasetTag(namespace, datasetName, newTag)
+    } else if (details && !selectedTags.includes(details.option)) {
       const newTag = details.option
       const newSelectedTags = [...selectedTags, newTag]
       setSelectedTags(newSelectedTags)
-
       datasetField
         ? addDatasetFieldTag(namespace, datasetName, newTag, datasetField)
         : addDatasetTag(namespace, datasetName, newTag)
@@ -117,7 +122,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   const handleDelete = (deletedTag: string) => {
     const newSelectedTags = selectedTags.filter((tag) => deletedTag !== tag)
-    
+
     setSelectedTags(newSelectedTags)
 
     datasetField
@@ -172,8 +177,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
               variant='outlined'
               onClick={handleButtonClick}
               color='primary'
-              size='medium'
               sx={{ marginRight: '8px' }}
+              style={{ paddingTop: '6.75px', paddingBottom: '6.75px' }}
               startIcon={<LocalOfferIcon />}
             >
               Edit Tag
@@ -214,7 +219,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             <TextField
               variant={!datasetField ? 'outlined' : 'standard'}
               {...params}
-              placeholder={selectedTags.length > 0 ? '' : 'Add some Tags.'}
+              placeholder={selectedTags.length > 0 ? '' : 'Search Tags'}
               InputProps={{
                 ...params.InputProps,
                 ...(datasetField ? { disableUnderline: true } : {}),
@@ -228,6 +233,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
         />
       </Box>
       <Dialog
+        PaperProps={{
+          sx: { backgroundColor: theme.palette.background.default, backgroundImage: 'none' },
+        }}
         open={openTagDesc}
         fullWidth
         maxWidth='sm'

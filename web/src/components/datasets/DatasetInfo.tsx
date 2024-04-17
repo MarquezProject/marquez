@@ -1,7 +1,7 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
-import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
+import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
 import { Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { connect, useSelector } from 'react-redux'
@@ -101,9 +101,13 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               {datasetFields.map((field) => {
                 return (
                   <React.Fragment key={field.name}>
-                    <TableRow sx={{ cursor: 'pointer' }}>
+                    <TableRow>
                       <TableCell align='left'>{field.name}</TableCell>
-                      {!showTags && <TableCell align='left'>{field.type}</TableCell>}
+                      {!showTags && (
+                        <TableCell align='left'>
+                          <Chip size={'small'} label={field.type} variant={'outlined'} />
+                        </TableCell>
+                      )}
                       {!showTags && (
                         <TableCell align='left'>{field.description || 'no description'}</TableCell>
                       )}
