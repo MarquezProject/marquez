@@ -5,9 +5,12 @@ import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box, Button, CircularProgress, Tab, Tabs } from '@mui/material'
+import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
+import { CalendarIcon } from '@mui/x-date-pickers'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../lineage/types'
+import { MqInfo } from '../core/info/MqInfo'
+import { Pause, Start } from '@mui/icons-material'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
@@ -20,7 +23,9 @@ import {
   resetRuns,
   setTabIndex,
 } from '../../store/actionCreators'
+import { formatUpdatedAt } from '../../helpers'
 import { jobRunsStatus } from '../../helpers/nodes'
+import { stopWatchDuration } from '../../helpers/time'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
@@ -31,6 +36,7 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
+import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -110,11 +116,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box display={'flex'} alignItems={'center'}>
-        {runs.length && (
-          <Box mr={1}>
-            <MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />
-          </Box>
-        )}
         <MqText font={'mono'} heading>
           {job.name}
         </MqText>
@@ -122,6 +123,52 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       <Box mt={1}>
         <MqText subdued>{job.description}</MqText>
       </Box>
+      <Divider sx={{ my: 1 }} />
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Created at'}
+            value={formatUpdatedAt(job.createdAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Updated at'}
+            value={formatUpdatedAt(job.updatedAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<SpeedRounded color={'disabled'} />}
+            label={'Last Runtime'}
+            value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<Start color={'disabled'} />}
+            label={'Last Started'}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<Pause color={'disabled'} />}
+            label={'Last Finished'}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<Pause color={'disabled'} />}
+            label={'State'}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+          />
+        </Grid>
+      </Grid>
+      <Divider sx={{ my: 1 }} />
       <Box
         mb={2}
         display={'flex'}
