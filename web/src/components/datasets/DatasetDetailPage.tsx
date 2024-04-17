@@ -2,7 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Divider, Grid, Switch, Tab, Tabs, createTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  Divider,
+  FormControlLabel,
+  Grid,
+  Switch,
+  Tab,
+  Tabs,
+  createTheme,
+} from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
 import { DatasetVersion } from '../../types/api'
@@ -202,12 +212,16 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           </Box>
           {tabIndex === 0 && (
             <Box ml={1} display={'flex'} alignItems={'center'}>
-              <MqText subheading>{i18next.t('datasets.show_field_tags')}</MqText>
-              <Switch
-                size={'small'}
-                checked={showTags}
-                onChange={() => setShowTags(!showTags)}
-                inputProps={{ 'aria-label': 'toggle show tags' }}
+              <FormControlLabel
+                control={
+                  <Switch
+                    size={'small'}
+                    checked={showTags}
+                    onChange={() => setShowTags(!showTags)}
+                    inputProps={{ 'aria-label': 'toggle show tags' }}
+                  />
+                }
+                label={i18next.t('datasets.show_field_tags')}
               />
             </Box>
           )}

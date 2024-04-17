@@ -101,7 +101,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
               {datasetFields.map((field) => {
                 return (
                   <React.Fragment key={field.name}>
-                    <TableRow sx={{ cursor: 'pointer' }}>
+                    <TableRow>
                       <TableCell align='left'>{field.name}</TableCell>
                       {!showTags && (
                         <TableCell align='left'>

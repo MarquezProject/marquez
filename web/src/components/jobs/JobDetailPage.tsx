@@ -7,7 +7,7 @@ import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
-import { DirectionsRun, Pause, Start } from '@mui/icons-material'
+import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../lineage/types'
 import { MqInfo } from '../core/info/MqInfo'
@@ -115,71 +115,10 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         padding: theme.spacing(2),
       }}
     >
-      <Box display={'flex'} alignItems={'center'}>
+      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
         <MqText font={'mono'} heading>
           {job.name}
         </MqText>
-      </Box>
-      <Box mt={1}>
-        <MqText subdued>{job.description}</MqText>
-      </Box>
-      <Divider sx={{ my: 1 }} />
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<CalendarIcon color={'disabled'} />}
-            label={'Created at'}
-            value={formatUpdatedAt(job.createdAt)}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<CalendarIcon color={'disabled'} />}
-            label={'Updated at'}
-            value={formatUpdatedAt(job.updatedAt)}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<SpeedRounded color={'disabled'} />}
-            label={'Last Runtime'}
-            value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<Start color={'disabled'} />}
-            label={'Last Started'}
-            value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<Pause color={'disabled'} />}
-            label={'Last Finished'}
-            value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <MqInfo
-            icon={<DirectionsRun color={'disabled'} />}
-            label={'State'}
-            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
-          />
-        </Grid>
-      </Grid>
-      <Divider sx={{ my: 1 }} />
-      <Box
-        mb={2}
-        display={'flex'}
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
-      >
-        <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
-          <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
-          <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
-        </Tabs>
         <Box display={'flex'} alignItems={'center'}>
           <Box mr={1}>
             <Button
@@ -221,10 +160,73 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
               {i18next.t('jobs.location')}
             </Button>
           </Box>
-          <IconButton onClick={() => setSearchParams({})} size='large'>
+          <IconButton onClick={() => setSearchParams({})} size='small'>
             <CloseIcon fontSize={'small'} />
           </IconButton>
         </Box>
+      </Box>
+      {job.description && (
+        <Box mt={1}>
+          <MqText subdued>{job.description}</MqText>
+        </Box>
+      )}
+      <Divider sx={{ mt: 2, mb: 1 }} />
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Created at'}
+            value={formatUpdatedAt(job.createdAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Updated at'}
+            value={formatUpdatedAt(job.updatedAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<SpeedRounded color={'disabled'} />}
+            label={'Last Runtime'}
+            value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<Start color={'disabled'} />}
+            label={'Last Started'}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<SportsScore color={'disabled'} />}
+            label={'Last Finished'}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<DirectionsRun color={'disabled'} />}
+            label={'Running Status'}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+          />
+        </Grid>
+      </Grid>
+      <Divider sx={{ my: 1 }} />
+      <Box
+        mb={2}
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+      >
+        <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
+          <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
+          <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
+        </Tabs>
       </Box>
       {tabIndex === 0 ? (
         job.latestRun ? (
