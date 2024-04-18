@@ -213,6 +213,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                     checked={showTags}
                     onChange={() => setShowTags(!showTags)}
                     inputProps={{ 'aria-label': 'toggle show tags' }}
+                    disabled={versionsLoading}
                   />
                 }
                 label={i18next.t('datasets.show_field_tags')}
