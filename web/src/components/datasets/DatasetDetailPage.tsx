@@ -105,13 +105,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name])
-
-  useEffect(() => {
-    if (showTags) {
-      fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-    }
-  }, [showTags])
+  }, [lineageDataset.name, showTags])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
@@ -219,6 +213,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                     checked={showTags}
                     onChange={() => setShowTags(!showTags)}
                     inputProps={{ 'aria-label': 'toggle show tags' }}
+                    disabled={versionsLoading}
                   />
                 }
                 label={i18next.t('datasets.show_field_tags')}
