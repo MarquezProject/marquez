@@ -1,7 +1,7 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import { IState } from '../../store/reducers'
-import { LineageDataset, LineageJob } from '../../components/lineage/types'
+import { LineageDataset, LineageJob } from '../../types/lineage'
 import { LineageGraph } from '../../types/api'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'

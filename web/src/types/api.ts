@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { JobOrDataset, LineageNode } from '../components/lineage/types'
+import { JobOrDataset, LineageNode } from './lineage'
 
 export interface Tag {
   name: string
