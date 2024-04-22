@@ -3,7 +3,7 @@
 
 import { Box, darken } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { JobOrDataset } from '../lineage/types'
+import { JobOrDataset } from '../../types/lineage'
 import { Link as RouterLink } from 'react-router-dom'
 import { SearchResult } from '../../types/api'
 import { encodeNode } from '../../helpers/nodes'

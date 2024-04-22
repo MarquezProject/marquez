@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { getSelectedPaths, initGraph, buildGraphAll } from '../../components/lineage/Lineage'
-import { LineageNode, MqNode } from '../../components/lineage/types'
+import { LineageNode, MqNode } from '../../types/lineage'
 import { graphlib } from 'dagre'
 
 class MockEdge {

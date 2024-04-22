@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageGraph } from '../../types/api'
-import { LineageJob } from '../../components/lineage/types'
+import { LineageJob } from '../../types/lineage'
 import { PositionedNode } from '../../../libs/graph'
 import { TableLineageJobNodeData } from './nodes'
 import { connect } from 'react-redux'
