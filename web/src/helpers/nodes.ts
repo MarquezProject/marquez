@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DataQualityFacets, EventType, Run, RunState } from '../types/api'
-import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../types/lineage'
 import { Undefinable } from '../types/util/Nullable'
 import { theme } from './theme'
 

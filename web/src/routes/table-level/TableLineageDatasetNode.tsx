@@ -1,7 +1,7 @@
 import { ChevronLeft } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
-import { LineageDataset } from '../../components/lineage/types'
+import { LineageDataset } from '../../types/lineage'
 import { LineageGraph } from '../../types/api'
 import { PositionedNode } from '../../../libs/graph'
 import { THEME_EXTRA, theme } from '../../helpers/theme'

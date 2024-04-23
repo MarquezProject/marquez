@@ -9,7 +9,7 @@ import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/ma
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
-import { LineageJob } from '../lineage/types'
+import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
