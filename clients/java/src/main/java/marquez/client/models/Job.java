@@ -7,7 +7,6 @@ package marquez.client.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Map;
@@ -51,8 +50,7 @@ public final class Job extends JobMeta {
       @Nullable final Run latestRun,
       @Nullable final Map<String, Object> facets,
       @Nullable UUID currentVersion,
-      @Nullable final Set<String> tags
-      ) {
+      @Nullable final Set<String> tags) {
     super(type, inputs, outputs, location, description, null, tags);
     this.id = id;
     this.name = name;
