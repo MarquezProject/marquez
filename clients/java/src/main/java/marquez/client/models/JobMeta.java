@@ -22,7 +22,7 @@ public class JobMeta {
   @Getter private final JobType type;
   @Getter private final Set<DatasetId> inputs;
   @Getter private final Set<DatasetId> outputs;
-  @Getter @NonNull private final Set<String> tags;
+  @Getter @Nullable private final Set<String> tags;
   @Nullable private final URL location;
   @Nullable String description;
   @Nullable String runId;

@@ -161,7 +161,6 @@ abstract class BaseResourceIntegrationTest {
             .description(JOB_DESCRIPTION)
             .tags(JOB_TAGS)
             .build();
-    System.out.println(JOB_META);
     // (2) Configure Marquez application using test configuration and database.
     MARQUEZ_APP =
         new DropwizardAppExtension<>(

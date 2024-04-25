@@ -45,7 +45,7 @@ public final class Job {
   @Getter private final ImmutableMap<String, Object> facets;
   @Nullable private UUID currentVersion;
   @Getter @Nullable private ImmutableList<String> labels;
-  @Getter private final ImmutableSet<TagName> tags;
+  @Getter @Nullable private final ImmutableSet<TagName> tags;
 
   public Job(
       @NonNull final JobId id,

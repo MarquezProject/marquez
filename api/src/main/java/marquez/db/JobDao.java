@@ -457,7 +457,7 @@ public interface JobDao extends BaseDao {
       NOW(),
       NOW(),
       :tagName,
-      'No Description'
+      NULL
     WHERE
         NOT EXISTS (SELECT 1 FROM tags WHERE name = :tagName)
     RETURNING uuid
