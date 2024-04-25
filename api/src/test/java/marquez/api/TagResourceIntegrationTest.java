@@ -111,7 +111,7 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
 
     // Tag Dataset with TESTDATASETTAG tag
     Job taggedJob = MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
-    
+
     assertThat(taggedJob.getTags()).contains("TESTDATASETTAG");
     // assert the number of tags should be 1
     assertThat(taggedJob.getTags()).hasSize(1);
