@@ -220,7 +220,18 @@ public interface DatasetFieldDao extends BaseDao {
           + "FROM dataset_fields f "
           + "INNER JOIN dataset_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid "
           + "WHERE fm.dataset_version_uuid = :datasetVersionUuid")
-  List<Field> find(UUID datasetVersionUuid);
+  List<Field> findByDatasetVersion(UUID datasetVersionUuid);
+
+  @SqlQuery(
+      "SELECT f.*, "
+          + "ARRAY(SELECT t.name "
+          + "      FROM dataset_fields_tag_mapping m "
+          + "      INNER JOIN tags t on t.uuid = m.tag_uuid "
+          + "      WHERE m.dataset_field_uuid = f.uuid) AS tags "
+          + "FROM dataset_fields f "
+          + "INNER JOIN dataset_schema_versions_field_mapping fm on fm.dataset_field_uuid = f.uuid "
+          + "WHERE fm.dataset_schema_version_uuid = :datasetSchemaVersionUuid")
+  List<Field> findByDatasetSchemaVersion(UUID datasetSchemaVersionUuid);
 
   @SqlQuery(
       """

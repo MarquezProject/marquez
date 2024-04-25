@@ -107,7 +107,7 @@ public interface DatasetDao extends BaseDao {
     ds.getCurrentVersion()
         .ifPresent(
             dsv -> {
-              ds.setFields(datasetFieldDao.find(dsv));
+              ds.setFields(datasetFieldDao.findByDatasetVersion(dsv));
             });
   }
 

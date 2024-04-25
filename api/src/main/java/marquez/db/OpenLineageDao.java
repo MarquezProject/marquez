@@ -914,6 +914,21 @@ public interface OpenLineageDao extends BaseDao {
             .map(DatasetFacets::getSchema)
             .map(SchemaDatasetFacet::getFields)
             .orElse(null);
+    List<DatasetFieldRow> datasetFields = new ArrayList<>();
+    if (fields != null) {
+      for (SchemaField field : fields) {
+        DatasetFieldRow datasetFieldRow =
+            daos.getDatasetFieldDao()
+                .upsert(
+                    UUID.randomUUID(),
+                    now,
+                    field.getName(),
+                    field.getType(),
+                    field.getDescription(),
+                    datasetRow.getUuid());
+        datasetFields.add(datasetFieldRow);
+      }
+    }
 
     final DatasetRow dsRow = datasetRow;
     DatasetVersionRow datasetVersionRow =
@@ -935,6 +950,10 @@ public interface OpenLineageDao extends BaseDao {
                               fields,
                               runUuid)
                           .getValue();
+                  UUID datasetSchemaVersionUuid =
+                      daos.getDatasetSchemaVersionDao()
+                          .upsertSchemaVersion(dsRow, datasetFields, now)
+                          .getValue();
                   DatasetVersionRow row =
                       daos.getDatasetVersionDao()
                           .upsert(
@@ -942,6 +961,7 @@ public interface OpenLineageDao extends BaseDao {
                               now,
                               dsRow.getUuid(),
                               versionUuid,
+                              datasetSchemaVersionUuid,
                               isInput ? null : runUuid,
                               daos.getDatasetVersionDao().toPgObjectSchemaFields(fields),
                               dsNamespace.getName(),
@@ -949,24 +969,13 @@ public interface OpenLineageDao extends BaseDao {
                               dslifecycleState);
                   return row;
                 });
+
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
-    List<DatasetFieldRow> datasetFields = new ArrayList<>();
-    if (fields != null) {
-      for (SchemaField field : fields) {
-        DatasetFieldRow datasetFieldRow =
-            daos.getDatasetFieldDao()
-                .upsert(
-                    UUID.randomUUID(),
-                    now,
-                    field.getName(),
-                    field.getType(),
-                    field.getDescription(),
-                    datasetRow.getUuid());
-        datasetFields.add(datasetFieldRow);
-        datasetFieldMappings.add(
-            new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
-      }
+    for (DatasetFieldRow datasetFieldRow : datasetFields) {
+      datasetFieldMappings.add(
+          new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
     }
+
     daos.getDatasetFieldDao().updateFieldMapping(datasetFieldMappings);
 
     if (isInput && runUuid != null) {
