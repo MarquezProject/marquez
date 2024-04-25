@@ -16,7 +16,7 @@ import {
   Search,
   Tag,
 } from '../../types/api'
-import { JobOrDataset } from '../../components/lineage/types'
+import { JobOrDataset } from '../../types/lineage'
 
 export const fetchEvents = (after: string, before: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_EVENTS,
