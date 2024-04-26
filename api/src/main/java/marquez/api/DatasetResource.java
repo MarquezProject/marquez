@@ -242,7 +242,7 @@ public class DatasetResource extends BaseResource {
     throwIfNotExists(namespaceName, datasetName);
     throwIfNotExists(namespaceName, datasetName, fieldName);
     log.info(
-        "Tagging field '{}' for dataset '{}' with '{}'.",
+        "Tagging field '{}' on dataset '{}' with '{}'.",
         fieldName.getValue(),
         datasetName.getValue(),
         tagName.getValue());
