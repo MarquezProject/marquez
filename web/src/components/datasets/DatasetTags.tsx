@@ -170,7 +170,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
         message={'Tag updated.'}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       />
-      <Box display={'flex'} alignItems='center' justifyContent='center'>
+      <Box display={'flex'} alignItems='center' justifyContent='center' width={'100%'}>
         {!datasetField && (
           <MQTooltip title='Edit a Tag' key='edit-tag'>
             <Button
@@ -189,7 +189,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
           multiple
           disableCloseOnSelect
           id='dataset-tags'
-          sx={{ width: 516, flex: 1 }}
+          sx={{ flex: 1 }}
           limitTags={!datasetField ? 5 : 4}
           autoHighlight
           disableClearable

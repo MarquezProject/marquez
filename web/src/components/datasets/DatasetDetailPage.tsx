@@ -141,14 +141,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
   return (
-    <Box
-      my={2}
-      sx={{
-        padding: `0 ${theme.spacing(2)}`,
-      }}
-    >
-      <Box>
-        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} my={2}>
+    <Box px={2}>
+      <Box
+        position={'sticky'}
+        top={'98px'}
+        bgcolor={theme.palette.background.default}
+        pt={2}
+        zIndex={theme.zIndex.appBar}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+        mb={2}
+      >
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pb={2}>
           {facetsStatus && (
             <Box mr={1}>
               <MqStatus label={'Quality'} color={facetsStatus} />
@@ -158,24 +161,45 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             <MqText heading font={'mono'}>
               {name}
             </MqText>
-            <Box ml={1}>
-              <MqText
-                small
-                link
-                linkTo={`/datasets/column-level/${encodeURIComponent(
-                  encodeURIComponent(firstVersion.id.namespace)
-                )}/${encodeURIComponent(firstVersion.id.name)}`}
+          </Box>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                variant='outlined'
+                size={'small'}
+                sx={{
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.3),
+                    backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  },
+                }}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
               >
-                COLUMN LEVEL
-              </MqText>
+                {i18next.t('datasets.dialog_delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={i18next.t('jobs.dialog_confirmation_title')}
+                ignoreWarning={() => {
+                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
+                  props.dialogToggle('')
+                }}
+              />
             </Box>
+            <IconButton onClick={() => setSearchParams({})}>
+              <CloseIcon fontSize={'small'} />
+            </IconButton>
           </Box>
         </Box>
         <Box>
           <MqText subdued>{description}</MqText>
         </Box>
       </Box>
-      <Divider sx={{ my: 1 }} />
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <MqInfo
@@ -206,39 +230,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           datasetName={lineageDataset.name}
           namespace={lineageDataset.namespace}
         />
-        <Box display={'flex'} alignItems={'center'}>
-          <Box mr={1}>
-            <Button
-              variant='outlined'
-              size={'small'}
-              sx={{
-                borderColor: theme.palette.error.main,
-                color: theme.palette.error.main,
-                '&:hover': {
-                  borderColor: alpha(theme.palette.error.main, 0.3),
-                  backgroundColor: alpha(theme.palette.error.main, 0.3),
-                },
-              }}
-              onClick={() => {
-                props.dialogToggle('')
-              }}
-            >
-              {i18next.t('datasets.dialog_delete')}
-            </Button>
-            <Dialog
-              dialogIsOpen={display.dialogIsOpen}
-              dialogToggle={dialogToggle}
-              title={i18next.t('jobs.dialog_confirmation_title')}
-              ignoreWarning={() => {
-                deleteDataset(lineageDataset.name, lineageDataset.namespace)
-                props.dialogToggle('')
-              }}
-            />
-          </Box>
-          <IconButton onClick={() => setSearchParams({})}>
-            <CloseIcon fontSize={'small'} />
-          </IconButton>
-        </Box>
       </Box>
       <Box display={'flex'} justifyContent={'space-between'} mb={2}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
