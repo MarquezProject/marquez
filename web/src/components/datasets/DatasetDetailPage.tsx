@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion } from '../../types/api'
+import { Dataset, DatasetVersion } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
@@ -26,6 +26,7 @@ import { datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
+  fetchDataset,
   fetchDatasetVersions,
   resetDataset,
   resetDatasetVersions,
@@ -48,6 +49,7 @@ import StorageIcon from '@mui/icons-material/Storage'
 
 interface StateProps {
   lineageDataset: LineageDataset
+  dataset: Dataset
   versions: DatasetVersion[]
   versionsLoading: boolean
   datasets: IState['datasets']
@@ -57,6 +59,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
+  fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
   deleteDataset: typeof deleteDataset
@@ -76,7 +79,9 @@ function a11yProps(index: number) {
 const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
+    dataset,
     display,
+    fetchDataset,
     fetchDatasetVersions,
     resetDataset,
     resetDatasetVersions,
@@ -105,6 +110,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+    fetchDataset(lineageDataset.namespace, lineageDataset.name)
   }, [lineageDataset.name, showTags])
 
   // if the dataset is deleted then redirect to datasets end point
@@ -142,46 +148,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       }}
     >
       <Box>
-        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-          <DatasetTags
-            datasetTags={tags}
-            datasetName={lineageDataset.name}
-            namespace={lineageDataset.namespace}
-          />
-          <Box display={'flex'} alignItems={'center'}>
-            <Box mr={1}>
-              <Button
-                variant='outlined'
-                size={'small'}
-                sx={{
-                  borderColor: theme.palette.error.main,
-                  color: theme.palette.error.main,
-                  '&:hover': {
-                    borderColor: alpha(theme.palette.error.main, 0.3),
-                    backgroundColor: alpha(theme.palette.error.main, 0.3),
-                  },
-                }}
-                onClick={() => {
-                  props.dialogToggle('')
-                }}
-              >
-                {i18next.t('datasets.dialog_delete')}
-              </Button>
-              <Dialog
-                dialogIsOpen={display.dialogIsOpen}
-                dialogToggle={dialogToggle}
-                title={i18next.t('jobs.dialog_confirmation_title')}
-                ignoreWarning={() => {
-                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
-                  props.dialogToggle('')
-                }}
-              />
-            </Box>
-            <IconButton onClick={() => setSearchParams({})}>
-              <CloseIcon fontSize={'small'} />
-            </IconButton>
-          </Box>
-        </Box>
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} my={2}>
           {facetsStatus && (
             <Box mr={1}>
@@ -204,22 +170,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
               </MqText>
             </Box>
           </Box>
-          {tabIndex === 0 && (
-            <Box ml={1} display={'flex'} alignItems={'center'}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    size={'small'}
-                    checked={showTags}
-                    onChange={() => setShowTags(!showTags)}
-                    inputProps={{ 'aria-label': 'toggle show tags' }}
-                    disabled={versionsLoading}
-                  />
-                }
-                label={i18next.t('datasets.show_field_tags')}
-              />
-            </Box>
-          )}
         </Box>
         <Box>
           <MqText subdued>{description}</MqText>
@@ -249,7 +199,47 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           />
         </Grid>
       </Grid>
-      <Divider sx={{ mt: 1 }} />
+      <Divider sx={{ my: 2 }} />
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <DatasetTags
+          datasetTags={tags}
+          datasetName={lineageDataset.name}
+          namespace={lineageDataset.namespace}
+        />
+        <Box display={'flex'} alignItems={'center'}>
+          <Box mr={1}>
+            <Button
+              variant='outlined'
+              size={'small'}
+              sx={{
+                borderColor: theme.palette.error.main,
+                color: theme.palette.error.main,
+                '&:hover': {
+                  borderColor: alpha(theme.palette.error.main, 0.3),
+                  backgroundColor: alpha(theme.palette.error.main, 0.3),
+                },
+              }}
+              onClick={() => {
+                props.dialogToggle('')
+              }}
+            >
+              {i18next.t('datasets.dialog_delete')}
+            </Button>
+            <Dialog
+              dialogIsOpen={display.dialogIsOpen}
+              dialogToggle={dialogToggle}
+              title={i18next.t('jobs.dialog_confirmation_title')}
+              ignoreWarning={() => {
+                deleteDataset(lineageDataset.name, lineageDataset.namespace)
+                props.dialogToggle('')
+              }}
+            />
+          </Box>
+          <IconButton onClick={() => setSearchParams({})}>
+            <CloseIcon fontSize={'small'} />
+          </IconButton>
+        </Box>
+      </Box>
       <Box display={'flex'} justifyContent={'space-between'} mb={2}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs
@@ -262,22 +252,43 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             <Tab label={i18next.t('datasets.history_tab')} {...a11yProps(2)} disableRipple={true} />
           </Tabs>
         </Box>
+        {tabIndex === 0 && (
+          <Box display={'flex'} alignItems={'center'}>
+            <FormControlLabel
+              sx={{ textWrap: 'nowrap' }}
+              labelPlacement={'start'}
+              control={
+                <Switch
+                  size={'small'}
+                  checked={showTags}
+                  onChange={() => setShowTags(!showTags)}
+                  inputProps={{ 'aria-label': 'toggle show tags' }}
+                  disabled={versionsLoading}
+                />
+              }
+              label={i18next.t('datasets.show_field_tags')}
+            />
+          </Box>
+        )}
       </Box>
       {tabIndex === 0 && (
         <DatasetInfo
+          dataset={dataset}
           datasetFields={firstVersion.fields}
           facets={firstVersion.facets}
           run={firstVersion.createdByRun}
           showTags={showTags}
+          isCurrentVersion
         />
       )}
-      {tabIndex === 1 && <DatasetVersions versions={props.versions} />}
+      {tabIndex === 1 && <DatasetVersions dataset={dataset} versions={props.versions} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
+  dataset: state.dataset.result,
   display: state.display,
   versions: state.datasetVersions.result.versions,
   versionsLoading: state.datasetVersions.isLoading,
@@ -288,6 +299,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
+      fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset,
       deleteDataset: deleteDataset,

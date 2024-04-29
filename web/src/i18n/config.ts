@@ -131,6 +131,7 @@ i18next
             name: 'NAME',
             type: 'TYPE',
             description: 'DESCRIPTION',
+            column_lineage: 'Column Lineage',
           },
           dataset_versions_columns: {
             version: 'VERSION',
