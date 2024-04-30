@@ -204,21 +204,21 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         <Grid item xs={4}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
-            label={'Updated at'}
+            label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(firstVersion.createdAt)}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<StorageIcon color={'disabled'} />}
-            label={'Dataset Type'}
-            value={firstVersion.type}
+            label={'Dataset Type'.toUpperCase()}
+            value={<MqText font={'mono'}>{firstVersion.type}</MqText>}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<ListIcon color={'disabled'} />}
-            label={'Fields'}
+            label={'Fields'.toUpperCase()}
             value={`${firstVersion.fields.length} columns`}
           />
         </Grid>
@@ -247,7 +247,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           <Box display={'flex'} alignItems={'center'}>
             <FormControlLabel
               sx={{ textWrap: 'nowrap' }}
-              labelPlacement={'start'}
               control={
                 <Switch
                   size={'small'}

@@ -103,17 +103,27 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             </TableHead>
             <TableBody>
               {datasetFields.map((field) => {
+                console.log()
+                const hasColumnLineage = dataset?.columnLineage.find((f) => f.name === field.name)
                 return (
                   <React.Fragment key={field.name}>
                     <TableRow>
-                      <TableCell align='left'>{field.name}</TableCell>
+                      <TableCell align='left'>
+                        <MqText font={'mono'}>{field.name}</MqText>
+                      </TableCell>
                       {!showTags && (
                         <TableCell align='left'>
-                          <Chip size={'small'} label={field.type} variant={'outlined'} />
+                          <Chip
+                            size={'small'}
+                            label={<MqText font={'mono'}>{field.type}</MqText>}
+                            variant={'outlined'}
+                          />
                         </TableCell>
                       )}
                       {!showTags && (
-                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                        <TableCell align='left'>
+                          <MqText subdued>{field.description || 'no description'}</MqText>
+                        </TableCell>
                       )}
                       {!showTags && (
                         <TableCell align='left'>
@@ -126,7 +136,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                               }
                             >
                               <IconButton
-                                disabled={!dataset.columnLineage}
+                                disabled={!hasColumnLineage}
                                 size={'small'}
                                 component={Link}
                                 to={`/datasets/column-level/${dataset.namespace}/${

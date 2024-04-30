@@ -176,42 +176,42 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         <Grid item xs={4}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
-            label={'Created at'}
+            label={'Created at'.toUpperCase()}
             value={formatUpdatedAt(job.createdAt)}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
-            label={'Updated at'}
+            label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(job.updatedAt)}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<SpeedRounded color={'disabled'} />}
-            label={'Last Runtime'}
+            label={'Last Runtime'.toUpperCase()}
             value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<Start color={'disabled'} />}
-            label={'Last Started'}
+            label={'Last Started'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<SportsScore color={'disabled'} />}
-            label={'Last Finished'}
+            label={'Last Finished'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
-            label={'Running Status'}
+            label={'Running Status'.toUpperCase()}
             value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
           />
         </Grid>
