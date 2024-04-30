@@ -103,8 +103,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             </TableHead>
             <TableBody>
               {datasetFields.map((field) => {
-                console.log()
-                const hasColumnLineage = dataset?.columnLineage.find((f) => f.name === field.name)
+                const hasColumnLineage = dataset?.columnLineage?.find((f) => f.name === field.name)
                 return (
                   <React.Fragment key={field.name}>
                     <TableRow>
