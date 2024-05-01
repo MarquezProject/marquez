@@ -82,7 +82,22 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
-  columnLineage: object
+  columnLineage: InputFields[]
+}
+
+interface InputField {
+  namespace: string
+  dataset: string
+  field: string
+  transformationDescription: string | null
+  transformationType: string | null
+}
+
+interface InputFields {
+  name: string
+  inputFields: InputField[]
+  transformationDescription: string | null
+  transformationType: string | null
 }
 
 export interface DatasetVersions {

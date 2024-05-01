@@ -3,7 +3,7 @@
 
 import { ArrowBackIosRounded } from '@mui/icons-material'
 import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { DatasetVersion } from '../../types/api'
+import { Dataset, DatasetVersion } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { formatUpdatedAt } from '../../helpers'
 import { useTheme } from '@emotion/react'
@@ -15,10 +15,11 @@ import React, { FunctionComponent, SetStateAction } from 'react'
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
+  dataset: Dataset
 }
 
 const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
-  const { versions } = props
+  const { versions, dataset } = props
 
   const [infoView, setInfoView] = React.useState<DatasetVersion | null>(null)
   const handleClick = (newValue: SetStateAction<DatasetVersion | null>) => {
@@ -40,6 +41,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps> = (props) => {
           </IconButton>
         </Box>
         <DatasetInfo
+          dataset={dataset}
           datasetFields={infoView.fields}
           facets={infoView.facets}
           run={infoView.createdByRun}

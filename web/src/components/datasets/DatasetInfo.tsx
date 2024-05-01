@@ -2,15 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 import * as Redux from 'redux'
 import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { Field, Run } from '../../types/api'
+import { Dataset, Field, Run } from '../../types/api'
 import { IState } from '../../store/reducers'
+import { Link } from 'react-router-dom'
 import { connect, useSelector } from 'react-redux'
+import { encodeQueryString } from '../../routes/column-level/ColumnLineageColumnNode'
 import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import DatasetTags from './DatasetTags'
+import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
+import SplitscreenIcon from '@mui/icons-material/Splitscreen'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -23,10 +28,8 @@ interface JobFacets {
 
 export interface JobFacetsProps {
   jobFacets: JobFacets
-}
-
-export interface SqlFacet {
-  query: string
+  isCurrentVersion?: boolean
+  dataset: Dataset
 }
 
 type DatasetInfoProps = {
@@ -38,7 +41,7 @@ type DatasetInfoProps = {
   DispatchProps
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
-  const { datasetFields, facets, run, fetchJobFacets, resetFacets, showTags } = props
+  const { datasetFields, facets, run, dataset, fetchJobFacets, resetFacets, showTags } = props
   const i18next = require('i18next')
   const dsNamespace = useSelector(
     (state: IState) => state.datasetVersions.result.versions[0].namespace
@@ -88,6 +91,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                     </MqText>
                   </TableCell>
                 )}
+                {!showTags && <TableCell align='left' />}
                 {showTags && (
                   <TableCell align='left'>
                     <MqText subheading inline>
@@ -99,17 +103,52 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             </TableHead>
             <TableBody>
               {datasetFields.map((field) => {
+                const hasColumnLineage = dataset?.columnLineage?.find((f) => f.name === field.name)
                 return (
                   <React.Fragment key={field.name}>
                     <TableRow>
-                      <TableCell align='left'>{field.name}</TableCell>
+                      <TableCell align='left'>
+                        <MqText font={'mono'}>{field.name}</MqText>
+                      </TableCell>
                       {!showTags && (
                         <TableCell align='left'>
-                          <Chip size={'small'} label={field.type} variant={'outlined'} />
+                          <Chip
+                            size={'small'}
+                            label={<MqText font={'mono'}>{field.type}</MqText>}
+                            variant={'outlined'}
+                          />
                         </TableCell>
                       )}
                       {!showTags && (
-                        <TableCell align='left'>{field.description || 'no description'}</TableCell>
+                        <TableCell align='left'>
+                          <MqText subdued>{field.description || 'no description'}</MqText>
+                        </TableCell>
+                      )}
+                      {!showTags && (
+                        <TableCell align='left'>
+                          {dataset && (
+                            <MQTooltip
+                              title={
+                                !dataset.columnLineage
+                                  ? 'No Column Lineage, check facet'
+                                  : i18next.t('dataset_info_columns.column_lineage')
+                              }
+                            >
+                              <IconButton
+                                disabled={!hasColumnLineage}
+                                size={'small'}
+                                component={Link}
+                                to={`/datasets/column-level/${dataset.namespace}/${
+                                  dataset.name
+                                }?column=${encodeURIComponent(
+                                  encodeQueryString(dataset.namespace, dataset.name, field.name)
+                                )}&columnName=${field.name}`}
+                              >
+                                <SplitscreenIcon />
+                              </IconButton>
+                            </MQTooltip>
+                          )}
+                        </TableCell>
                       )}
                       {showTags && (
                         <TableCell align='left'>
