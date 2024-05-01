@@ -50,7 +50,7 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   )
 
   return (
-    <Box mt={2}>
+    <Box>
       {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
       {run.facets && (
         <Box mt={2}>
@@ -61,7 +61,6 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
             data={run.facets}
             aria-label={i18next.t('jobs.facets_subhead_aria')}
             aria-required='true'
-            placeholder={i18next.t('jobs.search')}
           />
         </Box>
       )}
