@@ -158,9 +158,12 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </Box>
           )}
           <Box display={'flex'} alignItems={'center'}>
-            <MqText heading font={'mono'}>
-              {name}
-            </MqText>
+            <Box>
+              <MqText heading font={'mono'}>
+                {name}
+              </MqText>
+              <MqText subdued>{description}</MqText>
+            </Box>
           </Box>
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
@@ -195,9 +198,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
               <CloseIcon fontSize={'small'} />
             </IconButton>
           </Box>
-        </Box>
-        <Box>
-          <MqText subdued>{description}</MqText>
         </Box>
       </Box>
       <Grid container spacing={2}>

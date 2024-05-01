@@ -117,9 +117,16 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         mb={2}
       >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-          <MqText font={'mono'} heading>
-            {job.name}
-          </MqText>
+          <Box>
+            <MqText font={'mono'} heading>
+              {job.name}
+            </MqText>
+            {job.description && (
+              <Box mt={1}>
+                <MqText subdued>{job.description}</MqText>
+              </Box>
+            )}
+          </Box>
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
               <Button
@@ -167,11 +174,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           </Box>
         </Box>
       </Box>
-      {job.description && (
-        <Box mt={1}>
-          <MqText subdued>{job.description}</MqText>
-        </Box>
-      )}
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <MqInfo
