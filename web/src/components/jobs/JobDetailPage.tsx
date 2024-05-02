@@ -106,111 +106,114 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   return (
-    <Box
-      p={4}
-      display='flex'
-      flexDirection='column'
-      justifyContent='space-between'
-      sx={{
-        padding: theme.spacing(2),
-      }}
-    >
-      <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-        <MqText font={'mono'} heading>
-          {job.name}
-        </MqText>
-        <Box display={'flex'} alignItems={'center'}>
-          <Box mr={1}>
-            <Button
-              variant='outlined'
-              size={'small'}
-              sx={{
-                borderColor: theme.palette.error.main,
-                color: theme.palette.error.main,
-                '&:hover': {
-                  borderColor: alpha(theme.palette.error.main, 0.3),
-                  backgroundColor: alpha(theme.palette.error.main, 0.3),
-                },
-              }}
-              onClick={() => {
-                props.dialogToggle('')
-              }}
-            >
-              {i18next.t('jobs.dialog_delete')}
-            </Button>
-            <Dialog
-              dialogIsOpen={display.dialogIsOpen}
-              dialogToggle={dialogToggle}
-              title={i18next.t('jobs.dialog_confirmation_title')}
-              ignoreWarning={() => {
-                deleteJob(job.name, job.namespace)
-                props.dialogToggle('')
-              }}
-            />
+    <Box px={2} display='flex' flexDirection='column' justifyContent='space-between'>
+      <Box
+        position={'sticky'}
+        top={'98px'}
+        bgcolor={theme.palette.background.default}
+        py={2}
+        zIndex={theme.zIndex.appBar}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+        mb={2}
+      >
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+          <Box>
+            <MqText font={'mono'} heading>
+              {job.name}
+            </MqText>
+            {job.description && (
+              <Box mt={1}>
+                <MqText subdued>{job.description}</MqText>
+              </Box>
+            )}
           </Box>
-          <Box mr={1}>
-            <Button
-              size={'small'}
-              variant='outlined'
-              color='primary'
-              target={'_blank'}
-              href={job.location}
-              disabled={!job.location}
-            >
-              {i18next.t('jobs.location')}
-            </Button>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                variant='outlined'
+                size={'small'}
+                sx={{
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.3),
+                    backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  },
+                }}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
+              >
+                {i18next.t('jobs.dialog_delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={i18next.t('jobs.dialog_confirmation_title')}
+                ignoreWarning={() => {
+                  deleteJob(job.name, job.namespace)
+                  props.dialogToggle('')
+                }}
+              />
+            </Box>
+            <Box mr={1}>
+              <Button
+                size={'small'}
+                variant='outlined'
+                color='primary'
+                target={'_blank'}
+                href={job.location}
+                disabled={!job.location}
+              >
+                {i18next.t('jobs.location')}
+              </Button>
+            </Box>
+            <IconButton onClick={() => setSearchParams({})} size='small'>
+              <CloseIcon fontSize={'small'} />
+            </IconButton>
           </Box>
-          <IconButton onClick={() => setSearchParams({})} size='small'>
-            <CloseIcon fontSize={'small'} />
-          </IconButton>
         </Box>
       </Box>
-      {job.description && (
-        <Box mt={1}>
-          <MqText subdued>{job.description}</MqText>
-        </Box>
-      )}
-      <Divider sx={{ mt: 2, mb: 1 }} />
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
-            label={'Created at'}
+            label={'Created at'.toUpperCase()}
             value={formatUpdatedAt(job.createdAt)}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
-            label={'Updated at'}
+            label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(job.updatedAt)}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<SpeedRounded color={'disabled'} />}
-            label={'Last Runtime'}
+            label={'Last Runtime'.toUpperCase()}
             value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<Start color={'disabled'} />}
-            label={'Last Started'}
+            label={'Last Started'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<SportsScore color={'disabled'} />}
-            label={'Last Finished'}
+            label={'Last Finished'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
           />
         </Grid>
         <Grid item xs={4}>
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
-            label={'Running Status'}
+            label={'Running Status'.toUpperCase()}
             value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
           />
         </Grid>
