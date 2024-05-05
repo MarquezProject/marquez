@@ -363,7 +363,7 @@ public interface DatasetDao extends BaseDao {
     DatasetVersionRow dvRow =
         createDatasetVersionDao()
             .upsertDatasetVersion(
-                datasetRow.getUuid(),
+                datasetRow,
                 now,
                 namespaceName.getValue(),
                 datasetName.getValue(),

@@ -975,7 +975,6 @@ public interface OpenLineageDao extends BaseDao {
       datasetFieldMappings.add(
           new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
     }
-
     daos.getDatasetFieldDao().updateFieldMapping(datasetFieldMappings);
 
     if (isInput && runUuid != null) {

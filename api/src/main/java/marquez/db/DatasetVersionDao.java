@@ -25,6 +25,7 @@ import marquez.db.mappers.DatasetVersionMapper;
 import marquez.db.mappers.DatasetVersionRowMapper;
 import marquez.db.mappers.ExtendedDatasetVersionRowMapper;
 import marquez.db.models.DatasetFieldRow;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.TagRow;
@@ -47,7 +48,7 @@ public interface DatasetVersionDao extends BaseDao {
 
   @Transaction
   default DatasetVersionRow upsertDatasetVersion(
-      UUID datasetUuid,
+      DatasetRow datasetRow,
       Instant now,
       String namespaceName,
       String datasetName,
@@ -56,15 +57,38 @@ public interface DatasetVersionDao extends BaseDao {
     TagDao tagDao = createTagDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
+    List<DatasetFieldRow> datasetFields = new ArrayList<>();
+    List<DatasetFieldTag> datasetFieldTags = new ArrayList<>();
+    for (Field field : datasetMeta.getFields()) {
+      DatasetFieldRow datasetFieldRow =
+          datasetFieldDao.upsert(
+              UUID.randomUUID(),
+              now,
+              field.getName().getValue(),
+              field.getType(),
+              field.getDescription().orElse(null),
+              datasetRow.getUuid());
+      datasetFields.add(datasetFieldRow);
+      for (TagName tagName : field.getTags()) {
+        TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
+        datasetFieldTags.add(new DatasetFieldTag(datasetFieldRow.getUuid(), tag.getUuid(), now));
+      }
+    }
+    datasetFieldDao.updateTags(datasetFieldTags);
+
     Version version = Utils.newDatasetVersionFor(namespaceName, datasetName, datasetMeta);
     UUID newDatasetVersionUuid = UUID.randomUUID();
+    UUID datasetSchemaVersionUuid =
+        createDatasetSchemaVersionDao()
+            .upsertSchemaVersion(datasetRow, datasetFields, now)
+            .getValue();
     DatasetVersionRow datasetVersionRow =
         upsert(
             newDatasetVersionUuid,
             now,
-            datasetUuid,
+            datasetRow.getUuid(),
             version.getValue(),
-            null, // TODO add schema version
+            datasetSchemaVersionUuid,
             datasetMeta.getRunId().map(RunId::getValue).orElse(null),
             toPgObjectFields(datasetMeta.getFields()),
             namespaceName,
@@ -85,29 +109,13 @@ public interface DatasetVersionDao extends BaseDao {
     }
 
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
-    List<DatasetFieldTag> datasetFieldTag = new ArrayList<>();
-
-    for (Field field : datasetMeta.getFields()) {
-      DatasetFieldRow datasetFieldRow =
-          datasetFieldDao.upsert(
-              UUID.randomUUID(),
-              now,
-              field.getName().getValue(),
-              field.getType(),
-              field.getDescription().orElse(null),
-              datasetUuid);
-      for (TagName tagName : field.getTags()) {
-        TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
-        datasetFieldTag.add(new DatasetFieldTag(datasetFieldRow.getUuid(), tag.getUuid(), now));
-      }
+    for (DatasetFieldRow datasetFieldRow : datasetFields) {
       datasetFieldMappings.add(
           new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
     }
-
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
-    datasetFieldDao.updateTags(datasetFieldTag);
 
-    createDatasetDao().updateVersion(datasetUuid, now, datasetVersionRow.getUuid());
+    createDatasetDao().updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
     return datasetVersionRow;
   }
 
