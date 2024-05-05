@@ -6,9 +6,9 @@ public interface Sql {
   String WRITE_LINEAGE_EVENT =
       """
       INSERT INTO lineage_events (
-        run_transitioned_at,
+        event_time,
         event,
-        run_state,
+        event_type,
         job_name,
         job_namespace_name,
         producer,
@@ -250,8 +250,8 @@ public interface Sql {
       WITH dataset AS (
         SELECT uuid
           FROM datasets
-         WHERE namespace_name = '<dataset_namespace_name>'
-           AND name = '<dataset_name>'
+         WHERE namespace_name = '<dataset_namespace_name_%1$d>'
+           AND name = '<dataset_name_%1$d>'
       )
       INSERT INTO dataset_fields (
         uuid,
@@ -270,41 +270,38 @@ public interface Sql {
         dataset.uuid,                                   -- replace with the actual UUID value
         '<dataset_field_name_%1$d>',                    -- replace with the actual UUID value
         NULLIF('<dataset_field_description_%1$d>',  '') -- replace with the actual UUID value
-      FROM dataset
+      FROM dataset ON CONFLICT (uuid) DO NOTHING
       """;
 
   String WRITE_DATASET_VERSION_META =
       """
       WITH dataset AS (
-        SELECT uuid
+        SELECT uuid, namespace_name, name
           FROM datasets
-         WHERE namespace_name = '<dataset_namespace_name>'
-           AND name = '<dataset_name>'
+         WHERE namespace_name = '<dataset_namespace_name_%1$d>'
+           AND name = '<dataset_name_%1$d>'
       ),
       dataset_version AS (
         INSERT INTO dataset_versions (
           uuid,
           created_at,
-          updated_at,
-          job_uuid,
-          job_location,
-          namespace_uuid,
+          dataset_uuid,
+          run_uuid,
           namespace_name,
-          job_name
+          dataset_name
         )
         SELECT
-          '<dataset_version_uuid>', -- replace with the actual event_time value
+          '<dataset_version_uuid_%1$d>', -- replace with the actual event_time value
           '<created_at>',           -- replace with the actual event_time value
-          '<updated_at>',           -- replace with the actual event_time value
-          job.uuid,                 -- replace with the actual event_time value
-          job.location,             -- replace with the actual event_time value
-          job.namespace_uuid,       -- replace with the actual event_time value
-          job.namespace_name,       -- replace with the actual event_time value
-          job.name                  -- replace with the actual event_time value
-        FROM job ON CONFLICT (uuid) DO NOTHING
+          dataset.uuid              -- replace with the actual event_time value
+          '<run_id>',               -- replace with the actual event_time value
+          dataset.namespace_name,   -- replace with the actual event_time value
+          dataset.name              -- replace with the actual event_time value
+        FROM dataset ON CONFLICT (uuid) DO NOTHING
       )
       UPDATE datasets
-         SET current_version_uuid = '<dataset_version_uuid>'
-       WHERE uuid = '<dataset_uuid>'
-          """;
+         SET current_version_uuid = '<dataset_version_uuid_%1$d>'
+        FROM dataset
+       WHERE uuid = dataset.uuid
+      """;
 }

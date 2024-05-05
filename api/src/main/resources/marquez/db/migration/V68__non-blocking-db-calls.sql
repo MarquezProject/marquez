@@ -7,16 +7,14 @@ ALTER TABLE namespaces ALTER COLUMN created_at TYPE TIMESTAMPTZ;
 ALTER TABLE namespaces ALTER COLUMN updated_at TYPE TIMESTAMPTZ;
 ALTER TABLE namespaces DROP COLUMN current_owner_name;
 
-ALTER TABLE lineage_events RENAME COLUMN event_time TO "run_transitioned_at";
 ALTER TABLE lineage_events RENAME COLUMN created_at TO "event_received_time";
 ALTER TABLE lineage_events RENAME COLUMN run_uuid TO "run_id";
-ALTER TABLE lineage_events RENAME COLUMN event_type TO "run_state";
 ALTER TABLE lineage_events RENAME COLUMN job_namespace TO "job_namespace_name";
 
-ALTER TABLE lineage_events ALTER COLUMN run_transitioned_at TYPE TIMESTAMPTZ;
+ALTER TABLE lineage_events ALTER COLUMN event_time TYPE TIMESTAMPTZ;
 ALTER TABLE lineage_events ALTER COLUMN event_received_time DROP DEFAULT;
 ALTER TABLE lineage_events ALTER COLUMN event_received_time SET NOT NULL;
-ALTER TABLE lineage_events ALTER COLUMN run_state TYPE VARCHAR(64);
+ALTER TABLE lineage_events ALTER COLUMN event_type TYPE VARCHAR(64);
 ALTER TABLE lineage_events ALTER COLUMN _event_type DROP DEFAULT;
 ALTER TABLE lineage_events ALTER COLUMN _event_type SET NOT NULL;
 ALTER TABLE lineage_events ALTER COLUMN job_name TYPE VARCHAR;
@@ -58,15 +56,26 @@ ALTER TABLE job_versions RENAME COLUMN location TO "job_location";
 ALTER TABLE datasets DROP COLUMN physical_name;
 ALTER TABLE datasets ADD display_name VARCHAR(255);
 
+ALTER TABLE dataset_versions DROP COLUMN version;
+ALTER TABLE dataset_versions DROP COLUMN fields;
+ALTER TABLE dataset_versions DROP COLUMN lifecycle_state;
+ALTER TABLE dataset_versions ADD facets JSONB;
+
 ALTER TABLE sources ADD display_name VARCHAR(255);
 
 DROP INDEX IF EXISTS lineage_events_run_id_index;
 CREATE INDEX IF NOT EXISTS lineage_events_run_uuid_idx ON lineage_events(run_id);
 
+DROP TABLE IF EXISTS stream_versions;
 DROP TABLE IF EXISTS run_args;
 
 DROP VIEW IF EXISTS dataset_facets_view;
 DROP VIEW IF EXISTS job_facets_view;
 DROP VIEW IF EXISTS run_facets_view;
+
+DROP TABLE IF EXISTS dataset_facets;
+DROP TABLE IF EXISTS job_facets;
+DROP TABLE IF EXISTS run_facets;
+DROP TABLE IF EXISTS facet_migration_lock;
 
 DROP TRIGGER IF EXISTS runs_insert_job_uuid ON runs;

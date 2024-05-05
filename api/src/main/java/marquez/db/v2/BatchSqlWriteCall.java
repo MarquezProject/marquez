@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,12 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
   class WriteRunMetadata implements BatchSqlWriteCall {
     final Metadata.Run runMeta;
     final Metadata.Job jobMeta;
-    final Metadata.IO ioMeta;
+    @Nullable final Metadata.IO ioMeta;
 
     WriteRunMetadata(@NonNull final Metadata.Run runMeta) {
       this.runMeta = runMeta;
       this.jobMeta = runMeta.getJob();
-      this.ioMeta = runMeta.getIo();
+      this.ioMeta = runMeta.getIo().orElse(null);
     }
 
     static WriteRunMetadata newWriteCallFor(@NotNull final OpenLineage.RunEvent event) {
@@ -83,11 +84,15 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
       // ...
-      batchSqlAddAll(
-          Stream.concat(ioMeta.getInputs().asList().stream(), ioMeta.getOutputs().asList().stream())
-              .collect(toImmutableList()),
-          dbCallAsBatch);
+      if (ioMeta != null) {
+        batchSqlAddAll(
+            Stream.concat(
+                    ioMeta.getInputs().asList().stream(), ioMeta.getOutputs().asList().stream())
+                .collect(toImmutableList()),
+            dbCallAsBatch);
+      }
 
+      // ...
       dbCallAsBatch.execute();
     }
   }
@@ -209,12 +214,22 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
         .define(format("dataset_type_%d", idx), datasetMeta.getType())
         .define(format("dataset_name_%d", idx), datasetMeta.getName().getValue());
 
-    batchSqlAddAll(datasetMeta.getSchema().getFields().asList(), datasetMeta, dbCallAsBatch);
+    datasetMeta
+        .getSchema()
+        .ifPresent(
+            schema -> {
+              batchSqlAddAll(schema.getFields().asList(), datasetMeta, dbCallAsBatch);
+            });
 
-    dbCallAsBatch
-        .add(Sql.WRITE_DATASET_VERSION_META)
-        .define("dataset_namespace_name", datasetMeta.getNamespace().getValue())
-        .define("dataset_name", datasetMeta.getName().getValue());
+    try {
+      dbCallAsBatch
+          .add(format(Sql.WRITE_DATASET_VERSION_META, idx))
+          .define(format("dataset_version_uuid_%d", idx), datasetMeta.getVersionId().getVersion())
+          .define(format("dataset_namespace_name_%d", idx), datasetMeta.getNamespace().getValue())
+          .define(format("dataset_name_%d", idx), datasetMeta.getName().getValue());
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
   }
 
   /** ... */
@@ -228,8 +243,10 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
               final Metadata.Dataset.Schema.Field fieldMeta = fieldsMeta.get(idx);
               dbCallAsBatch
                   .add(format(Sql.WRITE_DATASET_FIELDS_META, idx))
-                  .define("dataset_namespace_name", datasetMeta.getNamespace().getValue())
-                  .define("dataset_name", datasetMeta.getName().getValue())
+                  .define(
+                      format("dataset_namespace_name_%d", idx),
+                      datasetMeta.getNamespace().getValue())
+                  .define(format("dataset_name_%d", idx), datasetMeta.getName().getValue())
                   .define(format("dataset_field_uuid_%d", idx), UUID.randomUUID())
                   .define(format("dataset_field_type_%d", idx), fieldMeta.getType())
                   .define(format("dataset_field_name_%d", idx), fieldMeta.getName())
