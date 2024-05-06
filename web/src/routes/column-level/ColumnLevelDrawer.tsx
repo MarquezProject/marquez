@@ -1,6 +1,7 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import {
+  Chip,
   CircularProgress,
   Divider,
   Table,
@@ -102,10 +103,18 @@ const ColumnLevelDrawer = ({
                     return (
                       <React.Fragment key={field.name}>
                         <TableRow>
-                          <TableCell align='left'>{field.name}</TableCell>
-                          <TableCell align='left'>{field.type}</TableCell>
                           <TableCell align='left'>
-                            {field.description || 'no description'}
+                            <MqText font={'mono'}>{field.name}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <Chip
+                              size={'small'}
+                              label={<MqText font={'mono'}>{field.type}</MqText>}
+                              variant={'outlined'}
+                            />
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subdued>{field.description || 'no description'}</MqText>
                           </TableCell>
                         </TableRow>
                       </React.Fragment>

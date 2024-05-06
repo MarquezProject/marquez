@@ -14,6 +14,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
+import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
 interface StateProps {
@@ -46,17 +47,36 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
 
   const addToToolTip = (dataset: LineageDataset) => {
     return (
-      <>
-        <b>{'Namespace: '}</b>
-        {dataset.namespace}
-        <br></br>
-        <b>{'Name: '}</b>
-        {dataset.name}
-        <br></br>
-        <b>{'Description: '}</b>
-        {dataset.description === null ? 'No Description' : dataset.description}
-        <br></br>
-      </>
+      <foreignObject>
+        <Box>
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Namespace:
+            </MqText>
+            <MqText block font={'mono'}>
+              {truncateText(dataset.namespace, 25)}
+            </MqText>
+          </Box>
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Name:
+            </MqText>
+            <MqText block font={'mono'}>
+              {truncateText(dataset.name, 25)}
+            </MqText>
+          </Box>
+          {dataset.description && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Description:
+              </MqText>
+              <MqText block font={'mono'}>
+                {dataset.description}
+              </MqText>
+            </Box>
+          )}
+        </Box>
+      </foreignObject>
     )
   }
 
@@ -130,7 +150,7 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
           </IconButton>
         </MQTooltip>
       </foreignObject>
-      <MQTooltip title={addToToolTip(node.data.dataset)}>
+      <MQTooltip placement={'right-start'} title={addToToolTip(node.data.dataset)}>
         <g>
           <text
             fontSize='8'
