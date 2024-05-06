@@ -23,6 +23,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import io.dropwizard.jackson.Jackson;
+import io.openlineage.server.OpenLineage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -49,13 +50,17 @@ import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.api.v2.models.Metadata;
 import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
 import marquez.common.models.Field;
 import marquez.common.models.FlexibleDateTimeDeserializer;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.Version;
+import marquez.common.models.v2.DatasetVersionId;
+import marquez.common.models.v2.JobVersionId;
 import marquez.service.models.DatasetMeta;
 import marquez.service.models.DbTableMeta;
 import marquez.service.models.LineageEvent;
@@ -287,6 +292,64 @@ public final class Utils {
                 jobLocation)
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
+  }
+
+  public static JobVersionId newJobVersionWith(
+      @NonNull final NamespaceName namespaceName,
+      @NonNull final JobName jobName,
+      @Nullable final URI jobLocation,
+      @Nullable final Metadata.IO io) {
+    final Version jobVersion =
+        Version.of(
+            UUID.nameUUIDFromBytes(
+                VERSION_JOINER
+                    .join(
+                        namespaceName.getValue(),
+                        jobName.getValue(),
+                        (io == null)
+                            ? null
+                            : io.getInputs().stream()
+                                .map(Metadata.Dataset::getVersionId)
+                                .sorted()
+                                .flatMap(
+                                    inputVersionId ->
+                                        Stream.of(
+                                            inputVersionId.getNamespace().getValue(),
+                                            inputVersionId.getName().getValue()))
+                                .collect(Collectors.joining(VERSION_DELIM)),
+                        (io == null)
+                            ? null
+                            : io.getOutputs().stream()
+                                .sorted()
+                                .flatMap(
+                                    outputVersionId ->
+                                        Stream.of(
+                                            outputVersionId.getNamespace().getValue(),
+                                            outputVersionId.getName().getValue()))
+                                .collect(Collectors.joining(VERSION_DELIM)),
+                        Optional.ofNullable(jobLocation).map(URI::toASCIIString).orElse(null))
+                    .getBytes(UTF_8)));
+    return JobVersionId.of(namespaceName, jobName, jobVersion);
+  }
+
+  public static DatasetVersionId newDatasetVersionIdWith(
+      @Nullable final OpenLineage.Run run,
+      @NonNull final NamespaceName namespaceName,
+      @NonNull final DatasetName datasetName,
+      @Nullable final Metadata.Dataset.Schema datasetSchema) {
+    final byte[] bytes =
+        VERSION_JOINER
+            .join(
+                (run == null) ? null : run.getRunId(),
+                namespaceName.getValue(),
+                datasetName.getValue(),
+                (datasetSchema == null)
+                    ? null
+                    : datasetSchema.getFields().stream()
+                        .map(Utils::joinField)
+                        .collect(joining(VERSION_DELIM)))
+            .getBytes(UTF_8);
+    return null;
   }
 
   /**

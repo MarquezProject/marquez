@@ -72,7 +72,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getId().getVersion());
+          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
 
       dbCallAsBatch
           .add(Sql.WRITE_RUN_META)
@@ -84,6 +84,8 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
           .define("run_ended_at", runMeta.getEndedAt().orElse(null));
 
       // ...
+      // 1. inputs: get.current() or new version (without runID) new input
+      // 2. outputs: always new version (with runID)
       if (ioMeta != null) {
         batchSqlAddAll(
             Stream.concat(
@@ -130,7 +132,7 @@ public interface BatchSqlWriteCall extends HandleConsumer<Exception> {
 
       dbCallAsBatch
           .add(Sql.WRITE_JOB_VERSION_META)
-          .define("job_version_uuid", jobMeta.getId().getVersion());
+          .define("job_version_uuid", jobMeta.getVersionId().getVersion());
 
       dbCallAsBatch.execute();
     }

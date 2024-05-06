@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static marquez.common.Utils.toJson;
 import static marquez.common.models.DatasetType.DB_TABLE;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.server.OpenLineage;
 import java.net.URI;
@@ -20,16 +19,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.Utils;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
-import marquez.common.models.DatasetVersionId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
-import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.common.models.SourceName;
+import marquez.common.models.v2.DatasetVersionId;
+import marquez.common.models.v2.JobVersionId;
 
 /** ... */
 public final class Metadata {
@@ -38,7 +38,7 @@ public final class Metadata {
   /** ... */
   @Builder
   @ToString
-  public static class Run {
+  public static final class Run {
     @Getter private final RunId id;
     @Getter private final RunState state;
     @Getter private final Instant transitionedOn;
@@ -48,20 +48,20 @@ public final class Metadata {
     @Nullable private final Instant nominalEndTime;
     @Nullable private final String externalId;
 
-    @Getter private final Metadata.Job job;
-    @Nullable private final Metadata.IO io;
+    @Getter private final Job job;
+    @Nullable private final IO io;
 
     @Getter private final String rawMeta;
     @Getter private final URI producer;
 
     /* ... */
-    public static Metadata.Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
+    public static Run newInstanceFor(@NonNull final OpenLineage.RunEvent event) {
       final OpenLineage.Run run = event.getRun();
-      final RunId runId = RunId.of(event.getRun().getRunId());
+      final RunId runId = RunId.of(run.getRunId());
       final RunState runState = RunState.forType(event.getEventType());
       final Instant runTransitionedOnAsUtc = toUtc(event.getEventTime());
-      final Metadata.Run.RunBuilder runBuilder =
-          Metadata.Run.builder()
+      final RunBuilder runBuilder =
+          Run.builder()
               .id(runId)
               .state(runState)
               .transitionedOn(runTransitionedOnAsUtc)
@@ -69,6 +69,7 @@ public final class Metadata {
               .nominalEndTime(Facets.nominalEndTimeFor(run).orElse(null))
               .rawMeta(toJson(event))
               .producer(event.getProducer());
+
       // ...
       if (runState.isDone()) {
         runBuilder.endedAt(runTransitionedOnAsUtc);
@@ -77,8 +78,10 @@ public final class Metadata {
       }
 
       // ...
-      final Metadata.Job job =
-          Metadata.Job.newInstanceFor(event.getJob(), event.getInputs(), event.getOutputs());
+      final Job job =
+          Job.newInstanceWith(run, event.getJob(), event.getInputs(), event.getOutputs());
+
+      // ...
       runBuilder.job(job);
       runBuilder.io(job.getIo().orElse(null));
 
@@ -105,7 +108,7 @@ public final class Metadata {
       return Optional.ofNullable(externalId);
     }
 
-    public Optional<Metadata.IO> getIo() {
+    public Optional<IO> getIo() {
       return Optional.ofNullable(io);
     }
 
@@ -118,33 +121,36 @@ public final class Metadata {
   /** ... */
   @Builder
   @ToString
-  public static class Job {
-    @Getter private final JobVersionId id;
+  public static final class Job {
+    @Getter private final JobVersionId versionId;
     @Getter private final JobType type;
     @Getter private final JobName name;
     @Getter private final NamespaceName namespace;
     @Nullable private final String description;
     @Nullable private final URI location;
-    @Nullable private final Metadata.IO io;
+    @Nullable private final IO io;
 
     /* ... */
-    public static Metadata.Job newInstanceFor(
+    public static Job newInstanceWith(
+        @NonNull final OpenLineage.Run run,
         @NonNull final OpenLineage.Job job,
         @Nullable final List<OpenLineage.InputDataset> inputs,
         @Nullable final List<OpenLineage.OutputDataset> outputs) {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       final Optional<URI> jobLocation = Facets.locationFor(job);
-      final Metadata.IO io = Metadata.IO.newInstanceFor(inputs, outputs);
-      final JobVersionId jobVersionId =
-          newVersionIdFor(namespaceName, jobName, jobLocation.orElse(null), io);
+      final IO io = IO.newInstanceWith(run, inputs, outputs);
 
       // ...
-      return Metadata.Job.builder()
+      final JobVersionId jobVersionId =
+          Utils.newJobVersionWith(namespaceName, jobName, jobLocation.orElse(null), io);
+
+      // ...
+      return Job.builder()
           .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
-          .id(jobVersionId)
+          .versionId(jobVersionId)
           .description(Facets.descriptionFor(job).orElse(null))
           .location(jobLocation.orElse(null))
           .io(io)
@@ -152,21 +158,23 @@ public final class Metadata {
     }
 
     /* ... */
-    public static Metadata.Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
+    public static Job newInstanceFor(@NonNull final OpenLineage.JobEvent event) {
       final OpenLineage.Job job = event.getJob();
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       final Optional<URI> jobLocation = Facets.locationFor(job);
-      final Metadata.IO io = Metadata.IO.newInstanceFor(event.getInputs(), event.getOutputs());
-      final JobVersionId jobVersionId =
-          newVersionIdFor(namespaceName, jobName, jobLocation.orElse(null), io);
+      final IO io = IO.newInstanceWith(event.getInputs(), event.getOutputs());
 
       // ...
-      return Metadata.Job.builder()
+      final JobVersionId jobVersionId =
+          Utils.newJobVersionWith(namespaceName, jobName, jobLocation.orElse(null), io);
+
+      // ...
+      return Job.builder()
           .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
-          .id(jobVersionId)
+          .versionId(jobVersionId)
           .description(Facets.descriptionFor(job).orElse(null))
           .location(jobLocation.orElse(null))
           .io(io)
@@ -181,44 +189,43 @@ public final class Metadata {
       return Optional.ofNullable(location);
     }
 
-    public Optional<Metadata.IO> getIo() {
+    public Optional<IO> getIo() {
       return Optional.ofNullable(io);
-    }
-
-    @VisibleForTesting
-    public static JobVersionId newVersionIdFor(
-        @NonNull final NamespaceName namespaceName,
-        @NonNull final JobName jobName,
-        @Nullable final URI jobLocation,
-        @NonNull final Metadata.IO io) {
-      return null;
     }
   }
 
   @Builder
   @ToString
   @EqualsAndHashCode
-  public static class Dataset {
+  public static final class Dataset {
     @Getter private final DatasetType type;
     @Getter private final DatasetName name;
     @Getter private final NamespaceName namespace;
     @Getter private final DatasetVersionId versionId;
-    @Nullable private final Metadata.Dataset.Schema schema;
-    @Getter private final Metadata.Dataset.Source source;
+    @Nullable private final Schema schema;
+    @Getter private final Source source;
 
-    public static Metadata.Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
-      return newInstanceFor(event.getDataset());
+    /* ... */
+    public static Dataset newInstanceFor(@NonNull final OpenLineage.DatasetEvent event) {
+      return newInstanceWith(null, event.getDataset());
     }
 
+    /* ... */
     static Dataset newInstanceFor(@NonNull final OpenLineage.Dataset dataset) {
+      return newInstanceWith(null, dataset);
+    }
+
+    /* ... */
+    static Dataset newInstanceWith(
+        @Nullable final OpenLineage.Run run, @NonNull final OpenLineage.Dataset dataset) {
       final NamespaceName namespaceName = NamespaceName.of(dataset.getNamespace());
       final DatasetName datasetName = DatasetName.of(dataset.getName());
-      final Metadata.Dataset.Schema datasetSchema = Facets.schemaFor(dataset).orElse(null);
+      final Dataset.Schema datasetSchema = Facets.schemaFor(dataset).orElse(null);
       final DatasetVersionId datasetVersionId =
-          newVersionIdFor(namespaceName, datasetName, datasetSchema);
+          Utils.newDatasetVersionIdWith(run, namespaceName, datasetName, datasetSchema);
 
       // ...
-      return Metadata.Dataset.builder()
+      return Dataset.builder()
           .type(DB_TABLE)
           .name(datasetName)
           .namespace(namespaceName)
@@ -228,18 +235,10 @@ public final class Metadata {
           .build();
     }
 
-    @VisibleForTesting
-    public static DatasetVersionId newVersionIdFor(
-        @NonNull final NamespaceName namespaceName,
-        @NonNull final DatasetName datasetName,
-        @NonNull final Metadata.Dataset.Schema datasetSchema) {
-      return null;
-    }
-
     @Builder
     @ToString
     public static class Schema {
-      @Getter @NonNull private final ImmutableSet<Dataset.Schema.Field> fields;
+      @Getter @NonNull private final ImmutableSet<Schema.Field> fields;
 
       @Builder
       @ToString
@@ -262,23 +261,32 @@ public final class Metadata {
       @Getter private final URI connectionUrl;
     }
 
-    public Optional<Metadata.Dataset.Schema> getSchema() {
+    public Optional<Dataset.Schema> getSchema() {
       return Optional.ofNullable(schema);
     }
   }
 
-  public static class IO {
+  /* ... */
+  public static final class IO {
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
 
-    IO(
-        @NonNull final ImmutableSet<Metadata.Dataset> inputs,
-        @NonNull final ImmutableSet<Metadata.Dataset> outputs) {
+    /* ... */
+    IO(@NonNull final ImmutableSet<Dataset> inputs, @NonNull final ImmutableSet<Dataset> outputs) {
       this.inputs = inputs;
       this.outputs = outputs;
     }
 
-    public static @Nullable IO newInstanceFor(
+    /* ... */
+    public static @Nullable IO newInstanceWith(
+        @Nullable final List<OpenLineage.InputDataset> inputs,
+        @Nullable final List<OpenLineage.OutputDataset> outputs) {
+      return newInstanceWith(null, inputs, outputs);
+    }
+
+    /* ... */
+    public static @Nullable IO newInstanceWith(
+        @Nullable final OpenLineage.Run run,
         @Nullable final List<OpenLineage.InputDataset> inputs,
         @Nullable final List<OpenLineage.OutputDataset> outputs) {
       if (inputs == null && outputs == null) {
@@ -286,23 +294,24 @@ public final class Metadata {
         return null;
       }
 
-      final ImmutableSet.Builder<Metadata.Dataset> inputsBuilder = ImmutableSet.builder();
+      final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
       if (inputs != null) {
         for (final OpenLineage.InputDataset input : inputs) {
-          inputsBuilder.add(Metadata.Dataset.newInstanceFor(input));
+          inputsBuilder.add(Dataset.newInstanceFor(input));
         }
       }
-      final ImmutableSet.Builder<Metadata.Dataset> outputsBuilder = ImmutableSet.builder();
+      final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
       if (outputs != null) {
         for (final OpenLineage.OutputDataset output : outputs) {
-          outputsBuilder.add(Metadata.Dataset.newInstanceFor(output));
+          outputsBuilder.add(Dataset.newInstanceWith(run, output));
         }
       }
 
-      return new Metadata.IO(inputsBuilder.build(), outputsBuilder.build());
+      return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
   }
 
+  /* ... */
   static class Facets {
     static final String DOCUMENTATION = "documentation";
     static final String DESCRIPTION = "description";
@@ -353,7 +362,7 @@ public final class Metadata {
           .map(facet -> (String) facet.getAdditionalProperties().get(DESCRIPTION));
     }
 
-    static Optional<Metadata.Dataset.Schema> schemaFor(@NonNull final OpenLineage.Dataset dataset) {
+    static Optional<Dataset.Schema> schemaFor(@NonNull final OpenLineage.Dataset dataset) {
       return Optional.ofNullable(dataset.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
           .map(facets -> facets.getAdditionalProperties().get(SCHEMA_FIELDS))
@@ -374,7 +383,7 @@ public final class Metadata {
                   // ...
                   (fields.isEmpty())
                       ? null // ...
-                      : Metadata.Dataset.Schema.builder().fields(fields).build());
+                      : Dataset.Schema.builder().fields(fields).build());
     }
 
     static Dataset.Source sourceFor(@NonNull final OpenLineage.Dataset dataset) {
