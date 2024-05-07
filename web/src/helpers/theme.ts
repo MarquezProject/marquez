@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { createTheme } from '@mui/material'
+import { createTheme, darken } from '@mui/material'
 
 export const theme = createTheme({
   components: {
@@ -47,6 +47,7 @@ export const theme = createTheme({
     },
     background: {
       default: '#191f26',
+      paper: darken('#191f26', 0.1),
     },
     secondary: {
       main: '#454f5b',

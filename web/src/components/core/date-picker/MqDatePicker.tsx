@@ -27,6 +27,13 @@ const MqDatePicker: React.FC<DatePickerProps> = ({
   return (
     <DateTimePicker
       label={label}
+      slotProps={{
+        desktopPaper: {
+          sx: {
+            backgroundImage: 'none',
+          },
+        },
+      }}
       sx={{
         label: {
           left: theme.spacing(2),
