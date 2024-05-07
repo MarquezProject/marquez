@@ -21,13 +21,19 @@ import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { datasetFacetsStatus, encodeNode } from '../../helpers/nodes'
+import {
+  datasetFacetsQualityAssertions,
+  datasetFacetsStatus,
+  encodeNode,
+} from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { useTheme } from '@emotion/react'
+import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
@@ -162,8 +168,8 @@ const Datasets: React.FC<DatasetsProps> = ({
                     <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
                       <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                     </TableCell>
-                    <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
+                    <TableCell key={i18next.t('datasets_route.quality')} align='left'>
+                      <MqText subheading>{i18next.t('datasets_route.quality')}</MqText>
                     </TableCell>
                     <TableCell key={i18next.t('datasets.column_lineage_tab')} align='left'>
                       <MqText inline subheading>
@@ -176,6 +182,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                   {datasets
                     .filter((dataset) => !dataset.deleted)
                     .map((dataset) => {
+                      const assertions = datasetFacetsQualityAssertions(dataset.facets)
                       return (
                         <TableRow key={dataset.name}>
                           <TableCell align='left'>
@@ -202,13 +209,21 @@ const Datasets: React.FC<DatasetsProps> = ({
                           <TableCell align='left'>
                             {datasetFacetsStatus(dataset.facets) ? (
                               <>
-                                <MqStatus
-                                  label={'Quality'}
-                                  color={datasetFacetsStatus(dataset.facets)}
-                                />
+                                <MQTooltip title={<Assertions assertions={assertions} />}>
+                                  <Box>
+                                    <MqStatus
+                                      label={
+                                        assertions.find((a) => !a.success)
+                                          ? 'UNHEALTHILY'
+                                          : 'HEALTHY'
+                                      }
+                                      color={datasetFacetsStatus(dataset.facets)}
+                                    />
+                                  </Box>
+                                </MQTooltip>
                               </>
                             ) : (
-                              <MqText>N/A</MqText>
+                              <MqStatus label={'N/A'} color={theme.palette.secondary.main} />
                             )}
                           </TableCell>
                           <TableCell>
@@ -222,7 +237,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 VIEW
                               </MqText>
                             ) : (
-                              <MqText>N/A</MqText>
+                              <MqText subdued>N/A</MqText>
                             )}
                           </TableCell>
                         </TableRow>
