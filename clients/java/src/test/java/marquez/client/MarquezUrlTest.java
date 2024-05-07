@@ -44,6 +44,54 @@ public class MarquezUrlTest {
   }
 
   @Test
+  void testToLineageUrl() {
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20",
+        marquezUrl.toLineageUrl(NodeId.of(new DatasetId("namespace", "dataset")), 20).toString());
+
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield&depth=20",
+        marquezUrl
+            .toLineageUrl(NodeId.of(new DatasetFieldId("namespace", "dataset", "field")), 20)
+            .toString());
+
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=job%3Anamespace%3Ajob&depth=20",
+        marquezUrl.toLineageUrl(NodeId.of(new JobId("namespace", "job")), 20).toString());
+
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=dataset%3Anamespace%3Adataset%23"
+            + version
+            + "&depth=20",
+        marquezUrl
+            .toLineageUrl(
+                NodeId.of(new DatasetVersionId("namespace", "dataset", UUID.fromString(version))),
+                20)
+            .toString());
+
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield%23"
+            + version
+            + "&depth=20",
+        marquezUrl
+            .toLineageUrl(
+                NodeId.of(
+                    new DatasetFieldVersionId(
+                        "namespace", "dataset", "field", UUID.fromString(version))),
+                20)
+            .toString());
+
+    Assertions.assertEquals(
+        "http://marquez:5000/api/v1/lineage?nodeId=job%3Anamespace%3Ajob%23"
+            + version
+            + "&depth=20",
+        marquezUrl
+            .toLineageUrl(
+                NodeId.of(new JobVersionId("namespace", "job", UUID.fromString(version))), 20)
+            .toString());
+  }
+
+  @Test
   void testToColumnLineageUrl() {
     Assertions.assertEquals(
         "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=true",

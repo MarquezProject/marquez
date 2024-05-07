@@ -16,6 +16,7 @@ import static marquez.client.MarquezPathV1.datasetVersionPath;
 import static marquez.client.MarquezPathV1.fieldTagPath;
 import static marquez.client.MarquezPathV1.jobPath;
 import static marquez.client.MarquezPathV1.jobVersionPath;
+import static marquez.client.MarquezPathV1.lineagePath;
 import static marquez.client.MarquezPathV1.listDatasetVersionsPath;
 import static marquez.client.MarquezPathV1.listDatasetsPath;
 import static marquez.client.MarquezPathV1.listJobVersionsPath;
@@ -206,6 +207,13 @@ class MarquezUrl {
     }
     queryParams.put("limit", limit);
     return from(searchPath(), queryParams.build());
+  }
+
+  URL toLineageUrl(NodeId nodeId, int depth) {
+    final ImmutableMap.Builder queryParams = new ImmutableMap.Builder();
+    queryParams.put("nodeId", nodeId.getValue());
+    queryParams.put("depth", String.valueOf(depth));
+    return from(lineagePath(), queryParams.build());
   }
 
   URL toColumnLineageUrl(NodeId nodeId, int depth, boolean withDownstream) {

@@ -8,9 +8,10 @@ export const genericErrorMessageConstructor = (functionName: string, error: APIE
   throw `${functionName} responded with error code ${code}: ${message}.  Here are the details: ${details}`
 }
 
-interface IParams {
+export interface IParams {
   method: HttpMethod
   body?: string
+  headers?: Record<string, string>
 }
 
 export const parseResponse = async (response: Response, functionName: string) => {
@@ -27,7 +28,7 @@ export const parseResponse = async (response: Response, functionName: string) =>
       const errorMessage = json || {
         code: response.status,
         message: 'Unknown error occurred',
-        details: body
+        details: body,
       }
       const error = genericErrorMessageConstructor(functionName, errorMessage)
       throw new Error(error)
@@ -45,3 +46,4 @@ export * from './events'
 export * from './facets'
 export * from './namespaces'
 export * from './jobs'
+export * from './tags'

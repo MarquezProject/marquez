@@ -83,7 +83,10 @@ class RunDaoTest {
         jdbi, runRow.getUuid(), RunState.COMPLETED, jobMeta.getOutputs());
 
     jobVersionDao.upsertJobVersionOnRunTransition(
-        jobRow, runRow.getUuid(), RunState.COMPLETED, Instant.now());
+        jobVersionDao.loadJobRowRunDetails(jobRow, runRow.getUuid()),
+        RunState.COMPLETED,
+        Instant.now(),
+        true);
 
     Optional<Run> run = runDao.findRunByUuid(runRow.getUuid());
     assertThat(run)
@@ -198,7 +201,10 @@ class RunDaoTest {
                   jdbi, runRow.getUuid(), RunState.COMPLETED, outputs);
 
               jobVersionDao.upsertJobVersionOnRunTransition(
-                  jobRow, runRow.getUuid(), RunState.COMPLETED, Instant.now());
+                  jobVersionDao.loadJobRowRunDetails(jobRow, runRow.getUuid()),
+                  RunState.COMPLETED,
+                  Instant.now(),
+                  true);
               return runRow;
             });
   }
@@ -224,7 +230,6 @@ class RunDaoTest {
             row.getRunArgsUuid(),
             null,
             null,
-            namespaceRow.getUuid(),
             namespaceRow.getName(),
             jobRow.getName(),
             null);
@@ -256,7 +261,6 @@ class RunDaoTest {
         row.getRunArgsUuid(),
         null,
         null,
-        namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
         null);
@@ -271,7 +275,6 @@ class RunDaoTest {
         row.getRunArgsUuid(),
         null,
         null,
-        namespaceRow.getUuid(),
         namespaceRow.getName(),
         jobRow.getName(),
         null);

@@ -1,12 +1,17 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { JobOrDataset, LineageNode } from '../components/lineage/types'
+import { JobOrDataset, LineageNode } from './lineage'
 
 export interface Tag {
   name: string
   description: string
 }
+
+export interface Tags {
+  tags: Tag[]
+}
+
 export interface Runs {
   runs: Run[]
 }
@@ -26,6 +31,7 @@ export interface Namespace {
 
 export interface Events {
   events: Event[]
+  totalCount: number
 }
 
 export type EventType = 'START' | 'RUNNING' | 'ABORT' | 'FAIL' | 'COMPLETE'
@@ -58,6 +64,7 @@ export interface Event {
 
 export interface Datasets {
   datasets: Dataset[]
+  totalCount: number
 }
 
 export interface Dataset {
@@ -75,7 +82,22 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
-  columnLineage: object
+  columnLineage: InputFields[]
+}
+
+interface InputField {
+  namespace: string
+  dataset: string
+  field: string
+  transformationDescription: string | null
+  transformationType: string | null
+}
+
+interface InputFields {
+  name: string
+  inputFields: InputField[]
+  transformationDescription: string | null
+  transformationType: string | null
 }
 
 export interface DatasetVersions {
@@ -131,6 +153,7 @@ export interface Field {
 }
 
 export interface Jobs {
+  totalCount: number
   jobs: Job[]
 }
 
@@ -211,4 +234,46 @@ export interface Facets {
   facets: {
     [key: string]: object
   }
+}
+
+export interface ColumnLineageGraph {
+  graph: ColumnLineageNode[]
+}
+
+export interface ColumnLineageNode {
+  id: string
+  type: string
+  data: ColumnLineageData
+  inEdges: ColumnLineageInEdge[]
+  outEdges: ColumnLineageOutEdge[]
+}
+
+export interface ColumnLineageData {
+  namespace: string
+  dataset: string
+  datasetVersion: string
+  field: string
+  fieldType: string
+  transformationDescription: any
+  transformationType: any
+  inputFields: ColumnLineage[]
+}
+
+export interface ColumnLineage {
+  namespace: string
+  dataset: string
+  datasetVersion: string
+  field: string
+  transformationDescription: any
+  transformationType: any
+}
+
+export interface ColumnLineageInEdge {
+  origin: string
+  destination: string
+}
+
+export interface ColumnLineageOutEdge {
+  origin: string
+  destination: string
 }

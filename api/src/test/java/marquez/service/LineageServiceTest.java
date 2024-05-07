@@ -9,12 +9,19 @@ import static marquez.db.LineageTestUtils.NAMESPACE;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import marquez.api.JdbiUtils;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.JobId;
@@ -30,11 +37,14 @@ import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.LineageService.UpstreamRunLineage;
 import marquez.service.models.Edge;
+import marquez.service.models.Job;
 import marquez.service.models.JobData;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
+import marquez.service.models.LineageEvent.JobTypeJobFacet;
 import marquez.service.models.LineageEvent.SchemaField;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
@@ -49,6 +59,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class LineageServiceTest {
@@ -56,7 +67,6 @@ public class LineageServiceTest {
   private static LineageDao lineageDao;
   private static LineageService lineageService;
   private static OpenLineageDao openLineageDao;
-
   private static DatasetDao datasetDao;
   private static JobDao jobDao;
 
@@ -68,8 +78,7 @@ public class LineageServiceTest {
               new SchemaField("firstname", "string", "the first name"),
               new SchemaField("lastname", "string", "the last name"),
               new SchemaField("birthdate", "date", "the date of birth")));
-  private final JobFacet jobFacet = new JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
-
+  private final JobFacet jobFacet = JobFacet.builder().build();
   static Jdbi jdbi;
 
   @BeforeAll
@@ -195,6 +204,27 @@ public class LineageServiceTest {
             NodeId.of(
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
+
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    jobs =
+        jobs.stream()
+            .filter(j -> j.getName().getValue().contains("newDownstreamJob"))
+            .collect(Collectors.toList());
+    assertTrue(jobs.size() > 0);
+    Job job = jobs.get(0);
+    assertTrue(job.getLatestRun().isPresent());
+    UpstreamRunLineage upstreamLineage =
+        lineageService.upstream(job.getLatestRun().get().getId(), 10);
+    assertThat(upstreamLineage.runs()).size().isEqualTo(3);
+    assertThat(upstreamLineage.runs().get(0).job().name().getValue())
+        .matches("newDownstreamJob.*<-outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(0).inputs().get(0).name().getValue())
+        .matches("outputData.*<-newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).job().name().getValue())
+        .matches("newReadJob.*<-commonDataset");
+    assertThat(upstreamLineage.runs().get(1).inputs().get(0).name().getValue())
+        .isEqualTo("commonDataset");
+    assertThat(upstreamLineage.runs().get(2).job().name().getValue()).isEqualTo("writeJob");
   }
 
   @Test
@@ -402,6 +432,165 @@ public class LineageServiceTest {
   }
 
   @Test
+  public void testGetLineageJobRunTwice() {
+    Dataset input = Dataset.builder().name("input-dataset").namespace(NAMESPACE).build();
+    Dataset output = Dataset.builder().name("output-dataset").namespace(NAMESPACE).build();
+    UUID runId = UUID.randomUUID();
+
+    // (1) Run batch job which outputs input-dataset
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "START",
+        jobFacet,
+        Arrays.asList(input),
+        Collections.emptyList(),
+        null,
+        ImmutableMap.of());
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Arrays.asList(output),
+        null,
+        ImmutableMap.of());
+
+    // (2) Rerun it
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "START",
+        jobFacet,
+        Arrays.asList(input),
+        Collections.emptyList(),
+        null,
+        ImmutableMap.of());
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someJob",
+        runId,
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Arrays.asList(output),
+        null,
+        ImmutableMap.of());
+
+    // (4) lineage on output dataset shall be same as lineage on input dataset
+    Lineage lineageFromInput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("input-dataset"))),
+            5,
+            true);
+
+    Lineage lineageFromOutput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("output-dataset"))),
+            5,
+            true);
+
+    assertThat(lineageFromInput.getGraph()).hasSize(3); // 2 datasets + 1 job
+    assertThat(lineageFromInput.getGraph()).isEqualTo(lineageFromOutput.getGraph());
+  }
+
+  @Test
+  public void testGetLineageForRunningStreamingJob() {
+    Dataset input = Dataset.builder().name("input-dataset").namespace(NAMESPACE).build();
+    Dataset output = Dataset.builder().name("output-dataset").namespace(NAMESPACE).build();
+
+    // (1) Run batch job which outputs input-dataset
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someInputBatchJob",
+        "COMPLETE",
+        jobFacet,
+        Collections.emptyList(),
+        Arrays.asList(input));
+
+    // (2) Run streaming job on the reading output of this job
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "streamingjob",
+        "RUNNING",
+        JobFacet.builder()
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
+            .build(),
+        Arrays.asList(input),
+        Arrays.asList(output));
+
+    // (3) Run batch job that reads output of streaming job (Note: streaming job is still running)
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "someOutputBatchJob",
+        "COMPLETE",
+        jobFacet,
+        Arrays.asList(output),
+        Collections.emptyList());
+
+    // (4) lineage on output dataset shall be same as lineage on input dataset
+    Lineage lineageFromInput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("input-dataset"))),
+            5,
+            true);
+
+    Lineage lineageFromOutput =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("output-dataset"))),
+            5,
+            true);
+
+    assertThat(lineageFromInput.getGraph()).hasSize(5); // 2 datasets + 3 jobs
+    assertThat(lineageFromInput.getGraph()).isEqualTo(lineageFromOutput.getGraph());
+  }
+
+  @Test
+  public void testGetLineageForCompleteStreamingJob() {
+    Dataset input = Dataset.builder().name("input-dataset").namespace(NAMESPACE).build();
+    Dataset output = Dataset.builder().name("output-dataset").namespace(NAMESPACE).build();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "streamingjob",
+        "RUNNING",
+        JobFacet.builder()
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
+            .build(),
+        Arrays.asList(input),
+        Arrays.asList(output));
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao,
+        "streamingjob",
+        "COMPLETE",
+        JobFacet.builder()
+            .jobType(JobTypeJobFacet.builder().processingType("STREAMING").build())
+            .build(),
+        Collections.emptyList(),
+        Collections.emptyList());
+
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("output-dataset"))),
+            5,
+            true);
+
+    assertThat(lineage.getGraph()).hasSize(3); // 1 job + 2 datasets
+  }
+
+  @Test
   public void testLineageForOrphanedDataset() {
     UpdateLineageRow writeJob =
         LineageTestUtils.createLineageRow(
@@ -435,5 +624,65 @@ public class LineageServiceTest {
 
   private boolean jobNameEquals(Node node, String writeJob) {
     return node.getId().asJobId().getName().getValue().equals(writeJob);
+  }
+
+  @Test
+  public void testSymlinkDatasetLineage() {
+    // (1) Create symlink facet for our main dataset
+    Map<String, Object> symlink = new HashMap<>();
+    Map<String, Object> symlinkInfo = new HashMap<>();
+    Map<String, Object> symlinkIdentifiers = new HashMap<>();
+    symlinkIdentifiers.put("name", "symlinkDataset");
+    symlinkIdentifiers.put("namespace", NAMESPACE);
+    symlinkIdentifiers.put("type", "DB_TABLE");
+    symlinkInfo.put("producer", "https://github.com/OpenLineage/producer/");
+    symlinkInfo.put("schemaURL", "https://openlineage.io/schema/url/");
+    symlinkInfo.put("identifiers", symlinkIdentifiers);
+    symlink.put("symlinks", symlinkInfo);
+
+    // (2) Create main dataset with a symlink
+    Dataset mainDataset =
+        new Dataset(
+            NAMESPACE,
+            "mainDataset",
+            newDatasetFacet(symlink, new SchemaField("firstname", "string", "the first name")));
+
+    // (3) Create the symlink dataset
+    Dataset symlinkDataset =
+        new Dataset(
+            NAMESPACE,
+            "symlinkDataset",
+            newDatasetFacet(new SchemaField("firstname", "string", "the first name")));
+
+    // (3) Create a job with the main dataset
+    UpdateLineageRow firstJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "firstJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(mainDataset),
+            Arrays.asList());
+
+    // (4) Create a job with the symlink dataset
+    UpdateLineageRow secondJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "secondJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(symlinkDataset),
+            Arrays.asList());
+
+    // (5) We expect the first and second job linked together because the main
+    // and symlink dataset are in fact the same dataset
+    Lineage lineage =
+        lineageService.lineage(
+            NodeId.of(
+                new DatasetId(new NamespaceName(NAMESPACE), new DatasetName("symlinkDataset"))),
+            5,
+            true);
+
+    assertThat(lineage.getGraph()).hasSize(2);
   }
 }

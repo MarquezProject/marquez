@@ -21,7 +21,7 @@ jobs:
   build-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     environment:
       TESTCONTAINERS_RYUK_DISABLED: true
     steps:
@@ -49,7 +49,7 @@ jobs:
   build-image-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - checkout
       - run: docker build --no-cache --tag "marquezproject/marquez:${CIRCLE_SHA1}" .
@@ -60,7 +60,7 @@ jobs:
   build-image-web:
     working_directory: ~/marquez/web
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - *checkout_project_root
       - run: docker build --no-cache --tag "marquezproject/marquez-web:${CIRCLE_SHA1}" .
@@ -71,7 +71,7 @@ jobs:
   unit-test-web:
     working_directory: ~/marquez/web
     docker:
-      - image: circleci/node:12.22.7
+      - image: cimg/node:18.16.0
     environment:
       TZ: 'America/New_York'
     steps:
@@ -92,7 +92,7 @@ jobs:
   build-client-java:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - checkout
       - restore_cache:
@@ -150,7 +150,7 @@ jobs:
   load-test-api:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - checkout
       - run: ./.circleci/get-docker-compose.sh
@@ -165,25 +165,30 @@ jobs:
   migrate-db:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     resource_class: large
     steps:
       - checkout
       - run: ./.circleci/get-docker-compose.sh
       - run: ./.circleci/db-migration.sh
 
-  release-java:
+  publish-snapshot:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - checkout
       - run: ./.circleci/get-jdk17.sh
-      - run: |
-          # Get, then decode the GPG private key used to sign *.jar
-          export ORG_GRADLE_PROJECT_signingKey=$(echo $GPG_SIGNING_KEY | base64 -d)
-          # Publish *.jar
-          ./gradlew publish
+      - run: ./.circleci/publish.sh # *SNAPSHOT.jar
+
+  release-java:
+    working_directory: ~/marquez
+    machine:
+      image: ubuntu-2004:2023.10.1
+    steps:
+      - checkout
+      - run: ./.circleci/get-jdk17.sh
+      - run: ./.circleci/publish.sh # *.jar
 
   release-python:
     working_directory: ~/marquez
@@ -199,7 +204,7 @@ jobs:
   release-docker:
     working_directory: ~/marquez
     machine:
-      image: ubuntu-2004:current
+      image: ubuntu-2004:2023.10.1
     steps:
       - checkout
       - run: ./docker/login.sh
@@ -225,6 +230,16 @@ workflows:
       - migrate-db:
           requires:
             - build-api
+      - publish-snapshot:
+          filters:
+            branches:
+              only: main
+          context: release
+          requires:
+            - build-image-api
+            - load-test-api
+            - migrate-db
+
   release:
     jobs:
       - build-client-python:

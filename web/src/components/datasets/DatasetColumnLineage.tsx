@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button } from '@material-ui/core'
+import { Box, Button } from '@mui/material'
 import { Dataset } from '../../types/api'
 import { IState } from '../../store/reducers'
-import { LineageDataset } from '../lineage/types'
+import { LineageDataset } from '../../types/lineage'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { fileSize } from '../../helpers'
 import { saveAs } from 'file-saver'
+import { useParams } from 'react-router-dom'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
@@ -31,13 +32,16 @@ interface DispatchProps {
 
 type IProps = DatasetColumnLineageProps & DispatchProps & StateProps
 
-const DatasetColumnLineage: FunctionComponent<IProps> = props => {
+const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
+  const i18next = require('i18next')
   const { dataset, lineageDataset, fetchDataset, resetDataset } = props
-  const columnLineage = dataset.columnLineage
+  const { name, namespace } = useParams()
 
   useEffect(() => {
-    fetchDataset(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name])
+    if (namespace && name) {
+      fetchDataset(namespace, name)
+    }
+  }, [name, namespace])
 
   // unmounting
   useEffect(
@@ -53,8 +57,7 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
     saveAs(blob, `${title}.json`)
   }
 
-  const i18next = require('i18next')
-
+  const columnLineage = dataset?.columnLineage
   return (
     <>
       {columnLineage ? (
@@ -90,14 +93,14 @@ const DatasetColumnLineage: FunctionComponent<IProps> = props => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  dataset: state.dataset.result
+  dataset: state.dataset.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDataset: fetchDataset,
-      resetDataset: resetDataset
+      resetDataset: resetDataset,
     },
     dispatch
   )

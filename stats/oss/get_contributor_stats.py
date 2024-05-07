@@ -49,7 +49,7 @@ class ContributorStats:
     def get_stats(self, date_start, date_end):
         """gets commit stats for all contributors"""
         console.print(
-            'GitHub repo found, getting historical stats...', 
+            'GitHub repo found, getting historical stats...',
             style="green"
             )
         for contributor in self.repo.get_stats_contributors():
@@ -65,19 +65,19 @@ class ContributorStats:
             for week in contributor.weeks:
                 alltime_additions += week.a
                 alltime_deletions += week.d
-                if date_start < week.w < date_end:     
+                if date_start < week.w < date_end:
                     period_additions += week.a
                     period_deletions += week.d
                     period_commits += week.c
             row = [
-                name, 
-                login, 
-                email, 
-                alltime_additions, 
-                alltime_deletions, 
-                alltime_commits, 
-                period_additions, 
-                period_deletions, 
+                name,
+                login,
+                email,
+                alltime_additions,
+                alltime_deletions,
+                alltime_commits,
+                period_additions,
+                period_deletions,
                 period_commits
             ]
             self.rows.append(row)
@@ -122,12 +122,12 @@ class ContributorStats:
         for row in self.rows:
             self.logins[row[1]] = {'pulls':0, 'total':0}
         console.print(
-            f'Getting pulls closed between {date_start} and {date_end}...', 
+            f'Getting pulls closed between {date_start} and {date_end}...',
             style='magenta'
             )
         pulls = self.repo.get_pulls(
-            state="closed", 
-            sort="created", 
+            state="closed",
+            sort="created",
             direction="desc"
             )
         for pull in pulls:
@@ -145,7 +145,7 @@ class ContributorStats:
     def add_pulls(self):
         """adds PR data to rows dataset"""
         console.print(
-            'Adding PRs to dataset and exporting table...', 
+            'Adding PRs to dataset and exporting table...',
             style='green'
             )
         for row in self.rows:
@@ -172,7 +172,7 @@ class ContributorStats:
             self.committer_avg = 'N/A'
         if len(self.committer_prs) > 0:
             self.committer_avg_prs = round(
-                sum(self.committer_prs)/len(self.committer_prs), 
+                sum(self.committer_prs)/len(self.committer_prs),
                 2
                 )
 
@@ -196,12 +196,12 @@ class ContributorStats:
                 row.append('N/A')
         if len(self.committer_prs) > 0 and len(self.committer_changes) > 0:
             console.print(
-                'Average # of PRs by committers during period: ', 
+                'Average # of PRs by committers during period: ',
                 round(sum(self.committer_prs)/len(self.committer_prs), 2),
                 style='green'
                 )
             console.print(
-                'Average size of commits by committers active during period: ', 
+                'Average size of commits by committers active during period: ',
                 round(sum(self.committer_changes)/len(self.committer_changes), 2),
                 style='green'
                 )
@@ -209,7 +209,7 @@ class ContributorStats:
     def verbose_str(self):
         """outputs a detailed ranked list to the terminal"""
         rank = 1
-        for row in reversed(self.rows):    
+        for row in reversed(self.rows):
             console.print(rank, ': ', row[0], style='yellow')
             console.print('login: ', row[1], style='yellow')
             if isinstance(row[2], str):
@@ -221,25 +221,25 @@ class ContributorStats:
             console.print('total additions this period: ', row[6], style='green')
             console.print('total deletions this period: ', row[7], style='green')
             console.print(
-                'total changes this period: ', 
-                row[6] + row[7], 
+                'total changes this period: ',
+                row[6] + row[7],
                 style='green'
                 )
             console.print('total commits this period: ', row[8], style='green')
             console.print('total PRs this period: ', row[9], style='green')
             console.print(
-                'average commit size this period: ', 
-                row[11], 
+                'average commit size this period: ',
+                row[11],
                 style='green'
                 )
             console.print(
-                'average commit size relative to active committer average: ', 
-                row[12], 
+                'average commit size relative to active committer average: ',
+                row[12],
                 style='magenta'
                 )
             console.print(
-                'number of PRs this period relative to active committer average: ', 
-                row[13], 
+                'number of PRs this period relative to active committer average: ',
+                row[13],
                 style='magenta'
                 )
             console.print('-------------', style='green')
@@ -248,7 +248,7 @@ class ContributorStats:
     def terse_str(self):
         """outputs a terse ranked list to the terminal"""
         rank = 1
-        for row in reversed(self.rows):    
+        for row in reversed(self.rows):
             console.print(rank, ': ', row[0], style='yellow')
             console.print('login: ', row[1], style='magenta')
             rank += 1
@@ -257,25 +257,25 @@ class ContributorStats:
         """writes the data to a local .csv file"""
         print('Exporting to .csv file...')
         header = [
-            'name', 
-            'username', 
-            'email', 
-            'all-time additions', 
-            'all-time deletions', 
-            'all-time commits', 
-            'additions this period', 
-            'deletions this period', 
-            'commits this period', 
-            'PRs this period', 
-            'committer status', 
-            'average commit size this period', 
+            'name',
+            'username',
+            'email',
+            'all-time additions',
+            'all-time deletions',
+            'all-time commits',
+            'additions this period',
+            'deletions this period',
+            'commits this period',
+            'PRs this period',
+            'committer status',
+            'average commit size this period',
             'changes relative to committer average for period',
             'PRs relative to committer average for period'
             ]
         with open(
-            'contributor_stats_table.csv', 
-            'w+', 
-            encoding='UTF8', 
+            'contributor_stats_table.csv',
+            'w+',
+            encoding='UTF8',
             newline=''
             ) as f:
             writer = csv.writer(f)
@@ -291,36 +291,36 @@ DEFAULT_END_OF_MONTH=DEFAULT_BEGINNING_OF_MONTH + relativedelta(months=+1)
 @click.command()
 @option_github_token  # TODO: this should only be required if --load isn't provided
 @click.option(
-    '--date-start', 
-    type=click.DateTime(formats=["%Y-%m-%d"]), 
+    '--date-start',
+    type=click.DateTime(formats=["%Y-%m-%d"]),
     default=str(DEFAULT_BEGINNING_OF_MONTH)
 )
 @click.option(
-    '--date-end', 
-    type=click.DateTime(formats=["%Y-%m-%d"]), 
+    '--date-end',
+    type=click.DateTime(formats=["%Y-%m-%d"]),
     default=str(DEFAULT_END_OF_MONTH)
 )
 @click.option('--verbose', is_flag="True", help="Print details")
 @click.option(
-    '--repo', 
-    help="Search org/repo", 
+    '--repo',
+    help="Search org/repo",
     default=str("MarquezProject/marquez")
     )
 @click.option(
-    '--org', 
-    help="Search org", 
+    '--org',
+    help="Search org",
     default=str("MarquezProject")
     )
 @click.option(
     '--team',
-    help="Search org for committer team name", 
+    help="Search org for committer team name",
     default=str("committers")
 )
 @click.option(
     '--sort',
     help=
     """
-    Sort options: PRs, commits-this-period, all-time-commits, all-time-additions, 
+    Sort options: PRs, commits-this-period, all-time-commits, all-time-additions,
     additions-this-period, deletions-this-period, all-time-deletions
     """,
     default=str("PRs")
@@ -335,10 +335,10 @@ def main(
     org: str,
     team: str,
     sort: str
-):    
-    with console.status('Working...', spinner='line'):    
+):
+    with console.status('Working...', spinner='line'):
         console.print(
-            'Fetching GitHub repo and org...', 
+            'Fetching GitHub repo and org...',
             style="green"
             )
         g = Github(github_token)

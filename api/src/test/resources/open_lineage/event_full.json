@@ -61,6 +61,13 @@
         },
         "query": "SELECT * FROM foo"
       },
+      "jobType": {
+        "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+        "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",
+        "jobType": "QUERY",
+        "integration": "FLINK",
+        "processingType": "STREAMING"
+      },
       "additionalProp1": {
         "_producer": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
         "_schemaURL": "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet",

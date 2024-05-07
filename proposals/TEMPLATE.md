@@ -29,5 +29,5 @@ Dicussion: [_Link to issue with dicussion on the change being proposed._]
 [_Include an Apache 2.0 license footer. Feel free to copy and paste the footer below._]
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

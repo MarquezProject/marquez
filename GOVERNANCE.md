@@ -89,7 +89,7 @@ Marquez is currently led by Willy Lulciuc.
 
 ## Marquez project meetings
 
-Some meetings are face-to-face, but most are conference calls.  
+Some meetings are face-to-face, but most are conference calls.
 Attendance at meetings is open to all.  Conference calls can be joined without an explicit invitation.
 However, due to physical security requirements at some of the venues we use,
 it is necessary to ensure you are added to the invitee list of any face-to-face meetings
@@ -100,13 +100,13 @@ Or a meeting may be at an organization's offices that are required to maintain a
 
 ## Marquez on Slack
 
-Marquez uses [a Slack community](http://bit.ly/MarquezSlack) to provide an ongoing dialogue between members.
+Marquez uses [a Slack community](https://bit.ly/Mqz_invite) to provide an ongoing dialogue between members.
 This creates a recorded discussion of design decisions and discussions that complement the project meetings.
 
 Follow the link above and register with the Slack service using your email address.
 Once signed in you can see all of the active Slack channels.
 
-Additional channels are added from time to time as new workgroups and discussion topics are established. 
+Additional channels are added from time to time as new workgroups and discussion topics are established.
 
 ## Marquez email
 
@@ -142,5 +142,5 @@ be resolved by voting. The voting process is a simple majority in which each com
 
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

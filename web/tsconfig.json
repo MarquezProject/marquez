@@ -11,11 +11,13 @@
     "lib": ["es2016", "es2017", "dom"],
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "resolveJsonModule": false
   },
   "include": [
     "./src/**/*",
+    "./libs/graph/src/**/*",
     "styles.d.ts"
   ],
   "exclude": ["./src/__tests__/*"]

@@ -21,10 +21,10 @@ plugins {
 }
 
 ext {
-    jdbi3Version = '3.37.1'
+    jdbi3Version = '3.40.0'
     prometheusVersion = '0.16.0'
-    testcontainersVersion = '1.17.6'
-    sentryVersion = '6.21.0'
+    testcontainersVersion = '1.18.3'
+    sentryVersion = '6.34.0'
 }
 
 dependencies {
@@ -43,16 +43,17 @@ dependencies {
     implementation "org.jdbi:jdbi3-jackson2:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-sqlobject:${jdbi3Version}"
-    implementation 'com.google.guava:guava:31.1-jre'
-    implementation 'org.dhatim:dropwizard-sentry:2.1.2-4'
+    implementation 'com.google.guava:guava:32.1.3-jre'
+    implementation 'org.dhatim:dropwizard-sentry:2.1.6'
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation 'org.flywaydb:flyway-core:8.5.13'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
-    implementation 'com.graphql-java:graphql-java:20.0'
+    implementation 'com.graphql-java:graphql-java:20.7'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"
+    testImplementation "org.jdbi:jdbi3-testcontainers:${jdbi3Version}"
     testImplementation "org.junit.vintage:junit-vintage-engine:${junit5Version}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
@@ -125,7 +126,9 @@ publishing {
 
     repositories {
         maven {
-            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
+            def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = System.getenv('SONATYPE_NEXUS_USERNAME')
                 password = System.getenv('SONATYPE_NEXUS_PASSWORD')
@@ -135,7 +138,6 @@ publishing {
 }
 
 signing {
-    required { isReleaseVersion }
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
     useInMemoryPgpKeys(signingKey, signingPassword)
@@ -147,7 +149,7 @@ application {
 }
 
 shadowJar {
-    classifier = ''
+    archiveClassifier.set('')
     transform(ServiceFileTransformer)
     // Add LICENSE to Jar
     from(projectDir) {

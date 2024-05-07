@@ -11,9 +11,9 @@
 # Usage: $ ./db-migration.sh
 
 # Version of PostgreSQL
-readonly POSTGRES_VERSION="12.1"
+readonly POSTGRES_VERSION="14"
 # Version of Marquez
-readonly MARQUEZ_VERSION=0.35.0
+readonly MARQUEZ_VERSION=0.46.0
 # Build version of Marquez
 readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
 

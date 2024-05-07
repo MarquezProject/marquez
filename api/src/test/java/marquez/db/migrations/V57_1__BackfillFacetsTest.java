@@ -28,6 +28,7 @@ import marquez.db.OpenLineageDao;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.flywaydb.core.api.migration.Context;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
@@ -167,8 +168,7 @@ public class V57_1__BackfillFacetsTest {
 
   @Test
   public void testMigrateForLineageWithNoDatasets() throws Exception {
-    LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    LineageEvent.JobFacet jobFacet = LineageEvent.JobFacet.builder().build();
     LineageTestUtils.createLineageRow(
         openLineageDao,
         "job_" + UUID.randomUUID(),

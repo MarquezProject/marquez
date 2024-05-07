@@ -47,6 +47,7 @@ helm delete marquez
 
 | Parameter                    | Description                            | Default                  |
 |------------------------------|----------------------------------------|--------------------------|
+| `marquez.serviceAccount`     | K8s service account for Marquez Deploy | `default`                |
 | `marquez.replicaCount`       | Number of desired replicas             | `1`                      |
 | `marquez.image.registry`     | Marquez image registry                 | `docker.io`              |
 | `marquez.image.repository`   | Marquez image repository               | `marquezproject/marquez` |
@@ -65,6 +66,7 @@ helm delete marquez
 | `marquez.resources.limits`   | K8s resource limit overrides           | `nil`                    |
 | `marquez.resources.requests` | K8s resource requests overrides        | `nil`                    |
 | `marquez.podAnnotations`     | Additional pod annotations for Marquez | `{}`                     |
+| `marquez.extraContainers`    | Additional container definitions to include inside Marquez Pod | `[]` |
 
 ### [Marquez Web UI](https://github.com/MarquezProject/marquez-web) **parameters**
 
@@ -202,5 +204,5 @@ kubectl logs -p <podName>
 See [CONTRIBUTING.md](https://github.com/MarquezProject/marquez-chart/blob/master/CONTRIBUTING.md) for more details about how to contribute.
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

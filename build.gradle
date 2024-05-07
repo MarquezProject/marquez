@@ -21,7 +21,7 @@ buildscript {
     dependencies {
         classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.15.0'
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
     }
 }
 
@@ -29,9 +29,6 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url = 'https://datakin.jfrog.io/artifactory/maven-public-libs-snapshot'
-        }
     }
 }
 
@@ -55,15 +52,14 @@ subprojects {
 
     ext {
         assertjVersion = '3.24.2'
-        dropwizardVersion = '2.1.6'
-        jacocoVersion = '0.8.10'
-        junit5Version = '5.9.3'
-        lombokVersion = '1.18.28'
-        mockitoVersion = '5.1.1'
-        openlineageVersion = '0.26.0'
+        dropwizardVersion = '2.1.12'
+        jacocoVersion = '0.8.11'
+        junit5Version = '5.10.2'
+        lombokVersion = '1.18.32'
+        mockitoVersion = '5.4.0'
+        openlineageVersion = '1.13.1'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.5.4'
-        isReleaseVersion = !version.endsWith('SNAPSHOT')
+        postgresqlVersion = '42.6.0'
     }
 
     dependencies {
@@ -73,7 +69,6 @@ subprojects {
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-        testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.projectlombok:lombok:${lombokVersion}"
         testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
@@ -95,14 +90,14 @@ subprojects {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    task sourceJar(type: Jar) {
-        classifier 'sources'
+    task sourceJar(type: Jar, dependsOn: classes) {
         from sourceSets.main.allJava
+        archiveClassifier.set("sources")
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier 'javadoc'
+    task javadocJar(type: Jar) {
         from javadoc.destinationDir
+        archiveClassifier.set("javadoc")
     }
 
     pmd {
@@ -132,6 +127,7 @@ subprojects {
         java {
             googleJavaFormat()
             removeUnusedImports()
+            endWithNewline()
             custom 'disallowWildcardImports', disallowWildcardImports
         }
     }
@@ -146,9 +142,9 @@ subprojects {
 
     jacocoTestReport {
         reports {
-            xml.enabled = true
-            html.enabled = true
-            html.destination = file(coverageDir)
+            xml.required = true
+            html.required = true
+            html.outputLocation = file(coverageDir)
         }
     }
 }

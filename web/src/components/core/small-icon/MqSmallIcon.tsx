@@ -3,19 +3,8 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
-import Box from '@material-ui/core/Box'
+import Box from '@mui/material/Box'
 import React from 'react'
-import createStyles from '@material-ui/core/styles/createStyles'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-const styles = () =>
-  createStyles({
-    icon: {
-      width: '10px !important',
-      height: 9,
-      fontSize: 9
-    }
-  })
 
 interface OwnProps {
   icon: IconDefinition
@@ -24,13 +13,7 @@ interface OwnProps {
   shape: 'circle' | 'rect'
 }
 
-const MqSmallIcon: React.FC<OwnProps & WithStyles<typeof styles>> = ({
-  icon,
-  backgroundColor,
-  foregroundColor,
-  shape,
-  classes
-}) => {
+const MqSmallIcon: React.FC<OwnProps> = ({ icon, backgroundColor, foregroundColor, shape }) => {
   return (
     <Box
       width={16}
@@ -41,9 +24,18 @@ const MqSmallIcon: React.FC<OwnProps & WithStyles<typeof styles>> = ({
       justifyContent={'center'}
       alignItems={'center'}
     >
-      <FontAwesomeIcon className={classes.icon} fixedWidth icon={icon} color={foregroundColor} />
+      <FontAwesomeIcon
+        style={{
+          width: '10px !important',
+          height: 9,
+          fontSize: 9,
+        }}
+        fixedWidth
+        icon={icon}
+        color={foregroundColor}
+      />
     </Box>
   )
 }
 
-export default withStyles(styles)(MqSmallIcon)
+export default MqSmallIcon

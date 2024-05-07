@@ -11,7 +11,6 @@ import static marquez.db.ColumnLineageTestUtils.getDatasetB;
 import static marquez.db.ColumnLineageTestUtils.getDatasetC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
@@ -41,6 +40,7 @@ import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
 import marquez.service.models.Lineage;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import org.jdbi.v3.core.Jdbi;
@@ -70,7 +70,7 @@ public class ColumnLineageServiceTest {
     fieldDao = jdbi.onDemand(DatasetFieldDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
     lineageService = new ColumnLineageService(dao, fieldDao);
-    jobFacet = new LineageEvent.JobFacet(null, null, null, LineageTestUtils.EMPTY_MAP);
+    jobFacet = JobFacet.builder().build();
   }
 
   @AfterEach
@@ -101,7 +101,10 @@ public class ColumnLineageServiceTest {
 
     // check dataset_A node
     Node col_a = getNode(lineage, "dataset_a", "col_b").get();
-    assertNull((ColumnLineageNodeData) col_a.getData());
+    ColumnLineageNodeData col_a_data = (ColumnLineageNodeData) col_a.getData();
+    assertThat(col_a_data.getInputFields()).hasSize(0);
+    assertEquals("dataset_a", col_a_data.getDataset());
+    assertEquals("", col_a_data.getFieldType());
 
     // verify edges
     // assert dataset_B (col_c) -> dataset_A (col_a)

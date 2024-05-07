@@ -1,16 +1,15 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
-import { Box } from '@material-ui/core'
+import * as Redux from 'redux'
+import { Box } from '@mui/material'
+import { IState } from '../../store/reducers'
 import { Run } from '../../types/api'
-import { formatUpdatedAt } from '../../helpers'
+import { connect } from 'react-redux'
+import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import MqCode from '../core/code/MqCode'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
-import * as Redux from 'redux'
-import { IState } from '../../store/reducers'
-import { connect } from 'react-redux'
-import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -29,13 +28,12 @@ export interface SqlFacet {
   query: string
 }
 
-
 type RunInfoProps = {
   run: Run
 } & JobFacetsProps &
   DispatchProps
 
-const RunInfo: FunctionComponent<RunInfoProps> = props => {
+const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   const { run, jobFacets, fetchJobFacets, resetFacets } = props
   const i18next = require('i18next')
 
@@ -52,40 +50,35 @@ const RunInfo: FunctionComponent<RunInfoProps> = props => {
   )
 
   return (
-    <Box mt={2}>
-      {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'}/>}
-      <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-        <Box ml={1}>
-          <MqText subdued>{formatUpdatedAt(run.updatedAt)}</MqText>
-        </Box>
-      </Box>
+    <Box>
+      {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
             <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
           </Box>
-          <MqJsonView data={run.facets} searchable={true} placeholder='Search' />
+          <MqJsonView
+            data={run.facets}
+            aria-label={i18next.t('jobs.facets_subhead_aria')}
+            aria-required='true'
+          />
         </Box>
       )}
     </Box>
   )
 }
 
-
 const mapStateToProps = (state: IState) => ({
-  jobFacets: state.facets.result
+  jobFacets: state.facets.result,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   Redux.bindActionCreators(
     {
       fetchJobFacets: fetchJobFacets,
-      resetFacets: resetFacets
+      resetFacets: resetFacets,
     },
     dispatch
   )
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(RunInfo)
+export default connect(mapStateToProps, mapDispatchToProps)(RunInfo)

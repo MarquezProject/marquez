@@ -116,6 +116,15 @@ public class MarquezClient {
     @Getter public final String value;
   }
 
+  public Lineage getLineage(NodeId nodeId) {
+    return getLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH);
+  }
+
+  public Lineage getLineage(NodeId nodeId, int depth) {
+    final String bodyAsJson = http.get(url.toLineageUrl(nodeId, depth));
+    return Lineage.fromJson(bodyAsJson);
+  }
+
   public Lineage getColumnLineage(NodeId nodeId) {
     return getColumnLineage(nodeId, DEFAULT_LINEAGE_GRAPH_DEPTH, false);
   }
@@ -231,6 +240,12 @@ public class MarquezClient {
     return Dataset.fromJson(bodyAsJson);
   }
 
+  public Dataset deleteDatasetTag(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
+    final String bodyAsJson = http.delete(url.toDatasetTagUrl(namespaceName, datasetName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
   public Dataset tagFieldWith(
       @NonNull String namespaceName,
       @NonNull String datasetName,
@@ -238,6 +253,16 @@ public class MarquezClient {
       @NonNull String tagName) {
     final String bodyAsJson =
         http.post(url.toFieldTagURL(namespaceName, datasetName, fieldName, tagName));
+    return Dataset.fromJson(bodyAsJson);
+  }
+
+  public Dataset deleteDatasetFieldTag(
+      @NonNull String namespaceName,
+      @NonNull String datasetName,
+      @NonNull String fieldName,
+      @NonNull String tagName) {
+    final String bodyAsJson =
+        http.delete(url.toFieldTagURL(namespaceName, datasetName, fieldName, tagName));
     return Dataset.fromJson(bodyAsJson);
   }
 

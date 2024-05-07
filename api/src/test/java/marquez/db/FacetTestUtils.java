@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import marquez.db.models.UpdateLineageRow;
 import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.JobFacet;
 import org.apache.commons.lang3.StringUtils;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
@@ -20,14 +21,20 @@ public class FacetTestUtils {
 
   public static UpdateLineageRow createLineageWithFacets(OpenLineageDao openLineageDao) {
     LineageEvent.JobFacet jobFacet =
-        new LineageEvent.JobFacet(
-            new LineageEvent.DocumentationJobFacet(PRODUCER_URL, SCHEMA_URL, "some-documentation"),
-            new LineageEvent.SourceCodeLocationJobFacet(
-                PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"),
-            new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"),
-            Map.of(
-                "ownership", "some-owner",
-                "sourceCode", "some-code"));
+        JobFacet.builder()
+            .documentation(
+                new LineageEvent.DocumentationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "some-documentation"))
+            .sourceCodeLocation(
+                new LineageEvent.SourceCodeLocationJobFacet(
+                    PRODUCER_URL, SCHEMA_URL, "git", "git@github.com:OpenLineage/OpenLineage.git"))
+            .sql(new LineageEvent.SQLJobFacet(PRODUCER_URL, SCHEMA_URL, "some sql query"))
+            .additional(
+                Map.of(
+                    "ownership", "some-owner",
+                    "sourceCode", "some-code"))
+            .build();
+
     return LineageTestUtils.createLineageRow(
         openLineageDao,
         "job_" + UUID.randomUUID(),

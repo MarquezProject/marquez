@@ -61,5 +61,5 @@ The following guides will help you and your team effectively deploy and manage M
 * [Running Marquez on AWS](running-on-aws.html)
 
 ----
-SPDX-License-Identifier: Apache-2.0 
+SPDX-License-Identifier: Apache-2.0
 Copyright 2018-2023 contributors to the Marquez project.

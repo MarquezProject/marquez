@@ -1,78 +1,41 @@
 // SPDX-License-Identifier: Apache-2.0
-
-import { MqInputBase } from '../input-base/MqInputBase'
-import { Theme } from '@material-ui/core'
+import { Box } from '@mui/system'
+import { THEME_EXTRA, theme } from '../../../helpers/theme'
+import { githubDarkTheme } from '@uiw/react-json-view/githubDark'
+import JsonView from '@uiw/react-json-view'
 import React from 'react'
-import ReactJson from 'searchable-react-json-view'
-import createStyles from '@material-ui/core/styles/createStyles'
-import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles'
-
-const styles = (theme: Theme) =>
-  createStyles({
-    input: {
-      marginBottom: `${theme.spacing(2)}px`
-    }
-  })
 
 interface OwnProps {
   data: object
-  searchable?: boolean
-  placeholder?: string
 }
 
-interface StateProps {
-  search: string
+type JsonViewProps = OwnProps
+
+githubDarkTheme.background = theme.palette.background.default
+githubDarkTheme.backgroundColor = theme.palette.background.default
+githubDarkTheme.borderLeftWidth = 2
+githubDarkTheme.borderLeftColor = theme.palette.grey[500]
+githubDarkTheme.borderLeftStyle = 'dashed'
+
+const mqTheme = {
+  ...githubDarkTheme,
+  '--w-rjv-info-color': THEME_EXTRA.typography.subdued,
+  '--w-rjv-type-null-color': theme.palette.warning.main,
+  '--w-rjv-type-boolean-color': theme.palette.error.main,
+  '--w-rjv-copied-color': theme.palette.primary.main,
+  '--w-rjv-key-string': theme.palette.common.white,
+  '--w-rjv-type-string-color': theme.palette.info.main,
+  '--w-rjv-ellipsis-color': theme.palette.info.main,
+  '--w-rjv-key-number': theme.palette.primary.main,
+  '--w-rjv-type-float-color': theme.palette.primary.main,
 }
 
-type JsonViewProps = WithStyles<typeof styles> & OwnProps
-
-const InputSearchJsonView = withStyles((theme: Theme) =>
-  createStyles({
-    input: {
-      padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`
-    }
-  })
-)(MqInputBase)
-
-class MqJsonView extends React.Component<JsonViewProps, StateProps> {
-  constructor(props: JsonViewProps) {
-    super(props)
-    this.state = {
-      search: ''
-    }
-  }
-
-  onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    this.setState({ search: event.target.value })
-  }
-
-  render() {
-    const { data, searchable = false, placeholder = 'Search', classes } = this.props
-    const { search } = this.state
-
-    return (
-      <>
-        {searchable &&
-          <InputSearchJsonView
-            className={classes.input}
-            onChange={event => this.onSearch(event)}
-            value={search}
-            autoComplete={'off'}
-            id={'json-view'}
-            placeholder={placeholder}
-          />
-        }
-        <ReactJson
-          src={data}
-          theme={'rjv_white'}
-          collapsed={2}
-          displayDataTypes={false}
-          enableClipboard={false}
-          highlightSearch={search}
-        />
-      </>
-    )
-  }
+const MqJsonView: React.FC<JsonViewProps> = ({ data }) => {
+  return (
+    <Box my={2}>
+      <JsonView style={mqTheme} collapsed={2} value={data} />
+    </Box>
+  )
 }
 
-export default withStyles(styles)(MqJsonView)
+export default MqJsonView

@@ -1,58 +1,67 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { createTheme } from '@material-ui/core'
+import { createTheme } from '@mui/material'
 
 export const theme = createTheme({
-  overrides: {
+  components: {
     MuiCssBaseline: {
-      '@global': {
-        body: {
-          color: '#fff'
-        }
-      }
-    }
+      styleOverrides: {
+        '@global': {
+          body: {
+            color: '#fff',
+          },
+        },
+        '.MuiInputBase-root': {
+          paddingTop: '0',
+          paddingBottom: '0',
+        },
+      },
+    },
   },
   typography: {
     fontFamily: 'Karla',
     h1: {
       fontSize: '2.5rem',
-      fontWeight: 600
+      fontWeight: 600,
     },
     h3: {
       fontSize: '1rem',
-      fontWeight: 600
+      fontWeight: 600,
     },
-    fontSize: 14
+    fontSize: 14,
   },
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
-      main: '#71ddbf'
+      main: '#71ddbf',
     },
     error: {
-      main: '#ee7b7b'
+      main: '#ee7b7b',
     },
     warning: {
-      main: '#7D7D7D'
+      main: '#7D7D7D',
     },
     info: {
-      main: '#FECC00'
+      main: '#9c98ec',
     },
     background: {
-      default: '#191f26'
+      default: '#191f26',
     },
     secondary: {
-      main: '#454f5b'
-    }
-  }
+      main: '#454f5b',
+    },
+  },
+  zIndex: {
+    snackbar: 9999,
+  },
 })
 
 export const THEME_EXTRA = {
   typography: {
     subdued: '#abb1bd',
-    disabled: '#8d9499'
-  }
+    disabled: '#8d9499',
+  },
 }
 
 // 1px for bottom border

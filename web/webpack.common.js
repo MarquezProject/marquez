@@ -7,7 +7,7 @@ module.exports = {
   module: {
     rules: [{
         test: /\.css$/,
-        use: [{
+      use: [{
             loader: 'style-loader',
           },
           {
@@ -18,14 +18,7 @@ module.exports = {
                 localIdentName: '[name]__[local]__[hash:base64:5]',
               },
             }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: [postCssModulesValues, autoprefixer],
-            },
-          }
-        ]
+        }]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -41,10 +34,10 @@ module.exports = {
           }
         }]
       },
-      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
       {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader"
+        loader: "ts-loader"
       },
       {
         test: /\.ico$/,

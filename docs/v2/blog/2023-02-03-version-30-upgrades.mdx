@@ -1,0 +1,89 @@
+---
+slug: version-30-upgrades
+description: How to ensure a smooth transition to the latest version of Marquez.
+title: Marquez 0.30.0 offers a big performance bump, with some assembly required
+authors:
+    name: Michael Robinson
+    title: Marquez Community Manager
+    url: https://github.com/merobi-hub
+    image_url: https://github.com/merobi-hub.png
+tags: [releases, web] 
+---
+
+This is a guide to making a smooth transition to the latest version of Marquez.
+
+<!--truncate-->
+
+## Marquez 0.30.0
+
+[Marquez 0.30.0](https://github.com/MarquezProject/marquez/releases/tag/0.30.0), 
+which we released on 2023-01-31, contains some exciting new features, including 
+[column-level lineage](https://github.com/MarquezProject/marquez/pull/2293) and 
+a [soft delete option](https://github.com/MarquezProject/marquez/pull/2343) in 
+the UI.
+
+Along with these long-awaited UI upgrades come some significant performance 
+improvements to the API. In prior versions of Marquez, accessing OpenLineage 
+facets required direct queries against the OpenLineage events table, which could 
+be quite costly depending on the size of this table. Some users have events 
+tables with more than 100K rows -- millions of rows, in fact. To address this 
+performance issue, Marquez 0.30.0 has new tables for dataset, job and run facets.
+
+So far, so simple, right? Protecting against data loss and ensuring a smooth 
+experience for users was not so simple, in fact. We needed a way to migrate the 
+data while not only avoiding loss but also keeping downtime to a minimum. The 
+solution that [Willy](https://github.com/wslulciuc) and 
+[Pawel](https://github.com/pawel-big-lebowski) found (with input from 
+[Mike Collado](https://github.com/collado-mike)) was to keep the data in the 
+events table until the migration process is complete and to create views on top 
+of the table for accessing the facets. After migration is complete, the views 
+are replaced to point to the new tables. Using views provides safeguards and 
+minimizes downtime during the migration. 
+
+## Migration Procedure
+
+As the 
+[migration plan](https://github.com/MarquezProject/marquez/blob/main/api/src/main/resources/marquez/db/migration/V57__readme.md) 
+says, users whose `lineage_events` tables have up to 100K rows can set it and 
+forget it -- no extra work is required beyond upgrading and restarting 
+Marquez, but be prepared for a brief downtime while a standard Flyway migration 
+fills the newly created tables automatically.
+
+For heavy users whose `lineage_events` tables have more than 100K rows, a 
+different process will be used. Instead of a standard migration, the process will 
+happen asynchronously so that the user can start the API and consume new 
+OpenLineage events as usual. Note that some API calls might return results
+slowly during the migration, especially if the output is based on facets.
+
+To perform a migration, these users must run a new `db-migrate` command:
+
+```
+java -jar api/build/libs/marquez-api-0.30.0.jar db-migrate --version v57 ./marquez.yml
+```
+
+Available command arguments, `version` (required) and `chunkSize` (optional), 
+allow the user to specify the migration version to apply and the number of 
+lineage events to process (the default being 10,000). The command will process 
+the data not in its entirety but in chunks, storing a state with information 
+about the chunks being processed. Consequently,
+
+- it can be stopped any time
+- it will continue automatically and process the remaining chunks. 
+
+A sample command specifying version 57 and 50,000 events:
+
+```
+java -jar api/build/libs/marquez-api-0.30.0.jar db-migrate --version v57 --chunkSize 50000 ./marquez.yml
+```
+
+## More Information
+
+For more details about what, if anything, you will need to do to ensure a smooth 
+transition to Marquez 0.30.0, check out the helpful
+[migration plan](https://github.com/MarquezProject/marquez/blob/main/api/src/main/resources/marquez/db/migration/V57__readme.md) 
+put together by [Willy](https://github.com/wslulciuc) and 
+[Pawel](https://github.com/pawel-big-lebowski). 
+
+For more information about the improvements and additions in Marquez 0.30.0, check 
+out [the release on GitHub](https://github.com/MarquezProject/marquez/releases/tag/0.30.0).
+
