@@ -1,3 +1,4 @@
+import { Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageGraph } from '../../types/api'
@@ -67,6 +68,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               </MqText>
             </Box>
           )}
+          <Divider sx={{ my: 1 }} />
           <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
             <MqText block bold sx={{ mr: 6 }}>
               Latest Run:

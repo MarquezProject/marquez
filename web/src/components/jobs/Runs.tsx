@@ -25,7 +25,6 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
-import RunStatus from './RunStatus'
 
 interface RunsProps {
   runs: Run[]
@@ -139,10 +138,7 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
               >
                 <TableCell align='left'>{run.id}</TableCell>
                 <TableCell align='left'>
-                  <Box display={'flex'} alignItems={'center'}>
-                    <RunStatus run={run} />
-                    <MqText>{run.state}</MqText>
-                  </Box>
+                  <MqStatus color={runStateColor(run.state)} label={run.state} />
                 </TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
