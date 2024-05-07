@@ -87,6 +87,7 @@ import marquez.client.models.Job;
 import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
+import marquez.client.models.JobVersionId;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
@@ -243,6 +244,8 @@ public class MarquezClientTest {
   private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
+  private static final JobVersionId JOB_VERSION =
+      new JobVersionId(JOB_ID.getNamespace(), JOB_ID.getName(), CURRENT_VERSION);
   private static final Job JOB =
       new Job(
           JOB_ID,
@@ -288,6 +291,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -303,6 +307,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -318,6 +323,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -333,6 +339,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -348,6 +355,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -378,6 +386,7 @@ public class MarquezClientTest {
               ENDED_AT,
               DURATION,
               RUN_ARGS,
+              JOB_VERSION,
               null,
               INPUT_RUN_DATASET_FACETS,
               OUTPUT_RUN_DATASET_FACETS),

@@ -8,6 +8,7 @@ import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
@@ -23,9 +24,11 @@ import {
   resetRuns,
   setTabIndex,
 } from '../../store/actionCreators'
+import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { formatUpdatedAt } from '../../helpers'
 import { jobRunsStatus } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
+import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
@@ -118,9 +121,29 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
           <Box>
-            <MqText font={'mono'} heading>
-              {job.name}
-            </MqText>
+            <Box display={'flex'} alignItems={'center'}>
+              <Box
+                mr={2}
+                borderRadius={theme.spacing(1)}
+                p={1}
+                width={32}
+                height={32}
+                display={'flex'}
+                bgcolor={theme.palette.primary.main}
+              >
+                <FontAwesomeIcon
+                  aria-hidden={'true'}
+                  title={'Job'}
+                  icon={faCog}
+                  width={16}
+                  height={16}
+                  color={theme.palette.common.white}
+                />
+              </Box>
+              <MqText font={'mono'} heading>
+                {truncateText(job.name, 40)}
+              </MqText>
+            </Box>
             {job.description && (
               <Box mt={1}>
                 <MqText subdued>{job.description}</MqText>
