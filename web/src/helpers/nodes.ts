@@ -107,6 +107,12 @@ export function jobRunsStatus(runs: Run[], limit = 14) {
     return theme.palette.primary.main as string
   }
 }
+export function datasetFacetsQualityAssertions(facets: DataQualityFacets) {
+  const assertions = facets?.dataQualityAssertions?.assertions
+  if (!assertions) {
+    return []
+  } else return assertions
+}
 
 export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
   const assertions = facets?.dataQualityAssertions?.assertions?.slice(-limit)
