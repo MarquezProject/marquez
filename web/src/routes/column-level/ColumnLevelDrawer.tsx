@@ -67,26 +67,28 @@ const ColumnLevelDrawer = ({
       >
         <Box px={2} pb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <Box display={'flex'} alignItems={'center'}>
-            <Box
-              mr={2}
-              borderRadius={theme.spacing(1)}
-              p={1}
-              width={32}
-              height={32}
-              display={'flex'}
-              bgcolor={theme.palette.info.main}
-            >
-              <FontAwesomeIcon
-                aria-hidden={'true'}
-                title={'Dataset'}
-                icon={faDatabase}
-                width={16}
-                height={16}
-                color={theme.palette.common.white}
-              />
+            <Box display={'flex'} alignItems={'center'}>
+              <Box
+                mr={2}
+                borderRadius={theme.spacing(1)}
+                p={1}
+                width={32}
+                height={32}
+                display={'flex'}
+                bgcolor={theme.palette.info.main}
+              >
+                <FontAwesomeIcon
+                  aria-hidden={'true'}
+                  title={'Dataset'}
+                  icon={faDatabase}
+                  width={16}
+                  height={16}
+                  color={theme.palette.common.white}
+                />
+              </Box>
             </Box>
+            <MqText heading>{searchParams.get('dataset')}</MqText>
           </Box>
-          <MqText heading>{searchParams.get('dataset')}</MqText>
           <IconButton
             onClick={() => {
               setSearchParams({})
