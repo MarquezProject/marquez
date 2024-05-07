@@ -8,9 +8,9 @@
 set -e
 
 # Version of Marquez
-readonly VERSION=0.45.0-rc.1
+readonly VERSION=0.46.0
 # Build version of Marquez
-readonly BUILD_VERSION=0.45.0-rc.1
+readonly BUILD_VERSION=0.46.0
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -50,7 +50,7 @@ usage() {
   echo "  --no-web              don't start the web UI"
   echo "  --no-volumes          don't create volumes"
   echo "  -h, --help            show help for script"
-  exit 1
+  echo
 }
 
 # Change working directory to project root
@@ -69,7 +69,7 @@ NO_WEB="false"
 NO_VOLUMES="false"
 TAG="${VERSION}"
 BUILD="false"
-ARGS="-V --force-recreate --remove-orphans"
+compose_args="-V --force-recreate --remove-orphans"
 # Parse args
 while [ $# -gt 0 ]; do
   case $1 in
@@ -95,7 +95,7 @@ while [ $# -gt 0 ]; do
        ;;
     --args)
        shift
-       ARGS+=" ${1}"
+       compose_args+=" ${1}"
        ;;
     -b|'--build')
        BUILD='true'
@@ -120,7 +120,7 @@ done
 
 # Enable detach mode to run containers in background
 if [[ "${DETACH}" = "true" ]]; then
-  ARGS+=" --detach"
+  compose_args+=" --detach"
 fi
 
 # Enable starting HTTP API server with sample metadata
@@ -131,7 +131,7 @@ fi
 # Enable building from source
 if [[ "${BUILD}" = "true" ]]; then
   compose_files+=" -f docker-compose.dev.yml"
-  ARGS+=" --build"
+  compose_args+=" --build"
 fi
 
 # Enable web UI
@@ -148,4 +148,4 @@ fi
 
 # Run docker compose cmd with overrides
 DOCKER_SCAN_SUGGEST="false" API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} POSTGRES_PORT=${POSTGRES_PORT} TAG=${TAG} \
-  docker --log-level ERROR compose $compose_files up $ARGS
+  docker --log-level ERROR compose $compose_files up $compose_args

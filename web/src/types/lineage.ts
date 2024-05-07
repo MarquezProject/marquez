@@ -1,14 +1,12 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Field, Run, Tag } from '../../types/api'
-import { Nullable } from '../../types/util/Nullable'
+import { Field, Run, Tag } from './api'
+import { Nullable } from './util/Nullable'
 
 export type JobOrDataset = 'JOB' | 'DATASET'
 export type BatchOrStream = 'BATCH' | 'STREAM' | 'SERVICE'
 export type DbTableOrStream = 'DB_TABLE' | 'STREAM'
-export type ariaJobLabel = string
-export type ariaDatasetLabel = string
 
 export interface LineageDataset {
   id: { namespace: string; name: string }

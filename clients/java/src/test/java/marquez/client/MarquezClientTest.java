@@ -87,6 +87,7 @@ import marquez.client.models.Job;
 import marquez.client.models.JobId;
 import marquez.client.models.JobMeta;
 import marquez.client.models.JobType;
+import marquez.client.models.JobVersionId;
 import marquez.client.models.JsonGenerator;
 import marquez.client.models.LineageEvent;
 import marquez.client.models.Namespace;
@@ -243,6 +244,8 @@ public class MarquezClientTest {
   private static final URL LOCATION = newLocation();
   private static final JobType JOB_TYPE = newJobType();
   private static final String JOB_DESCRIPTION = newDescription();
+  private static final JobVersionId JOB_VERSION =
+      new JobVersionId(JOB_ID.getNamespace(), JOB_ID.getName(), CURRENT_VERSION);
   private static final Job JOB =
       new Job(
           JOB_ID,
@@ -257,6 +260,7 @@ public class MarquezClientTest {
           OUTPUTS,
           LOCATION,
           JOB_DESCRIPTION,
+          null,
           null,
           null,
           null);
@@ -287,6 +291,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -302,6 +307,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -317,6 +323,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -332,6 +339,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -347,6 +355,7 @@ public class MarquezClientTest {
           ENDED_AT,
           DURATION,
           RUN_ARGS,
+          JOB_VERSION,
           null,
           INPUT_RUN_DATASET_FACETS,
           OUTPUT_RUN_DATASET_FACETS);
@@ -377,9 +386,11 @@ public class MarquezClientTest {
               ENDED_AT,
               DURATION,
               RUN_ARGS,
+              JOB_VERSION,
               null,
               INPUT_RUN_DATASET_FACETS,
               OUTPUT_RUN_DATASET_FACETS),
+          null,
           null,
           null);
 
@@ -833,6 +844,7 @@ public class MarquezClientTest {
             .type(JOB_TYPE)
             .inputs(INPUTS)
             .outputs(OUTPUTS)
+            .tags(ImmutableSet.of())
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
             .build();
@@ -853,17 +865,19 @@ public class MarquezClientTest {
             .type(JOB_TYPE)
             .inputs(INPUTS)
             .outputs(OUTPUTS)
+            .tags(ImmutableSet.of())
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
             .runId(RUN_ID)
             .build();
     final String metaAsJson = JsonGenerator.newJsonFor(meta);
+
     final String jobAsJson = JsonGenerator.newJsonFor(JOB_WITH_LATEST_RUN);
     when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
 
     final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
-    assertThat(job).isEqualTo(JOB_WITH_LATEST_RUN);
 
+    assertThat(job).isEqualTo(JOB_WITH_LATEST_RUN);
     verify(http, times(1)).put(url, metaAsJson);
   }
 
@@ -974,6 +988,30 @@ public class MarquezClientTest {
     assertThat(run).isEqualTo(FAILED);
 
     verify(http, times(1)).post(url);
+  }
+
+  @Test
+  public void testTagJob() throws Exception {
+    final URL url =
+        buildUrlFor("/namespaces/%s/jobs/%s/tags/%s", NAMESPACE_NAME, JOB_NAME, "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(JOB);
+    when(http.post(url)).thenReturn(runAsJson);
+
+    final Job job = client.tagJobWith(NAMESPACE_NAME, JOB_NAME, "tag_name");
+    assertThat(job).isEqualTo(JOB);
+  }
+
+  @Test
+  public void testDeleteJobTag() throws Exception {
+    final URL url =
+        buildUrlFor("/namespaces/%s/jobs/%s/tags/%s", NAMESPACE_NAME, JOB_NAME, "tag_name");
+
+    final String runAsJson = Utils.getMapper().writeValueAsString(JOB);
+    when(http.delete(url)).thenReturn(runAsJson);
+
+    final Job job = client.deleteJobTag(NAMESPACE_NAME, JOB_NAME, "tag_name");
+    assertThat(job).isEqualTo(JOB);
   }
 
   @Test

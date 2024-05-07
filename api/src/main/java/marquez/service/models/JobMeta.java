@@ -16,6 +16,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.JobType;
 import marquez.common.models.RunId;
+import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
@@ -26,6 +27,7 @@ public final class JobMeta {
   @Nullable private final URL location;
   @Nullable private final String description;
   @Nullable private final RunId runId;
+  @Getter private final ImmutableSet<TagName> tags;
 
   public JobMeta(
       @NonNull final JobType type,
@@ -33,13 +35,15 @@ public final class JobMeta {
       @NonNull final ImmutableSet<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final String description,
-      @Nullable final RunId runId) {
+      @Nullable final RunId runId,
+      @Nullable final ImmutableSet<TagName> tags) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
     this.description = description;
     this.runId = runId;
+    this.tags = tags;
   }
 
   public Optional<URL> getLocation() {

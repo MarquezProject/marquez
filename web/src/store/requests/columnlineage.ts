@@ -1,6 +1,6 @@
 import { API_URL } from '../../globals'
 import { ColumnLineageGraph } from '../../types/api'
-import { JobOrDataset } from '../../components/lineage/types'
+import { JobOrDataset } from '../../types/lineage'
 
 import { generateNodeId } from '../../helpers/nodes'
 import { genericFetchWrapper } from './index'

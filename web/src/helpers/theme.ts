@@ -43,7 +43,7 @@ export const theme = createTheme({
       main: '#7D7D7D',
     },
     info: {
-      main: '#FECC00',
+      main: '#9c98ec',
     },
     background: {
       default: '#191f26',
@@ -51,6 +51,9 @@ export const theme = createTheme({
     secondary: {
       main: '#454f5b',
     },
+  },
+  zIndex: {
+    snackbar: 9999,
   },
 })
 

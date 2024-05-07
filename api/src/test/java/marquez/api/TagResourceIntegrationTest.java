@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import marquez.client.models.Dataset;
+import marquez.client.models.Job;
 import marquez.client.models.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -99,5 +100,72 @@ public class TagResourceIntegrationTest extends BaseResourceIntegrationTest {
     assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags()).hasSize(1);
     // assert that only SENSITIVE remains
     assertThat(taggedDatasetFieldDelete.getFields().get(0).getTags()).containsExactly("SENSITIVE");
+  }
+
+  @Test
+  public void testApp_testJobTag() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create a job
+    MARQUEZ_CLIENT.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+
+    // Tag Dataset with TESTDATASETTAG tag
+    Job taggedJob = MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+
+    assertThat(taggedJob.getTags()).contains("TESTDATASETTAG");
+    // assert the number of tags should be 1
+    assertThat(taggedJob.getTags()).hasSize(1);
+  }
+
+  @Test
+  public void testApp_testJobTagDelete() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create job
+    MARQUEZ_CLIENT.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    // Tag Dataset with TESTDATASETTAG tag
+    Job taggedJob = MARQUEZ_CLIENT.tagJobWith(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    assertThat(taggedJob.getTags()).contains("TESTDATASETTAG");
+    // assert the number of tags should be 1
+    assertThat(taggedJob.getTags()).hasSize(1);
+
+    // Test that the tag TESTDATASETTAG is deleted from the dataset
+    Job taggedDeleteJob = MARQUEZ_CLIENT.deleteJobTag(NAMESPACE_NAME, JOB_NAME, "TESTDATASETTAG");
+    assertThat(taggedDeleteJob.getTags()).doesNotContain("TESTDATASETTAG");
+    // assert the number of tags should be 0
+    assertThat(taggedDeleteJob.getTags()).hasSize(0);
+  }
+
+  public void testApp_testDatasetTagFieldConflict() {
+    // Create Namespace
+    createNamespace(NAMESPACE_NAME);
+    // create a source
+    createSource(DB_TABLE_SOURCE_NAME);
+    // Create Dataset
+    MARQUEZ_CLIENT.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    // tag dataset field
+    Dataset taggedDatasetField =
+        MARQUEZ_CLIENT.tagFieldWith(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+    // assert the tag TESTFIELDTAG has been added to field at position 0
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).contains("TESTFIELDTAG");
+    // assert a total of two tags exist on the field
+    assertThat(taggedDatasetField.getFields().get(0).getTags()).hasSize(2);
+
+    // tag dataset field again to test ON CONFLICT DO NOTHING
+    Dataset taggedDatasetField2 =
+        MARQUEZ_CLIENT.tagFieldWith(
+            NAMESPACE_NAME,
+            DB_TABLE_NAME,
+            DB_TABLE_META.getFields().get(0).getName(),
+            "TESTFIELDTAG");
+    // assert the tag TESTFIELDTAG has been added to field at position 0
+    assertThat(taggedDatasetField2.getFields().get(0).getTags()).contains("TESTFIELDTAG");
+    // assert a total of two tags exist on the field
+    assertThat(taggedDatasetField2.getFields().get(0).getTags()).hasSize(2);
   }
 }

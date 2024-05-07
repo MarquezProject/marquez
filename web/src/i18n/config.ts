@@ -93,6 +93,7 @@ i18next
             column_lineage_tab: 'COLUMN LINEAGE',
             dialog_delete: 'DELETE',
             dialog_confirmation_title: 'Are you sure?',
+            show_field_tags: 'Show Field Tags',
           },
           datasets_route: {
             empty_title: 'No datasets found',
@@ -130,6 +131,7 @@ i18next
             name: 'NAME',
             type: 'TYPE',
             description: 'DESCRIPTION',
+            column_lineage: 'Column Lineage',
           },
           dataset_versions_columns: {
             version: 'VERSION',

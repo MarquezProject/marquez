@@ -5,6 +5,7 @@
 
 package marquez.db.mappers;
 
+import static marquez.db.Columns.stringArrayOrThrow;
 import static marquez.db.Columns.stringOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
@@ -18,9 +19,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +35,7 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 import marquez.db.Columns;
 import marquez.service.models.Job;
 import org.jdbi.v3.core.mapper.RowMapper;
@@ -68,7 +72,8 @@ public final class JobMapper implements RowMapper<Job> {
             null,
             facetsOrNull,
             uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
-            getLabels(facetsOrNull));
+            getLabels(facetsOrNull),
+            toTags(results, "tags"));
     return job;
   }
 
@@ -104,6 +109,15 @@ public final class JobMapper implements RowMapper<Job> {
         .ifPresent(e -> builder.add(e));
 
     return builder.build();
+  }
+
+  public static ImmutableSet<TagName> toTags(@NonNull ResultSet results, String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      return null;
+    }
+    List<String> arr = stringArrayOrThrow(results, column);
+    return arr.stream().map(TagName::of).collect(ImmutableSet.toImmutableSet());
   }
 
   private String getJobTypeFacetField(ImmutableMap<String, Object> facetsOrNull, String field) {

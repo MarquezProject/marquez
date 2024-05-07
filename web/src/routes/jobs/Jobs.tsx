@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import {
+  Button,
   Chip,
   Container,
   Table,
@@ -14,6 +14,7 @@ import {
   Tooltip,
   createTheme,
 } from '@mui/material'
+import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -26,6 +27,7 @@ import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
@@ -94,26 +96,58 @@ const Jobs: React.FC<JobsProps> = ({
   const i18next = require('i18next')
   return (
     <Container maxWidth={'lg'} disableGutters>
-      <MqScreenLoad loading={isJobsLoading || !isJobsInit}>
+      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <Box display={'flex'}>
+          <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
+          <Chip
+            size={'small'}
+            variant={'outlined'}
+            color={'primary'}
+            sx={{ marginLeft: 1 }}
+            label={totalCount + ' total'}
+          ></Chip>
+        </Box>
+        <Box display={'flex'} alignItems={'center'}>
+          {isJobsLoading && <CircularProgress size={16} />}
+          <Tooltip title={'Refresh'}>
+            <IconButton
+              sx={{ ml: 2 }}
+              color={'primary'}
+              size={'small'}
+              onClick={() => {
+                if (selectedNamespace) {
+                  fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                }
+              }}
+            >
+              <Refresh fontSize={'small'} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
+      <MqScreenLoad loading={isJobsLoading && !isJobsInit}>
         <>
           {jobs.length === 0 ? (
             <Box p={2}>
               <MqEmpty title={i18next.t('jobs_route.empty_title')}>
-                <MqText subdued>{i18next.t('jobs_route.empty_body')}</MqText>
+                <>
+                  <MqText subdued>{i18next.t('jobs_route.empty_body')}</MqText>
+                  <Button
+                    color={'primary'}
+                    size={'small'}
+                    onClick={() => {
+                      if (selectedNamespace) {
+                        fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                      }
+                    }}
+                  >
+                    Refresh
+                  </Button>
+                </>
               </MqEmpty>
             </Box>
           ) : (
             <>
-              <Box p={2} display={'flex'}>
-                <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
-                <Chip
-                  size={'small'}
-                  variant={'outlined'}
-                  color={'primary'}
-                  sx={{ marginLeft: 1 }}
-                  label={totalCount + ' total'}
-                ></Chip>
-              </Box>
               <Table size='small'>
                 <TableHead>
                   <TableRow>

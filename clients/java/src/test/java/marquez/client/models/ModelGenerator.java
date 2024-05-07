@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -177,6 +178,7 @@ public final class ModelGenerator {
         .type(newJobType())
         .inputs(newInputs(2))
         .outputs(newOutputs(4))
+        .tags(ImmutableSet.of())
         .location(newLocation())
         .description(newDescription())
         .build();
@@ -208,7 +210,8 @@ public final class ModelGenerator {
         newDescription(),
         latestRun,
         null,
-        currentVersion);
+        currentVersion,
+        null);
   }
 
   public static Job newJobWith(final UUID currentVersion) {
@@ -248,6 +251,7 @@ public final class ModelGenerator {
         null,
         null,
         newRunArgs(),
+        null,
         null,
         null,
         null);

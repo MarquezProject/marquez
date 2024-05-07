@@ -6,7 +6,6 @@ import { IState } from '../../store/reducers'
 import { Run } from '../../types/api'
 import { connect } from 'react-redux'
 import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
-import { formatUpdatedAt } from '../../helpers'
 import MqCode from '../core/code/MqCode'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
@@ -51,13 +50,8 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   )
 
   return (
-    <Box mt={2}>
+    <Box>
       {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
-      <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mt={1}>
-        <Box ml={1}>
-          <MqText subdued>{formatUpdatedAt(run.updatedAt)}</MqText>
-        </Box>
-      </Box>
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
@@ -67,7 +61,6 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
             data={run.facets}
             aria-label={i18next.t('jobs.facets_subhead_aria')}
             aria-required='true'
-            placeholder={i18next.t('jobs.search')}
           />
         </Box>
       )}

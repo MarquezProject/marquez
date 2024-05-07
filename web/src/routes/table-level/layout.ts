@@ -1,12 +1,7 @@
 import { Edge, Node as ElkNode } from '../../../libs/graph'
 import { LineageGraph } from '../../types/api'
 
-import {
-  JobOrDataset,
-  LineageDataset,
-  LineageJob,
-  LineageNode,
-} from '../../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, LineageNode } from '../../types/lineage'
 import { Nullable } from '../../types/util/Nullable'
 import { TableLevelNodeData } from './nodes'
 import { theme } from '../../helpers/theme'
@@ -76,13 +71,16 @@ export const createElkNodes = (
   lineageGraph: LineageGraph,
   currentGraphNode: Nullable<string>,
   isCompact: boolean,
-  isFull: boolean
+  isFull: boolean,
+  collapsedNodes: Nullable<string>
 ) => {
   const downstreamNodes = findDownstreamNodes(lineageGraph, currentGraphNode)
   const upstreamNodes = findUpstreamNodes(lineageGraph, currentGraphNode)
 
   const nodes: ElkNode<JobOrDataset, TableLevelNodeData>[] = []
   const edges: Edge[] = []
+
+  const collapsedNodesAsArray = collapsedNodes?.split(',')
 
   const filteredGraph = lineageGraph.graph.filter((node) => {
     if (isFull) return true
@@ -124,7 +122,8 @@ export const createElkNodes = (
         id: node.id,
         kind: node.type,
         width: 112,
-        height: isCompact ? 24 : 34 + data.fields.length * 10,
+        height:
+          isCompact || collapsedNodesAsArray?.includes(node.id) ? 24 : 34 + data.fields.length * 10,
         data: {
           dataset: data,
         },

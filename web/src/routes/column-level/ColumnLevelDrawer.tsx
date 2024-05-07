@@ -1,6 +1,7 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import {
+  Chip,
   CircularProgress,
   Divider,
   Table,
@@ -14,7 +15,6 @@ import { IState } from '../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchDataset } from '../../store/actionCreators'
-import { findConnectedNodes } from './layout'
 import { useSearchParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
@@ -53,9 +53,6 @@ const ColumnLevelDrawer = ({
     return null
   }
 
-  const column = searchParams.get('column')
-  const connectedColumns = findConnectedNodes(columnLineage.graph, column)
-
   return (
     <Box width={`${WIDTH}px`}>
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -76,65 +73,51 @@ const ColumnLevelDrawer = ({
       ) : (
         <>
           <Box p={2}>
-            <MqText subheading>Schema</MqText>
+            <MqText subheading>SCHEMA</MqText>
           </Box>
           {dataset.fields.length > 0 && (
-            <Table size='small'>
-              <TableHead>
-                <TableRow>
-                  <TableCell align='left'>
-                    <MqText subheading inline>
-                      {i18next.t('dataset_info_columns.name')}
-                    </MqText>
-                  </TableCell>
-                  <TableCell align='left'>
-                    <MqText subheading inline>
-                      {i18next.t('dataset_info_columns.type')}
-                    </MqText>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {dataset.fields.map((field) => {
-                  return (
-                    <TableRow key={field.name}>
-                      <TableCell align='left'>{field.name}</TableCell>
-                      <TableCell align='left'>{field.type}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          )}
-          {connectedColumns.length > 0 && column && (
             <>
-              <Box p={2}>
-                <MqText bold subheading>
-                  Connected Columns
-                </MqText>
-              </Box>
               <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell align='left'>
                       <MqText subheading inline>
-                        Dataset
+                        {i18next.t('dataset_info_columns.name')}
                       </MqText>
                     </TableCell>
                     <TableCell align='left'>
                       <MqText subheading inline>
-                        Field
+                        {i18next.t('dataset_info_columns.type')}
                       </MqText>
                     </TableCell>
+                    <TableCell align='left'>
+                      <MqText subheading inline>
+                        {i18next.t('dataset_info_columns.description')}
+                      </MqText>
+                    </TableCell>
+                    <TableCell align='left'></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {connectedColumns.map((c) => {
+                  {dataset.fields.map((field) => {
                     return (
-                      <TableRow key={c.id}>
-                        <TableCell align='left'>{c.data?.dataset || 'Unknown'}</TableCell>
-                        <TableCell align='left'>{c.data?.field || 'Unknown'}</TableCell>
-                      </TableRow>
+                      <React.Fragment key={field.name}>
+                        <TableRow>
+                          <TableCell align='left'>
+                            <MqText font={'mono'}>{field.name}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <Chip
+                              size={'small'}
+                              label={<MqText font={'mono'}>{field.type}</MqText>}
+                              variant={'outlined'}
+                            />
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subdued>{field.description || 'no description'}</MqText>
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
                     )
                   })}
                 </TableBody>
@@ -146,8 +129,7 @@ const ColumnLevelDrawer = ({
       {dataset && dataset.columnLineage && (
         <>
           <Box p={2}>
-            <MqText subheading>Column Lineage Facets</MqText>
-
+            <MqText subheading>FACETS</MqText>
             <MqJsonView data={dataset.columnLineage} />
           </Box>
         </>

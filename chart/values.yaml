@@ -8,6 +8,9 @@
 ## Properties related to core Marquez backend functionality and API usage
 ##
 marquez:
+  ## Kubernetes service account used for deployment
+  ##
+  serviceAccount: "default"
   ## Number of desired replicas
   ##
   replicaCount: 1
@@ -17,7 +20,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-    tag: 0.45.0-rc.1
+    tag: 0.46.0
     pullPolicy: IfNotPresent
   ## Name of the existing secret containing credentials for the Marquez installation.
   ## When this is specified, it will take precedence over the values configured in the 'db' section.
@@ -59,6 +62,8 @@ marquez:
   ## - name:
   ##   value:
   ##
+  ## Allowing passing in of extra container definitions to be run inside the marquez deployment - for example to allow cloud-sql-proxy container
+  extraContainers: []
 
 ## Properties related to Marquez frontend functionality
 ##
@@ -75,7 +80,7 @@ web:
   image:
     registry: docker.io
     repository: marquezproject/marquez-web
-    tag: 0.45.0-rc.1
+    tag: 0.46.0
     pullPolicy: IfNotPresent
   ## Marquez website will run on this port
   ##

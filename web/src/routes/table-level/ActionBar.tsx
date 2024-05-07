@@ -109,22 +109,27 @@ export const ActionBar = ({
             control={
               <Switch
                 size={'small'}
-                defaultChecked
                 value={isFull}
+                defaultChecked={searchParams.get('isFull') === 'true'}
                 onChange={(_, checked) => {
                   setIsFull(checked)
+                  searchParams.set('isFull', checked.toString())
+                  setSearchParams(searchParams)
                 }}
               />
             }
-            label={<MqText font={'mono'}>Complete Mode</MqText>}
+            label={<MqText font={'mono'}>Full Graph</MqText>}
           />
           <FormControlLabel
             control={
               <Switch
                 size={'small'}
                 value={isCompact}
+                defaultChecked={searchParams.get('isCompact') === 'true'}
                 onChange={(_, checked) => {
                   setIsCompact(checked)
+                  searchParams.set('isCompact', checked.toString())
+                  setSearchParams(searchParams)
                 }}
               />
             }
