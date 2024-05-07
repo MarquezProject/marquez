@@ -319,6 +319,18 @@ public final class JsonGenerator {
     obj.put("startedAt", run.getStartedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("endedAt", run.getEndedAt().map(ISO_INSTANT::format).orElse(null));
     obj.put("durationMs", run.getDurationMs().orElse(null));
+    obj.set(
+        "jobVersion",
+        run.getJobVersion()
+            .map(
+                jobVersionId -> {
+                  final ObjectNode jobVersion = MAPPER.createObjectNode();
+                  jobVersion.put("namespace", jobVersionId.getNamespace());
+                  jobVersion.put("name", jobVersionId.getName());
+                  jobVersion.put("version", jobVersionId.getVersion().toString());
+                  return jobVersion;
+                })
+            .orElse(null));
     obj.putArray("inputDatasetVersions").addAll(inputDatasetVersions);
     obj.putArray("outputDatasetVersions").addAll(outputDatasetVersions);
 

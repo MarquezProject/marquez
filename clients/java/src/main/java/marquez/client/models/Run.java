@@ -28,6 +28,7 @@ public final class Run extends RunMeta {
   @Nullable private final Instant startedAt;
   @Nullable private final Long durationMs;
   @Nullable private final Instant endedAt;
+  @Nullable private final JobVersionId jobVersion;
   @Getter private final Map<String, Object> facets;
   @Getter private final List<InputDatasetVersion> inputDatasetVersions;
   @Getter private final List<OutputDatasetVersion> outputDatasetVersions;
@@ -43,6 +44,7 @@ public final class Run extends RunMeta {
       @Nullable final Instant endedAt,
       @Nullable final Long durationMs,
       @Nullable final Map<String, String> args,
+      @Nullable final JobVersionId jobVersion,
       @Nullable final Map<String, Object> facets,
       @Nullable final List<InputDatasetVersion> inputDatasetVersions,
       @Nullable final List<OutputDatasetVersion> outputDatasetVersions) {
@@ -53,6 +55,7 @@ public final class Run extends RunMeta {
     this.startedAt = startedAt;
     this.durationMs = durationMs;
     this.endedAt = endedAt;
+    this.jobVersion = jobVersion;
     this.facets = (facets == null) ? ImmutableMap.of() : ImmutableMap.copyOf(facets);
     this.inputDatasetVersions =
         (inputDatasetVersions == null) ? Collections.emptyList() : inputDatasetVersions;
@@ -70,6 +73,10 @@ public final class Run extends RunMeta {
 
   public Optional<Long> getDurationMs() {
     return Optional.ofNullable(durationMs);
+  }
+
+  public Optional<JobVersionId> getJobVersion() {
+    return Optional.ofNullable(jobVersion);
   }
 
   public boolean hasFacets() {
