@@ -11,6 +11,7 @@ import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
+import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
 interface StateProps {
@@ -37,17 +38,36 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
 
   const addToToolTip = (job: LineageJob) => {
     return (
-      <>
-        <b>{'Namespace: '}</b>
-        {job.namespace}
-        <br></br>
-        <b>{'Name: '}</b>
-        {job.name}
-        <br></br>
-        <b>{'Description: '}</b>
-        {job.description === null ? 'No Description' : job.description}
-        <br></br>
-      </>
+      <foreignObject>
+        <Box>
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Namespace:
+            </MqText>
+            <MqText block font={'mono'}>
+              {truncateText(job.namespace, 25)}
+            </MqText>
+          </Box>
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Name:
+            </MqText>
+            <MqText block font={'mono'}>
+              {truncateText(job.name, 25)}
+            </MqText>
+          </Box>
+          {job.description && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Description:
+              </MqText>
+              <MqText block font={'mono'}>
+                {job.description}
+              </MqText>
+            </Box>
+          )}
+        </Box>
+      </foreignObject>
     )
   }
 
@@ -87,7 +107,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
         color={theme.palette.common.white}
         onClick={handleClick}
       />
-      <MQTooltip title={addToToolTip(node.data.job)}>
+      <MQTooltip title={addToToolTip(node.data.job)} placement={'right-start'}>
         <g>
           <text
             fontSize='8'
