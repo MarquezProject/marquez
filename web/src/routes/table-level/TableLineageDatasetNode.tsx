@@ -14,6 +14,7 @@ import { bindActionCreators } from 'redux'
 import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
+import { formatUpdatedAt } from '../../helpers'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
@@ -92,6 +93,14 @@ const TableLineageDatasetNode = ({
               </MqText>
             </Box>
           )}
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Updated at:
+            </MqText>
+            <MqText block font={'mono'}>
+              {formatUpdatedAt(lineageDataset.updatedAt)}
+            </MqText>
+          </Box>
           {dataset && datasetFacetsStatus(dataset.facets) && (
             <>
               <Divider sx={{ my: 1 }} />

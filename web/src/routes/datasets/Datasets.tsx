@@ -168,8 +168,8 @@ const Datasets: React.FC<DatasetsProps> = ({
                     <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
                       <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                     </TableCell>
-                    <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
+                    <TableCell key={i18next.t('datasets_route.quality')} align='left'>
+                      <MqText subheading>{i18next.t('datasets_route.quality')}</MqText>
                     </TableCell>
                     <TableCell key={i18next.t('datasets.column_lineage_tab')} align='left'>
                       <MqText inline subheading>

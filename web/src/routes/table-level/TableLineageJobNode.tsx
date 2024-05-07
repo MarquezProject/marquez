@@ -7,6 +7,7 @@ import { PositionedNode } from '../../../libs/graph'
 import { TableLineageJobNodeData } from './nodes'
 import { connect } from 'react-redux'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
+import { formatUpdatedAt } from '../../helpers'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -68,6 +69,14 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               </MqText>
             </Box>
           )}
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Updated at:
+            </MqText>
+            <MqText block font={'mono'}>
+              {formatUpdatedAt(job.updatedAt)}
+            </MqText>
+          </Box>
           <Divider sx={{ my: 1 }} />
           <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
             <MqText block bold sx={{ mr: 6 }}>
