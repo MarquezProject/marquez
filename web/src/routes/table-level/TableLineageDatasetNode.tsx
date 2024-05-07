@@ -16,10 +16,10 @@ import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/system/Box'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
+import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
@@ -95,7 +95,19 @@ const TableLineageDatasetNode = ({
           {dataset && datasetFacetsStatus(dataset.facets) && (
             <>
               <Divider sx={{ my: 1 }} />
-              <Assertions assertions={datasetFacetsQualityAssertions(dataset.facets)} />
+              <Box display={'flex'} justifyContent={'space-between'}>
+                <MqText block bold sx={{ mr: 6 }}>
+                  Quality:
+                </MqText>
+                <MqStatus
+                  label={
+                    datasetFacetsQualityAssertions(dataset.facets).find((a) => !a.success)
+                      ? 'UNHEALTHILY'
+                      : 'HEALTHY'
+                  }
+                  color={datasetFacetsStatus(dataset.facets)}
+                />
+              </Box>
             </>
           )}
         </Box>

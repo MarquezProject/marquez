@@ -21,13 +21,13 @@ const Assertions: React.FC<OwnProps> = ({ assertions, hasHeader }) => {
       {hasHeader && (
         <TableHead>
           <TableRow>
-            <TableCell>
+            <TableCell align={'left'}>
               <MqText bold>COLUMN</MqText>
             </TableCell>
-            <TableCell>
+            <TableCell align={'left'}>
               <MqText bold>ASSERTION</MqText>
             </TableCell>
-            <TableCell>
+            <TableCell align={'left'}>
               <MqText bold>STATUS</MqText>
             </TableCell>
           </TableRow>
@@ -38,13 +38,13 @@ const Assertions: React.FC<OwnProps> = ({ assertions, hasHeader }) => {
           const sx = { borderBottom: 'none' }
           return (
             <TableRow key={`${assertion.column}-${assertion.assertion}`}>
-              <TableCell sx={sx}>
+              <TableCell align={'left'} sx={sx}>
                 <MqText font={'mono'}>{assertion.column}</MqText>
               </TableCell>
-              <TableCell sx={sx}>
+              <TableCell align={'left'} sx={sx}>
                 <MqText subdued>{assertion.assertion}</MqText>
               </TableCell>
-              <TableCell sx={sx}>
+              <TableCell align={'left'} sx={sx}>
                 {
                   <MqStatus
                     label={assertion.success ? 'pass'.toUpperCase() : 'fail'.toUpperCase()}
