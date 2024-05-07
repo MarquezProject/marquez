@@ -140,7 +140,8 @@ final class DbTestUtils {
         jdbi,
         namespace.getName(),
         jobName,
-        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
+        new JobMeta(
+            JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null, null));
   }
 
   public static JobRow createJobWithSymlinkTarget(
@@ -150,7 +151,8 @@ final class DbTestUtils {
         namespace.getName(),
         jobName,
         jobSymlinkId,
-        new JobMeta(JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null));
+        new JobMeta(
+            JobType.BATCH, ImmutableSet.of(), ImmutableSet.of(), null, description, null, null));
   }
 
   /**
