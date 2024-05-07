@@ -127,7 +127,7 @@ export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
   if (isAllFalse) {
     return theme.palette.error.main as string
   } else if (isSomeFalse) {
-    return theme.palette.info.main as string
+    return theme.palette.error.main as string
   } else {
     return theme.palette.primary.main as string
   }

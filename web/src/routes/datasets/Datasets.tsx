@@ -212,7 +212,11 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 <MQTooltip title={<Assertions assertions={assertions} />}>
                                   <Box>
                                     <MqStatus
-                                      label={'Quality'.toUpperCase()}
+                                      label={
+                                        assertions.find((a) => !a.success)
+                                          ? 'UNHEALTHILY'
+                                          : 'HEALTHY'
+                                      }
                                       color={datasetFacetsStatus(dataset.facets)}
                                     />
                                   </Box>

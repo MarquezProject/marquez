@@ -10,6 +10,8 @@ import Tooltip from '@mui/material/Tooltip'
 interface MqToolTipProps {
   title: string | ReactElement
   children: ReactElement
+  onOpen?: (event: React.SyntheticEvent) => void
+  onClose?: (event: React.SyntheticEvent) => void
   placement?:
     | 'left'
     | 'right'
@@ -25,10 +27,12 @@ interface MqToolTipProps {
     | 'right-start'
 }
 
-const MQTooltip: React.FC<MqToolTipProps> = ({ title, children, placement }) => {
+const MQTooltip: React.FC<MqToolTipProps> = ({ title, onOpen, onClose, children, placement }) => {
   const theme = createTheme(useTheme())
   return (
     <Tooltip
+      onOpen={onOpen}
+      onClose={onClose}
       title={title}
       placement={placement || 'bottom'}
       componentsProps={{

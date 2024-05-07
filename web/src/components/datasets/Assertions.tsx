@@ -9,30 +9,33 @@ import React from 'react'
 
 interface OwnProps {
   assertions: Assertion[]
+  hasHeader?: boolean
 }
 
-const Assertions: React.FC<OwnProps> = ({ assertions }) => {
+const Assertions: React.FC<OwnProps> = ({ assertions, hasHeader }) => {
   if (assertions.length === 0) {
     return null
   }
   return (
     <Table size={'small'}>
-      <TableHead>
-        <TableRow>
-          <TableCell>
-            <MqText bold>COLUMN</MqText>
-          </TableCell>
-          <TableCell>
-            <MqText bold>ASSERTION</MqText>
-          </TableCell>
-          <TableCell>
-            <MqText bold>STATUS</MqText>
-          </TableCell>
-        </TableRow>
-      </TableHead>
+      {hasHeader && (
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <MqText bold>COLUMN</MqText>
+            </TableCell>
+            <TableCell>
+              <MqText bold>ASSERTION</MqText>
+            </TableCell>
+            <TableCell>
+              <MqText bold>STATUS</MqText>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+      )}
       <TableBody>
-        {assertions.map((assertion, index) => {
-          const sx = index === assertions.length - 1 ? { borderBottom: 'none' } : {}
+        {assertions.map((assertion) => {
+          const sx = { borderBottom: 'none' }
           return (
             <TableRow key={`${assertion.column}-${assertion.assertion}`}>
               <TableCell sx={sx}>

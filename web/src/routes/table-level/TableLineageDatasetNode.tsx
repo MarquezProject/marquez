@@ -1,24 +1,36 @@
 import { ChevronLeft } from '@mui/icons-material'
+import { Dataset, LineageGraph } from '../../types/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
-import { LineageGraph } from '../../types/api'
 import { PositionedNode } from '../../../libs/graph'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
 import { TableLineageDatasetNodeData } from './nodes'
 import { connect } from 'react-redux'
 
+import * as Redux from 'redux'
+import { Divider } from '@mui/material'
+import { bindActionCreators } from 'redux'
+import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
+import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/system/Box'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
+interface DispatchProps {
+  fetchDataset: typeof fetchDataset
+  resetDataset: typeof resetDataset
+}
+
 interface StateProps {
   lineage: LineageGraph
+  dataset: Dataset
 }
 
 interface TableLineageDatasetNodeProps {
@@ -28,7 +40,12 @@ interface TableLineageDatasetNodeProps {
 const ICON_SIZE = 12
 const COMPACT_HEIGHT = 24
 
-const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateProps) => {
+const TableLineageDatasetNode = ({
+  node,
+  dataset,
+  fetchDataset,
+  resetDataset,
+}: TableLineageDatasetNodeProps & StateProps & DispatchProps) => {
   const isCompact = node.height === COMPACT_HEIGHT
 
   const navigate = useNavigate()
@@ -45,7 +62,7 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
     )
   }
 
-  const addToToolTip = (dataset: LineageDataset) => {
+  const addToToolTip = (lineageDataset: LineageDataset, dataset: Dataset) => {
     return (
       <foreignObject>
         <Box>
@@ -54,7 +71,7 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(dataset.namespace, 25)}
+              {truncateText(lineageDataset.namespace, 25)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -62,18 +79,24 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(dataset.name, 25)}
+              {truncateText(lineageDataset.name, 25)}
             </MqText>
           </Box>
-          {dataset.description && (
+          {lineageDataset.description && (
             <Box display={'flex'} justifyContent={'space-between'}>
               <MqText block bold sx={{ mr: 6 }}>
                 Description:
               </MqText>
               <MqText block font={'mono'}>
-                {dataset.description}
+                {lineageDataset.description}
               </MqText>
             </Box>
+          )}
+          {dataset && datasetFacetsStatus(dataset.facets) && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Assertions assertions={datasetFacetsQualityAssertions(dataset.facets)} />
+            </>
           )}
         </Box>
       </foreignObject>
@@ -150,7 +173,12 @@ const TableLineageDatasetNode = ({ node }: TableLineageDatasetNodeProps & StateP
           </IconButton>
         </MQTooltip>
       </foreignObject>
-      <MQTooltip placement={'right-start'} title={addToToolTip(node.data.dataset)}>
+      <MQTooltip
+        onOpen={() => fetchDataset(node.data.dataset.namespace, node.data.dataset.name)}
+        onClose={() => resetDataset}
+        placement={'right-start'}
+        title={addToToolTip(node.data.dataset, dataset)}
+      >
         <g>
           <text
             fontSize='8'
@@ -193,6 +221,16 @@ TableLineageDatasetNode.getLayoutOptions = (node: TableLineageDatasetNodeProps['
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
+  dataset: state.dataset.result,
 })
 
-export default connect(mapStateToProps)(TableLineageDatasetNode)
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchDataset: fetchDataset,
+      resetDataset: resetDataset,
+    },
+    dispatch
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(TableLineageDatasetNode)

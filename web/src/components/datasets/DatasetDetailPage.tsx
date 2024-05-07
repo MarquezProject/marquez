@@ -248,7 +248,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         <Grid item xs={6}>
           <MqInfo
             icon={<RuleIcon color={'disabled'} />}
-            label={'Quality/Asserions'.toUpperCase()}
+            label={'Quality/Assertions'.toUpperCase()}
             value={
               facetsStatus ? (
                 <Box display={'flex'}>
