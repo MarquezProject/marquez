@@ -48,7 +48,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.namespace, 25)}
+              {truncateText(job.namespace, 40)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -56,7 +56,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.name, 25)}
+              {truncateText(job.name, 40)}
             </MqText>
           </Box>
           {job.description && (
