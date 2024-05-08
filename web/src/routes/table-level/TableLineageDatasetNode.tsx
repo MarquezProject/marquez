@@ -72,7 +72,7 @@ const TableLineageDatasetNode = ({
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(lineageDataset.namespace, 25)}
+              {truncateText(lineageDataset.namespace, 40)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -80,7 +80,7 @@ const TableLineageDatasetNode = ({
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(lineageDataset.name, 25)}
+              {truncateText(lineageDataset.name, 40)}
             </MqText>
           </Box>
           {lineageDataset.description && (
@@ -111,7 +111,7 @@ const TableLineageDatasetNode = ({
                 <MqStatus
                   label={
                     datasetFacetsQualityAssertions(dataset.facets).find((a) => !a.success)
-                      ? 'UNHEALTHILY'
+                      ? 'UNHEALTHY'
                       : 'HEALTHY'
                   }
                   color={datasetFacetsStatus(dataset.facets)}

@@ -11,7 +11,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   createTheme,
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
@@ -114,7 +113,7 @@ const Datasets: React.FC<DatasetsProps> = ({
         </Box>
         <Box display={'flex'} alignItems={'center'}>
           {isDatasetsLoading && <CircularProgress size={16} />}
-          <Tooltip title={'Refresh'}>
+          <MQTooltip title={'Refresh'}>
             <IconButton
               sx={{ ml: 2 }}
               color={'primary'}
@@ -127,7 +126,7 @@ const Datasets: React.FC<DatasetsProps> = ({
             >
               <Refresh fontSize={'small'} />
             </IconButton>
-          </Tooltip>
+          </MQTooltip>
         </Box>
       </Box>
       <MqScreenLoad loading={isDatasetsLoading && !isDatasetsInit}>
@@ -213,9 +212,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                   <Box>
                                     <MqStatus
                                       label={
-                                        assertions.find((a) => !a.success)
-                                          ? 'UNHEALTHILY'
-                                          : 'HEALTHY'
+                                        assertions.find((a) => !a.success) ? 'UNHEALTHY' : 'HEALTHY'
                                       }
                                       color={datasetFacetsStatus(dataset.facets)}
                                     />
@@ -252,7 +249,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                     {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
                   </>
                 </MqText>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
+                <MQTooltip title={i18next.t('events_route.previous_page')}>
                   <span>
                     <IconButton
                       sx={{
@@ -266,8 +263,8 @@ const Datasets: React.FC<DatasetsProps> = ({
                       <ChevronLeftRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
+                </MQTooltip>
+                <MQTooltip title={i18next.t('events_route.next_page')}>
                   <span>
                     <IconButton
                       color='primary'
@@ -278,7 +275,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                       <ChevronRightRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
+                </MQTooltip>
               </Box>
             </>
           )}

@@ -1,10 +1,11 @@
 import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
-import { Divider, FormControlLabel, Switch, TextField, Tooltip } from '@mui/material'
+import { Divider, FormControlLabel, Switch, TextField } from '@mui/material'
 import { fetchLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
@@ -49,7 +50,7 @@ export const ActionBar = ({
       borderColor={theme.palette.secondary.main}
     >
       <Box display={'flex'} alignItems={'center'}>
-        <Tooltip title={`Back to ${nodeType === 'JOB' ? 'jobs' : 'datasets'}`}>
+        <MQTooltip title={`Back to ${nodeType === 'JOB' ? 'jobs' : 'datasets'}`}>
           <IconButton
             size={'small'}
             sx={{ mr: 2 }}
@@ -57,7 +58,7 @@ export const ActionBar = ({
           >
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
-        </Tooltip>
+        </MQTooltip>
         <MqText heading>{nodeType === 'JOB' ? 'Jobs' : 'Datasets'}</MqText>
         <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
         <Box>
@@ -76,7 +77,7 @@ export const ActionBar = ({
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
-        <Tooltip title={'Refresh'}>
+        <MQTooltip title={'Refresh'}>
           <IconButton
             sx={{ mr: 2 }}
             color={'primary'}
@@ -89,7 +90,7 @@ export const ActionBar = ({
           >
             <Refresh fontSize={'small'} />
           </IconButton>
-        </Tooltip>
+        </MQTooltip>
         <TextField
           id='column-level-depth'
           type='number'
