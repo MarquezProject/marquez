@@ -23,7 +23,7 @@ interface OwnProps {
 
 const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
   JOB: <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />,
-  DATASET: <FontAwesomeIcon icon={faDatabase} color={theme.palette.primary.main} />,
+  DATASET: <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />,
 }
 
 type DkSearchListItemProps = OwnProps

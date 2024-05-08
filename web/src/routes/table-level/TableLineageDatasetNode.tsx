@@ -111,7 +111,7 @@ const TableLineageDatasetNode = ({
                 <MqStatus
                   label={
                     datasetFacetsQualityAssertions(dataset.facets).find((a) => !a.success)
-                      ? 'UNHEALTHILY'
+                      ? 'UNHEALTHY'
                       : 'HEALTHY'
                   }
                   color={datasetFacetsStatus(dataset.facets)}

@@ -56,7 +56,7 @@ const searchDelimiterMap = {
 type SearchDelimiterMap = typeof searchDelimiterMap
 
 export function parseSearchGroup(nodeId: string, field: keyof SearchDelimiterMap) {
-  return nodeId.split(':')[searchDelimiterMap[field]] || ''
+  return decodeURIComponent(nodeId.split(':')[searchDelimiterMap[field]]) || ''
 }
 
 export function eventTypeColor(state: EventType) {

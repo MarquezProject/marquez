@@ -40,6 +40,7 @@ const MQTooltip: React.FC<MqToolTipProps> = ({ title, onOpen, onClose, children,
           sx: {
             backgroundColor: `${darken(theme.palette.background.paper, 0.1)}`,
             color: theme.palette.common.white,
+            border: `1px solid ${theme.palette.secondary.main}`,
             maxWidth: '600px',
             fontSize: 14,
           },
