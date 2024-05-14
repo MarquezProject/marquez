@@ -37,14 +37,16 @@ if [[ -z "${volume_prefix}" ]]; then
 fi
 
 # Volumes with prefix
+nginx_conf_volume="${volume_prefix}_nginx-conf"
 data_volume="${volume_prefix}_data"
 db_conf_volume="${volume_prefix}_db-conf"
 db_init_volume="${volume_prefix}_db-init"
 db_backup_volume="${volume_prefix}_db-backup"
 
-echo "...creating volumes: ${data_volume}, ${db_conf_volume}, ${db_init_volume}, ${db_backup_volume}"
+echo "...creating volumes: ${nginx_conf_volume}, ${data_volume}, ${db_conf_volume}, ${db_init_volume}, ${db_backup_volume}"
 
 # Create persistent volumes for Marquez
+docker volume create "${nginx_conf_volume}" > /dev/null
 docker volume create "${data_volume}" > /dev/null
 docker volume create "${db_conf_volume}" > /dev/null
 docker volume create "${db_init_volume}" > /dev/null
@@ -52,10 +54,16 @@ docker volume create "${db_backup_volume}" > /dev/null
 
 # Provision persistent volumes for Marquez
 docker create --name volumes-provisioner \
+  -v "${nginx_conf_volume}:/nginx-conf" \
   -v "${data_volume}:/data" \
   -v "${db_conf_volume}:/db-conf" \
   -v "${db_init_volume}:/db-init" \
   busybox > /dev/null 2>&1
+
+# Add startup configuration for nginx
+docker cp ./docker/nginx/entrypoint.sh volumes-provisioner:/nginx-conf/
+docker cp ./docker/nginx/nginx.template volumes-provisioner:/nginx-conf/
+echo "Added files to volume ${nginx_conf_volume}: $(ls "${nginx_conf_volume}")"
 
 # Add startup configuration for Marquez
 docker cp ./docker/wait-for-it.sh volumes-provisioner:/data/wait-for-it.sh
