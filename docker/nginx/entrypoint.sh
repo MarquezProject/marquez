@@ -5,7 +5,6 @@
 #
 # Usage: $ ./entrypoint.sh
 
-# Replace environment variables in the Nginx template
 envsubst '$MARQUEZ_HOST,$MARQUEZ_PORT' < /etc/nginx/nginx.template > /etc/nginx/nginx.conf
 
 # Start Nginx
