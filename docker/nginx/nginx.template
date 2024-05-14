@@ -13,21 +13,10 @@ http {
 
             # Allow access from any origin:
             add_header 'Access-Control-Allow-Origin' '*';
-            # Or, configure access to a specific origin:
-            # Access-Control-Allow-Origin: https://example.com
+            # Or, configure access from a specific origin:
+            # add_header 'Access-Control-Allow-Origin' 'https://example.com';
             add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT';
             add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization';
-
-            # Handle preflight requests
-            if ($request_method = OPTIONS ) {
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, DELETE, PUT';
-                add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization';
-                add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain charset=UTF-8';
-                add_header 'Content-Length' 0;
-                return 204;
-            }
         }
     }
 }
