@@ -189,8 +189,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
           multiple
           disableCloseOnSelect
           id='dataset-tags'
-          sx={{ flex: 1 }}
-          limitTags={!datasetField ? 5 : 4}
+          sx={{ flex : 1,  width: datasetField ? 494 : 'auto' }}
+          limitTags={!datasetField ?  8 : 6}
           autoHighlight
           disableClearable
           disablePortal
@@ -252,6 +252,9 @@ const DatasetTags: React.FC<IProps> = (props) => {
             options={tagData.map((option) => option.name)}
             autoSelect
             freeSolo
+            fullWidth
+            autoFocus
+            forcePopupIcon
             onChange={handleTagDescChange}
             renderInput={(params) => (
               <TextField
@@ -260,7 +263,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
                 autoFocus
                 margin='dense'
                 id='tag'
-                fullWidth
                 variant='outlined'
                 InputLabelProps={{
                   ...params.InputProps,
@@ -273,7 +275,6 @@ const DatasetTags: React.FC<IProps> = (props) => {
             Description
           </MQText>
           <TextField
-            autoFocus
             multiline
             id='tag-description'
             name='tag-description'
