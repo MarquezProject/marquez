@@ -45,7 +45,7 @@ class GetChanges:
                     if label.name != "documentation":
                         labels.append(label.name)
                 try:
-                    change_str = f"* **{labels[0]}: {pull.title}** [`#{pull.number}`]({pull.html_url}) [@{pull.user.login}]({pull.user.html_url})  "  # noqa: E501
+                    change_str = f"* {labels[0]}: {pull.title} [`#{pull.number}`]({pull.html_url}) [@{pull.user.login}]({pull.user.html_url})  "  # noqa: E501
                 except Exception:
                     continue
                 """ Extracts one-line description if present """
