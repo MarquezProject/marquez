@@ -139,7 +139,7 @@ const config = {
                         items: [
                             {
                                 label: 'Slack',
-                                href: 'https://bit.ly/Mqz_invite',
+                                href: 'https://bit.ly/Marquez_Slack_invite',
                             },
                             {
                                 label: 'YouTube',
