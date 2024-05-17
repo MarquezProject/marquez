@@ -1,6 +1,54 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.46.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.47.0...HEAD)
+
+## [0.47.0](https://github.com/MarquezProject/marquez/compare/0.46.0...0.47.0) - 2024-05-17
+
+### Added
+
+* * * 
+#### Data Quality and Job Status Display in Marquez Web
+* Web: Data Quality [`#2810`](https://github.com/MarquezProject/marquez/pull/2810) [`#2785`](https://github.com/MarquezProject/marquez/pull/2785) [`#2812`](https://github.com/MarquezProject/marquez/pull/2812) [@phixMe](https://github.com/phixMe)  
+    *Adds Data Quality and Job Status display features.*
+* * * *
+* API: add job tagging to API [`#2774`](https://github.com/MarquezProject/marquez/pull/2774) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds support for job tagging to the API.*
+* Chart: add `serviceAccount`and `extraContainers` to helm chart values [`#2766`](https://github.com/MarquezProject/marquez/pull/2766) [@kostas-theo](https://github.com/kostas-theo)  
+    *To make the Kubernetes service account configurable, adds these values to the helm chart values with defaults set to maintain current functionality.*
+* Client/Java: add `jobVersion` field to Run in Java client [`#2808`](https://github.com/MarquezProject/marquez/pull/2808) [@davidjgoss](https://github.com/davidjgoss)  
+    *Adds `jobVersion` field to Run in Java client.*
+* Docker: improve down.sh script [`#2778`](https://github.com/MarquezProject/marquez/pull/2778) [@dolfinus](https://github.com/dolfinus)  
+    *Adds new `-v` option and fixes down.sh script to rely on `docker-compose down -v` and make volume deletion optional.*
+* Web: tooltips and display updates [`#2809`](https://github.com/MarquezProject/marquez/pull/2809) [@phixMe](https://github.com/phixMe)  
+    *Updates tooltips to be more modernized and custom.*
+* Web: update JSON theme [`#2807`](https://github.com/MarquezProject/marquez/pull/2807) [@phixMe](https://github.com/phixMe)  
+    *Makes the JSON theme more in-line with the Marquez brand.*
+* Web: column lineage linking and sticky tab titles [`#2805`](https://github.com/MarquezProject/marquez/pull/2805) [@phixMe](https://github.com/phixMe)  
+    *Adds sticky Titles and moves column lineage links to the table definition.*
+* Web: refine panel feature set [`#2798`](https://github.com/MarquezProject/marquez/pull/2798) [@phixMe](https://github.com/phixMe)  
+    *Adds many refinements in response to user feedback.*
+* Web: update dataset/dataset field-tagging experience [`#2761`](https://github.com/MarquezProject/marquez/pull/2761) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds support for adding multiple tags at once, introduces a switch to allow field-level tags to be exposed, and fixes refresh for an improved a field-tagging experience.*
+* Web: web refresh + loading states [`#2779`](https://github.com/MarquezProject/marquez/pull/2779) [@phixMe](https://github.com/phixMe)  
+    *Adds a refresh button for jobs, datasets, and lineage events pages. This also will work in empty states.*
+
+### Removed
+
+* Web: remove old files and dependencies [`#2801`](https://github.com/MarquezProject/marquez/pull/2801) [@phixMe](https://github.com/phixMe)  
+    *Drops deps and removes unused React components no longer required by the new lineage graph.*
+
+### Fixed
+
+* API: adapt column lineage query for symlink dataset [`#2775`](https://github.com/MarquezProject/marquez/pull/2775) [@sophiely](https://github.com/sophiely)  
+    *Changes the column lineage query in order to take only the 'main' dataset, not the dataset created via symlink.*
+* Web: resolve issue data quality assertion facet are not displayed [`#2528`](https://github.com/MarquezProject/marquez/pull/2528) [@sophiely](https://github.com/sophiely)  
+    *Fixes rendering of the `DataQualityAssertion` facet by adding support for `dataset`, `unknown` and `input`.*
+* Web: fix `showTags` refresh [`#2799`](https://github.com/MarquezProject/marquez/pull/2799) [@davidsharp7](https://github.com/davidsharp7)  
+    *Adds `showTags` to the dependencies of `fetchDatasetVersions` and disables the show tags toggle until the latest version has been pulled.*
+* Web: various dataset tags improvements [`#2813`](https://github.com/MarquezProject/marquez/pull/2813) [@davidsharp7](https://github.com/davidsharp7)  
+    *Various tag improvements including a carat for the dropdown.*
+* Web: use Webpack-bundled icon instead of GitHub-hosted content [`#2803`](https://github.com/MarquezProject/marquez/pull/2803) [@dodo0822](https://github.com/dodo0822)  
+    *For compliance with a strict CSP, replaces the icon with an SVG bundled by Webpack instead of linking to `raw.githubusercontent.com`.*
 
 ## [0.46.0](https://github.com/MarquezProject/marquez/compare/0.45.0...0.46.0) - 2024-03-15
 
@@ -203,7 +251,7 @@
     *Fixes margins and moves the label to be more inline with what the defaults are to fix issues caused by the recent Material-UI upgrade.*
 * Web: update i18n for general search filter and `runInfo` facets search [`#2557`](https://github.com/MarquezProject/marquez/pull/2557) [@merobi-hub](https://github.com/merobi-hub)
     *Adds missing i18n support for `runInfo` and search.*
-* Docker: update web proxy import [`#2571`](https://github.com/MarquezProject/marquez/pull/2571) [@phixme](https://github.com/phixMe)
+* Docker: update Web proxy import [`#2571`](https://github.com/MarquezProject/marquez/pull/2571) [@phixme](https://github.com/phixMe)
     *Updates the import style for the `http-proxy-middleware`.*
 
 ## [0.38.0](https://github.com/MarquezProject/marquez/compare/0.37.0...0.38.0) - 2023-08-02
@@ -319,7 +367,7 @@
 ### Removed
 
 * API: remove job context [`#2373`](https://github.com/MarquezProject/marquez/pull/2373) [@JDarDagran](https://github.com/JDarDagran)
-    *Removes the use of job context and adds two endpoints for job/run facets per run. These are called from web components to replace the job context with `SQLJobFacet`.*
+    *Removes the use of job context and adds two endpoints for job/run facets per run. These are called from Web components to replace the job context with `SQLJobFacet`.*
 * API: remove `jobs_fqn` table and move FQN into jobs directly [`#2448`](https://github.com/MarquezProject/marquez/pull/2448) [@collado-mike](https://github.com/collado-mike)
     *Fixes loading of certain jobs caused by the inability to enforce uniqueness constraints on fully qualified job names.*
 
@@ -427,8 +475,8 @@
     *Removes the conditions `updated_at < transitionedAt` and `start_run_state_uuid != null` to allow for updating the run state.*
 * Update linter [`#2322`](https://github.com/MarquezProject/marquez/pull/2322) [@phixMe](https://github.com/phixMe)
     *Adds `npm run eslint-fix` to the CI config to fail if it does not return with a RC 0.*
-* Fix asset loading for web [`#2323`](https://github.com/MarquezProject/marquez/pull/2323) [@phixMe](https://github.com/phixMe)
-    *Fixes the webpack config and allows files to be imported in a modern capacity that enforces the assets exist.*
+* Fix asset loading for Web [`#2323`](https://github.com/MarquezProject/marquez/pull/2323) [@phixMe](https://github.com/phixMe)
+    *Fixes the Webpack config and allows files to be imported in a modern capacity that enforces the assets exist.*
 
 ## [0.28.0](https://github.com/MarquezProject/marquez/compare/0.27.0...0.28.0) - 2022-11-21
 
@@ -604,7 +652,7 @@
 * Add support for `LifecycleStateChangeFacet` with an ability to softly delete datasets [`#1847`](https://github.com/MarquezProject/marquez/pull/1847)[@pawel-big-lebowski](https://github.com/pawel-big-lebowski)
 * Enable pod specific annotations in Marquez Helm Chart via `marquez.podAnnotations` [`#1945`](https://github.com/MarquezProject/marquez/pull/1945) [@wslulciuc](https://github.com/wslulciuc)
 * Add support for job renaming/redirection via symlink [`#1947`](https://github.com/MarquezProject/marquez/pull/1947) [@collado-mike](https://github.com/collado-mike)
-* Add `Created by` view for dataset versions along with SQL syntax highlighting in web UI [`#1929`](https://github.com/MarquezProject/marquez/pull/1929) [@phixMe](https://github.com/phixMe)
+* Add `Created by` view for dataset versions along with SQL syntax highlighting in Web UI [`#1929`](https://github.com/MarquezProject/marquez/pull/1929) [@phixMe](https://github.com/phixMe)
 * Add `operationId` to openapi spec [`#1978`](https://github.com/MarquezProject/marquez/pull/1978) [@phixMe](https://github.com/phixMe)
 
 ### Changed
@@ -615,8 +663,8 @@
 
 * Remove size limits on namespaces, dataset names, and and source connection urls [`#1925`](https://github.com/MarquezProject/marquez/pull/1925) [@collado-mike](https://github.com/collado-mike)
 * Update namespace names to allow `=`, `@`, and `;` [`#1936`](https://github.com/MarquezProject/marquez/pull/1936) [@mobuchowski](https://github.com/mobuchowski)
-* Time duration display in web UI [`#1950`](https://github.com/MarquezProject/marquez/pull/1950) [@phixMe](https://github.com/phixMe)
-* Enable web UI to access API via Helm Chart [@GZack2000](https://github.com/GZack2000)
+* Time duration display in Web UI [`#1950`](https://github.com/MarquezProject/marquez/pull/1950) [@phixMe](https://github.com/phixMe)
+* Enable Web UI to access API via Helm Chart [@GZack2000](https://github.com/GZack2000)
 
 ## [0.21.0](https://github.com/MarquezProject/marquez/compare/0.20.0...0.21.0) - 2022-03-03
 
@@ -707,9 +755,9 @@
 ### Added
 
 * Add simple python client example [@wslulciuc](https://github.com/wslulciuc)
-* Display dataset versions in web UI :tada: [@phixMe](https://github.com/phixMe)
-* Display runs and run facets in web UI :tada: [@phixMe](https://github.com/phixMe)
-* Facet formatting and highlighting as Json in web UI [@phixMe](https://github.com/phixMe)
+* Display dataset versions in Web UI :tada: [@phixMe](https://github.com/phixMe)
+* Display runs and run facets in Web UI :tada: [@phixMe](https://github.com/phixMe)
+* Facet formatting and highlighting as Json in Web UI [@phixMe](https://github.com/phixMe)
 * Add option for `docker/up.sh` to run in the background [@rossturk](https://github.com/rossturk)
 * Return `totalCount` in lists of jobs and datatsets [@phixMe](https://github.com/phixMe)
 
@@ -722,7 +770,7 @@
 
 * `Job.location` and `Source.connectionUrl` should be in URI format on write [@OleksandrDvornik](https://github.com/OleksandrDvornik)
 * Z-Index fix for nodes and edges in lineage graph [@phixMe](https://github.com/phixMe)
-* Format of the index files for web UI [@phixMe](https://github.com/phixMe)
+* Format of the index files for Web UI [@phixMe](https://github.com/phixMe)
 * Fix OpenLineage API to return correct response codes for exceptions propagated from async calls [@collado-mike](https://github.com/collado-mike)
 * Stopped overwriting nominal time information with nulls [@mobuchowski](https://github.com/mobuchowski)
 
@@ -1151,7 +1199,7 @@
 ### Added
 
 * Add dataset field versioning support
-* Add link to web UI
+* Add link to Web UI
 * Add `Job.context`
 
 ### Changed
