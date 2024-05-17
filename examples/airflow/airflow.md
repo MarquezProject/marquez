@@ -309,4 +309,4 @@ _Congrats_! You successfully step through a troubleshooting scenario of a failin
 
 # Feedback
 
-What did you think of this example? You can reach out to us on [slack](http://bit.ly/Mqz_invite) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
+What did you think of this example? You can reach out to us on [slack](https://bit.ly/Marquez_Slack_invite) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
