@@ -59,7 +59,7 @@ const ColumnLevelDrawer = ({
     <Box width={`${WIDTH}px`}>
       <Box
         position={'sticky'}
-        top={'98px'}
+        top={0}
         bgcolor={theme.palette.background.default}
         pt={2}
         zIndex={theme.zIndex.appBar}

@@ -112,7 +112,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     <Box px={2} display='flex' flexDirection='column' justifyContent='space-between'>
       <Box
         position={'sticky'}
-        top={'98px'}
+        top={0}
         bgcolor={theme.palette.background.default}
         py={2}
         zIndex={theme.zIndex.appBar}

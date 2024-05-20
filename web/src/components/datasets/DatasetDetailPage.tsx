@@ -152,7 +152,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     <Box px={2}>
       <Box
         position={'sticky'}
-        top={'98px'}
+        top={0}
         bgcolor={theme.palette.background.default}
         pt={2}
         zIndex={theme.zIndex.appBar}
