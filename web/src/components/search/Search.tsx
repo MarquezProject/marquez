@@ -119,7 +119,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     })
 
     setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
+      fetchSearch(state.search, label.toUpperCase(), state.sort.toUpperCase())
     }, 1)
   }
 
@@ -130,7 +130,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     })
 
     setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
+      fetchSearch(state.search, state.filter.toUpperCase(), label.toUpperCase())
     }, 1)
   }
 
