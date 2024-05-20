@@ -5,9 +5,13 @@ import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box, Button, CircularProgress, Tab, Tabs } from '@mui/material'
+import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
+import { CalendarIcon } from '@mui/x-date-pickers'
+import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
-import { LineageJob } from '../lineage/types'
+import { LineageJob } from '../../types/lineage'
+import { MqInfo } from '../core/info/MqInfo'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
@@ -20,18 +24,22 @@ import {
   resetRuns,
   setTabIndex,
 } from '../../store/actionCreators'
+import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
+import { formatUpdatedAt } from '../../helpers'
 import { jobRunsStatus } from '../../helpers/nodes'
+import { stopWatchDuration } from '../../helpers/time'
+import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
-import Io from '../io/Io'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
+import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -101,15 +109,139 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   return (
-    <Box
-      p={4}
-      display='flex'
-      flexDirection='column'
-      justifyContent='space-between'
-      sx={{
-        padding: theme.spacing(2),
-      }}
-    >
+    <Box px={2} display='flex' flexDirection='column' justifyContent='space-between'>
+      <Box
+        position={'sticky'}
+        top={'98px'}
+        bgcolor={theme.palette.background.default}
+        py={2}
+        zIndex={theme.zIndex.appBar}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+        mb={2}
+      >
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
+          <Box>
+            <Box display={'flex'} alignItems={'center'}>
+              <Box
+                mr={2}
+                borderRadius={theme.spacing(1)}
+                p={1}
+                width={32}
+                height={32}
+                display={'flex'}
+                bgcolor={theme.palette.primary.main}
+              >
+                <FontAwesomeIcon
+                  aria-hidden={'true'}
+                  title={'Job'}
+                  icon={faCog}
+                  width={16}
+                  height={16}
+                  color={theme.palette.common.white}
+                />
+              </Box>
+              <MqText font={'mono'} heading>
+                {truncateText(job.name, 40)}
+              </MqText>
+            </Box>
+            {job.description && (
+              <Box mt={1}>
+                <MqText subdued>{job.description}</MqText>
+              </Box>
+            )}
+          </Box>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box mr={1}>
+              <Button
+                variant='outlined'
+                size={'small'}
+                sx={{
+                  borderColor: theme.palette.error.main,
+                  color: theme.palette.error.main,
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.error.main, 0.3),
+                    backgroundColor: alpha(theme.palette.error.main, 0.3),
+                  },
+                }}
+                onClick={() => {
+                  props.dialogToggle('')
+                }}
+              >
+                {i18next.t('jobs.dialog_delete')}
+              </Button>
+              <Dialog
+                dialogIsOpen={display.dialogIsOpen}
+                dialogToggle={dialogToggle}
+                title={i18next.t('jobs.dialog_confirmation_title')}
+                ignoreWarning={() => {
+                  deleteJob(job.name, job.namespace)
+                  props.dialogToggle('')
+                }}
+              />
+            </Box>
+            <Box mr={1}>
+              <Button
+                size={'small'}
+                variant='outlined'
+                color='primary'
+                target={'_blank'}
+                href={job.location}
+                disabled={!job.location}
+              >
+                {i18next.t('jobs.location')}
+              </Button>
+            </Box>
+            <IconButton onClick={() => setSearchParams({})} size='small'>
+              <CloseIcon fontSize={'small'} />
+            </IconButton>
+          </Box>
+        </Box>
+      </Box>
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Created at'.toUpperCase()}
+            value={formatUpdatedAt(job.createdAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Updated at'.toUpperCase()}
+            value={formatUpdatedAt(job.updatedAt)}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<SpeedRounded color={'disabled'} />}
+            label={'Last Runtime'.toUpperCase()}
+            value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<Start color={'disabled'} />}
+            label={'Last Started'.toUpperCase()}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<SportsScore color={'disabled'} />}
+            label={'Last Finished'.toUpperCase()}
+            value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MqInfo
+            icon={<DirectionsRun color={'disabled'} />}
+            label={'Running Status'.toUpperCase()}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+          />
+        </Grid>
+      </Grid>
+      <Divider sx={{ my: 1 }} />
       <Box
         mb={2}
         display={'flex'}
@@ -119,68 +251,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
       >
         <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
           <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
-          <Tab label={'I/O'} disableRipple={true} />
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
         </Tabs>
-        <Box display={'flex'} alignItems={'center'}>
-          <Box mr={1}>
-            <Button
-              variant='outlined'
-              size={'small'}
-              sx={{
-                borderColor: theme.palette.error.main,
-                color: theme.palette.error.main,
-                '&:hover': {
-                  borderColor: alpha(theme.palette.error.main, 0.3),
-                  backgroundColor: alpha(theme.palette.error.main, 0.3),
-                },
-              }}
-              onClick={() => {
-                props.dialogToggle('')
-              }}
-            >
-              {i18next.t('jobs.dialog_delete')}
-            </Button>
-            <Dialog
-              dialogIsOpen={display.dialogIsOpen}
-              dialogToggle={dialogToggle}
-              title={i18next.t('jobs.dialog_confirmation_title')}
-              ignoreWarning={() => {
-                deleteJob(job.name, job.namespace)
-                props.dialogToggle('')
-              }}
-            />
-          </Box>
-          <Box mr={1}>
-            <Button
-              size={'small'}
-              variant='outlined'
-              color='primary'
-              target={'_blank'}
-              href={job.location}
-              disabled={!job.location}
-            >
-              {i18next.t('jobs.location')}
-            </Button>
-          </Box>
-          <IconButton onClick={() => setSearchParams({})} size='large'>
-            <CloseIcon fontSize={'small'} />
-          </IconButton>
-        </Box>
-      </Box>
-      <Box display={'flex'} alignItems={'center'}>
-        {runs.length && (
-          <Box mr={1}>
-            <MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />
-          </Box>
-        )}
-        <MqText font={'mono'} heading>
-          {job.name}
-        </MqText>
-      </Box>
-
-      <Box mt={1}>
-        <MqText subdued>{job.description}</MqText>
       </Box>
       {tabIndex === 0 ? (
         job.latestRun ? (
@@ -191,8 +263,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Io />}
-      {tabIndex === 2 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Runs runs={runs} />}
     </Box>
   )
 }

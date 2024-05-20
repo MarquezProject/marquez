@@ -1,8 +1,8 @@
 import { CenterFocusStrong, CropFree, ZoomIn, ZoomOut } from '@mui/icons-material'
-import { Tooltip } from '@mui/material'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import React from 'react'
 
 interface ZoomControlsProps {
@@ -28,27 +28,27 @@ export const ZoomControls = ({
       zIndex={1}
       borderColor={theme.palette.grey[500]}
     >
-      <Tooltip title={'Zoom in'} placement={'left'}>
+      <MQTooltip title={'Zoom in'} placement={'left'}>
         <IconButton size='small' onClick={() => handleScaleZoom('in')}>
           <ZoomIn />
         </IconButton>
-      </Tooltip>
-      <Tooltip title={'Zoom out'} placement={'left'}>
+      </MQTooltip>
+      <MQTooltip title={'Zoom out'} placement={'left'}>
         <IconButton size='small' onClick={() => handleScaleZoom('out')}>
           <ZoomOut />
         </IconButton>
-      </Tooltip>
-      <Tooltip title={'Reset zoom'} placement={'left'}>
+      </MQTooltip>
+      <MQTooltip title={'Reset zoom'} placement={'left'}>
         <IconButton size={'small'} onClick={handleResetZoom}>
           <CropFree />
         </IconButton>
-      </Tooltip>
+      </MQTooltip>
       {handleCenterOnNode && (
-        <Tooltip title={'Center on selected node'} placement={'left'}>
+        <MQTooltip title={'Center on selected node'} placement={'left'}>
           <IconButton size={'small'} onClick={handleCenterOnNode}>
             <CenterFocusStrong />
           </IconButton>
-        </Tooltip>
+        </MQTooltip>
       )}
     </Box>
   )

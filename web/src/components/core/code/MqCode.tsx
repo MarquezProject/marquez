@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { THEME_EXTRA } from '../../../helpers/theme'
-import { ocean } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
+import { solarizedDark } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 import Box from '@mui/material/Box'
 import MqText from '../text/MqText'
 import React from 'react'
@@ -26,7 +26,7 @@ const MqCode: React.FC<OwnProps> = ({ code, description, language }) => {
       )}
       <SyntaxHighlighter
         language={language}
-        style={ocean}
+        style={solarizedDark}
         customStyle={{
           backgroundColor: '#191f26',
           borderLeft: `2px dashed ${THEME_EXTRA.typography.subdued}`,

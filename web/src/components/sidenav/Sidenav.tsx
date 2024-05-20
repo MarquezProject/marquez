@@ -19,6 +19,8 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
+import iconSearchArrow from '../../img/iconSearchArrow.svg'
+
 interface SidenavProps {}
 
 const Sidenav: React.FC<SidenavProps> = () => {
@@ -97,7 +99,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
               active={location.pathname === '/events'}
             >
               <SVG
-                src='https://raw.githubusercontent.com/MarquezProject/marquez/main/web/src/img/iconSearchArrow.svg'
+                src={iconSearchArrow}
                 width={'30px'}
               />
             </MqIconButton>

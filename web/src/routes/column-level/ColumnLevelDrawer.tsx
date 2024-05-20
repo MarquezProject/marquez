@@ -1,8 +1,8 @@
 import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import {
+  Chip,
   CircularProgress,
-  Divider,
   Table,
   TableBody,
   TableCell,
@@ -10,10 +10,13 @@ import {
   TableRow,
 } from '@mui/material'
 import { ColumnLineageGraph, Dataset } from '../../types/api'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchDataset } from '../../store/actionCreators'
+import { theme } from '../../helpers/theme'
 import { useSearchParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
@@ -54,17 +57,47 @@ const ColumnLevelDrawer = ({
 
   return (
     <Box width={`${WIDTH}px`}>
-      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-        <MqText heading>{searchParams.get('dataset')}</MqText>
-        <IconButton
-          onClick={() => {
-            setSearchParams({})
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+      <Box
+        position={'sticky'}
+        top={'98px'}
+        bgcolor={theme.palette.background.default}
+        pt={2}
+        zIndex={theme.zIndex.appBar}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+      >
+        <Box px={2} pb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box display={'flex'} alignItems={'center'}>
+              <Box
+                mr={2}
+                borderRadius={theme.spacing(1)}
+                p={1}
+                width={32}
+                height={32}
+                display={'flex'}
+                bgcolor={theme.palette.info.main}
+              >
+                <FontAwesomeIcon
+                  aria-hidden={'true'}
+                  title={'Dataset'}
+                  icon={faDatabase}
+                  width={16}
+                  height={16}
+                  color={theme.palette.common.white}
+                />
+              </Box>
+            </Box>
+            <MqText heading>{searchParams.get('dataset')}</MqText>
+          </Box>
+          <IconButton
+            onClick={() => {
+              setSearchParams({})
+            }}
+          >
+            <CloseIcon fontSize={'small'} />
+          </IconButton>
+        </Box>
       </Box>
-      <Divider />
       {!dataset || isDatasetLoading ? (
         <Box mt={2} display={'flex'} justifyContent={'center'}>
           <CircularProgress color='primary' />
@@ -102,10 +135,18 @@ const ColumnLevelDrawer = ({
                     return (
                       <React.Fragment key={field.name}>
                         <TableRow>
-                          <TableCell align='left'>{field.name}</TableCell>
-                          <TableCell align='left'>{field.type}</TableCell>
                           <TableCell align='left'>
-                            {field.description || 'no description'}
+                            <MqText font={'mono'}>{field.name}</MqText>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <Chip
+                              size={'small'}
+                              label={<MqText font={'mono'}>{field.type}</MqText>}
+                              variant={'outlined'}
+                            />
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MqText subdued>{field.description || 'no description'}</MqText>
                           </TableCell>
                         </TableRow>
                       </React.Fragment>

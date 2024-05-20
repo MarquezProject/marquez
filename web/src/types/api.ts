@@ -1,7 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { JobOrDataset, LineageNode } from '../components/lineage/types'
+import { JobOrDataset, LineageNode } from './lineage'
 
 export interface Tag {
   name: string
@@ -82,7 +82,22 @@ export interface Dataset {
   description: string
   facets: object
   deleted: boolean
-  columnLineage: object
+  columnLineage: InputFields[]
+}
+
+interface InputField {
+  namespace: string
+  dataset: string
+  field: string
+  transformationDescription: string | null
+  transformationType: string | null
+}
+
+interface InputFields {
+  name: string
+  inputFields: InputField[]
+  transformationDescription: string | null
+  transformationType: string | null
 }
 
 export interface DatasetVersions {
@@ -91,12 +106,14 @@ export interface DatasetVersions {
 
 export interface DataQualityFacets {
   dataQualityAssertions?: {
-    assertions?: {
-      assertion: string
-      column: string
-      success: boolean
-    }[]
+    assertions?: Assertion[]
   }
+}
+
+export interface Assertion {
+  assertion: string
+  column: string
+  success: boolean
 }
 
 export interface DatasetVersion {

@@ -41,7 +41,7 @@ const MqChip: React.FC<MqChipProps> = ({
       sx={{
         display: 'inline-block',
         borderRadius: theme.spacing(2),
-        padding: '2px 8px',
+        padding: '2px 12px',
         cursor: 'pointer',
         userSelect: 'none',
         boxShadow: selected ? `0 0 2px 3px ${theme.palette.common.white}` : 'initial',
@@ -64,7 +64,9 @@ const MqChip: React.FC<MqChipProps> = ({
       )}
       {text && (
         <Box ml={icon ? 1 : 0} display={'inline'}>
-          <MqText inline>{text}</MqText>{' '}
+          <MqText font={'mono'} inline>
+            {text}
+          </MqText>
         </Box>
       )}
     </Box>

@@ -2,39 +2,60 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, Button, Tab, Tabs, createTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  Divider,
+  FormControlLabel,
+  Grid,
+  Switch,
+  Tab,
+  Tabs,
+  createTheme,
+} from '@mui/material'
+import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
-import { DatasetVersion } from '../../types/api'
+import { Dataset, DatasetVersion } from '../../types/api'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
-import { LineageDataset } from '../lineage/types'
+import { LineageDataset } from '../../types/lineage'
+import { MqInfo } from '../core/info/MqInfo'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { datasetFacetsStatus } from '../../helpers/nodes'
+import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
+  fetchDataset,
   fetchDatasetVersions,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
 } from '../../store/actionCreators'
+import { faDatabase } from '@fortawesome/free-solid-svg-icons'
+import { formatUpdatedAt } from '../../helpers'
+import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
+import Assertions from './Assertions'
 import CloseIcon from '@mui/icons-material/Close'
-import DatasetColumnLineage from './DatasetColumnLineage'
 import DatasetInfo from './DatasetInfo'
 import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
-import Io from '../io/Io'
+import ListIcon from '@mui/icons-material/List'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
+import React, { ChangeEvent, FunctionComponent, useEffect, useState } from 'react'
+import RuleIcon from '@mui/icons-material/Rule'
+import StorageIcon from '@mui/icons-material/Storage'
 
 interface StateProps {
   lineageDataset: LineageDataset
+  dataset: Dataset
   versions: DatasetVersion[]
   versionsLoading: boolean
   datasets: IState['datasets']
@@ -44,6 +65,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchDatasetVersions: typeof fetchDatasetVersions
+  fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
   deleteDataset: typeof deleteDataset
@@ -63,7 +85,9 @@ function a11yProps(index: number) {
 const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
+    dataset,
     display,
+    fetchDataset,
     fetchDatasetVersions,
     resetDataset,
     resetDatasetVersions,
@@ -79,6 +103,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
   const [_, setSearchParams] = useSearchParams()
+  const [showTags, setShowTags] = useState(false)
 
   // unmounting
   useEffect(
@@ -91,7 +116,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name, datasets.refreshTags])
+    fetchDataset(lineageDataset.namespace, lineageDataset.name)
+  }, [lineageDataset.name, showTags])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
@@ -104,9 +130,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (versionsLoading) {
+  if (versionsLoading && versions.length === 0) {
     return (
-      <Box display={'flex'} justifyContent={'center'}>
+      <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
       </Box>
     )
@@ -120,24 +146,53 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
+  const assertions = datasetFacetsQualityAssertions(firstVersion.facets)
+
   return (
-    <Box
-      my={2}
-      sx={{
-        padding: `0 ${theme.spacing(2)}`,
-      }}
-    >
-      <Box>
-        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-          <DatasetTags
-            datasetTags={tags}
-            datasetName={lineageDataset.name}
-            namespace={lineageDataset.namespace}
-          />
+    <Box px={2}>
+      <Box
+        position={'sticky'}
+        top={'98px'}
+        bgcolor={theme.palette.background.default}
+        pt={2}
+        zIndex={theme.zIndex.appBar}
+        sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+        mb={2}
+      >
+        <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pb={2}>
+          <Box display={'flex'} alignItems={'center'}>
+            <Box>
+              <Box display={'flex'} alignItems={'center'}>
+                <Box
+                  mr={2}
+                  borderRadius={theme.spacing(1)}
+                  p={1}
+                  width={32}
+                  height={32}
+                  display={'flex'}
+                  bgcolor={theme.palette.info.main}
+                >
+                  <FontAwesomeIcon
+                    aria-hidden={'true'}
+                    title={'Dataset'}
+                    icon={faDatabase}
+                    width={16}
+                    height={16}
+                    color={theme.palette.common.white}
+                  />
+                </Box>
+                <MqText font={'mono'} heading>
+                  {truncateText(name, 40)}
+                </MqText>
+              </Box>
+              <MqText subdued>{description}</MqText>
+            </Box>
+          </Box>
           <Box display={'flex'} alignItems={'center'}>
             <Box mr={1}>
               <Button
                 variant='outlined'
+                size={'small'}
                 sx={{
                   borderColor: theme.palette.error.main,
                   color: theme.palette.error.main,
@@ -167,63 +222,133 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </IconButton>
           </Box>
         </Box>
-        <Box display={'flex'} justifyContent={'space-between'} mb={2}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
-            <Tabs
-              value={tabIndex}
-              onChange={handleChange}
-              textColor='primary'
-              indicatorColor='primary'
-            >
-              <Tab
-                label={i18next.t('datasets.latest_tab')}
-                {...a11yProps(0)}
-                disableRipple={true}
-              />
-              <Tab label={'I/O'} {...a11yProps(1)} disableRipple={true} />
-              <Tab
-                label={i18next.t('datasets.history_tab')}
-                {...a11yProps(2)}
-                disableRipple={true}
-              />
-              <Tab
-                label={i18next.t('datasets.column_lineage_tab')}
-                {...a11yProps(3)}
-                disableRipple={true}
-              />
-            </Tabs>
+      </Box>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <MqInfo
+            icon={<CalendarIcon color={'disabled'} />}
+            label={'Updated at'.toUpperCase()}
+            value={formatUpdatedAt(firstVersion.createdAt)}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <MqInfo
+            icon={<StorageIcon color={'disabled'} />}
+            label={'Dataset Type'.toUpperCase()}
+            value={<MqText font={'mono'}>{firstVersion.type}</MqText>}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <MqInfo
+            icon={<ListIcon color={'disabled'} />}
+            label={'Fields'.toUpperCase()}
+            value={`${firstVersion.fields.length} columns`}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <MqInfo
+            icon={<RuleIcon color={'disabled'} />}
+            label={'Quality'.toUpperCase()}
+            value={
+              facetsStatus ? (
+                <Box display={'flex'}>
+                  <MQTooltip
+                    title={
+                      <Assertions
+                        assertions={assertions.filter((assertion) => assertion.success)}
+                      />
+                    }
+                  >
+                    <Box>
+                      <MqStatus
+                        label={`${
+                          assertions.filter((assertion) => assertion.success).length
+                        } Passing`.toUpperCase()}
+                        color={theme.palette.primary.main}
+                      />
+                    </Box>
+                  </MQTooltip>
+                  <Divider sx={{ mx: 1 }} orientation={'vertical'} />
+                  <MQTooltip
+                    title={
+                      <Assertions
+                        assertions={assertions.filter((assertion) => !assertion.success)}
+                      />
+                    }
+                  >
+                    <Box>
+                      <MqStatus
+                        label={`${
+                          assertions.filter((assertion) => !assertion.success).length
+                        } Failing`.toUpperCase()}
+                        color={theme.palette.error.main}
+                      />
+                    </Box>
+                  </MQTooltip>
+                </Box>
+              ) : (
+                <MqStatus label={'N/A'} color={theme.palette.secondary.main} />
+              )
+            }
+          />
+        </Grid>
+      </Grid>
+      <Divider sx={{ my: 2 }} />
+      <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <DatasetTags
+          datasetTags={tags}
+          datasetName={lineageDataset.name}
+          namespace={lineageDataset.namespace}
+        />
+      </Box>
+      <Box display={'flex'} justifyContent={'space-between'} mb={2}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
+          <Tabs
+            value={tabIndex}
+            onChange={handleChange}
+            textColor='primary'
+            indicatorColor='primary'
+          >
+            <Tab label={i18next.t('datasets.latest_tab')} {...a11yProps(0)} disableRipple={true} />
+            <Tab label={i18next.t('datasets.history_tab')} {...a11yProps(2)} disableRipple={true} />
+          </Tabs>
+        </Box>
+        {tabIndex === 0 && (
+          <Box display={'flex'} alignItems={'center'}>
+            <FormControlLabel
+              sx={{ textWrap: 'nowrap' }}
+              control={
+                <Switch
+                  size={'small'}
+                  checked={showTags}
+                  onChange={() => setShowTags(!showTags)}
+                  inputProps={{ 'aria-label': 'toggle show tags' }}
+                  disabled={versionsLoading}
+                />
+              }
+              label={i18next.t('datasets.show_field_tags')}
+            />
           </Box>
-        </Box>
-        <Box display={'flex'} alignItems={'center'}>
-          {facetsStatus && (
-            <Box mr={1}>
-              <MqStatus label={'Quality'} color={facetsStatus} />
-            </Box>
-          )}
-          <MqText heading font={'mono'}>
-            {name}
-          </MqText>
-        </Box>
-        <Box mb={2}>
-          <MqText subdued>{description}</MqText>
-        </Box>
+        )}
       </Box>
       {tabIndex === 0 && (
         <DatasetInfo
+          dataset={dataset}
           datasetFields={firstVersion.fields}
           facets={firstVersion.facets}
           run={firstVersion.createdByRun}
+          showTags={showTags}
+          isCurrentVersion
         />
       )}
-      {tabIndex === 1 && <Io />}
-      {tabIndex === 2 && <DatasetVersions versions={props.versions} />}
-      {tabIndex === 3 && <DatasetColumnLineage lineageDataset={props.lineageDataset} />}
+      {tabIndex === 1 && <DatasetVersions dataset={dataset} versions={props.versions} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
+  dataset: state.dataset.result,
   display: state.display,
   versions: state.datasetVersions.result.versions,
   versionsLoading: state.datasetVersions.isLoading,
@@ -234,6 +359,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchDatasetVersions: fetchDatasetVersions,
+      fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset,
       deleteDataset: deleteDataset,

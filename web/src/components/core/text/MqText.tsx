@@ -3,7 +3,7 @@
 
 import React, { ReactElement } from 'react'
 
-import { Box } from '@mui/system'
+import { Box, SxProps } from '@mui/system'
 import { Link as LinkRouter } from 'react-router-dom'
 import { THEME_EXTRA } from '../../../helpers/theme'
 import { Typography } from '@mui/material'
@@ -30,6 +30,8 @@ interface OwnProps {
   font?: 'primary' | 'mono'
   small?: boolean
   bottomMargin?: boolean
+  block?: boolean
+  sx?: SxProps
   children: ReactElement | (string | ReactElement)[] | string | string[] | number | undefined | null
   onClick?: () => void
 }
@@ -56,7 +58,9 @@ const MqText: React.FC<MqTextProps> = ({
   highlight,
   color,
   small,
+  block,
   onClick,
+  sx,
 }) => {
   const theme = createTheme(useTheme())
 
@@ -86,6 +90,9 @@ const MqText: React.FC<MqTextProps> = ({
     },
     bold: {
       fontWeight: 700,
+    },
+    block: {
+      display: 'block',
     },
     subdued: {
       color: THEME_EXTRA.typography.subdued,
@@ -140,6 +147,7 @@ const MqText: React.FC<MqTextProps> = ({
     inline ? classesObject.inline : {},
     small ? classesObject.small : {},
     link ? classesObject.link : {},
+    block ? classesObject.block : {},
     paragraph ? classesObject.paragraph : {},
     subheading ? classesObject.subheading : {},
     overflowHidden ? classesObject.overflowHidden : {}
@@ -154,7 +162,10 @@ const MqText: React.FC<MqTextProps> = ({
       <Typography
         onClick={onClick}
         variant='h4'
-        sx={Object.assign(classesObject.root, classesObject.heading, conditionalClasses)}
+        sx={{
+          ...Object.assign(classesObject.root, classesObject.heading, conditionalClasses),
+          ...sx,
+        }}
         style={style}
       >
         {children}
@@ -170,7 +181,10 @@ const MqText: React.FC<MqTextProps> = ({
       >
         <Box
           component='span'
-          sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
+          sx={{
+            ...Object.assign(classesObject.root, classesObject.link, conditionalClasses),
+            ...sx,
+          }}
         >
           {children}
         </Box>
@@ -183,7 +197,10 @@ const MqText: React.FC<MqTextProps> = ({
         href={href}
         target={'_blank'}
         rel='noopener noreferrer'
-        sx={Object.assign(classesObject.root, classesObject.link, conditionalClasses)}
+        sx={{
+          ...Object.assign(classesObject.root, classesObject.link, conditionalClasses),
+          ...sx,
+        }}
       >
         {children}
       </Link>
@@ -192,7 +209,7 @@ const MqText: React.FC<MqTextProps> = ({
     return (
       <Box
         onClick={onClick}
-        sx={Object.assign(classesObject.root, conditionalClasses)}
+        sx={{ ...Object.assign(classesObject.root, conditionalClasses), ...sx }}
         style={style}
       >
         {children}

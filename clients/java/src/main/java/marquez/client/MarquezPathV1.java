@@ -153,6 +153,11 @@ class MarquezPathV1 {
     return path("/namespaces/%s/datasets/%s/tags/%s", namespaceName, datasetName, tagName);
   }
 
+  static String jobTagPath(
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull String tagName) {
+    return path("/namespaces/%s/jobs/%s/tags/%s", namespaceName, jobName, tagName);
+  }
+
   static String fieldTagPath(
       String namespaceName, String datasetName, String fieldName, String tagName) {
     return path(

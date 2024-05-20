@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { JobOrDataset } from '../../components/lineage/types'
+import { JobOrDataset } from '../../types/lineage'
 import { generateNodeId } from '../../helpers/nodes'
 import { genericFetchWrapper } from './index'
 

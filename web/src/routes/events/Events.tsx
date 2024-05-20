@@ -11,7 +11,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   createTheme,
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
@@ -30,6 +29,7 @@ import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqCopy from '../../components/core/copy/MqCopy'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
@@ -187,7 +187,7 @@ const Events: React.FC<EventsProps> = ({
                 ></Chip>
               </Box>
             </Box>
-            <Tooltip title={'Refresh'}>
+            <MQTooltip title={'Refresh'}>
               <IconButton
                 color={'primary'}
                 size={'small'}
@@ -197,7 +197,7 @@ const Events: React.FC<EventsProps> = ({
               >
                 <Refresh fontSize={'small'} />
               </IconButton>
-            </Tooltip>
+            </MQTooltip>
           </Box>
           <Box
             p={2}
@@ -344,7 +344,7 @@ const Events: React.FC<EventsProps> = ({
                     {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
                   </>
                 </MqText>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
+                <MQTooltip title={i18next.t('events_route.previous_page')}>
                   <span>
                     <IconButton
                       sx={{
@@ -358,8 +358,8 @@ const Events: React.FC<EventsProps> = ({
                       <ChevronLeftRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
+                </MQTooltip>
+                <MQTooltip title={i18next.t('events_route.next_page')}>
                   <span>
                     <IconButton
                       color='primary'
@@ -370,7 +370,7 @@ const Events: React.FC<EventsProps> = ({
                       <ChevronRightRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
+                </MQTooltip>
               </Box>
             </>
           )}

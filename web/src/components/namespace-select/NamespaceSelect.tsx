@@ -59,6 +59,15 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({
           </MqText>
         </Box>
         <Select
+          inputProps={{
+            MenuProps: {
+              PaperProps: {
+                sx: {
+                  backgroundImage: 'none',
+                },
+              },
+            },
+          }}
           labelId='namespace-label'
           id='namespace-select'
           value={selectedNamespace}

@@ -7,6 +7,7 @@ package marquez.service.models;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.TagName;
 
 @EqualsAndHashCode
 @ToString
@@ -43,6 +45,7 @@ public final class Job {
   @Getter private final ImmutableMap<String, Object> facets;
   @Nullable private UUID currentVersion;
   @Getter @Nullable private ImmutableList<String> labels;
+  @Getter @Nullable private final ImmutableSet<TagName> tags;
 
   public Job(
       @NonNull final JobId id,
@@ -59,7 +62,8 @@ public final class Job {
       @Nullable final Run latestRun,
       @Nullable final ImmutableMap<String, Object> facets,
       @Nullable UUID currentVersion,
-      @Nullable ImmutableList<String> labels) {
+      @Nullable ImmutableList<String> labels,
+      @Nullable final ImmutableSet<TagName> tags) {
     this.id = id;
     this.type = type;
     this.name = name;
@@ -76,6 +80,7 @@ public final class Job {
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
     this.currentVersion = currentVersion;
     this.labels = (labels == null) ? ImmutableList.of() : labels;
+    this.tags = (tags == null) ? ImmutableSet.of() : tags;
   }
 
   public Optional<URL> getLocation() {

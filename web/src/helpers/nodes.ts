@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { DataQualityFacets, EventType, Run, RunState } from '../types/api'
-import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, MqNode } from '../types/lineage'
 import { Undefinable } from '../types/util/Nullable'
 import { theme } from './theme'
 
@@ -56,7 +56,7 @@ const searchDelimiterMap = {
 type SearchDelimiterMap = typeof searchDelimiterMap
 
 export function parseSearchGroup(nodeId: string, field: keyof SearchDelimiterMap) {
-  return nodeId.split(':')[searchDelimiterMap[field]] || ''
+  return decodeURIComponent(nodeId.split(':')[searchDelimiterMap[field]]) || ''
 }
 
 export function eventTypeColor(state: EventType) {
@@ -107,6 +107,12 @@ export function jobRunsStatus(runs: Run[], limit = 14) {
     return theme.palette.primary.main as string
   }
 }
+export function datasetFacetsQualityAssertions(facets: DataQualityFacets) {
+  const assertions = facets?.dataQualityAssertions?.assertions
+  if (!assertions) {
+    return []
+  } else return assertions
+}
 
 export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
   const assertions = facets?.dataQualityAssertions?.assertions?.slice(-limit)
@@ -121,7 +127,7 @@ export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
   if (isAllFalse) {
     return theme.palette.error.main as string
   } else if (isSomeFalse) {
-    return theme.palette.info.main as string
+    return theme.palette.error.main as string
   } else {
     return theme.palette.primary.main as string
   }

@@ -1,12 +1,7 @@
 import { Edge, Node as ElkNode } from '../../../libs/graph'
 import { LineageGraph } from '../../types/api'
 
-import {
-  JobOrDataset,
-  LineageDataset,
-  LineageJob,
-  LineageNode,
-} from '../../components/lineage/types'
+import { JobOrDataset, LineageDataset, LineageJob, LineageNode } from '../../types/lineage'
 import { Nullable } from '../../types/util/Nullable'
 import { TableLevelNodeData } from './nodes'
 import { theme } from '../../helpers/theme'

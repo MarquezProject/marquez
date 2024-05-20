@@ -72,21 +72,28 @@ export default (state: IDatasetsState = initialState, action: IDatasetsAction): 
     case DELETE_DATASET_SUCCESS:
       return { ...state, deletedDatasetName: payload.datasetName }
     case DELETE_DATASET_TAG:
-      return { ...state, refreshTags: false }
+      return { ...state }
     case DELETE_DATASET_TAG_SUCCESS:
-      return { ...state, refreshTags: true }
+      return {
+        ...state,
+      }
     case DELETE_DATASET_FIELD_TAG:
-      return { ...state, refreshTags: false }
+      return { ...state }
     case DELETE_DATASET_FIELD_TAG_SUCCESS:
-      return { ...state, refreshTags: true }
+      return {
+        ...state,
+      }
     case ADD_DATASET_TAG:
-      return { ...state, refreshTags: false }
+      return { ...state }
     case ADD_DATASET_TAG_SUCCESS:
       return { ...state, refreshTags: true }
     case ADD_DATASET_FIELD_TAG:
-      return { ...state, refreshTags: false }
+      return { ...state }
     case ADD_DATASET_FIELD_TAG_SUCCESS:
-      return { ...state, refreshTags: true }
+      return {
+        ...state,
+        refreshTags: true,
+      }
     default:
       return state
   }

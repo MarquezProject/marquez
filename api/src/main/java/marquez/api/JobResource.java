@@ -42,6 +42,7 @@ import marquez.common.models.FacetType;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.TagName;
 import marquez.common.models.Version;
 import marquez.db.JobFacetsDao;
 import marquez.db.JobVersionDao;
@@ -271,6 +272,47 @@ public class JobResource extends BaseResource {
     }
 
     return Response.ok(facets).build();
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @POST
+  @Path("/namespaces/{namespace}/jobs/{job}/tags/{tag}")
+  @Produces(APPLICATION_JSON)
+  public Response updatetag(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @PathParam("tag") TagName tagName) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, jobName);
+
+    jobService.updateJobTags(namespaceName.getValue(), jobName.getValue(), tagName.getValue());
+    Job job =
+        jobService
+            .findJobByName(namespaceName.getValue(), jobName.getValue())
+            .orElseThrow(() -> new JobNotFoundException(jobName));
+    return Response.ok(job).build();
+  }
+
+  @ResponseMetered
+  @ExceptionMetered
+  @DELETE
+  @Path("/namespaces/{namespace}/jobs/{job}/tags/{tag}")
+  @Produces(APPLICATION_JSON)
+  public Response deletetag(
+      @PathParam("namespace") NamespaceName namespaceName,
+      @PathParam("job") JobName jobName,
+      @PathParam("tag") TagName tagName) {
+    throwIfNotExists(namespaceName);
+    throwIfNotExists(namespaceName, jobName);
+
+    jobService.deleteJobTags(namespaceName.getValue(), jobName.getValue(), tagName.getValue());
+    Job job =
+        jobService
+            .findJobByName(namespaceName.getValue(), jobName.getValue())
+            .orElseThrow(() -> new JobNotFoundException(jobName));
+    return Response.ok(job).build();
   }
 
   @Value

@@ -11,7 +11,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   createTheme,
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
@@ -29,6 +28,7 @@ import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
@@ -109,7 +109,7 @@ const Jobs: React.FC<JobsProps> = ({
         </Box>
         <Box display={'flex'} alignItems={'center'}>
           {isJobsLoading && <CircularProgress size={16} />}
-          <Tooltip title={'Refresh'}>
+          <MQTooltip title={'Refresh'}>
             <IconButton
               sx={{ ml: 2 }}
               color={'primary'}
@@ -122,7 +122,7 @@ const Jobs: React.FC<JobsProps> = ({
             >
               <Refresh fontSize={'small'} />
             </IconButton>
-          </Tooltip>
+          </MQTooltip>
         </Box>
       </Box>
       <MqScreenLoad loading={isJobsLoading && !isJobsInit}>
@@ -213,7 +213,7 @@ const Jobs: React.FC<JobsProps> = ({
                     {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
                   </>
                 </MqText>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
+                <MQTooltip title={i18next.t('events_route.previous_page')}>
                   <span>
                     <IconButton
                       sx={{
@@ -227,8 +227,8 @@ const Jobs: React.FC<JobsProps> = ({
                       <ChevronLeftRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
+                </MQTooltip>
+                <MQTooltip title={i18next.t('events_route.next_page')}>
                   <span>
                     <IconButton
                       color='primary'
@@ -239,7 +239,7 @@ const Jobs: React.FC<JobsProps> = ({
                       <ChevronRightRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
+                </MQTooltip>
               </Box>
             </>
           )}

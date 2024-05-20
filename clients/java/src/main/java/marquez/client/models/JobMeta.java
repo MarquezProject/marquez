@@ -22,6 +22,7 @@ public class JobMeta {
   @Getter private final JobType type;
   @Getter private final Set<DatasetId> inputs;
   @Getter private final Set<DatasetId> outputs;
+  @Getter @Nullable private final Set<String> tags;
   @Nullable private final URL location;
   @Nullable String description;
   @Nullable String runId;
@@ -32,13 +33,15 @@ public class JobMeta {
       @NonNull final Set<DatasetId> outputs,
       @Nullable final URL location,
       @Nullable final String description,
-      @Nullable String runId) {
+      @Nullable String runId,
+      @Nullable final Set<String> tags) {
     this.type = type;
     this.inputs = inputs;
     this.outputs = outputs;
     this.location = location;
     this.description = description;
     this.runId = runId;
+    this.tags = (tags == null) ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
   }
 
   public Optional<URL> getLocation() {
@@ -68,10 +71,12 @@ public class JobMeta {
     @Nullable private URL location;
     @Nullable private String description;
     @Nullable String runId;
+    private Set<String> tags;
 
     private Builder() {
       this.inputs = ImmutableSet.of();
       this.outputs = ImmutableSet.of();
+      this.tags = ImmutableSet.of();
     }
 
     public Builder type(@NonNull String typeString) {
@@ -89,6 +94,11 @@ public class JobMeta {
         datasetIds.add(new DatasetId(namespaceName, datasetName));
       }
       inputs(datasetIds.build());
+      return this;
+    }
+
+    public Builder tags(@NonNull Set<String> tags) {
+      this.tags = ImmutableSet.copyOf(tags);
       return this;
     }
 
@@ -131,7 +141,7 @@ public class JobMeta {
     }
 
     public JobMeta build() {
-      return new JobMeta(type, inputs, outputs, location, description, runId);
+      return new JobMeta(type, inputs, outputs, location, description, runId, tags);
     }
   }
 }

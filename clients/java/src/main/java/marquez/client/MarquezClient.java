@@ -234,6 +234,18 @@ public class MarquezClient {
     return Datasets.fromJson(bodyAsJson).getValue();
   }
 
+  public Job tagJobWith(
+      @NonNull String namespaceName, @NonNull String jobName, @NonNull String tagName) {
+    final String bodyAsJson = http.post(url.toJobTagUrl(namespaceName, jobName, tagName));
+    return Job.fromJson(bodyAsJson);
+  }
+
+  public Job deleteJobTag(
+      @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
+    final String bodyAsJson = http.delete(url.toJobTagUrl(namespaceName, datasetName, tagName));
+    return Job.fromJson(bodyAsJson);
+  }
+
   public Dataset tagDatasetWith(
       @NonNull String namespaceName, @NonNull String datasetName, @NonNull String tagName) {
     final String bodyAsJson = http.post(url.toDatasetTagUrl(namespaceName, datasetName, tagName));

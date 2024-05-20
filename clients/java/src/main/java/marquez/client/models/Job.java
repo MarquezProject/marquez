@@ -49,8 +49,9 @@ public final class Job extends JobMeta {
       final String description,
       @Nullable final Run latestRun,
       @Nullable final Map<String, Object> facets,
-      @Nullable UUID currentVersion) {
-    super(type, inputs, outputs, location, description, null);
+      @Nullable UUID currentVersion,
+      @Nullable final Set<String> tags) {
+    super(type, inputs, outputs, location, description, null, tags);
     this.id = id;
     this.name = name;
     this.simpleName = simpleName;

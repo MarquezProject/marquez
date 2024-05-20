@@ -55,9 +55,9 @@ subprojects {
         dropwizardVersion = '2.1.12'
         jacocoVersion = '0.8.11'
         junit5Version = '5.10.2'
-        lombokVersion = '1.18.30'
+        lombokVersion = '1.18.32'
         mockitoVersion = '5.4.0'
-        openlineageVersion = '1.9.1'
+        openlineageVersion = '1.13.1'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.6.0'
     }
