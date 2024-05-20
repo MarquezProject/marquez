@@ -13,6 +13,7 @@ import { IState } from '../../store/reducers'
 import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
 import { Run } from '../../types/api'
+import { RunHistoryTimeline } from './RunHistoryTimelineChart'
 import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -34,12 +35,14 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import MaterialRunHistoryTimelineChart from './MaterialRunHistoryTimelineChart'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
 import SpeedRounded from '@mui/icons-material/SpeedRounded'
+import i18next from 'i18next'
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -242,6 +245,11 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Grid>
       </Grid>
       <Divider sx={{ my: 1 }} />
+      <MqText paragraph subheading>
+        RECENT RUNS
+      </MqText>
+      <RunHistoryTimeline runs={runs} />
+      <MaterialRunHistoryTimelineChart />
       <Box
         mb={2}
         display={'flex'}
