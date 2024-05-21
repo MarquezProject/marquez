@@ -1,3 +1,4 @@
+import { Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageGraph } from '../../types/api'
@@ -6,11 +7,13 @@ import { PositionedNode } from '../../../libs/graph'
 import { TableLineageJobNodeData } from './nodes'
 import { connect } from 'react-redux'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
+import { formatUpdatedAt } from '../../helpers'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
+import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 
@@ -45,7 +48,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.namespace, 25)}
+              {truncateText(job.namespace, 40)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -53,7 +56,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.name, 25)}
+              {truncateText(job.name, 40)}
             </MqText>
           </Box>
           {job.description && (
@@ -66,6 +69,28 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               </MqText>
             </Box>
           )}
+          <Box display={'flex'} justifyContent={'space-between'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Updated at:
+            </MqText>
+            <MqText block font={'mono'}>
+              {formatUpdatedAt(job.updatedAt)}
+            </MqText>
+          </Box>
+          <Divider sx={{ my: 1 }} />
+          <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+            <MqText block bold sx={{ mr: 6 }}>
+              Latest Run:
+            </MqText>
+            <MqStatus
+              label={job.latestRun?.state || 'N/A'}
+              color={
+                job.latestRun?.state === 'COMPLETED'
+                  ? theme.palette.primary.main
+                  : theme.palette.error.main
+              }
+            />
+          </Box>
         </Box>
       </foreignObject>
     )
@@ -94,7 +119,13 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
         y={0}
         height={node.height}
         width={24}
-        sx={{ rx: 4, fill: theme.palette.primary.main }}
+        sx={{
+          rx: 4,
+          fill:
+            node.data.job.latestRun?.state === 'COMPLETED'
+              ? theme.palette.primary.main
+              : theme.palette.error.main,
+        }}
       />
       <FontAwesomeIcon
         aria-hidden={'true'}

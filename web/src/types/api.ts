@@ -106,12 +106,14 @@ export interface DatasetVersions {
 
 export interface DataQualityFacets {
   dataQualityAssertions?: {
-    assertions?: {
-      assertion: string
-      column: string
-      success: boolean
-    }[]
+    assertions?: Assertion[]
   }
+}
+
+export interface Assertion {
+  assertion: string
+  column: string
+  success: boolean
 }
 
 export interface DatasetVersion {

@@ -103,7 +103,7 @@ i18next
             namespace_col: 'NAMESPACE',
             source_col: 'SOURCE',
             updated_col: 'UPDATED AT',
-            status_col: 'STATUS',
+            quality: 'QUALITY',
           },
           datasets_column_lineage: {
             empty_title: 'No column lineage',

@@ -1,9 +1,10 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Snackbar, Tooltip } from '@mui/material'
+import { Snackbar } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../tooltip/MQTooltip'
 import React from 'react'
 
 interface MqCopyProps {
@@ -21,7 +22,7 @@ const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
   }
   return (
     <>
-      <Tooltip title='Copy'>
+      <MQTooltip title='Copy'>
         <IconButton
           onClick={(event) => {
             event.stopPropagation()
@@ -34,7 +35,7 @@ const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
         >
           <ContentCopyIcon fontSize={'small'} />
         </IconButton>
-      </Tooltip>
+      </MQTooltip>
       <Snackbar
         open={open}
         autoHideDuration={2000}

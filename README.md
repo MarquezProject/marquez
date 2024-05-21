@@ -12,7 +12,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-active-brightgreen.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://bit.ly/Marquez_Slack_invite)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez-api.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
@@ -40,8 +40,26 @@ Want to be added? Send a pull request our way!
 
 Marquez provides a simple way to collect and view _dataset_, _job_, and _run_ metadata using [OpenLineage](https://openlineage.io). The easiest way to get up and running is with Docker. From the base of the Marquez repository, run:
 
-```
+### MacOS and Linux users:
+
+```bash
 $ ./docker/up.sh
+```
+
+### Windows users:
+
+Before cloning Marquez, configure Git to check out files with Unix-style file endings:
+
+```bash
+$ git config --global core.autocrlf false
+```
+
+Verify that Bash and PostgreSQL have been installed and added to the PATH variable (Git Bash is recommended).
+
+Start all services:
+
+```bash
+$ sh ./docker/up.sh
 ```
 
 > **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide.
@@ -79,8 +97,8 @@ Versions of Marquez are compatible with OpenLineage unless noted otherwise. We e
 | **Marquez**                                                                                      | **OpenLineage**                                               | **Status**    |
 |--------------------------------------------------------------------------------------------------|---------------------------------------------------------------|---------------|
 | [`UNRELEASED`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased)      | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `CURRENT`     |
-| [`0.44.0`](https://github.com/MarquezProject/marquez/blob/0.43.0/CHANGELOG.md#0430---2023-12-15) | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `RECOMMENDED` |
-| [`0.43.1`](https://github.com/MarquezProject/marquez/blob/0.42.0/CHANGELOG.md#0420---2023-10-17) | [`1-0-5`](https://openlineage.io/spec/1-0-0/OpenLineage.json) | `MAINTENANCE` |
+| [`0.46.0`](https://github.com/MarquezProject/marquez/blob/0.46.0/CHANGELOG.md#0460---2024-03-15) | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `RECOMMENDED` |
+| [`0.45.0`](https://github.com/MarquezProject/marquez/blob/0.45.0/CHANGELOG.md#0450---2024-03-07) | [`1-0-5`](https://openlineage.io/spec/1-0-0/OpenLineage.json) | `MAINTENANCE` |
 
 > **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
 
@@ -130,7 +148,7 @@ $ createdb marquez
 
 With your database created, you can now copy [`marquez.example.yml`](https://github.com/MarquezProject/marquez/blob/main/marquez.example.yml):
 
-```
+```bash
 $ cp marquez.example.yml marquez.yml
 ```
 
@@ -160,7 +178,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [MarquezProject Slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA)
+* Chat: [MarquezProject Slack](https://bit.ly/Marquez_Slack_invite)
 * Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing

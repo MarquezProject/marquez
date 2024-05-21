@@ -11,23 +11,29 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Tooltip,
   createTheme,
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Dataset } from '../../types/api'
+import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { datasetFacetsStatus, encodeNode } from '../../helpers/nodes'
+import {
+  datasetFacetsQualityAssertions,
+  datasetFacetsStatus,
+  encodeNode,
+} from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { useTheme } from '@emotion/react'
+import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
@@ -53,6 +59,7 @@ interface DispatchProps {
 type DatasetsProps = StateProps & DispatchProps
 
 const PAGE_SIZE = 20
+const DATASET_HEADER_HEIGHT = 62
 
 const Datasets: React.FC<DatasetsProps> = ({
   datasets,
@@ -108,7 +115,7 @@ const Datasets: React.FC<DatasetsProps> = ({
         </Box>
         <Box display={'flex'} alignItems={'center'}>
           {isDatasetsLoading && <CircularProgress size={16} />}
-          <Tooltip title={'Refresh'}>
+          <MQTooltip title={'Refresh'}>
             <IconButton
               sx={{ ml: 2 }}
               color={'primary'}
@@ -121,10 +128,13 @@ const Datasets: React.FC<DatasetsProps> = ({
             >
               <Refresh fontSize={'small'} />
             </IconButton>
-          </Tooltip>
+          </MQTooltip>
         </Box>
       </Box>
-      <MqScreenLoad loading={isDatasetsLoading && !isDatasetsInit}>
+      <MqScreenLoad
+        loading={isDatasetsLoading && !isDatasetsInit}
+        customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${DATASET_HEADER_HEIGHT}px)`}
+      >
         <>
           {datasets.length === 0 ? (
             <Box p={2}>
@@ -162,8 +172,8 @@ const Datasets: React.FC<DatasetsProps> = ({
                     <TableCell key={i18next.t('datasets_route.updated_col')} align='left'>
                       <MqText subheading>{i18next.t('datasets_route.updated_col')}</MqText>
                     </TableCell>
-                    <TableCell key={i18next.t('datasets_route.status_col')} align='left'>
-                      <MqText subheading>{i18next.t('datasets_route.status_col')}</MqText>
+                    <TableCell key={i18next.t('datasets_route.quality')} align='left'>
+                      <MqText subheading>{i18next.t('datasets_route.quality')}</MqText>
                     </TableCell>
                     <TableCell key={i18next.t('datasets.column_lineage_tab')} align='left'>
                       <MqText inline subheading>
@@ -176,6 +186,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                   {datasets
                     .filter((dataset) => !dataset.deleted)
                     .map((dataset) => {
+                      const assertions = datasetFacetsQualityAssertions(dataset.facets)
                       return (
                         <TableRow key={dataset.name}>
                           <TableCell align='left'>
@@ -202,13 +213,19 @@ const Datasets: React.FC<DatasetsProps> = ({
                           <TableCell align='left'>
                             {datasetFacetsStatus(dataset.facets) ? (
                               <>
-                                <MqStatus
-                                  label={'Quality'}
-                                  color={datasetFacetsStatus(dataset.facets)}
-                                />
+                                <MQTooltip title={<Assertions assertions={assertions} />}>
+                                  <Box>
+                                    <MqStatus
+                                      label={
+                                        assertions.find((a) => !a.success) ? 'UNHEALTHY' : 'HEALTHY'
+                                      }
+                                      color={datasetFacetsStatus(dataset.facets)}
+                                    />
+                                  </Box>
+                                </MQTooltip>
                               </>
                             ) : (
-                              <MqText>N/A</MqText>
+                              <MqStatus label={'N/A'} color={theme.palette.secondary.main} />
                             )}
                           </TableCell>
                           <TableCell>
@@ -222,7 +239,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 VIEW
                               </MqText>
                             ) : (
-                              <MqText>N/A</MqText>
+                              <MqText subdued>N/A</MqText>
                             )}
                           </TableCell>
                         </TableRow>
@@ -237,7 +254,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                     {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
                   </>
                 </MqText>
-                <Tooltip title={i18next.t('events_route.previous_page')}>
+                <MQTooltip title={i18next.t('events_route.previous_page')}>
                   <span>
                     <IconButton
                       sx={{
@@ -251,8 +268,8 @@ const Datasets: React.FC<DatasetsProps> = ({
                       <ChevronLeftRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
-                <Tooltip title={i18next.t('events_route.next_page')}>
+                </MQTooltip>
+                <MQTooltip title={i18next.t('events_route.next_page')}>
                   <span>
                     <IconButton
                       color='primary'
@@ -263,7 +280,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                       <ChevronRightRounded />
                     </IconButton>
                   </span>
-                </Tooltip>
+                </MQTooltip>
               </Box>
             </>
           )}

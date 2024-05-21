@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box, darken } from '@mui/material'
+import { Box } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GroupedSearch } from '../../types/api'
 import { IState } from '../../store/reducers'
@@ -33,14 +33,14 @@ const INITIAL_SEARCH_FILTER = [
     icon: faCog,
     foregroundColor: theme.palette.common.white,
     backgroundColor: theme.palette.primary.main,
-    text: i18next.t('search.filter.jobs'),
+    text: 'JOBS',
     value: 'JOB',
   },
   {
     icon: faDatabase,
     foregroundColor: theme.palette.common.white,
-    backgroundColor: theme.palette.primary.main,
-    text: i18next.t('search.filter.datasets'),
+    backgroundColor: theme.palette.info.main,
+    text: 'DATASETS',
     value: 'DATASET',
   },
 ]
@@ -119,7 +119,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     })
 
     setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
+      fetchSearch(state.search, label.toUpperCase(), state.sort.toUpperCase())
     }, 1)
   }
 
@@ -130,7 +130,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     })
 
     setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), state.sort.toUpperCase())
+      fetchSearch(state.search, state.filter.toUpperCase(), label.toUpperCase())
     }, 1)
   }
 
@@ -254,12 +254,12 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                           return (
                             <Box
                               sx={{
-                                borderTop: `2px solid ${theme.palette.common.white}`,
-                                borderBottom: `2px solid ${theme.palette.common.white}`,
+                                borderTop: `2px dashed ${theme.palette.secondary.main}`,
+                                borderBottom: `2px dashed ${theme.palette.secondary.main}`,
                                 padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(
                                   0.5
                                 )} ${theme.spacing(1)}`,
-                                backgroundColor: darken(theme.palette.background.paper, 0.05),
+                                backgroundColor: theme.palette.background.paper,
                               }}
                               key={result}
                               display={'flex'}

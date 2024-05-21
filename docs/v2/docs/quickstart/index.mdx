@@ -4,6 +4,8 @@ template: basepage
 sidebar_position: 1
 ---
 
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
+
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
@@ -21,8 +23,22 @@ This guide covers how you can quickly get started collecting _dataset_, _job_, a
 
 Before you begin, make sure you have installed:
 
+<Tabs groupId="prereqs">
+<TabItem value="macos" label="MacOS/Linux">
+
 * [Docker 17.05](https://docs.docker.com/install)+
 * [Docker Compose](https://docs.docker.com/compose/install)
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+* [Git Bash](https://gitforwindows.org/)
+* [PostgreSQL 14](https://www.postgresql.org/)
+* [Docker 17.05](https://docs.docker.com/install)+
+* [Docker Compose](https://docs.docker.com/compose/install)
+
+</TabItem>
+</Tabs>
 
 > Note: In this guide, we'll be running the Marquez HTTP server via Docker.
 
@@ -30,9 +46,23 @@ Before you begin, make sure you have installed:
 
 To checkout the Marquez source code, run:
 
-```
+<Tabs groupId="get">
+<TabItem value="macos" label="MacOS/Linux">
+
+```bash
 $ git clone https://github.com/MarquezProject/marquez && cd marquez
 ```
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+```bash
+$ git config --global core.autocrlf false
+$ git clone https://github.com/MarquezProject/marquez && cd marquez
+```
+
+</TabItem>
+</Tabs>
 
 ## Marquez Data Model {#marquez-data-model}
 
@@ -60,9 +90,24 @@ In this example, we'll be using sample dataset, job, and run metadata for a hypo
 
 To start Marquez with sample metadata that will be used and referenced in later sections, run the following script from the base of the Marquez repository (the `--seed` flag will execute the `marquez seed` [command](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/SeedCommand.java)):
 
-```
+<Tabs groupId="start">
+<TabItem value="macos" label="MacOS/Linux">
+
+```bash
 $ ./docker/up.sh --seed
 ```
+
+</TabItem>
+<TabItem value="windows" label="Windows">
+
+Verify that Postgres and Bash are in your `PATH`, then run:
+
+```bash
+$ sh ./docker/up.sh --seed
+```
+
+</TabItem>
+</Tabs>
 
 > **Tip:** Use the `--build` flag to build images from source, or `--tag X.Y.Z` to use a tagged image.
 
@@ -78,7 +123,7 @@ To view lineage metadata collected by Marquez, browse to the UI by visiting [htt
 
 ### View Job Metadata
 
-You should see the job `namespace`, `name`, the query, and a tab containing its run history: 
+You should see the job `namespace`, `name`, the query, and a tab containing its run history:
 
 ![](tab-view-job-metadata.png)
 
@@ -105,4 +150,4 @@ In this simple example, we showed you how to write sample lineage metadata to a 
 
 ## Feedback {#feedback}
 
-What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!  
+What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-29w4n8y45-Re3B1KTlZU5wO6X6JRzGmA) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!

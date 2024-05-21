@@ -23,7 +23,7 @@ import { MqInfo } from '../core/info/MqInfo'
 import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { datasetFacetsStatus } from '../../helpers/nodes'
+import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import {
   deleteDataset,
   dialogToggle,
@@ -38,6 +38,7 @@ import { formatUpdatedAt } from '../../helpers'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
+import Assertions from './Assertions'
 import CloseIcon from '@mui/icons-material/Close'
 import DatasetInfo from './DatasetInfo'
 import DatasetTags from './DatasetTags'
@@ -45,9 +46,11 @@ import DatasetVersions from './DatasetVersions'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import ListIcon from '@mui/icons-material/List'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { ChangeEvent, FunctionComponent, useEffect, useState } from 'react'
+import RuleIcon from '@mui/icons-material/Rule'
 import StorageIcon from '@mui/icons-material/Storage'
 
 interface StateProps {
@@ -143,11 +146,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
+  const assertions = datasetFacetsQualityAssertions(firstVersion.facets)
+
   return (
     <Box px={2}>
       <Box
         position={'sticky'}
-        top={'98px'}
+        top={0}
         bgcolor={theme.palette.background.default}
         pt={2}
         zIndex={theme.zIndex.appBar}
@@ -155,11 +160,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         mb={2}
       >
         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pb={2}>
-          {facetsStatus && (
-            <Box mr={1}>
-              <MqStatus label={'Quality'} color={facetsStatus} />
-            </Box>
-          )}
           <Box display={'flex'} alignItems={'center'}>
             <Box>
               <Box display={'flex'} alignItems={'center'}>
@@ -224,25 +224,72 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(firstVersion.createdAt)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <MqInfo
             icon={<StorageIcon color={'disabled'} />}
             label={'Dataset Type'.toUpperCase()}
             value={<MqText font={'mono'}>{firstVersion.type}</MqText>}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={6}>
           <MqInfo
             icon={<ListIcon color={'disabled'} />}
             label={'Fields'.toUpperCase()}
             value={`${firstVersion.fields.length} columns`}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <MqInfo
+            icon={<RuleIcon color={'disabled'} />}
+            label={'Quality'.toUpperCase()}
+            value={
+              facetsStatus ? (
+                <Box display={'flex'}>
+                  <MQTooltip
+                    title={
+                      <Assertions
+                        assertions={assertions.filter((assertion) => assertion.success)}
+                      />
+                    }
+                  >
+                    <Box>
+                      <MqStatus
+                        label={`${
+                          assertions.filter((assertion) => assertion.success).length
+                        } Passing`.toUpperCase()}
+                        color={theme.palette.primary.main}
+                      />
+                    </Box>
+                  </MQTooltip>
+                  <Divider sx={{ mx: 1 }} orientation={'vertical'} />
+                  <MQTooltip
+                    title={
+                      <Assertions
+                        assertions={assertions.filter((assertion) => !assertion.success)}
+                      />
+                    }
+                  >
+                    <Box>
+                      <MqStatus
+                        label={`${
+                          assertions.filter((assertion) => !assertion.success).length
+                        } Failing`.toUpperCase()}
+                        color={theme.palette.error.main}
+                      />
+                    </Box>
+                  </MQTooltip>
+                </Box>
+              ) : (
+                <MqStatus label={'N/A'} color={theme.palette.secondary.main} />
+              )
+            }
           />
         </Grid>
       </Grid>
