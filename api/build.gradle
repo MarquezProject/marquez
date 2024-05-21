@@ -48,7 +48,7 @@ dependencies {
     implementation "io.sentry:sentry:${sentryVersion}"
     implementation 'org.flywaydb:flyway-core:8.5.13'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
-    implementation 'com.graphql-java:graphql-java:20.7'
+    implementation 'com.graphql-java:graphql-java:20.9'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
