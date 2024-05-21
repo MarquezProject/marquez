@@ -14,6 +14,7 @@ import {
   createTheme,
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
+import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -54,6 +55,7 @@ interface DispatchProps {
 type JobsProps = StateProps & DispatchProps
 
 const PAGE_SIZE = 20
+const JOB_HEADER_HEIGHT = 62
 
 const Jobs: React.FC<JobsProps> = ({
   jobs,
@@ -125,7 +127,10 @@ const Jobs: React.FC<JobsProps> = ({
           </MQTooltip>
         </Box>
       </Box>
-      <MqScreenLoad loading={isJobsLoading && !isJobsInit}>
+      <MqScreenLoad
+        loading={isJobsLoading && !isJobsInit}
+        customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${JOB_HEADER_HEIGHT}px)`}
+      >
         <>
           {jobs.length === 0 ? (
             <Box p={2}>

@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Dataset } from '../../types/api'
+import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
@@ -58,6 +59,7 @@ interface DispatchProps {
 type DatasetsProps = StateProps & DispatchProps
 
 const PAGE_SIZE = 20
+const DATASET_HEADER_HEIGHT = 62
 
 const Datasets: React.FC<DatasetsProps> = ({
   datasets,
@@ -129,7 +131,10 @@ const Datasets: React.FC<DatasetsProps> = ({
           </MQTooltip>
         </Box>
       </Box>
-      <MqScreenLoad loading={isDatasetsLoading && !isDatasetsInit}>
+      <MqScreenLoad
+        loading={isDatasetsLoading && !isDatasetsInit}
+        customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${DATASET_HEADER_HEIGHT}px)`}
+      >
         <>
           {datasets.length === 0 ? (
             <Box p={2}>
