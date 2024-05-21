@@ -25,7 +25,7 @@ services:
     image: postgres:14
     container_name: marquez-db
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
