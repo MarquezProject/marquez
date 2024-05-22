@@ -16,6 +16,7 @@ readonly POSTGRES_VERSION="14"
 readonly MARQUEZ_VERSION=0.47.0
 # Build version of Marquez
 readonly MARQUEZ_BUILD_VERSION="$(git log --pretty=format:'%h' -n 1)" # SHA1
+readonly POSTGRES_PORT=5432
 
 readonly DB_MIGRATION_VOLUME="marquez_db-backup"
 readonly DB_MIGRATION_BACKUP="db-migration-backup"
