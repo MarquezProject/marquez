@@ -175,6 +175,8 @@ jobs:
       - run: ./.circleci/db-migration.sh
     environment:
       - POSTGRES_PORT=5432
+      - API_PORT=5000
+      - API_ADMIN_PORT=5001
 
   publish-snapshot:
     working_directory: ~/marquez
