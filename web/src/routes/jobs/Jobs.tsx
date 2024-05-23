@@ -4,7 +4,7 @@
 import * as Redux from 'redux'
 import {
   Button,
-  Chip,
+  ButtonGroup,
   Container,
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableRow,
   createTheme,
 } from '@mui/material'
-import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
+import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
@@ -26,12 +26,13 @@ import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
-import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
+import NumberGraph from '../../components/core/number-graph/NumberGraph'
+import PercentGraph from '../../components/core/number-graph/PercentGraph'
 import React from 'react'
 
 interface StateProps {
@@ -96,33 +97,30 @@ const Jobs: React.FC<JobsProps> = ({
   const i18next = require('i18next')
   return (
     <Container maxWidth={'lg'} disableGutters>
-      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-        <Box display={'flex'}>
-          <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
-          <Chip
-            size={'small'}
-            variant={'outlined'}
-            color={'primary'}
-            sx={{ marginLeft: 1 }}
-            label={totalCount + ' total'}
-          ></Chip>
+      <Box pt={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <MqText heading>Dashboard</MqText>
+        <ButtonGroup size={'small'} variant='text'>
+          <Button variant={'contained'}>1 Hour</Button>
+          <Button>8 Hours</Button>
+          <Button>24 Hours</Button>
+          <Button>7 Days</Button>
+        </ButtonGroup>
+      </Box>
+      <Box py={2} display={'flex'}>
+        <Box width={'calc(100% / 3)'}>
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+            <NumberGraph label={'TASK RUNS'} />
+          </Box>
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
-          {isJobsLoading && <CircularProgress size={16} />}
-          <MQTooltip title={'Refresh'}>
-            <IconButton
-              sx={{ ml: 2 }}
-              color={'primary'}
-              size={'small'}
-              onClick={() => {
-                if (selectedNamespace) {
-                  fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
-                }
-              }}
-            >
-              <Refresh fontSize={'small'} />
-            </IconButton>
-          </MQTooltip>
+        <Box width={'calc(100% / 3)'}>
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+            <NumberGraph label={'OL EVENTS'} />
+          </Box>
+        </Box>
+        <Box width={'calc(100% / 3)'}>
+          <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+            <PercentGraph label={'Coverage'} />
+          </Box>
         </Box>
       </Box>
       <MqScreenLoad loading={isJobsLoading && !isJobsInit}>
