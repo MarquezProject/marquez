@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -34,6 +35,7 @@ public final class DbTableVersion extends DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
+      @Nullable final UUID currentSchemaVersion,
       @Nullable final String lifecycleState,
       @Nullable final Run createdByRun,
       @Nullable final ImmutableMap<String, Object> facets) {
@@ -49,6 +51,7 @@ public final class DbTableVersion extends DatasetVersion {
         tags,
         lifecycleState,
         description,
+        currentSchemaVersion,
         createdByRun,
         facets);
   }
