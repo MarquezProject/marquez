@@ -5,6 +5,7 @@ import { Box } from '@mui/material'
 import { theme } from '../../helpers/theme'
 import MqText from '../core/text/MqText'
 import React from 'react'
+import Typewriter from './Typewriter'
 
 const importI18next = () => {
   return require('i18next')
@@ -19,7 +20,7 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
       sx={{
         zIndex: theme.zIndex.appBar + 3,
         position: 'absolute',
-        left: 122,
+        left: 40,
         height: '100%',
         display: 'flex',
         alignItems: 'center',
@@ -35,19 +36,11 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
           aria-label={i18next.t('search.search_aria')}
           aria-required='true'
         >
-          {i18next.t('search.search')}
+          Search your
         </MqText>
-        <MqText bold inline font={'mono'} color={theme.palette.common.white}>
+        <MqText bold inline>
           {' '}
-          {i18next.t('search.jobs')}
-        </MqText>
-        <MqText disabled inline font={'mono'}>
-          {' '}
-          {i18next.t('search.and')}
-        </MqText>
-        <MqText bold inline font={'mono'} color={theme.palette.common.white}>
-          {' '}
-          {i18next.t('search.datasets')}
+          <Typewriter words={['OpenLineage metadata…', 'OpenLineage Facets...']} />
         </MqText>
       </Box>
     </Box>
