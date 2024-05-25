@@ -2,10 +2,10 @@ package marquez.db.v2;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import com.google.common.collect.ImmutableList;
 import io.dropwizard.lifecycle.Managed;
 import io.openlineage.server.OpenLineage;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -67,9 +67,9 @@ public class MetadataDb {
   }
 
   /* ... */
-  public void writeBatchOf(@NotNull ImmutableList<OpenLineage.RunEvent> olRunEvents) {
-    for (final OpenLineage.RunEvent olRunEvent : olRunEvents) {
-      write(olRunEvent);
+  public void writeBatchOf(@NotNull List<OpenLineage.RunEvent> events) {
+    for (final OpenLineage.RunEvent event : events) {
+      write(event);
     }
   }
 
