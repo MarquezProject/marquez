@@ -37,6 +37,7 @@ import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
+import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
 import React from 'react'
 
 interface StateProps {
@@ -59,7 +60,7 @@ interface DispatchProps {
 type DatasetsProps = StateProps & DispatchProps
 
 const PAGE_SIZE = 20
-const DATASET_HEADER_HEIGHT = 62
+const DATASET_HEADER_HEIGHT = 64
 
 const Datasets: React.FC<DatasetsProps> = ({
   datasets,
@@ -105,16 +106,19 @@ const Datasets: React.FC<DatasetsProps> = ({
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
-          <Chip
-            size={'small'}
-            variant={'outlined'}
-            color={'primary'}
-            sx={{ marginLeft: 1 }}
-            label={totalCount + ' total'}
-          ></Chip>
+          {!isDatasetsLoading && (
+            <Chip
+              size={'small'}
+              variant={'outlined'}
+              color={'primary'}
+              sx={{ marginLeft: 1 }}
+              label={totalCount + ' total'}
+            ></Chip>
+          )}
         </Box>
         <Box display={'flex'} alignItems={'center'}>
           {isDatasetsLoading && <CircularProgress size={16} />}
+          <NamespaceSelect />
           <MQTooltip title={'Refresh'}>
             <IconButton
               sx={{ ml: 2 }}
