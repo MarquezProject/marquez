@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Event } from '../../types/api'
+import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { bindActionCreators } from 'redux'
@@ -64,6 +65,7 @@ type EventsProps = StateProps & DispatchProps
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
 const PAGE_SIZE = 20
+const EVENTS_HEADER_HEIGHT = 64
 
 const Events: React.FC<EventsProps> = ({
   events,
@@ -172,19 +174,24 @@ const Events: React.FC<EventsProps> = ({
 
   return (
     <Container maxWidth={'lg'} disableGutters>
-      <MqScreenLoad loading={!isEventsInit}>
+      <MqScreenLoad
+        loading={!isEventsInit}
+        customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
+      >
         <>
           <Box p={2} display={'flex'} justifyContent={'space-between'}>
             <Box>
               <Box display={'flex'} alignItems={'center'}>
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
-                <Chip
-                  size={'small'}
-                  variant={'outlined'}
-                  color={'primary'}
-                  sx={{ marginLeft: 1 }}
-                  label={totalCount + ' total'}
-                ></Chip>
+                {isEventsLoading && (
+                  <Chip
+                    size={'small'}
+                    variant={'outlined'}
+                    color={'primary'}
+                    sx={{ marginLeft: 1 }}
+                    label={totalCount + ' total'}
+                  ></Chip>
+                )}
               </Box>
             </Box>
             <MQTooltip title={'Refresh'}>
