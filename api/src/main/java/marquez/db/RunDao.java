@@ -7,6 +7,8 @@ package marquez.db;
 
 import static marquez.db.OpenLineageDao.DEFAULT_NAMESPACE_OWNER;
 
+import com.codahale.metrics.annotation.Timed;
+
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.List;
@@ -138,6 +140,7 @@ public interface RunDao extends BaseDao {
 """)
   Optional<JobRow> findJobRowByRunUuid(UUID uuid);
 
+  @Timed
   @SqlQuery(
       """
           WITH filtered_jobs AS (

@@ -4,6 +4,7 @@
  */
 
 package marquez.api;
+import java.time.*;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -64,7 +65,10 @@ public class JobResource extends BaseResource {
       @NonNull final JobVersionDao jobVersionDao,
       @NonNull JobFacetsDao jobFacetsDao,
       @NonNull RunFacetsDao runFacetsDao) {
+
     super(serviceFactory);
+    LocalDateTime time1 = java.time.LocalDateTime.now();
+    System.out.println(">>> Start : " + time1);
     this.jobVersionDao = jobVersionDao;
     this.jobFacetsDao = jobFacetsDao;
     this.runFacetsDao = runFacetsDao;
@@ -232,12 +236,18 @@ public class JobResource extends BaseResource {
       @PathParam("job") JobName jobName,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
+    LocalDateTime time1 = java.time.LocalDateTime.now();
     throwIfNotExists(namespaceName);
+    LocalDateTime time2 = java.time.LocalDateTime.now();
     throwIfNotExists(namespaceName, jobName);
-
+    LocalDateTime time3 = java.time.LocalDateTime.now();
     final List<Run> runs =
         runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    return Response.ok(new Runs(runs)).build();
+    LocalDateTime time4 = java.time.LocalDateTime.now();
+    Response val = Response.ok(new Runs(runs)).build();
+    LocalDateTime time5 = java.time.LocalDateTime.now();
+    System.out.println(">>> LocalDateTime : " + time1 + "\n"+ time2 + "\n"+ time3 + "\n"+ time4 + "\n" + time5);
+    return val;
   }
 
   @Path("/jobs/runs/{id}")
@@ -254,14 +264,23 @@ public class JobResource extends BaseResource {
   @Path("/jobs/runs/{id}/facets")
   public Response getRunFacets(
       @PathParam("id") RunId runId, @QueryParam("type") @NotNull FacetType type) {
+    LocalDateTime time1 = java.time.LocalDateTime.now();
     throwIfNotExists(runId);
+    LocalDateTime time2 = java.time.LocalDateTime.now();
     Object facets = null;
+    System.out.println(">>> Start : " + time1 + "\n"+ time2);
     switch (type) {
       case JOB:
+        LocalDateTime time4 = java.time.LocalDateTime.now();
         facets = jobFacetsDao.findJobFacetsByRunUuid(runId.getValue());
+        LocalDateTime time5 = java.time.LocalDateTime.now();
+        System.out.println(">>> JOB : " + time4 + "\n"+ time5);
         break;
       case RUN:
+        LocalDateTime time6 = java.time.LocalDateTime.now();
         facets = runFacetsDao.findRunFacetsByRunUuid(runId.getValue());
+        LocalDateTime time7 = java.time.LocalDateTime.now();
+        System.out.println(">>> RUN : " + time6 + "\n"+ time7);
         break;
       case DATASET:
         // for future case if there's a need to add dataset facets to the endpoint
@@ -269,7 +288,6 @@ public class JobResource extends BaseResource {
       default:
         break;
     }
-
     return Response.ok(facets).build();
   }
 

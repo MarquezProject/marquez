@@ -3,13 +3,13 @@ services:
   api:
     build: .
 
-  seed_marquez:
-    build: .
-
-  pghero:
-    image: ankane/pghero
-    container_name: pghero
-    ports:
-      - "8080:8080"
-    environment:
-      DATABASE_URL: postgres://postgres:password@db:5432
+#  seed_marquez:
+#    build: .
+#
+#  pghero:
+#    image: ankane/pghero
+#    container_name: pghero
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      DATABASE_URL: postgres://marquez_preprod:3ae43bdbfa9073bea78e3a15f95acad3@localhost:60901/marquez_preprod

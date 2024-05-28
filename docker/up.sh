@@ -119,9 +119,9 @@ if [[ "${DETACH}" = "true" ]]; then
 fi
 
 # Enable starting HTTP API server with sample metadata
-if [[ "${SEED}" = "true" ]]; then
-  compose_files+=" -f docker-compose.seed.yml"
-fi
+#if [[ "${SEED}" = "true" ]]; then
+#  compose_files+=" -f docker-compose.seed.yml"
+#fi
 
 # Enable building from source
 if [[ "${BUILD}" = "true" ]]; then

@@ -13,7 +13,6 @@ db:
   user: marquez_preprod
   password: 3ae43bdbfa9073bea78e3a15f95acad3
 
-
 migrateOnStartup: true
 
 graphql:
@@ -29,3 +28,16 @@ tags:
     description: Personally identifiable information
   - name: SENSITIVE
     description: Contains sensitive information
+
+exclude:
+  namespaces:
+    onRead:
+      enabled: true
+      pattern: '.*[!@#$%^&*()+=\[\]{};\|,<>?].*|^\/.*|^$'
+
+metrics:
+  frequency: ${METRICS_FREQUENCY:-1 minute}
+  reporters:
+    - type: console
+      timeZone: UTC
+      output: stdout
