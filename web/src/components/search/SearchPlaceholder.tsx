@@ -40,7 +40,7 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
         </MqText>
         <MqText bold inline>
           {' '}
-          <Typewriter words={['OpenLineage metadata…', 'OpenLineage Facets...']} />
+          <Typewriter words={['Jobs and Datasets…']} repeatCount={3} />
         </MqText>
       </Box>
     </Box>
