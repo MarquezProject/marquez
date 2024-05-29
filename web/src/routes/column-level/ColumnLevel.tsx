@@ -4,13 +4,13 @@ import { ColumnLevelNodeData, ColumnLevelNodeKinds, columnLevelNodeRenderer } fr
 import { ColumnLineageGraph } from '../../types/api'
 import { Drawer } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'
+import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { ZoomControls } from './ZoomControls'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { createElkNodes } from './layout'
 import { fetchColumnLineage } from '../../store/actionCreators'
-import { theme } from '../../helpers/theme'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
@@ -84,7 +84,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   return (
     <>
       <ActionBar fetchColumnLineage={fetchColumnLineage} depth={depth} setDepth={setDepth} />
-      <Box height={'calc(100vh - 98px - 64px)'}>
+      <Box height={`calc(100vh - ${HEADER_HEIGHT}px - 64px)`}>
         <Drawer
           anchor={'right'}
           open={!!searchParams.get('dataset')}
@@ -93,8 +93,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
             sx: {
               backgroundColor: theme.palette.background.default,
               backgroundImage: 'none',
-              mt: '98px',
-              height: 'calc(100vh - 98px)',
+              mt: `${HEADER_HEIGHT}px`,
+              height: `calc(100vh - ${HEADER_HEIGHT}px)`,
             },
           }}
         >

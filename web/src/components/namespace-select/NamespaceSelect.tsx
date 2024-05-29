@@ -48,7 +48,7 @@ const NamespaceSelect: React.FC<NamespaceSelectProps> = ({
         <Box
           sx={{
             position: 'absolute',
-            left: '12px',
+            left: '-4px',
             display: 'flex',
             alignItems: 'center',
             height: '100%',

@@ -3,7 +3,9 @@
 
 import React, { ReactElement } from 'react'
 
-import { theme } from '../../../helpers/theme'
+import { Link as RouterLink } from 'react-router-dom'
+import { THEME_EXTRA, theme } from '../../../helpers/theme'
+import { lighten } from '@mui/material'
 import Box from '@mui/material/Box'
 import ButtonBase from '@mui/material/ButtonBase'
 
@@ -12,40 +14,39 @@ interface OwnProps {
   title: string
   children: ReactElement
   active: boolean
+  to: string
 }
 
 type IconButtonProps = OwnProps
 
-const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children }) => {
+const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children, to }) => {
   return (
     <Box
       sx={{
         color: 'transparent',
         transition: theme.transitions.create(['color']),
         '&:hover': {
-          color: theme.palette.primary.main,
+          color: THEME_EXTRA.typography.subdued,
         },
       }}
     >
       <ButtonBase
         id={id}
+        component={RouterLink}
+        to={to}
         disableRipple={true}
         sx={Object.assign(
           {
-            width: theme.spacing(8),
-            height: theme.spacing(8),
-            borderRadius: theme.spacing(2),
+            width: theme.spacing(6),
+            height: theme.spacing(6),
+            borderRadius: theme.spacing(1),
             color: theme.palette.secondary.main,
-            background: theme.palette.background.default,
             transition: theme.transitions.create(['background-color', 'color']),
             border: '2px solid transparent',
-            '&:hover': {
-              border: `2px dashed ${theme.palette.primary.main}`,
-            },
           },
           active
             ? {
-                background: theme.palette.primary.main,
+                background: lighten(theme.palette.background.default, 0.05),
                 color: theme.palette.common.white,
               }
             : {}
@@ -56,10 +57,10 @@ const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children }
       <Box
         display={'flex'}
         justifyContent={'center'}
-        width={theme.spacing(8)}
         sx={{
           fontFamily: 'Karla',
           userSelect: 'none',
+          fontSize: '.625rem',
         }}
       >
         {title}
