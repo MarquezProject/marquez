@@ -62,10 +62,14 @@ public interface JobDao extends BaseDao {
       """
         WITH job_versions_facets AS (
             SELECT
-                job_version_uuid
-            ,   JSON_AGG(facet) as facets
+                f.job_version_uuid
+            ,   JSON_AGG(f.facet) as facets
             FROM
-                job_facets
+                job_facets f
+            LEFT JOIN
+                jobs_view j on j.current_version_uuid = f.job_version_uuid
+            WHERE
+                j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
             GROUP BY
                 job_version_uuid
         ),
