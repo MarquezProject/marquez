@@ -2,22 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import { Box } from '@mui/material'
+import { Box, Chip } from '@mui/material'
+import { DRAWER_WIDTH, THEME_EXTRA, theme } from '../../helpers/theme'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GroupedSearch } from '../../types/api'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
-import { THEME_EXTRA, theme } from '../../helpers/theme'
+import { SearchOutlined } from '@mui/icons-material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { faCog, faDatabase, faSearch, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faDatabase, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { fetchSearch, setSelectedNode } from '../../store/actionCreators'
 import { parseSearchGroup } from '../../helpers/nodes'
 import { useLocation } from 'react-router'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MqChipGroup from '../core/chip/MqChipGroup'
 import MqText from '../core/text/MqText'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import SearchListItem from './SearchListItem'
 import SearchPlaceholder from './SearchPlaceholder'
 import debounce from '@mui/material/utils/debounce'
@@ -84,6 +85,23 @@ interface SearchState {
 
 type SearchProps = StateProps & DispatchProps
 
+const useCmdKShortcut = (callback: () => void) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
+        event.preventDefault() // Prevent the default browser action
+        callback()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [callback])
+}
+
 const Search: React.FC<SearchProps> = (props: SearchProps) => {
   const [state, setState] = React.useState<SearchState>({
     open: true,
@@ -97,13 +115,25 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
     props.fetchSearch(q, filter, sort)
   }
 
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // focus on cmd + k
+  useCmdKShortcut(() => {
+    console.log('focus', inputRef)
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  })
+
   debounce(fetchSearch, 300)
 
   const location = useLocation()
-  React.useEffect(() => {
+  useEffect(() => {
     // close search on a route change
     setState({ ...state, open: false })
   }, [location])
+
+  // listen for cmd + k to focus search
 
   const onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setState({ ...state, search: event.target.value, open: true })
@@ -137,19 +167,17 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
   const { isSearching, isSearchingInit } = props
 
   return (
-    <Box width={538} position={'relative'} px={10} mr={-8} id={'searchContainer'}>
+    <Box width={`calc(100vw - ${DRAWER_WIDTH}px)`} position={'relative'} id={'searchContainer'}>
       <Box
         sx={{
           zIndex: theme.zIndex.appBar + 3,
           position: 'absolute',
-          left: theme.spacing(12),
+          left: theme.spacing(4),
           display: 'flex',
           alignItems: 'center',
           height: '100%',
         }}
-      >
-        <FontAwesomeIcon icon={faSearch} color={THEME_EXTRA.typography.disabled} />
-      </Box>
+      ></Box>
       {state.search.length === 0 && <SearchPlaceholder />}
       {state.search.length > 0 && (
         <Box
@@ -178,8 +206,13 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
           spellCheck={false}
           sx={{
             zIndex: theme.zIndex.appBar + 2,
+            height: '64px',
           }}
+          inputRef={inputRef}
           fullWidth={true}
+          autoFocus
+          startAdornment={<SearchOutlined />}
+          endAdornment={<Chip size={'small'} variant={'outlined'} label={'⌘K'}></Chip>}
           onFocus={() => setState({ ...state, open: true })}
           onChange={(event) => onSearch(event)}
           value={state.search}
@@ -198,14 +231,16 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                 width={'100%'}
                 sx={{
                   position: 'absolute',
-                  top: theme.spacing(-2),
                   width: '100%',
+                  top: 0,
                   right: 0,
-                  left: 0,
+                  left: '-3px',
                   zIndex: theme.zIndex.appBar + 1,
                   border: `2px dashed ${theme.palette.secondary.main}`,
                   borderRadius: theme.spacing(1),
                   backgroundColor: theme.palette.background.default,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
                 }}
               >
                 <Box
@@ -231,7 +266,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                   sx={{
                     margin: 0,
                     overflow: 'auto',
-                    maxHeight: `calc(100vh - ${theme.spacing(30)})`,
+                    maxHeight: `calc(100vh - ${theme.spacing(20)})`,
                     paddingLeft: 0,
                     borderBottomLeftRadius: theme.spacing(1),
                     borderBottomRightRadius: theme.spacing(1),
@@ -256,7 +291,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
                               sx={{
                                 borderTop: `2px dashed ${theme.palette.secondary.main}`,
                                 borderBottom: `2px dashed ${theme.palette.secondary.main}`,
-                                padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(
+                                padding: `${theme.spacing(0)} ${theme.spacing(3)} ${theme.spacing(
                                   0.5
                                 )} ${theme.spacing(1)}`,
                                 backgroundColor: theme.palette.background.paper,

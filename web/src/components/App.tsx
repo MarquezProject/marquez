@@ -55,7 +55,7 @@ const App = (): ReactElement => {
                   <title>{TITLE}</title>
                 </Helmet>
                 <CssBaseline />
-                <Box ml={12}>
+                <Box ml={'80px'}>
                   <Sidenav />
                   <Container maxWidth={'lg'} disableGutters={true}>
                     <Header />
