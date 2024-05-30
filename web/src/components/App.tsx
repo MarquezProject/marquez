@@ -25,6 +25,7 @@ import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../store/sagas'
+import Dashboard from "../routes/dashboard/Dashboard";
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -61,7 +62,8 @@ const App = (): ReactElement => {
                     <Header />
                   </Container>
                   <Routes>
-                    <Route path={'/'} element={<Jobs />} />
+                    <Route path={'/'} element={<Dashboard />} />
+                    <Route path={'/jobs'} element={<Jobs />} />
                     <Route path={'/datasets'} element={<Datasets />} />
                     <Route path={'/events'} element={<Events />} />
                     <Route

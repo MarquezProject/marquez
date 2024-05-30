@@ -19,8 +19,10 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
+import i18next from 'i18next'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
 import marquez_logo from './marquez-icon-white-solid.svg'
+import {Dashboard} from "@mui/icons-material";
 
 interface SidenavProps {}
 
@@ -79,8 +81,16 @@ const Sidenav: React.FC<SidenavProps> = () => {
           <MqIconButton
             to={'/'}
             id={'homeDrawerButton'}
-            title={i18next.t('sidenav.jobs')}
+            title={i18next.t('sidenav.home')}
             active={location.pathname === '/'}
+          >
+            <Dashboard />
+          </MqIconButton>
+          <MqIconButton
+            to={'/jobs'}
+            id={'jobsDrawerButton'}
+            title={i18next.t('sidenav.jobs')}
+            active={location.pathname === '/jobs'}
           >
             <FontAwesomeIcon icon={faCogs} fontSize={20} />
           </MqIconButton>
