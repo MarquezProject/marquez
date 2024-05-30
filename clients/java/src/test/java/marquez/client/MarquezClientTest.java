@@ -548,6 +548,17 @@ public class MarquezClientTest {
   }
 
   @Test
+  public void testClientBuilder_httpCustomizer() {
+    MarquezClient.Builder builder = MarquezClient.builder();
+    assertThat(builder.httpCustomizer == null);
+
+    builder.customize(httpClientBuilder -> httpClientBuilder.setMaxConnTotal(30));
+    assertThat(builder.httpCustomizer != null);
+
+    builder.build();
+  }
+
+  @Test
   public void testCreateNamespace() throws Exception {
     final URL url = buildUrlFor("/namespaces/%s", NAMESPACE_NAME);
 
