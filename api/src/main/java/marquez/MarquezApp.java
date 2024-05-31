@@ -5,6 +5,10 @@
 
 package marquez;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.dropwizard.Application;
@@ -40,6 +44,9 @@ import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -129,8 +136,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
+    final ElasticsearchClient elasticsearchClient = newElasticsearchClient();
     final MarquezContext marquezContext =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+        MarquezContext.builder()
+            .jdbi(jdbi)
+            .elasticsearchClient(elasticsearchClient)
+            .tags(config.getTags())
+            .build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);
@@ -145,6 +157,21 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // set namespaceFilter
     ExclusionsConfig exclusions = config.getExclude();
     Exclusions.use(exclusions);
+  }
+
+  private ElasticsearchClient newElasticsearchClient() {
+    String host = "search";
+    int port = 9200;
+    RestClient restClient =
+        RestClient.builder(new HttpHost(host, port, "http"))
+            .setDefaultHeaders(
+                new Header[] {
+                  //                    new BasicHeader("Authorization", "ApiKey " + apiKey)
+                })
+            .build();
+    ElasticsearchTransport transport =
+        new RestClientTransport(restClient, new JacksonJsonpMapper());
+    return new ElasticsearchClient(transport);
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

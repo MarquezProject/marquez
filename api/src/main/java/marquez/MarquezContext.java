@@ -5,6 +5,7 @@
 
 package marquez;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -101,14 +102,17 @@ public final class MarquezContext {
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
+  @Getter private final ElasticsearchClient elasticsearchClient;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
+      @NonNull final ElasticsearchClient elasticsearchClient,
       @NonNull final ImmutableSet<Tag> tags,
       List<RunTransitionListener> runTransitionListeners) {
     if (runTransitionListeners == null) {
       runTransitionListeners = new ArrayList<>();
     }
+    this.elasticsearchClient = elasticsearchClient;
 
     final BaseDao baseDao = jdbi.onDemand(NamespaceDao.class);
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
@@ -163,7 +167,8 @@ public final class MarquezContext {
     this.columnLineageResource = new ColumnLineageResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
-    this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
+    this.openLineageResource =
+        new OpenLineageResource(serviceFactory, elasticsearchClient, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
 
     this.resources =
@@ -190,6 +195,7 @@ public final class MarquezContext {
   public static class Builder {
 
     private Jdbi jdbi;
+    private ElasticsearchClient elasticsearchClient;
     private ImmutableSet<Tag> tags;
     private List<RunTransitionListener> runTransitionListeners;
 
@@ -200,6 +206,11 @@ public final class MarquezContext {
 
     public Builder jdbi(@NonNull Jdbi jdbi) {
       this.jdbi = jdbi;
+      return this;
+    }
+
+    public Builder elasticsearchClient(@NonNull ElasticsearchClient elasticsearchClient) {
+      this.elasticsearchClient = elasticsearchClient;
       return this;
     }
 
@@ -219,7 +230,7 @@ public final class MarquezContext {
     }
 
     public MarquezContext build() {
-      return new MarquezContext(jdbi, tags, runTransitionListeners);
+      return new MarquezContext(jdbi, elasticsearchClient, tags, runTransitionListeners);
     }
   }
 }

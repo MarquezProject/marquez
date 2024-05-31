@@ -9,15 +9,22 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -50,11 +57,15 @@ import marquez.service.models.NodeId;
 public class OpenLineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
 
+  private final ElasticsearchClient elasticsearchClient;
   private final OpenLineageDao openLineageDao;
 
   public OpenLineageResource(
-      @NonNull final ServiceFactory serviceFactory, @NonNull final OpenLineageDao openLineageDao) {
+      @NonNull final ServiceFactory serviceFactory,
+      @NonNull final ElasticsearchClient elasticsearchClient,
+      @NonNull final OpenLineageDao openLineageDao) {
     super(serviceFactory);
+    this.elasticsearchClient = elasticsearchClient;
     this.openLineageDao = openLineageDao;
   }
 
@@ -67,6 +78,7 @@ public class OpenLineageResource extends BaseResource {
   @Path("/lineage")
   public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
+    indexEvent((LineageEvent) event);
     if (event instanceof LineageEvent) {
       openLineageService
           .createAsync((LineageEvent) event)
@@ -84,6 +96,93 @@ public class OpenLineageResource extends BaseResource {
 
       // return serialized event
       asyncResponse.resume(Response.status(200).entity(event).build());
+    }
+  }
+
+  private UUID runUuidFromEvent(LineageEvent.Run run) {
+    UUID runUuid;
+    try {
+      runUuid = UUID.fromString(run.getRunId());
+    } catch (Exception e) {
+      runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
+    }
+    return runUuid;
+  }
+
+  private void indexEvent(@Valid @NotNull LineageEvent event) {
+    if (this.elasticsearchClient != null) {
+      UUID runUuid = runUuidFromEvent(event.getRun());
+      log.info("Indexing event {}", event);
+
+      if (event.getInputs() != null) {
+        indexDatasets(event.getInputs(), runUuid, event);
+      }
+      if (event.getOutputs() != null) {
+        indexDatasets(event.getOutputs(), runUuid, event);
+      }
+      indexJob(runUuid, event);
+    }
+  }
+
+  private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("run_id", runUuid.toString());
+    jsonMap.put("eventType", event.getEventType());
+    jsonMap.put("name", event.getJob().getName());
+    jsonMap.put("type", "JOB");
+    jsonMap.put("namespace", event.getJob().getNamespace());
+    jsonMap.put("facets", event.getJob().getFacets());
+    return jsonMap;
+  }
+
+  private Map<String, Object> buildDatasetIndexRequest(
+      UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("run_id", runUuid.toString());
+    jsonMap.put("eventType", event.getEventType());
+    jsonMap.put("name", dataset.getName());
+    jsonMap.put("type", "DATASET");
+    jsonMap.put("namespace", dataset.getNamespace());
+    jsonMap.put("facets", dataset.getFacets());
+    return jsonMap;
+  }
+
+  private void indexJob(UUID runUuid, LineageEvent event) {
+    index(
+        IndexRequest.of(
+            i ->
+                i.index("jobs")
+                    .id(
+                        String.format(
+                            "JOB:%s:%s", event.getJob().getNamespace(), event.getJob().getName()))
+                    .document(buildJobIndexRequest(runUuid, event))));
+  }
+
+  private void indexDatasets(
+      List<LineageEvent.Dataset> datasets, UUID runUuid, LineageEvent event) {
+    datasets.stream()
+        .map(dataset -> buildDatasetIndexRequest(runUuid, dataset, event))
+        .forEach(
+            jsonMap -> {
+              index(
+                  IndexRequest.of(
+                      i ->
+                          i.index("datasets")
+                              .id(
+                                  String.format(
+                                      "DATASET:%s:%s",
+                                      jsonMap.get("namespace"), jsonMap.get("name")))
+                              .document(jsonMap)));
+            });
+  }
+
+  private void index(IndexRequest<Map<String, Object>> request) {
+    try {
+      if (this.elasticsearchClient != null) {
+        this.elasticsearchClient.index(request);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
