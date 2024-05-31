@@ -1,5 +1,5 @@
 import { Box, Stack } from '@mui/system'
-import { Button, ButtonGroup, Container, Divider, Grid } from '@mui/material'
+import { Button, ButtonGroup, Chip, Container, Divider, Grid } from '@mui/material'
 import {
   Timeline,
   TimelineConnector,
@@ -143,17 +143,237 @@ const Dashboard: React.FC<Props> = () => {
             <Divider />
           </Grid>
           <Grid item md={8} xs={12} borderRight={1} borderColor={'divider'}>
-            {/*<Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>*/}
-            {/*  <MqText subdued label>*/}
-            {/*    RUNS*/}
-            {/*  </MqText>*/}
-            {/*  <Box display={'flex'}>*/}
-            {/*    <Chip color={'primary'} size={'small'} label={'10 passed'} variant={'outlined'} />*/}
-            {/*    <Divider sx={{ mx: 1 }} orientation={'vertical'} />*/}
-            {/*    <Chip color={'error'} size={'small'} label={'8 failed'} variant={'outlined'} />*/}
-            {/*  </Box>*/}
-            {/*</Box>*/}
-            {/*<BarGraph />*/}
+            <Box mr={2}>
+              <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
+                <MqText subdued>{selectedState} JOBS</MqText>
+                <Button size={'small'}>See More</Button>
+              </Box>
+
+              <Box p={2} mb={2} border={1} borderColor={'divider'}>
+                <Box display={'flex'} alignItems={'center'} mb={1}>
+                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
+                  <Chip size={'small'} label={'tag3'} />
+                </Box>
+                <Box display={'flex'}>
+                  <Box>
+                    <MqText subdued>LAST 10 RUNS</MqText>
+                    <Box display={'flex'}>
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <Box
+                          key={i}
+                          display={'flex'}
+                          alignItems={'center'}
+                          justifyContent={'space-between'}
+                          bgcolor={
+                            Math.random() > 0.5
+                              ? theme.palette.primary.main
+                              : theme.palette.error.main
+                          }
+                          mr={0.5}
+                          width={5}
+                          height={Math.floor(Math.random() * 40)}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>TYPE</MqText>
+                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>NAMESPACE</MqText>
+                    <MqText>food_delivery</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>PLATFORM</MqText>
+                    <MqText font={'mono'}>Airflow</MqText>
+                  </Box>
+                </Box>
+              </Box>
+              <Box p={2} mb={2} border={1} borderColor={'divider'}>
+                <Box display={'flex'} alignItems={'center'} mb={1}>
+                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
+                  <Chip size={'small'} label={'tag3'} />
+                </Box>
+                <Box display={'flex'}>
+                  <Box>
+                    <MqText subdued>LAST 10 RUNS</MqText>
+                    <Box display={'flex'}>
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <Box
+                          key={i}
+                          display={'flex'}
+                          alignItems={'center'}
+                          justifyContent={'space-between'}
+                          bgcolor={
+                            Math.random() > 0.5
+                              ? theme.palette.primary.main
+                              : theme.palette.error.main
+                          }
+                          mr={0.5}
+                          width={5}
+                          height={Math.floor(Math.random() * 40)}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>TYPE</MqText>
+                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>NAMESPACE</MqText>
+                    <MqText>food_delivery</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>PLATFORM</MqText>
+                    <MqText font={'mono'}>Airflow</MqText>
+                  </Box>
+                </Box>
+              </Box>
+              <Box p={2} mb={2} border={1} borderColor={'divider'}>
+                <Box display={'flex'} alignItems={'center'} mb={1}>
+                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
+                  <Chip size={'small'} label={'tag3'} />
+                </Box>
+                <Box display={'flex'}>
+                  <Box>
+                    <MqText subdued>LAST 10 RUNS</MqText>
+                    <Box display={'flex'}>
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <Box
+                          key={i}
+                          display={'flex'}
+                          alignItems={'center'}
+                          justifyContent={'space-between'}
+                          bgcolor={
+                            Math.random() > 0.5
+                              ? theme.palette.primary.main
+                              : theme.palette.error.main
+                          }
+                          mr={0.5}
+                          width={5}
+                          height={Math.floor(Math.random() * 40)}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>TYPE</MqText>
+                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>NAMESPACE</MqText>
+                    <MqText>food_delivery</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>PLATFORM</MqText>
+                    <MqText font={'mono'}>Airflow</MqText>
+                  </Box>
+                </Box>
+              </Box>
+              <Box p={2} mb={2} border={1} borderColor={'divider'}>
+                <Box display={'flex'} alignItems={'center'} mb={1}>
+                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
+                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
+                  <Chip size={'small'} label={'tag3'} />
+                </Box>
+                <Box display={'flex'}>
+                  <Box>
+                    <MqText subdued>LAST 10 RUNS</MqText>
+                    <Box display={'flex'}>
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <Box
+                          key={i}
+                          display={'flex'}
+                          alignItems={'center'}
+                          justifyContent={'space-between'}
+                          bgcolor={
+                            Math.random() > 0.5
+                              ? theme.palette.primary.main
+                              : theme.palette.error.main
+                          }
+                          mr={0.5}
+                          width={5}
+                          height={Math.floor(Math.random() * 40)}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>TYPE</MqText>
+                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>NAMESPACE</MqText>
+                    <MqText>food_delivery</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>LAST RUN</MqText>
+                    <MqText>4m 30s</MqText>
+                  </Box>
+                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>PLATFORM</MqText>
+                    <MqText font={'mono'}>Airflow</MqText>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
           </Grid>
           <Grid item xs={12} md={4}>
             <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
