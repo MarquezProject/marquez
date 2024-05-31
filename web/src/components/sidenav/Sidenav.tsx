@@ -81,7 +81,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
           <MqIconButton
             to={'/'}
             id={'homeDrawerButton'}
-            title={i18next.t('sidenav.home')}
+            title={i18next.t('sidenav.dataOps')}
             active={location.pathname === '/'}
           >
             <Dashboard />

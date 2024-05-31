@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LineChart } from '@mui/x-charts'
-
-import { Background } from '../../../libs/graph/src/components/ZoomPanSvg/Background'
 import { Chip, Divider } from '@mui/material'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/system/Box'
@@ -19,7 +17,7 @@ const StackedLineageEvents: React.FC<Props> = ({ label }) => {
   return (
     <Box>
       <Box display={'flex'} justifyContent={'space-between'}>
-        <MqText heading>Events</MqText>
+        <MqText subdued>EVENTS</MqText>
         <Box display={'flex'} alignItems={'center'}>
           <Chip color={'info'} size='small' label={'5.4K'} variant={'outlined'} />
           <Divider orientation={'vertical'} sx={{ mx: 1 }} />
@@ -33,6 +31,10 @@ const StackedLineageEvents: React.FC<Props> = ({ label }) => {
         {(parent) => (
           <>
             <LineChart
+                sx={{
+                    backgroundImage: 'radial-gradient(circle at 1px 1px, #bdbdbd42 1px, transparent 0)',
+                    backgroundSize: '24px 24px'
+                }}
               width={parent.width}
               height={200}
               series={[

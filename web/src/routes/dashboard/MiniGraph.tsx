@@ -5,6 +5,8 @@ import { LineChart } from '@mui/x-charts'
 import { theme } from '../../helpers/theme'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
+import {transparent} from "material-ui/styles/colors";
+import {alpha} from "@mui/material/styles";
 
 interface Props {}
 
@@ -21,7 +23,7 @@ const MiniGraph: React.FC<Props> = () => {
               type: 'line',
               showMark: false,
               area: true,
-              color: theme.palette.info.main,
+              color: alpha(theme.palette.info.main, 0.4),
             },
           ]}
           leftAxis={null}
