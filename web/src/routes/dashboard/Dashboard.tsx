@@ -1,5 +1,5 @@
 import { Box, Stack } from '@mui/system'
-import { Button, ButtonGroup, Chip, Container, Divider, Grid } from '@mui/material'
+import { Button, ButtonGroup, Container, Divider, Grid } from '@mui/material'
 import {
   Timeline,
   TimelineConnector,
@@ -10,6 +10,7 @@ import {
   timelineItemClasses,
 } from '@mui/lab'
 import { theme } from '../../helpers/theme'
+import JobRunItem from './JobRunItem'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
@@ -88,7 +89,7 @@ const Dashboard: React.FC<Props> = () => {
                         width: `calc(100% / ${states.length})`,
                         '&:hover': {
                           '.hover-box': {
-                            width: 40,
+                            width: selectedState === state.label ? 80 : 40,
                           },
                         },
                       }}
@@ -97,6 +98,7 @@ const Dashboard: React.FC<Props> = () => {
                         <Box
                           className={'hover-box'}
                           width={selectedState === state.label ? 80 : 20}
+                          borderRadius={'md'}
                           height={4}
                           bgcolor={state.color}
                           sx={{ transition: '.3s ease-in-out' }}
@@ -149,230 +151,10 @@ const Dashboard: React.FC<Props> = () => {
                 <Button size={'small'}>See More</Button>
               </Box>
 
-              <Box p={2} mb={2} border={1} borderColor={'divider'}>
-                <Box display={'flex'} alignItems={'center'} mb={1}>
-                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
-                  <Chip size={'small'} label={'tag3'} />
-                </Box>
-                <Box display={'flex'}>
-                  <Box>
-                    <MqText subdued>LAST 10 RUNS</MqText>
-                    <Box display={'flex'}>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <Box
-                          key={i}
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          bgcolor={
-                            Math.random() > 0.5
-                              ? theme.palette.primary.main
-                              : theme.palette.error.main
-                          }
-                          mr={0.5}
-                          width={5}
-                          height={Math.floor(Math.random() * 40)}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>TYPE</MqText>
-                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>NAMESPACE</MqText>
-                    <MqText>food_delivery</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>PLATFORM</MqText>
-                    <MqText font={'mono'}>Airflow</MqText>
-                  </Box>
-                </Box>
-              </Box>
-              <Box p={2} mb={2} border={1} borderColor={'divider'}>
-                <Box display={'flex'} alignItems={'center'} mb={1}>
-                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
-                  <Chip size={'small'} label={'tag3'} />
-                </Box>
-                <Box display={'flex'}>
-                  <Box>
-                    <MqText subdued>LAST 10 RUNS</MqText>
-                    <Box display={'flex'}>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <Box
-                          key={i}
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          bgcolor={
-                            Math.random() > 0.5
-                              ? theme.palette.primary.main
-                              : theme.palette.error.main
-                          }
-                          mr={0.5}
-                          width={5}
-                          height={Math.floor(Math.random() * 40)}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>TYPE</MqText>
-                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>NAMESPACE</MqText>
-                    <MqText>food_delivery</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>PLATFORM</MqText>
-                    <MqText font={'mono'}>Airflow</MqText>
-                  </Box>
-                </Box>
-              </Box>
-              <Box p={2} mb={2} border={1} borderColor={'divider'}>
-                <Box display={'flex'} alignItems={'center'} mb={1}>
-                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
-                  <Chip size={'small'} label={'tag3'} />
-                </Box>
-                <Box display={'flex'}>
-                  <Box>
-                    <MqText subdued>LAST 10 RUNS</MqText>
-                    <Box display={'flex'}>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <Box
-                          key={i}
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          bgcolor={
-                            Math.random() > 0.5
-                              ? theme.palette.primary.main
-                              : theme.palette.error.main
-                          }
-                          mr={0.5}
-                          width={5}
-                          height={Math.floor(Math.random() * 40)}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>TYPE</MqText>
-                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>NAMESPACE</MqText>
-                    <MqText>food_delivery</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>PLATFORM</MqText>
-                    <MqText font={'mono'}>Airflow</MqText>
-                  </Box>
-                </Box>
-              </Box>
-              <Box p={2} mb={2} border={1} borderColor={'divider'}>
-                <Box display={'flex'} alignItems={'center'} mb={1}>
-                  <MqText sx={{ mr: 2 }}>example_marquez</MqText>
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag1'} />
-                  <Chip sx={{ mr: 1 }} size={'small'} label={'tag2'} />
-                  <Chip size={'small'} label={'tag3'} />
-                </Box>
-                <Box display={'flex'}>
-                  <Box>
-                    <MqText subdued>LAST 10 RUNS</MqText>
-                    <Box display={'flex'}>
-                      {Array.from({ length: 10 }, (_, i) => (
-                        <Box
-                          key={i}
-                          display={'flex'}
-                          alignItems={'center'}
-                          justifyContent={'space-between'}
-                          bgcolor={
-                            Math.random() > 0.5
-                              ? theme.palette.primary.main
-                              : theme.palette.error.main
-                          }
-                          mr={0.5}
-                          width={5}
-                          height={Math.floor(Math.random() * 40)}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>TYPE</MqText>
-                    <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>NAMESPACE</MqText>
-                    <MqText>food_delivery</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>LAST RUN</MqText>
-                    <MqText>4m 30s</MqText>
-                  </Box>
-                  <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
-                  <Box>
-                    <MqText subdued>PLATFORM</MqText>
-                    <MqText font={'mono'}>Airflow</MqText>
-                  </Box>
-                </Box>
-              </Box>
+              <JobRunItem />
+              <JobRunItem />
+              <JobRunItem />
+              <JobRunItem />
             </Box>
           </Grid>
           <Grid item xs={12} md={4}>
