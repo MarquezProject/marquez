@@ -184,7 +184,26 @@ public interface ColumnLineageDao extends BaseDao {
           WHERE ARRAY[<values>]::DATASET_NAME[] && dv.dataset_symlinks -- array of string pairs is cast onto array of DATASET_NAME types to be checked if it has non-empty intersection with dataset symlinks
           ORDER BY output_dataset_field_uuid, input_dataset_field_uuid, updated_at DESC, updated_at
         ),
-        dataset_fields_view AS ( SELECT d.namespace_name as namespace_name, d.name as dataset_name, df.name as field_name, df.type, df.uuid FROM dataset_fields df INNER JOIN ( select * from datasets_view where current_version_uuid IN ( SELECT DISTINCT output_dataset_version_uuid FROM selected_column_lineage UNION SELECT DISTINCT input_dataset_version_uuid FROM selected_column_lineage ) ) d ON d.uuid = df.dataset_uuid )
+        dataset_fields_view AS (
+            SELECT
+                d.namespace_name AS namespace_name,
+                d.name AS dataset_name,
+                df.name AS field_name,
+                df.type,
+                df.uuid
+            FROM dataset_fields df
+            INNER JOIN (
+                SELECT uuid, namespace_name, name
+                FROM datasets_view
+                WHERE current_version_uuid IN (
+                    SELECT DISTINCT output_dataset_version_uuid
+                    FROM selected_column_lineage
+                    UNION
+                    SELECT DISTINCT input_dataset_version_uuid
+                    FROM selected_column_lineage
+                )
+            ) d ON d.uuid = df.dataset_uuid
+        )
         SELECT
           output_fields.namespace_name,
           output_fields.dataset_name,
