@@ -17,6 +17,7 @@ const JobRunItem: React.FC = () => {
       mb={2}
       border={1}
       borderColor={'divider'}
+      borderRadius={2}
       sx={{
         cursor: 'pointer',
         transition: 'background-color 0.3s',

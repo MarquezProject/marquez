@@ -144,7 +144,7 @@ const Dashboard: React.FC<Props> = () => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item md={8} xs={12} borderRight={1} borderColor={'divider'}>
+          <Grid item md={8} sm={12} borderRight={1} borderColor={'divider'}>
             <Box mr={2}>
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                 <MqText subdued>{selectedState} JOBS</MqText>
@@ -157,7 +157,7 @@ const Dashboard: React.FC<Props> = () => {
               <JobRunItem />
             </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item sm={12} md={4}>
             <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
               <MqText subdued>RECENT ACTIVITY</MqText>
               <Button size={'small'} sx={{ mr: 2 }}>
