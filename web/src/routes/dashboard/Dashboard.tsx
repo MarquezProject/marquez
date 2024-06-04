@@ -1,5 +1,15 @@
 import { Box, Stack } from '@mui/system'
-import { Button, ButtonGroup, Container, Divider, Drawer, Grid } from '@mui/material'
+import {
+  Button,
+  ButtonGroup,
+  Container,
+  Divider,
+  Drawer,
+  Grid,
+  List,
+  ListItem,
+} from '@mui/material'
+import { Code, Computer, RunCircleOutlined, Source } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import {
   Timeline,
@@ -204,12 +214,73 @@ const Dashboard: React.FC<Props> = () => {
               >
                 <TimelineItem>
                   <TimelineSeparator>
-                    <TimelineDot />
+                    <TimelineDot color='primary'>
+                      <RunCircleOutlined color={'secondary'} />
+                    </TimelineDot>
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
                     <MqText subdued sx={{ mr: 1 }} inline>
                       10:30 AM
+                    </MqText>
+                    <MqText inline link>
+                      delivery_time_7_days
+                    </MqText>
+                    <MqText inline> completed in 3m 40s</MqText>
+                  </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color={'primary'}>
+                      <Code color={'secondary'} />
+                    </TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <MqText subdued sx={{ mr: 1 }} inline>
+                      10:27 AM
+                    </MqText>
+                    <MqText link inline>
+                      delivery_time_7_days{' '}
+                    </MqText>
+                    <MqText inline>
+                      source code modified. New version e5af47b5-b1fa-49a6-8d3f-8a255e4fe787 created
+                      caused by the following:
+                      <List dense sx={{ p: 0 }}>
+                        <ListItem dense>
+                          <Box width={54}>
+                            <MqText small inline subdued>
+                              ADDED
+                            </MqText>
+                          </Box>
+                          <MqText inline small font={'mono'}>
+                            order_address_id
+                          </MqText>
+                        </ListItem>
+                        <ListItem dense>
+                          <Box width={54}>
+                            <MqText small inline subdued>
+                              REMOVED
+                            </MqText>
+                          </Box>
+                          <MqText small font={'mono'}>
+                            order_address
+                          </MqText>
+                        </ListItem>
+                      </List>
+                    </MqText>
+                  </TimelineContent>
+                </TimelineItem>
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot color={'info'}>
+                      <Computer color={'secondary'} />
+                    </TimelineDot>
+                    <TimelineConnector />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <MqText subdued sx={{ mr: 1 }} inline>
+                      10:24 AM
                     </MqText>
                     <MqText inline>
                       The job{' '}
@@ -223,107 +294,32 @@ const Dashboard: React.FC<Props> = () => {
                 </TimelineItem>
                 <TimelineItem>
                   <TimelineSeparator>
-                    <TimelineDot />
+                    <TimelineDot color={'primary'}>
+                      <Source color={'secondary'} />
+                    </TimelineDot>
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
                     <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
+                      10:18 AM
                     </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
+                    <MqText inline link>
+                      {' '}
+                      orders_july_2023
                     </MqText>
+                    <MqText inline> added to food_delivery_db.</MqText>
                   </TimelineContent>
                 </TimelineItem>
                 <TimelineItem>
                   <TimelineSeparator>
-                    <TimelineDot />
+                    <TimelineDot color={'info'}>
+                      <Computer color={'secondary'} />
+                    </TimelineDot>
                     <TimelineConnector />
                   </TimelineSeparator>
                   <TimelineContent>
                     <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
+                      10:24 AM
                     </MqText>
                     <MqText inline>
                       The job{' '}
