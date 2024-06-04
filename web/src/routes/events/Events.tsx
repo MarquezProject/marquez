@@ -13,11 +13,11 @@ import {
   TableRow,
   createTheme,
 } from '@mui/material'
-import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Event } from '../../types/api'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
+import { Refresh } from '@mui/icons-material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { eventTypeColor } from '../../helpers/nodes'
@@ -35,6 +35,7 @@ import MqCopy from '../../components/core/copy/MqCopy'
 import MqDatePicker from '../../components/core/date-picker/MqDatePicker'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
+import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect, useRef } from 'react'
@@ -344,41 +345,13 @@ const Events: React.FC<EventsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
-                <MqText subdued>
-                  <>
-                    {PAGE_SIZE * state.page + 1} -{' '}
-                    {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
-                  </>
-                </MqText>
-                <MQTooltip title={i18next.t('events_route.previous_page')}>
-                  <span>
-                    <IconButton
-                      sx={{
-                        marginLeft: theme.spacing(2),
-                      }}
-                      color='primary'
-                      disabled={state.page === 0}
-                      onClick={() => handleClickPage('prev')}
-                      size='large'
-                    >
-                      <ChevronLeftRounded />
-                    </IconButton>
-                  </span>
-                </MQTooltip>
-                <MQTooltip title={i18next.t('events_route.next_page')}>
-                  <span>
-                    <IconButton
-                      color='primary'
-                      onClick={() => handleClickPage('next')}
-                      size='large'
-                      disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
-                    >
-                      <ChevronRightRounded />
-                    </IconButton>
-                  </span>
-                </MQTooltip>
-              </Box>
+              <MqPaging
+                pageSize={PAGE_SIZE}
+                currentPage={state.page}
+                totalCount={totalCount}
+                incrementPage={() => handleClickPage('next')}
+                decrementPage={() => handleClickPage('prev')}
+              />
             </>
           )}
         </>
