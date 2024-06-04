@@ -28,6 +28,13 @@ export interface SqlFacet {
   query: string
 }
 
+export interface SourceCodeFacet {
+  language: string
+  sourceCode: string
+  _producer: string
+  _schemaURL: string
+}
+
 type RunInfoProps = {
   run: Run
 } & JobFacetsProps &
@@ -52,6 +59,12 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   return (
     <Box>
       {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
+      {
+        <MqCode
+          code={(jobFacets.sourceCode as SourceCodeFacet)?.sourceCode}
+          language={(jobFacets.sourceCode as SourceCodeFacet)?.language}
+        />
+      }
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
