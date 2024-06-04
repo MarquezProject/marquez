@@ -65,5 +65,5 @@ export const THEME_EXTRA = {
 }
 
 // 1px for bottom border
-export const HEADER_HEIGHT = 96 + 1
-export const DRAWER_WIDTH = 96
+export const HEADER_HEIGHT = 64 + 1
+export const DRAWER_WIDTH = 80

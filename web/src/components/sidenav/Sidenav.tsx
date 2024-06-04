@@ -4,11 +4,11 @@
 import React from 'react'
 import SVG from 'react-inlinesvg'
 
-import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
 
 import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme'
-import { Drawer, createTheme } from '@mui/material'
+import { Divider, Drawer, createTheme } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCogs, faDatabase } from '@fortawesome/free-solid-svg-icons'
 import MqIconButton from '../core/icon-button/MqIconButton'
@@ -20,6 +20,7 @@ import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
+import marquez_logo from './marquez-icon-white-solid.svg'
 
 interface SidenavProps {}
 
@@ -43,6 +44,12 @@ const Sidenav: React.FC<SidenavProps> = () => {
           borderRight: 'none',
         },
       }}
+      PaperProps={{
+        sx: {
+          backgroundColor: theme.palette.background.default,
+          backgroundImage: 'none',
+        },
+      }}
       variant='permanent'
     >
       <Box
@@ -52,71 +59,47 @@ const Sidenav: React.FC<SidenavProps> = () => {
         flexDirection={'column'}
         justifyContent={'space-between'}
         height={'100%'}
-        pt={2}
         pb={2}
         sx={{
           borderRight: `2px dashed ${theme.palette.secondary.main}`,
         }}
       >
-        <Box ml={2}>
-          <RouterLink
+        <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
+          <Box
+            display={'flex'}
+            alignItems={'center'}
+            justifyContent={'center'}
+            height={HEADER_HEIGHT}
+          >
+            <Link to='/'>
+              <img src={marquez_logo} height={40} alt='Marquez Logo' />
+            </Link>
+          </Box>
+          <Divider sx={{ my: 1 }} />
+          <MqIconButton
             to={'/'}
-            style={{
-              textDecoration: 'none',
-            }}
+            id={'homeDrawerButton'}
+            title={i18next.t('sidenav.jobs')}
+            active={location.pathname === '/'}
           >
-            <MqIconButton
-              id={'homeDrawerButton'}
-              title={i18next.t('sidenav.jobs')}
-              active={location.pathname === '/'}
-            >
-              <FontAwesomeIcon icon={faCogs} size={'2x'} />
-            </MqIconButton>
-          </RouterLink>
-          <RouterLink
+            <FontAwesomeIcon icon={faCogs} fontSize={20} />
+          </MqIconButton>
+          <MqIconButton
             to={'/datasets'}
-            style={{
-              textDecoration: 'none',
-            }}
+            id={'datasetsDrawerButton'}
+            title={i18next.t('sidenav.datasets')}
+            active={location.pathname === '/datasets'}
           >
-            <MqIconButton
-              id={'datasetsDrawerButton'}
-              title={i18next.t('sidenav.datasets')}
-              active={location.pathname === '/datasets'}
-            >
-              <FontAwesomeIcon icon={faDatabase} size={'2x'} />
-            </MqIconButton>
-          </RouterLink>
-          <RouterLink
+            <FontAwesomeIcon icon={faDatabase} fontSize={20} />
+          </MqIconButton>
+          <MqIconButton
+            id={'eventsButton'}
             to={'/events'}
-            style={{
-              textDecoration: 'none',
-            }}
+            title={i18next.t('sidenav.events')}
+            active={location.pathname === '/events'}
           >
-            <MqIconButton
-              id={'eventsButton'}
-              title={i18next.t('sidenav.events')}
-              active={location.pathname === '/events'}
-            >
-              <SVG
-                src={iconSearchArrow}
-                width={'30px'}
-              />
-            </MqIconButton>
-          </RouterLink>
-
-          {/* todo remove this link for now until direct linking available */}
-          {/*<RouterLink to={'/lineage'} sx={{
-              textDecoration: 'none'
-            }}>*/}
-          {/*  <MqIconButton*/}
-          {/*    id={'lineageDrawerButton'}*/}
-          {/*    title={'Lineage'}*/}
-          {/*    active={this.props.location.pathname.startsWith('/lineage')}*/}
-          {/*  >*/}
-          {/*    <FontAwesomeIcon icon={faArrowRight} size={'2x'} />*/}
-          {/*  </MqIconButton>*/}
-          {/*</RouterLink>*/}
+            <SVG src={iconSearchArrow} width={'20px'} />
+          </MqIconButton>
         </Box>
         <FormControl
           variant='outlined'

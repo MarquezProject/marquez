@@ -3,6 +3,7 @@ import { ActionBar } from './ActionBar'
 import { Box } from '@mui/system'
 import { DEFAULT_MAX_SCALE, Graph, ZoomPanControls } from '../../../libs/graph'
 import { Drawer } from '@mui/material'
+import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { JobOrDataset } from '../../types/lineage'
 import { LineageGraph } from '../../types/api'
@@ -12,7 +13,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { createElkNodes } from './layout'
 import { fetchLineage } from '../../store/actionCreators'
-import { theme } from '../../helpers/theme'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
@@ -103,7 +103,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
         isFull={isFull}
         setIsFull={setIsFull}
       />
-      <Box height={'calc(100vh - 98px - 64px)'}>
+      <Box height={`calc(100vh - ${HEADER_HEIGHT}px - ${HEADER_HEIGHT}px - 1px)`}>
         <Drawer
           anchor={'right'}
           open={!!searchParams.get('tableLevelNode')}
@@ -112,8 +112,8 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
             sx: {
               backgroundColor: theme.palette.background.default,
               backgroundImage: 'none',
-              mt: '98px',
-              height: 'calc(100vh - 98px)',
+              mt: `${HEADER_HEIGHT}px`,
+              height: `calc(100vh - ${HEADER_HEIGHT}px)`,
             },
           }}
         >

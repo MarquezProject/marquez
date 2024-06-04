@@ -27,35 +27,31 @@ implementation 'io.github.marquezproject:marquez-java:0.47.0
 // Connect to http://localhost:5000
 MarquezClient client = MarquezClient.builder()
   .baseUrl("http://localhost:5000")
-  .build()
+  .build();
 
 // List namespaces
 List<Namespace> namespaces = client.listNamespaces();
 ```
-### Writing Metadata
-To collect OpenLineage events using Marquez, please use the [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) library. OpenLineage is an Open Standard for lineage metadata collection designed to collect metadata for a job in execution.
 
-## HTTPS
+### Customization
+
+The client uses Apache's `httpclient` under the hood. The defaults can be a bit limiting, but you can optionally provide a function that accepts the `HttpClientBuilder` so you can customize it before it's finalised:
 
 ```java
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import marquez.client.MarquezClient;
-.
-.
-KeyManager[] keyManager = setUpKeyManagers();
-TrustManager[] trustManager = setUpTrustManagers();
-
 SSLContext sslContext = SSLContext.getInstance("TLS");
-sslContext.init(keyManager, trustManager, null);
+HttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(...);
 
-// Connect to https://localhost:5000
 MarquezClient client = MarquezClient.builder()
-  .sslContext(sslContext)
-  .baseUrl("https://localhost:5000")
+  .baseUrl("http://localhost:5000")
+  .httpCustomizer(httpClientBuilder -> {
+    httpClientBuilder.setSSLContext(sslContext);
+    httpClientBuilder.setConnectionManager(connectionManager);
+  })
   .build();
 ```
+
+### Writing Metadata
+To collect OpenLineage events using Marquez, please use the [openlineage-java](https://search.maven.org/artifact/io.openlineage/openlineage-java) library. OpenLineage is an Open Standard for lineage metadata collection designed to collect metadata for a job in execution.
 
 ----
 SPDX-License-Identifier: Apache-2.0
