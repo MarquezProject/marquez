@@ -184,6 +184,7 @@ public final class DbModelGenerator extends Generator {
         now,
         datasetUuid,
         newVersion().getValue(),
+        null,
         newLifecycleState(),
         runUuid,
         datasetName,

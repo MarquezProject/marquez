@@ -30,7 +30,7 @@ git clone https://github.com/MarquezProject/marquez && cd marquez/examples/airfl
 To make sure the latest [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) library is downloaded and installed when starting Airflow, you'll need to create a `requirements.txt` file with the following content:
 
 ```
-openlineage-airflow
+apache-airflow-providers-openlineage
 ```
 
 Next, we'll need to specify where we want Airflow to send DAG metadata. To do so, create a config file named `openlineage.env` with the following environment variables and values:
