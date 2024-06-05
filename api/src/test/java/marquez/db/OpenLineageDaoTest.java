@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetVersionId;
 import marquez.common.models.NamespaceName;
@@ -97,6 +99,19 @@ class OpenLineageDaoTest {
     assertThat(readJob.getInputs()).isPresent().get().asList().size().isEqualTo(1);
     assertThat(readJob.getInputs().get().get(0).getDatasetVersionRow())
         .isEqualTo(writeJob.getOutputs().get().get(0).getDatasetVersionRow());
+
+    // ensure schema version has the right field associations
+    UUID schemaVersionUuid =
+        writeJob
+            .getOutputs()
+            .get()
+            .get(0)
+            .getDatasetVersionRow()
+            .getSchemaVersionUuid()
+            .orElseThrow();
+    assertThat(datasetFieldDao.findByDatasetSchemaVersion(schemaVersionUuid))
+        .extracting((ds) -> ds.getName().getValue())
+        .containsExactlyInAnyOrder("name", "age");
   }
 
   @Test
@@ -563,6 +578,18 @@ class OpenLineageDaoTest {
 
     assertThat(readJob2.getInputs().get().get(0).getDatasetVersionRow())
         .isEqualTo(writeJob3.getOutputs().get().get(0).getDatasetVersionRow());
+
+    // verify that the dataset schema version remained the same across all runs
+    assertThat(
+            Stream.of(
+                    writeJob1.getOutputs().get().get(0),
+                    readJob1.getInputs().get().get(0),
+                    writeJob2.getOutputs().get().get(0),
+                    writeJob3.getOutputs().get().get(0),
+                    readJob2.getInputs().get().get(0))
+                .map(ds -> ds.getDatasetVersionRow().getSchemaVersionUuid().orElseThrow())
+                .collect(Collectors.toSet()))
+        .hasSize(1);
   }
 
   @Test

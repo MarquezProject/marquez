@@ -134,6 +134,7 @@ final class TestingDb {
                 row.getCreatedAt(),
                 row.getDatasetUuid(),
                 row.getVersion(),
+                row.getSchemaVersionUuid().orElse(null),
                 row.getRunUuid().orElseThrow(),
                 Columns.toPgObject(newFields(4)),
                 row.getNamespaceName(),
