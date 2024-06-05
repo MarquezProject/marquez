@@ -57,6 +57,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
+              uuidOrNull(results, Columns.DATASET_SCHEMA_VERSION_UUID),
               stringOrNull(results, Columns.LIFECYCLE_STATE),
               null,
               toFacetsOrNull(results, Columns.FACETS));
@@ -75,6 +76,7 @@ public final class DatasetVersionMapper implements RowMapper<DatasetVersion> {
               toFields(results, "fields"),
               columnNames.contains("tags") ? toTags(results, "tags") : null,
               stringOrNull(results, Columns.DESCRIPTION),
+              uuidOrNull(results, Columns.DATASET_SCHEMA_VERSION_UUID),
               stringOrNull(results, Columns.LIFECYCLE_STATE),
               null,
               toFacetsOrNull(results, Columns.FACETS));
