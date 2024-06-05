@@ -410,6 +410,8 @@ public interface RunDao extends BaseDao {
                   Instant.now(),
                   dsRow.get().getUuid(),
                   version,
+                  // this path does not upsert dataset_fields, therefore no schema version created
+                  null,
                   runUuid,
                   datasetVersionDao.toPgObjectFields(d.getFields()),
                   d.getNamespace().getValue(),

@@ -15,6 +15,9 @@ interface OwnProps {
 }
 
 const MqCode: React.FC<OwnProps> = ({ code, description, language }) => {
+  if (!code) {
+    return null
+  }
   return (
     <Box>
       {description && (

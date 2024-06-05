@@ -107,7 +107,7 @@ public interface DatasetDao extends BaseDao {
     ds.getCurrentVersion()
         .ifPresent(
             dsv -> {
-              ds.setFields(datasetFieldDao.find(dsv));
+              ds.setFields(datasetFieldDao.findByDatasetVersion(dsv));
             });
   }
 
@@ -363,7 +363,7 @@ public interface DatasetDao extends BaseDao {
     DatasetVersionRow dvRow =
         createDatasetVersionDao()
             .upsertDatasetVersion(
-                datasetRow.getUuid(),
+                datasetRow,
                 now,
                 namespaceName.getValue(),
                 datasetName.getValue(),

@@ -52,6 +52,7 @@ public abstract class DatasetVersion {
   @Getter @Setter private ImmutableSet<TagName> tags;
   @Nullable private final String lifecycleState;
   @Nullable private final String description;
+  @Nullable private final UUID currentSchemaVersion;
   @Nullable @Setter private Run createdByRun;
   @Nullable @Setter private UUID createdByRunUuid;
   @Getter private final ImmutableMap<String, Object> facets;
@@ -68,6 +69,7 @@ public abstract class DatasetVersion {
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String lifecycleState,
       @Nullable final String description,
+      @Nullable final UUID currentSchemaVersion,
       @Nullable final Run createdByRun,
       @Nullable final ImmutableMap<String, Object> facets) {
     this.id = id;
@@ -82,12 +84,17 @@ public abstract class DatasetVersion {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
     this.lifecycleState = lifecycleState;
     this.description = description;
+    this.currentSchemaVersion = currentSchemaVersion;
     this.createdByRun = createdByRun;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
   }
 
   public Optional<String> getDescription() {
     return Optional.ofNullable(description);
+  }
+
+  public Optional<UUID> getCurrentSchemaVersion() {
+    return Optional.ofNullable(currentSchemaVersion);
   }
 
   public Optional<Run> getCreatedByRun() {
