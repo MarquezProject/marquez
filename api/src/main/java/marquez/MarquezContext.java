@@ -169,7 +169,7 @@ public final class MarquezContext {
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource =
         new OpenLineageResource(serviceFactory, elasticsearchClient, openLineageDao);
-    this.searchResource = new SearchResource(searchDao);
+    this.searchResource = new SearchResource(searchDao, elasticsearchClient);
 
     this.resources =
         ImmutableList.of(

@@ -47,8 +47,6 @@ import marquez.common.models.RunId;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
-import marquez.service.models.DatasetEvent;
-import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
@@ -82,14 +80,6 @@ public class OpenLineageResource extends BaseResource {
     if (event instanceof LineageEvent) {
       openLineageService
           .createAsync((LineageEvent) event)
-          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
-    } else if (event instanceof DatasetEvent) {
-      openLineageService
-          .createAsync((DatasetEvent) event)
-          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
-    } else if (event instanceof JobEvent) {
-      openLineageService
-          .createAsync((JobEvent) event)
           .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
     } else {
       log.warn("Unsupported event type {}. Skipping without error", event.getClass().getName());
@@ -129,7 +119,7 @@ public class OpenLineageResource extends BaseResource {
     jsonMap.put("run_id", runUuid.toString());
     jsonMap.put("eventType", event.getEventType());
     jsonMap.put("name", event.getJob().getName());
-    jsonMap.put("type", "JOB");
+    jsonMap.put("type", event.getJob().isStreamingJob() ? "STREAM" : "BATCH");
     jsonMap.put("namespace", event.getJob().getNamespace());
     jsonMap.put("facets", event.getJob().getFacets());
     return jsonMap;
@@ -141,7 +131,8 @@ public class OpenLineageResource extends BaseResource {
     jsonMap.put("run_id", runUuid.toString());
     jsonMap.put("eventType", event.getEventType());
     jsonMap.put("name", dataset.getName());
-    jsonMap.put("type", "DATASET");
+    jsonMap.put("inputFacets", dataset.getInputFacets());
+    jsonMap.put("outputFacets", dataset.getOutputFacets());
     jsonMap.put("namespace", dataset.getNamespace());
     jsonMap.put("facets", dataset.getFacets());
     return jsonMap;
@@ -182,7 +173,7 @@ public class OpenLineageResource extends BaseResource {
         this.elasticsearchClient.index(request);
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      log.info("Failed to index event Elasticsearch not available.");
     }
   }
 

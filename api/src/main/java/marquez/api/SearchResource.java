@@ -8,11 +8,19 @@ package marquez.api;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.common.Utils.toLocateDateOrNull;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -42,9 +50,12 @@ public class SearchResource {
   private static final int MIN_LIMIT = 0;
 
   private final SearchDao searchDao;
+  private final ElasticsearchClient elasticsearchClient;
 
-  public SearchResource(@NonNull final SearchDao searchDao) {
+  public SearchResource(
+      @NonNull final SearchDao searchDao, @Nullable final ElasticsearchClient elasticsearchClient) {
     this.searchDao = searchDao;
+    this.elasticsearchClient = elasticsearchClient;
   }
 
   @Timed
@@ -70,6 +81,88 @@ public class SearchResource {
             toLocateDateOrNull(before),
             toLocateDateOrNull(after));
     return Response.ok(new SearchResults(searchResults)).build();
+  }
+
+  /**
+   * { "query": { "multi_match": { "type": "phrase_prefix", "query": "${query}", "fields": [
+   * "facets.sourceCode.sourceCode", "facets.sourceCode.language", "run_id", "name", "namespace",
+   * "type" ], "operator": "or" } } }
+   */
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/jobs")
+  public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
+    if (this.elasticsearchClient != null) {
+      SearchResponse<ObjectNode> response =
+          this.elasticsearchClient.search(
+              s ->
+                  s.index("jobs")
+                      .query(
+                          q ->
+                              q.multiMatch(
+                                  m ->
+                                      m.query(query)
+                                          .type(TextQueryType.PhrasePrefix)
+                                          .fields(
+                                              "facets.sourceCode.sourceCode",
+                                              "facets.sourceCode.language",
+                                              "run_id",
+                                              "name",
+                                              "namespace",
+                                              "type")
+                                          .operator(Operator.Or))),
+              ObjectNode.class);
+      return Response.ok(
+              response.hits().hits().stream().map(Hit::source).collect(Collectors.toList()))
+          .build();
+    } else {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
+  /**
+   * { "query": { "multi_match": { "query": "id", "fields": [ "facets.schema.fields.name",
+   * "facets.schema.fields.type", "facets.columnLineage.fields.*.inputFields.name",
+   * "facets.columnLineage.fields.*.inputFields.namespace",
+   * "facets.columnLineage.fields.*.inputFields.field",
+   * "facets.columnLineage.fields.*.transformationDescription",
+   * "facets.columnLineage.fields.*.transformationType" ] } } }
+   */
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/datasets")
+  public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
+    if (this.elasticsearchClient != null) {
+      SearchResponse<ObjectNode> response =
+          this.elasticsearchClient.search(
+              s ->
+                  s.index("datasets")
+                      .query(
+                          q ->
+                              q.multiMatch(
+                                  m ->
+                                      m.query(query)
+                                          .fields(
+                                              "facets.schema.fields.name",
+                                              "facets.schema.fields.type",
+                                              "facets.columnLineage.fields.*.inputFields.name",
+                                              "facets.columnLineage.fields.*.inputFields.namespace",
+                                              "facets.columnLineage.fields.*.inputFields.field",
+                                              "facets.columnLineage.fields.*.transformationDescription",
+                                              "facets.columnLineage.fields.*.transformationType"))),
+              ObjectNode.class);
+      return Response.ok(
+              response.hits().hits().stream().map(Hit::source).collect(Collectors.toList()))
+          .build();
+    } else {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
   }
 
   /** Wrapper for {@link SearchResult}s which also contains a {@code total count}. */
