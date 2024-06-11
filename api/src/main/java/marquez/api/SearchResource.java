@@ -19,6 +19,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,32 +98,35 @@ public class SearchResource {
   @Path("/jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
     if (this.elasticsearchClient != null) {
+      String[] fields = {
+        "facets.sourceCode.sourceCode",
+        "facets.sourceCode.language",
+        "run_id",
+        "name",
+        "namespace",
+        "type"
+      };
       SearchResponse<ObjectNode> response =
           this.elasticsearchClient.search(
-              s ->
-                  s.index("jobs")
-                      .query(
-                          q ->
-                              q.multiMatch(
-                                  m ->
-                                      m.query(query)
-                                          .type(TextQueryType.PhrasePrefix)
-                                          .fields(
-                                              "facets.sourceCode.sourceCode",
-                                              "facets.sourceCode.language",
-                                              "run_id",
-                                              "name",
-                                              "namespace",
-                                              "type")
-                                          .operator(Operator.Or)))
-                      .highlight(
-                          hl ->
-                              hl.fields("facets.sourceCode.sourceCode", f -> f.type("plain"))
-                                  .fields("facets.sourceCode.language", f -> f.type("plain"))
-                                  .fields("run_id", f -> f.type("plain"))
-                                  .fields("name", f -> f.type("plain"))
-                                  .fields("namespace", f -> f.type("plain"))
-                                  .fields("type", f -> f.type("plain"))),
+              s -> {
+                s.index("jobs")
+                    .query(
+                        q ->
+                            q.multiMatch(
+                                m ->
+                                    m.query(query)
+                                        .type(TextQueryType.PhrasePrefix)
+                                        .fields(Arrays.stream(fields).toList())
+                                        .operator(Operator.Or)));
+                s.highlight(
+                    hl -> {
+                      for (String field : fields) {
+                        hl.fields(field, f -> f.type("plain"));
+                      }
+                      return hl;
+                    });
+                return s;
+              },
               ObjectNode.class);
 
       List<ObjectNode> hits =
