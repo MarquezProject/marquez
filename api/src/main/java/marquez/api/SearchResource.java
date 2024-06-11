@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -113,11 +114,23 @@ public class SearchResource {
                                               "name",
                                               "namespace",
                                               "type")
-                                          .operator(Operator.Or))),
+                                          .operator(Operator.Or)))
+                      .highlight(
+                          hl ->
+                              hl.fields("facets.sourceCode.sourceCode", f -> f.type("plain"))
+                                  .fields("facets.sourceCode.language", f -> f.type("plain"))
+                                  .fields("run_id", f -> f.type("plain"))
+                                  .fields("name", f -> f.type("plain"))
+                                  .fields("namespace", f -> f.type("plain"))
+                                  .fields("type", f -> f.type("plain"))),
               ObjectNode.class);
-      return Response.ok(
-              response.hits().hits().stream().map(Hit::source).collect(Collectors.toList()))
-          .build();
+
+      List<ObjectNode> hits =
+          response.hits().hits().stream().map(Hit::source).collect(Collectors.toList());
+      List<Map<String, List<String>>> highlights =
+          response.hits().hits().stream().map(Hit::highlight).collect(Collectors.toList());
+
+      return Response.ok(new EsResult(hits, highlights)).build();
     } else {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
     }
@@ -162,6 +175,19 @@ public class SearchResource {
           .build();
     } else {
       return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
+  @ToString
+  public static final class EsResult {
+    @Getter private final List<ObjectNode> hits;
+    @Getter private final List<Map<String, List<String>>> highlights;
+
+    @JsonCreator
+    public EsResult(
+        @NonNull List<ObjectNode> hits, @NonNull List<Map<String, List<String>>> highlights) {
+      this.hits = hits;
+      this.highlights = highlights;
     }
   }
 
