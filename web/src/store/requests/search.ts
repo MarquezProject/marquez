@@ -11,3 +11,8 @@ export const getSearch = async (q: string, filter = 'ALL', sort = 'NAME', limit 
   }
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchSearch')
 }
+
+export const getEsSearch = async (q: string) => {
+  const url = `${API_URL}/search/jobs?q=${q}`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchEsSearch')
+}

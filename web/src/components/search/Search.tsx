@@ -1,89 +1,16 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import * as Redux from 'redux'
 import { Box, Chip } from '@mui/material'
-import { DRAWER_WIDTH, THEME_EXTRA, theme } from '../../helpers/theme'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { GroupedSearch } from '../../types/api'
-import { IState } from '../../store/reducers'
+import { Close, SearchOutlined } from '@mui/icons-material'
+import { DRAWER_WIDTH, theme } from '../../helpers/theme'
 import { MqInputBase } from '../core/input-base/MqInputBase'
-import { SearchOutlined } from '@mui/icons-material'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { faCog, faDatabase, faSort, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { fetchSearch, setSelectedNode } from '../../store/actionCreators'
-import { parseSearchGroup } from '../../helpers/nodes'
 import { useLocation } from 'react-router'
+import BaseSearch from './base-search/BaseSearch'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
-import MqChipGroup from '../core/chip/MqChipGroup'
-import MqText from '../core/text/MqText'
-import React, { useEffect, useRef } from 'react'
-import SearchListItem from './SearchListItem'
+import IconButton from '@mui/material/IconButton'
+import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
-import debounce from '@mui/material/utils/debounce'
-
-const i18next = require('i18next')
-
-const INITIAL_SEARCH_FILTER = [
-  {
-    text: 'All',
-    value: 'All',
-  },
-  {
-    icon: faCog,
-    foregroundColor: theme.palette.common.white,
-    backgroundColor: theme.palette.primary.main,
-    text: 'JOBS',
-    value: 'JOB',
-  },
-  {
-    icon: faDatabase,
-    foregroundColor: theme.palette.common.white,
-    backgroundColor: theme.palette.info.main,
-    text: 'DATASETS',
-    value: 'DATASET',
-  },
-]
-
-const INITIAL_SEARCH_SORT_FILTER = [
-  {
-    icon: faSort,
-    value: 'Sort',
-    foregroundColor: theme.palette.common.white,
-    backgroundColor: 'transparent',
-    selectable: false,
-  },
-  {
-    text: 'Updated at',
-    value: 'UPDATE_AT',
-  },
-  {
-    text: 'Name',
-    value: 'NAME',
-  },
-]
-
-interface StateProps {
-  searchResults: Map<string, GroupedSearch[]>
-  isSearching: boolean
-  isSearchingInit: boolean
-}
-
-interface DispatchProps {
-  setSelectedNode: typeof setSelectedNode
-  fetchSearch: typeof fetchSearch
-}
-
-interface SearchState {
-  open: boolean
-  search: string
-  selected: string
-  filter: string
-  sort: string
-}
-
-type SearchProps = StateProps & DispatchProps
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -102,69 +29,25 @@ const useCmdKShortcut = (callback: () => void) => {
   }, [callback])
 }
 
-const Search: React.FC<SearchProps> = (props: SearchProps) => {
-  const [state, setState] = React.useState<SearchState>({
-    open: true,
-    search: '',
-    selected: '',
-    filter: 'All',
-    sort: 'UPDATE_AT',
-  })
-
-  const fetchSearch = (q: string, filter = 'ALL', sort = 'NAME') => {
-    props.fetchSearch(q, filter, sort)
-  }
+const Search: React.FC = () => {
+  const [search, setSearch] = useState('')
+  const [open, setOpen] = useState(true)
 
   const inputRef = useRef<HTMLInputElement>(null)
 
   // focus on cmd + k
   useCmdKShortcut(() => {
-    console.log('focus', inputRef)
     if (inputRef.current) {
       inputRef.current.focus()
     }
   })
 
-  debounce(fetchSearch, 300)
-
   const location = useLocation()
   useEffect(() => {
     // close search on a route change
-    setState({ ...state, open: false })
+    setOpen(false)
+    setSearch('')
   }, [location])
-
-  // listen for cmd + k to focus search
-
-  const onSearch = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setState({ ...state, search: event.target.value, open: true })
-    if (event.target.value.length > 0) {
-      fetchSearch(event.target.value, state.filter.toUpperCase(), state.sort.toUpperCase())
-    }
-  }
-
-  const onSelectFilter = (label: string) => {
-    setState({
-      ...state,
-      filter: label,
-    })
-
-    setTimeout(() => {
-      fetchSearch(state.search, label.toUpperCase(), state.sort.toUpperCase())
-    }, 1)
-  }
-
-  const onSelectSortFilter = (label: string) => {
-    setState({
-      ...state,
-      sort: label,
-    })
-
-    setTimeout(() => {
-      fetchSearch(state.search, state.filter.toUpperCase(), label.toUpperCase())
-    }, 1)
-  }
-
-  const { isSearching, isSearchingInit } = props
 
   return (
     <Box width={`calc(100vw - ${DRAWER_WIDTH}px)`} position={'relative'} id={'searchContainer'}>
@@ -178,8 +61,8 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
           height: '100%',
         }}
       ></Box>
-      {state.search.length === 0 && <SearchPlaceholder />}
-      {state.search.length > 0 && (
+      {search.length === 0 && <SearchPlaceholder />}
+      {search.length > 0 && (
         <Box
           sx={{
             position: 'absolute',
@@ -190,16 +73,7 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
             height: '100%',
             cursor: 'pointer',
           }}
-        >
-          <FontAwesomeIcon
-            icon={faTimes}
-            size={'1x'}
-            color={THEME_EXTRA.typography.disabled}
-            onClick={() => {
-              setState({ ...state, open: false, search: '', selected: '' })
-            }}
-          />
-        </Box>
+        ></Box>
       )}
       <Box>
         <MqInputBase
@@ -212,164 +86,40 @@ const Search: React.FC<SearchProps> = (props: SearchProps) => {
           fullWidth={true}
           autoFocus
           startAdornment={<SearchOutlined />}
-          endAdornment={<Chip size={'small'} variant={'outlined'} label={'⌘K'}></Chip>}
-          onFocus={() => setState({ ...state, open: true })}
-          onChange={(event) => onSearch(event)}
-          value={state.search}
+          endAdornment={
+            <>
+              <IconButton
+                sx={{ mr: 1 }}
+                size={'small'}
+                onClick={() => {
+                  setOpen(false)
+                  setSearch('')
+                }}
+              >
+                <Close />
+              </IconButton>
+              <Chip size={'small'} variant={'outlined'} label={'⌘K'}></Chip>
+            </>
+          }
+          onFocus={() => setOpen(true)}
+          onChange={(event) => {
+            setSearch(event.target.value)
+            setOpen(true)
+          }}
+          value={search}
           autoComplete={'off'}
           id={'searchBar'}
         />
         <ClickAwayListener
           mouseEvent='onMouseDown'
           touchEvent='onTouchStart'
-          onClickAway={() => setState({ ...state, open: false })}
+          onClickAway={() => setOpen(false)}
         >
-          <Box>
-            {state.open && state.search.length > 0 && (
-              <Box
-                position={'absolute'}
-                width={'100%'}
-                sx={{
-                  position: 'absolute',
-                  width: '100%',
-                  top: 0,
-                  right: 0,
-                  left: '-3px',
-                  zIndex: theme.zIndex.appBar + 1,
-                  border: `2px dashed ${theme.palette.secondary.main}`,
-                  borderRadius: theme.spacing(1),
-                  backgroundColor: theme.palette.background.default,
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    marginTop: '64px',
-                    padding: theme.spacing(2),
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <MqChipGroup
-                    chips={INITIAL_SEARCH_FILTER}
-                    onSelect={onSelectFilter}
-                    initialSelection={state.filter}
-                  />
-                  <MqChipGroup
-                    chips={INITIAL_SEARCH_SORT_FILTER}
-                    onSelect={onSelectSortFilter}
-                    initialSelection={state.sort}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    margin: 0,
-                    overflow: 'auto',
-                    maxHeight: `calc(100vh - ${theme.spacing(20)})`,
-                    paddingLeft: 0,
-                    borderBottomLeftRadius: theme.spacing(1),
-                    borderBottomRightRadius: theme.spacing(1),
-                  }}
-                >
-                  {props.searchResults.size === 0 && (
-                    <Box m={2} display={'flex'} alignItems={'center'} justifyContent={'center'}>
-                      <MqText>
-                        {isSearching || !isSearchingInit
-                          ? i18next.t('search.status')
-                          : i18next.t('search.none')}
-                      </MqText>
-                    </Box>
-                  )}
-                  {[...props.searchResults].map((resultsWithGroups, index) => {
-                    return resultsWithGroups.map((result) => {
-                      if (typeof result === 'string') {
-                        // is group
-                        if (result.length > 0) {
-                          return (
-                            <Box
-                              sx={{
-                                borderTop: `2px dashed ${theme.palette.secondary.main}`,
-                                borderBottom: `2px dashed ${theme.palette.secondary.main}`,
-                                padding: `${theme.spacing(0)} ${theme.spacing(3)} ${theme.spacing(
-                                  0.5
-                                )} ${theme.spacing(1)}`,
-                                backgroundColor: theme.palette.background.paper,
-                              }}
-                              key={result}
-                              display={'flex'}
-                              justifyContent={'space-between'}
-                              alignItems={'center'}
-                            >
-                              <Box>
-                                <MqText bold font={'mono'}>
-                                  {parseSearchGroup(result, 'group')}
-                                </MqText>
-                              </Box>
-                              <Box>
-                                <MqText bold font={'mono'} small>
-                                  {parseSearchGroup(result, 'namespace')}
-                                </MqText>
-                              </Box>
-                            </Box>
-                          )
-                        } else return null
-                        // is a list of group members
-                      } else if (result.length) {
-                        return (
-                          <Box key={result[0].group + index}>
-                            {result.map((listItem) => {
-                              return (
-                                <React.Fragment key={listItem.name}>
-                                  <SearchListItem
-                                    searchResult={listItem}
-                                    search={state.search}
-                                    selected={listItem.name === state.selected}
-                                    onClick={(nodeName) => {
-                                      setState({
-                                        ...state,
-                                        open: false,
-                                        search: nodeName,
-                                      })
-                                      props.setSelectedNode(listItem.nodeId)
-                                    }}
-                                  />
-                                </React.Fragment>
-                              )
-                            })}
-                          </Box>
-                        )
-                      } else {
-                        return null
-                      }
-                    })
-                  })}
-                </Box>
-              </Box>
-            )}
-          </Box>
+          <BaseSearch search={search} open={open} />
         </ClickAwayListener>
       </Box>
     </Box>
   )
 }
 
-const mapStateToProps = (state: IState) => {
-  return {
-    searchResults: state.search.data.results,
-    rawResults: state.search.data.rawResults,
-    isSearching: state.search.isLoading,
-    isSearchingInit: state.search.init,
-  }
-}
-
-const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
-  bindActionCreators(
-    {
-      setSelectedNode: setSelectedNode,
-      fetchSearch: fetchSearch,
-    },
-    dispatch
-  )
-
-export default connect(mapStateToProps, mapDispatchToProps)(Search)
+export default Search

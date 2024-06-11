@@ -14,6 +14,7 @@ import {
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
+  FETCH_ES_SEARCH,
   FETCH_EVENTS,
   FETCH_JOBS,
   FETCH_JOB_FACETS,
@@ -27,6 +28,7 @@ import {
   Dataset,
   DatasetVersion,
   Datasets,
+  EsSearchResult,
   Events,
   Facets,
   Jobs,
@@ -73,6 +75,7 @@ import {
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
+  fetchEsSearchSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
   fetchJobsSuccess,
@@ -83,8 +86,8 @@ import {
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
+import { getEsSearch, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
-import { getSearch } from '../requests/search'
 
 export function* fetchTags() {
   try {
@@ -370,6 +373,18 @@ export function* fetchRunFacetsSaga() {
       const { payload } = yield take(FETCH_RUN_FACETS)
       const runFacets: Facets = yield call(getRunFacets, payload.runId)
       yield put(fetchFacetsSuccess(runFacets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching run facets'))
+    }
+  }
+}
+
+export function* fetchEsSearchSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_ES_SEARCH)
+      const esSearchResult: EsSearchResult = yield call(getEsSearch, payload.runId)
+      yield put(fetchEsSearchSuccess(esSearchResult))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching run facets'))
     }

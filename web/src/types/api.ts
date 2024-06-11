@@ -279,3 +279,34 @@ export interface ColumnLineageOutEdge {
   origin: string
   destination: string
 }
+
+// esSearch
+
+interface SourceCodeFacet {
+  language: string
+  _producer: string
+  _schemaURL: string
+  sourceCode: string
+}
+
+interface EsSearchFacet {
+  sourceCode?: SourceCodeFacet
+}
+
+interface Hit {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: string
+  type: string
+  facets: EsSearchFacet
+}
+
+interface Highlight {
+  'facets.sourceCode.sourceCode'?: string[]
+}
+
+export interface EsSearchResult {
+  hits: Hit[]
+  highlights: Highlight[]
+}
