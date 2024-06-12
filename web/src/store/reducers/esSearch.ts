@@ -1,28 +1,29 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { FETCH_ES_SEARCH, FETCH_ES_SEARCH_SUCCESS } from '../actionCreators/actionTypes'
+import { FETCH_ES_SEARCH_JOBS, FETCH_ES_SEARCH_JOBS_SUCCESS } from '../actionCreators/actionTypes'
 
-import { EsSearchResult } from '../../types/api'
-import { fetchEsSearch, fetchEsSearchSuccess } from '../actionCreators'
+import { EsSearchResultJobs } from '../../types/api'
+import { fetchEsSearchJobs, fetchEsSearchJobsSuccess } from '../actionCreators'
 
-export type IEsSearchState = { isLoading: boolean; data: EsSearchResult; init: boolean }
+export type IEsSearchJobsState = { isLoading: boolean; data: EsSearchResultJobs; init: boolean }
 
-export const initialState: IEsSearchState = {
+export const initialState: IEsSearchJobsState = {
   isLoading: false,
   data: { hits: [], highlights: [] },
   init: false,
 }
 
-type IJobsAction = ReturnType<typeof fetchEsSearchSuccess> & ReturnType<typeof fetchEsSearch>
+type IJobsAction = ReturnType<typeof fetchEsSearchJobsSuccess> &
+  ReturnType<typeof fetchEsSearchJobs>
 
-export default (state = initialState, action: IJobsAction): IEsSearchState => {
+export default (state = initialState, action: IJobsAction): IEsSearchJobsState => {
   const { type, payload } = action
 
   switch (type) {
-    case FETCH_ES_SEARCH:
+    case FETCH_ES_SEARCH_JOBS:
       return { ...state, isLoading: true }
-    case FETCH_ES_SEARCH_SUCCESS: {
+    case FETCH_ES_SEARCH_JOBS_SUCCESS: {
       return {
         ...state,
         isLoading: false,

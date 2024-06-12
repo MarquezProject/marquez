@@ -4,23 +4,23 @@
 import * as Redux from 'redux'
 import { Chip, Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IEsSearchState } from '../../../store/reducers/esSearch'
+import { IEsSearchJobsState } from '../../../store/reducers/esSearch'
 import { IState } from '../../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
-import { fetchEsSearch } from '../../../store/actionCreators'
+import { fetchEsSearchJobs } from '../../../store/actionCreators'
 import { theme } from '../../../helpers/theme'
 import Box from '@mui/system/Box'
 import MqText from '../../core/text/MqText'
 import React, { useEffect } from 'react'
 
 interface StateProps {
-  esSearch: IEsSearchState
+  esSearchJobs: IEsSearchJobsState
 }
 
 interface DispatchProps {
-  fetchEsSearch: typeof fetchEsSearch
+  fetchEsSearchJobs: typeof fetchEsSearchJobs
 }
 
 interface Props {
@@ -54,16 +54,16 @@ function getValueAfterLastPeriod(s: string) {
 
 const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
-  fetchEsSearch,
-  esSearch,
+  fetchEsSearchJobs,
+  esSearchJobs,
 }) => {
   useEffect(() => {
-    fetchEsSearch(search)
-  }, [search, fetchEsSearch])
+    fetchEsSearchJobs(search)
+  }, [search, fetchEsSearchJobs])
 
   return (
     <Box>
-      {esSearch.data.hits.map((hit, index) => {
+      {esSearchJobs.data.hits.map((hit, index) => {
         return (
           <Box
             key={hit.run_id}
@@ -86,7 +86,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               <Box ml={2}>
                 {hit.name}
                 <Box>
-                  {Object.entries(esSearch.data.highlights[index]).map(([key, value]) => {
+                  {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
                       return (
                         <Box
@@ -122,7 +122,9 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 <>
                   <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
                   <Box>
-                    <MqText subdued>{'Language'}</MqText>
+                    <MqText subdued sx={{ mb: 1 }}>
+                      {'Language'}
+                    </MqText>
                     <Chip
                       size={'small'}
                       variant={'outlined'}
@@ -133,7 +135,9 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               )}
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
               <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued>{'Namespace'}</MqText>
+                <MqText subdued sx={{ mb: 1 }}>
+                  {'Namespace'}
+                </MqText>
                 <MqText font={'mono'}>{hit.namespace}</MqText>
               </Box>
             </Box>
@@ -146,14 +150,14 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
 const mapStateToProps = (state: IState) => {
   return {
-    esSearch: state.esSearch,
+    esSearchJobs: state.esSearchJobs,
   }
 }
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchEsSearch: fetchEsSearch,
+      fetchEsSearchJobs: fetchEsSearchJobs,
     },
     dispatch
   )

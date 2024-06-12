@@ -306,7 +306,7 @@ interface Highlight {
   'facets.sourceCode.sourceCode'?: string[]
 }
 
-export interface EsSearchResult {
+export interface EsSearchResultJobs {
   hits: Hit[]
   highlights: Highlight[]
 }

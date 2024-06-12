@@ -7,7 +7,7 @@ import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
-  EsSearchResult,
+  EsSearchResultJobs,
   Events,
   Facets,
   Job,
@@ -428,14 +428,14 @@ export const setColumnLineageGraphDepth = (depth: number) => ({
   payload: depth,
 })
 
-export const fetchEsSearch = (q: string) => ({
-  type: actionTypes.FETCH_ES_SEARCH,
+export const fetchEsSearchJobs = (q: string) => ({
+  type: actionTypes.FETCH_ES_SEARCH_JOBS,
   payload: {
     q,
   },
 })
 
-export const fetchEsSearchSuccess = (search: EsSearchResult) => ({
-  type: actionTypes.FETCH_ES_SEARCH_SUCCESS,
+export const fetchEsSearchJobsSuccess = (search: EsSearchResultJobs) => ({
+  type: actionTypes.FETCH_ES_SEARCH_JOBS_SUCCESS,
   payload: search,
 })

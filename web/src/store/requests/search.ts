@@ -12,7 +12,12 @@ export const getSearch = async (q: string, filter = 'ALL', sort = 'NAME', limit 
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchSearch')
 }
 
-export const getEsSearch = async (q: string) => {
+export const getEsSearchJobs = async (q: string) => {
   const url = `${API_URL}/search/jobs?q=${q}`
-  return genericFetchWrapper(url, { method: 'GET' }, 'fetchEsSearch')
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchEsSearchJobs')
+}
+
+export const getEsSearchDatasets = async (q: string) => {
+  const url = `${API_URL}/search/datasets?q=${q}`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchEsSearchDatasets')
 }
