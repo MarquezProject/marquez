@@ -91,16 +91,18 @@ const Search: React.FC = () => {
           startAdornment={<SearchOutlined />}
           endAdornment={
             <>
-              <IconButton
-                sx={{ mr: 1 }}
-                size={'small'}
-                onClick={() => {
-                  setOpen(false)
-                  setSearch('')
-                }}
-              >
-                <Close />
-              </IconButton>
+              {open && (
+                <IconButton
+                  sx={{ mr: 1 }}
+                  size={'small'}
+                  onClick={() => {
+                    setOpen(false)
+                    setSearch('')
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              )}
               <Chip size={'small'} variant={'outlined'} label={'⌘K'}></Chip>
             </>
           }
