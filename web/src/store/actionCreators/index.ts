@@ -429,13 +429,13 @@ export const setColumnLineageGraphDepth = (depth: number) => ({
 })
 
 export const fetchEsSearch = (q: string) => ({
-  type: actionTypes.FETCH_SEARCH,
+  type: actionTypes.FETCH_ES_SEARCH,
   payload: {
     q,
   },
 })
 
 export const fetchEsSearchSuccess = (search: EsSearchResult) => ({
-  type: actionTypes.FETCH_SEARCH_SUCCESS,
+  type: actionTypes.FETCH_ES_SEARCH_SUCCESS,
   payload: search,
 })

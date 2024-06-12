@@ -383,10 +383,11 @@ export function* fetchEsSearchSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_ES_SEARCH)
-      const esSearchResult: EsSearchResult = yield call(getEsSearch, payload.runId)
+      const esSearchResult: EsSearchResult = yield call(getEsSearch, payload.q)
       yield put(fetchEsSearchSuccess(esSearchResult))
     } catch (e) {
-      yield put(applicationError('Something went wrong while fetching run facets'))
+      console.log(e)
+      yield put(applicationError('Something went wrong while searching'))
     }
   }
 }
@@ -406,6 +407,7 @@ export default function* rootSaga(): Generator {
     fetchColumnLineage(),
     fetchSearch(),
     deleteJobSaga(),
+    fetchEsSearchSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
     addDatasetTagSaga(),

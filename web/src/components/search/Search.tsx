@@ -8,6 +8,7 @@ import { MqInputBase } from '../core/input-base/MqInputBase'
 import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
+import EsSearch from './es-search/EsSearch'
 import IconButton from '@mui/material/IconButton'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
@@ -28,6 +29,8 @@ const useCmdKShortcut = (callback: () => void) => {
     }
   }, [callback])
 }
+
+const elasticSearchEnabled = true
 
 const Search: React.FC = () => {
   const [search, setSearch] = useState('')
@@ -115,7 +118,35 @@ const Search: React.FC = () => {
           touchEvent='onTouchStart'
           onClickAway={() => setOpen(false)}
         >
-          <BaseSearch search={search} open={open} />
+          <Box>
+            {open && search.length > 0 && (
+              <Box
+                position={'absolute'}
+                width={'100%'}
+                sx={{
+                  position: 'absolute',
+                  width: '100%',
+                  top: 0,
+                  right: 0,
+                  left: '-3px',
+                  zIndex: theme.zIndex.appBar + 1,
+                  border: `2px dashed ${theme.palette.secondary.main}`,
+                  borderRadius: theme.spacing(1),
+                  backgroundColor: theme.palette.background.default,
+                  borderTopLeftRadius: 0,
+                  borderBottomLeftRadius: 0,
+                }}
+              >
+                <Box mt={'64px'} borderTop={1} borderColor={'divider'}>
+                  {elasticSearchEnabled ? (
+                    <EsSearch search={search} />
+                  ) : (
+                    <BaseSearch search={search} />
+                  )}
+                </Box>
+              </Box>
+            )}
+          </Box>
         </ClickAwayListener>
       </Box>
     </Box>
