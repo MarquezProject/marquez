@@ -14,6 +14,7 @@ import {
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
+  FETCH_ES_SEARCH_DATASETS,
   FETCH_ES_SEARCH_JOBS,
   FETCH_EVENTS,
   FETCH_JOBS,
@@ -28,6 +29,7 @@ import {
   Dataset,
   DatasetVersion,
   Datasets,
+  EsSearchResultDatasets,
   EsSearchResultJobs,
   Events,
   Facets,
@@ -75,6 +77,7 @@ import {
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
+  fetchEsSearchDatasetsSuccess,
   fetchEsSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
@@ -86,7 +89,7 @@ import {
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
-import { getEsSearchJobs, getSearch } from '../requests/search'
+import { getEsSearchDatasets, getEsSearchJobs, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
 
 export function* fetchTags() {
@@ -386,7 +389,21 @@ export function* fetchEsSearchJobsSaga() {
       const EsSearchResultJobs: EsSearchResultJobs = yield call(getEsSearchJobs, payload.q)
       yield put(fetchEsSearchJobsSuccess(EsSearchResultJobs))
     } catch (e) {
-      console.log(e)
+      yield put(applicationError('Something went wrong while searching'))
+    }
+  }
+}
+
+export function* fetchEsSearchDatasetsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_ES_SEARCH_DATASETS)
+      const EsSearchResultDatasets: EsSearchResultDatasets = yield call(
+        getEsSearchDatasets,
+        payload.q
+      )
+      yield put(fetchEsSearchDatasetsSuccess(EsSearchResultDatasets))
+    } catch (e) {
       yield put(applicationError('Something went wrong while searching'))
     }
   }
@@ -408,6 +425,7 @@ export default function* rootSaga(): Generator {
     fetchSearch(),
     deleteJobSaga(),
     fetchEsSearchJobsSaga(),
+    fetchEsSearchDatasetsSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
     addDatasetTagSaga(),

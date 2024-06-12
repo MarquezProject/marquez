@@ -7,6 +7,7 @@ import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
+  EsSearchResultDatasets,
   EsSearchResultJobs,
   Events,
   Facets,
@@ -437,5 +438,17 @@ export const fetchEsSearchJobs = (q: string) => ({
 
 export const fetchEsSearchJobsSuccess = (search: EsSearchResultJobs) => ({
   type: actionTypes.FETCH_ES_SEARCH_JOBS_SUCCESS,
+  payload: search,
+})
+
+export const fetchEsSearchDatasets = (q: string) => ({
+  type: actionTypes.FETCH_ES_SEARCH_DATASETS,
+  payload: {
+    q,
+  },
+})
+
+export const fetchEsSearchDatasetsSuccess = (search: EsSearchResultDatasets) => ({
+  type: actionTypes.FETCH_ES_SEARCH_DATASETS_SUCCESS,
   payload: search,
 })

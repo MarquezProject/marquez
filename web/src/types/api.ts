@@ -282,6 +282,7 @@ export interface ColumnLineageOutEdge {
 
 // esSearch
 
+// jobs
 interface SourceCodeFacet {
   language: string
   _producer: string
@@ -293,7 +294,7 @@ interface EsSearchFacet {
   sourceCode?: SourceCodeFacet
 }
 
-interface Hit {
+interface JobHit {
   run_id: string
   name: string
   namespace: string
@@ -302,11 +303,66 @@ interface Hit {
   facets: EsSearchFacet
 }
 
-interface Highlight {
+interface JobHighlight {
   'facets.sourceCode.sourceCode'?: string[]
 }
 
 export interface EsSearchResultJobs {
-  hits: Hit[]
-  highlights: Highlight[]
+  hits: JobHit[]
+  highlights: JobHighlight[]
+}
+
+// datasets
+type DatasetHighlight = {
+  [key: string]: string[]
+}
+
+type SearchInputField = {
+  namespace: string
+  name: string
+  field: string
+}
+
+type ColumnLineageField = {
+  inputFields: SearchInputField[]
+  transformationDescription: string
+  transformationType: string
+}
+
+type SchemaField = {
+  name: string
+  type: string
+  fields: any[]
+}
+
+type SchemaFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: SchemaField[]
+}
+
+type ColumnLineageFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: {
+    [key: string]: ColumnLineageField
+  }
+}
+
+type EsSearchDatasetFacets = {
+  schema: SchemaFacet
+  columnLineage: ColumnLineageFacet
+}
+
+type DatasetHit = {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: string
+  facets: EsSearchDatasetFacets
+}
+
+export type EsSearchResultDatasets = {
+  hits: DatasetHit[]
+  highlights: DatasetHighlight[]
 }
