@@ -3,7 +3,7 @@
 
 import { Box, Chip } from '@mui/material'
 import { Close, SearchOutlined } from '@mui/icons-material'
-import { DRAWER_WIDTH, theme } from '../../helpers/theme'
+import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { MqInputBase } from '../core/input-base/MqInputBase'
 import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
@@ -147,7 +147,13 @@ const Search: React.FC = () => {
                   borderBottomLeftRadius: 0,
                 }}
               >
-                <Box mt={'64px'} borderTop={1} borderColor={'divider'}>
+                <Box
+                  mt={'64px'}
+                  borderTop={1}
+                  borderColor={'divider'}
+                  overflow={'auto'}
+                  maxHeight={`calc(100vh - ${HEADER_HEIGHT}px - 24px)`}
+                >
                   {elasticSearchEnabled ? (
                     <EsSearch search={search} />
                   ) : (

@@ -13,7 +13,9 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
 import { theme } from '../../../helpers/theme'
+import { truncateText } from '../../../helpers/text'
 import Box from '@mui/system/Box'
+import MQTooltip from '../../core/tooltip/MQTooltip'
 import MqText from '../../core/text/MqText'
 import React, { useEffect } from 'react'
 
@@ -91,7 +93,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
               </Box>
               <Box ml={2}>
-                {hit.name}
+                {truncateText(hit.name, 20)}
                 <Box>
                   {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
@@ -143,7 +145,6 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   </Box>
                 </>
               )}
-
             </Box>
           </Box>
         )
@@ -169,7 +170,11 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />
               </Box>
               <Box ml={2}>
-                {hit.name}
+                <MQTooltip title={hit.name}>
+                  <Box>
+                    <MqText>{truncateText(hit.name, 20)}</MqText>
+                  </Box>
+                </MQTooltip>
                 <Box display={'flex'}>
                   {Object.entries(esSearchDatasets.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
@@ -181,12 +186,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                           mb={0.5}
                           mr={0.5}
                         >
-                          <Chip
-                            label={getValueAfterLastPeriod(key)}
-                            variant={'outlined'}
-                            size={'small'}
-                            sx={{ mr: 1 }}
-                          />
+                          <Chip label={key} variant={'outlined'} size={'small'} sx={{ mr: 1 }} />
                           {parseStringToSegments(highlightedString || '').map((segment, index) => (
                             <MqText
                               subdued
