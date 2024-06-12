@@ -16,6 +16,7 @@ import { theme } from '../../../helpers/theme'
 import { truncateText } from '../../../helpers/text'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../core/tooltip/MQTooltip'
+import MqEmpty from '../../core/empty/MqEmpty'
 import MqText from '../../core/text/MqText'
 import React, { useEffect } from 'react'
 
@@ -70,6 +71,14 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
     fetchEsSearchDatasets(search)
   }, [search, fetchEsSearchJobs])
 
+  if (esSearchJobs.data.hits.length === 0 && esSearchDatasets.data.hits.length === 0) {
+    return (
+      <Box my={4}>
+        <MqEmpty title={'No Hits'} body={'Keep typing or try a more precise search.'} />
+      </Box>
+    )
+  }
+
   return (
     <Box>
       {esSearchJobs.data.hits.map((hit, index) => {
@@ -93,7 +102,11 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
               </Box>
               <Box ml={2}>
-                {truncateText(hit.name, 20)}
+                <MQTooltip title={hit.name}>
+                  <Box>
+                    <MqText>{truncateText(hit.name, 20)}</MqText>
+                  </Box>
+                </MQTooltip>
                 <Box>
                   {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {

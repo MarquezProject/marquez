@@ -4,9 +4,12 @@
 import { Box, Chip } from '@mui/material'
 import { Close, SearchOutlined } from '@mui/icons-material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
+import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
+import { connect } from 'react-redux'
 import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import EsSearch from './es-search/EsSearch'
 import IconButton from '@mui/material/IconButton'
@@ -30,9 +33,30 @@ const useCmdKShortcut = (callback: () => void) => {
   }, [callback])
 }
 
+const useEscapeShortcut = (callback: () => void) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault() // Prevent the default browser action
+        callback()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [callback])
+}
+
 const elasticSearchEnabled = true
 
-const Search: React.FC = () => {
+interface StateProps {
+  isLoading: boolean
+}
+
+const Search: React.FC = ({ isLoading }: StateProps) => {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(true)
 
@@ -43,6 +67,14 @@ const Search: React.FC = () => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
+  })
+
+  useEffect(() => {
+    if (search === '') setOpen(false)
+  }, [search])
+
+  useEscapeShortcut(() => {
+    setOpen(false)
   })
 
   const location = useLocation()
@@ -91,8 +123,10 @@ const Search: React.FC = () => {
           startAdornment={<SearchOutlined />}
           endAdornment={
             <>
+              {isLoading && <CircularProgress size={16} />}
               {open && (
                 <IconButton
+                  color={'secondary'}
                   sx={{ mr: 1 }}
                   size={'small'}
                   onClick={() => {
@@ -169,4 +203,8 @@ const Search: React.FC = () => {
   )
 }
 
-export default Search
+const mapStateToProps = (state: IState) => ({
+  isLoading: state.esSearchJobs.isLoading || state.esSearchDatasets.isLoading,
+})
+
+export default connect(mapStateToProps)(Search)
