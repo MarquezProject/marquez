@@ -1,4 +1,4 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { Box, Chip } from '@mui/material'
@@ -96,14 +96,19 @@ const Search: React.FC = () => {
                   sx={{ mr: 1 }}
                   size={'small'}
                   onClick={() => {
-                    setOpen(false)
                     setSearch('')
+                    setOpen(false)
                   }}
                 >
                   <Close />
                 </IconButton>
               )}
-              <Chip size={'small'} variant={'outlined'} label={'⌘K'}></Chip>
+              <Chip
+                color={open ? 'primary' : 'default'}
+                size={'small'}
+                variant={'outlined'}
+                label={'⌘K'}
+              />
             </>
           }
           onFocus={() => setOpen(true)}
@@ -118,7 +123,10 @@ const Search: React.FC = () => {
         <ClickAwayListener
           mouseEvent='onMouseDown'
           touchEvent='onTouchStart'
-          onClickAway={() => setOpen(false)}
+          onClickAway={() => {
+            setOpen(false)
+            setSearch('')
+          }}
         >
           <Box>
             {open && search.length > 0 && (

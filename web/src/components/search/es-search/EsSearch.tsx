@@ -88,7 +88,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                     return value.map((highlightedString: any, idx: number) => {
                       return (
                         <Box
-                          key={`${key}-${highlightedString}`}
+                          key={`${key}-${value}-${idx}`}
                           display={'flex'}
                           alignItems={'center'}
                           mb={0.5}
@@ -99,11 +99,11 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                             size={'small'}
                             sx={{ mr: 1 }}
                           />
-                          {parseStringToSegments(highlightedString || '').map((segment) => (
+                          {parseStringToSegments(highlightedString || '').map((segment, index) => (
                             <MqText
                               subdued
                               small
-                              key={`${segment.text}-${idx}`}
+                              key={`${key}-${highlightedString}-${segment.text}-${index}`}
                               inline
                               highlight={segment.isBold}
                             >
@@ -130,7 +130,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 </>
               )}
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
-              <Box>
+              <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
                 <MqText subdued>{'Namespace'}</MqText>
                 <MqText font={'mono'}>{hit.namespace}</MqText>
               </Box>
