@@ -4,12 +4,14 @@
 import * as Redux from 'redux'
 import { Chip, Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { IEsSearchDatasetsState } from '../../../store/reducers/esSearchDatasets'
 import { IEsSearchJobsState } from '../../../store/reducers/esSearch'
 import { IState } from '../../../store/reducers'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
-import { fetchEsSearchJobs } from '../../../store/actionCreators'
+import { faDatabase } from '@fortawesome/free-solid-svg-icons'
+import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
 import { theme } from '../../../helpers/theme'
 import Box from '@mui/system/Box'
 import MqText from '../../core/text/MqText'
@@ -17,10 +19,12 @@ import React, { useEffect } from 'react'
 
 interface StateProps {
   esSearchJobs: IEsSearchJobsState
+  esSearchDatasets: IEsSearchDatasetsState
 }
 
 interface DispatchProps {
   fetchEsSearchJobs: typeof fetchEsSearchJobs
+  fetchEsSearchDatasets: typeof fetchEsSearchDatasets
 }
 
 interface Props {
@@ -55,10 +59,13 @@ function getValueAfterLastPeriod(s: string) {
 const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
   fetchEsSearchJobs,
+  fetchEsSearchDatasets,
   esSearchJobs,
+  esSearchDatasets,
 }) => {
   useEffect(() => {
     fetchEsSearchJobs(search)
+    fetchEsSearchDatasets(search)
   }, [search, fetchEsSearchJobs])
 
   return (
@@ -118,13 +125,16 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   })}
                 </Box>
               </Box>
+              <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
+              <Box>
+                <MqText subdued>{'Namespace'}</MqText>
+                <MqText font={'mono'}>{hit.namespace}</MqText>
+              </Box>
               {hit.facets.sourceCode?.language && (
                 <>
                   <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
                   <Box>
-                    <MqText subdued sx={{ mb: 1 }}>
-                      {'Language'}
-                    </MqText>
+                    <MqText subdued>{'Language'}</MqText>
                     <Chip
                       size={'small'}
                       variant={'outlined'}
@@ -133,12 +143,76 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   </Box>
                 </>
               )}
+
+            </Box>
+          </Box>
+        )
+      })}
+      {esSearchDatasets.data.hits.map((hit, index) => {
+        return (
+          <Box
+            key={hit.run_id}
+            px={2}
+            py={1}
+            borderBottom={1}
+            borderColor={'divider'}
+            sx={{
+              transition: 'background-color 0.3s',
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: theme.palette.action.hover,
+              },
+            }}
+          >
+            <Box display={'flex'}>
+              <Box display={'flex'} alignItems={'center'}>
+                <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />
+              </Box>
+              <Box ml={2}>
+                {hit.name}
+                <Box display={'flex'}>
+                  {Object.entries(esSearchDatasets.data.highlights[index]).map(([key, value]) => {
+                    return value.map((highlightedString: any, idx: number) => {
+                      return (
+                        <Box
+                          key={`${key}-${value}-${idx}`}
+                          display={'flex'}
+                          alignItems={'center'}
+                          mb={0.5}
+                          mr={0.5}
+                        >
+                          <Chip
+                            label={getValueAfterLastPeriod(key)}
+                            variant={'outlined'}
+                            size={'small'}
+                            sx={{ mr: 1 }}
+                          />
+                          {parseStringToSegments(highlightedString || '').map((segment, index) => (
+                            <MqText
+                              subdued
+                              small
+                              key={`${key}-${highlightedString}-${segment.text}-${index}`}
+                              inline
+                              highlight={segment.isBold}
+                            >
+                              {segment.text}
+                            </MqText>
+                          ))}
+                        </Box>
+                      )
+                    })
+                  })}
+                </Box>
+              </Box>
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
               <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued sx={{ mb: 1 }}>
-                  {'Namespace'}
-                </MqText>
+                <MqText subdued>{'Namespace'}</MqText>
                 <MqText font={'mono'}>{hit.namespace}</MqText>
+              </Box>
+              <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
+              <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
+                <MqText subdued>Total Fields</MqText>
+                <MqText font={'mono'}>{hit.facets.schema.fields.length.toString()} fields</MqText>
               </Box>
             </Box>
           </Box>
@@ -151,6 +225,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 const mapStateToProps = (state: IState) => {
   return {
     esSearchJobs: state.esSearchJobs,
+    esSearchDatasets: state.esSearchDatasets,
   }
 }
 
@@ -158,6 +233,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchEsSearchJobs: fetchEsSearchJobs,
+      fetchEsSearchDatasets: fetchEsSearchDatasets,
     },
     dispatch
   )
