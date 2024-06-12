@@ -79,8 +79,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               },
             }}
           >
-            <Box display={'flex'} alignItems={'center'}>
-              <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
+            <Box display={'flex'}>
+              <Box display={'flex'} alignItems={'center'}>
+                <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
+              </Box>
               <Box ml={2}>
                 {hit.name}
                 <Box>
