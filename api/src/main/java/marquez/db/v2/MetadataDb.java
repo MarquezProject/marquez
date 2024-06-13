@@ -5,7 +5,9 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import io.dropwizard.lifecycle.Managed;
 import io.openlineage.server.OpenLineage;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -21,6 +23,8 @@ import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.SourceName;
 import marquez.common.models.TagName;
+import marquez.service.models.Namespace;
+import marquez.service.models.NamespaceMeta;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.async.JdbiExecutor;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -30,13 +34,11 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.stringtemplate4.StringTemplateEngine;
 
-/** ... */
 @Slf4j
-public class MetadataDb {
+public final class MetadataDb {
   private final ConcurrentLinkedQueue<BatchSqlWriteCall> nonBlockingDbCallQueue;
   private final JdbiExecutor nonBlockingDbCallExecutor;
 
-  /* ... */
   private MetadataDb(@NonNull final ConnectionPool connectionPool) {
     this.nonBlockingDbCallQueue = new ConcurrentLinkedQueue<>();
     this.nonBlockingDbCallExecutor =
@@ -49,7 +51,6 @@ public class MetadataDb {
                 .setSqlLogger(LogDbCalls.newInstance()),
             Executors.newFixedThreadPool(connectionPool.getMaximumPoolSize()));
 
-    // ...
     final BatchSqlWriter batchSqlWriter =
         MetadataDb.BatchSqlWriter.builder()
             .nonBlockingDbCallQueue(nonBlockingDbCallQueue)
@@ -57,7 +58,7 @@ public class MetadataDb {
             .initialPollDelayMs(1000)
             .pollIntervalMs(2000)
             .build();
-    // ...
+
     batchSqlWriter.start();
   }
 
@@ -75,6 +76,7 @@ public class MetadataDb {
 
   /* ... */
   public void write(@NotNull OpenLineage.BaseEvent event) {
+    // Write event to psq queue (with partition_id), OR in-memory queue
     nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newWriteCallFor(event));
   }
 
@@ -83,6 +85,38 @@ public class MetadataDb {
         .useHandle(
             nonBlockingHandle -> {
               throw new UnsupportedOperationException("MetadataDb.listNamespaces()");
+            })
+        .toCompletableFuture();
+  }
+
+  /**
+   * ...
+   *
+   * @param namespaceName ...
+   * @param namespaceMeta ...
+   * @return ...
+   */
+  public CompletableFuture<Namespace> putNamespace(
+      @NonNull NamespaceName namespaceName, @NonNull NamespaceMeta namespaceMeta) {
+    log.debug("Writing metadata for namespace '{}': {}", namespaceName.getValue(), namespaceMeta);
+    return nonBlockingDbCallExecutor
+        .withHandle(
+            nonBlockingHandle -> {
+              final UUID uuid = UUID.randomUUID();
+              final Instant nowAsUtc = Instant.now();
+              nonBlockingHandle
+                  .createUpdate(Sql.UPSERT.NAMESPACE_META)
+                  .bind("uuid", uuid)
+                  .bind("createdAt", nowAsUtc)
+                  .bind("updatedAt", nowAsUtc)
+                  .bind("namespace", namespaceName.getValue())
+                  .bind("description", namespaceMeta.getDescription().orElse(null))
+                  .execute();
+              return nonBlockingHandle
+                  .select(Sql.SELECT.NAMESPACE)
+                  .bind("uuid", uuid)
+                  .mapTo(Namespace.class)
+                  .one();
             })
         .toCompletableFuture();
   }

@@ -5,25 +5,37 @@
 
 package marquez.common.models.v2;
 
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
 import marquez.common.models.DatasetName;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.Version;
 
 /** Version ID for {@code Dataset}. */
-@Value
-@Builder
-@AllArgsConstructor
-public class DatasetVersionId {
-  @NonNull NamespaceName namespace;
-  @NonNull DatasetName name;
-  @NonNull UUID version;
+@EqualsAndHashCode
+@ToString
+public final class DatasetVersionId {
+  @Getter private final NamespaceName namespace;
+  @Getter private final DatasetName name;
+  @Getter private final Version version;
+
+  @JsonCreator
+  public DatasetVersionId(
+      @NonNull final NamespaceName namespaceName,
+      @NonNull final DatasetName datasetName,
+      @NonNull final Version datasetVersion) {
+    this.namespace = namespaceName;
+    this.name = datasetName;
+    this.version = datasetVersion;
+  }
 
   public static DatasetVersionId of(
-      final NamespaceName namespaceName, final DatasetName jobName, final UUID version) {
-    return new DatasetVersionId(namespaceName, jobName, version);
+      @NonNull final NamespaceName namespaceName,
+      @NonNull final DatasetName datasetName,
+      @NonNull final Version version) {
+    return new DatasetVersionId(namespaceName, datasetName, version);
   }
 }

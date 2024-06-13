@@ -2,6 +2,35 @@ package marquez.db.v2;
 
 /** ... */
 public interface Sql {
+  Upsert UPSERT = new Upsert();
+  Select SELECT = new Select();
+
+  class Upsert {
+    String NAMESPACE_META =
+        """
+                      INSERT INTO namespaces (
+                        uuid,
+                        created_at,
+                        updated_at,
+                        name,
+                        description
+                      ) VALUES (
+                        :uuid,                   -- replace with the actual event_time value
+                        :createdAt,              -- replace with the actual event_time value
+                        :updatedAt',             -- replace with the actual event_time value
+                        :namespace,              -- replace with the actual event_time value
+                        NULLIF(:description, '') -- replace with the actual event_time value
+                     )
+                     ON CONFLICT (name)
+                     DO UPDATE SET updated_at  = EXCLUDED.updated_at,
+                                   description = COALESCE(NULLIF(EXCLUDED.description, ''), :description)
+                      """;
+  }
+
+  class Select {
+    String NAMESPACE = "";
+  }
+
   /* ... */
   String WRITE_LINEAGE_EVENT =
       """
@@ -45,7 +74,7 @@ public interface Sql {
           '<job_namespace_name>',                   -- replace with the actual event_time value
           NULLIF('<job_namespace_description>', '') -- replace with the actual event_time value
         )
-        ON CONFLICT (name)
+        ON CONFLICT (name) DO NOTHING
         DO UPDATE SET updated_at  = EXCLUDED.updated_at,
                       description = COALESCE(NULLIF(EXCLUDED.description, ''), namespaces.description)
         RETURNING *
