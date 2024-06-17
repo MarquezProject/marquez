@@ -76,8 +76,17 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
         jobTags: payload.jobTags,
       }
     case ADD_JOB_TAG:
+      return {
+        ...state,
+      }
     case ADD_JOB_TAG_SUCCESS:
+      return {
+        ...state,
+      }
     case DELETE_JOB_TAG:
+      return {
+        ...state,
+      }
     case DELETE_JOB_TAG_SUCCESS:
       return {
         ...state,
