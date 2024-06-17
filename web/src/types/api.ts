@@ -171,6 +171,7 @@ export interface Job {
   location: string
   description: string
   latestRun: Run
+  tags: string[]
 }
 
 export interface JobId {

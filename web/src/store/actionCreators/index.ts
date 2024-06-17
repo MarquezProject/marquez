@@ -109,6 +109,24 @@ export const deleteDatasetSuccess = (datasetName: string) => ({
   },
 })
 
+export const deleteJobTag = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.DELETE_JOB_TAG,
+  payload: {
+    namespace,
+    jobName,
+    tag,
+  },
+})
+
+export const deleteJobTagSuccess = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.DELETE_JOB_TAG_SUCCESS,
+  payload: {
+    jobName,
+    namespace,
+    tag,
+  },
+})
+
 export const deleteDatasetTag = (namespace: string, datasetName: string, tag: string) => ({
   type: actionTypes.DELETE_DATASET_TAG,
   payload: {
@@ -154,6 +172,24 @@ export const deleteDatasetFieldTagSuccess = (
     namespace,
     tag,
     field,
+  },
+})
+
+export const addJobTag = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.ADD_JOB_TAG,
+  payload: {
+    namespace,
+    jobName,
+    tag,
+  },
+})
+
+export const addJobTagSuccess = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.ADD_JOB_TAG_SUCCESS,
+  payload: {
+    jobName,
+    namespace,
+    tag,
   },
 })
 
@@ -218,11 +254,26 @@ export const fetchJobs = (namespace: string, limit: number, offset: number) => (
   },
 })
 
+export const fetchJobTags = (namespace: string, job: string) => ({
+  type: actionTypes.FETCH_JOB_TAGS,
+  payload: {
+    namespace,
+    job,
+  },
+})
+
 export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs,
     totalCount,
+  },
+})
+
+export const fetchJobTagsSuccess = (jobTags: string[]) => ({
+  type: actionTypes.FETCH_JOB_TAGS_SUCCESS,
+  payload: {
+    jobTags,
   },
 })
 

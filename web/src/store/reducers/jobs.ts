@@ -2,14 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  ADD_JOB_TAG,
+  ADD_JOB_TAG_SUCCESS,
   DELETE_JOB,
   DELETE_JOB_SUCCESS,
+  DELETE_JOB_TAG,
+  DELETE_JOB_TAG_SUCCESS,
   FETCH_JOBS,
   FETCH_JOBS_SUCCESS,
+  FETCH_JOB_TAGS,
+  FETCH_JOB_TAGS_SUCCESS,
   RESET_JOBS,
 } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
-import { deleteJob, fetchJobsSuccess } from '../actionCreators'
+import {
+  addJobTag,
+  deleteJob,
+  deleteJobTag,
+  fetchJobTagsSuccess,
+  fetchJobsSuccess,
+} from '../actionCreators'
 
 export type IJobsState = {
   isLoading: boolean
@@ -17,6 +29,7 @@ export type IJobsState = {
   totalCount: number
   init: boolean
   deletedJobName: string
+  jobTags: string[]
 }
 
 export const initialState: IJobsState = {
@@ -25,9 +38,14 @@ export const initialState: IJobsState = {
   totalCount: 0,
   init: false,
   deletedJobName: '',
+  jobTags: [],
 }
 
-export type IJobsAction = ReturnType<typeof fetchJobsSuccess> & ReturnType<typeof deleteJob>
+export type IJobsAction = ReturnType<typeof fetchJobsSuccess> &
+  ReturnType<typeof deleteJob> &
+  ReturnType<typeof fetchJobTagsSuccess> &
+  ReturnType<typeof deleteJobTag> &
+  ReturnType<typeof addJobTag>
 
 export default (state = initialState, action: IJobsAction): IJobsState => {
   const { type, payload } = action
@@ -49,6 +67,21 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
       return { ...state, result: state.result.filter((e) => e.name !== payload.jobName) }
     case DELETE_JOB_SUCCESS:
       return { ...state, deletedJobName: payload.jobName }
+    case FETCH_JOB_TAGS:
+      return { ...state, isLoading: true }
+    case FETCH_JOB_TAGS_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        jobTags: payload.jobTags,
+      }
+    case ADD_JOB_TAG:
+    case ADD_JOB_TAG_SUCCESS:
+    case DELETE_JOB_TAG:
+    case DELETE_JOB_TAG_SUCCESS:
+      return {
+        ...state,
+      }
     default:
       return state
   }
