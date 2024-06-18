@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IEsSearchDatasetsState } from '../../../store/reducers/esSearchDatasets'
 import { IEsSearchJobsState } from '../../../store/reducers/esSearch'
 import { IState } from '../../../store/reducers'
+import { Nullable } from '../../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
@@ -59,6 +60,24 @@ function getValueAfterLastPeriod(s: string) {
   return s.split('.').pop()
 }
 
+const useArrowKeys = (callback: (direction: 'up' | 'down') => void) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault() // Prevent the default browser action
+        callback('down')
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault() // Prevent the default browser action
+        callback('up')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [callback])
+}
+
 const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
   fetchEsSearchJobs,
@@ -66,10 +85,32 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   esSearchJobs,
   esSearchDatasets,
 }) => {
+  const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
+
+  useArrowKeys((direction) => {
+    console.log('what')
+    if (direction === 'up') {
+      setSelectedIndex(selectedIndex === null ? null : Math.max(selectedIndex - 1, 0))
+    } else {
+      setSelectedIndex(
+        selectedIndex === null
+          ? 0
+          : Math.min(
+              selectedIndex + 1,
+              esSearchJobs.data.hits.length + esSearchDatasets.data.hits.length - 1
+            )
+      )
+    }
+  })
+
   useEffect(() => {
     fetchEsSearchJobs(search)
     fetchEsSearchDatasets(search)
   }, [search, fetchEsSearchJobs])
+
+  useEffect(() => {
+    setSelectedIndex(null)
+  }, [esSearchJobs.data.hits, esSearchDatasets.data.hits])
 
   if (esSearchJobs.data.hits.length === 0 && esSearchDatasets.data.hits.length === 0) {
     return (
@@ -95,6 +136,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               '&:hover': {
                 backgroundColor: theme.palette.action.hover,
               },
+              backgroundColor: selectedIndex === index ? theme.palette.action.hover : undefined,
             }}
           >
             <Box display={'flex'}>
@@ -176,6 +218,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               '&:hover': {
                 backgroundColor: theme.palette.action.hover,
               },
+              backgroundColor:
+                selectedIndex === index + esSearchDatasets.data.hits.length
+                  ? theme.palette.action.hover
+                  : undefined,
             }}
           >
             <Box display={'flex'}>
