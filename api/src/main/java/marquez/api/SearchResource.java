@@ -152,24 +152,29 @@ public class SearchResource {
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
     if (this.elasticsearchClient != null) {
       String[] fields = {
-              "facets.schema.fields.name",
-              "facets.schema.fields.type",
-              "facets.columnLineage.fields.*.inputFields.name",
-              "facets.columnLineage.fields.*.inputFields.namespace",
-              "facets.columnLineage.fields.*.inputFields.field",
-              "facets.columnLineage.fields.*.transformationDescription",
-              "facets.columnLineage.fields.*.transformationType"
+        "facets.schema.fields.name",
+        "facets.schema.fields.type",
+        "facets.columnLineage.fields.*.inputFields.name",
+        "facets.columnLineage.fields.*.inputFields.namespace",
+        "facets.columnLineage.fields.*.inputFields.field",
+        "facets.columnLineage.fields.*.transformationDescription",
+        "facets.columnLineage.fields.*.transformationType"
       };
-      SearchResponse<ObjectNode> response = this.elasticsearchClient.search(
-              s -> s.index("datasets")
-                      .query(q -> q.multiMatch(m -> m.query(query)
-                              .fields(Arrays.stream(fields).toList())))
-                      .highlight(hl -> {
-                        for (String field : fields) {
-                          hl.fields(field, f -> f.type("plain"));
-                        }
-                        return hl;
-                      }),
+      SearchResponse<ObjectNode> response =
+          this.elasticsearchClient.search(
+              s ->
+                  s.index("datasets")
+                      .query(
+                          q ->
+                              q.multiMatch(
+                                  m -> m.query(query).fields(Arrays.stream(fields).toList())))
+                      .highlight(
+                          hl -> {
+                            for (String field : fields) {
+                              hl.fields(field, f -> f.type("plain"));
+                            }
+                            return hl;
+                          }),
               ObjectNode.class);
 
       return formatEsResponse(response);
@@ -180,9 +185,9 @@ public class SearchResource {
 
   private Response formatEsResponse(SearchResponse<ObjectNode> response) {
     List<ObjectNode> hits =
-            response.hits().hits().stream().map(Hit::source).collect(Collectors.toList());
+        response.hits().hits().stream().map(Hit::source).collect(Collectors.toList());
     List<Map<String, List<String>>> highlights =
-            response.hits().hits().stream().map(Hit::highlight).collect(Collectors.toList());
+        response.hits().hits().stream().map(Hit::highlight).collect(Collectors.toList());
 
     return Response.ok(new EsResult(hits, highlights)).build();
   }
