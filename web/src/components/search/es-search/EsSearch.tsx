@@ -88,7 +88,6 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
 
   useArrowKeys((direction) => {
-    console.log('what')
     if (direction === 'up') {
       setSelectedIndex(selectedIndex === null ? null : Math.max(selectedIndex - 1, 0))
     } else {
