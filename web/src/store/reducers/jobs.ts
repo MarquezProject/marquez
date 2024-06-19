@@ -11,13 +11,7 @@ import {
   RESET_JOBS,
 } from '../actionCreators/actionTypes'
 import { IJob } from '../../types'
-import {
-  addJobTag,
-  deleteJob,
-  deleteJobTag,
-  fetchJobTagsSuccess,
-  fetchJobsSuccess,
-} from '../actionCreators'
+import { deleteJob, fetchJobTagsSuccess, fetchJobsSuccess } from '../actionCreators'
 
 export type IJobsState = {
   isLoading: boolean
