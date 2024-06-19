@@ -22,11 +22,10 @@ import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
-import React, { useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import Snackbar from '@mui/material/Snackbar'
 
 interface JobTagsProps {
@@ -48,7 +47,7 @@ const JobTags: React.FC<IProps> = (props) => {
 
   const [listTag, setListTag] = useState('')
   const [openTagDesc, setOpenTagDesc] = useState(false)
-  const [tagDescription, setTagDescription] = useState('No Description')
+  const [tagDescription, setTagDescription] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>(jobTags)
 
   const handleButtonClick = () => {
@@ -61,16 +60,16 @@ const JobTags: React.FC<IProps> = (props) => {
   const handleTagDescClose = () => {
     setOpenTagDesc(false)
     setListTag('')
-    setTagDescription('No Description')
+    setTagDescription('')
   }
 
-  const handleTagDescChange = (_event: any, value: string) => {
+  const handleTagDescChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     const selectedTagData = tagData.find((tag) => tag.name === value)
     setListTag(value)
-    setTagDescription(selectedTagData ? selectedTagData.description : 'No Description')
+    setTagDescription(selectedTagData ? selectedTagData.description : '')
   }
 
-  const handleDescriptionChange = (event: any) => {
+  const handleDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTagDescription(event.target.value)
   }
 
@@ -110,7 +109,7 @@ const JobTags: React.FC<IProps> = (props) => {
     setSnackbarOpen(true)
     setOpenTagDesc(false)
     setListTag('')
-    setTagDescription('No Description')
+    setTagDescription('')
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
@@ -182,8 +181,7 @@ const JobTags: React.FC<IProps> = (props) => {
               <div>
                 <MQText bold>{option}</MQText>
                 <MQText subdued overflowHidden>
-                  {tagData.find((tagItem) => tagItem.name === option)?.description ||
-                    'No Tag Description'}
+                  {tagData.find((tagItem) => tagItem.name === option)?.description || ''}
                 </MQText>
               </div>
             </li>
@@ -217,8 +215,10 @@ const JobTags: React.FC<IProps> = (props) => {
           }
         }}
       >
-        <DialogTitle>Select a Tag to change</DialogTitle>
         <DialogContent>
+          <MQText heading bottomMargin>
+            Select a Tag to change
+          </MQText>
           <MQText subheading>Tag</MQText>
           <Autocomplete
             options={tagData.map((option) => option.name)}
@@ -252,7 +252,7 @@ const JobTags: React.FC<IProps> = (props) => {
             name='tag-description'
             fullWidth
             variant='outlined'
-            placeholder={'No Description'}
+            placeholder={''}
             onChange={handleDescriptionChange}
             rows={6}
             value={tagDescription}

@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  ADD_JOB_TAG,
-  ADD_JOB_TAG_SUCCESS,
   DELETE_JOB,
   DELETE_JOB_SUCCESS,
-  DELETE_JOB_TAG,
-  DELETE_JOB_TAG_SUCCESS,
   FETCH_JOBS,
   FETCH_JOBS_SUCCESS,
   FETCH_JOB_TAGS,
@@ -74,22 +70,6 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
         ...state,
         isLoading: false,
         jobTags: payload.jobTags,
-      }
-    case ADD_JOB_TAG:
-      return {
-        ...state,
-      }
-    case ADD_JOB_TAG_SUCCESS:
-      return {
-        ...state,
-      }
-    case DELETE_JOB_TAG:
-      return {
-        ...state,
-      }
-    case DELETE_JOB_TAG_SUCCESS:
-      return {
-        ...state,
       }
     default:
       return state
