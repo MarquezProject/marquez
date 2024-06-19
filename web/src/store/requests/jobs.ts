@@ -25,3 +25,18 @@ export const getRuns = async (jobName: string, namespace: string, limit = 100, o
   )}/runs?limit=${limit}&offset=${offset}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchRuns')
 }
+
+export const getJob = async (namespace: string, job: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${job}`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchJob')
+}
+
+export const deleteJobTag = async (namespace: string, jobName: string, tag: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${jobName}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteJobTag')
+}
+
+export const addJobTag = async (namespace: string, jobName: string, tag: string) => {
+  const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${jobName}/tags/${tag}`
+  return genericFetchWrapper(url, { method: 'POST' }, 'addJobTag')
+}

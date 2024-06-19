@@ -19,6 +19,7 @@ import { connect } from 'react-redux'
 import {
   deleteJob,
   dialogToggle,
+  fetchJobTags,
   fetchRuns,
   resetJobs,
   resetRuns,
@@ -34,6 +35,7 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import JobTags from './JobTags'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
@@ -48,6 +50,7 @@ interface DispatchProps {
   deleteJob: typeof deleteJob
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
+  fetchJobTags: typeof fetchJobTags
 }
 
 type IProps = {
@@ -57,6 +60,7 @@ type IProps = {
   runsLoading: boolean
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
+  jobTags: string[]
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
@@ -73,6 +77,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     runsLoading,
     tabIndex,
     setTabIndex,
+    jobTags,
+    fetchJobTags,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -84,6 +90,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
 
   useEffect(() => {
     fetchRuns(job.name, job.namespace)
+    fetchJobTags(job.namespace, job.name)
   }, [job.name])
 
   useEffect(() => {
@@ -100,7 +107,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     }
   }, [])
 
-  if (runsLoading) {
+  if (runsLoading || jobs.isLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -242,6 +249,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Grid>
       </Grid>
       <Divider sx={{ my: 1 }} />
+      <JobTags jobTags={jobTags} jobName={job.name} namespace={job.namespace} />
       <Box
         mb={2}
         display={'flex'}
@@ -274,6 +282,7 @@ const mapStateToProps = (state: IState) => ({
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
+  jobTags: state.jobs.jobTags,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -285,6 +294,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteJob: deleteJob,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
+      fetchJobTags: fetchJobTags,
     },
     dispatch
   )
