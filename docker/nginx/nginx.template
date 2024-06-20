@@ -1,0 +1,22 @@
+events {}
+
+http {
+    server {
+        listen 80;
+
+        location / {
+            proxy_pass http://${MARQUEZ_HOST}:${MARQUEZ_PORT};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Allow access from any origin:
+            add_header 'Access-Control-Allow-Origin' '*';
+            # Or, configure access from a specific origin:
+            # add_header 'Access-Control-Allow-Origin' 'https://example.com';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, DELETE, PUT';
+            add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization';
+        }
+    }
+}
