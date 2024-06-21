@@ -74,7 +74,7 @@ public final class MetadataDb {
     }
   }
 
-  /* ... */
+  /* Writes a {@code OpenLineage} event. */
   public void write(@NotNull OpenLineage.BaseEvent event) {
     // Write event to psq queue (with partition_id), OR in-memory queue
     nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newWriteCallFor(event));
@@ -118,35 +118,49 @@ public final class MetadataDb {
                   .mapTo(Namespace.class)
                   .one();
             })
-        .toCompletableFuture();
-  }
-
-  public CompletableFuture<Void> getNamespace(@NonNull NamespaceName namespaceName) {
-    return nonBlockingDbCallExecutor
-        .useHandle(
-            nonBlockingHandle -> {
-              throw new UnsupportedOperationException("MetadataDb.get(DatasetId)");
+        .exceptionally(
+            exception -> {
+              return null;
             })
         .toCompletableFuture();
   }
 
-  public CompletableFuture<Void> listNamespaces() {
+  /**
+   * ...
+   *
+   * @param namespaceName ...
+   * @return ...
+   */
+  public CompletableFuture<Namespace> getNamespace(@NonNull NamespaceName namespaceName) {
     return nonBlockingDbCallExecutor
-        .useHandle(
-            nonBlockingHandle -> {
-              throw new UnsupportedOperationException("MetadataDb.listNamespaces()");
-            })
+        .withHandle(
+            nonBlockingHandle ->
+                nonBlockingHandle
+                    .select(Sql.SELECT.NAMESPACE)
+                    .bind("name", namespaceName.getValue())
+                    .mapTo(Namespace.class)
+                    .one())
+        .toCompletableFuture();
+  }
+
+  /**
+   * @return ...
+   */
+  public CompletableFuture<Namespace> listNamespaces() {
+    return nonBlockingDbCallExecutor
+        .withHandle(
+            nonBlockingHandle ->
+                nonBlockingHandle.select(Sql.SELECT.NAMESPACES).mapTo(Namespace.class).one())
         .toCompletableFuture();
   }
 
   public CompletableFuture<Void> softDeleteNamespace(@NonNull NamespaceName namespaceName) {
     return nonBlockingDbCallExecutor
-        .useHandle(
-            nonBlockingHandle -> {
-              throw new UnsupportedOperationException(
-                  "MetadataDb.softDeleteNamespace(NamespaceName)");
-            })
-        .toCompletableFuture();
+        .withHandle(nonBlockingHandle -> nonBlockingHandle.execute(Sql.DELETE.NAMESPACE))
+        .exceptionally(
+            exception -> {
+              return null;
+            });
   }
 
   public CompletableFuture<Void> getSource(@NonNull SourceName sourceName) {

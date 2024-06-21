@@ -4,6 +4,7 @@ package marquez.db.v2;
 public interface Sql {
   Upsert UPSERT = new Upsert();
   Select SELECT = new Select();
+  Delete DELETE = new Delete();
 
   class Upsert {
     String NAMESPACE_META =
@@ -28,6 +29,11 @@ public interface Sql {
   }
 
   class Select {
+    String NAMESPACE = "";
+    String NAMESPACES = "";
+  }
+
+  class Delete {
     String NAMESPACE = "";
   }
 

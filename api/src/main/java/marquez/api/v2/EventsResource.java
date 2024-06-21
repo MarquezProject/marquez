@@ -2,8 +2,6 @@ package marquez.api.v2;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import io.openlineage.server.OpenLineage;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,14 +22,14 @@ public class EventsResource {
   @GET
   @Path("/events/lineage")
   @Produces(APPLICATION_JSON)
-  public Response lineage(@NotNull OpenLineage.RunEvent event) {
+  public Response lineage() {
     return Response.ok().build();
   }
 
   @GET
   @Path("/events/lifecycle")
   @Produces(APPLICATION_JSON)
-  public Response lifecycle(@NotNull OpenLineage.RunEvent event) {
+  public Response lifecycle() {
     return Response.ok().build();
   }
 }
