@@ -316,7 +316,10 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         {tabIndex === 0 && (
           <Box display={'flex'} alignItems={'center'}>
             <FormControlLabel
-              sx={{ textWrap: 'nowrap' }}
+              sx={{
+                textWrap: 'nowrap',
+                '& .MuiFormControlLabel-label': { fontSize: '0.875rem' },
+              }}
               control={
                 <Switch
                   size={'small'}
