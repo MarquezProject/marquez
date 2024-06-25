@@ -37,7 +37,7 @@ interface Props {
 
 type TextSegment = {
   text: string
-  isBold: boolean
+  isHighlighted: boolean
 }
 
 function parseStringToSegments(input: string): TextSegment[] {
@@ -45,12 +45,12 @@ function parseStringToSegments(input: string): TextSegment[] {
     if (segment.startsWith('<em>') && segment.endsWith('</em>')) {
       return {
         text: segment.slice(4, -5),
-        isBold: true,
+        isHighlighted: true,
       }
     } else {
       return {
         text: segment,
-        isBold: false,
+        isHighlighted: false,
       }
     }
   })
@@ -142,12 +142,21 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               <Box display={'flex'} alignItems={'center'}>
                 <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
               </Box>
-              <Box ml={2}>
+              <Box ml={2} width={280} minWidth={280}>
                 <MQTooltip title={hit.name}>
                   <Box>
-                    <MqText>{truncateText(hit.name, 20)}</MqText>
+                    <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
                   </Box>
                 </MQTooltip>
+                <MQTooltip title={hit.namespace}>
+                  <Box>
+                    <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                  </Box>
+                </MQTooltip>
+              </Box>
+              <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
+              <Box>
+                <MqText subdued>Match</MqText>
                 <Box>
                   {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
@@ -164,27 +173,26 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                             size={'small'}
                             sx={{ mr: 1 }}
                           />
-                          {parseStringToSegments(highlightedString || '').map((segment, index) => (
-                            <MqText
-                              subdued
-                              small
-                              key={`${key}-${highlightedString}-${segment.text}-${index}`}
-                              inline
-                              highlight={segment.isBold}
-                            >
-                              {segment.text}
-                            </MqText>
-                          ))}
+                          <Box>
+                            {parseStringToSegments(highlightedString || '').map(
+                              (segment, index) => (
+                                <MqText
+                                  subdued
+                                  small
+                                  key={`${key}-${highlightedString}-${segment.text}-${index}`}
+                                  inline
+                                  highlight={segment.isHighlighted}
+                                >
+                                  {segment.text}
+                                </MqText>
+                              )
+                            )}
+                          </Box>
                         </Box>
                       )
                     })
                   })}
                 </Box>
-              </Box>
-              <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
-              <Box>
-                <MqText subdued>{'Namespace'}</MqText>
-                <MqText font={'mono'}>{hit.namespace}</MqText>
               </Box>
               {hit.facets.sourceCode?.language && (
                 <>
@@ -227,13 +235,22 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               <Box display={'flex'} alignItems={'center'}>
                 <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />
               </Box>
-              <Box ml={2}>
+              <Box ml={2} width={280} minWidth={280}>
                 <MQTooltip title={hit.name}>
                   <Box>
-                    <MqText>{truncateText(hit.name, 20)}</MqText>
+                    <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
                   </Box>
                 </MQTooltip>
-                <Box display={'flex'}>
+                <MQTooltip title={hit.namespace}>
+                  <Box>
+                    <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                  </Box>
+                </MQTooltip>
+              </Box>
+              <Divider orientation={'vertical'} sx={{ mx: 1 }} flexItem />
+              <Box>
+                <MqText subdued>Match</MqText>
+                <Box>
                   {Object.entries(esSearchDatasets.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
                       return (
@@ -251,7 +268,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                               small
                               key={`${key}-${highlightedString}-${segment.text}-${index}`}
                               inline
-                              highlight={segment.isBold}
+                              highlight={segment.isHighlighted}
                             >
                               {segment.text}
                             </MqText>
@@ -261,11 +278,6 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                     })
                   })}
                 </Box>
-              </Box>
-              <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
-              <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued>{'Namespace'}</MqText>
-                <MqText font={'mono'}>{hit.namespace}</MqText>
               </Box>
               <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
               <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>

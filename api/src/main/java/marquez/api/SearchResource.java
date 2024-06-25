@@ -99,6 +99,7 @@ public class SearchResource {
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
     if (this.elasticsearchClient != null) {
       String[] fields = {
+        "facets.sql.query",
         "facets.sourceCode.sourceCode",
         "facets.sourceCode.language",
         "run_id",
