@@ -10,6 +10,7 @@ import { IState } from '../../../store/reducers'
 import { Nullable } from '../../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { debounce } from 'lodash'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
@@ -19,7 +20,7 @@ import Box from '@mui/system/Box'
 import MQTooltip from '../../core/tooltip/MQTooltip'
 import MqEmpty from '../../core/empty/MqEmpty'
 import MqText from '../../core/text/MqText'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 interface StateProps {
   esSearchJobs: IEsSearchJobsState
@@ -78,6 +79,9 @@ const useArrowKeys = (callback: (direction: 'up' | 'down') => void) => {
   }, [callback])
 }
 
+const FIELDS_TO_PRINT = 5
+const DEBOUNCE_TIME_MS = 500
+
 const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
   fetchEsSearchJobs,
@@ -102,10 +106,20 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
     }
   })
 
+  const debouncedFetchJobs = useCallback(
+    debounce((searchTerm) => fetchEsSearchJobs(searchTerm), DEBOUNCE_TIME_MS),
+    []
+  )
+
+  const debouncedFetchDatasets = useCallback(
+    debounce((searchTerm) => fetchEsSearchDatasets(searchTerm), DEBOUNCE_TIME_MS),
+    []
+  )
+
   useEffect(() => {
-    fetchEsSearchJobs(search)
-    fetchEsSearchDatasets(search)
-  }, [search, fetchEsSearchJobs])
+    debouncedFetchJobs(search)
+    debouncedFetchDatasets(search)
+  }, [search, debouncedFetchJobs, debouncedFetchDatasets])
 
   useEffect(() => {
     setSelectedIndex(null)
@@ -281,8 +295,25 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               </Box>
               <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
               <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued>Total Fields</MqText>
-                <MqText font={'mono'}>{hit.facets.schema.fields.length.toString()} fields</MqText>
+                <MqText subdued>Fields</MqText>
+                <Box display={'flex'} alignItems={'center'}>
+                  {hit.facets.schema.fields.slice(0, FIELDS_TO_PRINT).map((field) => {
+                    return (
+                      <Chip
+                        key={field.name}
+                        label={field.name}
+                        variant={'outlined'}
+                        size={'small'}
+                        sx={{ mr: 1 }}
+                      />
+                    )
+                  })}
+                  {hit.facets.schema.fields.length > FIELDS_TO_PRINT && (
+                    <MqText inline subdued>{`+ ${
+                      hit.facets.schema.fields.length - FIELDS_TO_PRINT
+                    }`}</MqText>
+                  )}
+                </Box>
               </Box>
             </Box>
           </Box>
