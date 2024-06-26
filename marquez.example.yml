@@ -66,6 +66,13 @@ logging:
     #   environment: ${SENTRY_ENVIRONMENT}
     #   stacktraceAppPackages: ['marquez']
 
+elastic:
+  enabled: true
+  scheme: http
+  host: search
+  port: 9200
+  password: ${ELASTIC_PASSWORD}
+
 ### TRACING ###
 
 # Enables tracing with sentry (see: https://docs.sentry.io/product/sentry-basics/tracing/distributed-tracing)

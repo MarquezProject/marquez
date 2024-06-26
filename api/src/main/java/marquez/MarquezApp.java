@@ -40,13 +40,20 @@ import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
+import marquez.search.ElasticConfig;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -136,7 +143,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
-    final ElasticsearchClient elasticsearchClient = newElasticsearchClient();
+    final ElasticsearchClient elasticsearchClient = newElasticsearchClient(config.getElasticConfig());
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)
@@ -159,15 +166,17 @@ public final class MarquezApp extends Application<MarquezConfig> {
     Exclusions.use(exclusions);
   }
 
-  private ElasticsearchClient newElasticsearchClient() {
+  private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
     String host = "search";
     int port = 9200;
+
+    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
+
     RestClient restClient =
-        RestClient.builder(new HttpHost(host, port, "http"))
-            .setDefaultHeaders(
-                new Header[] {
-                  //                    new BasicHeader("Authorization", "ApiKey " + apiKey)
-                })
+        RestClient.builder(new HttpHost(elasticConfig.getHost(), elasticConfig.getPort(), elasticConfig.getScheme()))
+                .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();
     ElasticsearchTransport transport =
         new RestClientTransport(restClient, new JacksonJsonpMapper());

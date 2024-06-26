@@ -210,7 +210,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   })}
                 </Box>
               </Box>
-              {hit.facets.sourceCode?.language && (
+              {hit.facets?.sourceCode?.language && (
                 <>
                   <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
                   <Box>
@@ -218,7 +218,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                     <Chip
                       size={'small'}
                       variant={'outlined'}
-                      label={hit.facets.sourceCode.language}
+                      label={hit.facets?.sourceCode.language}
                     />
                   </Box>
                 </>

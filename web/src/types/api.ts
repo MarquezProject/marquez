@@ -300,7 +300,7 @@ interface JobHit {
   namespace: string
   eventType: string
   type: string
-  facets: EsSearchFacet
+  facets?: EsSearchFacet
 }
 
 interface JobHighlight {
