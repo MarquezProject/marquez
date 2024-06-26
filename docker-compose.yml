@@ -23,7 +23,7 @@ services:
       - db:${POSTGRES_PORT}
       - --
       - /opt/marquez/wait-for-it.sh
-      - search:9200
+      - search:${ELASTICSEARCH_PORT}
       - --
       - ./entrypoint.sh
 

@@ -167,9 +167,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
-    String host = "search";
-    int port = 9200;
-
     final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY,
             new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
