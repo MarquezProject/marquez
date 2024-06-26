@@ -153,20 +153,22 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
             }}
           >
             <Box display={'flex'}>
-              <Box display={'flex'} alignItems={'center'}>
-                <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
-              </Box>
-              <Box ml={2} width={280} minWidth={280}>
-                <MQTooltip title={hit.name}>
-                  <Box>
-                    <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
-                  </Box>
-                </MQTooltip>
-                <MQTooltip title={hit.namespace}>
-                  <Box>
-                    <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
-                  </Box>
-                </MQTooltip>
+              <Box display={'flex'}>
+                <Box display={'flex'} alignItems={'center'} height={42}>
+                  <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />
+                </Box>
+                <Box ml={2} width={280} minWidth={280}>
+                  <MQTooltip title={hit.name}>
+                    <Box>
+                      <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
+                    </Box>
+                  </MQTooltip>
+                  <MQTooltip title={hit.namespace}>
+                    <Box>
+                      <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                    </Box>
+                  </MQTooltip>
+                </Box>
               </Box>
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
               <Box>
@@ -246,20 +248,22 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
             }}
           >
             <Box display={'flex'}>
-              <Box display={'flex'} alignItems={'center'}>
-                <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />
-              </Box>
-              <Box ml={2} width={280} minWidth={280}>
-                <MQTooltip title={hit.name}>
-                  <Box>
-                    <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
-                  </Box>
-                </MQTooltip>
-                <MQTooltip title={hit.namespace}>
-                  <Box>
-                    <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
-                  </Box>
-                </MQTooltip>
+              <Box display={'flex'}>
+                <Box display={'flex'} alignItems={'center'} height={42}>
+                  <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />
+                </Box>
+                <Box ml={2} width={280} minWidth={280}>
+                  <MQTooltip title={hit.name}>
+                    <Box>
+                      <MqText font={'mono'}>{truncateText(hit.name, 30)}</MqText>
+                    </Box>
+                  </MQTooltip>
+                  <MQTooltip title={hit.namespace}>
+                    <Box>
+                      <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                    </Box>
+                  </MQTooltip>
+                </Box>
               </Box>
               <Divider orientation={'vertical'} sx={{ mx: 1 }} flexItem />
               <Box>
