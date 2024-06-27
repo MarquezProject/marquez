@@ -11,6 +11,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -177,8 +178,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
                 httpClientBuilder ->
                     httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();
-    ElasticsearchTransport transport =
-        new RestClientTransport(restClient, new JacksonJsonpMapper());
+    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
+    // register JavaTimeModule to handle ZonedDateTime
+    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
+    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
     return new ElasticsearchClient(transport);
   }
 
