@@ -102,6 +102,7 @@ public class SearchResource {
         "facets.sql.query",
         "facets.sourceCode.sourceCode",
         "facets.sourceCode.language",
+        "runFacets.processing_engine.name",
         "run_id",
         "name",
         "namespace",

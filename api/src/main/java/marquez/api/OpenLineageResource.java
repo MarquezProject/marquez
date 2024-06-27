@@ -14,8 +14,13 @@ import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -116,13 +121,25 @@ public class OpenLineageResource extends BaseResource {
 
   private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
     Map<String, Object> jsonMap = new HashMap<>();
+
     jsonMap.put("run_id", runUuid.toString());
     jsonMap.put("eventType", event.getEventType());
     jsonMap.put("name", event.getJob().getName());
     jsonMap.put("type", event.getJob().isStreamingJob() ? "STREAM" : "BATCH");
     jsonMap.put("namespace", event.getJob().getNamespace());
     jsonMap.put("facets", event.getJob().getFacets());
+    // note event.getRun().getFacets() has a serialization issue with jackson;
+    jsonMap.put("runFacets", event.getRun().getFacets().getAdditionalFacets());
     return jsonMap;
+  }
+
+  public ObjectMapper objectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+    return mapper;
   }
 
   private Map<String, Object> buildDatasetIndexRequest(

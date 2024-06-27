@@ -301,6 +301,69 @@ interface JobHit {
   eventType: string
   type: string
   facets?: EsSearchFacet
+  runFacets: EsSearchRunFacet
+}
+
+interface SparkLogicalPlan {
+  _producer: string
+  _schemaURL: string
+  plan: Plan[]
+}
+
+interface Plan {
+  class: string
+  numChildren: number
+  ifPartitionNotExists?: boolean
+  partitionColumns?: any[]
+  query?: number
+  outputColumnNames?: string
+  output?: AttributeReference[][]
+  isStreaming?: boolean
+}
+
+interface AttributeReference {
+  class: string
+  numChildren: number
+  name: string
+  dataType: string
+  nullable: boolean
+  metadata: Record<string, any>
+  exprId: ExprId
+  qualifier: any[]
+}
+
+interface ExprId {
+  productClass: string
+  id: number
+  jvmId: string
+}
+
+interface SparkVersion {
+  _producer: string
+  _schemaURL: string
+  sparkVersion: string
+  openlineageSparkVersion: string
+}
+
+interface ProcessingEngine {
+  _producer: string
+  _schemaURL: string
+  version: string
+  name: string
+  openlineageAdapterVersion: string
+}
+
+interface EnvironmentProperties {
+  _producer: string
+  _schemaURL: string
+  environmentProperties: Record<string, any>
+}
+
+interface EsSearchRunFacet {
+  'spark.logicalPlan'?: SparkLogicalPlan
+  spark_version?: SparkVersion
+  processing_engine?: ProcessingEngine
+  'environment-properties'?: EnvironmentProperties
 }
 
 interface JobHighlight {

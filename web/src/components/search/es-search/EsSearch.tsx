@@ -21,6 +21,8 @@ import MQTooltip from '../../core/tooltip/MQTooltip'
 import MqEmpty from '../../core/empty/MqEmpty'
 import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
+import airflow_logo from './airlfow-logo.svg'
+import spark_logo from './spark-logo.svg'
 
 interface StateProps {
   esSearchJobs: IEsSearchJobsState
@@ -57,9 +59,9 @@ function parseStringToSegments(input: string): TextSegment[] {
   })
 }
 
-function getValueAfterLastPeriod(s: string) {
-  return s.split('.').pop()
-}
+// function getValueAfterLastPeriod(s: string) {
+//   return s.split('.').pop()
+// }
 
 const useArrowKeys = (callback: (direction: 'up' | 'down') => void) => {
   useEffect(() => {
@@ -170,6 +172,23 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   </MQTooltip>
                 </Box>
               </Box>
+
+              {hit.runFacets?.processing_engine && (
+                <>
+                  <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
+                  <Box>
+                    <MqText subdued>{'Integration'}</MqText>
+                    {hit.runFacets.processing_engine.name === 'spark' ? (
+                      <img src={spark_logo} height={24} alt='Spark' />
+                    ) : hit.runFacets.processing_engine.name === 'Airflow' ? (
+                      <img src={airflow_logo} height={24} alt='Airflow' />
+                    ) : (
+                      <Chip size={'small'} label={hit.runFacets?.processing_engine.name} />
+                    )}
+                  </Box>
+                </>
+              )}
+
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
               <Box>
                 <MqText subdued>Match</MqText>
@@ -183,12 +202,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                           alignItems={'center'}
                           mb={0.5}
                         >
-                          <Chip
-                            label={getValueAfterLastPeriod(key)}
-                            variant={'outlined'}
-                            size={'small'}
-                            sx={{ mr: 1 }}
-                          />
+                          <Chip label={key} variant={'outlined'} size={'small'} sx={{ mr: 1 }} />
                           <Box>
                             {parseStringToSegments(highlightedString || '').map(
                               (segment, index) => (
