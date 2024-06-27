@@ -114,8 +114,8 @@ export function datasetFacetsQualityAssertions(facets: DataQualityFacets) {
   } else return assertions
 }
 
-export function datasetFacetsStatus(facets: DataQualityFacets, limit = 14) {
-  const assertions = facets?.dataQualityAssertions?.assertions?.slice(-limit)
+export function datasetFacetsStatus(facets: DataQualityFacets) {
+  const assertions = facets?.dataQualityAssertions?.assertions
 
   if (!assertions?.length) {
     return null
