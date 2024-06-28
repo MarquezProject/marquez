@@ -442,6 +442,7 @@ public interface JobVersionDao extends BaseDao {
         d.getDatasetRow().getCreatedAt(),
         d.getDatasetVersionRow().getDatasetUuid(),
         d.getDatasetVersionRow().getVersion(),
+        d.getDatasetVersionRow().getSchemaVersionUuid().orElse(null),
         null,
         null,
         d.getDatasetRow().getNamespaceName(),

@@ -5,11 +5,13 @@ import * as Effects from 'redux-saga/effects'
 import {
   ADD_DATASET_FIELD_TAG,
   ADD_DATASET_TAG,
+  ADD_JOB_TAG,
   ADD_TAGS,
   DELETE_DATASET,
   DELETE_DATASET_FIELD_TAG,
   DELETE_DATASET_TAG,
   DELETE_JOB,
+  DELETE_JOB_TAG,
   FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
@@ -17,6 +19,7 @@ import {
   FETCH_EVENTS,
   FETCH_JOBS,
   FETCH_JOB_FACETS,
+  FETCH_JOB_TAGS,
   FETCH_LINEAGE,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
@@ -44,15 +47,18 @@ import { Search } from '../../types/api'
 import {
   addDatasetFieldTag,
   addDatasetTag,
+  addJobTag,
   addTags,
   deleteDataset,
   deleteDatasetFieldTag,
   deleteDatasetTag,
   deleteJob,
+  deleteJobTag,
   getDataset,
   getDatasetVersions,
   getDatasets,
   getEvents,
+  getJob,
   getJobFacets,
   getJobs,
   getNamespaces,
@@ -63,18 +69,21 @@ import {
 import {
   addDatasetFieldTagSuccess,
   addDatasetTagSuccess,
+  addJobTagSuccess,
   addTagsSuccess,
   applicationError,
   deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
   deleteDatasetTagSuccess,
   deleteJobSuccess,
+  deleteJobTagSuccess,
   fetchColumnLineageSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
+  fetchJobTagsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
@@ -178,6 +187,18 @@ export function* fetchJobsSaga() {
   }
 }
 
+export function* fetchJobTagsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOB_TAGS)
+      const response: Job = yield call(getJob, payload.namespace, payload.job)
+      yield put(fetchJobTagsSuccess(response.tags))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching job runs'))
+    }
+  }
+}
+
 export function* deleteJobSaga() {
   while (true) {
     try {
@@ -249,6 +270,18 @@ export function* deleteDatasetSaga() {
   }
 }
 
+export function* deleteJobTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_JOB_TAG)
+      yield call(deleteJobTag, payload.namespace, payload.jobName, payload.tag)
+      yield put(deleteJobTagSuccess(payload.namespace, payload.jobName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from job'))
+    }
+  }
+}
+
 export function* deleteDatasetTagSaga() {
   while (true) {
     try {
@@ -282,6 +315,18 @@ export function* deleteDatasetFieldTagSaga() {
       )
     } catch (e) {
       yield put(applicationError('Something went wrong while removing tag from dataset field'))
+    }
+  }
+}
+
+export function* addJobTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_JOB_TAG)
+      yield call(addJobTag, payload.namespace, payload.jobName, payload.tag)
+      yield put(addJobTagSuccess(payload.namespace, payload.jobName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to job'))
     }
   }
 }
@@ -393,10 +438,13 @@ export default function* rootSaga(): Generator {
     deleteJobSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
+    deleteJobTagSaga(),
     addDatasetTagSaga(),
+    addJobTagSaga(),
     deleteDatasetFieldTagSaga(),
     addDatasetFieldTagSaga(),
     addTagsSaga(),
+    fetchJobTagsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

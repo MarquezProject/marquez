@@ -11,13 +11,7 @@ import {
 import { Box, createTheme } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Tag } from '../../types/api'
-import {
-  addDatasetFieldTag,
-  addDatasetTag,
-  addTags,
-  deleteDatasetFieldTag,
-  deleteDatasetTag,
-} from '../../store/actionCreators'
+import { addJobTag, addTags, deleteJobTag } from '../../store/actionCreators'
 import { bindActionCreators } from 'redux'
 import { connect, useSelector } from 'react-redux'
 import { useTheme } from '@emotion/react'
@@ -31,43 +25,30 @@ import DialogContent from '@mui/material/DialogContent'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
-import React, { useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import Snackbar from '@mui/material/Snackbar'
 
-interface DatasetTagsProps {
+interface JobTagsProps {
   namespace: string
-  datasetName: string
-  datasetTags: string[]
-  datasetField?: string
+  jobName: string
+  jobTags: string[]
 }
 
 interface DispatchProps {
-  deleteDatasetTag: typeof deleteDatasetTag
-  addDatasetTag: typeof addDatasetTag
-  deleteDatasetFieldTag: typeof deleteDatasetFieldTag
-  addDatasetFieldTag: typeof addDatasetFieldTag
+  deleteJobTag: typeof deleteJobTag
+  addJobTag: typeof addJobTag
   addTags: typeof addTags
 }
 
-type IProps = DatasetTagsProps & DispatchProps
+type IProps = JobTagsProps & DispatchProps
 
-const DatasetTags: React.FC<IProps> = (props) => {
-  const {
-    namespace,
-    datasetName,
-    datasetTags,
-    deleteDatasetTag,
-    addDatasetTag,
-    deleteDatasetFieldTag,
-    addDatasetFieldTag,
-    datasetField,
-    addTags,
-  } = props
+const JobTags: React.FC<IProps> = (props) => {
+  const { namespace, jobName, jobTags, deleteJobTag, addJobTag, addTags } = props
 
   const [listTag, setListTag] = useState('')
   const [openTagDesc, setOpenTagDesc] = useState(false)
   const [tagDescription, setTagDescription] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>(datasetTags)
+  const [selectedTags, setSelectedTags] = useState<string[]>(jobTags)
 
   const handleButtonClick = () => {
     setOpenTagDesc(true)
@@ -82,13 +63,13 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setTagDescription('')
   }
 
-  const handleTagDescChange = (_event: any, value: string) => {
+  const handleTagDescChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     const selectedTagData = tagData.find((tag) => tag.name === value)
     setListTag(value)
     setTagDescription(selectedTagData ? selectedTagData.description : '')
   }
 
-  const handleDescriptionChange = (event: any) => {
+  const handleDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTagDescription(event.target.value)
   }
 
@@ -106,16 +87,12 @@ const DatasetTags: React.FC<IProps> = (props) => {
       const newTag = details.option
       const newSelectedTags = selectedTags.filter((tag) => newTag !== tag)
       setSelectedTags(newSelectedTags)
-      datasetField
-        ? deleteDatasetFieldTag(namespace, datasetName, newTag, datasetField)
-        : deleteDatasetTag(namespace, datasetName, newTag)
+      deleteJobTag(namespace, jobName, newTag)
     } else if (details && !selectedTags.includes(details.option)) {
       const newTag = details.option
       const newSelectedTags = [...selectedTags, newTag]
       setSelectedTags(newSelectedTags)
-      datasetField
-        ? addDatasetFieldTag(namespace, datasetName, newTag, datasetField)
-        : addDatasetTag(namespace, datasetName, newTag)
+      addJobTag(namespace, jobName, newTag)
     }
   }
 
@@ -124,9 +101,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
     setSelectedTags(newSelectedTags)
 
-    datasetField
-      ? deleteDatasetFieldTag(namespace, datasetName, deletedTag, datasetField)
-      : deleteDatasetTag(namespace, datasetName, deletedTag)
+    deleteJobTag(namespace, jobName, deletedTag)
   }
 
   const addTag = () => {
@@ -170,26 +145,24 @@ const DatasetTags: React.FC<IProps> = (props) => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       />
       <Box display={'flex'} alignItems='center' justifyContent='center' width={'100%'}>
-        {!datasetField && (
-          <MQTooltip title='Edit a Tag' key='edit-tag'>
-            <Button
-              variant='outlined'
-              onClick={handleButtonClick}
-              color='primary'
-              sx={{ marginRight: '8px' }}
-              style={{ paddingTop: '6.75px', paddingBottom: '6.75px' }}
-              startIcon={<LocalOfferIcon />}
-            >
-              Edit Tag
-            </Button>
-          </MQTooltip>
-        )}
+        <MQTooltip title='Edit a Tag' key='edit-tag'>
+          <Button
+            variant='outlined'
+            onClick={handleButtonClick}
+            color='primary'
+            sx={{ marginRight: '8px' }}
+            style={{ paddingTop: '6.75px', paddingBottom: '6.75px' }}
+            startIcon={<LocalOfferIcon />}
+          >
+            Edit Tag
+          </Button>
+        </MQTooltip>
         <Autocomplete
           multiple
           disableCloseOnSelect
           id='dataset-tags'
-          sx={{ flex: 1, width: datasetField ? 494 : 'auto' }}
-          limitTags={!datasetField ? 8 : 6}
+          sx={{ flex: 1, width: 'auto' }}
+          limitTags={6}
           autoHighlight
           disableClearable
           disablePortal
@@ -215,12 +188,11 @@ const DatasetTags: React.FC<IProps> = (props) => {
           )}
           renderInput={(params) => (
             <TextField
-              variant={!datasetField ? 'outlined' : 'standard'}
+              variant={'outlined'}
               {...params}
               placeholder={selectedTags.length > 0 ? '' : 'Search Tags'}
               InputProps={{
                 ...params.InputProps,
-                ...(datasetField ? { disableUnderline: true } : {}),
               }}
               InputLabelProps={{
                 shrink: true,
@@ -247,9 +219,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
           <MQText label sx={{ fontSize: '1.25rem' }} bottomMargin>
             Select a Tag to change
           </MQText>
-          <MQText label sx={{ fontSize: '0.85rem' }}>
-            Tag
-          </MQText>
+          <MQText label sx={{ fontSize: '0.85rem' }}>Tag</MQText>
           <Autocomplete
             options={tagData.map((option) => option.name)}
             autoSelect
@@ -310,13 +280,11 @@ const DatasetTags: React.FC<IProps> = (props) => {
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      deleteDatasetTag: deleteDatasetTag,
-      addDatasetTag: addDatasetTag,
-      deleteDatasetFieldTag: deleteDatasetFieldTag,
-      addDatasetFieldTag: addDatasetFieldTag,
+      deleteJobTag: deleteJobTag,
+      addJobTag: addJobTag,
       addTags: addTags,
     },
     dispatch
   )
 
-export default connect(null, mapDispatchToProps)(DatasetTags)
+export default connect(null, mapDispatchToProps)(JobTags)

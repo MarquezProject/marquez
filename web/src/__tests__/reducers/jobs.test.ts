@@ -18,7 +18,7 @@ describe('jobs reducer', () => {
         jobs: jobs as Job[]
       }
     } as IJobsAction
-    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, totalCount: 13, init: true, deletedJobName: '' })
+    expect(jobsReducer(initialState, action)).toStrictEqual({ isLoading: false, result: jobs, totalCount: 13, init: true, deletedJobName: '', jobTags:[] })
   })
 })
 
