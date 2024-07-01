@@ -298,7 +298,7 @@ interface JobHit {
   run_id: string
   name: string
   namespace: string
-  eventType: string
+  eventType: EventType
   type: string
   facets?: EsSearchFacet
   runFacets: EsSearchRunFacet

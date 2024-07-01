@@ -11,6 +11,7 @@ import { Nullable } from '../../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { debounce } from 'lodash'
+import { eventTypeColor } from '../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
@@ -19,6 +20,7 @@ import { truncateText } from '../../../helpers/text'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../core/tooltip/MQTooltip'
 import MqEmpty from '../../core/empty/MqEmpty'
+import MqStatus from '../../core/status/MqStatus'
 import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
@@ -167,17 +169,27 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   </MQTooltip>
                   <MQTooltip title={hit.namespace}>
                     <Box>
-                      <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                      <MqText subdued label>
+                        {truncateText(hit.namespace, 30)}
+                      </MqText>
                     </Box>
                   </MQTooltip>
                 </Box>
               </Box>
-
+              <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
+              <Box>
+                <MqText subdued label>
+                  Last State
+                </MqText>
+                <MqStatus color={eventTypeColor(hit.eventType)} label={hit.eventType} />
+              </Box>
               {hit.runFacets?.processing_engine && (
                 <>
                   <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
                   <Box>
-                    <MqText subdued>{'Integration'}</MqText>
+                    <MqText subdued label>
+                      {'Integration'}
+                    </MqText>
                     {hit.runFacets.processing_engine.name === 'spark' ? (
                       <img src={spark_logo} height={24} alt='Spark' />
                     ) : hit.runFacets.processing_engine.name === 'Airflow' ? (
@@ -191,7 +203,9 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
               <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
               <Box>
-                <MqText subdued>Match</MqText>
+                <MqText subdued label>
+                  Match
+                </MqText>
                 <Box>
                   {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
@@ -202,7 +216,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                           alignItems={'center'}
                           mb={0.5}
                         >
-                          <Chip label={key} variant={'outlined'} size={'small'} sx={{ mr: 1 }} />
+                          {/*<Chip label={key} variant={'outlined'} size={'small'} sx={{ mr: 1 }} />*/}
+                          <MqText inline bold sx={{ mr: 1 }}>
+                            {`${key}: `}
+                          </MqText>
                           <Box>
                             {parseStringToSegments(highlightedString || '').map(
                               (segment, index) => (
@@ -228,7 +245,9 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 <>
                   <Divider flexItem sx={{ mx: 1 }} orientation={'vertical'} />
                   <Box>
-                    <MqText subdued>{'Language'}</MqText>
+                    <MqText subdued label>
+                      {'Language'}
+                    </MqText>
                     <Chip
                       size={'small'}
                       variant={'outlined'}
@@ -274,14 +293,18 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   </MQTooltip>
                   <MQTooltip title={hit.namespace}>
                     <Box>
-                      <MqText subdued>{truncateText(hit.namespace, 30)}</MqText>
+                      <MqText subdued label>
+                        {truncateText(hit.namespace, 30)}
+                      </MqText>
                     </Box>
                   </MQTooltip>
                 </Box>
               </Box>
               <Divider orientation={'vertical'} sx={{ mx: 1 }} flexItem />
               <Box>
-                <MqText subdued>Match</MqText>
+                <MqText subdued label>
+                  Match
+                </MqText>
                 <Box>
                   {Object.entries(esSearchDatasets.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
@@ -313,8 +336,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               </Box>
               <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
               <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued>Fields</MqText>
-                <Box display={'flex'} alignItems={'center'}>
+                <MqText subdued label>
+                  Fields
+                </MqText>
+                <Box>
                   {hit.facets.schema.fields.slice(0, FIELDS_TO_PRINT).map((field) => {
                     return (
                       <Chip
