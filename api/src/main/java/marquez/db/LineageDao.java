@@ -100,6 +100,13 @@ public interface LineageDao {
 
   @SqlQuery(
       """
+    SELECT j.*, NULL as input_uuids, NULL AS output_uuids FROM jobs_view j
+    WHERE j.parent_job_uuid= :jobId
+    LIMIT 1""")
+  Optional<JobData> getParentJobData(UUID jobId);
+
+  @SqlQuery(
+      """
       SELECT ds.*, dv.fields, dv.lifecycle_state
       FROM datasets_view ds
       LEFT JOIN dataset_versions dv ON dv.uuid = ds.current_version_uuid

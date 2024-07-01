@@ -34,6 +34,7 @@ public class JobData implements NodeData {
   @NonNull JobName name;
   @NonNull String simpleName;
   @Nullable String parentJobName;
+  @Nullable UUID parentJobUuid;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;
@@ -70,5 +71,9 @@ public class JobData implements NodeData {
   @JsonIgnore
   public Set<UUID> getOutputUuids() {
     return outputUuids;
+  }
+
+  public UUID getParentJobUuid() {
+    return parentJobUuid;
   }
 }
