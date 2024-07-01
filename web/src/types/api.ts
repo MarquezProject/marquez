@@ -280,3 +280,153 @@ export interface ColumnLineageOutEdge {
   origin: string
   destination: string
 }
+
+// esSearch
+
+// jobs
+interface SourceCodeFacet {
+  language: string
+  _producer: string
+  _schemaURL: string
+  sourceCode: string
+}
+
+interface EsSearchFacet {
+  sourceCode?: SourceCodeFacet
+}
+
+interface JobHit {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: EventType
+  type: string
+  facets?: EsSearchFacet
+  runFacets: EsSearchRunFacet
+}
+
+interface SparkLogicalPlan {
+  _producer: string
+  _schemaURL: string
+  plan: Plan[]
+}
+
+interface Plan {
+  class: string
+  numChildren: number
+  ifPartitionNotExists?: boolean
+  partitionColumns?: any[]
+  query?: number
+  outputColumnNames?: string
+  output?: AttributeReference[][]
+  isStreaming?: boolean
+}
+
+interface AttributeReference {
+  class: string
+  numChildren: number
+  name: string
+  dataType: string
+  nullable: boolean
+  metadata: Record<string, any>
+  exprId: ExprId
+  qualifier: any[]
+}
+
+interface ExprId {
+  productClass: string
+  id: number
+  jvmId: string
+}
+
+interface SparkVersion {
+  _producer: string
+  _schemaURL: string
+  sparkVersion: string
+  openlineageSparkVersion: string
+}
+
+interface ProcessingEngine {
+  _producer: string
+  _schemaURL: string
+  version: string
+  name: string
+  openlineageAdapterVersion: string
+}
+
+interface EnvironmentProperties {
+  _producer: string
+  _schemaURL: string
+  environmentProperties: Record<string, any>
+}
+
+interface EsSearchRunFacet {
+  'spark.logicalPlan'?: SparkLogicalPlan
+  spark_version?: SparkVersion
+  processing_engine?: ProcessingEngine
+  'environment-properties'?: EnvironmentProperties
+}
+
+interface JobHighlight {
+  'facets.sourceCode.sourceCode'?: string[]
+}
+
+export interface EsSearchResultJobs {
+  hits: JobHit[]
+  highlights: JobHighlight[]
+}
+
+// datasets
+type DatasetHighlight = {
+  [key: string]: string[]
+}
+
+type SearchInputField = {
+  namespace: string
+  name: string
+  field: string
+}
+
+type ColumnLineageField = {
+  inputFields: SearchInputField[]
+  transformationDescription: string
+  transformationType: string
+}
+
+type SchemaField = {
+  name: string
+  type: string
+  fields: any[]
+}
+
+type SchemaFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: SchemaField[]
+}
+
+type ColumnLineageFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: {
+    [key: string]: ColumnLineageField
+  }
+}
+
+type EsSearchDatasetFacets = {
+  schema: SchemaFacet
+  columnLineage: ColumnLineageFacet
+}
+
+type DatasetHit = {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: string
+  facets: EsSearchDatasetFacets
+}
+
+export type EsSearchResultDatasets = {
+  hits: DatasetHit[]
+  highlights: DatasetHighlight[]
+}

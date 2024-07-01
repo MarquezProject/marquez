@@ -5,8 +5,13 @@
 
 package marquez;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -36,10 +41,16 @@ import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
+import marquez.search.ElasticConfig;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.elasticsearch.client.RestClient;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -129,8 +140,14 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
+    final ElasticsearchClient elasticsearchClient =
+        newElasticsearchClient(config.getElasticConfig());
     final MarquezContext marquezContext =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+        MarquezContext.builder()
+            .jdbi(jdbi)
+            .elasticsearchClient(elasticsearchClient)
+            .tags(config.getTags())
+            .build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);
@@ -145,6 +162,27 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // set namespaceFilter
     ExclusionsConfig exclusions = config.getExclude();
     Exclusions.use(exclusions);
+  }
+
+  private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
+    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(
+        AuthScope.ANY,
+        new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
+
+    RestClient restClient =
+        RestClient.builder(
+                new HttpHost(
+                    elasticConfig.getHost(), elasticConfig.getPort(), elasticConfig.getScheme()))
+            .setHttpClientConfigCallback(
+                httpClientBuilder ->
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+            .build();
+    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
+    // register JavaTimeModule to handle ZonedDateTime
+    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
+    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
+    return new ElasticsearchClient(transport);
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

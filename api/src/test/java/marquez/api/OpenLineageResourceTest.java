@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableSortedSet;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -54,7 +55,9 @@ class OpenLineageResourceTest {
 
     UNDER_TEST =
         ResourceExtension.builder()
-            .addResource(new OpenLineageResource(serviceFactory, openLineageDao))
+            .addResource(
+                new OpenLineageResource(
+                    serviceFactory, new ElasticsearchClient(null), openLineageDao))
             .build();
   }
 

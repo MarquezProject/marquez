@@ -16,6 +16,8 @@ import {
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
+  FETCH_ES_SEARCH_DATASETS,
+  FETCH_ES_SEARCH_JOBS,
   FETCH_EVENTS,
   FETCH_JOBS,
   FETCH_JOB_FACETS,
@@ -30,6 +32,8 @@ import {
   Dataset,
   DatasetVersion,
   Datasets,
+  EsSearchResultDatasets,
+  EsSearchResultJobs,
   Events,
   Facets,
   Jobs,
@@ -81,6 +85,8 @@ import {
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
+  fetchEsSearchDatasetsSuccess,
+  fetchEsSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
   fetchJobTagsSuccess,
@@ -92,8 +98,8 @@ import {
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
+import { getEsSearchDatasets, getEsSearchJobs, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
-import { getSearch } from '../requests/search'
 
 export function* fetchTags() {
   try {
@@ -421,6 +427,33 @@ export function* fetchRunFacetsSaga() {
   }
 }
 
+export function* fetchEsSearchJobsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_ES_SEARCH_JOBS)
+      const EsSearchResultJobs: EsSearchResultJobs = yield call(getEsSearchJobs, payload.q)
+      yield put(fetchEsSearchJobsSuccess(EsSearchResultJobs))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while searching'))
+    }
+  }
+}
+
+export function* fetchEsSearchDatasetsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_ES_SEARCH_DATASETS)
+      const EsSearchResultDatasets: EsSearchResultDatasets = yield call(
+        getEsSearchDatasets,
+        payload.q
+      )
+      yield put(fetchEsSearchDatasetsSuccess(EsSearchResultDatasets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while searching'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -436,6 +469,8 @@ export default function* rootSaga(): Generator {
     fetchColumnLineage(),
     fetchSearch(),
     deleteJobSaga(),
+    fetchEsSearchJobsSaga(),
+    fetchEsSearchDatasetsSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
     deleteJobTagSaga(),

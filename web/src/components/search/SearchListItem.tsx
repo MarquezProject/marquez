@@ -18,7 +18,6 @@ interface OwnProps {
   searchResult: SearchResult
   search: string
   onClick: (nodeName: string) => void
-  selected: boolean
 }
 
 const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
@@ -28,12 +27,7 @@ const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
 
 type DkSearchListItemProps = OwnProps
 
-const SearchListItem: React.FC<DkSearchListItemProps> = ({
-  searchResult,
-  search,
-  onClick,
-  selected,
-}) => {
+const SearchListItem: React.FC<DkSearchListItemProps> = ({ searchResult, search, onClick }) => {
   const name = searchResult.name.substring(
     searchResult.name.lastIndexOf('.') + 1,
     searchResult.name.length
@@ -48,7 +42,6 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({
       to={`/lineage/${encodeNode(searchResult.type, searchResult.namespace, searchResult.name)}`}
     >
       <Box
-        className={selected ? 'selected' : ''}
         sx={{
           display: 'block',
           color: 'inherit',
@@ -63,12 +56,12 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({
             borderBottomLeftRadius: '2px',
             borderBottomRightRadius: '2px',
           },
-          '&:hover, &.selected': {
+          '&:hover': {
             backgroundColor: darken(theme.palette.background.paper, 0.02),
           },
           '&:nth-pf-type(even)': {
             backgroundColor: darken(theme.palette.background.paper, 0.2),
-            '&:hover, &.selected': {
+            '&:hover': {
               backgroundColor: darken(theme.palette.background.paper, 0.02),
             },
           },

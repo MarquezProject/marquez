@@ -44,7 +44,7 @@ const MqChip: React.FC<MqChipProps> = ({
         padding: '2px 12px',
         cursor: 'pointer',
         userSelect: 'none',
-        boxShadow: selected ? `0 0 2px 3px ${theme.palette.common.white}` : 'initial',
+        boxShadow: selected ? `0 0 1px 1px ${theme.palette.secondary.main}` : 'initial',
       }}
       onClick={() => {
         if (selectable !== false && onSelect) {

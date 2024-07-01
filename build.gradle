@@ -52,7 +52,9 @@ subprojects {
 
     ext {
         assertjVersion = '3.25.3'
+        elasticsearchVersion = '8.13.4'
         dropwizardVersion = '2.1.12'
+        jacksonDatabindVersion = '2.12.3'
         jacocoVersion = '0.8.11'
         junit5Version = '5.10.2'
         lombokVersion = '1.18.32'
@@ -64,6 +66,8 @@ subprojects {
 
     dependencies {
         implementation "org.projectlombok:lombok:${lombokVersion}"
+        implementation "co.elastic.clients:elasticsearch-java:${elasticsearchVersion}"
+        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
         testImplementation "org.assertj:assertj-core:${assertjVersion}"

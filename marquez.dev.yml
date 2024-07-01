@@ -23,6 +23,14 @@ logging:
   appenders:
     - type: console
 
+elastic:
+  enabled: true
+  scheme: http
+  host: search
+  port: 9200
+  username: elastic
+  password: elastic
+
 tags:
   - name: PII
     description: Personally identifiable information
