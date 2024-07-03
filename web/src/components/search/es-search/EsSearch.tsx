@@ -25,6 +25,7 @@ import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
 import spark_logo from './spark-logo.svg'
+import {useNavigate} from "react-router-dom";
 
 interface StateProps {
   esSearchJobs: IEsSearchJobsState
@@ -94,6 +95,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   esSearchDatasets,
 }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
+  const navigate = useNavigate()
 
   useArrowKeys((direction) => {
     if (direction === 'up') {
@@ -143,6 +145,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
         return (
           <Box
             key={hit.run_id}
+            onClick={() => navigate(`/lineage/job/${hit.namespace}/${hit.name}`)}
             px={2}
             py={1}
             borderBottom={1}
@@ -264,6 +267,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
         return (
           <Box
             key={hit.run_id}
+            onClick={() => navigate(`/lineage/dataset/${hit.namespace}/${hit.name}`)}
             px={2}
             py={1}
             borderBottom={1}
