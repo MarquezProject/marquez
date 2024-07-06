@@ -189,8 +189,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
           multiple
           disableCloseOnSelect
           id='dataset-tags'
-          sx={{ flex : 1,  width: datasetField ? 494 : 'auto' }}
-          limitTags={!datasetField ?  8 : 6}
+          sx={{ flex: 1, width: datasetField ? 494 : 'auto' }}
+          limitTags={!datasetField ? 8 : 6}
           autoHighlight
           disableClearable
           disablePortal

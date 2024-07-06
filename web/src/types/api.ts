@@ -413,8 +413,8 @@ type ColumnLineageFacet = {
 }
 
 type EsSearchDatasetFacets = {
-  schema: SchemaFacet
-  columnLineage: ColumnLineageFacet
+  schema?: SchemaFacet
+  columnLineage?: ColumnLineageFacet
 }
 
 type DatasetHit = {
@@ -422,7 +422,7 @@ type DatasetHit = {
   name: string
   namespace: string
   eventType: string
-  facets: EsSearchDatasetFacets
+  facets?: EsSearchDatasetFacets
 }
 
 export type EsSearchResultDatasets = {

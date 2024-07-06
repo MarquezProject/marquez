@@ -85,11 +85,6 @@ public class SearchResource {
     return Response.ok(new SearchResults(searchResults)).build();
   }
 
-  /**
-   * { "query": { "multi_match": { "type": "phrase_prefix", "query": "${query}", "fields": [
-   * "facets.sourceCode.sourceCode", "facets.sourceCode.language", "run_id", "name", "namespace",
-   * "type" ], "operator": "or" } } }
-   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -137,14 +132,6 @@ public class SearchResource {
     }
   }
 
-  /**
-   * { "query": { "multi_match": { "query": "id", "fields": [ "facets.schema.fields.name",
-   * "facets.schema.fields.type", "facets.columnLineage.fields.*.inputFields.name",
-   * "facets.columnLineage.fields.*.inputFields.namespace",
-   * "facets.columnLineage.fields.*.inputFields.field",
-   * "facets.columnLineage.fields.*.transformationDescription",
-   * "facets.columnLineage.fields.*.transformationType" ] } } }
-   */
   @Timed
   @ResponseMetered
   @ExceptionMetered
@@ -154,6 +141,9 @@ public class SearchResource {
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
     if (this.elasticsearchClient != null) {
       String[] fields = {
+        "run_id",
+        "name",
+        "namespace",
         "facets.schema.fields.name",
         "facets.schema.fields.type",
         "facets.columnLineage.fields.*.inputFields.name",

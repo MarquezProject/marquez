@@ -17,6 +17,7 @@ import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
 import { theme } from '../../../helpers/theme'
 import { truncateText } from '../../../helpers/text'
+import { useNavigate } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../core/tooltip/MQTooltip'
 import MqEmpty from '../../core/empty/MqEmpty'
@@ -25,7 +26,6 @@ import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
 import spark_logo from './spark-logo.svg'
-import {useNavigate} from "react-router-dom";
 
 interface StateProps {
   esSearchJobs: IEsSearchJobsState
@@ -338,30 +338,34 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   })}
                 </Box>
               </Box>
-              <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
-              <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
-                <MqText subdued label>
-                  Fields
-                </MqText>
-                <Box>
-                  {hit.facets.schema.fields.slice(0, FIELDS_TO_PRINT).map((field) => {
-                    return (
-                      <Chip
-                        key={field.name}
-                        label={field.name}
-                        variant={'outlined'}
-                        size={'small'}
-                        sx={{ mr: 1 }}
-                      />
-                    )
-                  })}
-                  {hit.facets.schema.fields.length > FIELDS_TO_PRINT && (
-                    <MqText inline subdued>{`+ ${
-                      hit.facets.schema.fields.length - FIELDS_TO_PRINT
-                    }`}</MqText>
-                  )}
-                </Box>
-              </Box>
+              {hit.facets?.schema?.fields && (
+                <>
+                  <Divider orientation={'vertical'} flexItem sx={{ mx: 1 }} />
+                  <Box display={'flex'} flexDirection={'column'} justifyContent={'flex-start'}>
+                    <MqText subdued label>
+                      Fields
+                    </MqText>
+                    <Box>
+                      {hit.facets?.schema?.fields.slice(0, FIELDS_TO_PRINT).map((field) => {
+                        return (
+                          <Chip
+                            key={field.name}
+                            label={field.name}
+                            variant={'outlined'}
+                            size={'small'}
+                            sx={{ mr: 1 }}
+                          />
+                        )
+                      })}
+                      {hit.facets?.schema && hit.facets.schema.fields.length > FIELDS_TO_PRINT && (
+                        <MqText inline subdued>{`+ ${
+                          hit.facets.schema.fields.length - FIELDS_TO_PRINT
+                        }`}</MqText>
+                      )}
+                    </Box>
+                  </Box>
+                </>
+              )}
             </Box>
           </Box>
         )
