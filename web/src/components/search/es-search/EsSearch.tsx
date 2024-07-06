@@ -66,15 +66,18 @@ function parseStringToSegments(input: string): TextSegment[] {
 //   return s.split('.').pop()
 // }
 
-const useArrowKeys = (callback: (direction: 'up' | 'down') => void) => {
+const useArrowKeys = (callback: (key: 'up' | 'down' | 'enter') => void) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowDown') {
-        event.preventDefault() // Prevent the default browser action
+        event.preventDefault()
         callback('down')
       } else if (event.key === 'ArrowUp') {
-        event.preventDefault() // Prevent the default browser action
+        event.preventDefault()
         callback('up')
+      } else if (event.key === 'Enter') {
+        event.preventDefault()
+        callback('enter')
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -97,10 +100,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
   const navigate = useNavigate()
 
-  useArrowKeys((direction) => {
-    if (direction === 'up') {
+  useArrowKeys((key) => {
+    if (key === 'up') {
       setSelectedIndex(selectedIndex === null ? null : Math.max(selectedIndex - 1, 0))
-    } else {
+    } else if (key === 'down') {
       setSelectedIndex(
         selectedIndex === null
           ? 0
@@ -109,6 +112,14 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
               esSearchJobs.data.hits.length + esSearchDatasets.data.hits.length - 1
             )
       )
+    } else if (selectedIndex !== null) {
+      if (selectedIndex < esSearchJobs.data.hits.length) {
+        const jobHit = esSearchJobs.data.hits[selectedIndex]
+        navigate(`/lineage/job/${jobHit.namespace}/${jobHit.name}`)
+      } else {
+        const datasetHit = esSearchDatasets.data.hits[selectedIndex - esSearchJobs.data.hits.length]
+        navigate(`/lineage/dataset/${datasetHit.namespace}/${datasetHit.name}`)
+      }
     }
   })
 
@@ -279,7 +290,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 backgroundColor: theme.palette.action.hover,
               },
               backgroundColor:
-                selectedIndex === index + esSearchDatasets.data.hits.length
+                selectedIndex === index + esSearchJobs.data.hits.length
                   ? theme.palette.action.hover
                   : undefined,
             }}
