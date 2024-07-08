@@ -155,7 +155,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
       {esSearchJobs.data.hits.map((hit, index) => {
         return (
           <Box
-            key={hit.run_id}
+            key={`job-${hit.run_id}`}
             onClick={() => navigate(`/lineage/${encodeNode('JOB', hit.namespace, hit.name)}`)}
             px={2}
             py={1}
@@ -277,7 +277,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
       {esSearchDatasets.data.hits.map((hit, index) => {
         return (
           <Box
-            key={hit.run_id}
+            key={`dataset-${index}-${hit.run_id}`}
             onClick={() => navigate(`/lineage/${encodeNode('DATASET', hit.namespace, hit.name)}`)}
             px={2}
             py={1}
