@@ -213,6 +213,16 @@ public abstract class BaseIntegrationTest {
     return http2.sendAsync(request, BodyHandlers.ofString());
   }
 
+  protected CompletableFuture<HttpResponse<String>> getMetrics() {
+    HttpRequest request =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + "/metrics"))
+            .GET()
+            .build();
+
+    return http2.sendAsync(request, BodyHandlers.ofString());
+  }
+
   protected CompletableFuture<HttpResponse<String>> fetchLineage(String nodeId) {
     HttpRequest request =
         HttpRequest.newBuilder()

@@ -36,6 +36,7 @@ import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
+import marquez.logging.MarquezMetricNameStrategy;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -162,7 +163,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             .installPlugin(new SqlObjectPlugin())
             .installPlugin(new PostgresPlugin())
             .installPlugin(new Jackson2Plugin());
-    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics());
+    SqlLogger sqlLogger = new InstrumentedSqlLogger(env.metrics(), new MarquezMetricNameStrategy());
     if (isSentryEnabled(config)) {
       sqlLogger = new TracingSQLLogger(sqlLogger);
     }
