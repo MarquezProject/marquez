@@ -11,7 +11,7 @@ import { Nullable } from '../../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { debounce } from 'lodash'
-import { eventTypeColor } from '../../../helpers/nodes'
+import { encodeNode, eventTypeColor } from '../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
@@ -115,10 +115,10 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
     } else if (selectedIndex !== null) {
       if (selectedIndex < esSearchJobs.data.hits.length) {
         const jobHit = esSearchJobs.data.hits[selectedIndex]
-        navigate(`/lineage/job/${jobHit.namespace}/${jobHit.name}`)
+        navigate(`/lineage/${encodeNode('JOB', jobHit.namespace, jobHit.name)}`)
       } else {
         const datasetHit = esSearchDatasets.data.hits[selectedIndex - esSearchJobs.data.hits.length]
-        navigate(`/lineage/dataset/${datasetHit.namespace}/${datasetHit.name}`)
+        navigate(`/lineage/${encodeNode('DATASET', datasetHit.namespace, datasetHit.name)}`)
       }
     }
   })
@@ -156,7 +156,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
         return (
           <Box
             key={hit.run_id}
-            onClick={() => navigate(`/lineage/job/${hit.namespace}/${hit.name}`)}
+            onClick={() => navigate(`/lineage/${encodeNode('JOB', hit.namespace, hit.name)}`)}
             px={2}
             py={1}
             borderBottom={1}
@@ -278,7 +278,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
         return (
           <Box
             key={hit.run_id}
-            onClick={() => navigate(`/lineage/dataset/${hit.namespace}/${hit.name}`)}
+            onClick={() => navigate(`/lineage/${encodeNode('DATASET', hit.namespace, hit.name)}`)}
             px={2}
             py={1}
             borderBottom={1}

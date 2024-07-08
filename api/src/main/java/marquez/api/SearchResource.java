@@ -159,7 +159,10 @@ public class SearchResource {
                       .query(
                           q ->
                               q.multiMatch(
-                                  m -> m.query(query).fields(Arrays.stream(fields).toList())))
+                                  m -> m.query(query)
+                                          .type(TextQueryType.PhrasePrefix)
+                                          .fields(Arrays.stream(fields).toList())
+                                          .operator(Operator.Or)))
                       .highlight(
                           hl -> {
                             for (String field : fields) {
