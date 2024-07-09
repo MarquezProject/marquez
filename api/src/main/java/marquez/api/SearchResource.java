@@ -14,7 +14,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,12 +36,10 @@ import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
 import marquez.db.SearchDao;
+import marquez.service.SearchService;
+import marquez.service.ServiceFactory;
 import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.query_dsl.Operator;
-import org.opensearch.client.opensearch._types.query_dsl.TextQueryType;
 import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.BuiltinHighlighterType;
-import org.opensearch.client.opensearch.core.search.HighlighterType;
 import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
@@ -53,13 +50,13 @@ public class SearchResource {
   private static final String DEFAULT_LIMIT = "10";
   private static final int MIN_LIMIT = 0;
 
+  private final SearchService searchService;
   private final SearchDao searchDao;
-  private final OpenSearchClient openSearchClient;
 
   public SearchResource(
-      @NonNull final SearchDao searchDao, @Nullable final OpenSearchClient openSearchClient) {
+          @NonNull final ServiceFactory serviceFactory, @NonNull final SearchDao searchDao, @Nullable final OpenSearchClient openSearchClient) {
+    this.searchService = serviceFactory.getSearchService();
     this.searchDao = searchDao;
-    this.openSearchClient = openSearchClient;
   }
 
   @Timed
@@ -94,44 +91,7 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("/jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
-    if (this.openSearchClient != null) {
-      String[] fields = {
-        "facets.sql.query",
-        "facets.sourceCode.sourceCode",
-        "facets.sourceCode.language",
-        "runFacets.processing_engine.name",
-        "run_id",
-        "name",
-        "namespace",
-        "type"
-      };
-      SearchResponse<ObjectNode> response =
-          this.openSearchClient.search(
-              s -> {
-                s.index("jobs")
-                    .query(
-                        q ->
-                            q.multiMatch(
-                                m ->
-                                    m.query(query)
-                                        .type(TextQueryType.PhrasePrefix)
-                                        .fields(Arrays.stream(fields).toList())
-                                        .operator(Operator.Or)));
-                s.highlight(
-                    hl -> {
-                      for (String field : fields) {
-                        hl.fields(field, f -> f.type(HighlighterType.of(fn -> fn.builtin(BuiltinHighlighterType.Plain))));
-                      }
-                      return hl;
-                    });
-                return s;
-              },
-              ObjectNode.class);
-
-      return formatEsResponse(response);
-    } else {
-      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
+      return formatEsResponse(this.searchService.searchJobs(query));
   }
 
   @Timed
@@ -141,43 +101,7 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("/datasets")
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
-    if (this.openSearchClient != null) {
-      String[] fields = {
-        "run_id",
-        "name",
-        "namespace",
-        "facets.schema.fields.name",
-        "facets.schema.fields.type",
-        "facets.columnLineage.fields.*.inputFields.name",
-        "facets.columnLineage.fields.*.inputFields.namespace",
-        "facets.columnLineage.fields.*.inputFields.field",
-        "facets.columnLineage.fields.*.transformationDescription",
-        "facets.columnLineage.fields.*.transformationType"
-      };
-      SearchResponse<ObjectNode> response =
-          this.openSearchClient.search(
-              s ->
-                  s.index("datasets")
-                      .query(
-                          q ->
-                              q.multiMatch(
-                                  m -> m.query(query)
-                                          .type(TextQueryType.PhrasePrefix)
-                                          .fields(Arrays.stream(fields).toList())
-                                          .operator(Operator.Or)))
-                      .highlight(
-                          hl -> {
-                            for (String field : fields) {
-                              hl.fields(field, f -> f.type(HighlighterType.of(fn -> fn.builtin(BuiltinHighlighterType.Plain))));
-                            }
-                            return hl;
-                          }),
-              ObjectNode.class);
-
-      return formatEsResponse(response);
-    } else {
-      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
-    }
+    return formatEsResponse(this.searchService.searchDatasets(query));
   }
 
   private Response formatEsResponse(SearchResponse<ObjectNode> response) {

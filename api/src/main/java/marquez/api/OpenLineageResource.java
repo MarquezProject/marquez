@@ -15,13 +15,10 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import javax.validation.Valid;
@@ -47,23 +44,17 @@ import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch.core.IndexRequest;
-
 @Slf4j
 @Path("/api/v1")
 public class OpenLineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
 
-  private final OpenSearchClient openSearchClient;
   private final OpenLineageDao openLineageDao;
 
   public OpenLineageResource(
       @NonNull final ServiceFactory serviceFactory,
-      @NonNull final OpenSearchClient openSearchClient,
       @NonNull final OpenLineageDao openLineageDao) {
     super(serviceFactory);
-    this.openSearchClient = openSearchClient;
     this.openLineageDao = openLineageDao;
   }
 
@@ -76,7 +67,7 @@ public class OpenLineageResource extends BaseResource {
   @Path("/lineage")
   public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
-    indexEvent((LineageEvent) event);
+    serviceFactory.getSearchService().indexEvent((LineageEvent) event);
     if (event instanceof LineageEvent) {
       openLineageService
           .createAsync((LineageEvent) event)
@@ -97,86 +88,6 @@ public class OpenLineageResource extends BaseResource {
       runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
     }
     return runUuid;
-  }
-
-  private void indexEvent(@Valid @NotNull LineageEvent event) {
-    if (this.openSearchClient != null) {
-      UUID runUuid = runUuidFromEvent(event.getRun());
-      log.info("Indexing event {}", event);
-
-      if (event.getInputs() != null) {
-        indexDatasets(event.getInputs(), runUuid, event);
-      }
-      if (event.getOutputs() != null) {
-        indexDatasets(event.getOutputs(), runUuid, event);
-      }
-      indexJob(runUuid, event);
-    }
-  }
-
-  private Map<String, Object> buildJobIndexRequest(UUID runUuid, LineageEvent event) {
-    Map<String, Object> jsonMap = new HashMap<>();
-
-    jsonMap.put("run_id", runUuid.toString());
-    jsonMap.put("eventType", event.getEventType());
-    jsonMap.put("name", event.getJob().getName());
-    jsonMap.put("type", event.getJob().isStreamingJob() ? "STREAM" : "BATCH");
-    jsonMap.put("namespace", event.getJob().getNamespace());
-    jsonMap.put("facets", event.getJob().getFacets());
-    jsonMap.put("runFacets", event.getRun().getFacets());
-    return jsonMap;
-  }
-
-  private Map<String, Object> buildDatasetIndexRequest(
-      UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
-    Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("run_id", runUuid.toString());
-    jsonMap.put("eventType", event.getEventType());
-    jsonMap.put("name", dataset.getName());
-    jsonMap.put("inputFacets", dataset.getInputFacets());
-    jsonMap.put("outputFacets", dataset.getOutputFacets());
-    jsonMap.put("namespace", dataset.getNamespace());
-    jsonMap.put("facets", dataset.getFacets());
-    return jsonMap;
-  }
-
-  private void indexJob(UUID runUuid, LineageEvent event) {
-    index(
-        IndexRequest.of(
-            i ->
-                i.index("jobs")
-                    .id(
-                        String.format(
-                            "JOB:%s:%s", event.getJob().getNamespace(), event.getJob().getName()))
-                    .document(buildJobIndexRequest(runUuid, event))));
-  }
-
-  private void indexDatasets(
-      List<LineageEvent.Dataset> datasets, UUID runUuid, LineageEvent event) {
-    datasets.stream()
-        .map(dataset -> buildDatasetIndexRequest(runUuid, dataset, event))
-        .forEach(
-            jsonMap -> {
-              index(
-                  IndexRequest.of(
-                      i ->
-                          i.index("datasets")
-                              .id(
-                                  String.format(
-                                      "DATASET:%s:%s",
-                                      jsonMap.get("namespace"), jsonMap.get("name")))
-                              .document(jsonMap)));
-            });
-  }
-
-  private void index(IndexRequest<Map<String, Object>> request) {
-    try {
-      if (this.openSearchClient != null) {
-        this.openSearchClient.index(request);
-      }
-    } catch (IOException e) {
-      log.info("Failed to index event OpenSearch not available.", e);
-    }
   }
 
   private void onComplete(Void result, Throwable err, AsyncResponse asyncResponse) {

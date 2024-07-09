@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableSortedSet;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
@@ -30,7 +29,6 @@ import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.opensearch.client.opensearch.OpenSearchClient;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class OpenLineageResourceTest {
@@ -58,7 +56,7 @@ class OpenLineageResourceTest {
         ResourceExtension.builder()
             .addResource(
                 new OpenLineageResource(
-                    serviceFactory, new OpenSearchClient(null), openLineageDao))
+                    serviceFactory, openLineageDao))
             .build();
   }
 
