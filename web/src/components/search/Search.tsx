@@ -50,7 +50,7 @@ const useEscapeShortcut = (callback: () => void) => {
   }, [callback])
 }
 
-const elasticSearchEnabled = true
+const isAdvancedSearchEnabled = true
 
 interface StateProps {
   isLoading: boolean
@@ -188,7 +188,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                   overflow={'auto'}
                   maxHeight={`calc(100vh - ${HEADER_HEIGHT}px - 24px)`}
                 >
-                  {elasticSearchEnabled ? (
+                  {isAdvancedSearchEnabled ? (
                     <EsSearch search={search} />
                   ) : (
                     <BaseSearch search={search} />

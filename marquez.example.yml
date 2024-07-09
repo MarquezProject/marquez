@@ -66,12 +66,13 @@ logging:
     #   environment: ${SENTRY_ENVIRONMENT}
     #   stacktraceAppPackages: ['marquez']
 
-elastic:
+search:
   enabled: true
   scheme: http
-  host: search
+  host: marquez-opensearch
   port: 9200
-  password: ${ELASTIC_PASSWORD}
+  username: admin
+  password: admin
 
 ### TRACING ###
 

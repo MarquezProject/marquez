@@ -3,13 +3,13 @@ package marquez.search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
-public class ElasticConfig {
+public class SearchConfig {
   public static final boolean ENABLED = false;
   public static final String SCHEME = "http";
-  public static final String HOST = "search";
+  public static final String HOST = "marquez-opensearch";
   public static final int PORT = 9200;
-  public static final String USERNAME = "elastic";
-  public static final String PASSWORD = "elastic";
+  public static final String USERNAME = "admin";
+  public static final String PASSWORD = "admin";
 
   @Getter @JsonProperty private boolean enabled = ENABLED;
 

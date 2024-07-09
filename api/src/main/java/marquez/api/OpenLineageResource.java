@@ -175,7 +175,7 @@ public class OpenLineageResource extends BaseResource {
         this.openSearchClient.index(request);
       }
     } catch (IOException e) {
-      log.info("Failed to index event Elasticsearch not available.", e);
+      log.info("Failed to index event OpenSearch not available.", e);
     }
   }
 

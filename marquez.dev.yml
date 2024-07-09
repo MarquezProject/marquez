@@ -23,13 +23,13 @@ logging:
   appenders:
     - type: console
 
-elastic:
+search:
   enabled: true
   scheme: http
-  host: search
+  host: marquez-opensearch
   port: 9200
-  username: elastic
-  password: elastic
+  username: admin
+  password: admin
 
 tags:
   - name: PII

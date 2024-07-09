@@ -6,8 +6,6 @@ services:
     environment:
       - MARQUEZ_PORT=${API_PORT}
       - MARQUEZ_ADMIN_PORT=${API_ADMIN_PORT}
-      - ELASTIC_USER=elastic
-      - ELASTIC_PASSWORD=elastic
     ports:
       - "${API_PORT}:${API_PORT}"
       - "${API_ADMIN_PORT}:${API_ADMIN_PORT}"
@@ -24,7 +22,7 @@ services:
       - db:${POSTGRES_PORT}
       - --
       - /opt/marquez/wait-for-it.sh
-      - opensearch:${ELASTICSEARCH_PORT}
+      - opensearch:${SEARCH_PORT}
       - --
       - ./entrypoint.sh
 
@@ -46,29 +44,6 @@ services:
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
-
-#  search:
-#    image: elasticsearch:8.13.4
-#    container_name: marquez-search
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#      nofile:
-#        soft: 65536
-#        hard: 65536
-#    environment:
-#      - xpack.security.enabled=true
-#      - xpack.security.authc.api_key.enabled=true
-#      - discovery.type=single-node
-#      - ELASTIC_PASSWORD=elastic
-#    volumes:
-#      - elasticsearch-data:/usr/share/elasticsearch/data
-#    cap_add:
-#      - IPC_LOCK
-#    ports:
-#      - "9200:9200"
-#      - "9300:9300"
 
   opensearch:
     image: opensearchproject/opensearch:2.5.0
@@ -94,7 +69,6 @@ services:
 
 volumes:
   data:
-  elasticsearch-data:
   opensearch-data:
   db-conf:
   db-init:

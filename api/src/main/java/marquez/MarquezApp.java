@@ -39,6 +39,7 @@ import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
+import marquez.search.SearchConfig;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -54,11 +55,7 @@ import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.opensearch.client.RestClient;
-import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
@@ -149,7 +146,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)
-            .openSearchClient(newOpenSearchClient())
+            .openSearchClient(newOpenSearchClient(config.getSearchConfig()))
             .tags(config.getTags())
             .build();
 
@@ -168,34 +165,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
     Exclusions.use(exclusions);
   }
 
-//  private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
-//    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//    credentialsProvider.setCredentials(
-//        AuthScope.ANY,
-//        new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
-//
-//    RestClient restClient =
-//        RestClient.builder(
-//                new HttpHost(
-//                    elasticConfig.getHost(), elasticConfig.getPort(), elasticConfig.getScheme()))
-//            .setHttpClientConfigCallback(
-//                httpClientBuilder ->
-//                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
-//            .build();
-//    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
-//    // register JavaTimeModule to handle ZonedDateTime
-//    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
-//    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
-//    return new ElasticsearchClient(transport);
-//  }
-
-  private OpenSearchClient newOpenSearchClient() {
-    final HttpHost host = new HttpHost("marquez-opensearch", 9200, "http");
+  private OpenSearchClient newOpenSearchClient(SearchConfig searchConfig) {
+    final HttpHost host = new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
     final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    // Only for demo purposes. Don't specify your credentials in code.
-    credentialsProvider.setCredentials(new AuthScope(host), new UsernamePasswordCredentials("admin", "admin"));
-
-    // Initialize the client with SSL and TLS enabled
+    credentialsProvider.setCredentials(new AuthScope(host), new UsernamePasswordCredentials(searchConfig.getUsername(), searchConfig.getPassword()));
     final RestClient restClient = RestClient.builder(host)
             .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();
@@ -205,12 +178,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
     final OpenSearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
     OpenSearchClient openSearchClient = new OpenSearchClient(transport);
-      BooleanResponse booleanResponse = null;
+      BooleanResponse booleanResponse;
       try {
           booleanResponse = openSearchClient.ping();
           log.info("OpenSearch Active: {}", booleanResponse.value());
       } catch (IOException e) {
-          throw new RuntimeException(e);
+          log.warn("Search not configured");
       }
     return openSearchClient;
   }
