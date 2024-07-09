@@ -15,15 +15,16 @@ services:
       - data:/opt/marquez
     links:
       - "db:postgres"
+      - opensearch
     depends_on:
-      - search
+      - opensearch
       - db
     entrypoint: 
       - /opt/marquez/wait-for-it.sh 
       - db:${POSTGRES_PORT}
       - --
       - /opt/marquez/wait-for-it.sh
-      - search:${ELASTICSEARCH_PORT}
+      - opensearch:${ELASTICSEARCH_PORT}
       - --
       - ./entrypoint.sh
 
@@ -46,9 +47,32 @@ services:
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
 
-  search:
-    image: elasticsearch:8.13.4
-    container_name: marquez-search
+#  search:
+#    image: elasticsearch:8.13.4
+#    container_name: marquez-search
+#    ulimits:
+#      memlock:
+#        soft: -1
+#        hard: -1
+#      nofile:
+#        soft: 65536
+#        hard: 65536
+#    environment:
+#      - xpack.security.enabled=true
+#      - xpack.security.authc.api_key.enabled=true
+#      - discovery.type=single-node
+#      - ELASTIC_PASSWORD=elastic
+#    volumes:
+#      - elasticsearch-data:/usr/share/elasticsearch/data
+#    cap_add:
+#      - IPC_LOCK
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+
+  opensearch:
+    image: opensearchproject/opensearch:2.5.0
+    container_name: marquez-opensearch
     ulimits:
       memlock:
         soft: -1
@@ -57,12 +81,11 @@ services:
         soft: 65536
         hard: 65536
     environment:
-      - xpack.security.enabled=true
-      - xpack.security.authc.api_key.enabled=true
+      - plugins.security.ssl.http.enabled=false
       - discovery.type=single-node
-      - ELASTIC_PASSWORD=elastic
+      - OPENSEARCH_PASSWORD=admin
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - opensearch-data:/usr/share/opensearch/data
     cap_add:
       - IPC_LOCK
     ports:
@@ -72,6 +95,7 @@ services:
 volumes:
   data:
   elasticsearch-data:
+  opensearch-data:
   db-conf:
   db-init:
   db-backup:

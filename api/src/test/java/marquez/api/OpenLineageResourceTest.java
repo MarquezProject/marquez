@@ -30,6 +30,7 @@ import marquez.service.models.Node;
 import marquez.service.models.NodeId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opensearch.client.opensearch.OpenSearchClient;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 class OpenLineageResourceTest {
@@ -57,7 +58,7 @@ class OpenLineageResourceTest {
         ResourceExtension.builder()
             .addResource(
                 new OpenLineageResource(
-                    serviceFactory, new ElasticsearchClient(null), openLineageDao))
+                    serviceFactory, new OpenSearchClient(null), openLineageDao))
             .build();
   }
 

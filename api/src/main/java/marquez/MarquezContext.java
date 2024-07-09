@@ -5,7 +5,6 @@
 
 package marquez;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -59,6 +58,7 @@ import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.models.Tag;
 import org.jdbi.v3.core.Jdbi;
+import org.opensearch.client.opensearch.OpenSearchClient;
 
 @Getter
 public final class MarquezContext {
@@ -102,17 +102,17 @@ public final class MarquezContext {
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
-  @Getter private final ElasticsearchClient elasticsearchClient;
+  @Getter private final OpenSearchClient openSearchClient;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
-      @NonNull final ElasticsearchClient elasticsearchClient,
+      @NonNull final OpenSearchClient openSearchClient,
       @NonNull final ImmutableSet<Tag> tags,
       List<RunTransitionListener> runTransitionListeners) {
     if (runTransitionListeners == null) {
       runTransitionListeners = new ArrayList<>();
     }
-    this.elasticsearchClient = elasticsearchClient;
+    this.openSearchClient = openSearchClient;
 
     final BaseDao baseDao = jdbi.onDemand(NamespaceDao.class);
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
@@ -168,8 +168,8 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource =
-        new OpenLineageResource(serviceFactory, elasticsearchClient, openLineageDao);
-    this.searchResource = new SearchResource(searchDao, elasticsearchClient);
+        new OpenLineageResource(serviceFactory, openSearchClient, openLineageDao);
+    this.searchResource = new SearchResource(searchDao, openSearchClient);
 
     this.resources =
         ImmutableList.of(
@@ -195,7 +195,7 @@ public final class MarquezContext {
   public static class Builder {
 
     private Jdbi jdbi;
-    private ElasticsearchClient elasticsearchClient;
+    private OpenSearchClient openSearchClient;
     private ImmutableSet<Tag> tags;
     private List<RunTransitionListener> runTransitionListeners;
 
@@ -209,8 +209,8 @@ public final class MarquezContext {
       return this;
     }
 
-    public Builder elasticsearchClient(@NonNull ElasticsearchClient elasticsearchClient) {
-      this.elasticsearchClient = elasticsearchClient;
+    public Builder openSearchClient(@NonNull OpenSearchClient openSearchClient) {
+      this.openSearchClient = openSearchClient;
       return this;
     }
 
@@ -230,7 +230,7 @@ public final class MarquezContext {
     }
 
     public MarquezContext build() {
-      return new MarquezContext(jdbi, elasticsearchClient, tags, runTransitionListeners);
+      return new MarquezContext(jdbi, openSearchClient, tags, runTransitionListeners);
     }
   }
 }

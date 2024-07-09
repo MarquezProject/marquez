@@ -13,5 +13,5 @@ services:
       - "db:postgres"
     depends_on:
       - api
-      - search
+      - opensearch
     entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--", "./wait-for-it.sh", "search:${ELASTICSEARCH_PORT}", "--", "./seed.sh"]

@@ -9,8 +9,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
@@ -49,21 +47,23 @@ import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.IndexRequest;
 
 @Slf4j
 @Path("/api/v1")
 public class OpenLineageResource extends BaseResource {
   private static final String DEFAULT_DEPTH = "20";
 
-  private final ElasticsearchClient elasticsearchClient;
+  private final OpenSearchClient openSearchClient;
   private final OpenLineageDao openLineageDao;
 
   public OpenLineageResource(
       @NonNull final ServiceFactory serviceFactory,
-      @NonNull final ElasticsearchClient elasticsearchClient,
+      @NonNull final OpenSearchClient openSearchClient,
       @NonNull final OpenLineageDao openLineageDao) {
     super(serviceFactory);
-    this.elasticsearchClient = elasticsearchClient;
+    this.openSearchClient = openSearchClient;
     this.openLineageDao = openLineageDao;
   }
 
@@ -100,7 +100,7 @@ public class OpenLineageResource extends BaseResource {
   }
 
   private void indexEvent(@Valid @NotNull LineageEvent event) {
-    if (this.elasticsearchClient != null) {
+    if (this.openSearchClient != null) {
       UUID runUuid = runUuidFromEvent(event.getRun());
       log.info("Indexing event {}", event);
 
@@ -171,11 +171,11 @@ public class OpenLineageResource extends BaseResource {
 
   private void index(IndexRequest<Map<String, Object>> request) {
     try {
-      if (this.elasticsearchClient != null) {
-        this.elasticsearchClient.index(request);
+      if (this.openSearchClient != null) {
+        this.openSearchClient.index(request);
       }
     } catch (IOException e) {
-      log.info("Failed to index event Elasticsearch not available.");
+      log.info("Failed to index event Elasticsearch not available.", e);
     }
   }
 

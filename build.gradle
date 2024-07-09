@@ -68,6 +68,8 @@ subprojects {
         implementation "org.projectlombok:lombok:${lombokVersion}"
         implementation "co.elastic.clients:elasticsearch-java:${elasticsearchVersion}"
         implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}"
+        implementation 'org.opensearch.client:opensearch-rest-client:2.15.0'
+        implementation 'org.opensearch.client:opensearch-java:2.6.0'
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
         testImplementation "org.assertj:assertj-core:${assertjVersion}"

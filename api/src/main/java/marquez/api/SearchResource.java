@@ -8,11 +8,6 @@ package marquez.api;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static marquez.common.Utils.toLocateDateOrNull;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
-import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
@@ -42,6 +37,13 @@ import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;
 import marquez.db.SearchDao;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.query_dsl.Operator;
+import org.opensearch.client.opensearch._types.query_dsl.TextQueryType;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.BuiltinHighlighterType;
+import org.opensearch.client.opensearch.core.search.HighlighterType;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
 @Path("/api/v1/search")
@@ -52,12 +54,12 @@ public class SearchResource {
   private static final int MIN_LIMIT = 0;
 
   private final SearchDao searchDao;
-  private final ElasticsearchClient elasticsearchClient;
+  private final OpenSearchClient openSearchClient;
 
   public SearchResource(
-      @NonNull final SearchDao searchDao, @Nullable final ElasticsearchClient elasticsearchClient) {
+      @NonNull final SearchDao searchDao, @Nullable final OpenSearchClient openSearchClient) {
     this.searchDao = searchDao;
-    this.elasticsearchClient = elasticsearchClient;
+    this.openSearchClient = openSearchClient;
   }
 
   @Timed
@@ -92,7 +94,7 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("/jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
-    if (this.elasticsearchClient != null) {
+    if (this.openSearchClient != null) {
       String[] fields = {
         "facets.sql.query",
         "facets.sourceCode.sourceCode",
@@ -104,7 +106,7 @@ public class SearchResource {
         "type"
       };
       SearchResponse<ObjectNode> response =
-          this.elasticsearchClient.search(
+          this.openSearchClient.search(
               s -> {
                 s.index("jobs")
                     .query(
@@ -118,7 +120,7 @@ public class SearchResource {
                 s.highlight(
                     hl -> {
                       for (String field : fields) {
-                        hl.fields(field, f -> f.type("plain"));
+                        hl.fields(field, f -> f.type(HighlighterType.of(fn -> fn.builtin(BuiltinHighlighterType.Plain))));
                       }
                       return hl;
                     });
@@ -139,7 +141,7 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("/datasets")
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
-    if (this.elasticsearchClient != null) {
+    if (this.openSearchClient != null) {
       String[] fields = {
         "run_id",
         "name",
@@ -153,7 +155,7 @@ public class SearchResource {
         "facets.columnLineage.fields.*.transformationType"
       };
       SearchResponse<ObjectNode> response =
-          this.elasticsearchClient.search(
+          this.openSearchClient.search(
               s ->
                   s.index("datasets")
                       .query(
@@ -166,7 +168,7 @@ public class SearchResource {
                       .highlight(
                           hl -> {
                             for (String field : fields) {
-                              hl.fields(field, f -> f.type("plain"));
+                              hl.fields(field, f -> f.type(HighlighterType.of(fn -> fn.builtin(BuiltinHighlighterType.Plain))));
                             }
                             return hl;
                           }),

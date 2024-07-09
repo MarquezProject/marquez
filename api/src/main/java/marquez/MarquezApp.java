@@ -5,10 +5,6 @@
 
 package marquez;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -26,6 +22,8 @@ import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.sentry.Sentry;
+
+import java.io.IOException;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import lombok.NonNull;
@@ -41,7 +39,6 @@ import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
 import marquez.logging.LoggingMdcFilter;
-import marquez.search.ElasticConfig;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -50,7 +47,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RestClient;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -58,6 +54,16 @@ import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.endpoints.BooleanResponse;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 @Slf4j
 public final class MarquezApp extends Application<MarquezConfig> {
@@ -140,12 +146,10 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
-    final ElasticsearchClient elasticsearchClient =
-        newElasticsearchClient(config.getElasticConfig());
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)
-            .elasticsearchClient(elasticsearchClient)
+            .openSearchClient(newOpenSearchClient())
             .tags(config.getTags())
             .build();
 
@@ -164,25 +168,51 @@ public final class MarquezApp extends Application<MarquezConfig> {
     Exclusions.use(exclusions);
   }
 
-  private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
-    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(
-        AuthScope.ANY,
-        new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
+//  private ElasticsearchClient newElasticsearchClient(ElasticConfig elasticConfig) {
+//    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+//    credentialsProvider.setCredentials(
+//        AuthScope.ANY,
+//        new UsernamePasswordCredentials(elasticConfig.getUsername(), elasticConfig.getPassword()));
+//
+//    RestClient restClient =
+//        RestClient.builder(
+//                new HttpHost(
+//                    elasticConfig.getHost(), elasticConfig.getPort(), elasticConfig.getScheme()))
+//            .setHttpClientConfigCallback(
+//                httpClientBuilder ->
+//                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+//            .build();
+//    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
+//    // register JavaTimeModule to handle ZonedDateTime
+//    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
+//    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
+//    return new ElasticsearchClient(transport);
+//  }
 
-    RestClient restClient =
-        RestClient.builder(
-                new HttpHost(
-                    elasticConfig.getHost(), elasticConfig.getPort(), elasticConfig.getScheme()))
-            .setHttpClientConfigCallback(
-                httpClientBuilder ->
-                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+  private OpenSearchClient newOpenSearchClient() {
+    final HttpHost host = new HttpHost("marquez-opensearch", 9200, "http");
+    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    // Only for demo purposes. Don't specify your credentials in code.
+    credentialsProvider.setCredentials(new AuthScope(host), new UsernamePasswordCredentials("admin", "admin"));
+
+    // Initialize the client with SSL and TLS enabled
+    final RestClient restClient = RestClient.builder(host)
+            .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();
+
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
     // register JavaTimeModule to handle ZonedDateTime
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
-    ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
-    return new ElasticsearchClient(transport);
+    final OpenSearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
+    OpenSearchClient openSearchClient = new OpenSearchClient(transport);
+      BooleanResponse booleanResponse = null;
+      try {
+          booleanResponse = openSearchClient.ping();
+          log.info("OpenSearch Active: {}", booleanResponse.value());
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+    return openSearchClient;
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {
