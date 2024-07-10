@@ -80,7 +80,16 @@ public final class MetadataDb {
     nonBlockingDbCallQueue.offer(BatchSqlWriteCall.newWriteCallFor(event));
   }
 
-  public CompletableFuture<Void> listEventsOf() {
+  public CompletableFuture<Void> listLineageEvents() {
+    return nonBlockingDbCallExecutor
+        .useHandle(
+            nonBlockingHandle -> {
+              throw new UnsupportedOperationException("MetadataDb.listNamespaces()");
+            })
+        .toCompletableFuture();
+  }
+
+  public CompletableFuture<Void> listLifecycleEvents() {
     return nonBlockingDbCallExecutor
         .useHandle(
             nonBlockingHandle -> {
@@ -96,7 +105,7 @@ public final class MetadataDb {
    * @param namespaceMeta ...
    * @return ...
    */
-  public CompletableFuture<Namespace> putNamespace(
+  public CompletableFuture<Namespace> write(
       @NonNull NamespaceName namespaceName, @NonNull NamespaceMeta namespaceMeta) {
     log.debug("Writing metadata for namespace '{}': {}", namespaceName.getValue(), namespaceMeta);
     return nonBlockingDbCallExecutor
@@ -156,11 +165,15 @@ public final class MetadataDb {
 
   public CompletableFuture<Void> softDeleteNamespace(@NonNull NamespaceName namespaceName) {
     return nonBlockingDbCallExecutor
-        .withHandle(nonBlockingHandle -> nonBlockingHandle.execute(Sql.DELETE.NAMESPACE))
+        .useHandle(
+            nonBlockingHandle -> {
+              nonBlockingHandle.execute(Sql.DELETE.NAMESPACE);
+            })
         .exceptionally(
             exception -> {
               return null;
-            });
+            })
+        .toCompletableFuture();
   }
 
   public CompletableFuture<Void> getSource(@NonNull SourceName sourceName) {

@@ -10,7 +10,8 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.db.v2.MetadataDb;
 
 @Slf4j
-@Path("/api/v1")
+@Path("/api/betav2")
 public class LineageResource {
   private final MetadataDb metaDb;
 
@@ -30,17 +31,15 @@ public class LineageResource {
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("/batch/lineage")
-  public Response collectBatchOf(@NotNull BatchOfEvents batch) {
+  public void collectBatchOf(@Suspended AsyncResponse asyncResponse, @NotNull BatchOfEvents batch) {
     metaDb.writeBatchOf(batch.getEvents());
-    return Response.ok().build();
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("/lineage")
-  public Response collect(@NotNull OpenLineage.RunEvent event) {
+  public void collect(@Suspended AsyncResponse asyncResponse, @NotNull OpenLineage.RunEvent event) {
     metaDb.write(event);
-    return Response.ok().build();
   }
 
   /** A batch of lineage {@code events} . */
