@@ -25,6 +25,8 @@ services:
       - opensearch:${SEARCH_PORT}
       - --
       - ./entrypoint.sh
+    networks:
+      - opensearch-net
 
   db:
     image: postgres:14
@@ -44,10 +46,13 @@ services:
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
+    networks:
+      - opensearch-net
 
   opensearch:
     image: opensearchproject/opensearch:2.5.0
-    container_name: marquez-opensearch
+    container_name: opensearch
+    hostname: opensearch
     ulimits:
       memlock:
         soft: -1
@@ -56,8 +61,13 @@ services:
         soft: 65536
         hard: 65536
     environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch
+      - discovery.seed_hosts=opensearch,opensearch-2
+      - cluster.initial_cluster_manager_nodes=opensearch,opensearch-2
+      - bootstrap.memory_lock=true
       - plugins.security.ssl.http.enabled=false
-      - discovery.type=single-node
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
       - OPENSEARCH_PASSWORD=admin
     volumes:
       - opensearch-data:/usr/share/opensearch/data
@@ -66,10 +76,53 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    networks:
+      - opensearch-net
+
+  opensearch-2:
+    image: opensearchproject/opensearch:2.5.0
+    container_name: opensearch-2
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-2
+      - discovery.seed_hosts=opensearch,opensearch-2
+      - cluster.initial_cluster_manager_nodes=opensearch,opensearch-2
+      - bootstrap.memory_lock=true
+      - plugins.security.ssl.http.enabled=false
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_PASSWORD=admin
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-2-data:/usr/share/opensearch/data
+    networks:
+      - opensearch-net
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.5.0
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601 # Map host port 5601 to container port 5601
+    expose:
+      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch:9200","http://opensearch-2:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
+    networks:
+      - opensearch-net
 
 volumes:
   data:
   opensearch-data:
+  opensearch-2-data:
   db-conf:
   db-init:
   db-backup:
+
+networks:
+  opensearch-net:

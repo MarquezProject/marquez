@@ -6,7 +6,7 @@ import lombok.Getter;
 public class SearchConfig {
   public static final boolean ENABLED = false;
   public static final String SCHEME = "http";
-  public static final String HOST = "marquez-opensearch";
+  public static final String HOST = "opensearch";
   public static final int PORT = 9200;
   public static final String USERNAME = "admin";
   public static final String PASSWORD = "admin";

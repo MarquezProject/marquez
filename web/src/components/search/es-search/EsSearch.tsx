@@ -363,6 +363,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                             key={field.name}
                             label={field.name}
                             variant={'outlined'}
+                            color={field.name.toLowerCase().includes(search.toLowerCase()) ? 'primary' : 'default'}
                             size={'small'}
                             sx={{ mr: 1 }}
                           />
