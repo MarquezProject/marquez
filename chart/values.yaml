@@ -139,6 +139,13 @@ postgresql:
     ##
     existingSecret: ""
 
+opensearch:
+  enabled: false
+  ## Opensearch password
+  extraEnvs:
+    - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+      value: admin
+
 ## Additional labels to all the deployed resources; note that
 ## the following standard labels will automatically be applied.
 ##   app.kubernetes.io/name, helm.sh/chart,

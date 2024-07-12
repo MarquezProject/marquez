@@ -19,7 +19,7 @@ helm install marquez . --dependency-update
 To install the chart with the release name `marquez` using a fresh Postgres instance.
 
 ```bash
-helm install marquez . --dependency-update --set postgresql.enabled=true
+helm install marquez . --dependency-update --set postgresql.enabled=true --set opensearch.enabled=true
 ```
 
 > **Note:** For a list of parameters that can be overridden during installation, see the [configuration](#configuration) section.
@@ -84,14 +84,16 @@ helm delete marquez
 
 ### [Postgres](https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml) (sub-chart) **parameters**
 
-| Parameter                        | Description                     | Default   |
-|----------------------------------|---------------------------------|-----------|
-| `postgresql.enabled`             | Deploy PostgreSQL container(s)  | `false`   |
-| `postgresql.image.tag`           | PostgreSQL image version        | `12.1.0`  |
-| `postgresql.auth.username`       | PostgreSQL username             | `buendia` |
-| `postgresql.auth.password`       | PostgreSQL password             | `macondo` |
-| `postgresql.auth.database`       | PostgreSQL database             | `marquez` |
-| `postgresql.auth.existingSecret` | Name of existing secret object  | `nil`     |
+| Parameter                        | Description                    | Default   |
+|----------------------------------|--------------------------------|-----------|
+| `postgresql.enabled`             | Deploy PostgreSQL container(s) | `false`   |
+| `opensearch.enabled`             | Deploy Opensearch container(s) | `false`   |
+| `postgresql.image.tag`           | PostgreSQL image version       | `12.1.0`  |
+| `postgresql.auth.username`       | PostgreSQL username            | `buendia` |
+| `postgresql.auth.password`       | PostgreSQL password            | `macondo` |
+| `postgresql.auth.database`       | PostgreSQL database            | `marquez` |
+| `opensearch.auth.database`       | OpenSearch password            | `marquez` |
+| `postgresql.auth.existingSecret` | Name of existing secret object | `nil`     |
 
 ### Common **parameters**
 
@@ -128,7 +130,7 @@ helm delete marquez
 The quickest way to install Marquez via Kubernetes is to create a local Postgres instance.
 
 ```bash
-helm install marquez . --dependency-update --set postgresql.enabled=true
+helm install marquez . --dependency-update --set postgresql.enabled=true  --set opensearch.enabled=true
 ```
 
 ### Docker Postgres
