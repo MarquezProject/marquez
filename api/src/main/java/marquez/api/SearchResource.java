@@ -54,7 +54,9 @@ public class SearchResource {
   private final SearchDao searchDao;
 
   public SearchResource(
-          @NonNull final ServiceFactory serviceFactory, @NonNull final SearchDao searchDao, @Nullable final OpenSearchClient openSearchClient) {
+      @NonNull final ServiceFactory serviceFactory,
+      @NonNull final SearchDao searchDao,
+      @Nullable final OpenSearchClient openSearchClient) {
     this.searchService = serviceFactory.getSearchService();
     this.searchDao = searchDao;
   }
@@ -91,7 +93,7 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("/jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
-      return formatEsResponse(this.searchService.searchJobs(query));
+    return formatEsResponse(this.searchService.searchJobs(query));
   }
 
   @Timed

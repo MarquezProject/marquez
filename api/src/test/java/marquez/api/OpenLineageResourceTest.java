@@ -54,9 +54,7 @@ class OpenLineageResourceTest {
 
     UNDER_TEST =
         ResourceExtension.builder()
-            .addResource(
-                new OpenLineageResource(
-                    serviceFactory, openLineageDao))
+            .addResource(new OpenLineageResource(serviceFactory, openLineageDao))
             .build();
   }
 

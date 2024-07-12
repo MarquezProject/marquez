@@ -22,7 +22,6 @@ import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.sentry.Sentry;
-
 import java.io.IOException;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
@@ -166,11 +165,17 @@ public final class MarquezApp extends Application<MarquezConfig> {
   }
 
   private OpenSearchClient newOpenSearchClient(SearchConfig searchConfig) {
-    final HttpHost host = new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
+    final HttpHost host =
+        new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
     final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(new AuthScope(host), new UsernamePasswordCredentials(searchConfig.getUsername(), searchConfig.getPassword()));
-    final RestClient restClient = RestClient.builder(host)
-            .setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+    credentialsProvider.setCredentials(
+        new AuthScope(host),
+        new UsernamePasswordCredentials(searchConfig.getUsername(), searchConfig.getPassword()));
+    final RestClient restClient =
+        RestClient.builder(host)
+            .setHttpClientConfigCallback(
+                httpClientBuilder ->
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
             .build();
 
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
@@ -178,13 +183,13 @@ public final class MarquezApp extends Application<MarquezConfig> {
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
     final OpenSearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
     OpenSearchClient openSearchClient = new OpenSearchClient(transport);
-      BooleanResponse booleanResponse;
-      try {
-          booleanResponse = openSearchClient.ping();
-          log.info("OpenSearch Active: {}", booleanResponse.value());
-      } catch (IOException e) {
-          log.warn("Search not configured");
-      }
+    BooleanResponse booleanResponse;
+    try {
+      booleanResponse = openSearchClient.ping();
+      log.info("OpenSearch Active: {}", booleanResponse.value());
+    } catch (IOException e) {
+      log.warn("Search not configured");
+    }
     return openSearchClient;
   }
 

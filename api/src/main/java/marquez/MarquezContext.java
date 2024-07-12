@@ -43,7 +43,20 @@ import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
-import marquez.service.*;
+import marquez.service.ColumnLineageService;
+import marquez.service.DatasetFieldService;
+import marquez.service.DatasetService;
+import marquez.service.DatasetVersionService;
+import marquez.service.JobService;
+import marquez.service.LineageService;
+import marquez.service.NamespaceService;
+import marquez.service.OpenLineageService;
+import marquez.service.RunService;
+import marquez.service.RunTransitionListener;
+import marquez.service.SearchService;
+import marquez.service.ServiceFactory;
+import marquez.service.SourceService;
+import marquez.service.TagService;
 import marquez.service.models.Tag;
 import org.jdbi.v3.core.Jdbi;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -158,8 +171,7 @@ public final class MarquezContext {
     this.columnLineageResource = new ColumnLineageResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
-    this.openLineageResource =
-        new OpenLineageResource(serviceFactory, openLineageDao);
+    this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(serviceFactory, searchDao, openSearchClient);
 
     this.resources =

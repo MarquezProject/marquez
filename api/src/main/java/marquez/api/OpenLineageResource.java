@@ -44,6 +44,7 @@ import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
+
 @Slf4j
 @Path("/api/v1")
 public class OpenLineageResource extends BaseResource {
@@ -52,8 +53,7 @@ public class OpenLineageResource extends BaseResource {
   private final OpenLineageDao openLineageDao;
 
   public OpenLineageResource(
-      @NonNull final ServiceFactory serviceFactory,
-      @NonNull final OpenLineageDao openLineageDao) {
+      @NonNull final ServiceFactory serviceFactory, @NonNull final OpenLineageDao openLineageDao) {
     super(serviceFactory);
     this.openLineageDao = openLineageDao;
   }
