@@ -35,6 +35,7 @@ import {
   Jobs,
   LineageGraph,
   Namespaces,
+  Runs,
   Tags,
 } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
@@ -167,8 +168,14 @@ export function* fetchRunsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_RUNS)
-      const { runs } = yield call(getRuns, payload.jobName, payload.namespace)
-      yield put(fetchRunsSuccess(payload.jobName, runs))
+      const response: Runs = yield call(
+        getRuns,
+        payload.jobName,
+        payload.namespace,
+        payload.limit,
+        payload.offset
+      )
+      yield put(fetchRunsSuccess(payload.jobName, response.runs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }

@@ -238,7 +238,8 @@ public class JobResource extends BaseResource {
 
     final List<Run> runs =
         runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    return Response.ok(new Runs(runs)).build();
+    final int totalCount = jobService.countJobRuns(namespaceName.getValue(), jobName.getValue());
+    return Response.ok(new Runs(runs, totalCount)).build();
   }
 
   @Path("/jobs/runs/{id}")
@@ -328,6 +329,9 @@ public class JobResource extends BaseResource {
   public static class Runs {
     @NonNull
     @JsonProperty("runs")
-    List<Run> value;
+    List<Run> value;    
+
+    @JsonProperty("totalCount")
+    int totalCount;
   }
 }

@@ -1,10 +1,12 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import * as Redux from 'redux'
 import { ArrowBackIosRounded } from '@mui/icons-material'
 import {
   Box,
   Chip,
+  CircularProgress,
   IconButton,
   Table,
   TableBody,
@@ -12,8 +14,12 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
+import { IState } from '../../store/reducers'
 import { Run } from '../../types/api'
 import { alpha, createTheme } from '@mui/material/styles'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { fetchRuns } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
@@ -21,18 +27,45 @@ import { useTheme } from '@emotion/react'
 import MqCode from '../core/code/MqCode'
 import MqCopy from '../core/copy/MqCopy'
 import MqEmpty from '../core/empty/MqEmpty'
+import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
 
-interface RunsProps {
-  runs: Run[]
-  facets?: object
+interface DispatchProps {
+  fetchRuns: typeof fetchRuns
 }
 
+interface StateProps {
+  runs: Run[]
+  facets?: object
+  jobName: string
+  jobNamespace: string
+  totalCount: number
+  runsLoading: boolean
+}
+
+interface RunsState {
+  page: number
+}
+
+type RunsProps = StateProps & DispatchProps
+
+const PAGE_SIZE = 10
+
 const Runs: FunctionComponent<RunsProps> = (props) => {
-  const { runs, facets } = props
+  const { runs, facets, jobName, jobNamespace, totalCount, fetchRuns, runsLoading } = props
+
+  // set state in runs
+  const [state, setState] = React.useState<RunsState>({
+    page: 0,
+  })
+
+  React.useEffect(() => {
+    fetchRuns(jobName, jobNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+  }, [state.page])
+
   const i18next = require('i18next')
   if (runs.length === 0) {
     return <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
@@ -44,6 +77,21 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
   }
 
   const theme = createTheme(useTheme())
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+    // reset page scroll
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
+  }
+
+  if (runsLoading) {
+    return (
+      <Box display={'flex'} justifyContent={'center'} mt={2}>
+        <CircularProgress color='primary' />
+      </Box>
+    )
+  }
 
   if (infoView) {
     return (
@@ -149,6 +197,13 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
           })}
         </TableBody>
       </Table>
+      <MqPaging
+        pageSize={PAGE_SIZE}
+        currentPage={state.page}
+        totalCount={totalCount}
+        incrementPage={() => handleClickPage('next')}
+        decrementPage={() => handleClickPage('prev')}
+      />
       {facets && (
         <Box mt={2}>
           <Box mb={1}>
@@ -161,4 +216,17 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
   )
 }
 
-export default Runs
+const mapStateToProps = (state: IState) => ({
+  runs: state.runs.result,
+  totalCount: state.runs.totalCount,
+  runsLoading: state.runs.isLoading,
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchRuns: fetchRuns,
+    },
+    dispatch
+  )
+export default connect(mapStateToProps, mapDispatchToProps)(Runs)

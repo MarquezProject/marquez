@@ -57,7 +57,6 @@ type IProps = {
   job: LineageJob
   jobs: IState['jobs']
   runs: Run[]
-  runsLoading: boolean
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
   jobTags: string[]
@@ -74,7 +73,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     dialogToggle,
     runs,
     display,
-    runsLoading,
     tabIndex,
     setTabIndex,
     jobTags,
@@ -88,8 +86,9 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   }
   const i18next = require('i18next')
 
+  // return only latest row
   useEffect(() => {
-    fetchRuns(job.name, job.namespace)
+    fetchRuns(job.name, job.namespace, 10, 0)
     fetchJobTags(job.namespace, job.name)
   }, [job.name])
 
@@ -107,7 +106,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     }
   }, [])
 
-  if (runsLoading || jobs.isLoading) {
+  if (jobs.isLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -271,14 +270,13 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Runs jobNamespace={job.namespace} jobName={job.name} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
   runs: state.runs.result,
-  runsLoading: state.runs.isLoading,
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,

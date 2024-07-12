@@ -183,6 +183,7 @@ export type JobType = 'BATCH' | 'STREAM' | 'SERVICE'
 
 export interface Runs {
   runs: Run[]
+  totalCount: number
 }
 
 export interface Run {

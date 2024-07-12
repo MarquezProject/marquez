@@ -5,9 +5,9 @@ import { FETCH_RUNS, FETCH_RUNS_SUCCESS, RESET_RUNS } from '../actionCreators/ac
 import { Run } from '../../types/api'
 import { fetchRunsSuccess } from '../actionCreators'
 
-export type IRunsState = { isLoading: boolean; result: Run[]; init: boolean }
+export type IRunsState = { isLoading: boolean; result: Run[]; init: boolean; totalCount: number }
 
-export const initialState: IRunsState = { isLoading: false, result: [], init: false }
+export const initialState: IRunsState = { isLoading: false, result: [], init: false, totalCount: 0 }
 
 type IRunsAction = ReturnType<typeof fetchRunsSuccess>
 
@@ -17,7 +17,13 @@ export default (state = initialState, action: IRunsAction): IRunsState => {
     case FETCH_RUNS:
       return { ...state, isLoading: true }
     case FETCH_RUNS_SUCCESS:
-      return { ...state, isLoading: false, init: true, result: payload.runs }
+      return {
+        ...state,
+        isLoading: false,
+        init: true,
+        result: payload.runs,
+        totalCount: payload.totalCount,
+      }
     case RESET_RUNS:
       return initialState
     default:
