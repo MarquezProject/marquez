@@ -48,6 +48,7 @@ interface StateProps {
 
 interface RunsState {
   page: number
+  pageInit: boolean
 }
 
 type RunsProps = StateProps & DispatchProps
@@ -60,10 +61,13 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
   // set state in runs
   const [state, setState] = React.useState<RunsState>({
     page: 0,
+    pageInit: true
   })
 
   React.useEffect(() => {
+    if (!state.pageInit){
     fetchRuns(jobName, jobNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+    }
   }, [state.page])
 
   const i18next = require('i18next')
@@ -82,7 +86,7 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
     // reset page scroll
     window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage })
+    setState({ ...state, page: directionPage, pageInit: false})
   }
 
   if (runsLoading) {
