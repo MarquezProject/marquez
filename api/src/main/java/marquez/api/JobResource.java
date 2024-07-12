@@ -329,7 +329,7 @@ public class JobResource extends BaseResource {
   public static class Runs {
     @NonNull
     @JsonProperty("runs")
-    List<Run> value;    
+    List<Run> value;
 
     @JsonProperty("totalCount")
     int totalCount;
