@@ -103,6 +103,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     return () => {
       resetRuns()
       resetJobs()
+      setTabIndex(0)
     }
   }, [])
 

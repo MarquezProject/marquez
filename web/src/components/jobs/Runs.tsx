@@ -58,35 +58,34 @@ const PAGE_SIZE = 10
 const Runs: FunctionComponent<RunsProps> = (props) => {
   const { runs, facets, jobName, jobNamespace, totalCount, fetchRuns, runsLoading } = props
 
-  // set state in runs
+  const i18next = require('i18next')
+
   const [state, setState] = React.useState<RunsState>({
     page: 0,
-    pageInit: true
+    pageInit: true,
   })
-
-  React.useEffect(() => {
-    if (!state.pageInit){
-    fetchRuns(jobName, jobNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
-    }
-  }, [state.page])
-
-  const i18next = require('i18next')
-  if (runs.length === 0) {
-    return <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
-  }
-
-  const [infoView, setInfoView] = React.useState<Run | null>(null)
-  const handleClick = (newValue: SetStateAction<Run | null>) => {
-    setInfoView(newValue)
-  }
-
-  const theme = createTheme(useTheme())
 
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
     // reset page scroll
     window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage, pageInit: false})
+    setState({ ...state, page: directionPage, pageInit: false })
+  }
+
+  const theme = createTheme(useTheme())
+  const [infoView, setInfoView] = React.useState<Run | null>(null)
+  const handleClick = (newValue: SetStateAction<Run | null>) => {
+    setInfoView(newValue)
+  }
+
+  React.useEffect(() => {
+    if (!state.pageInit) {
+      fetchRuns(jobName, jobNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+    }
+  }, [state.page])
+
+  if (runs.length === 0) {
+    return <MqEmpty title={i18next.t('jobs.empty_title')} body={i18next.t('jobs.empty_body')} />
   }
 
   if (runsLoading) {
@@ -195,7 +194,11 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
                 <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
                 <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
                 <TableCell align='left'>N/A</TableCell>
-                <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
+                <TableCell align='left'>
+                  {run.state === 'RUNNING' || run.state === 'NEW'
+                    ? 'N/A'
+                    : stopWatchDuration(run.durationMs)}
+                </TableCell>
               </TableRow>
             )
           })}
