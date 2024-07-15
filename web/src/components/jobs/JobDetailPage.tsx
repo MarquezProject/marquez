@@ -37,6 +37,7 @@ import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import JobTags from './JobTags'
 import MqEmpty from '../core/empty/MqEmpty'
+import MqPaging from '../paging/MqPaging'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
@@ -53,6 +54,10 @@ interface DispatchProps {
   fetchJobTags: typeof fetchJobTags
 }
 
+interface RunsState {
+  page: number
+}
+
 type IProps = {
   job: LineageJob
   jobs: IState['jobs']
@@ -60,7 +65,11 @@ type IProps = {
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
   jobTags: string[]
+  totalCount: number
+  runsLoading: boolean
 } & DispatchProps
+
+const PAGE_SIZE = 10
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
@@ -77,6 +86,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex,
     jobTags,
     fetchJobTags,
+    totalCount,
+    runsLoading,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -84,13 +95,28 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
+
+  const [state, setState] = React.useState<RunsState>({
+    page: 0,
+  })
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+    // reset page scroll
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
+  }
+
   const i18next = require('i18next')
 
   // return only latest row
   useEffect(() => {
-    fetchRuns(job.name, job.namespace, 10, 0)
     fetchJobTags(job.namespace, job.name)
   }, [job.name])
+
+  useEffect(() => {
+    fetchRuns(job.name, job.namespace, PAGE_SIZE, state.page)
+  }, [job.name, state.page])
 
   useEffect(() => {
     if (jobs.deletedJobName) {
@@ -107,7 +133,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     }
   }, [])
 
-  if (jobs.isLoading) {
+  if (jobs.isLoading || runsLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -271,7 +297,16 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Runs jobNamespace={job.namespace} jobName={job.name} />}
+      {tabIndex === 1 && <Runs runs={runs} />}
+      {tabIndex === 1 && (
+        <MqPaging
+          pageSize={PAGE_SIZE}
+          currentPage={state.page}
+          totalCount={totalCount}
+          incrementPage={() => handleClickPage('next')}
+          decrementPage={() => handleClickPage('prev')}
+        />
+      )}
     </Box>
   )
 }
@@ -282,6 +317,8 @@ const mapStateToProps = (state: IState) => ({
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
   jobTags: state.jobs.jobTags,
+  totalCount: state.runs.totalCount,
+  runsLoading: state.runs.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
