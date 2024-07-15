@@ -144,7 +144,7 @@ opensearch:
   ## Opensearch password
   extraEnvs:
     - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
-      value: admin
+      value: Marquez4Ever!
 
 ## Additional labels to all the deployed resources; note that
 ## the following standard labels will automatically be applied.

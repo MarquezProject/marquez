@@ -29,7 +29,7 @@ search:
   host: opensearch
   port: 9200
   username: admin
-  password: admin
+  password: ${SEARCH_PASSWORD:-admin}
 
 tags:
   - name: PII
