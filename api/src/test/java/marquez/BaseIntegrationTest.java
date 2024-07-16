@@ -215,10 +215,14 @@ public abstract class BaseIntegrationTest {
 
   protected CompletableFuture<HttpResponse<String>> getMetrics() {
     HttpRequest request =
-        HttpRequest.newBuilder()
-            .uri(URI.create(baseUrl + "/metrics"))
-            .GET()
-            .build();
+        HttpRequest.newBuilder().uri(URI.create(baseUrl + "/metrics")).GET().build();
+
+    return http2.sendAsync(request, BodyHandlers.ofString());
+  }
+
+  protected CompletableFuture<HttpResponse<String>> getMetricsV2() {
+    HttpRequest request =
+        HttpRequest.newBuilder().uri(URI.create(baseUrl + "/metrics/v2")).GET().build();
 
     return http2.sendAsync(request, BodyHandlers.ofString());
   }
