@@ -20,6 +20,7 @@ import {
   FETCH_JOBS,
   FETCH_JOB_FACETS,
   FETCH_JOB_TAGS,
+  FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
@@ -86,6 +87,7 @@ import {
   fetchFacetsSuccess,
   fetchJobTagsSuccess,
   fetchJobsSuccess,
+  fetchLatestRunsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
@@ -178,6 +180,18 @@ export function* fetchRunsSaga() {
       yield put(fetchRunsSuccess(payload.jobName, response.runs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
+    }
+  }
+}
+
+export function* fetchLatestRunsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LATEST_RUNS)
+      const response: Runs = yield call(getRuns, payload.jobName, payload.namespace, 14, 0)
+      yield put(fetchLatestRunsSuccess(response.runs))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching latest job runs'))
     }
   }
 }
@@ -433,6 +447,7 @@ export default function* rootSaga(): Generator {
   const sagasThatWatchForAction = [
     fetchJobsSaga(),
     fetchRunsSaga(),
+    fetchLatestRunsSaga(),
     fetchDatasetsSaga(),
     fetchDatasetSaga(),
     fetchDatasetVersionsSaga(),

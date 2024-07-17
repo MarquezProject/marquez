@@ -315,6 +315,21 @@ export const fetchRunsSuccess = (jobName: string, jobRuns: Run[], totalCount: nu
   },
 })
 
+export const fetchLatestRuns = (jobName: string, namespace: string) => ({
+  type: actionTypes.FETCH_LATEST_RUNS,
+  payload: {
+    jobName,
+    namespace,
+  },
+})
+
+export const fetchLatestRunsSuccess = (jobRuns: Run[]) => ({
+  type: actionTypes.FETCH_LATEST_RUNS_SUCCESS,
+  payload: {
+    runs: jobRuns,
+  },
+})
+
 export const fetchRunFacets = (runId: string) => ({
   type: actionTypes.FETCH_RUN_FACETS,
   payload: {

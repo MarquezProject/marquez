@@ -20,7 +20,7 @@ import {
   deleteJob,
   dialogToggle,
   fetchJobTags,
-  fetchRuns,
+  fetchLatestRuns,
   resetJobs,
   resetRuns,
   setTabIndex,
@@ -37,7 +37,6 @@ import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import JobTags from './JobTags'
 import MqEmpty from '../core/empty/MqEmpty'
-import MqPaging from '../paging/MqPaging'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
@@ -45,7 +44,7 @@ import Runs from './Runs'
 import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
-  fetchRuns: typeof fetchRuns
+  fetchLatestRuns: typeof fetchLatestRuns
   resetRuns: typeof resetRuns
   resetJobs: typeof resetJobs
   deleteJob: typeof deleteJob
@@ -54,40 +53,32 @@ interface DispatchProps {
   fetchJobTags: typeof fetchJobTags
 }
 
-interface RunsState {
-  page: number
-}
-
 type IProps = {
   job: LineageJob
   jobs: IState['jobs']
-  runs: Run[]
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
   jobTags: string[]
-  totalCount: number
-  runsLoading: boolean
+  latestRuns: Run[]
+  isLatestRunsLoading: boolean
 } & DispatchProps
-
-const PAGE_SIZE = 10
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
   const {
     job,
     jobs,
-    fetchRuns,
+    fetchLatestRuns,
     resetRuns,
     deleteJob,
     dialogToggle,
-    runs,
+    latestRuns,
     display,
     tabIndex,
     setTabIndex,
     jobTags,
     fetchJobTags,
-    totalCount,
-    runsLoading,
+    isLatestRunsLoading,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -96,27 +87,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  const [state, setState] = React.useState<RunsState>({
-    page: 0,
-  })
-
-  const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
-    // reset page scroll
-    window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage })
-  }
-
   const i18next = require('i18next')
 
-  // return only latest row
   useEffect(() => {
     fetchJobTags(job.namespace, job.name)
+    fetchLatestRuns(job.name, job.namespace)
   }, [job.name])
-
-  useEffect(() => {
-    fetchRuns(job.name, job.namespace, PAGE_SIZE, state.page)
-  }, [job.name, state.page])
 
   useEffect(() => {
     if (jobs.deletedJobName) {
@@ -127,13 +103,13 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   // unmounting
   useEffect(() => {
     return () => {
-      resetRuns()
       resetJobs()
+      resetRuns()
       setTabIndex(0)
     }
   }, [])
 
-  if (jobs.isLoading || runsLoading) {
+  if (jobs.isLoading || isLatestRunsLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -270,7 +246,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
             label={'Running Status'.toUpperCase()}
-            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(latestRuns)} />}
           />
         </Grid>
       </Grid>
@@ -297,34 +273,24 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Runs runs={runs} />}
-      {tabIndex === 1 && (
-        <MqPaging
-          pageSize={PAGE_SIZE}
-          currentPage={state.page}
-          totalCount={totalCount}
-          incrementPage={() => handleClickPage('next')}
-          decrementPage={() => handleClickPage('prev')}
-        />
-      )}
+      {tabIndex === 1 && <Runs jobName={job.name} jobNamespace={job.namespace} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  runs: state.runs.result,
+  latestRuns: state.runs.latestRuns,
+  isLatestRunsLoading: state.runs.isLatestRunsLoading,
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
   jobTags: state.jobs.jobTags,
-  totalCount: state.runs.totalCount,
-  runsLoading: state.runs.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchRuns: fetchRuns,
+      fetchLatestRuns: fetchLatestRuns,
       resetRuns: resetRuns,
       resetJobs: resetJobs,
       deleteJob: deleteJob,
