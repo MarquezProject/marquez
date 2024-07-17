@@ -7,6 +7,8 @@ package marquez;
 
 import static marquez.db.ColumnLineageTestUtils.getDatasetA;
 import static marquez.db.ColumnLineageTestUtils.getDatasetB;
+import static marquez.db.LineageTestUtils.PRODUCER_URL;
+import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -573,5 +575,59 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     jobs = client.listJobs(namespaceName);
     assertThat(jobs).hasSize(1);
+  }
+
+  @Test
+  public void testApp_getTableVersionsWithSymlinks() {
+    client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, DB_TABLE_META);
+
+    ImmutableMap<String, Object> outputFacets =
+        ImmutableMap.of("outputFacetKey", "outputFacetValue");
+    ImmutableMap<String, Object> inputFacets = ImmutableMap.of("inputFacetKey", "inputFacetValue");
+
+    final LineageEvent.DatasetFacets datasetFacets =
+        LineageTestUtils.newDatasetFacet(
+            outputFacets,
+            LineageEvent.SchemaField.builder()
+                .name("firstname")
+                .type("string")
+                .description("the first name")
+                .build());
+    datasetFacets
+        .getDocumentation()
+        .setDescription(DB_TABLE_META.getDescription().orElse("the dataset documentation"));
+    datasetFacets.setSymlinks(
+        new LineageEvent.DatasetSymlinkFacet(
+            PRODUCER_URL,
+            SCHEMA_URL,
+            Collections.singletonList(
+                new LineageEvent.SymlinkIdentifier("symlinkNamespace", "symlinkName", "type"))));
+    final LineageEvent lineageEvent =
+        LineageEvent.builder()
+            .producer("testApp_getTableVersionsWithSymlinks")
+            .eventType("COMPLETE")
+            .run(
+                new LineageEvent.Run(
+                    UUID.randomUUID().toString(), LineageEvent.RunFacet.builder().build()))
+            .job(LineageEvent.Job.builder().namespace(NAMESPACE_NAME).name(JOB_NAME).build())
+            .eventTime(ZonedDateTime.now())
+            .inputs(
+                Collections.singletonList(
+                    LineageEvent.Dataset.builder()
+                        .namespace(NAMESPACE_NAME)
+                        .name(DB_TABLE_NAME)
+                        .facets(datasetFacets)
+                        .build()))
+            .outputs(Collections.emptyList())
+            .build();
+    System.out.println("event is " + lineageEvent);
+    final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
+    assertThat(resp.join()).isEqualTo(201);
+    List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
+
+    versions.forEach(
+        datasetVersion -> {
+          assertThat(datasetVersion.getName()).isNotEqualTo("symlinkName");
+        });
   }
 }
