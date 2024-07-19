@@ -198,7 +198,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     assertThat(initialDatasetVersion.getTags()).isEqualTo(DB_TABLE_META.getTags());
     assertThat(initialDatasetVersion.getCreatedByRun()).isNotPresent();
     assertThat(initialDatasetVersion.hasFacets()).isFalse();
-    System.out.println(initialDatasetVersion);
+
     final DatasetVersion latestDatasetVersion =
         client.getDatasetVersion(NAMESPACE_NAME, DB_TABLE_NAME, versions.get(0).getVersion());
     assertThat(latestDatasetVersion.getCreatedByRun()).isPresent();
