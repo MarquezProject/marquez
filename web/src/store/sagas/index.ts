@@ -17,6 +17,7 @@ import {
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
   FETCH_EVENTS,
+  FETCH_INITIAL_DATASET_VERSIONS,
   FETCH_JOBS,
   FETCH_JOB_FACETS,
   FETCH_JOB_TAGS,
@@ -28,7 +29,7 @@ import {
 import {
   ColumnLineageGraph,
   Dataset,
-  DatasetVersion,
+  DatasetVersions,
   Datasets,
   Events,
   Facets,
@@ -83,6 +84,7 @@ import {
   fetchDatasetsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
+  fetchInitialDatasetVersionsSuccess,
   fetchJobTagsSuccess,
   fetchJobsSuccess,
   fetchLineageSuccess,
@@ -385,14 +387,34 @@ export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET_VERSIONS)
-      const datasets: DatasetVersion[] = yield call(
+      const response: DatasetVersions = yield call(
         getDatasetVersions,
         payload.namespace,
-        payload.name
+        payload.name,
+        payload.limit,
+        payload.offset
       )
-      yield put(fetchDatasetVersionsSuccess(datasets))
+      yield put(fetchDatasetVersionsSuccess(response.versions, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
+    }
+  }
+}
+
+export function* fetchInitialDatasetVersionsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_INITIAL_DATASET_VERSIONS)
+      const response: DatasetVersions = yield call(
+        getDatasetVersions,
+        payload.namespace,
+        payload.name,
+        1,
+        0
+      )
+      yield put(fetchInitialDatasetVersionsSuccess(response.versions, response.totalCount))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching dataset versions'))
     }
   }
 }
@@ -429,6 +451,7 @@ export default function* rootSaga(): Generator {
     fetchDatasetsSaga(),
     fetchDatasetSaga(),
     fetchDatasetVersionsSaga(),
+    fetchInitialDatasetVersionsSaga(),
     fetchEventsSaga(),
     fetchJobFacetsSaga(),
     fetchRunFacetsSaga(),

@@ -219,7 +219,9 @@ const JobTags: React.FC<IProps> = (props) => {
           <MQText label sx={{ fontSize: '1.25rem' }} bottomMargin>
             Select a Tag to change
           </MQText>
-          <MQText label sx={{ fontSize: '0.85rem' }}>Tag</MQText>
+          <MQText label sx={{ fontSize: '0.85rem' }}>
+            Tag
+          </MQText>
           <Autocomplete
             options={tagData.map((option) => option.name)}
             autoSelect

@@ -44,9 +44,11 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, dataset, fetchJobFacets, resetFacets, showTags } = props
   const i18next = require('i18next')
   const dsNamespace = useSelector(
-    (state: IState) => state.datasetVersions.result.versions[0].namespace
+    (state: IState) => state.datasetVersions.initDsVersion.versions[0].namespace
   )
-  const dsName = useSelector((state: IState) => state.datasetVersions.result.versions[0].name)
+  const dsName = useSelector(
+    (state: IState) => state.datasetVersions.initDsVersion.versions[0].name
+  )
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
