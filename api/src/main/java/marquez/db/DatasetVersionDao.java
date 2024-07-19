@@ -310,7 +310,7 @@ public interface DatasetVersionDao extends BaseDao {
   Optional<DatasetVersionRow> findRowByUuid(UUID uuid);
 
   @SqlQuery(
-    """
+      """
     select
         count(*)
     from

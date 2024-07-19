@@ -31,7 +31,6 @@ import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import marquez.api.JobResource.Runs;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.DatasetVersionNotFoundException;
 import marquez.api.models.ResultsPage;
@@ -135,8 +134,10 @@ public class DatasetResource extends BaseResource {
         datasetVersionService.findAllWithRun(
             namespaceName.getValue(), datasetName.getValue(), limit, offset);
 
-    final int totalCount = datasetVersionService.countDatasetVersions(namespaceName.getValue(), datasetName.getValue());
-     return Response.ok(new DatasetVersions(datasetVersions, totalCount)).build();
+    final int totalCount =
+        datasetVersionService.countDatasetVersions(
+            namespaceName.getValue(), datasetName.getValue());
+    return Response.ok(new DatasetVersions(datasetVersions, totalCount)).build();
   }
 
   @Timed
