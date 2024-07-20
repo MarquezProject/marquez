@@ -136,7 +136,12 @@ const Runs: FunctionComponent<RunsProps> = (props) => {
                 }}
                 onClick={() => handleClick(run)}
               >
-                <TableCell align='left'>{run.id}</TableCell>
+                <TableCell align='left'>
+                  <Box display={'flex'} alignItems={'center'}>
+                    {run.id.substring(0, 8)}...
+                    <MqCopy string={run.id} />{' '}
+                  </Box>
+                </TableCell>
                 <TableCell align='left'>
                   <MqStatus color={runStateColor(run.state)} label={run.state} />
                 </TableCell>
