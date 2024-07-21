@@ -111,7 +111,6 @@ class DatasetDaoTest {
                 new RunId(UUID.randomUUID())));
 
     // Same dataset id, different dataset versions, but same schema version
-    System.out.println(secondResult);
     assertEquals(firstResult.getId(), secondResult.getId());
     assertNotEquals(firstResult.getCurrentVersion(), secondResult.getCurrentVersion());
     assertEquals(resolveSchemaVersion(firstResult), resolveSchemaVersion(secondResult));
