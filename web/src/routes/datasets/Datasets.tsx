@@ -28,6 +28,7 @@ import {
 } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { truncateText } from '../../helpers/text'
 import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
@@ -203,11 +204,11 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 dataset.name
                               )}`}
                             >
-                              {dataset.name}
+                              {truncateText(dataset.name, 40)}
                             </MqText>
                           </TableCell>
                           <TableCell align='left'>
-                            <MqText>{dataset.namespace}</MqText>
+                            <MqText>{truncateText(dataset.namespace, 40)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText>{dataset.sourceName}</MqText>
