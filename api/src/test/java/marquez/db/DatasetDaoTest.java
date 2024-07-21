@@ -111,9 +111,14 @@ class DatasetDaoTest {
                 new RunId(UUID.randomUUID())));
 
     // Same dataset id, different dataset versions, but same schema version
+    System.out.println(secondResult);
     assertEquals(firstResult.getId(), secondResult.getId());
     assertNotEquals(firstResult.getCurrentVersion(), secondResult.getCurrentVersion());
     assertEquals(resolveSchemaVersion(firstResult), resolveSchemaVersion(secondResult));
+
+    // test count of dataset versions
+    int jobCount = datasetVersionDao.countDatasetVersions(NAMESPACE, DATASET);
+    assertEquals(jobCount, 2);
   }
 
   @Test
@@ -310,6 +315,7 @@ class DatasetDaoTest {
 
     Optional<marquez.service.models.Dataset> datasetByName =
         datasetDao.findDatasetByName(NAMESPACE, DATASET);
+
     assertThat(datasetByName)
         .isPresent()
         .get()

@@ -176,7 +176,6 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
 
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
     assertThat(versions).hasSizeGreaterThanOrEqualTo(2);
-
     versions.forEach(
         datasetVersion -> {
           assertThat(datasetVersion.getId())
@@ -270,7 +269,6 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     client.createDataset(NAMESPACE_NAME, "table1", DB_TABLE_META_WITH_RUN);
 
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, "table1");
-
     assertThat(versions).hasSizeGreaterThan(1);
     DatasetVersion version = versions.get(0); // most recent dataset version
     assertThat(version.getCreatedByRun()).isNotEqualTo(Optional.empty());
