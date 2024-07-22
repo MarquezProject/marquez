@@ -62,10 +62,6 @@ function parseStringToSegments(input: string): TextSegment[] {
   })
 }
 
-// function getValueAfterLastPeriod(s: string) {
-//   return s.split('.').pop()
-// }
-
 const useArrowKeys = (callback: (key: 'up' | 'down' | 'enter') => void) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -88,7 +84,7 @@ const useArrowKeys = (callback: (key: 'up' | 'down' | 'enter') => void) => {
 }
 
 const FIELDS_TO_PRINT = 5
-const DEBOUNCE_TIME_MS = 500
+const DEBOUNCE_TIME_MS = 200
 
 const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
@@ -98,6 +94,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   esSearchDatasets,
 }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
+  const [isDebouncing, setIsDebouncing] = React.useState<boolean>(true)
   const navigate = useNavigate()
 
   useArrowKeys((key) => {
@@ -124,16 +121,24 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
   })
 
   const debouncedFetchJobs = useCallback(
-    debounce((searchTerm) => fetchEsSearchJobs(searchTerm), DEBOUNCE_TIME_MS),
+    debounce(async (searchTerm) => {
+      fetchEsSearchJobs(searchTerm);
+      setIsDebouncing(false); // Set loading to false after the fetch completes
+    }, DEBOUNCE_TIME_MS),
     []
-  )
+  );
+
 
   const debouncedFetchDatasets = useCallback(
-    debounce((searchTerm) => fetchEsSearchDatasets(searchTerm), DEBOUNCE_TIME_MS),
+    debounce(async (searchTerm) => {
+      fetchEsSearchDatasets(searchTerm);
+      setIsDebouncing(false); // Set loading to false after the fetch completes
+    }, DEBOUNCE_TIME_MS),
     []
-  )
+  );
 
   useEffect(() => {
+    setIsDebouncing(true)
     debouncedFetchJobs(search)
     debouncedFetchDatasets(search)
   }, [search, debouncedFetchJobs, debouncedFetchDatasets])
@@ -142,7 +147,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
     setSelectedIndex(null)
   }, [esSearchJobs.data.hits, esSearchDatasets.data.hits])
 
-  if (esSearchJobs.data.hits.length === 0 && esSearchDatasets.data.hits.length === 0) {
+  if (esSearchJobs.data.hits.length === 0 && esSearchDatasets.data.hits.length === 0 && !isDebouncing) {
     return (
       <Box my={4}>
         <MqEmpty title={'No Hits'} body={'Keep typing or try a more precise search.'} />
