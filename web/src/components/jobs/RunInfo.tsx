@@ -59,12 +59,12 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   return (
     <Box>
       {<MqCode code={(jobFacets?.sql as SqlFacet)?.query} language={'sql'} />}
-      {
+      {jobFacets?.sourceCode && (
         <MqCode
           code={(jobFacets.sourceCode as SourceCodeFacet)?.sourceCode}
           language={(jobFacets.sourceCode as SourceCodeFacet)?.language}
         />
-      }
+      )}
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
