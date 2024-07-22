@@ -620,7 +620,6 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
                         .build()))
             .outputs(Collections.emptyList())
             .build();
-    System.out.println("event is " + lineageEvent);
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
     assertThat(resp.join()).isEqualTo(201);
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
