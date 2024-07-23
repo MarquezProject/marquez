@@ -71,19 +71,40 @@ export const fetchDatasetSuccess = (dataset: Dataset) => ({
   },
 })
 
-export const fetchDatasetVersions = (namespace: string, name: string) => ({
+export const fetchDatasetVersions = (
+  namespace: string,
+  name: string,
+  limit: number,
+  offset: number
+) => ({
   type: actionTypes.FETCH_DATASET_VERSIONS,
+  payload: {
+    namespace,
+    name,
+    limit,
+    offset,
+  },
+})
+
+export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[], totalCount: number) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
+  payload: { versions, totalCount },
+})
+
+export const fetchInitialDatasetVersions = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_INITIAL_DATASET_VERSIONS,
   payload: {
     namespace,
     name,
   },
 })
 
-export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
-  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
-  payload: {
-    versions,
-  },
+export const fetchInitialDatasetVersionsSuccess = (
+  versions: DatasetVersion[],
+  totalCount: number
+) => ({
+  type: actionTypes.FETCH_INITIAL_DATASET_VERSIONS_SUCCESS,
+  payload: { versions, totalCount },
 })
 
 export const resetDatasetVersions = () => ({

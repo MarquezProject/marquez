@@ -316,6 +316,20 @@ public interface DatasetVersionDao extends BaseDao {
   Optional<DatasetVersionRow> findRowByUuid(UUID uuid);
 
   @SqlQuery(
+      """
+    select
+        count(*)
+    from
+        dataset_versions
+    where
+        namespace_name = :namespaceName
+    and
+        dataset_name = :dataset
+    ;
+    """)
+  int countDatasetVersions(String namespaceName, String dataset);
+
+  @SqlQuery(
       "INSERT INTO dataset_versions "
           + "(uuid, created_at, dataset_uuid, version, dataset_schema_version_uuid, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
           + "VALUES "

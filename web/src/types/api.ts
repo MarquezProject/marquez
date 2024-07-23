@@ -101,6 +101,7 @@ interface InputFields {
 }
 
 export interface DatasetVersions {
+  totalCount: number
   versions: DatasetVersion[]
 }
 
