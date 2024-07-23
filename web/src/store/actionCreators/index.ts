@@ -317,18 +317,36 @@ export const deleteJobSuccess = (jobName: string) => ({
   },
 })
 
-export const fetchRuns = (jobName: string, namespace: string) => ({
+export const fetchRuns = (jobName: string, namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_RUNS,
+  payload: {
+    jobName,
+    namespace,
+    limit,
+    offset,
+  },
+})
+
+export const fetchRunsSuccess = (jobName: string, jobRuns: Run[], totalCount: number) => ({
+  type: actionTypes.FETCH_RUNS_SUCCESS,
+  payload: {
+    jobName,
+    runs: jobRuns,
+    totalCount,
+  },
+})
+
+export const fetchLatestRuns = (jobName: string, namespace: string) => ({
+  type: actionTypes.FETCH_LATEST_RUNS,
   payload: {
     jobName,
     namespace,
   },
 })
 
-export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
-  type: actionTypes.FETCH_RUNS_SUCCESS,
+export const fetchLatestRunsSuccess = (jobRuns: Run[]) => ({
+  type: actionTypes.FETCH_LATEST_RUNS_SUCCESS,
   payload: {
-    jobName,
     runs: jobRuns,
   },
 })
