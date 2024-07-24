@@ -38,7 +38,7 @@ import marquez.jobs.DbRetentionJob;
 import marquez.logging.DelegatingSqlLogger;
 import marquez.logging.LabelledSqlLogger;
 import marquez.logging.LoggingMdcFilter;
-import marquez.service.SqlMetrics;
+import marquez.service.DatabaseMetrics;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
@@ -62,7 +62,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
   private static final String PROMETHEUS = "prometheus";
   private static final String PROMETHEUS_V2 = "prometheus_v2";
   private static final String PROMETHEUS_ENDPOINT = "/metrics";
-  private static final String PROMETHEUS_ENDPOINT_V2 = "/metrics/v2";
+  private static final String PROMETHEUS_ENDPOINT_V2 = "/v2beta/metrics";
 
   public static void main(final String[] args) throws Exception {
     new MarquezApp().run(args);
@@ -78,9 +78,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // Enable metric collection for prometheus.
     CollectorRegistry.defaultRegistry.register(
         new DropwizardExports(bootstrap.getMetricRegistry()));
-    SqlMetrics.registry.register(new DropwizardExports(bootstrap.getMetricRegistry()));
+    DatabaseMetrics.registry.register(new DropwizardExports(bootstrap.getMetricRegistry()));
     DefaultExports.initialize(); // Add metrics for CPU, JVM memory, etc.
-    DefaultExports.register(SqlMetrics.registry);
+    DefaultExports.register(DatabaseMetrics.registry);
 
     // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
@@ -206,7 +206,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // Expose metrics for monitoring.
     env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
     env.servlets()
-        .addServlet(PROMETHEUS_V2, new MetricsServlet(SqlMetrics.registry))
+        .addServlet(PROMETHEUS_V2, new MetricsServlet(DatabaseMetrics.registry))
         .addMapping(PROMETHEUS_ENDPOINT_V2);
   }
 

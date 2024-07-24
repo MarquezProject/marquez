@@ -46,9 +46,9 @@ public class MetricsIntegrationTest extends BaseIntegrationTest {
                 });
     assertThat(response.join())
         .contains(
-            "marquez_sql_duration_seconds_sum{object_name=\"marquez.db.NamespaceDao\","
-                + "method_name=\"findAll\","
-                + "endpoint_method=\"GET\","
-                + "endpoint_path=\"/api/v1/namespaces\",}");
+            "marquez_db_duration_seconds_by_http_call_sum{sql_class=\"marquez.db.NamespaceDao\","
+                + "sql_method=\"findAll\","
+                + "http_method=\"GET\","
+                + "http_path=\"/api/v1/namespaces\",}");
   }
 }

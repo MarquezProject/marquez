@@ -7,7 +7,7 @@ package marquez.logging;
 
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
-import marquez.service.SqlMetrics;
+import marquez.service.DatabaseMetrics;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.core.statement.StatementContext;
@@ -34,7 +34,7 @@ public class LabelledSqlLogger implements SqlLogger {
     if (extensionMethod != null) {
       final long elapsed = context.getElapsedTime(ChronoUnit.NANOS);
       if (MDC.get("method") != null && MDC.get("pathWithParams") != null) {
-        SqlMetrics.emitSqlDurationMetrics(
+        DatabaseMetrics.recordDbDuration(
             extensionMethod.getType().getName(),
             extensionMethod.getMethod().getName(),
             MDC.get("method"),

@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
-import marquez.service.SqlMetrics;
+import marquez.service.DatabaseMetrics;
 import org.jdbi.v3.core.extension.ExtensionMethod;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.junit.jupiter.api.AfterEach;
@@ -55,14 +55,15 @@ public class LabelledSqlLoggerTest {
     when(context.getExtensionMethod()).thenReturn(extensionMethod);
 
     // Mock static method
-    try (MockedStatic<SqlMetrics> mockedSqlMetrics = Mockito.mockStatic(SqlMetrics.class)) {
+    try (MockedStatic<DatabaseMetrics> mockedDatabaseMetrics =
+        Mockito.mockStatic(DatabaseMetrics.class)) {
       // Call the method under test
       logger.logAfterExecution(context);
 
       // Verify the static method call
-      mockedSqlMetrics.verify(
+      mockedDatabaseMetrics.verify(
           () ->
-              SqlMetrics.emitSqlDurationMetrics(
+              DatabaseMetrics.recordDbDuration(
                   "marquez.logging.LabelledSqlLoggerTest$TestClass",
                   "testMethod",
                   "GET",
@@ -86,14 +87,15 @@ public class LabelledSqlLoggerTest {
     when(context.getExtensionMethod()).thenReturn(extensionMethod);
 
     // Mock static method
-    try (MockedStatic<SqlMetrics> mockedSqlMetrics = Mockito.mockStatic(SqlMetrics.class)) {
+    try (MockedStatic<DatabaseMetrics> mockedSqlMetrics =
+        Mockito.mockStatic(DatabaseMetrics.class)) {
       // Call the method under test
       logger.logException(context, new SQLException("Test Exception"));
 
       // Verify the static method call
       mockedSqlMetrics.verify(
           () ->
-              SqlMetrics.emitSqlDurationMetrics(
+              DatabaseMetrics.recordDbDuration(
                   "marquez.logging.LabelledSqlLoggerTest$TestClass",
                   "testMethod",
                   "POST",
