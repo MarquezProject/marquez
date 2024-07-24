@@ -25,6 +25,7 @@ import { fetchEvents, resetEvents } from '../../store/actionCreators'
 import { fileSize, formatUpdatedAt } from '../../helpers'
 import { formatDateAPIQuery, formatDatePicker } from '../../helpers/time'
 import { saveAs } from 'file-saver'
+import { truncateText } from '../../helpers/text'
 import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
@@ -305,9 +306,9 @@ const Events: React.FC<EventsProps> = ({
                               label={event.eventType}
                             />
                           </TableCell>
-                          <TableCell align='left'>{event.job.name}</TableCell>
+                          <TableCell align='left'>{truncateText(event.job.name, 40)}</TableCell>
                           <TableCell align='left'>
-                            <MqText> {event.job.namespace} </MqText>
+                            <MqText> {truncateText(event.job.namespace, 40)} </MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText>{formatUpdatedAt(event.eventTime)}</MqText>

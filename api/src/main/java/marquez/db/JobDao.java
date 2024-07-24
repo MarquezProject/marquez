@@ -253,6 +253,20 @@ public interface JobDao extends BaseDao {
   int count();
 
   @SqlQuery(
+      """
+      select
+          count(*)
+      from
+          runs
+      where
+          namespace_name = :namespaceName
+      and
+          job_name = :job
+      ;
+      """)
+  int countJobRuns(String namespaceName, String job);
+
+  @SqlQuery(
       "SELECT count(*) FROM jobs_view AS j WHERE j.namespace_name = :namespaceName\n"
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);

@@ -19,7 +19,12 @@ export const deleteJob = async (jobName: string, namespace: string) => {
   return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteJob')
 }
 
-export const getRuns = async (jobName: string, namespace: string, limit = 100, offset = 0) => {
+export const getRuns = async (
+  jobName: string,
+  namespace: string,
+  limit: number,
+  offset: number
+) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/jobs/${encodeURIComponent(
     jobName
   )}/runs?limit=${limit}&offset=${offset}`
