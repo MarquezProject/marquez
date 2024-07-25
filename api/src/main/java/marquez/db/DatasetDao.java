@@ -126,7 +126,7 @@ public interface DatasetDao extends BaseDao {
                   df.facet,
                   df."name",
                   df.created_at,
-                  rank() OVER (PARTITION BY "name"
+                  rank() OVER (PARTITION BY df.dataset_version_uuid, "name"
                                ORDER BY created_at DESC) AS r
           FROM dataset_facets AS df
           WHERE df.facet IS NOT NULL
