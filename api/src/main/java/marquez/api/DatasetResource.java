@@ -4,6 +4,7 @@
  */
 
 package marquez.api;
+import java.time.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -125,15 +126,24 @@ public class DatasetResource extends BaseResource {
       @PathParam("dataset") DatasetName datasetName,
       @QueryParam("limit") @DefaultValue("100") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset) {
+    LocalDateTime time1 = java.time.LocalDateTime.now();
     throwIfNotExists(namespaceName);
+    LocalDateTime time2 = java.time.LocalDateTime.now();
     throwIfNotExists(namespaceName, datasetName);
+    LocalDateTime time3 = java.time.LocalDateTime.now();
     checkArgument(limit >= 0, "limit must be >= 0");
+    LocalDateTime time4 = java.time.LocalDateTime.now();
     checkArgument(offset >= 0, "offset must be >= 0");
+    LocalDateTime time5 = java.time.LocalDateTime.now();
 
     final List<DatasetVersion> datasetVersions =
         datasetVersionService.findAllWithRun(
             namespaceName.getValue(), datasetName.getValue(), limit, offset);
-    return Response.ok(new DatasetVersions(datasetVersions)).build();
+    LocalDateTime time6 = java.time.LocalDateTime.now();
+    Response val = Response.ok(new DatasetVersions(datasetVersions)).build();
+    LocalDateTime time7 = java.time.LocalDateTime.now();
+    System.out.println(">>> LocalDateTime : " + time1 + "\n"+ time2 + "\n"+ time3 + "\n"+ time4 + "\n" + time5+ "\n"+ time6 + "\n" + time7);
+    return val;
   }
 
   @Timed

@@ -61,14 +61,57 @@ public interface JobDao extends BaseDao {
   @SqlQuery(
       """
     WITH job_versions_facets AS (
-        SELECT job_version_uuid, JSON_AGG(facet) as facets
-        FROM job_facets
-        GROUP BY job_version_uuid
-    )
-    SELECT j.*, facets
-    FROM jobs_view j
-    LEFT OUTER JOIN job_versions_facets f ON j.current_version_uuid = f.job_version_uuid
-    WHERE j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
+            SELECT
+                f.job_version_uuid
+            ,   JSON_AGG(f.facet) as facets
+            FROM
+                job_facets f
+            LEFT JOIN
+                jobs_view j on j.current_version_uuid = f.job_version_uuid
+            WHERE
+                j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
+            GROUP BY
+                job_version_uuid
+        ),
+        job_tags as (
+        SELECT
+            j.uuid
+        ,   ARRAY_AGG(t.name) as tags
+        FROM
+            jobs j
+        INNER JOIN
+            jobs_tag_mapping jtm
+        ON
+            jtm.job_uuid = j.uuid
+        AND
+            j.simple_name = :jobName
+        AND
+            j.namespace_name = :namespaceName
+        INNER JOIN
+            tags t
+        ON
+            jtm.tag_uuid = t.uuid
+        GROUP BY
+          j.uuid
+        )
+        SELECT
+            j.*
+        ,   facets
+        ,   jt.tags as tags
+        FROM
+            jobs_view j
+        LEFT OUTER JOIN
+            job_versions_facets f
+        ON
+            j.current_version_uuid = f.job_version_uuid
+        LEFT OUTER JOIN
+            job_tags jt
+        ON
+            j.uuid = jt.uuid
+        WHERE
+            j.namespace_name = :namespaceName
+        AND
+            (j.name = :jobName OR :jobName = ANY(j.aliases))
   """)
   Optional<Job> findJobByName(String namespaceName, String jobName);
 

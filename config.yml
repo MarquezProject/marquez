@@ -13,7 +13,6 @@ db:
   user: marquez_preprod
   password: ${POSTGRES_PASSWORD}
 
-
 migrateOnStartup: true
 
 graphql:
@@ -35,3 +34,10 @@ exclude:
     onRead:
       enabled: true
       pattern: '.*[!@#$%^&*()+=\[\]{};\|,<>?].*|^\/.*|^$'
+
+metrics:
+  frequency: ${METRICS_FREQUENCY:-1 minute}
+  reporters:
+    - type: console
+      timeZone: UTC
+      output: stdout
