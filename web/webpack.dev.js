@@ -41,6 +41,7 @@ const webpackDev = {
   plugins: [
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(true),
+      __REACT_APP_ADVANCED_SEARCH__: JSON.stringify(process.env.REACT_APP_ADVANCED_SEARCH || true),
       __API_URL__: JSON.stringify('/api/v1'),
       __NODE_ENV__: JSON.stringify('development'),
       __TEMP_ACTOR_STR__: JSON.stringify('me'),

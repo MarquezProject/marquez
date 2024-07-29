@@ -15,6 +15,7 @@ import EsSearch from './es-search/EsSearch'
 import IconButton from '@mui/material/IconButton'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
+import {REACT_APP_ADVANCED_SEARCH} from "../../globals";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -49,8 +50,6 @@ const useEscapeShortcut = (callback: () => void) => {
     }
   }, [callback])
 }
-
-const isAdvancedSearchEnabled = true
 
 interface StateProps {
   isLoading: boolean
@@ -188,7 +187,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                   overflow={'auto'}
                   maxHeight={`calc(100vh - ${HEADER_HEIGHT}px - 24px)`}
                 >
-                  {isAdvancedSearchEnabled ? (
+                  {REACT_APP_ADVANCED_SEARCH ? (
                     <EsSearch search={search} />
                   ) : (
                     <BaseSearch search={search} />
