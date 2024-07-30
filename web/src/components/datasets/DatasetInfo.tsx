@@ -140,11 +140,11 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                                 disabled={!hasColumnLineage}
                                 size={'small'}
                                 component={Link}
-                                to={`/datasets/column-level/${dataset.namespace}/${
-                                  dataset.name
+                                to={`/datasets/column-level/${encodeURIComponent(dataset.namespace)}/${
+                                  encodeURIComponent(dataset.name)
                                 }?column=${encodeURIComponent(
                                   encodeQueryString(dataset.namespace, dataset.name, field.name)
-                                )}&columnName=${field.name}`}
+                                )}&columnName=${encodeURIComponent(field.name)}`}
                               >
                                 <SplitscreenIcon />
                               </IconButton>
