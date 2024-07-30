@@ -6,7 +6,7 @@
 
 ### Added
 * API: add endpoint method and path to metrics name [`#2850`](https://github.com/MarquezProject/marquez/pull/2850) [@JDarDagran](https://github.com/JDarDagran)  
-    *In the metrics endpoint there was information gathered containing the SQL Object name and method name. This introduces labels (DAO name, DAO method, endpoint method, endpoint path) to add more information about endpoints.*
+    *In the metrics endpoint, there was information gathered containing the SQL Object name and method name. This introduces labels (DAO name, DAO method, endpoint method, endpoint path) and adds more information about endpoints.*
 * API: add paging to dataset versions panel [`#2855`](https://github.com/MarquezProject/marquez/pull/2855) [@davidsharp7](https://github.com/davidsharp7)  
     *Adds Datasets paging.*
 * API: add paging on Jobs panel [`#2852`](https://github.com/MarquezProject/marquez/pull/2852) [@davidsharp7](https://github.com/davidsharp7)  
