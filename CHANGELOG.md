@@ -26,7 +26,7 @@
 * API: Dataset query to get only the latest facet for each version [`#2859`](https://github.com/MarquezProject/marquez/pull/2859) [@sophiely](https://github.com/sophiely)  
     *The facet partition is ranked by Dataset version and facet name so as we can take only the most recent facet for each Dataset UUID and type.*
 * API: optimize column lineage query performance [`#2821`](https://github.com/MarquezProject/marquez/pull/2821) [@vinhnemo](https://github.com/vinhnemo)  
-    *Adds a filter condition to the CTE `dataset_fields_view` in [ColumnLineageDao.java:](https://github.com/MarquezProject/marquez/blob/d6ac3e6435748cada4e08516250feee48ed9c0fa/api/src/main/java/marquez/db/ColumnLineageDao.java#L187)*
+    *Adds a filter condition to the CTE `dataset_fields_view` in [ColumnLineageDao.java](https://github.com/MarquezProject/marquez/blob/d6ac3e6435748cada4e08516250feee48ed9c0fa/api/src/main/java/marquez/db/ColumnLineageDao.java#L187).*
 * Web: deduplicate the versions displayed [`#2854`](https://github.com/MarquezProject/marquez/pull/2854) [@namyyys](https://github.com/namyyys)  
     *Excludes the symlinks from the result of the query displaying the version history in order to exclude duplicate versions.*
 * Web: clean up issues highlighted by some Spark Integration Data [`#2856`](https://github.com/MarquezProject/marquez/pull/2856) [@phixMe](https://github.com/phixMe)  
