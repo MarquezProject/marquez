@@ -67,8 +67,8 @@ public class OpenLineageResource extends BaseResource {
   @Path("/lineage")
   public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
-    serviceFactory.getSearchService().indexEvent((LineageEvent) event);
     if (event instanceof LineageEvent) {
+      serviceFactory.getSearchService().indexEvent((LineageEvent) event);
       openLineageService
           .createAsync((LineageEvent) event)
           .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
@@ -78,16 +78,6 @@ public class OpenLineageResource extends BaseResource {
       // return serialized event
       asyncResponse.resume(Response.status(200).entity(event).build());
     }
-  }
-
-  private UUID runUuidFromEvent(LineageEvent.Run run) {
-    UUID runUuid;
-    try {
-      runUuid = UUID.fromString(run.getRunId());
-    } catch (Exception e) {
-      runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
-    }
-    return runUuid;
   }
 
   private void onComplete(Void result, Throwable err, AsyncResponse asyncResponse) {
