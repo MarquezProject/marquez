@@ -40,6 +40,8 @@ import marquez.common.models.RunId;
 import marquez.db.OpenLineageDao;
 import marquez.service.ServiceFactory;
 import marquez.service.models.BaseEvent;
+import marquez.service.models.DatasetEvent;
+import marquez.service.models.JobEvent;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.NodeId;
 
@@ -69,6 +71,14 @@ public class OpenLineageResource extends BaseResource {
       serviceFactory.getSearchService().indexEvent((LineageEvent) event);
       openLineageService
           .createAsync((LineageEvent) event)
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
+    } else if (event instanceof DatasetEvent) {
+      openLineageService
+          .createAsync((DatasetEvent) event)
+          .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
+    } else if (event instanceof JobEvent) {
+      openLineageService
+          .createAsync((JobEvent) event)
           .whenComplete((result, err) -> onComplete(result, err, asyncResponse));
     } else {
       log.warn("Unsupported event type {}. Skipping without error", event.getClass().getName());
