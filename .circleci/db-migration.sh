@@ -64,7 +64,6 @@ if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --tag "${MARQUEZ_VERSION}" \
   --no-web \
-  --no-search \
   --seed > /dev/null; then
   error "failed to start db using backup!"
   exit_with_cause
@@ -78,7 +77,6 @@ log "start db using backup (marquez=${MARQUEZ_BUILD_VERSION}):"
 if ! ./docker/up.sh \
   --args "--exit-code-from seed_marquez" \
   --no-web \
-  --no-search \
   --no-volumes \
   --build \
   --seed > /dev/null; then
