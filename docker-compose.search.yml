@@ -4,6 +4,9 @@ services:
     image: opensearchproject/opensearch:2.5.0
     container_name: opensearch
     hostname: opensearch
+    sysctls:
+      - net.core.somaxconn=65535
+      - vm.max_map_count=262144
     ulimits:
       memlock:
         soft: -1
@@ -33,6 +36,9 @@ services:
   opensearch-2:
     image: opensearchproject/opensearch:2.5.0
     container_name: opensearch-2
+    sysctls:
+      - net.core.somaxconn=65535
+      - vm.max_map_count=262144
     environment:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-2
