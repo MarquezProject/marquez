@@ -19,7 +19,8 @@ import { connect } from 'react-redux'
 import {
   deleteJob,
   dialogToggle,
-  fetchRuns,
+  fetchJobTags,
+  fetchLatestRuns,
   resetJobs,
   resetRuns,
   setTabIndex,
@@ -34,6 +35,7 @@ import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
+import JobTags from './JobTags'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
@@ -42,21 +44,23 @@ import Runs from './Runs'
 import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
-  fetchRuns: typeof fetchRuns
+  fetchLatestRuns: typeof fetchLatestRuns
   resetRuns: typeof resetRuns
   resetJobs: typeof resetJobs
   deleteJob: typeof deleteJob
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
+  fetchJobTags: typeof fetchJobTags
 }
 
 type IProps = {
   job: LineageJob
   jobs: IState['jobs']
-  runs: Run[]
-  runsLoading: boolean
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
+  jobTags: string[]
+  latestRuns: Run[]
+  isLatestRunsLoading: boolean
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
@@ -64,15 +68,17 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     job,
     jobs,
-    fetchRuns,
+    fetchLatestRuns,
     resetRuns,
     deleteJob,
     dialogToggle,
-    runs,
+    latestRuns,
     display,
-    runsLoading,
     tabIndex,
     setTabIndex,
+    jobTags,
+    fetchJobTags,
+    isLatestRunsLoading,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -80,10 +86,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
+
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchRuns(job.name, job.namespace)
+    fetchJobTags(job.namespace, job.name)
+    fetchLatestRuns(job.name, job.namespace)
   }, [job.name])
 
   useEffect(() => {
@@ -95,12 +103,13 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   // unmounting
   useEffect(() => {
     return () => {
-      resetRuns()
       resetJobs()
+      resetRuns()
+      setTabIndex(0)
     }
   }, [])
 
-  if (runsLoading) {
+  if (jobs.isLoading || isLatestRunsLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -237,11 +246,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
             label={'Running Status'.toUpperCase()}
-            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(latestRuns)} />}
           />
         </Grid>
       </Grid>
       <Divider sx={{ my: 1 }} />
+      <JobTags jobTags={jobTags} jobName={job.name} namespace={job.namespace} />
       <Box
         mb={2}
         display={'flex'}
@@ -263,28 +273,30 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Runs jobName={job.name} jobNamespace={job.namespace} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  runs: state.runs.result,
-  runsLoading: state.runs.isLoading,
+  latestRuns: state.runs.latestRuns,
+  isLatestRunsLoading: state.runs.isLatestRunsLoading,
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
+  jobTags: state.jobs.jobTags,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchRuns: fetchRuns,
+      fetchLatestRuns: fetchLatestRuns,
       resetRuns: resetRuns,
       resetJobs: resetJobs,
       deleteJob: deleteJob,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
+      fetchJobTags: fetchJobTags,
     },
     dispatch
   )

@@ -101,6 +101,7 @@ interface InputFields {
 }
 
 export interface DatasetVersions {
+  totalCount: number
   versions: DatasetVersion[]
 }
 
@@ -171,6 +172,7 @@ export interface Job {
   location: string
   description: string
   latestRun: Run
+  tags: string[]
 }
 
 export interface JobId {
@@ -182,6 +184,7 @@ export type JobType = 'BATCH' | 'STREAM' | 'SERVICE'
 
 export interface Runs {
   runs: Run[]
+  totalCount: number
 }
 
 export interface Run {

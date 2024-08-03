@@ -5,11 +5,13 @@ import * as Effects from 'redux-saga/effects'
 import {
   ADD_DATASET_FIELD_TAG,
   ADD_DATASET_TAG,
+  ADD_JOB_TAG,
   ADD_TAGS,
   DELETE_DATASET,
   DELETE_DATASET_FIELD_TAG,
   DELETE_DATASET_TAG,
   DELETE_JOB,
+  DELETE_JOB_TAG,
   FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
@@ -17,8 +19,11 @@ import {
   FETCH_ES_SEARCH_DATASETS,
   FETCH_ES_SEARCH_JOBS,
   FETCH_EVENTS,
+  FETCH_INITIAL_DATASET_VERSIONS,
   FETCH_JOBS,
   FETCH_JOB_FACETS,
+  FETCH_JOB_TAGS,
+  FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
@@ -27,7 +32,7 @@ import {
 import {
   ColumnLineageGraph,
   Dataset,
-  DatasetVersion,
+  DatasetVersions,
   Datasets,
   EsSearchResultDatasets,
   EsSearchResultJobs,
@@ -36,6 +41,7 @@ import {
   Jobs,
   LineageGraph,
   Namespaces,
+  Runs,
   Tags,
 } from '../../types/api'
 import { all, put, take } from 'redux-saga/effects'
@@ -48,15 +54,18 @@ import { Search } from '../../types/api'
 import {
   addDatasetFieldTag,
   addDatasetTag,
+  addJobTag,
   addTags,
   deleteDataset,
   deleteDatasetFieldTag,
   deleteDatasetTag,
   deleteJob,
+  deleteJobTag,
   getDataset,
   getDatasetVersions,
   getDatasets,
   getEvents,
+  getJob,
   getJobFacets,
   getJobs,
   getNamespaces,
@@ -67,12 +76,14 @@ import {
 import {
   addDatasetFieldTagSuccess,
   addDatasetTagSuccess,
+  addJobTagSuccess,
   addTagsSuccess,
   applicationError,
   deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
   deleteDatasetTagSuccess,
   deleteJobSuccess,
+  deleteJobTagSuccess,
   fetchColumnLineageSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
@@ -81,7 +92,10 @@ import {
   fetchEsSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
+  fetchInitialDatasetVersionsSuccess,
+  fetchJobTagsSuccess,
   fetchJobsSuccess,
+  fetchLatestRunsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchRunsSuccess,
@@ -164,10 +178,28 @@ export function* fetchRunsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_RUNS)
-      const { runs } = yield call(getRuns, payload.jobName, payload.namespace)
-      yield put(fetchRunsSuccess(payload.jobName, runs))
+      const response: Runs = yield call(
+        getRuns,
+        payload.jobName,
+        payload.namespace,
+        payload.limit,
+        payload.offset
+      )
+      yield put(fetchRunsSuccess(payload.jobName, response.runs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
+    }
+  }
+}
+
+export function* fetchLatestRunsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LATEST_RUNS)
+      const response: Runs = yield call(getRuns, payload.jobName, payload.namespace, 14, 0)
+      yield put(fetchLatestRunsSuccess(response.runs))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching latest job runs'))
     }
   }
 }
@@ -178,6 +210,18 @@ export function* fetchJobsSaga() {
       const { payload } = yield take(FETCH_JOBS)
       const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
       yield put(fetchJobsSuccess(response.jobs, response.totalCount))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching job runs'))
+    }
+  }
+}
+
+export function* fetchJobTagsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOB_TAGS)
+      const response: Job = yield call(getJob, payload.namespace, payload.job)
+      yield put(fetchJobTagsSuccess(response.tags))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
@@ -255,6 +299,18 @@ export function* deleteDatasetSaga() {
   }
 }
 
+export function* deleteJobTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_JOB_TAG)
+      yield call(deleteJobTag, payload.namespace, payload.jobName, payload.tag)
+      yield put(deleteJobTagSuccess(payload.namespace, payload.jobName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while removing tag from job'))
+    }
+  }
+}
+
 export function* deleteDatasetTagSaga() {
   while (true) {
     try {
@@ -288,6 +344,18 @@ export function* deleteDatasetFieldTagSaga() {
       )
     } catch (e) {
       yield put(applicationError('Something went wrong while removing tag from dataset field'))
+    }
+  }
+}
+
+export function* addJobTagSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(ADD_JOB_TAG)
+      yield call(addJobTag, payload.namespace, payload.jobName, payload.tag)
+      yield put(addJobTagSuccess(payload.namespace, payload.jobName, payload.tag))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while adding tag to job'))
     }
   }
 }
@@ -346,14 +414,34 @@ export function* fetchDatasetVersionsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_DATASET_VERSIONS)
-      const datasets: DatasetVersion[] = yield call(
+      const response: DatasetVersions = yield call(
         getDatasetVersions,
         payload.namespace,
-        payload.name
+        payload.name,
+        payload.limit,
+        payload.offset
       )
-      yield put(fetchDatasetVersionsSuccess(datasets))
+      yield put(fetchDatasetVersionsSuccess(response.versions, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching dataset runs'))
+    }
+  }
+}
+
+export function* fetchInitialDatasetVersionsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_INITIAL_DATASET_VERSIONS)
+      const response: DatasetVersions = yield call(
+        getDatasetVersions,
+        payload.namespace,
+        payload.name,
+        1,
+        0
+      )
+      yield put(fetchInitialDatasetVersionsSuccess(response.versions, response.totalCount))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while fetching dataset versions'))
     }
   }
 }
@@ -414,9 +502,11 @@ export default function* rootSaga(): Generator {
   const sagasThatWatchForAction = [
     fetchJobsSaga(),
     fetchRunsSaga(),
+    fetchLatestRunsSaga(),
     fetchDatasetsSaga(),
     fetchDatasetSaga(),
     fetchDatasetVersionsSaga(),
+    fetchInitialDatasetVersionsSaga(),
     fetchEventsSaga(),
     fetchJobFacetsSaga(),
     fetchRunFacetsSaga(),
@@ -428,10 +518,13 @@ export default function* rootSaga(): Generator {
     fetchEsSearchDatasetsSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
+    deleteJobTagSaga(),
     addDatasetTagSaga(),
+    addJobTagSaga(),
     deleteDatasetFieldTagSaga(),
     addDatasetFieldTagSaga(),
     addTagsSaga(),
+    fetchJobTagsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

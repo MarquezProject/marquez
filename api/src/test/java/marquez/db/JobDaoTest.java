@@ -136,6 +136,7 @@ public class JobDaoTest {
     assertThat(jobDao.count()).isEqualTo(4);
 
     assertThat(jobDao.countFor(namespace.getName())).isEqualTo(3);
+    assertThat(jobDao.countJobRuns(namespace.getName(), "targetJob")).isEqualTo(0);
   }
 
   @Test

@@ -20,14 +20,16 @@ export const getDatasets = async (namespace: string, limit = 20, offset = 0) => 
 export const getDatasetVersions = async (
   namespace: string,
   dataset: string,
-  limit = 100,
-  offset = 0
+  limit: number,
+  offset: number
 ) => {
   const url = `${API_URL}/namespaces/${encodeURIComponent(namespace)}/datasets/${encodeURIComponent(
     dataset
   )}/versions?limit=${limit}&offset=${offset}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchDatasetVersions').then(
-    (versions: DatasetVersions) => versions.versions
+    (r: DatasetVersions) => {
+      return { versions: r.versions, totalCount: r.totalCount }
+    }
   )
 }
 

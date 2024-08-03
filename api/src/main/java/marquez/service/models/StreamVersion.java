@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.net.URL;
 import java.time.Instant;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -40,6 +41,7 @@ public final class StreamVersion extends DatasetVersion {
       @Nullable final ImmutableList<Field> fields,
       @Nullable final ImmutableSet<TagName> tags,
       @Nullable final String description,
+      @Nullable final UUID currentSchemaVersion,
       @Nullable final String lifecycleState,
       @Nullable final Run createdByRun,
       @Nullable final ImmutableMap<String, Object> facets) {
@@ -55,6 +57,7 @@ public final class StreamVersion extends DatasetVersion {
         tags,
         lifecycleState,
         description,
+        currentSchemaVersion,
         createdByRun,
         facets);
     this.schemaLocation = schemaLocation;
