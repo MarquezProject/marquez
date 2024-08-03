@@ -49,6 +49,7 @@ usage() {
   echo "  -s, --seed            seed HTTP API server with metadata"
   echo "  -d, --detach          run in the background"
   echo "  --no-web              don't start the web UI"
+  echo "  --no-search           don't start search"
   echo "  --no-volumes          don't create volumes"
   echo "  -h, --help            show help for script"
   echo
@@ -68,6 +69,7 @@ WEB_PORT=3000
 POSTGRES_PORT=5432
 SEARCH_PORT=9200
 NO_WEB="false"
+NO_SEARCH="false"
 NO_VOLUMES="false"
 TAG="${VERSION}"
 BUILD="false"
@@ -112,6 +114,7 @@ while [ $# -gt 0 ]; do
        ;;
     -d|'--detach') DETACH='true' ;;
     --no-web) NO_WEB='true' ;;
+    --no-search) NO_SEARCH='true' ;;
     --no-volumes) NO_VOLUMES='true' ;;
     -h|'--help')
        usage
@@ -145,6 +148,11 @@ if [[ "${NO_WEB}" = "false" ]]; then
   compose_files+=" -f docker-compose.web.yml"
   # Enable building web UI from source
   [[ "${BUILD}" = "true" ]] && compose_files+=" -f docker-compose.web-dev.yml"
+fi
+
+# Enable search UI
+if [[ "${NO_SEARCH}" = "false" ]]; then
+  compose_files+=" -f docker-compose.search.yml"
 fi
 
 # Create docker volumes for Marquez
