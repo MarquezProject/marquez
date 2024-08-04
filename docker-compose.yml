@@ -13,20 +13,13 @@ services:
       - data:/opt/marquez
     links:
       - "db:postgres"
-      - opensearch
     depends_on:
-      - opensearch
       - db
     entrypoint: 
       - /opt/marquez/wait-for-it.sh 
       - db:${POSTGRES_PORT}
       - --
-      - /opt/marquez/wait-for-it.sh
-      - opensearch:${SEARCH_PORT}
-      - --
       - ./entrypoint.sh
-    networks:
-      - opensearch-net
 
   db:
     image: postgres:14
@@ -46,16 +39,9 @@ services:
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     # Enables SQL statement logging (see: https://www.postgresql.org/docs/12/runtime-config-logging.html#GUC-LOG-STATEMENT)
     # command: ["postgres", "-c", "log_statement=all"]
-    networks:
-      - opensearch-net
 
 volumes:
   data:
-  opensearch-data:
-  opensearch-2-data:
   db-conf:
   db-init:
   db-backup:
-
-networks:
-  opensearch-net:
