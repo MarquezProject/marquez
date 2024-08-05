@@ -226,7 +226,7 @@ export function* deleteJobSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_JOB)
-      const job: Job = yield call(deleteJob, payload.jobName, payload.namespace)
+      const job: Job = yield call(deleteJob, payload.namespace, payload.jobName)
       yield put(deleteJobSuccess(job.name))
     } catch (e) {
       yield put(applicationError('Something went wrong while removing job'))
@@ -285,7 +285,7 @@ export function* deleteDatasetSaga() {
   while (true) {
     try {
       const { payload } = yield take(DELETE_DATASET)
-      const dataset: Dataset = yield call(deleteDataset, payload.datasetName, payload.namespace)
+      const dataset: Dataset = yield call(deleteDataset, payload.namespace, payload.datasetName)
       yield put(deleteDatasetSuccess(dataset.name))
     } catch (e) {
       yield put(applicationError('Something went wrong while removing job'))
@@ -325,8 +325,8 @@ export function* deleteDatasetFieldTagSaga() {
         deleteDatasetFieldTag,
         payload.namespace,
         payload.datasetName,
-        payload.tag,
-        payload.field
+        payload.field,
+        payload.tag
       )
       yield put(
         deleteDatasetFieldTagSuccess(
@@ -374,8 +374,8 @@ export function* addDatasetFieldTagSaga() {
         addDatasetFieldTag,
         payload.namespace,
         payload.datasetName,
-        payload.tag,
-        payload.field
+        payload.field,
+        payload.tag
       )
       yield put(
         addDatasetFieldTagSuccess(
