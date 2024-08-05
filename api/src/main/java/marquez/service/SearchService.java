@@ -39,7 +39,7 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 @Slf4j
 public class SearchService {
 
-  private OpenSearchClient openSearchClient;
+  private final OpenSearchClient openSearchClient;
 
   public SearchService(SearchConfig searchConfig) {
     final HttpHost host =
