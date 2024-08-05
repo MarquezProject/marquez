@@ -116,6 +116,10 @@ services:
     networks:
       - opensearch-net
 
+  web:
+    networks:
+      - opensearch-net
+
 volumes:
   data:
   opensearch-data:

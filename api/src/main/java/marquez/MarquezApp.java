@@ -7,7 +7,6 @@ package marquez;
 
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -22,7 +21,6 @@ import io.prometheus.client.dropwizard.DropwizardExports;
 import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
 import io.sentry.Sentry;
-import java.io.IOException;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import lombok.NonNull;
@@ -40,16 +38,11 @@ import marquez.jobs.DbRetentionJob;
 import marquez.logging.DelegatingSqlLogger;
 import marquez.logging.LabelledSqlLogger;
 import marquez.logging.LoggingMdcFilter;
-import marquez.search.SearchConfig;
 import marquez.service.DatabaseMetrics;
 import marquez.tracing.SentryConfig;
 import marquez.tracing.TracingContainerResponseFilter;
 import marquez.tracing.TracingSQLLogger;
 import marquez.tracing.TracingServletFilter;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.flywaydb.core.api.FlywayException;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.SqlLogger;
@@ -57,12 +50,6 @@ import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.json.jackson.JacksonJsonpMapper;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.transport.OpenSearchTransport;
-import org.opensearch.client.transport.endpoints.BooleanResponse;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 @Slf4j
 public final class MarquezApp extends Application<MarquezConfig> {
@@ -152,7 +139,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)
-            .openSearchClient(newOpenSearchClient(config.getSearchConfig()))
+            .searchConfig(config.getSearchConfig())
             .tags(config.getTags())
             .build();
 
@@ -169,35 +156,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
     // set namespaceFilter
     ExclusionsConfig exclusions = config.getExclude();
     Exclusions.use(exclusions);
-  }
-
-  private OpenSearchClient newOpenSearchClient(SearchConfig searchConfig) {
-    final HttpHost host =
-        new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
-    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(
-        new AuthScope(host),
-        new UsernamePasswordCredentials(searchConfig.getUsername(), searchConfig.getPassword()));
-    final RestClient restClient =
-        RestClient.builder(host)
-            .setHttpClientConfigCallback(
-                httpClientBuilder ->
-                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
-            .build();
-
-    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
-    // register JavaTimeModule to handle ZonedDateTime
-    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
-    final OpenSearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
-    OpenSearchClient openSearchClient = new OpenSearchClient(transport);
-    BooleanResponse booleanResponse;
-    try {
-      booleanResponse = openSearchClient.ping();
-      log.info("OpenSearch Active: {}", booleanResponse.value());
-    } catch (IOException e) {
-      log.warn("Search not configured");
-    }
-    return openSearchClient;
   }
 
   private boolean isSentryEnabled(MarquezConfig config) {

@@ -38,7 +38,6 @@ import marquez.api.models.SearchSort;
 import marquez.db.SearchDao;
 import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 
@@ -54,9 +53,7 @@ public class SearchResource {
   private final SearchDao searchDao;
 
   public SearchResource(
-      @NonNull final ServiceFactory serviceFactory,
-      @NonNull final SearchDao searchDao,
-      @Nullable final OpenSearchClient openSearchClient) {
+      @NonNull final ServiceFactory serviceFactory, @NonNull final SearchDao searchDao) {
     this.searchService = serviceFactory.getSearchService();
     this.searchDao = searchDao;
   }

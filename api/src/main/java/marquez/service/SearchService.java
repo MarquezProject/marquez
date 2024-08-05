@@ -6,6 +6,7 @@
 package marquez.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -15,9 +16,15 @@ import java.util.Map;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import marquez.search.SearchConfig;
 import marquez.service.models.LineageEvent;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.query_dsl.Operator;
 import org.opensearch.client.opensearch._types.query_dsl.TextQueryType;
@@ -25,14 +32,45 @@ import org.opensearch.client.opensearch.core.IndexRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.BuiltinHighlighterType;
 import org.opensearch.client.opensearch.core.search.HighlighterType;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.endpoints.BooleanResponse;
+import org.opensearch.client.transport.rest_client.RestClientTransport;
 
 @Slf4j
 public class SearchService {
 
-  private final OpenSearchClient openSearchClient;
+  private OpenSearchClient openSearchClient;
 
-  public SearchService(@NonNull final OpenSearchClient openSearchClient) {
-    this.openSearchClient = openSearchClient;
+  public SearchService(SearchConfig searchConfig) {
+    final HttpHost host =
+        new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
+    final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(
+        new AuthScope(host),
+        new UsernamePasswordCredentials(searchConfig.getUsername(), searchConfig.getPassword()));
+    final RestClient restClient =
+        RestClient.builder(host)
+            .setHttpClientConfigCallback(
+                httpClientBuilder ->
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider))
+            .build();
+
+    JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
+    // register JavaTimeModule to handle ZonedDateTime
+    jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
+    final OpenSearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
+    this.openSearchClient = new OpenSearchClient(transport);
+    BooleanResponse booleanResponse;
+    try {
+      booleanResponse = openSearchClient.ping();
+      log.info("OpenSearch Active: {}", booleanResponse.value());
+    } catch (IOException e) {
+      log.warn("Search not configured");
+    }
+  }
+
+  public OpenSearchClient getClient() {
+    return this.openSearchClient;
   }
 
   public SearchResponse<ObjectNode> searchDatasets(String query) throws IOException {

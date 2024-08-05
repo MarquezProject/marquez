@@ -43,6 +43,7 @@ import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
+import marquez.search.SearchConfig;
 import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
@@ -59,7 +60,6 @@ import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.models.Tag;
 import org.jdbi.v3.core.Jdbi;
-import org.opensearch.client.opensearch.OpenSearchClient;
 
 @Getter
 public final class MarquezContext {
@@ -104,17 +104,17 @@ public final class MarquezContext {
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
-  @Getter private final OpenSearchClient openSearchClient;
+  @Getter private final SearchConfig searchConfig;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
-      @NonNull final OpenSearchClient openSearchClient,
+      @NonNull final SearchConfig searchConfig,
       @NonNull final ImmutableSet<Tag> tags,
       List<RunTransitionListener> runTransitionListeners) {
     if (runTransitionListeners == null) {
       runTransitionListeners = new ArrayList<>();
     }
-    this.openSearchClient = openSearchClient;
+    this.searchConfig = searchConfig;
 
     final BaseDao baseDao = jdbi.onDemand(NamespaceDao.class);
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
@@ -147,7 +147,7 @@ public final class MarquezContext {
     this.openLineageService = new OpenLineageService(baseDao, runService);
     this.lineageService = new LineageService(lineageDao, jobDao);
     this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
-    this.searchService = new SearchService(openSearchClient);
+    this.searchService = new SearchService(searchConfig);
     this.jdbiException = new JdbiExceptionExceptionMapper();
     this.jsonException = new JsonProcessingExceptionMapper();
     final ServiceFactory serviceFactory =
@@ -172,7 +172,7 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
-    this.searchResource = new SearchResource(serviceFactory, searchDao, openSearchClient);
+    this.searchResource = new SearchResource(serviceFactory, searchDao);
 
     this.resources =
         ImmutableList.of(
@@ -198,7 +198,7 @@ public final class MarquezContext {
   public static class Builder {
 
     private Jdbi jdbi;
-    private OpenSearchClient openSearchClient;
+    private SearchConfig searchConfig;
     private ImmutableSet<Tag> tags;
     private List<RunTransitionListener> runTransitionListeners;
 
@@ -212,8 +212,8 @@ public final class MarquezContext {
       return this;
     }
 
-    public Builder openSearchClient(@NonNull OpenSearchClient openSearchClient) {
-      this.openSearchClient = openSearchClient;
+    public Builder searchConfig(@NonNull SearchConfig searchConfig) {
+      this.searchConfig = searchConfig;
       return this;
     }
 
@@ -233,7 +233,7 @@ public final class MarquezContext {
     }
 
     public MarquezContext build() {
-      return new MarquezContext(jdbi, openSearchClient, tags, runTransitionListeners);
+      return new MarquezContext(jdbi, searchConfig, tags, runTransitionListeners);
     }
   }
 }
