@@ -91,8 +91,6 @@ spec:
                   key: {{ include "marquez.database.existingsecret.key" . }}
             - name: MIGRATE_ON_STARTUP
               value: {{ .Values.marquez.migrateOnStartup | quote }}
-            - name: SEARCH_PASSWORD
-              value: = {{ "Marquez4Ever!" }}
           {{- if .Values.marquez.resources }}
           resources: {{- toYaml .Values.marquez.resources | nindent 12 }}
           {{- end }}

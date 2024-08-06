@@ -5,8 +5,4 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 11.8.1
-- name: opensearch
-  repository: https://opensearch-project.github.io/helm-charts
-  version: 2.21.0
-digest: sha256:b7f71608c49ded8cd4ea7658d253f6b36f120e3a934281b9c70657115d7cdf9d
-generated: "2024-07-15T13:21:32.634905-07:00"
+
