@@ -18,6 +18,7 @@ import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
+import marquez.api.OpenSearchResource;
 import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
@@ -100,6 +101,7 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final SearchResource searchResource;
+  @Getter private final OpenSearchResource openSearchResource;
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
@@ -172,7 +174,8 @@ public final class MarquezContext {
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
-    this.searchResource = new SearchResource(serviceFactory, searchDao);
+    this.searchResource = new SearchResource(searchDao);
+    this.openSearchResource = new OpenSearchResource(serviceFactory);
 
     this.resources =
         ImmutableList.of(
@@ -185,7 +188,8 @@ public final class MarquezContext {
             jdbiException,
             jsonException,
             openLineageResource,
-            searchResource);
+            searchResource,
+            openSearchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
