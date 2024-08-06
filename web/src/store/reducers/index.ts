@@ -10,6 +10,8 @@ import dataset, { IDatasetState } from './dataset'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'
+import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatasets'
+import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import events, { IEventsState } from './events'
 import facets, { IFacetsState } from './facets'
 import jobs, { IJobsState } from './jobs'
@@ -24,6 +26,8 @@ export interface IState {
   datasets: IDatasetsState
   dataset: IDatasetState
   datasetVersions: IDatasetVersionsState
+  openSearchJobs: IOpenSearchJobsState
+  openSearchDatasets: IOpenSearchDatasetsState
   events: IEventsState
   jobs: IJobsState
   runs: IRunsState
@@ -50,6 +54,8 @@ export default (history: History): Reducer =>
     display,
     lineage,
     search,
+    openSearchJobs,
+    openSearchDatasets,
     facets,
     tags,
   })

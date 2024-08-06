@@ -16,6 +16,8 @@ import {
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
+  FETCH_OPEN_SEARCH_DATASETS,
+  FETCH_OPEN_SEARCH_JOBS,
   FETCH_EVENTS,
   FETCH_INITIAL_DATASET_VERSIONS,
   FETCH_JOBS,
@@ -32,6 +34,8 @@ import {
   Dataset,
   DatasetVersions,
   Datasets,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Events,
   Facets,
   Jobs,
@@ -84,6 +88,8 @@ import {
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
+  fetchOpenSearchDatasetsSuccess,
+  fetchOpenSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
   fetchInitialDatasetVersionsSuccess,
@@ -97,8 +103,8 @@ import {
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
+import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
-import { getSearch } from '../requests/search'
 
 export function* fetchTags() {
   try {
@@ -464,6 +470,33 @@ export function* fetchRunFacetsSaga() {
   }
 }
 
+export function* fetchOpenSearchJobsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_OPEN_SEARCH_JOBS)
+      const OpenSearchResultJobs: OpenSearchResultJobs = yield call(getOpenSearchJobs, payload.q)
+      yield put(fetchOpenSearchJobsSuccess(OpenSearchResultJobs))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while searching'))
+    }
+  }
+}
+
+export function* fetchOpenSearchDatasetsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_OPEN_SEARCH_DATASETS)
+      const OpenSearchResultDatasets: OpenSearchResultDatasets = yield call(
+        getOpenSearchDatasets,
+        payload.q
+      )
+      yield put(fetchOpenSearchDatasetsSuccess(OpenSearchResultDatasets))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while searching'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -481,6 +514,8 @@ export default function* rootSaga(): Generator {
     fetchColumnLineage(),
     fetchSearch(),
     deleteJobSaga(),
+    fetchOpenSearchJobsSaga(),
+    fetchOpenSearchDatasetsSaga(),
     deleteDatasetSaga(),
     deleteDatasetTagSaga(),
     deleteJobTagSaga(),

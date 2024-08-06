@@ -137,7 +137,11 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
     final Jdbi jdbi = newJdbi(config, env, source);
     final MarquezContext marquezContext =
-        MarquezContext.builder().jdbi(jdbi).tags(config.getTags()).build();
+        MarquezContext.builder()
+            .jdbi(jdbi)
+            .searchConfig(config.getSearchConfig())
+            .tags(config.getTags())
+            .build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);

@@ -18,6 +18,7 @@ import marquez.api.DatasetResource;
 import marquez.api.JobResource;
 import marquez.api.NamespaceResource;
 import marquez.api.OpenLineageResource;
+import marquez.api.OpenSearchResource;
 import marquez.api.SearchResource;
 import marquez.api.SourceResource;
 import marquez.api.TagResource;
@@ -43,6 +44,7 @@ import marquez.db.SourceDao;
 import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
+import marquez.search.SearchConfig;
 import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
@@ -53,6 +55,7 @@ import marquez.service.NamespaceService;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
+import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
 import marquez.service.TagService;
@@ -89,6 +92,7 @@ public final class MarquezContext {
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
   @Getter private final ColumnLineageService columnLineageService;
+  @Getter private final SearchService searchService;
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
@@ -97,18 +101,22 @@ public final class MarquezContext {
   @Getter private final TagResource tagResource;
   @Getter private final OpenLineageResource openLineageResource;
   @Getter private final SearchResource searchResource;
+  @Getter private final OpenSearchResource openSearchResource;
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
+  @Getter private final SearchConfig searchConfig;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
+      @NonNull final SearchConfig searchConfig,
       @NonNull final ImmutableSet<Tag> tags,
       List<RunTransitionListener> runTransitionListeners) {
     if (runTransitionListeners == null) {
       runTransitionListeners = new ArrayList<>();
     }
+    this.searchConfig = searchConfig;
 
     final BaseDao baseDao = jdbi.onDemand(NamespaceDao.class);
     this.namespaceDao = jdbi.onDemand(NamespaceDao.class);
@@ -141,6 +149,7 @@ public final class MarquezContext {
     this.openLineageService = new OpenLineageService(baseDao, runService);
     this.lineageService = new LineageService(lineageDao, jobDao);
     this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
+    this.searchService = new SearchService(searchConfig);
     this.jdbiException = new JdbiExceptionExceptionMapper();
     this.jsonException = new JsonProcessingExceptionMapper();
     final ServiceFactory serviceFactory =
@@ -151,6 +160,7 @@ public final class MarquezContext {
             .namespaceService(namespaceService)
             .tagService(tagService)
             .openLineageService(openLineageService)
+            .searchService(searchService)
             .sourceService(sourceService)
             .lineageService(lineageService)
             .columnLineageService(columnLineageService)
@@ -165,6 +175,7 @@ public final class MarquezContext {
     this.tagResource = new TagResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
+    this.openSearchResource = new OpenSearchResource(serviceFactory);
 
     this.resources =
         ImmutableList.of(
@@ -177,7 +188,8 @@ public final class MarquezContext {
             jdbiException,
             jsonException,
             openLineageResource,
-            searchResource);
+            searchResource,
+            openSearchResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
@@ -190,6 +202,7 @@ public final class MarquezContext {
   public static class Builder {
 
     private Jdbi jdbi;
+    private SearchConfig searchConfig;
     private ImmutableSet<Tag> tags;
     private List<RunTransitionListener> runTransitionListeners;
 
@@ -200,6 +213,11 @@ public final class MarquezContext {
 
     public Builder jdbi(@NonNull Jdbi jdbi) {
       this.jdbi = jdbi;
+      return this;
+    }
+
+    public Builder searchConfig(@NonNull SearchConfig searchConfig) {
+      this.searchConfig = searchConfig;
       return this;
     }
 
@@ -219,7 +237,7 @@ public final class MarquezContext {
     }
 
     public MarquezContext build() {
-      return new MarquezContext(jdbi, tags, runTransitionListeners);
+      return new MarquezContext(jdbi, searchConfig, tags, runTransitionListeners);
     }
   }
 }

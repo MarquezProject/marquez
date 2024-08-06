@@ -23,6 +23,14 @@ logging:
   appenders:
     - type: console
 
+search:
+  enabled: true
+  scheme: http
+  host: opensearch
+  port: 9200
+  username: admin
+  password: ${SEARCH_PASSWORD:-admin}
+
 tags:
   - name: PII
     description: Personally identifiable information
