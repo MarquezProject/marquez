@@ -212,6 +212,7 @@ public final class DbModelGenerator extends Generator {
       @NonNull final UUID namespaceUuid,
       @NonNull final String namespaceName) {
     final String parentJobName = newJobName().getValue();
+    final UUID parentJobUuid = newRowUuid();
     final String jobName = newJobName().getValue();
     final String jobSimpleName = jobName;
     return new JobRow(
@@ -224,6 +225,7 @@ public final class DbModelGenerator extends Generator {
         jobName,
         jobSimpleName,
         parentJobName,
+        parentJobUuid,
         newDescription(),
         null,
         newLocation().toString(),
