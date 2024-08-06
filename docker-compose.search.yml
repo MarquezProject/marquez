@@ -120,6 +120,10 @@ services:
     networks:
       - opensearch-net
 
+  seed_marquez:
+    depends_on:
+      - opensearch
+
 volumes:
   data:
   opensearch-data:

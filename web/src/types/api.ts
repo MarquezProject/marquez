@@ -283,7 +283,7 @@ export interface ColumnLineageOutEdge {
   destination: string
 }
 
-// esSearch
+// OpenSearch
 
 // jobs
 interface SourceCodeFacet {
@@ -293,7 +293,7 @@ interface SourceCodeFacet {
   sourceCode: string
 }
 
-interface EsSearchFacet {
+interface OpenSearchFacet {
   sourceCode?: SourceCodeFacet
 }
 
@@ -303,8 +303,8 @@ interface JobHit {
   namespace: string
   eventType: EventType
   type: string
-  facets?: EsSearchFacet
-  runFacets: EsSearchRunFacet
+  facets?: OpenSearchFacet
+  runFacets: OpenSearchRunFacet
 }
 
 interface SparkLogicalPlan {
@@ -362,7 +362,7 @@ interface EnvironmentProperties {
   environmentProperties: Record<string, any>
 }
 
-interface EsSearchRunFacet {
+interface OpenSearchRunFacet {
   'spark.logicalPlan'?: SparkLogicalPlan
   spark_version?: SparkVersion
   processing_engine?: ProcessingEngine
@@ -373,7 +373,7 @@ interface JobHighlight {
   'facets.sourceCode.sourceCode'?: string[]
 }
 
-export interface EsSearchResultJobs {
+export interface OpenSearchResultJobs {
   hits: JobHit[]
   highlights: JobHighlight[]
 }
@@ -415,7 +415,7 @@ type ColumnLineageFacet = {
   }
 }
 
-type EsSearchDatasetFacets = {
+type OpenSearchDatasetFacets = {
   schema?: SchemaFacet
   columnLineage?: ColumnLineageFacet
 }
@@ -425,10 +425,10 @@ type DatasetHit = {
   name: string
   namespace: string
   eventType: string
-  facets?: EsSearchDatasetFacets
+  facets?: OpenSearchDatasetFacets
 }
 
-export type EsSearchResultDatasets = {
+export type OpenSearchResultDatasets = {
   hits: DatasetHit[]
   highlights: DatasetHighlight[]
 }

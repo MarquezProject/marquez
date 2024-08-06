@@ -39,6 +39,30 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 @Slf4j
 public class SearchService {
 
+  String[] DATASET_FIELDS = {
+    "run_id",
+    "name",
+    "namespace",
+    "facets.schema.fields.name",
+    "facets.schema.fields.type",
+    "facets.columnLineage.fields.*.inputFields.name",
+    "facets.columnLineage.fields.*.inputFields.namespace",
+    "facets.columnLineage.fields.*.inputFields.field",
+    "facets.columnLineage.fields.*.transformationDescription",
+    "facets.columnLineage.fields.*.transformationType"
+  };
+
+  String[] JOB_FIELDS = {
+    "facets.sql.query",
+    "facets.sourceCode.sourceCode",
+    "facets.sourceCode.language",
+    "runFacets.processing_engine.name",
+    "run_id",
+    "name",
+    "namespace",
+    "type"
+  };
+
   private final OpenSearchClient openSearchClient;
 
   public SearchService(SearchConfig searchConfig) {
@@ -74,18 +98,6 @@ public class SearchService {
   }
 
   public SearchResponse<ObjectNode> searchDatasets(String query) throws IOException {
-    String[] fields = {
-      "run_id",
-      "name",
-      "namespace",
-      "facets.schema.fields.name",
-      "facets.schema.fields.type",
-      "facets.columnLineage.fields.*.inputFields.name",
-      "facets.columnLineage.fields.*.inputFields.namespace",
-      "facets.columnLineage.fields.*.inputFields.field",
-      "facets.columnLineage.fields.*.transformationDescription",
-      "facets.columnLineage.fields.*.transformationType"
-    };
     return this.openSearchClient.search(
         s ->
             s.index("datasets")
@@ -95,11 +107,11 @@ public class SearchService {
                             m ->
                                 m.query(query)
                                     .type(TextQueryType.PhrasePrefix)
-                                    .fields(Arrays.stream(fields).toList())
+                                    .fields(Arrays.stream(DATASET_FIELDS).toList())
                                     .operator(Operator.Or)))
                 .highlight(
                     hl -> {
-                      for (String field : fields) {
+                      for (String field : DATASET_FIELDS) {
                         hl.fields(
                             field,
                             f ->
@@ -113,16 +125,6 @@ public class SearchService {
   }
 
   public SearchResponse<ObjectNode> searchJobs(String query) throws IOException {
-    String[] fields = {
-      "facets.sql.query",
-      "facets.sourceCode.sourceCode",
-      "facets.sourceCode.language",
-      "runFacets.processing_engine.name",
-      "run_id",
-      "name",
-      "namespace",
-      "type"
-    };
     return this.openSearchClient.search(
         s -> {
           s.index("jobs")
@@ -132,11 +134,11 @@ public class SearchService {
                           m ->
                               m.query(query)
                                   .type(TextQueryType.PhrasePrefix)
-                                  .fields(Arrays.stream(fields).toList())
+                                  .fields(Arrays.stream(JOB_FIELDS).toList())
                                   .operator(Operator.Or)));
           s.highlight(
               hl -> {
-                for (String field : fields) {
+                for (String field : JOB_FIELDS) {
                   hl.fields(
                       field,
                       f ->
@@ -152,7 +154,7 @@ public class SearchService {
 
   public void indexEvent(@Valid @NotNull LineageEvent event) {
     UUID runUuid = runUuidFromEvent(event.getRun());
-    log.info("Indexing event {}", event);
+    log.debug("Indexing event {}", event);
 
     if (event.getInputs() != null) {
       indexDatasets(event.getInputs(), runUuid, event);
@@ -231,7 +233,7 @@ public class SearchService {
     try {
       this.openSearchClient.index(request);
     } catch (IOException e) {
-      log.info("Failed to index event OpenSearch not available.", e);
+      log.error("Failed to index event OpenSearch not available.", e);
     }
   }
 }

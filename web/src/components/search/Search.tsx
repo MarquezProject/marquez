@@ -11,7 +11,7 @@ import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
-import EsSearch from './es-search/EsSearch'
+import OpenSearch from './open-search/OpenSearch'
 import IconButton from '@mui/material/IconButton'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
@@ -188,7 +188,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                   maxHeight={`calc(100vh - ${HEADER_HEIGHT}px - 24px)`}
                 >
                   {REACT_APP_ADVANCED_SEARCH ? (
-                    <EsSearch search={search} />
+                    <OpenSearch search={search} />
                   ) : (
                     <BaseSearch search={search} />
                   )}
@@ -203,7 +203,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
 }
 
 const mapStateToProps = (state: IState) => ({
-  isLoading: state.esSearchJobs.isLoading || state.esSearchDatasets.isLoading,
+  isLoading: state.openSearchJobs.isLoading || state.openSearchDatasets.isLoading,
 })
 
 export default connect(mapStateToProps)(Search)

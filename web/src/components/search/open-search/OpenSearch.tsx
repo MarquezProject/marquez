@@ -4,8 +4,8 @@
 import * as Redux from 'redux'
 import { Chip, Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IEsSearchDatasetsState } from '../../../store/reducers/esSearchDatasets'
-import { IEsSearchJobsState } from '../../../store/reducers/esSearch'
+import { IOpenSearchDatasetsState } from '../../../store/reducers/openSearchDatasets'
+import { IOpenSearchJobsState } from '../../../store/reducers/openSearch'
 import { IState } from '../../../store/reducers'
 import { Nullable } from '../../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
@@ -14,7 +14,7 @@ import { debounce } from 'lodash'
 import { encodeNode, eventTypeColor } from '../../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
-import { fetchEsSearchDatasets, fetchEsSearchJobs } from '../../../store/actionCreators'
+import { fetchOpenSearchDatasets, fetchOpenSearchJobs } from '../../../store/actionCreators'
 import { theme } from '../../../helpers/theme'
 import { truncateText } from '../../../helpers/text'
 import { useNavigate } from 'react-router-dom'
@@ -28,13 +28,13 @@ import airflow_logo from './airlfow-logo.svg'
 import spark_logo from './spark-logo.svg'
 
 interface StateProps {
-  esSearchJobs: IEsSearchJobsState
-  esSearchDatasets: IEsSearchDatasetsState
+  openSearchJobs: IOpenSearchJobsState
+  openSearchDatasets: IOpenSearchDatasetsState
 }
 
 interface DispatchProps {
-  fetchEsSearchJobs: typeof fetchEsSearchJobs
-  fetchEsSearchDatasets: typeof fetchEsSearchDatasets
+  fetchOpenSearchJobs: typeof fetchOpenSearchJobs
+  fetchOpenSearchDatasets: typeof fetchOpenSearchDatasets
 }
 
 interface Props {
@@ -86,12 +86,12 @@ const useArrowKeys = (callback: (key: 'up' | 'down' | 'enter') => void) => {
 const FIELDS_TO_PRINT = 5
 const DEBOUNCE_TIME_MS = 200
 
-const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
+const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
   search,
-  fetchEsSearchJobs,
-  fetchEsSearchDatasets,
-  esSearchJobs,
-  esSearchDatasets,
+  fetchOpenSearchJobs,
+  fetchOpenSearchDatasets,
+  openSearchJobs,
+  openSearchDatasets,
 }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<Nullable<number>>(null)
   const [isDebouncing, setIsDebouncing] = React.useState<boolean>(true)
@@ -106,15 +106,15 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
           ? 0
           : Math.min(
               selectedIndex + 1,
-              esSearchJobs.data.hits.length + esSearchDatasets.data.hits.length - 1
+              openSearchJobs.data.hits.length + openSearchDatasets.data.hits.length - 1
             )
       )
     } else if (selectedIndex !== null) {
-      if (selectedIndex < esSearchJobs.data.hits.length) {
-        const jobHit = esSearchJobs.data.hits[selectedIndex]
+      if (selectedIndex < openSearchJobs.data.hits.length) {
+        const jobHit = openSearchJobs.data.hits[selectedIndex]
         navigate(`/lineage/${encodeNode('JOB', jobHit.namespace, jobHit.name)}`)
       } else {
-        const datasetHit = esSearchDatasets.data.hits[selectedIndex - esSearchJobs.data.hits.length]
+        const datasetHit = openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
         navigate(`/lineage/${encodeNode('DATASET', datasetHit.namespace, datasetHit.name)}`)
       }
     }
@@ -122,7 +122,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   const debouncedFetchJobs = useCallback(
     debounce(async (searchTerm) => {
-      fetchEsSearchJobs(searchTerm);
+      fetchOpenSearchJobs(searchTerm);
       setIsDebouncing(false); // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
@@ -131,7 +131,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   const debouncedFetchDatasets = useCallback(
     debounce(async (searchTerm) => {
-      fetchEsSearchDatasets(searchTerm);
+      fetchOpenSearchDatasets(searchTerm);
       setIsDebouncing(false); // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
@@ -145,9 +145,9 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   useEffect(() => {
     setSelectedIndex(null)
-  }, [esSearchJobs.data.hits, esSearchDatasets.data.hits])
+  }, [openSearchJobs.data.hits, openSearchDatasets.data.hits])
 
-  if (esSearchJobs.data.hits.length === 0 && esSearchDatasets.data.hits.length === 0 && !isDebouncing) {
+  if (openSearchJobs.data.hits.length === 0 && openSearchDatasets.data.hits.length === 0 && !isDebouncing) {
     return (
       <Box my={4}>
         <MqEmpty title={'No Hits'} body={'Keep typing or try a more precise search.'} />
@@ -157,7 +157,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   return (
     <Box>
-      {esSearchJobs.data.hits.map((hit, index) => {
+      {openSearchJobs.data.hits.map((hit, index) => {
         return (
           <Box
             key={`job-${hit.run_id}`}
@@ -226,7 +226,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   Match
                 </MqText>
                 <Box>
-                  {Object.entries(esSearchJobs.data.highlights[index]).map(([key, value]) => {
+                  {Object.entries(openSearchJobs.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
                       return (
                         <Box
@@ -279,7 +279,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
           </Box>
         )
       })}
-      {esSearchDatasets.data.hits.map((hit, index) => {
+      {openSearchDatasets.data.hits.map((hit, index) => {
         return (
           <Box
             key={`dataset-${index}-${hit.run_id}`}
@@ -295,7 +295,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                 backgroundColor: theme.palette.action.hover,
               },
               backgroundColor:
-                selectedIndex === index + esSearchJobs.data.hits.length
+                selectedIndex === index + openSearchJobs.data.hits.length
                   ? theme.palette.action.hover
                   : undefined,
             }}
@@ -326,7 +326,7 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
                   Match
                 </MqText>
                 <Box>
-                  {Object.entries(esSearchDatasets.data.highlights[index]).map(([key, value]) => {
+                  {Object.entries(openSearchDatasets.data.highlights[index]).map(([key, value]) => {
                     return value.map((highlightedString: any, idx: number) => {
                       return (
                         <Box
@@ -393,18 +393,18 @@ const EsSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
 const mapStateToProps = (state: IState) => {
   return {
-    esSearchJobs: state.esSearchJobs,
-    esSearchDatasets: state.esSearchDatasets,
+    openSearchJobs: state.openSearchJobs,
+    openSearchDatasets: state.openSearchDatasets,
   }
 }
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchEsSearchJobs: fetchEsSearchJobs,
-      fetchEsSearchDatasets: fetchEsSearchDatasets,
+      fetchOpenSearchJobs: fetchOpenSearchJobs,
+      fetchOpenSearchDatasets: fetchOpenSearchDatasets,
     },
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(EsSearch)
+export default connect(mapStateToProps, mapDispatchToProps)(OpenSearch)

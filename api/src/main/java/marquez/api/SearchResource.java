@@ -42,7 +42,7 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
-@Path("/api/v1/search")
+@Path("/api/v2beta/search")
 public class SearchResource {
   private static final String YYYY_MM_DD = "^\\d{4}-\\d{2}-\\d{2}$";
   private static final String DEFAULT_SORT = "name";
@@ -109,16 +109,16 @@ public class SearchResource {
     List<Map<String, List<String>>> highlights =
         response.hits().hits().stream().map(Hit::highlight).collect(Collectors.toList());
 
-    return Response.ok(new EsResult(hits, highlights)).build();
+    return Response.ok(new OpenSearchResult(hits, highlights)).build();
   }
 
   @ToString
-  public static final class EsResult {
+  public static final class OpenSearchResult {
     @Getter private final List<ObjectNode> hits;
     @Getter private final List<Map<String, List<String>>> highlights;
 
     @JsonCreator
-    public EsResult(
+    public OpenSearchResult(
         @NonNull List<ObjectNode> hits, @NonNull List<Map<String, List<String>>> highlights) {
       this.hits = hits;
       this.highlights = highlights;
