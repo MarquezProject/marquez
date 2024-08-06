@@ -7,7 +7,7 @@ import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
-import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
+import {DirectionsRun, EscalatorWarning, Speed, SportsScore, Start, Title} from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../../types/lineage'
@@ -41,7 +41,6 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
-import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
   fetchLatestRuns: typeof fetchLatestRuns
@@ -207,46 +206,60 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Created at'.toUpperCase()}
             value={formatUpdatedAt(job.createdAt)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(job.updatedAt)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
-            icon={<SpeedRounded color={'disabled'} />}
+            icon={<Speed color={'disabled'} />}
             label={'Last Runtime'.toUpperCase()}
             value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
+          <MqInfo
+            icon={<Title color={'disabled'} />}
+            label={'Type'.toUpperCase()}
+            value={job.type ? job.type : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={3}>
           <MqInfo
             icon={<Start color={'disabled'} />}
             label={'Last Started'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<SportsScore color={'disabled'} />}
             label={'Last Finished'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
             label={'Running Status'.toUpperCase()}
             value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(latestRuns)} />}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <MqInfo
+            icon={<EscalatorWarning color={'disabled'} />}
+            label={'Parent Job'.toUpperCase()}
+            value={job.parentJobName ? job.parentJobName : 'None'}
           />
         </Grid>
       </Grid>
