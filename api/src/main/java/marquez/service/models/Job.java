@@ -34,6 +34,7 @@ public final class Job {
   @Getter private final JobName name;
   @Getter private final String simpleName;
   @Getter private final String parentJobName;
+  @Getter private final UUID parentJobUuid;
   @Getter private final Instant createdAt;
   @Getter private final Instant updatedAt;
   @Getter private final NamespaceName namespace;
@@ -53,6 +54,7 @@ public final class Job {
       @NonNull final JobName name,
       @NonNull String simpleName,
       @Nullable String parentJobName,
+      @Nullable UUID parentJobUuid,
       @NonNull final Instant createdAt,
       @NonNull final Instant updatedAt,
       @NonNull final Set<DatasetId> inputs,
@@ -69,6 +71,7 @@ public final class Job {
     this.name = name;
     this.simpleName = simpleName;
     this.parentJobName = parentJobName;
+    this.parentJobUuid = parentJobUuid;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.namespace = id.getNamespace();
