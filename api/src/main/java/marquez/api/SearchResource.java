@@ -42,7 +42,7 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
-@Path("/api/v2beta/search")
+@Path("/api/")
 public class SearchResource {
   private static final String YYYY_MM_DD = "^\\d{4}-\\d{2}-\\d{2}$";
   private static final String DEFAULT_SORT = "name";
@@ -63,6 +63,7 @@ public class SearchResource {
   @ExceptionMetered
   @GET
   @Produces(APPLICATION_JSON)
+  @Path("v1/search")
   public Response search(
       @QueryParam("q") @NotBlank String query,
       @QueryParam("filter") @Nullable SearchFilter filter,
@@ -88,9 +89,9 @@ public class SearchResource {
   @ExceptionMetered
   @GET
   @Produces(APPLICATION_JSON)
-  @Path("/jobs")
+  @Path("v2beta/search/jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
-    return formatEsResponse(this.searchService.searchJobs(query));
+    return formatOpenSearchResponse(this.searchService.searchJobs(query));
   }
 
   @Timed
@@ -98,12 +99,12 @@ public class SearchResource {
   @ExceptionMetered
   @GET
   @Produces(APPLICATION_JSON)
-  @Path("/datasets")
+  @Path("v2beta/search/datasets")
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
-    return formatEsResponse(this.searchService.searchDatasets(query));
+    return formatOpenSearchResponse(this.searchService.searchDatasets(query));
   }
 
-  private Response formatEsResponse(SearchResponse<ObjectNode> response) {
+  private Response formatOpenSearchResponse(SearchResponse<ObjectNode> response) {
     List<ObjectNode> hits =
         response.hits().hits().stream().map(Hit::source).collect(Collectors.toList());
     List<Map<String, List<String>>> highlights =
