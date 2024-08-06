@@ -211,8 +211,6 @@ class MarquezUrl {
       queryParams.put("sort", sort);
     }
     queryParams.put("limit", limit);
-    System.out.println("peter");
-    System.out.println(from(searchPath(), queryParams.build()));
     return from(searchPath(), queryParams.build());
   }
 
