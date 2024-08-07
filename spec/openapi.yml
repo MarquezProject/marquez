@@ -1551,6 +1551,15 @@ components:
         name:
           description: The name of the job.
           type: string
+        simpleName:
+          description: The shortened name of the job.
+          type: string
+        parentJobName:
+          description: The name of the parent job.
+          type: string
+        parentJobUuid:
+          description: The UUID of the parent job.
+          type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
