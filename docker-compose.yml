@@ -1,5 +1,19 @@
 version: "3.7"
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - nginx-conf:/etc/nginx
+    environment:
+      - MARQUEZ_HOST=api
+      - MARQUEZ_PORT=${API_PORT}
+    depends_on:
+      - api
+    entrypoint: ["./etc/nginx/entrypoint.sh"]
+
   api:
     image: "marquezproject/marquez:${TAG}"
     container_name: marquez-api
@@ -41,6 +55,7 @@ services:
     # command: ["postgres", "-c", "log_statement=all"]
 
 volumes:
+  nginx-conf:
   data:
   db-conf:
   db-init:
