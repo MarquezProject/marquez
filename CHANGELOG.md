@@ -2,9 +2,24 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.48.0...HEAD)
 
+## [0.49.0](https://github.com/MarquezProject/marquez/compare/0.48.0...0.49.0) - 2024-08-07
+
+### Added
+
+* API: Job-to-Job lineage [`#2752`](https://github.com/MarquezProject/marquez/pull/2752) [@yanlibert](https://github.com/yanlibert)  
+    *Intended in part to spur a larger discussion of full parent/child hierarchy handling in Marquez. Changes only the backend API, adding the Job UUID along with the parent name to the Job metadata returned.*
+
+### Fixed
+
+* Web: security updates [`#2864`](https://github.com/MarquezProject/marquez/pull/2864) [@phixMe](https://github.com/phixMe)  
+    *Resolves `critical` security issues found using NPM's `audit` command.*
+* Web: encode Job name in API requests [`#2866`](https://github.com/MarquezProject/marquez/pull/2866) [@dolfinus](https://github.com/dolfinus)  
+    *Urlencodes Job, Dataset, tag and field names while sending an API request.*
+
 ## [0.48.0](https://github.com/MarquezProject/marquez/compare/0.47.0...0.48.0) - 2024-07-30
 
 ### Added
+
 * API: add endpoint method and path to metrics name [`#2850`](https://github.com/MarquezProject/marquez/pull/2850) [@JDarDagran](https://github.com/JDarDagran)  
     *In the metrics endpoint, there was information gathered containing the SQL Object name and method name. This introduces labels (DAO name, DAO method, endpoint method, endpoint path) and adds more information about endpoints.*
 * API: add paging to dataset versions panel [`#2855`](https://github.com/MarquezProject/marquez/pull/2855) [@davidsharp7](https://github.com/davidsharp7)  
