@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./docs/assets/images/marquez-logo.png" width="500px" />
   <a href="https://lfaidata.foundation/projects">
-    <img src="./docs/assets/images/lfaidata-project-badge-incubation-black.png" width="125px" />
+    <img src="./docs/assets/images/lfaidata-project-badge-graduate-black.png" width="125px" />
   </a>
 </div>
 
