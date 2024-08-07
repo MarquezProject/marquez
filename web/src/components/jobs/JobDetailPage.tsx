@@ -7,7 +7,14 @@ import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
-import {DirectionsRun, EscalatorWarning, Speed, SportsScore, Start, Title} from '@mui/icons-material'
+import {
+  DirectionsRun,
+  EscalatorWarning,
+  Speed,
+  SportsScore,
+  Start,
+  Title,
+} from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../../types/lineage'
@@ -36,6 +43,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import JobTags from './JobTags'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
@@ -259,7 +267,15 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<EscalatorWarning color={'disabled'} />}
             label={'Parent Job'.toUpperCase()}
-            value={job.parentJobName ? job.parentJobName : 'None'}
+            value={
+              job.parentJobName ? (
+                <MQTooltip title={job.parentJobName}>
+                  <>{truncateText(job.parentJobName, 16)}</>
+                </MQTooltip>
+              ) : (
+                'None'
+              )
+            }
           />
         </Grid>
       </Grid>
