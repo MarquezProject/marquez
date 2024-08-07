@@ -273,7 +273,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                   <>{truncateText(job.parentJobName, 16)}</>
                 </MQTooltip>
               ) : (
-                'None'
+                'N/A'
               )
             }
           />
