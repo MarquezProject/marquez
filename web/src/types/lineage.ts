@@ -36,6 +36,8 @@ export interface LineageJob {
   location: string
   description: string
   latestRun: Nullable<Run>
+  parentJobName: Nullable<string>
+  parentJobUuid: Nullable<string>
 }
 
 export interface LineageEdge {
