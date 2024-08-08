@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.49.0-SNAPSHOT
+  version: 0.50.0-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -1550,6 +1550,15 @@ components:
           type: string
         name:
           description: The name of the job.
+          type: string
+        simpleName:
+          description: The shortened name of the job.
+          type: string
+        parentJobName:
+          description: The name of the parent job.
+          type: string
+        parentJobUuid:
+          description: The UUID of the parent job.
           type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
