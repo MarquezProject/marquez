@@ -7,7 +7,14 @@ import '../../i18n/config'
 import * as Redux from 'redux'
 import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
-import { DirectionsRun, SportsScore, Start } from '@mui/icons-material'
+import {
+  DirectionsRun,
+  EscalatorWarning,
+  Speed,
+  SportsScore,
+  Start,
+  Title,
+} from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageJob } from '../../types/lineage'
@@ -20,7 +27,7 @@ import {
   deleteJob,
   dialogToggle,
   fetchJobTags,
-  fetchRuns,
+  fetchLatestRuns,
   resetJobs,
   resetRuns,
   setTabIndex,
@@ -36,15 +43,15 @@ import CloseIcon from '@mui/icons-material/Close'
 import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import JobTags from './JobTags'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
-import SpeedRounded from '@mui/icons-material/SpeedRounded'
 
 interface DispatchProps {
-  fetchRuns: typeof fetchRuns
+  fetchLatestRuns: typeof fetchLatestRuns
   resetRuns: typeof resetRuns
   resetJobs: typeof resetJobs
   deleteJob: typeof deleteJob
@@ -56,11 +63,11 @@ interface DispatchProps {
 type IProps = {
   job: LineageJob
   jobs: IState['jobs']
-  runs: Run[]
-  runsLoading: boolean
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
   jobTags: string[]
+  latestRuns: Run[]
+  isLatestRunsLoading: boolean
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
@@ -68,17 +75,17 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     job,
     jobs,
-    fetchRuns,
+    fetchLatestRuns,
     resetRuns,
     deleteJob,
     dialogToggle,
-    runs,
+    latestRuns,
     display,
-    runsLoading,
     tabIndex,
     setTabIndex,
     jobTags,
     fetchJobTags,
+    isLatestRunsLoading,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -86,11 +93,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const handleChange = (event: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
+
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchRuns(job.name, job.namespace)
     fetchJobTags(job.namespace, job.name)
+    fetchLatestRuns(job.name, job.namespace)
   }, [job.name])
 
   useEffect(() => {
@@ -102,12 +110,13 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   // unmounting
   useEffect(() => {
     return () => {
-      resetRuns()
       resetJobs()
+      resetRuns()
+      setTabIndex(0)
     }
   }, [])
 
-  if (runsLoading || jobs.isLoading) {
+  if (jobs.isLoading || isLatestRunsLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -205,46 +214,68 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Created at'.toUpperCase()}
             value={formatUpdatedAt(job.createdAt)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(job.updatedAt)}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
-            icon={<SpeedRounded color={'disabled'} />}
+            icon={<Speed color={'disabled'} />}
             label={'Last Runtime'.toUpperCase()}
             value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
+          <MqInfo
+            icon={<Title color={'disabled'} />}
+            label={'Type'.toUpperCase()}
+            value={job.type ? job.type : 'N/A'}
+          />
+        </Grid>
+        <Grid item xs={3}>
           <MqInfo
             icon={<Start color={'disabled'} />}
             label={'Last Started'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.startedAt) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<SportsScore color={'disabled'} />}
             label={'Last Finished'.toUpperCase()}
             value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
             label={'Running Status'.toUpperCase()}
-            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(runs)} />}
+            value={<MqStatus label={job.latestRun?.state} color={jobRunsStatus(latestRuns)} />}
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <MqInfo
+            icon={<EscalatorWarning color={'disabled'} />}
+            label={'Parent Job'.toUpperCase()}
+            value={
+              job.parentJobName ? (
+                <MQTooltip title={job.parentJobName}>
+                  <>{truncateText(job.parentJobName, 16)}</>
+                </MQTooltip>
+              ) : (
+                'N/A'
+              )
+            }
           />
         </Grid>
       </Grid>
@@ -271,14 +302,14 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           )
         )
       ) : null}
-      {tabIndex === 1 && <Runs runs={runs} />}
+      {tabIndex === 1 && <Runs jobName={job.name} jobNamespace={job.namespace} />}
     </Box>
   )
 }
 
 const mapStateToProps = (state: IState) => ({
-  runs: state.runs.result,
-  runsLoading: state.runs.isLoading,
+  latestRuns: state.runs.latestRuns,
+  isLatestRunsLoading: state.runs.isLatestRunsLoading,
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
@@ -288,7 +319,7 @@ const mapStateToProps = (state: IState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchRuns: fetchRuns,
+      fetchLatestRuns: fetchLatestRuns,
       resetRuns: resetRuns,
       resetJobs: resetJobs,
       deleteJob: deleteJob,

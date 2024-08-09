@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./docs/assets/images/marquez-logo.png" width="500px" />
   <a href="https://lfaidata.foundation/projects">
-    <img src="./docs/assets/images/lfaidata-project-badge-incubation-black.png" width="125px" />
+    <img src="./docs/assets/images/lfaidata-project-badge-graduate-black.png" width="125px" />
   </a>
 </div>
 
@@ -22,7 +22,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 
 ## Status
 
-Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/marquez) incubation project under active development, and we'd love your help!
+Marquez is an [LF AI & Data Foundation](https://lfaidata.foundation/projects/marquez) Graduated project under active development, and we'd love your help!
 
 ## Adopters
 
@@ -31,6 +31,7 @@ Want to be added? Send a pull request our way!
 * [Astronomer](https://astronomer.io)
 * [Datakin](https://datakin.com)
 * [Northwestern Mutual](https://www.northwesternmutual.com)
+* [Ilum](https://ilum.cloud)
 
 ## Try it!
 
@@ -96,9 +97,9 @@ Versions of Marquez are compatible with OpenLineage unless noted otherwise. We e
 
 | **Marquez**                                                                                      | **OpenLineage**                                               | **Status**    |
 |--------------------------------------------------------------------------------------------------|---------------------------------------------------------------|---------------|
-| [`UNRELEASED`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased)      | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `CURRENT`     |
-| [`0.46.0`](https://github.com/MarquezProject/marquez/blob/0.46.0/CHANGELOG.md#0460---2024-03-15) | [`1-0-5`](https://openlineage.io/spec/1-0-5/OpenLineage.json) | `RECOMMENDED` |
-| [`0.45.0`](https://github.com/MarquezProject/marquez/blob/0.45.0/CHANGELOG.md#0450---2024-03-07) | [`1-0-5`](https://openlineage.io/spec/1-0-0/OpenLineage.json) | `MAINTENANCE` |
+| [`UNRELEASED`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased)      | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `CURRENT`     |
+| [`0.49.0`](https://github.com/MarquezProject/marquez/blob/0.49.0/CHANGELOG.md#0490---2024-08-07) | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `RECOMMENDED` |
+| [`0.48.0`](https://github.com/MarquezProject/marquez/blob/0.45.0/CHANGELOG.md#0480---2024-08-05) | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `MAINTENANCE` |
 
 > **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
 
@@ -179,7 +180,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
 * Chat: [MarquezProject Slack](https://bit.ly/Marquez_Slack_invite)
-* Twitter: [@MarquezProject](https://twitter.com/MarquezProject)
+* X: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing
 
@@ -191,4 +192,4 @@ If you discover a vulnerability in the project, please open an issue and attach 
 
 ----
 SPDX-License-Identifier: Apache-2.0
-Copyright 2018-2023 contributors to the Marquez project.
+Copyright 2018-2024 contributors to the Marquez project.

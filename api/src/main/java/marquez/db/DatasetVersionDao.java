@@ -278,6 +278,11 @@ public interface DatasetVersionDao extends BaseDao {
       	WHERE dv.namespace_name = :namespaceName
             AND dv.dataset_name = :datasetName
       	LIMIT :limit OFFSET :offset
+        ),
+        dataset_symlinks_names as (
+          SELECT DISTINCT dataset_uuid, name
+          FROM dataset_symlinks
+          WHERE NOT is_primary
         )
         SELECT
 	        type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
@@ -285,6 +290,7 @@ public interface DatasetVersionDao extends BaseDao {
             tags, dataset_version_uuid,
 	        JSONB_AGG(facets ORDER BY lineage_event_time ASC) AS facets
         FROM dataset_info
+        WHERE name NOT IN (SELECT name FROM dataset_symlinks_names)
         GROUP BY type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
             created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid
@@ -308,6 +314,20 @@ public interface DatasetVersionDao extends BaseDao {
 
   @SqlQuery(SELECT + "WHERE dv.uuid = :uuid")
   Optional<DatasetVersionRow> findRowByUuid(UUID uuid);
+
+  @SqlQuery(
+      """
+    select
+        count(*)
+    from
+        dataset_versions
+    where
+        namespace_name = :namespaceName
+    and
+        dataset_name = :dataset
+    ;
+    """)
+  int countDatasetVersions(String namespaceName, String dataset);
 
   @SqlQuery(
       "INSERT INTO dataset_versions "

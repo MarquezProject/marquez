@@ -154,6 +154,17 @@ public class LineageService extends DelegatingLineageDao {
         log.error("Could not find job node for {}", jobData);
         continue;
       }
+
+      Optional<JobData> parentJobData = getParentJobData(data.getParentJobUuid());
+      parentJobData.ifPresent(
+          parent -> {
+            log.debug(
+                "child: {}, parent: {} with UUID: {}",
+                parent.getId().getName(),
+                data.getParentJobName(),
+                data);
+          });
+
       Set<DatasetData> inputs =
           data.getInputUuids().stream()
               .map(datasetById::get)

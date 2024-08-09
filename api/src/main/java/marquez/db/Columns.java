@@ -92,6 +92,7 @@ public final class Columns {
 
   /* JOB ROW COLUMNS */
   public static final String PARENT_JOB_NAME = "parent_job_name";
+  public static final String PARENT_JOB_UUID = "parent_job_uuid";
   public static final String SIMPLE_NAME = "simple_name";
   public static final String SYMLINK_TARGET_UUID = "symlink_target_uuid";
 
