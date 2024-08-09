@@ -6,6 +6,7 @@ services:
     environment:
       - MARQUEZ_HOST=api
       - MARQUEZ_PORT=${API_PORT}
+      - WEB_PORT=${WEB_PORT}
       - REACT_APP_ADVANCED_SEARCH=false
     ports:
       - "${WEB_PORT}:${WEB_PORT}"

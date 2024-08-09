@@ -25,7 +25,7 @@ public class JobRow {
   @NonNull String name;
   @NonNull String simpleName;
   @Nullable String parentJobName;
-  @Nullable UUID parentJoUuid;
+  @Nullable UUID parentJobUuid;
   @Nullable String description;
   @Nullable UUID currentVersionUuid;
   @Nullable String location;

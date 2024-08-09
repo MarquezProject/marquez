@@ -9,6 +9,8 @@ const apiOptions = {
 const app = express()
 const path = __dirname + '/dist'
 
+const port = process.env.WEB_PORT
+
 app.use('/', express.static(path))
 app.use('/datasets', express.static(path))
 app.use('/events', express.static(path))
@@ -23,6 +25,6 @@ router.get('/healthcheck', function (req, res) {
 
 app.use(router)
 
-app.listen(3000, function() {
-  console.log('App listening on port 3000!')
+app.listen(port, function() {
+  console.log(`App listening on port ${port}!`)
 })
