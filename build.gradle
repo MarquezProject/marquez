@@ -53,7 +53,6 @@ subprojects {
     ext {
         assertjVersion = '3.25.3'
         dropwizardVersion = '2.1.12'
-        jacksonDatabindVersion = '2.12.3'
         jacocoVersion = '0.8.12'
         junit5Version = '5.10.2'
         lombokVersion = '1.18.34'
@@ -65,7 +64,6 @@ subprojects {
 
     dependencies {
         implementation "org.projectlombok:lombok:${lombokVersion}"
-        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}"
         implementation 'org.opensearch.client:opensearch-rest-client:2.15.0'
         implementation 'org.opensearch.client:opensearch-java:2.6.0'
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"

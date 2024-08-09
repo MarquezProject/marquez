@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package marquez.api;
+package marquez.api.v2beta;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -32,12 +32,12 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 
 @Slf4j
-@Path("api/v2beta/search")
-public class OpenSearchResource {
+@Path("/api/v2beta/search")
+public class SearchResource {
 
   private final SearchService searchService;
 
-  public OpenSearchResource(@NonNull final ServiceFactory serviceFactory) {
+  public SearchResource(@NonNull final ServiceFactory serviceFactory) {
     this.searchService = serviceFactory.getSearchService();
   }
 

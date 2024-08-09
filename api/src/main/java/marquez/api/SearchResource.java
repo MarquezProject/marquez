@@ -34,7 +34,7 @@ import marquez.api.models.SearchSort;
 import marquez.db.SearchDao;
 
 @Slf4j
-@Path("api/v1/search")
+@Path("/api/v1/search")
 public class SearchResource {
   private static final String YYYY_MM_DD = "^\\d{4}-\\d{2}-\\d{2}$";
   private static final String DEFAULT_SORT = "name";

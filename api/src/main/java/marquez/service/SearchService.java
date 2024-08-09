@@ -64,8 +64,10 @@ public class SearchService {
   };
 
   private final OpenSearchClient openSearchClient;
+  private final SearchConfig searchConfig;
 
   public SearchService(SearchConfig searchConfig) {
+    this.searchConfig = searchConfig;
     final HttpHost host =
         new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
     final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -153,6 +155,10 @@ public class SearchService {
   }
 
   public void indexEvent(@Valid @NotNull LineageEvent event) {
+    if (!searchConfig.isEnabled()) {
+      log.debug("Search is disabled, skipping indexing");
+      return;
+    }
     UUID runUuid = runUuidFromEvent(event.getRun());
     log.debug("Indexing event {}", event);
 
