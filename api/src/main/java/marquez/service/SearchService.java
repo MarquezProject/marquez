@@ -249,7 +249,6 @@ public class SearchService {
   }
 
   public boolean isEnabled() {
-    System.out.println("SearchConfig: " + searchConfig.isEnabled());
     return !searchConfig.isEnabled();
   }
 }
