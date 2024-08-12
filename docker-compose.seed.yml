@@ -5,6 +5,7 @@ services:
     container_name: seed-marquez-with-metadata
     environment:
       - MARQUEZ_URL=http://api:${API_PORT}
+      - SEARCH_ENABLED=false
     volumes:
       - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./docker/seed.sh:/usr/src/app/seed.sh

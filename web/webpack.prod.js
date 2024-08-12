@@ -25,7 +25,7 @@ const webpackProd = {
     new webpack.DefinePlugin({
       __DEVELOPMENT__: JSON.stringify(false),
       __NODE_ENV__: JSON.stringify('production'),
-      __REACT_APP_ADVANCED_SEARCH__: JSON.stringify(process.env.REACT_APP_ADVANCED_SEARCH || true),
+      __REACT_APP_ADVANCED_SEARCH__: process.env.REACT_APP_ADVANCED_SEARCH === 'true',
       __API_URL__: JSON.stringify('/api/v1'),
       __API_BETA_URL__: JSON.stringify('/api/v2beta'),
       __TEMP_ACTOR_STR__: JSON.stringify('me'),

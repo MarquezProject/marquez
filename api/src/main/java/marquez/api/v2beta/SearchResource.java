@@ -48,6 +48,9 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
+    if (searchService.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
     return formatOpenSearchResponse(this.searchService.searchJobs(query));
   }
 
@@ -58,6 +61,9 @@ public class SearchResource {
   @Produces(APPLICATION_JSON)
   @Path("datasets")
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
+    if (searchService.isEnabled()) {
+      return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
     return formatOpenSearchResponse(this.searchService.searchDatasets(query));
   }
 

@@ -24,7 +24,7 @@ logging:
     - type: console
 
 search:
-  enabled: true
+  enabled: ${SEARCH_ENABLED:-true}
   scheme: http
   host: ${SEARCH_HOST:-opensearch}
   port: ${SEARCH_PORT:-9200}

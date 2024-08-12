@@ -160,6 +160,12 @@ if [[ "${NO_VOLUMES}" = "false" ]]; then
   ./docker/volumes.sh marquez
 fi
 
+# Enable search in UI an API if search container is enabled
+SEARCH_ENABLED="true"
+if [[ "${NO_SEARCH}" = "true" ]]; then
+  SEARCH_ENABLED="false"
+fi
+
 # Run docker compose cmd with overrides
-DOCKER_SCAN_SUGGEST="false" API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} POSTGRES_PORT=${POSTGRES_PORT} SEARCH_PORT=${SEARCH_PORT} TAG=${TAG} \
+DOCKER_SCAN_SUGGEST="false" API_PORT=${API_PORT} API_ADMIN_PORT=${API_ADMIN_PORT} WEB_PORT=${WEB_PORT} POSTGRES_PORT=${POSTGRES_PORT} SEARCH_ENABLED=${SEARCH_ENABLED} SEARCH_PORT=${SEARCH_PORT} TAG=${TAG} \
   docker --log-level ERROR compose $compose_files up $compose_args

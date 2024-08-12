@@ -68,6 +68,11 @@ public class SearchService {
 
   public SearchService(SearchConfig searchConfig) {
     this.searchConfig = searchConfig;
+    if (!searchConfig.isEnabled()) {
+      log.info("Search is disabled, skipping initialization");
+      this.openSearchClient = null;
+      return;
+    }
     final HttpHost host =
         new HttpHost(searchConfig.getHost(), searchConfig.getPort(), searchConfig.getScheme());
     final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -241,5 +246,10 @@ public class SearchService {
     } catch (IOException e) {
       log.error("Failed to index event OpenSearch not available.", e);
     }
+  }
+
+  public boolean isEnabled() {
+    System.out.println("SearchConfig: " + searchConfig.isEnabled());
+    return !searchConfig.isEnabled();
   }
 }

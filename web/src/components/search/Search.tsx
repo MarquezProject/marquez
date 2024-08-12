@@ -15,7 +15,7 @@ import OpenSearch from './open-search/OpenSearch'
 import IconButton from '@mui/material/IconButton'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
-import {REACT_APP_ADVANCED_SEARCH} from "../../globals";
+import { REACT_APP_ADVANCED_SEARCH } from "../../globals";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
