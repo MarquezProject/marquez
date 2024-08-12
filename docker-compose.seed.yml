@@ -12,5 +12,4 @@ services:
       - ./docker/metadata.json:/usr/src/app/metadata.json
     depends_on:
       - api
-      - opensearch
-    entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--", "./wait-for-it.sh", "opensearch:${SEARCH_PORT}", "--", "./seed.sh"]
+    entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--timeout=60", "--", "./seed.sh"]
