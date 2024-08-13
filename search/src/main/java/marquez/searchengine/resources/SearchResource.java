@@ -1,6 +1,5 @@
 package marquez.searchengine.resources;
 
-import java.io.IOException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -9,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import marquez.searchengine.SearchConfig;
 import marquez.searchengine.services.SearchService;
 import marquez.service.models.LineageEvent;
 
@@ -19,8 +17,8 @@ public class SearchResource {
 
   private final SearchService searchService;
 
-  public SearchResource(SearchConfig config) throws IOException {
-    this.searchService = new SearchService(config);
+  public SearchResource() {
+    this.searchService = new SearchService();
   }
 
   @GET

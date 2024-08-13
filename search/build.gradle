@@ -1,10 +1,12 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+
 ext {
     luceneVersion = '9.11.1'
 }
 
 dependencies {
     implementation project(':api')
-    
+
     implementation "org.apache.lucene:lucene-core:${luceneVersion}"
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
@@ -15,3 +17,29 @@ dependencies {
 application {
     mainClassName = 'marquez.searchengine.SearchApplication'
 }
+
+runShadow {
+    args = ['server']
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    transform(ServiceFileTransformer)
+    from(projectDir) {
+        include 'LICENSE'
+    }
+    manifest {
+        attributes(
+                'Created-By': "Gradle ${gradle.gradleVersion}",
+                'Built-By': System.getProperty('user.name'),
+                'Build-Jdk': System.getProperty('java.version'),
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Main-Class': application.mainClass)
+    }
+}
+
+tasks.distZip.dependsOn tasks.shadowJar
+tasks.distTar.dependsOn tasks.shadowJar
+tasks.startScripts.dependsOn tasks.shadowJar
+tasks.shadowJar.dependsOn tasks.jar

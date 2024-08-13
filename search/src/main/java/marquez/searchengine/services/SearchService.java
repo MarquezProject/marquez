@@ -1,13 +1,11 @@
 package marquez.searchengine.services;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import marquez.searchengine.SearchConfig;
 import marquez.service.models.LineageEvent;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -18,24 +16,24 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.StoredFields;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 
 public class SearchService {
 
-  private final SearchConfig config;
   private final Directory indexDirectory;
   private final StandardAnalyzer analyzer;
 
-  public SearchService(SearchConfig config) throws IOException {
-    this.config = config;
+  public SearchService() {
+    // Use ByteBuffersDirectory for in-memory indexing
+    this.indexDirectory = new ByteBuffersDirectory();
     this.analyzer = new StandardAnalyzer();
-    this.indexDirectory = FSDirectory.open(Paths.get(config.getIndexDirectory()));
   }
 
   public void indexEvent(LineageEvent event) throws IOException {
@@ -93,8 +91,10 @@ public class SearchService {
       TopDocs topDocs = searcher.search(q, 10);
 
       SearchResult result = new SearchResult();
+      StoredFields storedFields = searcher.storedFields();
+
       for (ScoreDoc sd : topDocs.scoreDocs) {
-        Document doc = searcher.doc(sd.doc);
+        Document doc = storedFields.document(sd.doc);
         result.addDocument(doc);
       }
       return result;

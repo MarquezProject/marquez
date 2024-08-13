@@ -5,6 +5,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.io.IOException;
 import marquez.searchengine.resources.SearchResource;
+import marquez.searchengine.health.SearchHealthCheck;;
 
 public class SearchApplication extends Application<SearchConfig> {
 
@@ -18,14 +19,12 @@ public class SearchApplication extends Application<SearchConfig> {
   }
 
   @Override
-  public void initialize(Bootstrap<SearchConfig> bootstrap) {
-    // Any bootstrap initialization goes here
-  }
+  public void initialize(Bootstrap<SearchConfig> bootstrap) {}
 
   @Override
   public void run(SearchConfig configuration, Environment environment) throws IOException {
-    // Register resources
-    final SearchResource searchResource = new SearchResource(configuration);
+    final SearchResource searchResource = new SearchResource();
     environment.jersey().register(searchResource);
+    environment.healthChecks().register("search-health-check", new SearchHealthCheck());
   }
 }

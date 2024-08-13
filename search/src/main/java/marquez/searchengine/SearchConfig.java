@@ -7,13 +7,7 @@ public class SearchConfig extends Configuration {
 
   @JsonProperty private boolean enabled = true;
 
-  @JsonProperty private String indexDirectory = "./index";
-
   public boolean isEnabled() {
     return enabled;
-  }
-
-  public String getIndexDirectory() {
-    return indexDirectory;
   }
 }
