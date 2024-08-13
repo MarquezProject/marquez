@@ -3,6 +3,8 @@ ext {
 }
 
 dependencies {
+    implementation project(':api')
+    
     implementation "org.apache.lucene:lucene-core:${luceneVersion}"
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
@@ -11,5 +13,5 @@ dependencies {
 }
 
 application {
-    mainClassName = 'marquez.searchengine.SearchServiceApplication'
+    mainClassName = 'marquez.searchengine.SearchApplication'
 }
