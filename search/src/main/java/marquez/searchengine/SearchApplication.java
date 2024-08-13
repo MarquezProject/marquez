@@ -4,8 +4,8 @@ import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.io.IOException;
+import marquez.searchengine.health.SearchHealthCheck;
 import marquez.searchengine.resources.SearchResource;
-import marquez.searchengine.health.SearchHealthCheck;;
 
 public class SearchApplication extends Application<SearchConfig> {
 

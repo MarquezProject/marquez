@@ -10,6 +10,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-core:${luceneVersion}"
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
+    implementation "org.apache.lucene:lucene-highlighter:${luceneVersion}"
 
     implementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"
 }
@@ -19,7 +20,7 @@ application {
 }
 
 runShadow {
-    args = ['server']
+    args = ['server', 'search.yml']
 }
 
 shadowJar {
