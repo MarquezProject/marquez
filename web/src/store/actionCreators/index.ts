@@ -7,6 +7,8 @@ import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Events,
   Facets,
   Job,
@@ -515,4 +517,28 @@ export const fetchSearchSuccess = (search: Search) => ({
 export const setColumnLineageGraphDepth = (depth: number) => ({
   type: actionTypes.SET_COLUMN_LINEAGE_GRAPH_DEPTH,
   payload: depth,
+})
+
+export const fetchOpenSearchJobs = (q: string) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_JOBS,
+  payload: {
+    q,
+  },
+})
+
+export const fetchOpenSearchJobsSuccess = (search: OpenSearchResultJobs) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_JOBS_SUCCESS,
+  payload: search,
+})
+
+export const fetchOpenSearchDatasets = (q: string) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_DATASETS,
+  payload: {
+    q,
+  },
+})
+
+export const fetchOpenSearchDatasetsSuccess = (search: OpenSearchResultDatasets) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_DATASETS_SUCCESS,
+  payload: search,
 })

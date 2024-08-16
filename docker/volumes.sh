@@ -41,14 +41,16 @@ data_volume="${volume_prefix}_data"
 db_conf_volume="${volume_prefix}_db-conf"
 db_init_volume="${volume_prefix}_db-init"
 db_backup_volume="${volume_prefix}_db-backup"
+opensearch_volume="${volume_prefix}_opensearch-data"
 
-echo "...creating volumes: ${data_volume}, ${db_conf_volume}, ${db_init_volume}, ${db_backup_volume}"
+echo "...creating volumes: ${data_volume}, ${db_conf_volume}, ${db_init_volume}, ${db_backup_volume} ${opensearch_volume}"
 
 # Create persistent volumes for Marquez
 docker volume create "${data_volume}" > /dev/null
 docker volume create "${db_conf_volume}" > /dev/null
 docker volume create "${db_init_volume}" > /dev/null
 docker volume create "${db_backup_volume}" > /dev/null
+docker volume create "${opensearch_volume}" > /dev/null
 
 # Provision persistent volumes for Marquez
 docker create --name volumes-provisioner \

@@ -296,7 +296,7 @@ const Events: React.FC<EventsProps> = ({
                         >
                           <TableCell align='left'>
                             <Box display={'flex'} alignItems={'center'}>
-                              <MqText font={'mono'}>{event.run.runId}</MqText>
+                              <MqText font={'mono'}>{event.run.runId.substring(0, 8)}...</MqText>
                               <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>
@@ -308,7 +308,7 @@ const Events: React.FC<EventsProps> = ({
                           </TableCell>
                           <TableCell align='left'>{truncateText(event.job.name, 40)}</TableCell>
                           <TableCell align='left'>
-                            <MqText> {truncateText(event.job.namespace, 40)} </MqText>
+                            <MqText> {truncateText(event.job.namespace, 40)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText>{formatUpdatedAt(event.eventTime)}</MqText>

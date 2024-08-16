@@ -53,7 +53,7 @@ const MqChipGroup: React.FC<MqChipGroupProps> = ({ chips, initialSelection, onSe
   return (
     <Box
       sx={{
-        border: `1px solid ${theme.palette.primary.main}`,
+        border: `1px solid ${theme.palette.secondary.main}`,
         backgroundColor: theme.palette.background.paper,
         borderRadius: theme.spacing(2),
         display: 'inline-block',

@@ -16,6 +16,7 @@ import marquez.api.filter.exclusions.ExclusionsConfig;
 import marquez.db.FlywayFactory;
 import marquez.graphql.GraphqlConfig;
 import marquez.jobs.DbRetentionConfig;
+import marquez.search.SearchConfig;
 import marquez.service.models.Tag;
 import marquez.tracing.SentryConfig;
 
@@ -43,6 +44,10 @@ public class MarquezConfig extends Configuration {
   @Getter
   @JsonProperty("sentry")
   private final SentryConfig sentry = new SentryConfig();
+
+  @Getter
+  @JsonProperty("search")
+  private final SearchConfig searchConfig = new SearchConfig();
 
   @Getter
   @Setter
