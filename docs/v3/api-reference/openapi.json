@@ -992,14 +992,6 @@
     "/runlineage/upstream": {
       "get": {
         "operationId": "getRunLineageUpstream",
-        "paramteters": [
-          {
-            "$ref": "#/components/parameters/runId"
-          },
-          {
-            "$ref": "#/components/parameters/depth"
-          }
-        ],
         "tags": [
           "Lineage"
         ],
@@ -1144,7 +1136,6 @@
             }
           },
           {
-            "before": null,
             "name": "before",
             "in": "query",
             "description": "Match jobs or datasets **before** `YYYY-MM-DD`.",
@@ -1156,7 +1147,6 @@
             }
           },
           {
-            "after": null,
             "name": "after",
             "in": "query",
             "description": "Match jobs or datasets **after** `YYYY-MM-DD`.",
@@ -2895,12 +2885,12 @@
             "$ref": "#/components/schemas/SearchResultType"
           },
           "name": {
-            "type": null,
+            "type": "string",
             "description": "The name of the dataset or job.",
             "example": "public.delivery_7_days"
           },
           "updatedAt": {
-            "type": null,
+            "type": "string",
             "description": "An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the dataset or job was updated.",
             "example": "2019-05-09T19:49:24.201Z"
           },
