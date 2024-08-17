@@ -11,7 +11,6 @@
     "light": "#07C983",
     "dark": "#07C983",
     "background": {
-      "light": "#B0B0B0",
       "dark": "#191F26"
     },
     "anchors": {
