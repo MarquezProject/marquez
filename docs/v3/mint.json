@@ -1,29 +1,25 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Marquez Project",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
+    "primary": "#71DDBF",
     "light": "#07C983",
-    "dark": "#0D9373",
+    "dark": "#71DDBF",
     "anchors": {
-      "from": "#0D9373",
+      "from": "#71DDBF",
       "to": "#07C983"
     }
   },
   "topbarLinks": [
-    {
-      "name": "Support",
-      "url": "mailto:hi@mintlify.com"
-    }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Demo",
+    "url": "https://demo.marquezproject.ai"
   },
   "tabs": [
     {
@@ -41,7 +37,7 @@
     {
       "name": "Community",
       "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "url": "https://marquezproject.slack.com"
     },
     {
       "name": "Blog",
@@ -85,8 +81,9 @@
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
+    "slack": "https://marquezproject.slack.com",
+    "x": "https://x.com/marquezproject",
+    "github": "https://github.com/MarquezProject/marquez",
     "linkedin": "https://www.linkedin.com/company/mintsearch"
   }
 }
