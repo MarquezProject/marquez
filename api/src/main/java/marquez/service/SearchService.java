@@ -249,6 +249,6 @@ public class SearchService {
   }
 
   public boolean isEnabled() {
-    return !searchConfig.isEnabled();
+    return searchConfig.isEnabled();
   }
 }

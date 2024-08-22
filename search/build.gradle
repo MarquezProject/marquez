@@ -11,6 +11,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
     implementation "org.apache.lucene:lucene-highlighter:${luceneVersion}"
+    implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.16.0'
 
     implementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"
 }

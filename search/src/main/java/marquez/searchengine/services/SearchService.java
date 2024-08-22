@@ -1,12 +1,9 @@
 package marquez.searchengine.services;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import marquez.service.models.LineageEvent;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -27,8 +24,8 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import marquez.searchengine.models.IndexResponse;
+import marquez.searchengine.models.SearchResult;
 
 public class SearchService {
 
@@ -41,41 +38,67 @@ public class SearchService {
         this.analyzer = new StandardAnalyzer();
     }
 
-    public void indexEvent(LineageEvent event) throws IOException {
+    // Method to index a job document
+    public IndexResponse indexJobDocument(Map<String, Object> document) throws IOException {
         try (IndexWriter writer = new IndexWriter(indexDirectory, new IndexWriterConfig(analyzer))) {
-            UUID runUuid = UUID.fromString(event.getRun().getRunId());
-            if (event.getInputs() != null) {
-                for (LineageEvent.Dataset dataset : event.getInputs()) {
-                    writer.addDocument(buildDatasetDocument(runUuid, dataset, event));
-                }
+            Document doc = new Document();
+
+            doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
+            doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
+            doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
+            doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
+
+            if (document.containsKey("facets")) {
+                doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
             }
-            if (event.getOutputs() != null) {
-                for (LineageEvent.Dataset dataset : event.getOutputs()) {
-                    writer.addDocument(buildDatasetDocument(runUuid, dataset, event));
-                }
+            if (document.containsKey("runFacets")) {
+                doc.add(new TextField("runFacets", document.get("runFacets").toString(), Field.Store.YES));
             }
-            writer.addDocument(buildJobDocument(runUuid, event));
+
+            writer.addDocument(doc);
             writer.commit();
+            return createIndexResponse("jobs", document.get("name").toString(), true);
         }
     }
 
-    private Document buildJobDocument(UUID runUuid, LineageEvent event) {
-        Document doc = new Document();
-        doc.add(new StringField("run_id", runUuid.toString(), Field.Store.YES));
-        doc.add(new TextField("name", event.getJob().getName(), Field.Store.YES));
-        doc.add(new TextField("type", event.getJob().isStreamingJob() ? "STREAM" : "BATCH", Field.Store.YES));
-        doc.add(new TextField("namespace", event.getJob().getNamespace(), Field.Store.YES));
-        doc.add(new TextField("facets", event.getJob().getFacets().toString(), Field.Store.YES));
-        return doc;
+    // Method to index a dataset document
+    public IndexResponse indexDatasetDocument(Map<String, Object> document) throws IOException {
+        try (IndexWriter writer = new IndexWriter(indexDirectory, new IndexWriterConfig(analyzer))) {
+            Document doc = new Document();
+
+            doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
+            doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
+            doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
+            doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
+
+            if (document.containsKey("facets")) {
+                doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
+            }
+            if (document.containsKey("inputFacets")) {
+                doc.add(new TextField("inputFacets", document.get("inputFacets").toString(), Field.Store.YES));
+            }
+            if (document.containsKey("outputFacets")) {
+                doc.add(new TextField("outputFacets", document.get("outputFacets").toString(), Field.Store.YES));
+            }
+
+            //System.out.println("Indexing document: " + doc);
+            writer.addDocument(doc);
+            writer.commit();
+
+            return createIndexResponse("datasets", document.get("name").toString(), true);
+        }
     }
 
-    private Document buildDatasetDocument(UUID runUuid, LineageEvent.Dataset dataset, LineageEvent event) {
-        Document doc = new Document();
-        doc.add(new StringField("run_id", runUuid.toString(), Field.Store.YES));
-        doc.add(new TextField("name", dataset.getName(), Field.Store.YES));
-        doc.add(new TextField("namespace", dataset.getNamespace(), Field.Store.YES));
-        doc.add(new TextField("facets", dataset.getFacets().toString(), Field.Store.YES));
-        return doc;
+    private IndexResponse createIndexResponse(String index, String id, boolean created) {
+        long version = 1L; // Simulated version number
+        String result = created ? "created" : "updated";
+
+        IndexResponse.ShardInfo shardInfo = new IndexResponse.ShardInfo(1, 1, 0); // 1 shard, 1 successful, 0 failed
+
+        long seqNo = 1L; // Simulated sequence number
+        long primaryTerm = 1L; // Simulated primary term
+
+        return new IndexResponse(index, id, version, result, shardInfo, seqNo, primaryTerm);
     }
 
     private boolean isIndexEmpty() throws IOException {
@@ -98,6 +121,7 @@ public class SearchService {
         long startTime = System.currentTimeMillis();
 
         if (isIndexEmpty()) {
+            System.out.println("Index is empty");
             return createEmptySearchResult(startTime);
         }
 
@@ -105,17 +129,19 @@ public class SearchService {
             IndexSearcher searcher = new IndexSearcher(reader);
             MultiFieldQueryParser parser = new MultiFieldQueryParser(fields.toArray(new String[0]), analyzer);
             Query q = parser.parse(query);
+            //System.out.println("Executing query: " + q.toString());
 
             TopDocs topDocs = searcher.search(q, MAX_RESULTS);
+            //System.out.println("Total hits: " + topDocs.totalHits);
             long took = System.currentTimeMillis() - startTime;
 
             SearchResult result = new SearchResult();
             result.setTook(took);
             result.getHitsMetadata().getTotalHits().setValue(topDocs.totalHits.value);
-            //result.setMaxScore(topDocs.getMaxScore());
+            // result.setMaxScore(topDocs.getMaxScore());
 
             StoredFields storedFields = searcher.storedFields();
-            SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
+            SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("","");
             Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(q));
 
             for (ScoreDoc sd : topDocs.scoreDocs) {
@@ -132,7 +158,7 @@ public class SearchService {
                     }
                 }
 
-                result.addDocument(highlightedDoc);
+                result.addDocument("index",highlightedDoc);
             }
 
             return result;
@@ -145,242 +171,9 @@ public class SearchService {
         SearchResult result = new SearchResult();
         result.setTook(took);
         result.getHitsMetadata().getTotalHits().setValue(0);
-        //result.setMaxScore(0.0f);
+        // result.setMaxScore(0.0f);
         result.setTimedOut(false);
 
         return result;
     }
-
-
-    public static class SearchResult {
-        @JsonProperty("took")
-        private long took;
-    
-        @JsonProperty("timed_out")
-        private boolean timedOut = false;
-    
-        @JsonProperty("_shards")
-        private ShardStatistics shards;
-    
-        @JsonProperty("hits")
-        private HitsMetadata hitsMetadata;
-    
-        @JsonProperty("num_reduce_phases")
-        private long numberOfReducePhases;
-    
-        @JsonProperty("terminated_early")
-        private boolean terminatedEarly;
-    
-        @JsonProperty("suggest")
-        private Map<String, Object> suggest = new HashMap<>(); // Initialize as empty map
-    
-        // Constructor
-        public SearchResult() {
-            this.shards = new ShardStatistics(1, 1, 0, 0); // Assuming a single shard with no failures
-            this.hitsMetadata = new HitsMetadata();
-            this.numberOfReducePhases = 0; // Default value
-            this.terminatedEarly = false; // Default value
-            this.suggest = new HashMap<>(); // Empty suggestion map
-        }
-    
-        // Add document to hits
-        public void addDocument(Map<String, String> doc) {
-            Map<String, Object> hit = new HashMap<>();
-            hit.put("_source", doc);
-            hitsMetadata.addHit(hit);
-        }
-    
-        // Getters and Setters for all fields
-        public long getTook() {
-            return took;
-        }
-    
-        public void setTook(long took) {
-            this.took = took;
-        }
-    
-        public boolean isTimedOut() {
-            return timedOut;
-        }
-    
-        public void setTimedOut(boolean timedOut) {
-            this.timedOut = timedOut;
-        }
-    
-        public ShardStatistics getShards() {
-            return shards;
-        }
-    
-        public void setShards(ShardStatistics shards) {
-            this.shards = shards;
-        }
-    
-        public HitsMetadata getHitsMetadata() {
-            return hitsMetadata;
-        }
-    
-        public void setHitsMetadata(HitsMetadata hitsMetadata) {
-            this.hitsMetadata = hitsMetadata;
-        }
-    
-        public long getNumberOfReducePhases() {
-            return numberOfReducePhases;
-        }
-    
-        public void setNumberOfReducePhases(long numberOfReducePhases) {
-            this.numberOfReducePhases = numberOfReducePhases;
-        }
-    
-        public boolean isTerminatedEarly() {
-            return terminatedEarly;
-        }
-    
-        public void setTerminatedEarly(boolean terminatedEarly) {
-            this.terminatedEarly = terminatedEarly;
-        }
-    
-        public Map<String, Object> getSuggest() {
-            return suggest;
-        }
-    
-        public void setSuggest(Map<String, Object> suggest) {
-            this.suggest = suggest;
-        }
-    
-        // ShardStatistics inner class
-        public static class ShardStatistics {
-            @JsonProperty("total")
-            private int total;
-    
-            @JsonProperty("successful")
-            private int successful;
-    
-            @JsonProperty("skipped")
-            private int skipped;
-    
-            @JsonProperty("failed")
-            private int failed;
-    
-            // Constructor
-            public ShardStatistics(int total, int successful, int skipped, int failed) {
-                this.total = total;
-                this.successful = successful;
-                this.skipped = skipped;
-                this.failed = failed;
-            }
-    
-            // Getters and Setters
-            public int getTotal() {
-                return total;
-            }
-    
-            public void setTotal(int total) {
-                this.total = total;
-            }
-    
-            public int getSuccessful() {
-                return successful;
-            }
-    
-            public void setSuccessful(int successful) {
-                this.successful = successful;
-            }
-    
-            public int getSkipped() {
-                return skipped;
-            }
-    
-            public void setSkipped(int skipped) {
-                this.skipped = skipped;
-            }
-    
-            public int getFailed() {
-                return failed;
-            }
-    
-            public void setFailed(int failed) {
-                this.failed = failed;
-            }
-        }
-    
-        // HitsMetadata inner class
-        public static class HitsMetadata {
-            @JsonProperty("total")
-            private TotalHits totalHits;
-    
-            @JsonProperty("max_score")
-            private Float maxScore;
-    
-            @JsonProperty("hits")
-            private List<Map<String, Object>> hits;
-    
-            public HitsMetadata() {
-                this.totalHits = new TotalHits(0, "eq");
-                this.maxScore = null;
-                this.hits = new ArrayList<>();
-            }
-    
-            // Getters and Setters
-            public TotalHits getTotalHits() {
-                return totalHits;
-            }
-    
-            public void setTotalHits(TotalHits totalHits) {
-                this.totalHits = totalHits;
-            }
-    
-            public Float getMaxScore() {
-                return maxScore;
-            }
-    
-            public void setMaxScore(Float maxScore) {
-                this.maxScore = maxScore;
-            }
-    
-            public List<Map<String, Object>> getHits() {
-                return hits;
-            }
-    
-            public void setHits(List<Map<String, Object>> hits) {
-                this.hits = hits;
-            }
-    
-            // Add a hit to the hits list
-            public void addHit(Map<String, Object> hit) {
-                this.hits.add(hit);
-            }
-        }
-    
-        // TotalHits inner class
-        public static class TotalHits {
-            @JsonProperty("value")
-            private long value;
-    
-            @JsonProperty("relation")
-            private String relation;
-    
-            public TotalHits(long value, String relation) {
-                this.value = value;
-                this.relation = relation;
-            }
-    
-            // Getters and Setters
-            public long getValue() {
-                return value;
-            }
-    
-            public void setValue(long value) {
-                this.value = value;
-            }
-    
-            public String getRelation() {
-                return relation;
-            }
-    
-            public void setRelation(String relation) {
-                this.relation = relation;
-            }
-        }
-    }
- 
 }
