@@ -1,4 +1,4 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { createTheme } from '@mui/material/styles'
@@ -10,7 +10,6 @@ export interface MqInputBaseProps extends InputBaseProps {}
 
 export const MqInputBase: React.FC<MqInputBaseProps> = (props) => {
   const theme = createTheme(useTheme())
-
   return (
     <InputBase
       {...props}

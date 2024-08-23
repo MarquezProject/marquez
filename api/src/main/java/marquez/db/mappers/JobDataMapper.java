@@ -10,6 +10,7 @@ import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.urlOrNull;
 import static marquez.db.Columns.uuidArrayOrEmpty;
+import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
 import com.google.common.collect.ImmutableSet;
@@ -39,6 +40,7 @@ public class JobDataMapper implements RowMapper<JobData> {
         JobName.of(stringOrThrow(results, Columns.NAME)),
         stringOrThrow(results, Columns.SIMPLE_NAME),
         stringOrNull(results, Columns.PARENT_JOB_NAME),
+        uuidOrNull(results, Columns.PARENT_JOB_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),

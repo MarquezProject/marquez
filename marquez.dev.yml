@@ -9,7 +9,7 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://postgres:${POSTGRES_PORT:-5432}/marquez
+  url: jdbc:postgresql://${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/marquez
   user: marquez
   password: marquez
 
@@ -22,6 +22,14 @@ logging:
   level: INFO
   appenders:
     - type: console
+
+search:
+  enabled: ${SEARCH_ENABLED:-true}
+  scheme: http
+  host: ${SEARCH_HOST:-opensearch}
+  port: ${SEARCH_PORT:-9200}
+  username: admin
+  password: admin
 
 tags:
   - name: PII

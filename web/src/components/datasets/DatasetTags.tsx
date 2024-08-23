@@ -28,7 +28,6 @@ import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
 import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
@@ -67,7 +66,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
 
   const [listTag, setListTag] = useState('')
   const [openTagDesc, setOpenTagDesc] = useState(false)
-  const [tagDescription, setTagDescription] = useState('No Description')
+  const [tagDescription, setTagDescription] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>(datasetTags)
 
   const handleButtonClick = () => {
@@ -80,13 +79,13 @@ const DatasetTags: React.FC<IProps> = (props) => {
   const handleTagDescClose = () => {
     setOpenTagDesc(false)
     setListTag('')
-    setTagDescription('No Description')
+    setTagDescription('')
   }
 
   const handleTagDescChange = (_event: any, value: string) => {
     const selectedTagData = tagData.find((tag) => tag.name === value)
     setListTag(value)
-    setTagDescription(selectedTagData ? selectedTagData.description : 'No Description')
+    setTagDescription(selectedTagData ? selectedTagData.description : '')
   }
 
   const handleDescriptionChange = (event: any) => {
@@ -135,7 +134,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setSnackbarOpen(true)
     setOpenTagDesc(false)
     setListTag('')
-    setTagDescription('No Description')
+    setTagDescription('')
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {
@@ -189,8 +188,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
           multiple
           disableCloseOnSelect
           id='dataset-tags'
-          sx={{ flex : 1,  width: datasetField ? 494 : 'auto' }}
-          limitTags={!datasetField ?  8 : 6}
+          sx={{ flex: 1, width: datasetField ? 494 : 'auto' }}
+          limitTags={!datasetField ? 8 : 6}
           autoHighlight
           disableClearable
           disablePortal
@@ -209,8 +208,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
               <div>
                 <MQText bold>{option}</MQText>
                 <MQText subdued overflowHidden>
-                  {tagData.find((tagItem) => tagItem.name === option)?.description ||
-                    'No Tag Description'}
+                  {tagData.find((tagItem) => tagItem.name === option)?.description || ''}
                 </MQText>
               </div>
             </li>
@@ -245,9 +243,13 @@ const DatasetTags: React.FC<IProps> = (props) => {
           }
         }}
       >
-        <DialogTitle>Select a Tag to change</DialogTitle>
         <DialogContent>
-          <MQText subheading>Tag</MQText>
+          <MQText label sx={{ fontSize: '1.25rem' }} bottomMargin>
+            Select a Tag to change
+          </MQText>
+          <MQText label sx={{ fontSize: '0.85rem' }}>
+            Tag
+          </MQText>
           <Autocomplete
             options={tagData.map((option) => option.name)}
             autoSelect
@@ -271,7 +273,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
               />
             )}
           />
-          <MQText subheading bottomMargin>
+          <MQText label sx={{ fontSize: '0.85rem' }} bottomMargin>
             Description
           </MQText>
           <TextField
@@ -280,7 +282,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
             name='tag-description'
             fullWidth
             variant='outlined'
-            placeholder={'No Description'}
+            placeholder={''}
             onChange={handleDescriptionChange}
             rows={6}
             value={tagDescription}

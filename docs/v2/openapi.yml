@@ -1288,7 +1288,7 @@ components:
         name: my-dataset
         physicalName: public.mytable
         createdAt: 2019-05-09T19:49:24.201361Z
-        upodatedAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
         namespace: my-namespace
         sourceName: my-source
         fields: [

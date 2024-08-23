@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 import lombok.AllArgsConstructor;
@@ -54,6 +55,7 @@ import marquez.client.models.SearchSort;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.client.models.Tag;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 @Slf4j
 public class MarquezClient {
@@ -506,6 +508,7 @@ public class MarquezClient {
     @VisibleForTesting URL baseUrl;
     @VisibleForTesting @Nullable String apiKey;
     @VisibleForTesting @Nullable SSLContext sslContext;
+    @VisibleForTesting @Nullable Consumer<HttpClientBuilder> httpCustomizer;
 
     private Builder() {
       this.baseUrl = DEFAULT_BASE_URL;
@@ -530,10 +533,15 @@ public class MarquezClient {
       return this;
     }
 
+    public Builder customize(@Nullable Consumer<HttpClientBuilder> httpCustomizer) {
+      this.httpCustomizer = httpCustomizer;
+      return this;
+    }
+
     public MarquezClient build() {
       return new MarquezClient(
           MarquezUrl.create(baseUrl),
-          MarquezHttp.create(sslContext, MarquezClient.Version.get(), apiKey));
+          MarquezHttp.create(sslContext, httpCustomizer, MarquezClient.Version.get(), apiKey));
     }
   }
 

@@ -25,6 +25,7 @@ import marquez.db.mappers.DatasetVersionMapper;
 import marquez.db.mappers.DatasetVersionRowMapper;
 import marquez.db.mappers.ExtendedDatasetVersionRowMapper;
 import marquez.db.models.DatasetFieldRow;
+import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.TagRow;
@@ -47,7 +48,7 @@ public interface DatasetVersionDao extends BaseDao {
 
   @Transaction
   default DatasetVersionRow upsertDatasetVersion(
-      UUID datasetUuid,
+      DatasetRow datasetRow,
       Instant now,
       String namespaceName,
       String datasetName,
@@ -56,14 +57,38 @@ public interface DatasetVersionDao extends BaseDao {
     TagDao tagDao = createTagDao();
     DatasetFieldDao datasetFieldDao = createDatasetFieldDao();
 
+    List<DatasetFieldRow> datasetFields = new ArrayList<>();
+    List<DatasetFieldTag> datasetFieldTags = new ArrayList<>();
+    for (Field field : datasetMeta.getFields()) {
+      DatasetFieldRow datasetFieldRow =
+          datasetFieldDao.upsert(
+              UUID.randomUUID(),
+              now,
+              field.getName().getValue(),
+              field.getType(),
+              field.getDescription().orElse(null),
+              datasetRow.getUuid());
+      datasetFields.add(datasetFieldRow);
+      for (TagName tagName : field.getTags()) {
+        TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
+        datasetFieldTags.add(new DatasetFieldTag(datasetFieldRow.getUuid(), tag.getUuid(), now));
+      }
+    }
+    datasetFieldDao.updateTags(datasetFieldTags);
+
     Version version = Utils.newDatasetVersionFor(namespaceName, datasetName, datasetMeta);
     UUID newDatasetVersionUuid = UUID.randomUUID();
+    UUID datasetSchemaVersionUuid =
+        createDatasetSchemaVersionDao()
+            .upsertSchemaVersion(datasetRow, datasetFields, now)
+            .getValue();
     DatasetVersionRow datasetVersionRow =
         upsert(
             newDatasetVersionUuid,
             now,
-            datasetUuid,
+            datasetRow.getUuid(),
             version.getValue(),
+            datasetSchemaVersionUuid,
             datasetMeta.getRunId().map(RunId::getValue).orElse(null),
             toPgObjectFields(datasetMeta.getFields()),
             namespaceName,
@@ -84,29 +109,13 @@ public interface DatasetVersionDao extends BaseDao {
     }
 
     List<DatasetFieldMapping> datasetFieldMappings = new ArrayList<>();
-    List<DatasetFieldTag> datasetFieldTag = new ArrayList<>();
-
-    for (Field field : datasetMeta.getFields()) {
-      DatasetFieldRow datasetFieldRow =
-          datasetFieldDao.upsert(
-              UUID.randomUUID(),
-              now,
-              field.getName().getValue(),
-              field.getType(),
-              field.getDescription().orElse(null),
-              datasetUuid);
-      for (TagName tagName : field.getTags()) {
-        TagRow tag = tagDao.upsert(UUID.randomUUID(), now, tagName.getValue());
-        datasetFieldTag.add(new DatasetFieldTag(datasetFieldRow.getUuid(), tag.getUuid(), now));
-      }
+    for (DatasetFieldRow datasetFieldRow : datasetFields) {
       datasetFieldMappings.add(
           new DatasetFieldMapping(datasetVersionRow.getUuid(), datasetFieldRow.getUuid()));
     }
-
     datasetFieldDao.updateFieldMapping(datasetFieldMappings);
-    datasetFieldDao.updateTags(datasetFieldTag);
 
-    createDatasetDao().updateVersion(datasetUuid, now, datasetVersionRow.getUuid());
+    createDatasetDao().updateVersion(datasetRow.getUuid(), now, datasetVersionRow.getUuid());
     return datasetVersionRow;
   }
 
@@ -166,8 +175,8 @@ public interface DatasetVersionDao extends BaseDao {
           LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
-          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
-          t.tags, f.facets
+          dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+          sv.schema_location, t.tags, f.facets
       FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
@@ -197,8 +206,8 @@ public interface DatasetVersionDao extends BaseDao {
           LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid  AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown' OR df.type ILIKE 'input')
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
-          dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
-          t.tags, f.facets
+          dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+          sv.schema_location, t.tags, f.facets
       FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
       LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
@@ -246,8 +255,8 @@ public interface DatasetVersionDao extends BaseDao {
       """
       WITH dataset_info AS (
 	    SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,
-		dv.created_at, dv.version, dv.fields, dv.run_uuid AS createdByRunUuid, sv.schema_location,
-		t.tags, f.facets, f.lineage_event_time, f.dataset_version_uuid, facet_name
+		dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+		sv.schema_location, t.tags, f.facets, f.lineage_event_time, f.dataset_version_uuid, facet_name
 		FROM dataset_versions dv
 		LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
 		LEFT JOIN stream_versions AS sv ON sv.dataset_version_uuid = dv.uuid
@@ -269,15 +278,21 @@ public interface DatasetVersionDao extends BaseDao {
       	WHERE dv.namespace_name = :namespaceName
             AND dv.dataset_name = :datasetName
       	LIMIT :limit OFFSET :offset
+        ),
+        dataset_symlinks_names as (
+          SELECT DISTINCT dataset_uuid, name
+          FROM dataset_symlinks
+          WHERE NOT is_primary
         )
         SELECT
 	        type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
-            created_at, version, fields, createdByRunUuid, schema_location,
+            created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid,
 	        JSONB_AGG(facets ORDER BY lineage_event_time ASC) AS facets
         FROM dataset_info
+        WHERE name NOT IN (SELECT name FROM dataset_symlinks_names)
         GROUP BY type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
-            created_at, version, fields, createdByRunUuid, schema_location,
+            created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid
         ORDER BY created_at DESC
   """)
@@ -301,10 +316,24 @@ public interface DatasetVersionDao extends BaseDao {
   Optional<DatasetVersionRow> findRowByUuid(UUID uuid);
 
   @SqlQuery(
+      """
+    select
+        count(*)
+    from
+        dataset_versions
+    where
+        namespace_name = :namespaceName
+    and
+        dataset_name = :dataset
+    ;
+    """)
+  int countDatasetVersions(String namespaceName, String dataset);
+
+  @SqlQuery(
       "INSERT INTO dataset_versions "
-          + "(uuid, created_at, dataset_uuid, version, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
+          + "(uuid, created_at, dataset_uuid, version, dataset_schema_version_uuid, run_uuid, fields, namespace_name, dataset_name, lifecycle_state) "
           + "VALUES "
-          + "(:uuid, :now, :datasetUuid, :version, :runUuid, :fields, :namespaceName, :datasetName, :lifecycleState) "
+          + "(:uuid, :now, :datasetUuid, :version, :schemaVersionUuid, :runUuid, :fields, :namespaceName, :datasetName, :lifecycleState) "
           + "ON CONFLICT(version) "
           + "DO UPDATE SET "
           + "run_uuid = EXCLUDED.run_uuid "
@@ -314,6 +343,7 @@ public interface DatasetVersionDao extends BaseDao {
       Instant now,
       UUID datasetUuid,
       UUID version,
+      UUID schemaVersionUuid,
       UUID runUuid,
       PGobject fields,
       String namespaceName,

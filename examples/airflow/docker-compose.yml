@@ -87,6 +87,7 @@ services:
     environment:
       - MARQUEZ_HOST=marquez
       - MARQUEZ_PORT=5000
+      - REACT_APP_ADVANCED_SEARCH=false
     ports:
       - "3000:3000"
     stdin_open: true

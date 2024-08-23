@@ -28,7 +28,7 @@ import {
   deleteDataset,
   dialogToggle,
   fetchDataset,
-  fetchDatasetVersions,
+  fetchInitialDatasetVersions,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
@@ -56,15 +56,15 @@ import StorageIcon from '@mui/icons-material/Storage'
 interface StateProps {
   lineageDataset: LineageDataset
   dataset: Dataset
-  versions: DatasetVersion[]
-  versionsLoading: boolean
+  initVersions: DatasetVersion[]
+  initVersionsLoading: boolean
   datasets: IState['datasets']
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
 }
 
 interface DispatchProps {
-  fetchDatasetVersions: typeof fetchDatasetVersions
+  fetchInitialDatasetVersions: typeof fetchInitialDatasetVersions
   fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
@@ -88,13 +88,13 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     dataset,
     display,
     fetchDataset,
-    fetchDatasetVersions,
     resetDataset,
     resetDatasetVersions,
+    fetchInitialDatasetVersions,
     deleteDataset,
     dialogToggle,
-    versions,
-    versionsLoading,
+    initVersions,
+    initVersionsLoading,
     lineageDataset,
     tabIndex,
     setTabIndex,
@@ -114,8 +114,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     []
   )
 
+  // might need to map first version to its own state
   useEffect(() => {
-    fetchDatasetVersions(lineageDataset.namespace, lineageDataset.name)
+    fetchInitialDatasetVersions(lineageDataset.namespace, lineageDataset.name)
     fetchDataset(lineageDataset.namespace, lineageDataset.name)
   }, [lineageDataset.name, showTags])
 
@@ -130,7 +131,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (versionsLoading && versions.length === 0) {
+  if (initVersionsLoading && initVersions.length === 0) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -138,11 +139,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     )
   }
 
-  if (versions.length === 0) {
+  if (initVersions.length === 0) {
     return null
   }
 
-  const firstVersion = versions[0]
+  const firstVersion = initVersions[0]
   const { name, tags, description } = firstVersion
   const facetsStatus = datasetFacetsStatus(firstVersion.facets)
 
@@ -316,14 +317,17 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
         {tabIndex === 0 && (
           <Box display={'flex'} alignItems={'center'}>
             <FormControlLabel
-              sx={{ textWrap: 'nowrap' }}
+              sx={{
+                textWrap: 'nowrap',
+                '& .MuiFormControlLabel-label': { fontSize: '0.875rem' },
+              }}
               control={
                 <Switch
                   size={'small'}
                   checked={showTags}
                   onChange={() => setShowTags(!showTags)}
                   inputProps={{ 'aria-label': 'toggle show tags' }}
-                  disabled={versionsLoading}
+                  disabled={initVersionsLoading}
                 />
               }
               label={i18next.t('datasets.show_field_tags')}
@@ -341,7 +345,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           isCurrentVersion
         />
       )}
-      {tabIndex === 1 && <DatasetVersions dataset={dataset} versions={props.versions} />}
+      {tabIndex === 1 && <DatasetVersions dataset={dataset} />}
     </Box>
   )
 }
@@ -350,15 +354,15 @@ const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
   dataset: state.dataset.result,
   display: state.display,
-  versions: state.datasetVersions.result.versions,
-  versionsLoading: state.datasetVersions.isLoading,
+  initVersions: state.datasetVersions.initDsVersion.versions,
+  initVersionsLoading: state.datasetVersions.isInitDsVerLoading,
   tabIndex: state.lineage.tabIndex,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchDatasetVersions: fetchDatasetVersions,
+      fetchInitialDatasetVersions: fetchInitialDatasetVersions,
       fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset,
