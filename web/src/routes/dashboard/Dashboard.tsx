@@ -26,6 +26,7 @@ import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
+import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
 
 interface Props {}
@@ -44,7 +45,6 @@ const states = [
 
 const Dashboard: React.FC<Props> = () => {
   const [timeframe, setTimeframe] = React.useState('8 Hours')
-  const [refreshInterval, setRefreshInterval] = React.useState('30s')
   const [selectedState, setSelectedState] = React.useState('FAIL')
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
   return (
@@ -74,17 +74,7 @@ const Dashboard: React.FC<Props> = () => {
             {/* todo look into SplitButton to replace this one */}
             <Box>
               <MqText subdued>REFRESH</MqText>
-              <ButtonGroup color={'secondary'} size={'small'} variant='outlined'>
-                {REFRESH_INTERVALS.map((ri) => (
-                  <Button
-                    key={ri}
-                    variant={refreshInterval === ri ? 'contained' : 'outlined'}
-                    onClick={() => setRefreshInterval(ri)}
-                  >
-                    {ri}
-                  </Button>
-                ))}
-              </ButtonGroup>
+              <SplitButton options={REFRESH_INTERVALS} />
             </Box>
             <Divider sx={{ mx: 2 }} orientation={'vertical'} />
             <Box>
@@ -129,7 +119,7 @@ const Dashboard: React.FC<Props> = () => {
                           <Box
                             className={'hover-box'}
                             width={selectedState === state.label ? 80 : 20}
-                            borderRadius={'md'}
+                            borderRadius={theme.shape.borderRadius}
                             height={4}
                             bgcolor={state.color}
                             sx={{ transition: '.3s ease-in-out' }}
