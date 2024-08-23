@@ -40,7 +40,10 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
         </MqText>
         <MqText bold inline>
           {' '}
-          <Typewriter words={['Jobs and Datasets…']} repeatCount={3} />
+          <Typewriter
+            words={['Jobs and Datasets…', 'SQL queries…', 'Dataset columns…', 'Source code…']}
+            repeatCount={3}
+          />
         </MqText>
       </Box>
     </Box>
