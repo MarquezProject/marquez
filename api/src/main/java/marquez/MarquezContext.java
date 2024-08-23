@@ -54,11 +54,11 @@ import marquez.service.NamespaceService;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
 import marquez.service.RunTransitionListener;
-import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
 import marquez.service.TagService;
 import marquez.service.models.Tag;
+import marquez.service.v2beta;
 import org.jdbi.v3.core.Jdbi;
 
 @Getter
@@ -91,7 +91,7 @@ public final class MarquezContext {
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
   @Getter private final ColumnLineageService columnLineageService;
-  @Getter private final SearchService searchService;
+  @Getter private final v2beta.SearchService searchService;
   @Getter private final NamespaceResource namespaceResource;
   @Getter private final SourceResource sourceResource;
   @Getter private final DatasetResource datasetResource;
@@ -148,7 +148,7 @@ public final class MarquezContext {
     this.openLineageService = new OpenLineageService(baseDao, runService);
     this.lineageService = new LineageService(lineageDao, jobDao);
     this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
-    this.searchService = new SearchService(searchConfig);
+    this.searchService = new v2beta.SearchService(searchConfig);
     this.jdbiException = new JdbiExceptionExceptionMapper();
     this.jsonException = new JsonProcessingExceptionMapper();
     final ServiceFactory serviceFactory =

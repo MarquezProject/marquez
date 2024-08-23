@@ -23,5 +23,5 @@ public class ServiceFactory {
   @NonNull DatasetFieldService datasetFieldService;
   @NonNull LineageService lineageService;
   @NonNull ColumnLineageService columnLineageService;
-  @NonNull SearchService searchService;
+  @NonNull v2beta.SearchService searchService;
 }

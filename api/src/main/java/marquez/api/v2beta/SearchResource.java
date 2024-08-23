@@ -26,8 +26,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
+import marquez.service.v2beta;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 
@@ -35,7 +35,7 @@ import org.opensearch.client.opensearch.core.search.Hit;
 @Path("/api/v2beta/search")
 public class SearchResource {
 
-  private final SearchService searchService;
+  private final v2beta.SearchService searchService;
 
   public SearchResource(@NonNull final ServiceFactory serviceFactory) {
     this.searchService = serviceFactory.getSearchService();
