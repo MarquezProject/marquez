@@ -14,6 +14,7 @@ import { composeWithDevTools } from '@redux-devtools/extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
 import ColumnLevel from '../routes/column-level/ColumnLevel'
+import Dashboard from '../routes/dashboard/Dashboard'
 import Datasets from '../routes/datasets/Datasets'
 import Events from '../routes/events/Events'
 import Header from './header/Header'
@@ -25,7 +26,6 @@ import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../store/sagas'
-import Dashboard from "../routes/dashboard/Dashboard";
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {

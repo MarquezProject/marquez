@@ -16,8 +16,6 @@ import {
   FETCH_DATASET,
   FETCH_DATASETS,
   FETCH_DATASET_VERSIONS,
-  FETCH_OPEN_SEARCH_DATASETS,
-  FETCH_OPEN_SEARCH_JOBS,
   FETCH_EVENTS,
   FETCH_INITIAL_DATASET_VERSIONS,
   FETCH_JOBS,
@@ -25,6 +23,8 @@ import {
   FETCH_JOB_TAGS,
   FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
+  FETCH_OPEN_SEARCH_DATASETS,
+  FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
@@ -34,13 +34,13 @@ import {
   Dataset,
   DatasetVersions,
   Datasets,
-  OpenSearchResultDatasets,
-  OpenSearchResultJobs,
   Events,
   Facets,
   Jobs,
   LineageGraph,
   Namespaces,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Runs,
   Tags,
 } from '../../types/api'
@@ -88,8 +88,6 @@ import {
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
-  fetchOpenSearchDatasetsSuccess,
-  fetchOpenSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
   fetchInitialDatasetVersionsSuccess,
@@ -98,13 +96,15 @@ import {
   fetchLatestRunsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
+  fetchOpenSearchDatasetsSuccess,
+  fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
-import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
+import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
 
 export function* fetchTags() {
   try {

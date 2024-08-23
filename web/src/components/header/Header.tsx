@@ -9,7 +9,6 @@ import Box from '@mui/material/Box'
 import React, { ReactElement } from 'react'
 import Search from '../search/Search'
 
-
 const Header = (): ReactElement => {
   const theme = createTheme(useTheme())
 

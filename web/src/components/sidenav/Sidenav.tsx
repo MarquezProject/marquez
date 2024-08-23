@@ -19,10 +19,9 @@ import { FormControl, MenuItem, Select } from '@mui/material'
 import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
-import i18next from 'i18next'
+import { Dashboard } from '@mui/icons-material'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
 import marquez_logo from './marquez-icon-white-solid.svg'
-import {Dashboard} from "@mui/icons-material";
 
 interface SidenavProps {}
 

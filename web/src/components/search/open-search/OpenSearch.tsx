@@ -114,7 +114,8 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
         const jobHit = openSearchJobs.data.hits[selectedIndex]
         navigate(`/lineage/${encodeNode('JOB', jobHit.namespace, jobHit.name)}`)
       } else {
-        const datasetHit = openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
+        const datasetHit =
+          openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
         navigate(`/lineage/${encodeNode('DATASET', datasetHit.namespace, datasetHit.name)}`)
       }
     }
@@ -122,20 +123,19 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   const debouncedFetchJobs = useCallback(
     debounce(async (searchTerm) => {
-      fetchOpenSearchJobs(searchTerm);
-      setIsDebouncing(false); // Set loading to false after the fetch completes
+      fetchOpenSearchJobs(searchTerm)
+      setIsDebouncing(false) // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
-  );
-
+  )
 
   const debouncedFetchDatasets = useCallback(
     debounce(async (searchTerm) => {
-      fetchOpenSearchDatasets(searchTerm);
-      setIsDebouncing(false); // Set loading to false after the fetch completes
+      fetchOpenSearchDatasets(searchTerm)
+      setIsDebouncing(false) // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
-  );
+  )
 
   useEffect(() => {
     setIsDebouncing(true)
@@ -147,7 +147,11 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
     setSelectedIndex(null)
   }, [openSearchJobs.data.hits, openSearchDatasets.data.hits])
 
-  if (openSearchJobs.data.hits.length === 0 && openSearchDatasets.data.hits.length === 0 && !isDebouncing) {
+  if (
+    openSearchJobs.data.hits.length === 0 &&
+    openSearchDatasets.data.hits.length === 0 &&
+    !isDebouncing
+  ) {
     return (
       <Box my={4}>
         <MqEmpty title={'No Hits'} body={'Keep typing or try a more precise search.'} />
@@ -368,7 +372,11 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
                             key={field.name}
                             label={field.name}
                             variant={'outlined'}
-                            color={field.name.toLowerCase().includes(search.toLowerCase()) ? 'primary' : 'default'}
+                            color={
+                              field.name.toLowerCase().includes(search.toLowerCase())
+                                ? 'primary'
+                                : 'default'
+                            }
                             size={'small'}
                             sx={{ mr: 1 }}
                           />

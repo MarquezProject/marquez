@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LineChart } from '@mui/x-charts'
+import { alpha } from '@mui/material/styles'
 import { theme } from '../../helpers/theme'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
-import {transparent} from "material-ui/styles/colors";
-import {alpha} from "@mui/material/styles";
 
 interface Props {}
 

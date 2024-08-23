@@ -1,7 +1,7 @@
 import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import { Divider, FormControlLabel, Switch, TextField } from '@mui/material'
+import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { fetchLineage } from '../../store/actionCreators'
-import {HEADER_HEIGHT, theme} from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
