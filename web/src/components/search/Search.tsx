@@ -114,7 +114,8 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
           spellCheck={false}
           sx={{
             zIndex: theme.zIndex.appBar + 2,
-            height: '64px',
+            height: HEADER_HEIGHT - 1,
+            paddingRight: theme.spacing(3),
           }}
           inputRef={inputRef}
           fullWidth={true}
@@ -181,7 +182,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                 }}
               >
                 <Box
-                  mt={'64px'}
+                  mt={HEADER_HEIGHT - 1}
                   borderTop={1}
                   borderColor={'divider'}
                   overflow={'auto'}
