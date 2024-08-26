@@ -69,7 +69,6 @@ public class OpenLineageResource extends BaseResource {
       throws JsonProcessingException, SQLException {
     if (event instanceof LineageEvent) {
       serviceFactory.getOpsService().createLineageMetric((LineageEvent) event);
-      System.out.println("Indexing event" + serviceFactory.getSearchService().isEnabled());
       if (serviceFactory.getSearchService().isEnabled()) {
         serviceFactory.getSearchService().indexEvent((LineageEvent) event);
       }
