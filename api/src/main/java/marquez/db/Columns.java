@@ -144,6 +144,14 @@ public final class Columns {
   public static final String EVENT = "event";
   public static final String EVENT_TIME = "event_time";
 
+  /* METRICS ROW COLUMNS */
+  public static final String START_INTERVAL = "start_interval";
+  public static final String END_INTERVAL = "end_interval";
+  public static final String START = "start";
+  public static final String COMPLETE = "complete";
+  public static final String FAIL = "fail";
+  public static final String ABORT = "abort";
+
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       return null;
