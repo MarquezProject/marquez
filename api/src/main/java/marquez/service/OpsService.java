@@ -16,6 +16,10 @@ public class OpsService {
     return this.opsDao.getLastDayMetrics();
   }
 
+  public List<LineageMetric> getLastWeekLineageMetrics() {
+    return this.opsDao.getLastWeekMetrics();
+  }
+
   public void createLineageMetric(LineageEvent lineageEvent) {
     this.opsDao.createLineageMetric(
         lineageEvent.getEventTime().toInstant(), lineageEvent.getEventType());
