@@ -9,7 +9,7 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/marquez
+  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/marquez
   user: marquez
   password: marquez
 
