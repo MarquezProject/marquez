@@ -12,4 +12,4 @@ services:
       - ./docker/metadata.json:/usr/src/app/metadata.json
     depends_on:
       - api
-    entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--timeout=60", "--", "./seed.sh"]
+    entrypoint: ["./wait-for-it.sh", "api:${API_PORT}", "--timeout=120", "--", "./seed.sh"]
