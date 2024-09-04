@@ -35,6 +35,7 @@ import marquez.cli.SeedCommand;
 import marquez.common.Utils;
 import marquez.db.DbMigration;
 import marquez.jobs.DbRetentionJob;
+import marquez.jobs.MaterializeViewRefresherJob;
 import marquez.logging.DelegatingSqlLogger;
 import marquez.logging.LabelledSqlLogger;
 import marquez.logging.LoggingMdcFilter;
@@ -152,6 +153,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
       // Add job to apply retention policy to database.
       env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }
+
+    // Add job to refresh materialized views.
+    env.lifecycle().manage(new MaterializeViewRefresherJob(jdbi));
 
     // set namespaceFilter
     ExclusionsConfig exclusions = config.getExclude();

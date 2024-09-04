@@ -14,4 +14,8 @@ public class OpsService {
   public List<LineageMetric> getLastDayLineageMetrics() {
     return this.opsDao.getLastDayMetrics();
   }
+
+  public List<LineageMetric> getLastWeekLineageMetrics() {
+    return this.opsDao.getLastWeekMetrics();
+  }
 }

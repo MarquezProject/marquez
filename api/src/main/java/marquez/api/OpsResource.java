@@ -33,4 +33,14 @@ public class OpsResource {
   public Response getLastDayLineageMetrics() {
     return Response.ok(opsService.getLastDayLineageMetrics()).build();
   }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Path("/lineage-metrics/week")
+  @Produces(APPLICATION_JSON)
+  public Response getLastWeekLineageMetrics() {
+    return Response.ok(opsService.getLastWeekLineageMetrics()).build();
+  }
 }
