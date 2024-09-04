@@ -9,7 +9,7 @@ import {
   List,
   ListItem,
 } from '@mui/material'
-import { Code, Computer, RunCircleOutlined, Source } from '@mui/icons-material'
+import {ChevronRight, Code, Computer, RunCircleOutlined, Source} from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import {
   Timeline,
@@ -28,7 +28,7 @@ import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
-import TimelineDrawer from "./TimelineDrawer";
+import TimelineDrawer from './TimelineDrawer'
 
 interface Props {}
 
@@ -90,7 +90,6 @@ const Dashboard: React.FC<Props> = () => {
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <MqText heading>Data Ops</MqText>
           <Box display={'flex'}>
-            {/* todo look into SplitButton to replace this one */}
             <Box>
               <MqText subdued>REFRESH</MqText>
               <SplitButton options={REFRESH_INTERVALS} />
@@ -184,11 +183,27 @@ const Dashboard: React.FC<Props> = () => {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item md={8} sm={12} borderRight={1} borderColor={'divider'}>
-              <Box mr={2}>
+            <Grid
+              item
+              md={8}
+              sm={12}
+              borderRight={{
+                xs: 'none',
+                md: 1,
+              }}
+              borderColor={{
+                md: 'divider',
+              }}
+            >
+              <Box
+                mr={{
+                  xs: 0,
+                  md: 2,
+                }}
+              >
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                   <MqText subdued>{selectedState} JOBS</MqText>
-                  <Button size={'small'} onClick={() => setJobsDrawerOpen(true)}>
+                  <Button disableRipple size={'small'} endIcon={<ChevronRight />} onClick={() => setJobsDrawerOpen(true)}>
                     See More
                   </Button>
                 </Box>
@@ -202,7 +217,7 @@ const Dashboard: React.FC<Props> = () => {
             <Grid item sm={12} md={4}>
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <MqText subdued>RECENT ACTIVITY</MqText>
-                <Button size={'small'} sx={{ mr: 2 }} onClick={() => setTimelineOpen(true)}>
+                <Button disableRipple size={'small'} sx={{ mr: 2 }} endIcon={<ChevronRight />} onClick={() => setTimelineOpen(true)}>
                   See More
                 </Button>
               </Box>

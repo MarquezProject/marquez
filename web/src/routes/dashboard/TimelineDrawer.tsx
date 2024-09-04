@@ -1,18 +1,18 @@
 import { Box } from '@mui/system'
-import { theme } from '../../helpers/theme'
-import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import { Code, Computer, RunCircleOutlined, Source } from '@mui/icons-material'
+import { List, ListItem } from '@mui/material'
 import {
   Timeline,
   TimelineConnector,
   TimelineContent,
   TimelineDot,
   TimelineItem,
+  TimelineSeparator,
   timelineItemClasses,
-  TimelineSeparator
-} from "@mui/lab";
-import {Code, Computer, RunCircleOutlined, Source} from "@mui/icons-material";
-import {List, ListItem} from "@mui/material";
+} from '@mui/lab'
+import { theme } from '../../helpers/theme'
+import MqText from '../../components/core/text/MqText'
+import React from 'react'
 const WIDTH = 400
 
 const TimelineDrawer = () => {
