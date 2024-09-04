@@ -28,6 +28,7 @@ import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
+import TimelineDrawer from "./TimelineDrawer";
 
 interface Props {}
 
@@ -47,6 +48,7 @@ const Dashboard: React.FC<Props> = () => {
   const [timeframe, setTimeframe] = React.useState('8 Hours')
   const [selectedState, setSelectedState] = React.useState('FAIL')
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
+  const [timelineOpen, setTimelineOpen] = React.useState(false)
   return (
     <>
       <Drawer
@@ -64,6 +66,23 @@ const Dashboard: React.FC<Props> = () => {
       >
         <Box>
           <JobsDrawer />
+        </Box>
+      </Drawer>
+      <Drawer
+        anchor={'right'}
+        open={timelineOpen}
+        onClose={() => setTimelineOpen(false)}
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.background.default,
+            backgroundImage: 'none',
+            mt: `${HEADER_HEIGHT}px`,
+            height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+          },
+        }}
+      >
+        <Box>
+          <TimelineDrawer />
         </Box>
       </Drawer>
 
@@ -183,7 +202,7 @@ const Dashboard: React.FC<Props> = () => {
             <Grid item sm={12} md={4}>
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <MqText subdued>RECENT ACTIVITY</MqText>
-                <Button size={'small'} sx={{ mr: 2 }}>
+                <Button size={'small'} sx={{ mr: 2 }} onClick={() => setTimelineOpen(true)}>
                   See More
                 </Button>
               </Box>
