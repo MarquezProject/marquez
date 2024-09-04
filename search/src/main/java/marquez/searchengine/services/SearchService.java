@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+//import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -34,13 +34,15 @@ public class SearchService {
 
     private final Directory jobIndexDirectory;
     private final Directory datasetIndexDirectory;    
-    private final StandardAnalyzer analyzer;
+    //private final StandardAnalyzer analyzer;
+    private final NGramAnalyzer analyzer;
     private static final int MAX_RESULTS = 10;
 
     public SearchService() {
         this.jobIndexDirectory = new ByteBuffersDirectory();
         this.datasetIndexDirectory = new ByteBuffersDirectory();
-        this.analyzer = new StandardAnalyzer();
+        //this.analyzer = new StandardAnalyzer();
+        this.analyzer = new NGramAnalyzer(3, 4);
     }
 
     // Method to index a job document
