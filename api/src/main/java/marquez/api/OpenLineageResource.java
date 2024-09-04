@@ -68,7 +68,6 @@ public class OpenLineageResource extends BaseResource {
   public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
     if (event instanceof LineageEvent) {
-      serviceFactory.getOpsService().createLineageMetric((LineageEvent) event);
       if (serviceFactory.getSearchService().isEnabled()) {
         serviceFactory.getSearchService().indexEvent((LineageEvent) event);
       }
