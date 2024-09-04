@@ -13,21 +13,28 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+
 //import com.fasterxml.jackson.databind.ObjectMapper;
 import marquez.searchengine.services.SearchService;
 import marquez.searchengine.models.IndexResponse;
 import marquez.searchengine.models.SearchResult;
 import marquez.searchengine.models.SearchRequest;
-
+import marquez.db.OpenLineageDao;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class SearchResource {
 
     private final SearchService searchService;
+    private final Jdbi jdbi;
 
-    public SearchResource() {
-        this.searchService = new SearchService();
+    public SearchResource(Jdbi jdbi) throws IOException {
+        this.jdbi = jdbi.installPlugin(new SqlObjectPlugin());
+        OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+        this.searchService = new SearchService(openLineageDao);
     }
 
     @POST

@@ -4,6 +4,10 @@ import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.io.IOException;
+
+import org.jdbi.v3.core.Jdbi;
+
+import marquez.searchengine.db.DatabaseConnection;
 import marquez.searchengine.health.SearchHealthCheck;
 import marquez.searchengine.resources.SearchResource;
 
@@ -23,7 +27,8 @@ public class SearchApplication extends Application<SearchConfig> {
 
   @Override
   public void run(SearchConfig configuration, Environment environment) throws IOException {
-    final SearchResource searchResource = new SearchResource();
+    Jdbi jdbi = DatabaseConnection.initializeJdbi();
+    final SearchResource searchResource = new SearchResource(jdbi);
     environment.jersey().register(searchResource);
     environment.healthChecks().register("search-health-check", new SearchHealthCheck());
   }

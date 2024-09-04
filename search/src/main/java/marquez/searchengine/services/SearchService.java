@@ -1,10 +1,16 @@
 package marquez.searchengine.services;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 //import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -29,20 +35,89 @@ import org.apache.lucene.store.Directory;
 
 import marquez.searchengine.models.IndexResponse;
 import marquez.searchengine.models.SearchResult;
+import marquez.db.OpenLineageDao;
+import marquez.service.models.LineageEvent;
+import marquez.service.models.LineageEvent.Dataset;
 
 public class SearchService {
 
+    private final OpenLineageDao openLineageDao;
     private final Directory jobIndexDirectory;
     private final Directory datasetIndexDirectory;    
     //private final StandardAnalyzer analyzer;
     private final NGramAnalyzer analyzer;
     private static final int MAX_RESULTS = 10;
 
-    public SearchService() {
+    public SearchService(OpenLineageDao openLineageDao) throws IOException {
+        this.openLineageDao = openLineageDao;
         this.jobIndexDirectory = new ByteBuffersDirectory();
         this.datasetIndexDirectory = new ByteBuffersDirectory();
         //this.analyzer = new StandardAnalyzer();
         this.analyzer = new NGramAnalyzer(3, 4);
+        // init index with DB lineage events
+        loadLineageEventsFromDatabase();
+    }
+
+    private void loadLineageEventsFromDatabase() throws IOException {
+        ZonedDateTime before = ZonedDateTime.now(); // Current time
+        ZonedDateTime after = before.minusYears(5); // Fetch events from the past 1 month
+        int limit = 1000; // Limit of events to load at a time
+        int offset = 0; // Offset for pagination
+
+        List<LineageEvent> lineageEvents;
+        System.out.println("prout");
+        do {
+            // Fetch a batch of lineage events
+            lineageEvents = openLineageDao.getAllLineageEventsDesc(before, after, limit, offset);
+
+            // Index each event into Lucene
+            for (LineageEvent event : lineageEvents) {
+                System.out.println("prooooooout");
+                indexLineageEvent(event);
+            }
+
+            offset += limit; // Increment the offset for the next batch
+        } while (!lineageEvents.isEmpty());
+    }
+
+    private void indexLineageEvent(@Valid @NotNull LineageEvent event) throws IOException {
+        // Convert inputs and outputs to Map<String, Object> and index them
+        if (event.getInputs() != null) {
+            for (Dataset input : event.getInputs()) {
+                Map<String, Object> inputMap = mapDatasetEvent(input, event.getRun().getRunId(), event.getEventType());
+                indexDatasetDocument(inputMap);
+            }
+        }
+
+        if (event.getOutputs() != null) {
+            for (Dataset  output : event.getOutputs()) {
+                Map<String, Object> outputMap = mapDatasetEvent(output, event.getRun().getRunId(), event.getEventType());
+                indexDatasetDocument(outputMap);
+            }
+        }
+        Map<String, Object> jobMap = mapJobEvent(event);
+        indexJobDocument(jobMap);
+    }
+
+    private Map<String, Object> mapDatasetEvent(Dataset dataset, String run_id, String eventType) {
+        Map<String, Object> datasetMap = new HashMap<>();
+        datasetMap.put("run_id", run_id);
+        datasetMap.put("eventType", eventType);
+        datasetMap.put("name", dataset.getName());
+        datasetMap.put("namespace", dataset.getNamespace());
+        Optional.ofNullable(dataset.getFacets()).ifPresent(facets -> datasetMap.put("facets", facets));
+        return datasetMap;
+    }
+
+    // Helper method to map job details to Map<String, Object>
+    private Map<String, Object> mapJobEvent(LineageEvent event) {
+        Map<String, Object> jobMap = new HashMap<>();
+        jobMap.put("run_id", event.getRun().getRunId().toString());
+        jobMap.put("name", event.getJob().getName());
+        jobMap.put("namespace", event.getJob().getNamespace());
+        jobMap.put("eventType", event.getEventType());
+        Optional.ofNullable(event.getRun().getFacets()).ifPresent(facets -> jobMap.put("facets", facets));
+        return jobMap;
     }
 
     // Method to index a job document
