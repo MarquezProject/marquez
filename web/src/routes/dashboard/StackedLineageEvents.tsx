@@ -6,12 +6,20 @@ import { theme } from '../../helpers/theme'
 import Box from '@mui/system/Box'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
+import {LineageMetric} from "../../store/requests/lineageMetrics";
+import lineage from "../../store/reducers/lineage";
 
 interface Props {
-  label: string
+  lineageMetrics: LineageMetric[]
 }
 
-const StackedLineageEvents: React.FC<Props> = () => {
+const StackedLineageEvents = ({ lineageMetrics }: Props) => {
+  const labels = lineageMetrics.map(item => new Date(item.startInterval));
+  const failData = lineageMetrics.map(item => item.fail);
+  const startData = lineageMetrics.map(item => item.start);
+  const completeData = lineageMetrics.map(item => item.complete);
+  const abortData = lineageMetrics.map(item => item.abort);
+
   return (
     <Box>
       <ParentSize>
@@ -26,27 +34,34 @@ const StackedLineageEvents: React.FC<Props> = () => {
               height={200}
               series={[
                 {
-                  data: [34, 233, 236, 237, 354, 459, 652, 920],
-                  type: 'line',
-                  showMark: false,
-                  color: theme.palette.primary.main,
-                },
-                {
-                  data: [23, 148, 276, 349, 502, 658, 789, 934],
+                  data: startData,
                   type: 'line',
                   showMark: false,
                   color: theme.palette.info.main,
                 },
                 {
-                  data: [108, 128, 439, 476, 496, 544, 622, 970],
+                  data: completeData,
+                  type: 'line',
+                  showMark: false,
+                  color: theme.palette.primary.main,
+                },
+                {
+                  data: failData,
                   type: 'line',
                   showMark: false,
                   color: theme.palette.error.main,
                 },
+                {
+                  data: abortData,
+                  type: 'line',
+                  showMark: false,
+                  color: theme.palette.secondary.main,
+                },
               ]}
-              leftAxis={null}
+              margin={{ left: 4, right: 8, top: 6, bottom: 6 }}
+              xAxis={[{ data: labels, scaleType: 'time', disableLine: true, disableTicks: true }]}
               bottomAxis={null}
-              margin={{ left: 4, right: 4, top: 0, bottom: 0 }}
+              leftAxis={null}
             />
           </>
         )}

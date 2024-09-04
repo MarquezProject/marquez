@@ -25,30 +25,54 @@ import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, {useEffect} from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
 import TimelineDrawer from './TimelineDrawer'
+import {IState} from "../../store/reducers";
+import * as Redux from "redux";
+import {bindActionCreators} from "redux";
+import {fetchLineage, fetchLineageMetrics} from "../../store/actionCreators";
+import {LineageMetric} from "../../store/requests/lineageMetrics";
+import {connect} from "react-redux";
 
-interface Props {}
+interface StateProps {
+  lineageMetrics: LineageMetric[]
+}
 
-const TIMEFRAMES = ['8 Hours', '24 Hours', '7 Days']
+interface DispatchProps {
+  fetchLineageMetrics: typeof fetchLineageMetrics
+}
+
+const TIMEFRAMES = ['24 Hours', '7 Days']
 const REFRESH_INTERVALS = ['30s', '5m', '10m', 'Never']
 
 const states = [
-  { label: 'FAIL', color: theme.palette.error.main, bgColor: 'error' },
-  { label: 'RUNNING', color: theme.palette.info.main, bgColor: 'info' },
+  { label: 'START', color: theme.palette.info.main, bgColor: 'secondary' },
   { label: 'COMPLETE', color: theme.palette.primary.main, bgColor: 'primary' },
-  { label: 'ABORT', color: theme.palette.warning.main, bgColor: 'secondary' },
-  { label: 'START', color: theme.palette.secondary.main, bgColor: 'secondary' },
-  { label: 'OTHER', color: theme.palette.secondary.main, bgColor: 'secondary' },
+  { label: 'FAIL', color: theme.palette.error.main, bgColor: 'error' },
+  { label: 'ABORT', color: theme.palette.secondary.main, bgColor: 'secondary' },
 ]
 
-const Dashboard: React.FC<Props> = () => {
-  const [timeframe, setTimeframe] = React.useState('8 Hours')
+const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps & DispatchProps) => {
+  const [timeframe, setTimeframe] = React.useState('24 Hours')
   const [selectedState, setSelectedState] = React.useState('FAIL')
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
   const [timelineOpen, setTimelineOpen] = React.useState(false)
+
+  useEffect(() => {
+    if (timeframe === '24 Hours') {
+      fetchLineageMetrics('day')
+    } else if (timeframe === '7 Days') {
+      fetchLineageMetrics('week')
+    }
+  }, [timeframe]);
+
+  const failed= lineageMetrics.map(item => item.fail).reduce((a, b) => a + b, 0);
+  const started = lineageMetrics.map(item => item.start).reduce((a, b) => a + b, 0);
+  const completed = lineageMetrics.map(item => item.complete).reduce((a, b) => a + b, 0);
+  const aborted = lineageMetrics.map(item => item.abort).reduce((a, b) => a + b, 0);
+
   return (
     <>
       <Drawer
@@ -114,7 +138,7 @@ const Dashboard: React.FC<Props> = () => {
         <Box mt={1}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
-              <StackedLineageEvents label={'OpenLineage Events'} />
+              <StackedLineageEvents lineageMetrics={lineageMetrics} />
               <Box display={'flex'}>
                 <ButtonGroup size={'small'} fullWidth>
                   {states.map((state) => (
@@ -142,7 +166,7 @@ const Dashboard: React.FC<Props> = () => {
                             bgcolor={state.color}
                             sx={{ transition: '.3s ease-in-out' }}
                           />
-                          {Math.floor(Math.random() * 100)}
+                          {state.label === 'FAIL' ? failed : state.label === 'COMPLETE' ? completed : state.label === 'ABORT' ? aborted : started}
                         </Stack>
                       </Button>
                     </MQTooltip>
@@ -364,4 +388,16 @@ const Dashboard: React.FC<Props> = () => {
   )
 }
 
-export default Dashboard
+const mapStateToProps = (state: IState) => ({
+  lineageMetrics: state.lineageMetrics.data,
+})
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchLineageMetrics: fetchLineageMetrics,
+    },
+    dispatch
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)

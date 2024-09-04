@@ -27,7 +27,7 @@ import {
   FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
-  FETCH_SEARCH,
+  FETCH_SEARCH, FETCH_LINEAGE_METRICS,
 } from '../actionCreators/actionTypes'
 import {
   ColumnLineageGraph,
@@ -100,11 +100,12 @@ import {
   fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
-  fetchTagsSuccess,
+  fetchTagsSuccess, fetchLineageMetricsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
+import {getLineageMetrics, LineageMetric} from "../requests/lineageMetrics";
 
 export function* fetchTags() {
   try {
@@ -497,6 +498,23 @@ export function* fetchOpenSearchDatasetsSaga() {
   }
 }
 
+export function* fetchLineageMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LINEAGE_METRICS)
+      const lineageMetrics: LineageMetric[] = yield call(
+        getLineageMetrics,
+        payload
+      )
+      yield put(fetchLineageMetricsSuccess(lineageMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting lineage metrics'))
+    }
+  }
+}
+
+
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -525,6 +543,7 @@ export default function* rootSaga(): Generator {
     addDatasetFieldTagSaga(),
     addTagsSaga(),
     fetchJobTagsSaga(),
+    fetchLineageMetricsSaga()
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

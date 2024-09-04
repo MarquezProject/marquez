@@ -20,6 +20,7 @@ import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import runs, { IRunsState } from './runs'
 import search, { ISearchState } from './search'
 import tags, { ITagsState } from './tags'
+import lineageMetrics, { ILineageMetricsState } from "./lineageMetrics";
 
 export interface IState {
   tags: ITagsState
@@ -38,6 +39,7 @@ export interface IState {
   columnLineage: IColumnLineageState
   search: ISearchState
   facets: IFacetsState
+  lineageMetrics: ILineageMetricsState
 }
 
 export default (history: History): Reducer =>
@@ -58,4 +60,5 @@ export default (history: History): Reducer =>
     openSearchDatasets,
     facets,
     tags,
+    lineageMetrics
   })
