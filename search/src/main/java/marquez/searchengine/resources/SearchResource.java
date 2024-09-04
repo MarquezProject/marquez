@@ -14,10 +14,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 //import com.fasterxml.jackson.databind.ObjectMapper;
-
 import marquez.searchengine.services.SearchService;
 import marquez.searchengine.models.IndexResponse;
 import marquez.searchengine.models.SearchResult;
+import marquez.searchengine.models.SearchRequest;
+
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,7 +38,7 @@ public class SearchResource {
             String query = request.getQuery().getMulti_match().getQuery();
             List<String> fields = request.getQuery().getMulti_match().getFields();
             // Log the extracted details for debugging
-            //System.out.println("Received query: " + query);
+            //System.out.println("Received query: " + query + fields);
             SearchResult result = searchService.searchJobs(query, fields);
             //String jsonResponse = new ObjectMapper().writeValueAsString(result);
             //System.out.println("Serialized Response: " + jsonResponse);
@@ -54,7 +55,7 @@ public class SearchResource {
         try {
             String query = request.getQuery().getMulti_match().getQuery();
             List<String> fields = request.getQuery().getMulti_match().getFields();
-            // // Log the extracted details for debugging
+            // Log the extracted details for debugging
             //System.out.println("Received query: " + query);
             SearchResult result = searchService.searchDatasets(query, fields);
             //String jsonResponse = new ObjectMapper().writeValueAsString(result);

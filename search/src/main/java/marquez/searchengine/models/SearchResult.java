@@ -29,6 +29,10 @@ public class SearchResult {
     @JsonProperty("suggest")
     private Map<String, Object> suggest = new HashMap<>(); // Initialize as empty map
 
+    @JsonProperty("highlights")
+    private List<Map<String, List<String>>> highlights; // Add this field for highlights
+
+
     // Constructor
     public SearchResult() {
         this.shards = new ShardStatistics(1, 1, 0, 0); // Assuming a single shard with no failures
@@ -36,14 +40,17 @@ public class SearchResult {
         this.numberOfReducePhases = 0; // Default value
         this.terminatedEarly = false; // Default value
         this.suggest = new HashMap<>(); // Empty suggestion map
+        this.highlights = new ArrayList<>();
     }
 
     // Add document to hits
-    public void addDocument(String index, Map<String, String> doc) {
+    public void addDocument(String index, Map<String, String> doc, Map<String, List<String>> highlight, int indexPosition) {
         Map<String, Object> hit = new HashMap<>();
         hit.put("_index", index);  // Include the index name in the hit
         hit.put("_source", doc);
-        hitsMetadata.addHit(index, hit);
+        hit.putAll(doc);
+        hitsMetadata.addHit(index, hit, indexPosition);
+        highlights.add(highlight);
     }
 
     // Getters and Setters for all fields
@@ -202,11 +209,12 @@ public class SearchResult {
         }
 
         // Add a hit to the hits list
-        public void addHit(String index, Map<String, Object> doc) {
+        public void addHit(String index, Map<String, Object> doc, int indexPosition) {
             Map<String, Object> hit = new HashMap<>();
             hit.put("_index", index); 
             hit.putAll(doc);
-            hit.put("_id", "id");
+            //String uniqueId = ((Map<String, Object>) doc.get("_source")).get("run_id") + "-" + indexPosition;
+            hit.put("_id", "id");  // Ensure the `_id` is unique
             this.hits.add(hit);
         }
     }

@@ -1,4 +1,4 @@
-package marquez.searchengine.resources;
+package marquez.searchengine.models;
 
 import java.util.Map;
 import java.util.List;
