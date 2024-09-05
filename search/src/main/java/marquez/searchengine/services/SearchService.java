@@ -22,14 +22,10 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.StoredFields;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -69,14 +65,12 @@ public class SearchService {
         int offset = 0; // Offset for pagination
 
         List<LineageEvent> lineageEvents;
-        System.out.println("prout");
         do {
             // Fetch a batch of lineage events
             lineageEvents = openLineageDao.getAllLineageEventsDesc(before, after, limit, offset);
 
             // Index each event into Lucene
             for (LineageEvent event : lineageEvents) {
-                System.out.println("prooooooout");
                 indexLineageEvent(event);
             }
 
@@ -139,7 +133,8 @@ public class SearchService {
             TopDocs topDocs = searcher.search(query, 1);
     
             if (topDocs.totalHits.value > 0) {
-                Document existingDoc = searcher.doc(topDocs.scoreDocs[0].doc);
+                StoredFields storedFields = searcher.storedFields();
+                Document existingDoc = storedFields.document(topDocs.scoreDocs[0].doc);
                 // Compare other fields to determine if the document needs an update
                 for (Map.Entry<String, Object> entry : document.entrySet()) {
                     String fieldName = entry.getKey();
@@ -147,10 +142,9 @@ public class SearchService {
                     // If the stored field is different from the new field value, return true (needs update)
                     if (fieldValue != null && !fieldValue.equals(existingDoc.get(fieldName))) {
                         return false; // Document exists but needs an update
+                        //TODO: handle that case in a better way
                     }
                 }
-                System.out.println("Document exists and does not need an update");
-    
                 return true; // Document exists and does not need an update
             }
     
@@ -163,6 +157,7 @@ public class SearchService {
     
 
     // Method to index a job document
+    //TODO: don't index a Map, use the Dataset object directly
     public IndexResponse indexJobDocument(Map<String, Object> document) throws IOException {
         // Check if the document already exists
         if (documentAlreadyExists(document, jobIndexDirectory)) {
@@ -192,6 +187,7 @@ public class SearchService {
     }
 
     // Method to index a dataset document
+    //TODO: don't index a Map, use the Dataset object directly
     public IndexResponse indexDatasetDocument(Map<String, Object> document) throws IOException {
         // Check if the document exists
         if (documentAlreadyExists(document, datasetIndexDirectory)) {
