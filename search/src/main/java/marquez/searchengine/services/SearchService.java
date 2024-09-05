@@ -61,42 +61,55 @@ public class SearchService {
     private void loadLineageEventsFromDatabase() throws IOException {
         ZonedDateTime before = ZonedDateTime.now(); // Current time
         ZonedDateTime after = before.minusYears(5); // Fetch events from the past 1 month
-        int limit = 1000; // Limit of events to load at a time
+        int limit = 50000; // Limit of events to load at a time
         int offset = 0; // Offset for pagination
 
         List<LineageEvent> lineageEvents;
         do {
             // Fetch a batch of lineage events
             lineageEvents = openLineageDao.getAllLineageEventsDesc(before, after, limit, offset);
+            System.out.println("Lineage events fetched: "+lineageEvents.size());
 
-            // Index each event into Lucene
-            for (LineageEvent event : lineageEvents) {
-                indexLineageEvent(event);
-            }
+            indexLineageEvents(lineageEvents);
 
             offset += limit; // Increment the offset for the next batch
         } while (!lineageEvents.isEmpty());
     }
 
-    private void indexLineageEvent(@Valid @NotNull LineageEvent event) throws IOException {
-        // Convert inputs and outputs to Map<String, Object> and index them
-        if (event.getInputs() != null) {
-            for (Dataset input : event.getInputs()) {
-                Map<String, Object> inputMap = mapDatasetEvent(input, event.getRun().getRunId(), event.getEventType());
-                indexDatasetDocument(inputMap);
+    private void indexLineageEvents(@Valid @NotNull List<LineageEvent> lineageEvents) throws IOException {
+        List<Map<String, Object>> inputMaps = new ArrayList<>();
+        List<Map<String, Object>> outputMaps = new ArrayList<>();
+        List<Map<String, Object>> jobMaps = new ArrayList<>();
+        for (LineageEvent event : lineageEvents) {
+            if (event.getInputs() != null) {
+                for (Dataset input : event.getInputs()) {
+                    Map<String, Object> inputMap = mapDatasetEvent(input, event.getRun().getRunId(),
+                            event.getEventType());
+                    inputMaps.add(inputMap);
+                }
             }
-        }
-
-        if (event.getOutputs() != null) {
-            for (Dataset  output : event.getOutputs()) {
-                Map<String, Object> outputMap = mapDatasetEvent(output, event.getRun().getRunId(), event.getEventType());
-                indexDatasetDocument(outputMap);
+            if (event.getOutputs() != null) {
+                for (Dataset output : event.getOutputs()) {
+                    Map<String, Object> outputMap = mapDatasetEvent(output, event.getRun().getRunId(),
+                            event.getEventType());
+                    outputMaps.add(outputMap);
+                }
             }
+            Map<String, Object> jobMap = mapJobEvent(event);
+            jobMaps.add(jobMap);
         }
-        Map<String, Object> jobMap = mapJobEvent(event);
-        indexJobDocument(jobMap);
+        if (!inputMaps.isEmpty()) {
+            indexDatasetDocuments(inputMaps);
+        }
+        if (!outputMaps.isEmpty()) {
+            indexDatasetDocuments(outputMaps);
+        }
+        if (!jobMaps.isEmpty()) {
+            indexJobDocuments(jobMaps);
+        }
     }
 
+    // Helper method to map dataset details to Map<String, Object>
     private Map<String, Object> mapDatasetEvent(Dataset dataset, String run_id, String eventType) {
         Map<String, Object> datasetMap = new HashMap<>();
         datasetMap.put("run_id", run_id);
@@ -155,31 +168,15 @@ public class SearchService {
         }
     }
     
-
     // Method to index a job document
     //TODO: don't index a Map, use the Dataset object directly
     public IndexResponse indexJobDocument(Map<String, Object> document) throws IOException {
         // Check if the document already exists
         if (documentAlreadyExists(document, jobIndexDirectory)) {
-            // Document exists and needs an update; first delete the old document
             return createIndexResponse("jobs", document.get("name").toString(), false);
         }
-
         try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
-            Document doc = new Document();
-
-            doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
-            doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
-            doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
-            doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
-
-            if (document.containsKey("facets")) {
-                doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
-            }
-            if (document.containsKey("runFacets")) {
-                doc.add(new TextField("runFacets", document.get("runFacets").toString(), Field.Store.YES));
-            }
-
+            Document doc = createJobDocument(document);
             writer.addDocument(doc);
             writer.commit();
             return createIndexResponse("jobs", document.get("name").toString(), true);
@@ -191,33 +188,77 @@ public class SearchService {
     public IndexResponse indexDatasetDocument(Map<String, Object> document) throws IOException {
         // Check if the document exists
         if (documentAlreadyExists(document, datasetIndexDirectory)) {
-            // Document exists and needs an update; first delete the old document
             return createIndexResponse("datasets", document.get("name").toString(), false);
         }
-
         try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
-            Document doc = new Document();
-
-            doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
-            doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
-            doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
-            doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
-
-            if (document.containsKey("facets")) {
-                doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
-            }
-            if (document.containsKey("inputFacets")) {
-                doc.add(new TextField("inputFacets", document.get("inputFacets").toString(), Field.Store.YES));
-            }
-            if (document.containsKey("outputFacets")) {
-                doc.add(new TextField("outputFacets", document.get("outputFacets").toString(), Field.Store.YES));
-            }
-
+            Document doc = createDatasetDocument(document);
             writer.addDocument(doc);
             writer.commit();
-
             return createIndexResponse("datasets", document.get("name").toString(), true);
         }
+    }
+
+    public void indexJobDocuments(List<Map<String, Object>> documents) throws IOException {
+        // Check if the document already exists
+        try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
+            for (Map<String, Object> document : documents) {
+                if (documentAlreadyExists(document, jobIndexDirectory)) {
+                    continue;
+                }
+                Document doc = createJobDocument(document);
+                writer.addDocument(doc);
+            }
+            writer.commit();
+        }
+    }
+
+    public void indexDatasetDocuments(List<Map<String, Object>> documents) throws IOException {
+        // Check if the document exists
+        try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
+            for (Map<String, Object> document : documents) {
+                if (documentAlreadyExists(document, datasetIndexDirectory)) {
+                    continue;
+                }
+                Document doc = createDatasetDocument(document);
+                writer.addDocument(doc);
+            }
+            writer.commit();
+        }
+    }
+
+    private Document createJobDocument(Map<String, Object> document) {
+        Document doc = new Document();
+        doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
+        doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
+        doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
+        doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
+        if (document.containsKey("facets")) {
+            doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
+        }
+        if (document.containsKey("runFacets")) {
+            doc.add(new TextField("runFacets", document.get("runFacets").toString(), Field.Store.YES));
+        }
+        return doc;
+    }
+
+    private Document createDatasetDocument(Map<String, Object> document) {
+        Document doc = new Document();
+
+        doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
+        doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
+        doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
+        doc.add(new TextField("eventType", (String) document.get("eventType"), Field.Store.YES));
+
+        if (document.containsKey("facets")) {
+            doc.add(new TextField("facets", document.get("facets").toString(), Field.Store.YES));
+        }
+        if (document.containsKey("inputFacets")) {
+            doc.add(new TextField("inputFacets", document.get("inputFacets").toString(), Field.Store.YES));
+        }
+        if (document.containsKey("outputFacets")) {
+            doc.add(new TextField("outputFacets", document.get("outputFacets").toString(), Field.Store.YES));
+        }
+        return doc;
     }
 
     private IndexResponse createIndexResponse(String index, String id, boolean created) {
