@@ -87,8 +87,8 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                 data: completeData,
                 type: 'line',
                 showMark: false,
-                label: 'Completed',
                 color: theme.palette.primary.main,
+                label: 'Completed',
               },
               {
                 data: failData,
@@ -96,14 +96,13 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                 showMark: false,
                 color: theme.palette.error.main,
                 label: 'Failed',
-                disableHighlight: true,
               },
               {
                 data: abortData,
                 type: 'line',
-                label: 'Aborted',
                 showMark: false,
                 color: theme.palette.secondary.main,
+                label: 'Aborted',
               },
             ]}
             margin={{ left: 16, right: 16, top: 6, bottom: 0 }}
