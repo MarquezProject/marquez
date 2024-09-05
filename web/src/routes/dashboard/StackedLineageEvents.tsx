@@ -1,39 +1,42 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import { Chip } from '@mui/material'
 import { LineChart } from '@mui/x-charts'
+import { LineageMetric } from '../../store/requests/lineageMetrics'
+import { pluralize } from '../../helpers/text'
+import { sum } from 'lodash'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/system/Box'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
-import {LineageMetric} from "../../store/requests/lineageMetrics";
-import { Chip } from "@mui/material";
-import { sum } from "lodash";
-import { pluralize } from "../../helpers/text";
 
 interface Props {
   lineageMetrics: LineageMetric[]
 }
 
 const formatTime = (date: Date) =>
-  date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
 const StackedLineageEvents = ({ lineageMetrics }: Props) => {
+  const isWeek = lineageMetrics.length === 7
 
-  const isWeek = lineageMetrics.length === 7;
-
-  const labels = lineageMetrics.map(item => {
+  const labels = lineageMetrics.map((item) => {
     if (isWeek) {
-      return new Date(item.startInterval).toLocaleDateString('en-US', { weekday: 'long' });
+      return new Date(item.startInterval).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+      })
     }
-    return `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`;
-  });
+    return `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`
+  })
 
-  const failData = lineageMetrics.map(item => item.fail);
-  const startData = lineageMetrics.map(item => item.start);
-  const completeData = lineageMetrics.map(item => item.complete);
-  const abortData = lineageMetrics.map(item => item.abort);
-  const totalEvents = sum(failData) + sum(startData) + sum(completeData) + sum(abortData);
+  const failData = lineageMetrics.map((item) => item.fail)
+  const startData = lineageMetrics.map((item) => item.start)
+  const completeData = lineageMetrics.map((item) => item.complete)
+  const abortData = lineageMetrics.map((item) => item.abort)
+  const totalEvents = sum(failData) + sum(startData) + sum(completeData) + sum(abortData)
 
   return (
     <Box
@@ -44,11 +47,16 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
         maxWidth: '100%', // ensures the container doesn't stretch beyond the parent size
       }}
     >
-      <Chip size={'small'} variant={'outlined'} sx={{
-        position: 'absolute',
-        top: 8,
-        right: 8,
-      }} label={pluralize(totalEvents, 'event', 'events')}></Chip>
+      <Chip
+        size={'small'}
+        variant={'outlined'}
+        sx={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+        }}
+        label={pluralize(totalEvents, 'event', 'events')}
+      ></Chip>
       <ParentSize>
         {(parent) => (
           <LineChart
@@ -57,8 +65,7 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
               backgroundSize: '20px 20px',
               overflow: 'hidden', // confines the background to the chart area
               backgroundPosition: 'left 16px top', // Adjust the starting position of the background
-              clipPath: 'inset(0 16px 0 16px)' // Clips 16px from the left and right
-
+              clipPath: 'inset(0 16px 0 16px)', // Clips 16px from the left and right
             }}
             width={parent.width}
             height={200}

@@ -1,3 +1,4 @@
+import * as Redux from 'redux'
 import { Box, Stack } from '@mui/system'
 import {
   Button,
@@ -8,9 +9,12 @@ import {
   Grid,
   List,
   ListItem,
+  Skeleton,
 } from '@mui/material'
-import {ChevronRight, Code, Computer, RunCircleOutlined, Source} from '@mui/icons-material'
+import { ChevronRight, Code, Computer, RunCircleOutlined, Source } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
+import { IState } from '../../store/reducers'
+import { LineageMetric } from '../../store/requests/lineageMetrics'
 import {
   Timeline,
   TimelineConnector,
@@ -20,24 +24,23 @@ import {
   TimelineSeparator,
   timelineItemClasses,
 } from '@mui/lab'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { fetchLineageMetrics } from '../../store/actionCreators'
+import { useSearchParams } from 'react-router-dom'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
-import React, {useEffect} from 'react'
+import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
 import TimelineDrawer from './TimelineDrawer'
-import {IState} from "../../store/reducers";
-import * as Redux from "redux";
-import {bindActionCreators} from "redux";
-import {fetchLineage, fetchLineageMetrics} from "../../store/actionCreators";
-import {LineageMetric} from "../../store/requests/lineageMetrics";
-import {connect} from "react-redux";
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
+  isLineageMetricsLoading: boolean
 }
 
 interface DispatchProps {
@@ -48,30 +51,39 @@ const TIMEFRAMES = ['24 Hours', '7 Days']
 const REFRESH_INTERVALS = ['30s', '5m', '10m', 'Never']
 
 const states = [
-  { label: 'START', color: theme.palette.info.main, bgColor: 'secondary' },
-  { label: 'COMPLETE', color: theme.palette.primary.main, bgColor: 'primary' },
-  { label: 'FAIL', color: theme.palette.error.main, bgColor: 'error' },
-  { label: 'ABORT', color: theme.palette.secondary.main, bgColor: 'secondary' },
+  { label: 'Started', color: theme.palette.info.main, bgColor: 'secondary' },
+  { label: 'Completed', color: theme.palette.primary.main, bgColor: 'primary' },
+  { label: 'Failed', color: theme.palette.error.main, bgColor: 'error' },
+  { label: 'Aborted', color: theme.palette.secondary.main, bgColor: 'secondary' },
 ]
 
-const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps & DispatchProps) => {
-  const [timeframe, setTimeframe] = React.useState('24 Hours')
+const Dashboard: React.FC = ({
+  lineageMetrics,
+  fetchLineageMetrics,
+  isLineageMetricsLoading,
+}: StateProps & DispatchProps) => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [timeframe, setTimeframe] = React.useState(
+    searchParams.get('timeframe') === 'week' ? '7 Days' : '24 Hours'
+  )
   const [selectedState, setSelectedState] = React.useState('FAIL')
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
   const [timelineOpen, setTimelineOpen] = React.useState(false)
 
   useEffect(() => {
     if (timeframe === '24 Hours') {
+      setSearchParams({ timeframe: 'day' })
       fetchLineageMetrics('day')
     } else if (timeframe === '7 Days') {
+      setSearchParams({ timeframe: 'week' })
       fetchLineageMetrics('week')
     }
-  }, [timeframe]);
+  }, [timeframe])
 
-  const failed= lineageMetrics.map(item => item.fail).reduce((a, b) => a + b, 0);
-  const started = lineageMetrics.map(item => item.start).reduce((a, b) => a + b, 0);
-  const completed = lineageMetrics.map(item => item.complete).reduce((a, b) => a + b, 0);
-  const aborted = lineageMetrics.map(item => item.abort).reduce((a, b) => a + b, 0);
+  const failed = lineageMetrics.map((item) => item.fail).reduce((a, b) => a + b, 0)
+  const started = lineageMetrics.map((item) => item.start).reduce((a, b) => a + b, 0)
+  const completed = lineageMetrics.map((item) => item.complete).reduce((a, b) => a + b, 0)
+  const aborted = lineageMetrics.map((item) => item.abort).reduce((a, b) => a + b, 0)
 
   return (
     <>
@@ -109,7 +121,6 @@ const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps
           <TimelineDrawer />
         </Box>
       </Drawer>
-
       <Container maxWidth={'lg'}>
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <MqText heading>Data Ops</MqText>
@@ -138,41 +149,61 @@ const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps
         <Box mt={1}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={8}>
-              <StackedLineageEvents lineageMetrics={lineageMetrics} />
-              <Box display={'flex'}>
-                <ButtonGroup size={'small'} fullWidth>
-                  {states.map((state) => (
-                    <MQTooltip key={state.label} title={state.label}>
-                      <Button
-                        onClick={() => setSelectedState(state.label)}
-                        variant={'text'}
-                        color={state.bgColor as any}
-                        sx={{
-                          height: 40,
-                          width: `calc(100% / ${states.length})`,
-                          '&:hover': {
-                            '.hover-box': {
-                              width: selectedState === state.label ? 80 : 40,
-                            },
-                          },
-                        }}
-                      >
-                        <Stack>
-                          <Box
-                            className={'hover-box'}
-                            width={selectedState === state.label ? 80 : 20}
-                            borderRadius={theme.shape.borderRadius}
-                            height={4}
-                            bgcolor={state.color}
-                            sx={{ transition: '.3s ease-in-out' }}
-                          />
-                          {state.label === 'FAIL' ? failed : state.label === 'COMPLETE' ? completed : state.label === 'ABORT' ? aborted : started}
-                        </Stack>
-                      </Button>
-                    </MQTooltip>
-                  ))}
-                </ButtonGroup>
-              </Box>
+              {isLineageMetricsLoading ? (
+                <Box>
+                  <Skeleton variant={'rectangular'} height={200} />
+                  <Box display={'flex'} justifyContent={'space-around'} mt={'4px'}>
+                    <Skeleton variant={'rectangular'} width={'15%'} height={36} />
+                    <Skeleton variant={'rectangular'} width={'15%'} height={36} />
+                    <Skeleton variant={'rectangular'} width={'15%'} height={36} />
+                    <Skeleton variant={'rectangular'} width={'15%'} height={36} />
+                  </Box>
+                </Box>
+              ) : (
+                <>
+                  <StackedLineageEvents lineageMetrics={lineageMetrics} />
+                  <Box display={'flex'}>
+                    <ButtonGroup size={'small'} fullWidth>
+                      {states.map((state) => (
+                        <MQTooltip key={state.label} title={state.label}>
+                          <Button
+                            onClick={() => setSelectedState(state.label)}
+                            variant={'text'}
+                            color={state.bgColor as any}
+                            sx={{
+                              height: 40,
+                              width: `calc(100% / ${states.length})`,
+                              '&:hover': {
+                                '.hover-box': {
+                                  width: selectedState === state.label ? 80 : 40,
+                                },
+                              },
+                            }}
+                          >
+                            <Stack>
+                              <Box
+                                className={'hover-box'}
+                                width={selectedState === state.label ? 80 : 20}
+                                borderRadius={theme.shape.borderRadius}
+                                height={4}
+                                bgcolor={state.color}
+                                sx={{ transition: '.3s ease-in-out' }}
+                              />
+                              {state.label === 'Failed'
+                                ? failed
+                                : state.label === 'Completed'
+                                ? completed
+                                : state.label === 'Aborted'
+                                ? aborted
+                                : started}
+                            </Stack>
+                          </Button>
+                        </MQTooltip>
+                      ))}
+                    </ButtonGroup>
+                  </Box>
+                </>
+              )}
             </Grid>
             <Grid container item xs={12} md={4} spacing={2}>
               <Grid item xs={6}>
@@ -227,7 +258,12 @@ const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps
               >
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                   <MqText subdued>{selectedState} JOBS</MqText>
-                  <Button disableRipple size={'small'} endIcon={<ChevronRight />} onClick={() => setJobsDrawerOpen(true)}>
+                  <Button
+                    disableRipple
+                    size={'small'}
+                    endIcon={<ChevronRight />}
+                    onClick={() => setJobsDrawerOpen(true)}
+                  >
                     See More
                   </Button>
                 </Box>
@@ -241,7 +277,13 @@ const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps
             <Grid item sm={12} md={4}>
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <MqText subdued>RECENT ACTIVITY</MqText>
-                <Button disableRipple size={'small'} sx={{ mr: 2 }} endIcon={<ChevronRight />} onClick={() => setTimelineOpen(true)}>
+                <Button
+                  disableRipple
+                  size={'small'}
+                  sx={{ mr: 2 }}
+                  endIcon={<ChevronRight />}
+                  onClick={() => setTimelineOpen(true)}
+                >
                   See More
                 </Button>
               </Box>
@@ -390,6 +432,7 @@ const Dashboard: React.FC = ({ lineageMetrics, fetchLineageMetrics }: StateProps
 
 const mapStateToProps = (state: IState) => ({
   lineageMetrics: state.lineageMetrics.data,
+  isLineageMetricsLoading: state.lineageMetrics.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

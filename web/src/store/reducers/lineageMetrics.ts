@@ -1,11 +1,6 @@
-import {
-  FETCH_LINEAGE_METRICS, FETCH_LINEAGE_METRICS_SUCCESS,
-} from '../actionCreators/actionTypes'
-import {
-  fetchLineageMetrics,
-  fetchLineageMetricsSuccess,
-} from '../actionCreators'
-import {LineageMetric} from "../requests/lineageMetrics";
+import { FETCH_LINEAGE_METRICS, FETCH_LINEAGE_METRICS_SUCCESS } from '../actionCreators/actionTypes'
+import { LineageMetric } from '../requests/lineageMetrics'
+import { fetchLineageMetrics, fetchLineageMetricsSuccess } from '../actionCreators'
 
 export type ILineageMetricsState = {
   isLoading: boolean

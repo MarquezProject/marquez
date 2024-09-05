@@ -23,11 +23,12 @@ import {
   FETCH_JOB_TAGS,
   FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
+  FETCH_LINEAGE_METRICS,
   FETCH_OPEN_SEARCH_DATASETS,
   FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
-  FETCH_SEARCH, FETCH_LINEAGE_METRICS,
+  FETCH_SEARCH,
 } from '../actionCreators/actionTypes'
 import {
   ColumnLineageGraph,
@@ -51,6 +52,7 @@ const call: any = Effects.call
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
 
+import { LineageMetric, getLineageMetrics } from '../requests/lineageMetrics'
 import {
   addDatasetFieldTag,
   addDatasetTag,
@@ -94,18 +96,18 @@ import {
   fetchJobTagsSuccess,
   fetchJobsSuccess,
   fetchLatestRunsSuccess,
+  fetchLineageMetricsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchOpenSearchDatasetsSuccess,
   fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
-  fetchTagsSuccess, fetchLineageMetricsSuccess,
+  fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
-import {getLineageMetrics, LineageMetric} from "../requests/lineageMetrics";
 
 export function* fetchTags() {
   try {
@@ -502,18 +504,13 @@ export function* fetchLineageMetricsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_LINEAGE_METRICS)
-      const lineageMetrics: LineageMetric[] = yield call(
-        getLineageMetrics,
-        payload
-      )
+      const lineageMetrics: LineageMetric[] = yield call(getLineageMetrics, payload)
       yield put(fetchLineageMetricsSuccess(lineageMetrics))
     } catch (e) {
       yield put(applicationError('Something went wrong while getting lineage metrics'))
     }
   }
 }
-
-
 
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
@@ -543,7 +540,7 @@ export default function* rootSaga(): Generator {
     addDatasetFieldTagSaga(),
     addTagsSaga(),
     fetchJobTagsSaga(),
-    fetchLineageMetricsSaga()
+    fetchLineageMetricsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

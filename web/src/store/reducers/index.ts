@@ -14,13 +14,13 @@ import events, { IEventsState } from './events'
 import facets, { IFacetsState } from './facets'
 import jobs, { IJobsState } from './jobs'
 import lineage, { ILineageState } from './lineage'
+import lineageMetrics, { ILineageMetricsState } from './lineageMetrics'
 import namespaces, { INamespacesState } from './namespaces'
 import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatasets'
 import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import runs, { IRunsState } from './runs'
 import search, { ISearchState } from './search'
 import tags, { ITagsState } from './tags'
-import lineageMetrics, { ILineageMetricsState } from "./lineageMetrics";
 
 export interface IState {
   tags: ITagsState
@@ -60,5 +60,5 @@ export default (history: History): Reducer =>
     openSearchDatasets,
     facets,
     tags,
-    lineageMetrics
+    lineageMetrics,
   })

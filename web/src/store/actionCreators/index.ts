@@ -19,7 +19,7 @@ import {
   Tag,
 } from '../../types/api'
 import { JobOrDataset } from '../../types/lineage'
-import {LineageMetric} from "../requests/lineageMetrics";
+import { LineageMetric } from '../requests/lineageMetrics'
 
 export const fetchEvents = (after: string, before: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_EVENTS,
@@ -543,7 +543,6 @@ export const fetchOpenSearchDatasetsSuccess = (search: OpenSearchResultDatasets)
   type: actionTypes.FETCH_OPEN_SEARCH_DATASETS_SUCCESS,
   payload: search,
 })
-
 
 export const fetchLineageMetrics = (unit: 'day' | 'week') => ({
   type: actionTypes.FETCH_LINEAGE_METRICS,
