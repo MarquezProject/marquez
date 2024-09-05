@@ -13,8 +13,12 @@ interface Props {
   lineageMetrics: LineageMetric[]
 }
 
+const formatTime = (date: Date) =>
+  date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+
 const StackedLineageEvents = ({ lineageMetrics }: Props) => {
-  const labels = lineageMetrics.map(item => new Date(item.startInterval));
+  const labels = lineageMetrics.map(item => `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`);
   const failData = lineageMetrics.map(item => item.fail);
   const startData = lineageMetrics.map(item => item.start);
   const completeData = lineageMetrics.map(item => item.complete);
@@ -28,7 +32,7 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
             <LineChart
               sx={{
                 backgroundImage: 'radial-gradient(circle at 1px 1px, #bdbdbd42 1px, transparent 0)',
-                backgroundSize: '24px 24px',
+                backgroundSize: `20px 20px`,
               }}
               width={parent.width}
               height={200}
@@ -38,11 +42,13 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                   type: 'line',
                   showMark: false,
                   color: theme.palette.info.main,
+                  label: 'Started',
                 },
                 {
                   data: completeData,
                   type: 'line',
                   showMark: false,
+                  label: 'Completed',
                   color: theme.palette.primary.main,
                 },
                 {
@@ -50,18 +56,26 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                   type: 'line',
                   showMark: false,
                   color: theme.palette.error.main,
+                  label: 'Failed',
+                  disableHighlight: true,
                 },
                 {
                   data: abortData,
                   type: 'line',
+                  label: 'Aborted',
                   showMark: false,
                   color: theme.palette.secondary.main,
                 },
               ]}
-              margin={{ left: 4, right: 8, top: 6, bottom: 6 }}
-              xAxis={[{ data: labels, scaleType: 'time', disableLine: true, disableTicks: true }]}
+              margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+              xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
               bottomAxis={null}
               leftAxis={null}
+              slotProps={{
+                legend: {
+                  hidden: true,
+                }
+              }}
             />
           </>
         )}

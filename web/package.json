@@ -27,7 +27,7 @@
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.13.2",
     "@mui/system": "^5.13.2",
-    "@mui/x-charts": "^7.5.0",
+    "@mui/x-charts": "^7.15.0",
     "@mui/x-date-pickers": "^6.5.0",
     "@types/jest": "^29.5.2",
     "@types/react-router-dom": "^5.3.3",
