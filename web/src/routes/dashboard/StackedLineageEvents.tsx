@@ -16,7 +16,12 @@ interface Props {
 }
 
 const formatTime = (date: Date) =>
-  date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  date.toLocaleTimeString([], {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 
 const StackedLineageEvents = ({ lineageMetrics }: Props) => {
   const isWeek = lineageMetrics.length === 7
@@ -44,7 +49,7 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
       position={'relative'}
       sx={{
         overflowX: 'hidden', // prevents background from stretching horizontally
-        maxWidth: '100%', // ensures the container doesn't stretch beyond the parent size
+        maxWidth: 'calc(100% + 32px)', // ensures the container doesn't stretch beyond the parent size
       }}
     >
       <Chip
@@ -100,7 +105,7 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                 color: theme.palette.secondary.main,
               },
             ]}
-            margin={{ left: 16, right: 16, top: 4, bottom: 0 }}
+            margin={{ left: 16, right: 16, top: 6, bottom: 0 }}
             xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
             bottomAxis={null}
             leftAxis={null}

@@ -11,15 +11,16 @@ import Popper from '@mui/material/Popper'
 
 interface Props {
   options: string[]
+  onClick: (option: string) => void
 }
 
-export default function SplitButton({ options }: Props) {
+export default function SplitButton({ options, onClick }: Props) {
   const [open, setOpen] = React.useState(false)
   const anchorRef = React.useRef<HTMLDivElement>(null)
-  const [selectedIndex, setSelectedIndex] = React.useState(1)
+  const [selectedIndex, setSelectedIndex] = React.useState(0)
 
   const handleClick = () => {
-    console.info(`You clicked ${options[selectedIndex]}`)
+    onClick(options[selectedIndex])
   }
 
   const handleMenuItemClick = (

@@ -31,7 +31,6 @@ import { useSearchParams } from 'react-router-dom'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
-import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
@@ -48,7 +47,17 @@ interface DispatchProps {
 }
 
 const TIMEFRAMES = ['24 Hours', '7 Days']
-const REFRESH_INTERVALS = ['30s', '5m', '10m', 'Never']
+
+type RefreshInterval = '30s' | '5m' | '10m' | 'Never'
+
+const REFRESH_INTERVALS: RefreshInterval[] = ['30s', '5m', '10m', 'Never']
+
+const INTERVAL_TO_MS_MAP: Record<RefreshInterval, number> = {
+  '30s': 30000,
+  '5m': 300000,
+  '10m': 600000,
+  Never: 0,
+}
 
 const states = [
   { label: 'Started', color: theme.palette.info.main, bgColor: 'secondary' },
@@ -66,6 +75,8 @@ const Dashboard: React.FC = ({
   const [timeframe, setTimeframe] = React.useState(
     searchParams.get('timeframe') === 'week' ? '7 Days' : '24 Hours'
   )
+  const [intervalKey, setIntervalKey] = React.useState<RefreshInterval>('30s')
+
   const [selectedState, setSelectedState] = React.useState('FAIL')
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
   const [timelineOpen, setTimelineOpen] = React.useState(false)
@@ -79,6 +90,21 @@ const Dashboard: React.FC = ({
       fetchLineageMetrics('week')
     }
   }, [timeframe])
+
+  useEffect(() => {
+    const intervalTime = INTERVAL_TO_MS_MAP[intervalKey]
+
+    if (intervalTime > 0) {
+      const intervalId = setInterval(() => {
+        console.log('fetching')
+        fetchLineageMetrics(timeframe === '24 Hours' ? 'day' : 'week')
+      }, intervalTime)
+
+      return () => clearInterval(intervalId)
+    }
+
+    return
+  }, [intervalKey])
 
   const failed = lineageMetrics.map((item) => item.fail).reduce((a, b) => a + b, 0)
   const started = lineageMetrics.map((item) => item.start).reduce((a, b) => a + b, 0)
@@ -127,7 +153,12 @@ const Dashboard: React.FC = ({
           <Box display={'flex'}>
             <Box>
               <MqText subdued>REFRESH</MqText>
-              <SplitButton options={REFRESH_INTERVALS} />
+              <SplitButton
+                options={REFRESH_INTERVALS}
+                onClick={(option) => {
+                  setIntervalKey(option as RefreshInterval)
+                }}
+              />
             </Box>
             <Divider sx={{ mx: 2 }} orientation={'vertical'} />
             <Box>
@@ -148,7 +179,7 @@ const Dashboard: React.FC = ({
         </Box>
         <Box mt={1}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={12}>
               {isLineageMetricsLoading ? (
                 <Box>
                   <Skeleton variant={'rectangular'} height={200} />
@@ -205,36 +236,36 @@ const Dashboard: React.FC = ({
                 </>
               )}
             </Grid>
-            <Grid container item xs={12} md={4} spacing={2}>
-              <Grid item xs={6}>
-                <MqText label subdued>
-                  Data Sources
-                </MqText>
-                <MqText>800</MqText>
-                <MiniGraph />
-              </Grid>
-              <Grid item xs={6}>
-                <MqText label subdued>
-                  Datasets
-                </MqText>
-                <MqText>800</MqText>
-                <MiniGraph />
-              </Grid>
-              <Grid item xs={6}>
-                <MqText label subdued>
-                  Datasets With Schemas
-                </MqText>
-                <MqText>800</MqText>
-                <MiniGraph />
-              </Grid>
-              <Grid item xs={6}>
-                <MqText label subdued>
-                  Jobs
-                </MqText>
-                <MqText>800</MqText>
-                <MiniGraph />
-              </Grid>
-            </Grid>
+            {/*<Grid container item xs={12} md={4} spacing={2}>*/}
+            {/*  <Grid item xs={6}>*/}
+            {/*    <MqText label subdued>*/}
+            {/*      Data Sources*/}
+            {/*    </MqText>*/}
+            {/*    <MqText>800</MqText>*/}
+            {/*    <MiniGraph />*/}
+            {/*  </Grid>*/}
+            {/*  <Grid item xs={6}>*/}
+            {/*    <MqText label subdued>*/}
+            {/*      Datasets*/}
+            {/*    </MqText>*/}
+            {/*    <MqText>800</MqText>*/}
+            {/*    <MiniGraph />*/}
+            {/*  </Grid>*/}
+            {/*  <Grid item xs={6}>*/}
+            {/*    <MqText label subdued>*/}
+            {/*      Datasets With Schemas*/}
+            {/*    </MqText>*/}
+            {/*    <MqText>800</MqText>*/}
+            {/*    <MiniGraph />*/}
+            {/*  </Grid>*/}
+            {/*  <Grid item xs={6}>*/}
+            {/*    <MqText label subdued>*/}
+            {/*      Jobs*/}
+            {/*    </MqText>*/}
+            {/*    <MqText>800</MqText>*/}
+            {/*    <MiniGraph />*/}
+            {/*  </Grid>*/}
+            {/*</Grid>*/}
             <Grid item xs={12}>
               <Divider />
             </Grid>
