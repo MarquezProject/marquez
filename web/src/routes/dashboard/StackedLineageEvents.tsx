@@ -7,7 +7,7 @@ import Box from '@mui/system/Box'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
 import {LineageMetric} from "../../store/requests/lineageMetrics";
-import lineage from "../../store/reducers/lineage";
+import { Chip } from "@mui/material";
 
 interface Props {
   lineageMetrics: LineageMetric[]
@@ -16,68 +16,89 @@ interface Props {
 const formatTime = (date: Date) =>
   date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
-
 const StackedLineageEvents = ({ lineageMetrics }: Props) => {
-  const labels = lineageMetrics.map(item => `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`);
+
+  const isWeek = lineageMetrics.length === 7;
+
+  const labels = lineageMetrics.map(item => {
+    if (isWeek) {
+      return new Date(item.startInterval).toLocaleDateString('en-US', { weekday: 'long' });
+    }
+    return `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`;
+  });
   const failData = lineageMetrics.map(item => item.fail);
   const startData = lineageMetrics.map(item => item.start);
   const completeData = lineageMetrics.map(item => item.complete);
   const abortData = lineageMetrics.map(item => item.abort);
 
   return (
-    <Box>
+    <Box
+      mx={'-16px'}
+      position={'relative'}
+      sx={{
+        overflowX: 'hidden', // prevents background from stretching horizontally
+        maxWidth: '100%', // ensures the container doesn't stretch beyond the parent size
+      }}
+    >
+      <Chip size={'small'} variant={'outlined'} sx={{
+        position: 'absolute',
+        top: 0,
+        right: 0,
+      }} label={failData.length + startData.length + completeData.length + abortData.length + ' events'}></Chip>
       <ParentSize>
         {(parent) => (
-          <>
-            <LineChart
-              sx={{
-                backgroundImage: 'radial-gradient(circle at 1px 1px, #bdbdbd42 1px, transparent 0)',
-                backgroundSize: `20px 20px`,
-              }}
-              width={parent.width}
-              height={200}
-              series={[
-                {
-                  data: startData,
-                  type: 'line',
-                  showMark: false,
-                  color: theme.palette.info.main,
-                  label: 'Started',
-                },
-                {
-                  data: completeData,
-                  type: 'line',
-                  showMark: false,
-                  label: 'Completed',
-                  color: theme.palette.primary.main,
-                },
-                {
-                  data: failData,
-                  type: 'line',
-                  showMark: false,
-                  color: theme.palette.error.main,
-                  label: 'Failed',
-                  disableHighlight: true,
-                },
-                {
-                  data: abortData,
-                  type: 'line',
-                  label: 'Aborted',
-                  showMark: false,
-                  color: theme.palette.secondary.main,
-                },
-              ]}
-              margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
-              xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
-              bottomAxis={null}
-              leftAxis={null}
-              slotProps={{
-                legend: {
-                  hidden: true,
-                }
-              }}
-            />
-          </>
+          <LineChart
+            sx={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, #bdbdbd42 1px, transparent 0)',
+              backgroundSize: '20px 20px',
+              overflow: 'hidden', // confines the background to the chart area
+              backgroundPosition: 'left 16px top', // Adjust the starting position of the background
+              clipPath: 'inset(0 16px 0 16px)' // Clips 16px from the left and right
+
+            }}
+            width={parent.width}
+            height={200}
+            series={[
+              {
+                data: startData,
+                type: 'line',
+                showMark: false,
+                color: theme.palette.info.main,
+                label: 'Started',
+              },
+              {
+                data: completeData,
+                type: 'line',
+                showMark: false,
+                label: 'Completed',
+                color: theme.palette.primary.main,
+              },
+              {
+                data: failData,
+                type: 'line',
+                showMark: false,
+                color: theme.palette.error.main,
+                label: 'Failed',
+                disableHighlight: true,
+              },
+              {
+                data: abortData,
+                type: 'line',
+                label: 'Aborted',
+                showMark: false,
+                color: theme.palette.secondary.main,
+              },
+            ]}
+            margin={{ left: 16, right: 16, top: 4, bottom: 0 }}
+            xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
+            bottomAxis={null}
+            leftAxis={null}
+            slotProps={{
+              legend: {
+                hidden: true,
+              },
+            }}
+          />
         )}
       </ParentSize>
     </Box>
