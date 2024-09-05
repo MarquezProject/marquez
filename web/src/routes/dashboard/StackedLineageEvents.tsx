@@ -28,10 +28,11 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
 
   const labels = lineageMetrics.map((item) => {
     if (isWeek) {
-      return new Date(item.startInterval).toLocaleDateString('en-US', {
+      return new Date(item.startInterval).toLocaleDateString(['UTC'], {
         weekday: 'long',
         month: 'short',
         day: 'numeric',
+        timeZone: 'UTC',
       })
     }
     return `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`
