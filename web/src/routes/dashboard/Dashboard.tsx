@@ -96,7 +96,6 @@ const Dashboard: React.FC = ({
 
     if (intervalTime > 0) {
       const intervalId = setInterval(() => {
-        console.log('fetching')
         fetchLineageMetrics(timeframe === '24 Hours' ? 'day' : 'week')
       }, intervalTime)
 
