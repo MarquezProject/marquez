@@ -8,6 +8,8 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
 import {LineageMetric} from "../../store/requests/lineageMetrics";
 import { Chip } from "@mui/material";
+import { sum } from "lodash";
+import { pluralize } from "../../helpers/text";
 
 interface Props {
   lineageMetrics: LineageMetric[]
@@ -26,10 +28,12 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
     }
     return `${formatTime(new Date(item.startInterval))} - ${formatTime(new Date(item.endInterval))}`;
   });
+
   const failData = lineageMetrics.map(item => item.fail);
   const startData = lineageMetrics.map(item => item.start);
   const completeData = lineageMetrics.map(item => item.complete);
   const abortData = lineageMetrics.map(item => item.abort);
+  const totalEvents = sum(failData) + sum(startData) + sum(completeData) + sum(abortData);
 
   return (
     <Box
@@ -42,9 +46,9 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
     >
       <Chip size={'small'} variant={'outlined'} sx={{
         position: 'absolute',
-        top: 0,
-        right: 0,
-      }} label={failData.length + startData.length + completeData.length + abortData.length + ' events'}></Chip>
+        top: 8,
+        right: 8,
+      }} label={pluralize(totalEvents, 'event', 'events')}></Chip>
       <ParentSize>
         {(parent) => (
           <LineChart
