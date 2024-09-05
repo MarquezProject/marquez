@@ -22,10 +22,14 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -120,8 +124,52 @@ public class SearchService {
         return jobMap;
     }
 
+    private boolean documentAlreadyExists(Map<String, Object> document, Directory indexDirectory) throws IOException {
+        // Check if the index is empty before performing any search
+        if (isIndexEmpty(indexDirectory)) {
+            return false; // No document exists if the index is empty
+        }
+    
+        try (DirectoryReader reader = DirectoryReader.open(indexDirectory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{"name", "namespace"}, analyzer);
+            String name = (String) document.get("name");
+            String namespace = (String) document.get("namespace");
+            Query query = parser.parse("name:\"" + name + "\" AND namespace:\"" + namespace + "\"");
+            TopDocs topDocs = searcher.search(query, 1);
+    
+            if (topDocs.totalHits.value > 0) {
+                Document existingDoc = searcher.doc(topDocs.scoreDocs[0].doc);
+                // Compare other fields to determine if the document needs an update
+                for (Map.Entry<String, Object> entry : document.entrySet()) {
+                    String fieldName = entry.getKey();
+                    String fieldValue = entry.getValue() != null ? entry.getValue().toString() : null;
+                    // If the stored field is different from the new field value, return true (needs update)
+                    if (fieldValue != null && !fieldValue.equals(existingDoc.get(fieldName))) {
+                        return false; // Document exists but needs an update
+                    }
+                }
+                System.out.println("Document exists and does not need an update");
+    
+                return true; // Document exists and does not need an update
+            }
+    
+            return false; // Document does not exist
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Failed to search for document", e);
+        }
+    }
+    
+
     // Method to index a job document
     public IndexResponse indexJobDocument(Map<String, Object> document) throws IOException {
+        // Check if the document already exists
+        if (documentAlreadyExists(document, jobIndexDirectory)) {
+            // Document exists and needs an update; first delete the old document
+            return createIndexResponse("jobs", document.get("name").toString(), false);
+        }
+
         try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
             Document doc = new Document();
 
@@ -145,6 +193,12 @@ public class SearchService {
 
     // Method to index a dataset document
     public IndexResponse indexDatasetDocument(Map<String, Object> document) throws IOException {
+        // Check if the document exists
+        if (documentAlreadyExists(document, datasetIndexDirectory)) {
+            // Document exists and needs an update; first delete the old document
+            return createIndexResponse("datasets", document.get("name").toString(), false);
+        }
+
         try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
             Document doc = new Document();
 
