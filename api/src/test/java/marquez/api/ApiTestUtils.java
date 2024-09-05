@@ -16,6 +16,7 @@ import marquez.service.JobService;
 import marquez.service.LineageService;
 import marquez.service.NamespaceService;
 import marquez.service.OpenLineageService;
+import marquez.service.OpsService;
 import marquez.service.RunService;
 import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
@@ -60,6 +61,7 @@ public class ApiTestUtils {
             (DatasetService) mocks.getOrDefault(DatasetService.class, (mock(DatasetService.class))))
         .searchService(
             (SearchService) mocks.getOrDefault(SearchService.class, (mock(SearchService.class))))
+        .opsService((OpsService) mocks.getOrDefault(OpsService.class, (mock(OpsService.class))))
         .build();
   }
 }
