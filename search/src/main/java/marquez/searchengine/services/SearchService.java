@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -49,6 +53,10 @@ public class SearchService {
     //private final StandardAnalyzer analyzer;
     private final NGramAnalyzer analyzer;
     private static final int MAX_RESULTS = 10;
+    private final ExecutorService executor;
+    private final IndexWriter jobIndexWriter;
+    private final IndexWriter datasetIndexWriter;
+
 
     public SearchService(OpenLineageDao openLineageDao) throws IOException {
         this.openLineageDao = openLineageDao;
@@ -56,6 +64,9 @@ public class SearchService {
         this.datasetIndexDirectory = new ByteBuffersDirectory();
         //this.analyzer = new StandardAnalyzer();
         this.analyzer = new NGramAnalyzer(3, 4);
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.jobIndexWriter = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer));
+        this.datasetIndexWriter = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer));
         // init index with DB lineage events
         loadLineageEventsFromDatabase();
     }
@@ -67,14 +78,52 @@ public class SearchService {
         int offset = 0;
 
         List<LineageEvent> lineageEvents;
+        List<Future<Void>> futures = new ArrayList<>();
         do {
             // Fetch a batch of lineage events
             lineageEvents = openLineageDao.getAllLineageEventsDesc(before, after, limit, offset);
-
-            indexLineageEvents(lineageEvents);
-
+            
+            // If there are events, process them in parallel
+            if (!lineageEvents.isEmpty()) {
+                // Submit the batch to the executor service
+                Future<Void> future = executor.submit(new LineageEventProcessor(lineageEvents));
+                futures.add(future);
+            }
+            System.out.println("done");
             offset += limit;
         } while (!lineageEvents.isEmpty());
+        // Wait for all tasks to finish
+        for (Future<Void> future : futures) {
+            try {
+                future.get(); // Wait for each thread to finish
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        executor.shutdown();
+
+        // Close the IndexWriters when done
+        jobIndexWriter.close();
+        datasetIndexWriter.close();
+    }
+
+    // The class responsible for processing a batch of lineage events in parallel
+    private class LineageEventProcessor implements Callable<Void> {
+        private final List<LineageEvent> events;
+
+        public LineageEventProcessor(List<LineageEvent> events) {
+            this.events = events;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            try {
+                indexLineageEvents(events); // Index the batch of lineage events
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 
     private void indexLineageEvents(@Valid @NotNull List<LineageEvent> lineageEvents) throws IOException {
@@ -102,13 +151,13 @@ public class SearchService {
         }
         // At this point, inputMaps, outputMaps, and jobMaps are de-duplicated
         if (!inputMaps.isEmpty()) {
-            indexDatasetDocuments(new ArrayList<>(inputMaps.values()));
+            indexDatasetDocuments(new ArrayList<>(inputMaps.values()), datasetIndexWriter);
         }
         if (!outputMaps.isEmpty()) {
-            indexDatasetDocuments(new ArrayList<>(outputMaps.values()));
+            indexDatasetDocuments(new ArrayList<>(outputMaps.values()), datasetIndexWriter);
         }
         if (!jobMaps.isEmpty()) {
-            indexJobDocuments(new ArrayList<>(jobMaps.values()));
+            indexJobDocuments(new ArrayList<>(jobMaps.values()), jobIndexWriter);
         }
     }
 
@@ -179,30 +228,26 @@ public class SearchService {
         }
     }
 
-    public void indexJobDocuments(List<Map<String, Object>> documents) throws IOException {
-        try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
-            for (Map<String, Object> document : documents) {
-                if (documentAlreadyExists((String) document.get("id"), jobIndexDirectory)) {
-                    continue;
-                }
-                Document doc = createJobDocument(document);
-                writer.addDocument(doc);
+    public void indexJobDocuments(List<Map<String, Object>> documents, IndexWriter writer) throws IOException {
+        for (Map<String, Object> document : documents) {
+            if (documentAlreadyExists((String) document.get("id"), jobIndexDirectory)) {
+                continue;
             }
-            writer.commit();
+            Document doc = createJobDocument(document);
+            writer.addDocument(doc);
         }
+        writer.commit();
     }
 
-    public void indexDatasetDocuments(List<Map<String, Object>> documents) throws IOException {
-        try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
-            for (Map<String, Object> document : documents) {
-                if (documentAlreadyExists((String) document.get("id"), datasetIndexDirectory)) {
-                    continue;
-                }
-                Document doc = createDatasetDocument(document);
-                writer.addDocument(doc);
+    public void indexDatasetDocuments(List<Map<String, Object>> documents, IndexWriter writer) throws IOException {
+        for (Map<String, Object> document : documents) {
+            if (documentAlreadyExists((String) document.get("id"), datasetIndexDirectory)) {
+                continue;
             }
-            writer.commit();
+            Document doc = createDatasetDocument(document);
+            writer.addDocument(doc);
         }
+        writer.commit();
     }
 
     private Document createJobDocument(Map<String, Object> document) {
