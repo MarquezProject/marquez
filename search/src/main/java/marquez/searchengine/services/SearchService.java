@@ -22,10 +22,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.StoredFields;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -59,10 +61,10 @@ public class SearchService {
     }
 
     private void loadLineageEventsFromDatabase() throws IOException {
-        ZonedDateTime before = ZonedDateTime.now(); // Current time
-        ZonedDateTime after = before.minusYears(5); // Fetch events from the past 1 month
-        int limit = 50000; // Limit of events to load at a time
-        int offset = 0; // Offset for pagination
+        ZonedDateTime before = ZonedDateTime.now(); 
+        ZonedDateTime after = before.minusDays(1);
+        int limit = 10000; 
+        int offset = 0;
 
         List<LineageEvent> lineageEvents;
         do {
@@ -72,40 +74,42 @@ public class SearchService {
 
             indexLineageEvents(lineageEvents);
 
-            offset += limit; // Increment the offset for the next batch
+            offset += limit;
         } while (!lineageEvents.isEmpty());
     }
 
     private void indexLineageEvents(@Valid @NotNull List<LineageEvent> lineageEvents) throws IOException {
-        List<Map<String, Object>> inputMaps = new ArrayList<>();
-        List<Map<String, Object>> outputMaps = new ArrayList<>();
-        List<Map<String, Object>> jobMaps = new ArrayList<>();
+        // for dedup purpose
+        Map<String, Map<String, Object>> inputMaps = new HashMap<>();
+        Map<String, Map<String, Object>> outputMaps = new HashMap<>();
+        Map<String, Map<String, Object>> jobMaps = new HashMap<>();
+
         for (LineageEvent event : lineageEvents) {
             if (event.getInputs() != null) {
                 for (Dataset input : event.getInputs()) {
-                    Map<String, Object> inputMap = mapDatasetEvent(input, event.getRun().getRunId(),
-                            event.getEventType());
-                    inputMaps.add(inputMap);
+                    Map<String, Object> inputMap = mapDatasetEvent(input, event.getRun().getRunId(), event.getEventType());
+                    //deduplicate on uniqueId
+                    inputMaps.put((String)inputMap.get("id"), inputMap); 
                 }
             }
             if (event.getOutputs() != null) {
                 for (Dataset output : event.getOutputs()) {
-                    Map<String, Object> outputMap = mapDatasetEvent(output, event.getRun().getRunId(),
-                            event.getEventType());
-                    outputMaps.add(outputMap);
+                    Map<String, Object> outputMap = mapDatasetEvent(output, event.getRun().getRunId(), event.getEventType());
+                    outputMaps.put((String)outputMap.get("id"), outputMap); 
                 }
             }
             Map<String, Object> jobMap = mapJobEvent(event);
-            jobMaps.add(jobMap);
+            jobMaps.put((String)jobMap.get("id"), jobMap);
         }
+        // At this point, inputMaps, outputMaps, and jobMaps are de-duplicated
         if (!inputMaps.isEmpty()) {
-            indexDatasetDocuments(inputMaps);
+            indexDatasetDocuments(new ArrayList<>(inputMaps.values()));
         }
         if (!outputMaps.isEmpty()) {
-            indexDatasetDocuments(outputMaps);
+            indexDatasetDocuments(new ArrayList<>(outputMaps.values()));
         }
         if (!jobMaps.isEmpty()) {
-            indexJobDocuments(jobMaps);
+            indexJobDocuments(new ArrayList<>(jobMaps.values()));
         }
     }
 
@@ -116,6 +120,7 @@ public class SearchService {
         datasetMap.put("eventType", eventType);
         datasetMap.put("name", dataset.getName());
         datasetMap.put("namespace", dataset.getNamespace());
+        datasetMap.put("id",dataset.getName()+"_"+dataset.getNamespace());
         Optional.ofNullable(dataset.getFacets()).ifPresent(facets -> datasetMap.put("facets", facets));
         return datasetMap;
     }
@@ -126,42 +131,24 @@ public class SearchService {
         jobMap.put("run_id", event.getRun().getRunId().toString());
         jobMap.put("name", event.getJob().getName());
         jobMap.put("namespace", event.getJob().getNamespace());
+        jobMap.put("id",event.getJob().getName()+"_"+event.getJob().getNamespace());
         jobMap.put("eventType", event.getEventType());
         Optional.ofNullable(event.getRun().getFacets()).ifPresent(facets -> jobMap.put("facets", facets));
         return jobMap;
     }
 
-    private boolean documentAlreadyExists(Map<String, Object> document, Directory indexDirectory) throws IOException {
-        // Check if the index is empty before performing any search
+    private boolean documentAlreadyExists(String uniqueId, Directory indexDirectory) throws IOException {
         if (isIndexEmpty(indexDirectory)) {
-            return false; // No document exists if the index is empty
+            return false; 
         }
-    
         try (DirectoryReader reader = DirectoryReader.open(indexDirectory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            MultiFieldQueryParser parser = new MultiFieldQueryParser(new String[]{"name", "namespace"}, analyzer);
-            String name = (String) document.get("name");
-            String namespace = (String) document.get("namespace");
-            Query query = parser.parse("name:\"" + name + "\" AND namespace:\"" + namespace + "\"");
-            TopDocs topDocs = searcher.search(query, 1);
-    
-            if (topDocs.totalHits.value > 0) {
-                StoredFields storedFields = searcher.storedFields();
-                Document existingDoc = storedFields.document(topDocs.scoreDocs[0].doc);
-                // Compare other fields to determine if the document needs an update
-                for (Map.Entry<String, Object> entry : document.entrySet()) {
-                    String fieldName = entry.getKey();
-                    String fieldValue = entry.getValue() != null ? entry.getValue().toString() : null;
-                    // If the stored field is different from the new field value, return true (needs update)
-                    if (fieldValue != null && !fieldValue.equals(existingDoc.get(fieldName))) {
-                        return false; // Document exists but needs an update
-                        //TODO: handle that case in a better way
-                    }
-                }
-                return true; // Document exists and does not need an update
+            Query query = new TermQuery(new Term("id", uniqueId)); 
+            TopDocs topDocs = searcher.search(query, 1); 
+            if (topDocs.totalHits.value > 0){
+                System.out.println("found duplicate "+uniqueId);
             }
-    
-            return false; // Document does not exist
+            return topDocs.totalHits.value > 0;
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Failed to search for document", e);
@@ -171,8 +158,7 @@ public class SearchService {
     // Method to index a job document
     //TODO: don't index a Map, use the Dataset object directly
     public IndexResponse indexJobDocument(Map<String, Object> document) throws IOException {
-        // Check if the document already exists
-        if (documentAlreadyExists(document, jobIndexDirectory)) {
+        if (documentAlreadyExists((String) document.get("id"), jobIndexDirectory)) {
             return createIndexResponse("jobs", document.get("name").toString(), false);
         }
         try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
@@ -186,8 +172,7 @@ public class SearchService {
     // Method to index a dataset document
     //TODO: don't index a Map, use the Dataset object directly
     public IndexResponse indexDatasetDocument(Map<String, Object> document) throws IOException {
-        // Check if the document exists
-        if (documentAlreadyExists(document, datasetIndexDirectory)) {
+        if (documentAlreadyExists((String) document.get("id"), datasetIndexDirectory)) {
             return createIndexResponse("datasets", document.get("name").toString(), false);
         }
         try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
@@ -199,10 +184,9 @@ public class SearchService {
     }
 
     public void indexJobDocuments(List<Map<String, Object>> documents) throws IOException {
-        // Check if the document already exists
         try (IndexWriter writer = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer))) {
             for (Map<String, Object> document : documents) {
-                if (documentAlreadyExists(document, jobIndexDirectory)) {
+                if (documentAlreadyExists((String) document.get("id"), jobIndexDirectory)) {
                     continue;
                 }
                 Document doc = createJobDocument(document);
@@ -213,10 +197,9 @@ public class SearchService {
     }
 
     public void indexDatasetDocuments(List<Map<String, Object>> documents) throws IOException {
-        // Check if the document exists
         try (IndexWriter writer = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer))) {
             for (Map<String, Object> document : documents) {
-                if (documentAlreadyExists(document, datasetIndexDirectory)) {
+                if (documentAlreadyExists((String) document.get("id"), datasetIndexDirectory)) {
                     continue;
                 }
                 Document doc = createDatasetDocument(document);
@@ -228,6 +211,7 @@ public class SearchService {
 
     private Document createJobDocument(Map<String, Object> document) {
         Document doc = new Document();
+        doc.add(new StringField("id", (String) document.get("id"), Field.Store.YES));
         doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
         doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
         doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
@@ -243,7 +227,7 @@ public class SearchService {
 
     private Document createDatasetDocument(Map<String, Object> document) {
         Document doc = new Document();
-
+        doc.add(new StringField("id", (String) document.get("id"), Field.Store.YES));
         doc.add(new StringField("run_id", (String) document.get("run_id"), Field.Store.YES));
         doc.add(new TextField("name", (String) document.get("name"), Field.Store.YES));
         doc.add(new TextField("namespace", (String) document.get("namespace"), Field.Store.YES));
