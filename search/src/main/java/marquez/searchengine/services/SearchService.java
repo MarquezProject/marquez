@@ -68,7 +68,18 @@ public class SearchService {
         this.jobIndexWriter = new IndexWriter(jobIndexDirectory, new IndexWriterConfig(analyzer));
         this.datasetIndexWriter = new IndexWriter(datasetIndexDirectory, new IndexWriterConfig(analyzer));
         // init index with DB lineage events
-        loadLineageEventsFromDatabase();
+        indexLineageEventsInBackground();
+    }
+
+    // Load lineage events from DB and index them in the background
+    private void indexLineageEventsInBackground() {
+        executor.submit(() -> {
+            try {
+                loadLineageEventsFromDatabase();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void loadLineageEventsFromDatabase() throws IOException {
