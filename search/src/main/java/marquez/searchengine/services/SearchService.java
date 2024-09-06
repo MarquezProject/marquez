@@ -70,7 +70,6 @@ public class SearchService {
         do {
             // Fetch a batch of lineage events
             lineageEvents = openLineageDao.getAllLineageEventsDesc(before, after, limit, offset);
-            System.out.println("Lineage events fetched: "+lineageEvents.size());
 
             indexLineageEvents(lineageEvents);
 
@@ -145,9 +144,6 @@ public class SearchService {
             IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new TermQuery(new Term("id", uniqueId)); 
             TopDocs topDocs = searcher.search(query, 1); 
-            if (topDocs.totalHits.value > 0){
-                System.out.println("found duplicate "+uniqueId);
-            }
             return topDocs.totalHits.value > 0;
         } catch (Exception e) {
             e.printStackTrace();
