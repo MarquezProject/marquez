@@ -8,8 +8,7 @@ package marquez.jobs;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import io.dropwizard.lifecycle.Managed;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoField;
+import java.time.LocalTime;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.Jdbi;
@@ -28,8 +27,10 @@ public class MaterializeViewRefresherJob extends AbstractScheduledService implem
 
     // Define fixed schedule and delay until the hour strikes.
     int MINUTES_IN_HOUR = 60;
-    Duration duration =
-        Duration.ofMinutes(MINUTES_IN_HOUR - Instant.now().get(ChronoField.MINUTE_OF_HOUR));
+    LocalTime now = LocalTime.now();
+    int minutesRemaining =
+        MINUTES_IN_HOUR - now.getMinute(); // Get the remaining minutes in the hour
+    Duration duration = Duration.ofMinutes(minutesRemaining);
     this.fixedRateScheduler =
         Scheduler.newFixedRateSchedule(duration, Duration.ofMinutes(FREQUENCY));
   }
