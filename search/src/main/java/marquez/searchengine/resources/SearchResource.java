@@ -25,11 +25,10 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 public class SearchResource {
 
   private final SearchService searchService;
-  private final Jdbi jdbi;
 
   public SearchResource(Jdbi jdbi) throws IOException {
-    this.jdbi = jdbi.installPlugin(new SqlObjectPlugin());
-    OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+    OpenLineageDao openLineageDao =
+        jdbi.installPlugin(new SqlObjectPlugin()).onDemand(OpenLineageDao.class);
     this.searchService = new SearchService(openLineageDao);
   }
 
@@ -40,11 +39,8 @@ public class SearchResource {
     try {
       String query = request.getQuery().getMulti_match().getQuery();
       List<String> fields = request.getQuery().getMulti_match().getFields();
-      // Log the extracted details for debugging
-      // System.out.println("Received query: " + query + fields);
       SearchResult result = searchService.searchJobs(query, fields);
       // String jsonResponse = new ObjectMapper().writeValueAsString(result);
-      // System.out.println("Serialized Response: " + jsonResponse);
       return Response.ok(result).build();
     } catch (Exception e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -58,11 +54,7 @@ public class SearchResource {
     try {
       String query = request.getQuery().getMulti_match().getQuery();
       List<String> fields = request.getQuery().getMulti_match().getFields();
-      // Log the extracted details for debugging
-      // System.out.println("Received query: " + query);
       SearchResult result = searchService.searchDatasets(query, fields);
-      // String jsonResponse = new ObjectMapper().writeValueAsString(result);
-      // System.out.println("Serialized Response: " + jsonResponse);
       return Response.ok(result).build();
     } catch (Exception e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();

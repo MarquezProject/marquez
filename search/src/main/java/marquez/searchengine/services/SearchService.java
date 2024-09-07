@@ -83,7 +83,7 @@ public class SearchService {
 
   private void loadLineageEventsFromDatabase() throws IOException {
     ZonedDateTime before = ZonedDateTime.now();
-    ZonedDateTime after = before.minusDays(1);
+    ZonedDateTime after = before.minusYears(5);
     int limit = 10000;
     int offset = 0;
 
