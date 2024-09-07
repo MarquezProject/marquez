@@ -11,9 +11,9 @@ dependencies {
     implementation "org.apache.lucene:lucene-queryparser:${luceneVersion}"
     implementation "org.apache.lucene:lucene-analysis-common:${luceneVersion}"
     implementation "org.apache.lucene:lucene-highlighter:${luceneVersion}"
-    implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.16.0'
     implementation 'org.jdbi:jdbi3-core:3.45.4'
     implementation 'org.jdbi:jdbi3-sqlobject:3.45.4'
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
 
 
     implementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"

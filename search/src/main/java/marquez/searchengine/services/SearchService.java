@@ -38,6 +38,7 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
+import lombok.extern.slf4j.Slf4j;
 
 import marquez.searchengine.models.IndexResponse;
 import marquez.searchengine.models.SearchResult;
@@ -45,6 +46,7 @@ import marquez.db.OpenLineageDao;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 
+@Slf4j
 public class SearchService {
 
     private final OpenLineageDao openLineageDao;
@@ -100,7 +102,7 @@ public class SearchService {
                 Future<Void> future = executor.submit(new LineageEventProcessor(lineageEvents));
                 futures.add(future);
             }
-            System.out.println("done");
+            log.info("I'm done loading events");;
             offset += limit;
         } while (!lineageEvents.isEmpty());
         // Wait for all tasks to finish
