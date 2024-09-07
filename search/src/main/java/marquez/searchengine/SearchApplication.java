@@ -3,15 +3,12 @@ package marquez.searchengine;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
-
-import org.jdbi.v3.core.Jdbi;
-
+import lombok.extern.slf4j.Slf4j;
 import marquez.searchengine.db.DatabaseConnection;
 import marquez.searchengine.health.SearchHealthCheck;
 import marquez.searchengine.resources.SearchResource;
+import org.jdbi.v3.core.Jdbi;
 
 @Slf4j
 public class SearchApplication extends Application<SearchConfig> {
