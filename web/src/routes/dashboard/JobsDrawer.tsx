@@ -1,6 +1,5 @@
 import { Box } from '@mui/system'
 import { theme } from '../../helpers/theme'
-import JobRunItem from './JobRunItem'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 const WIDTH = 800
@@ -24,17 +23,7 @@ const JobsDrawer = () => {
             </MqText>
           </Box>
         </Box>
-        <Box>
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-          <JobRunItem />
-        </Box>
+        <Box></Box>
       </Box>
     </Box>
   )

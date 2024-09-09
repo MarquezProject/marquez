@@ -1,32 +1,14 @@
 import * as Redux from 'redux'
 import { Box, Stack } from '@mui/system'
-import {
-  Button,
-  ButtonGroup,
-  Container,
-  Divider,
-  Drawer,
-  Grid,
-  List,
-  ListItem,
-  Skeleton,
-} from '@mui/material'
-import { ChevronRight, Code, Computer, RunCircleOutlined, Source } from '@mui/icons-material'
+import { Button, ButtonGroup, Container, Divider, Drawer, Grid, Skeleton } from '@mui/material'
+import { ChevronRight } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
+import { Job } from '../../types/api'
 import { LineageMetric } from '../../store/requests/lineageMetrics'
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineSeparator,
-  timelineItemClasses,
-} from '@mui/lab'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import { fetchLineageMetrics } from '../../store/actionCreators'
+import { fetchJobs, fetchLineageMetrics } from '../../store/actionCreators'
 import { useSearchParams } from 'react-router-dom'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
@@ -40,17 +22,20 @@ import TimelineDrawer from './TimelineDrawer'
 interface StateProps {
   lineageMetrics: LineageMetric[]
   isLineageMetricsLoading: boolean
+  jobs: Job[]
+  isJobsLoading: boolean
 }
 
 interface DispatchProps {
   fetchLineageMetrics: typeof fetchLineageMetrics
+  fetchJobs: typeof fetchJobs
 }
 
 const TIMEFRAMES = ['24 Hours', '7 Days']
-
 type RefreshInterval = '30s' | '5m' | '10m' | 'Never'
-
 const REFRESH_INTERVALS: RefreshInterval[] = ['30s', '5m', '10m', 'Never']
+
+const JOB_RUN_LIMIT = 4
 
 const INTERVAL_TO_MS_MAP: Record<RefreshInterval, number> = {
   '30s': 30000,
@@ -70,6 +55,8 @@ const Dashboard: React.FC = ({
   lineageMetrics,
   fetchLineageMetrics,
   isLineageMetricsLoading,
+  jobs,
+  fetchJobs,
 }: StateProps & DispatchProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [timeframe, setTimeframe] = React.useState(
@@ -92,11 +79,15 @@ const Dashboard: React.FC = ({
   }, [timeframe])
 
   useEffect(() => {
+    fetchJobs('food_delivery', JOB_RUN_LIMIT, 0)
+  }, [])
+
+  useEffect(() => {
     const intervalTime = INTERVAL_TO_MS_MAP[intervalKey]
 
     if (intervalTime > 0) {
       const intervalId = setInterval(() => {
-        fetchLineageMetrics(timeframe === '24 Hours' ? 'day' : 'week')
+        fetchLineageMetrics(searchParams.get('timeframe') === 'week' ? 'week' : 'day')
       }, intervalTime)
 
       return () => clearInterval(intervalId)
@@ -105,10 +96,18 @@ const Dashboard: React.FC = ({
     return
   }, [intervalKey])
 
-  const failed = lineageMetrics.map((item) => item.fail).reduce((a, b) => a + b, 0)
-  const started = lineageMetrics.map((item) => item.start).reduce((a, b) => a + b, 0)
-  const completed = lineageMetrics.map((item) => item.complete).reduce((a, b) => a + b, 0)
-  const aborted = lineageMetrics.map((item) => item.abort).reduce((a, b) => a + b, 0)
+  const metrics = lineageMetrics.reduce(
+    (acc, item) => {
+      acc.failed += item.fail
+      acc.started += item.start
+      acc.completed += item.complete
+      acc.aborted += item.abort
+      return acc
+    },
+    { failed: 0, started: 0, completed: 0, aborted: 0 }
+  )
+
+  const { failed, started, completed, aborted } = metrics
 
   return (
     <>
@@ -219,13 +218,18 @@ const Dashboard: React.FC = ({
                                 bgcolor={state.color}
                                 sx={{ transition: '.3s ease-in-out' }}
                               />
-                              {state.label === 'Failed'
-                                ? failed
-                                : state.label === 'Completed'
-                                ? completed
-                                : state.label === 'Aborted'
-                                ? aborted
-                                : started}
+                              {(() => {
+                                switch (state.label) {
+                                  case 'Failed':
+                                    return failed
+                                  case 'Completed':
+                                    return completed
+                                  case 'Aborted':
+                                    return aborted
+                                  default:
+                                    return started
+                                }
+                              })()}
                             </Stack>
                           </Button>
                         </MQTooltip>
@@ -268,22 +272,11 @@ const Dashboard: React.FC = ({
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid
-              item
-              md={8}
-              sm={12}
-              borderRight={{
-                xs: 'none',
-                md: 1,
-              }}
-              borderColor={{
-                md: 'divider',
-              }}
-            >
+            <Grid item sm={12}>
               <Box
                 mr={{
                   xs: 0,
-                  md: 2,
+                  md: 0,
                 }}
               >
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
@@ -297,14 +290,12 @@ const Dashboard: React.FC = ({
                     See More
                   </Button>
                 </Box>
-
-                <JobRunItem />
-                <JobRunItem />
-                <JobRunItem />
-                <JobRunItem />
+                {jobs.map((job) => (
+                  <JobRunItem key={job.id.namespace + job.id.name} job={job} />
+                ))}
               </Box>
             </Grid>
-            <Grid item sm={12} md={4}>
+            {/* <Grid item sm={12} md={4}>
               <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                 <MqText subdued>RECENT ACTIVITY</MqText>
                 <Button
@@ -452,7 +443,7 @@ const Dashboard: React.FC = ({
                   </TimelineContent>
                 </TimelineItem>
               </Timeline>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
       </Container>
@@ -463,12 +454,15 @@ const Dashboard: React.FC = ({
 const mapStateToProps = (state: IState) => ({
   lineageMetrics: state.lineageMetrics.data,
   isLineageMetricsLoading: state.lineageMetrics.isLoading,
+  jobs: state.jobs.result,
+  isJobsLoading: state.jobs.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
       fetchLineageMetrics: fetchLineageMetrics,
+      fetchJobs: fetchJobs,
     },
     dispatch
   )
