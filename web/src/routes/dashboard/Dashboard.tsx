@@ -155,7 +155,7 @@ const Dashboard: React.FC = ({
       </Drawer>
       <Container maxWidth={'lg'}>
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-          <MqText heading>Data Ops</MqText>
+          <MqText heading>DataOps</MqText>
           <Box display={'flex'}>
             <Box>
               <MqText subdued>REFRESH</MqText>

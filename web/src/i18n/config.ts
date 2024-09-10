@@ -64,7 +64,7 @@ i18next
             no_outputs: 'No outputs for this node.',
           },
           sidenav: {
-            dataOps: 'DATA OPS',
+            dataOps: 'DATAOPS',
             jobs: 'JOBS',
             datasets: 'DATASETS',
             events: 'EVENTS',
