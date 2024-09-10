@@ -69,11 +69,18 @@ const Dashboard: React.FC = ({
   const [timelineOpen, setTimelineOpen] = React.useState(false)
 
   useEffect(() => {
+    const currentSearchParams = searchParams.get('timeframe')
+    if (currentSearchParams === 'day' && timeframe !== '24 Hours') {
+      setTimeframe('24 Hours')
+    } else if (currentSearchParams === 'week' && timeframe !== '7 Days') {
+      setTimeframe('7 Days')
+    }
+  }, [searchParams])
+
+  useEffect(() => {
     if (timeframe === '24 Hours') {
-      setSearchParams({ timeframe: 'day' })
       fetchLineageMetrics('day')
     } else if (timeframe === '7 Days') {
-      setSearchParams({ timeframe: 'week' })
       fetchLineageMetrics('week')
     }
   }, [timeframe])
