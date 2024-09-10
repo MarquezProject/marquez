@@ -94,14 +94,15 @@ const Dashboard: React.FC = ({
 
     if (intervalTime > 0) {
       const intervalId = setInterval(() => {
-        fetchLineageMetrics(searchParams.get('timeframe') === 'week' ? 'week' : 'day')
+        const currentSearchParams = searchParams.get('timeframe')
+        fetchLineageMetrics(currentSearchParams === 'week' ? 'week' : 'day')
       }, intervalTime)
 
       return () => clearInterval(intervalId)
     }
 
     return
-  }, [intervalKey])
+  }, [intervalKey, searchParams])
 
   const metrics = lineageMetrics.reduce(
     (acc, item) => {
@@ -154,7 +155,7 @@ const Dashboard: React.FC = ({
       </Drawer>
       <Container maxWidth={'lg'}>
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-          <MqText heading>Data Ops</MqText>
+          <MqText heading>Data Ops {timeframe}</MqText>
           <Box display={'flex'}>
             <Box>
               <MqText subdued>REFRESH</MqText>
