@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_URL } from '../../globals'
-import { Jobs } from '../../types/api'
+import {Jobs, RunState} from '../../types/api'
 import { genericFetchWrapper } from './index'
 
 export const getJobs = async (namespace: string, limit = 25, offset = 0) => {
@@ -53,4 +53,9 @@ export const addJobTag = async (namespace: string, jobName: string, tag: string)
   const encodedTag = encodeURIComponent(tag)
   const url = `${API_URL}/namespaces/${encodedNamespace}/jobs/${encodedJob}/tags/${encodedTag}`
   return genericFetchWrapper(url, { method: 'POST' }, 'addJobTag')
+}
+
+export const getJobsByState = async (runState: RunState, limit: number, offset: number) => {
+  const url = `${API_URL}/jobs?runState=${runState}&limit=${limit}&offset=${offset}`
+  return genericFetchWrapper(url, { method: 'POST' }, 'fetchJobsByState')
 }

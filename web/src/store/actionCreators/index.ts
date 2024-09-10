@@ -15,6 +15,7 @@ import {
   OpenSearchResultDatasets,
   OpenSearchResultJobs,
   Run,
+  RunState,
   Search,
   Tag,
 } from '../../types/api'
@@ -554,4 +555,21 @@ export const fetchLineageMetrics = (unit: 'day' | 'week') => ({
 export const fetchLineageMetricsSuccess = (lineageMetrics: LineageMetric[]) => ({
   type: actionTypes.FETCH_LINEAGE_METRICS_SUCCESS,
   payload: lineageMetrics,
+})
+
+export const fetchJobsByState = (state: RunState, limit: number, offset: number) => ({
+  type: actionTypes.FETCH_JOBS_BY_STATE,
+  payload: {
+    state,
+    limit,
+    offset,
+  },
+})
+
+export const fetchJobsByStateSuccess = (jobs: Job[], totalCount: number) => ({
+  type: actionTypes.FETCH_JOBS_BY_STATE_SUCCESS,
+  payload: {
+    jobs,
+    totalCount,
+  }
 })

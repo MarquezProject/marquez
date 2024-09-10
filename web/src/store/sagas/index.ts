@@ -28,7 +28,7 @@ import {
   FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
-  FETCH_SEARCH,
+  FETCH_SEARCH, FETCH_JOBS_BY_STATE,
 } from '../actionCreators/actionTypes'
 import {
   ColumnLineageGraph,
@@ -73,7 +73,7 @@ import {
   getNamespaces,
   getRunFacets,
   getRuns,
-  getTags,
+  getTags, getJobsByState,
 } from '../requests'
 import {
   addDatasetFieldTagSuccess,
@@ -103,7 +103,7 @@ import {
   fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
-  fetchTagsSuccess,
+  fetchTagsSuccess, fetchJobsByStateSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
@@ -512,6 +512,18 @@ export function* fetchLineageMetricsSaga() {
   }
 }
 
+export function* fetchJobsByState() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOBS_BY_STATE)
+      const response: Jobs = yield call(getJobsByState, payload.runState, payload.limit, payload.offset)
+      yield put(fetchJobsSuccess(response.jobs, response.totalCount))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting jobs by state'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -541,6 +553,7 @@ export default function* rootSaga(): Generator {
     addTagsSaga(),
     fetchJobTagsSaga(),
     fetchLineageMetricsSaga(),
+    fetchJobsByState(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])
