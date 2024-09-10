@@ -52,16 +52,16 @@ public class MaterializeViewRefresherJob extends AbstractScheduledService implem
       log.info("Refreshing materialized views...");
       jdbi.useHandle(
           handle -> {
-            handle.execute("REFRESH MATERIALIZED VIEW lineage_metrics_hourly");
+            handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_hourly_view");
           });
-      log.info("Materialized view `lineage_metrics_hourly` refreshed.");
+      log.info("Materialized view `lineage_events_by_type_hourly_view` refreshed.");
 
       if (java.time.LocalTime.now().getHour() == 0) {
         jdbi.useHandle(
             handle -> {
-              handle.execute("REFRESH MATERIALIZED VIEW lineage_metrics_daily");
+              handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_daily_view");
             });
-        log.info("Materialized view `lineage_metrics_daily` refreshed.");
+        log.info("Materialized view `lineage_events_by_type_daily_view` refreshed.");
       }
 
     } catch (Exception error) {

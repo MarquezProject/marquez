@@ -6,21 +6,21 @@
 package marquez.service;
 
 import java.util.List;
-import marquez.db.OpsDao;
+import marquez.db.StatsDao;
 import marquez.db.models.LineageMetric;
 
-public class OpsService {
-  private final OpsDao opsDao;
+public class StatsService {
+  private final StatsDao statsDao;
 
-  public OpsService(OpsDao opsDao) {
-    this.opsDao = opsDao;
+  public StatsService(StatsDao statsDao) {
+    this.statsDao = statsDao;
   }
 
   public List<LineageMetric> getLastDayLineageMetrics() {
-    return this.opsDao.getLastDayMetrics();
+    return this.statsDao.getLastDayMetrics();
   }
 
   public List<LineageMetric> getLastWeekLineageMetrics() {
-    return this.opsDao.getLastWeekMetrics();
+    return this.statsDao.getLastWeekMetrics();
   }
 }

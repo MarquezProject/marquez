@@ -12,7 +12,7 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(LineageMetricRowMapper.class)
-public interface OpsDao extends BaseDao {
+public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
@@ -34,7 +34,7 @@ public interface OpsDao extends BaseDao {
             FROM
                 hour_series hs
                     LEFT JOIN
-                lineage_metrics_hourly hourly_metrics
+                lineage_events_by_type_hourly_view hourly_metrics
                 ON
                     hs.start_interval = hourly_metrics.start_interval
             ORDER BY
@@ -62,7 +62,7 @@ public interface OpsDao extends BaseDao {
           FROM
               day_series ds
                   LEFT JOIN
-              lineage_metrics_daily mv
+              lineage_events_by_type_daily_view mv
               ON
                   ds.start_interval = mv.start_interval
           ORDER BY
