@@ -173,7 +173,10 @@ const Dashboard: React.FC = ({
                   <Button
                     key={tf}
                     variant={timeframe === tf ? 'contained' : 'outlined'}
-                    onClick={() => setTimeframe(tf)}
+                    onClick={() => {
+                      setTimeframe(tf);
+                      setSearchParams({ timeframe: tf === '7 Days' ? 'week' : 'day' })
+                    }}
                   >
                     {tf}
                   </Button>
@@ -287,7 +290,7 @@ const Dashboard: React.FC = ({
                 }}
               >
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
-                  <MqText subdued>{selectedState} JOBS</MqText>
+                  <MqText subheading>Jobs</MqText>
                   <Button
                     disableRipple
                     size={'small'}
