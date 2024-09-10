@@ -187,22 +187,22 @@ public interface ColumnLineageDao extends BaseDao {
         dataset_fields_view AS (
             SELECT
                 d.namespace_name AS namespace_name,
-                d.name AS dataset_name,
+                d.dataset_name AS dataset_name,
                 df.name AS field_name,
                 df.type,
                 df.uuid
             FROM dataset_fields df
             INNER JOIN (
-                SELECT uuid, namespace_name, name
-                FROM datasets_view
-                WHERE current_version_uuid IN (
+                SELECT DISTINCT dataset_uuid, namespace_name, dataset_name
+                FROM dataset_versions
+                WHERE uuid IN (
                     SELECT DISTINCT output_dataset_version_uuid
                     FROM selected_column_lineage
                     UNION
                     SELECT DISTINCT input_dataset_version_uuid
                     FROM selected_column_lineage
                 )
-            ) d ON d.uuid = df.dataset_uuid
+            ) d ON d.dataset_uuid = df.dataset_uuid
         )
         SELECT
           output_fields.namespace_name,
