@@ -56,7 +56,6 @@ public class StatsTest extends DbTest {
       fail("failed to apply dry run", e);
     }
 
-    // Assert the response
     List<LineageMetric> lastDayLineageMetrics = DB.lastDayLineageMetrics();
     List<LineageMetric> lastWeekLineageMetrics = DB.lastWeekLineageMetrics();
 
