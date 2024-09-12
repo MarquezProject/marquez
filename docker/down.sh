@@ -3,7 +3,7 @@
 # Copyright 2018-2023 contributors to the Marquez project
 # SPDX-License-Identifier: Apache-2.0
 #
-# Usage: $ ./down.sh [FLAGS] 
+# Usage: $ ./down.sh [FLAGS]
 
 set -e
 
@@ -53,5 +53,5 @@ done
 
 # We can ignore the tag and port(s) when cleaning up running
 # containers and volumes
-API_PORT=${RANDOM} API_ADMIN_PORT=${RANDOM} WEB_PORT=${RANDOM} TAG=${RANDOM} \
+API_PORT=${RANDOM} API_ADMIN_PORT=${RANDOM} WEB_PORT=${RANDOM} TAG=${RANDOM} POSTGRES_PORT=${RANDOM} SEARCH_ENABLED=${RANDOM} \
   docker compose $compose_files down $compose_args

@@ -5,6 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { Box, Container, CssBaseline } from '@mui/material'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 import { LocalizationProvider } from '@mui/x-date-pickers'
+import { NotFound } from '../routes/not-found/NotFound'
 import { Provider } from 'react-redux'
 import { ReduxRouter, createRouterMiddleware } from '@lagunovsky/redux-react-router'
 import { Route, Routes } from 'react-router-dom'
@@ -71,6 +72,7 @@ const App = (): ReactElement => {
                       element={<ColumnLevel />}
                     />
                     <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
+                    <Route path='*' element={<NotFound />} />
                   </Routes>
                   <Toast />
                 </Box>

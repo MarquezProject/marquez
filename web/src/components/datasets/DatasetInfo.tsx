@@ -116,7 +116,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                         <TableCell align='left'>
                           <Chip
                             size={'small'}
-                            label={<MqText font={'mono'}>{field.type}</MqText>}
+                            label={<MqText font={'mono'} small>{field.type || 'N/A'}</MqText>}
                             variant={'outlined'}
                           />
                         </TableCell>
