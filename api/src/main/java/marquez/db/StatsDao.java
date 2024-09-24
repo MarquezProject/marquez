@@ -19,19 +19,19 @@ public interface StatsDao extends BaseDao {
 
   @SqlUpdate(
       """
-      INSERT INTO current_hour_lineage_metrics(metric_time, state)
-      VALUES (:metricTime, :state);
+      INSERT INTO current_hour_lineage_metrics(event_time, state)
+      VALUES (:eventTime, :state);
       """)
   void createCurrentHourLineageMetric(
-      @Bind("metricTime") Instant metricTime, @Bind("state") String state);
+      @Bind("eventTime") Instant eventTime, @Bind("state") String state);
 
   @SqlUpdate(
       """
-      INSERT INTO current_day_lineage_metrics(metric_time, state)
-      VALUES (:metricTime, :state);
+      INSERT INTO current_day_lineage_metrics(event_time, state)
+      VALUES (:eventTime, :state);
       """)
   void createCurrentDayLineageMetric(
-      @Bind("metricTime") Instant metricTime, @Bind("state") String state);
+      @Bind("eventTime") Instant eventTime, @Bind("state") String state);
 
   @SqlQuery(
       """
