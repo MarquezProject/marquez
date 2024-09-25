@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
 const CopyPlugin = require('copy-webpack-plugin')
 const path = require('path')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 // look for elkjs package folder
 const elkjsRoot = path.dirname(require.resolve('elkjs/package.json'));
@@ -54,6 +55,10 @@ const webpackDev = {
           { from: path.join(elkjsRoot, 'lib/elk-worker.min.js'), to: 'elk-worker.min.js' },
         ],
       }),
+    new MonacoWebpackPlugin({
+      // available options are documented at https://github.com/microsoft/monaco-editor/blob/main/webpack-plugin/README.md#options
+      languages: ['json', 'sql', 'python', 'java']
+    })
   ]
 }
 

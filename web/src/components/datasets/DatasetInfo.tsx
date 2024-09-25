@@ -16,6 +16,7 @@ import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 import SplitscreenIcon from '@mui/icons-material/Splitscreen'
+import {MqEditor} from "../core/editor/MqEditor";
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -60,6 +61,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
     },
     []
   )
+
+  console.log(facets)
 
   return (
     <Box>
@@ -176,6 +179,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
           <MqJsonView data={facets} aria-label={i18next.t('dataset_info.facets_subhead_aria')} />
+          <MqEditor value={JSON.stringify(facets, null, 2)} language={'json'}></MqEditor>
         </Box>
       )}
     </Box>
