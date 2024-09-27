@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from "react";
 import MonacoEditor from "react-monaco-editor/lib/editor";
+import {Box} from "@mui/material";
 
 interface Props {
   value: string;
   language: string;
+  width: number | string;
+  height: number | string;
 }
 
-export const MqEditor = ({value, language}: Props) => {
+export const MqEditor = ({value, language, width, height}: Props) => {
   const editorDidMount = (editor: any, monaco: any) => {
-    editor.focus();
   }
   const onChange = (newValue: any, e: any) => {
     console.log('onChange', newValue, e);
@@ -16,18 +18,24 @@ export const MqEditor = ({value, language}: Props) => {
 
   const options = {
     selectOnLineNumbers: true,
-    readOnly: true
+    readOnly: true,
+    glyphMargin: false,
+    folding: false,
+    lineNumbers: "off",
+    lineDecorationsWidth: 0,
+    lineNumbersMinChars: 0
   };
 
   return (
+    <Box position={'relative'}>
     <MonacoEditor
-      width={'100%'}
-      height={400}
+      width={width}
+      height={height}
       language={language}
       theme="vs-dark"
       value={value}
-      options={options}
-      editorDidMount={editorDidMount}
+      onChange={onChange}
     />
+    </Box>
   );
 }

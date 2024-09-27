@@ -17,6 +17,7 @@ import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
 import SplitscreenIcon from '@mui/icons-material/Splitscreen'
 import {MqEditor} from "../core/editor/MqEditor";
+import ParentSize from "@visx/responsive/lib/components/ParentSize";
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -178,8 +179,12 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
           <Box mb={1}>
             <MqText subheading>{i18next.t('dataset_info.facets_subhead')}</MqText>
           </Box>
-          <MqJsonView data={facets} aria-label={i18next.t('dataset_info.facets_subhead_aria')} />
-          <MqEditor value={JSON.stringify(facets, null, 2)} language={'json'}></MqEditor>
+          {/*<MqJsonView data={facets} aria-label={i18next.t('dataset_info.facets_subhead_aria')} />*/}
+          <ParentSize>
+            {({width, height}) => (
+              <MqEditor width={width} height={80} value={JSON.stringify(facets, null, 2)} language={'json'} />
+            )}
+          </ParentSize>
         </Box>
       )}
     </Box>
