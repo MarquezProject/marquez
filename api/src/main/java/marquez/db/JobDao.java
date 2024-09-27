@@ -15,11 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import marquez.common.models.DatasetId;
-import marquez.common.models.DatasetName;
-import marquez.common.models.JobName;
-import marquez.common.models.JobType;
-import marquez.common.models.NamespaceName;
+
+import marquez.common.models.*;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobDataset;
 import marquez.db.JobVersionDao.JobDatasetMapper;
@@ -242,10 +239,14 @@ public interface JobDao extends BaseDao {
           ON f.run_uuid = jv.latest_run_uuid
         LEFT OUTER JOIN job_tags jt
           ON j.uuid  = jt.uuid
+        LEFT OUTER JOIN runs r
+          ON r.uuid = jv.latest_run_uuid
+        WHERE
+            r.current_run_state ilike :lastRunState
         ORDER BY
             j.name
       """)
-  List<Job> findAll(String namespaceName, int limit, int offset);
+  List<Job> findAll(String namespaceName, String lastRunState, int limit, int offset);
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
@@ -269,9 +270,9 @@ public interface JobDao extends BaseDao {
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
-  default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
+  default List<Job> findAllWithRun(String namespaceName, String lastRunState, int limit, int offset) {
     RunDao runDao = createRunDao();
-    return findAll(namespaceName, limit, offset).stream()
+    return findAll(namespaceName, lastRunState, limit, offset).stream()
         .peek(
             j -> {
               List<Run> runs = runDao.findByLatestJob(namespaceName, j.getName().getValue(), 10, 0);

@@ -164,11 +164,12 @@ public class JobResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("lastRunState") @DefaultValue("%") String lastRunState,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
+    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), lastRunState, limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
