@@ -25,6 +25,7 @@ import marquez.db.JobVersionDao.JobDataset;
 import marquez.db.JobVersionDao.JobDatasetMapper;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
+import marquez.db.mappers.RunMapper;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Job;
@@ -38,6 +39,7 @@ import org.postgresql.util.PGobject;
 @RegisterRowMapper(JobRowMapper.class)
 @RegisterRowMapper(JobMapper.class)
 @RegisterRowMapper(JobDatasetMapper.class)
+@RegisterRowMapper(RunMapper.class)
 public interface JobDao extends BaseDao {
 
   @SqlQuery(
@@ -138,14 +140,10 @@ public interface JobDao extends BaseDao {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
-          Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
-          run.ifPresentOrElse(
-              r -> this.setJobData(r, j),
-              () ->
-                  this.setJobData(
-                      createJobVersionDao()
-                          .findCurrentInputOutputDatasetsFor(namespaceName, jobName),
-                      j));
+          List<Run> runs = createRunDao().findByLatestJob(namespaceName, jobName, 1, 0);
+          this.setJobData(runs, j);
+          this.setJobDataset(
+              createJobVersionDao().findCurrentInputOutputDatasetsFor(namespaceName, jobName), j);
         });
     return job;
   }
@@ -275,14 +273,14 @@ public interface JobDao extends BaseDao {
     RunDao runDao = createRunDao();
     return findAll(namespaceName, limit, offset).stream()
         .peek(
-            j ->
-                runDao
-                    .findByLatestJob(namespaceName, j.getName().getValue())
-                    .ifPresent(run -> this.setJobData(run, j)))
-        .collect(Collectors.toList());
+            j -> {
+              List<Run> runs = runDao.findByLatestJob(namespaceName, j.getName().getValue(), 10, 0);
+              this.setJobData(runs, j);
+            })
+        .toList();
   }
 
-  default void setJobData(List<JobDataset> datasets, Job j) {
+  default void setJobDataset(List<JobDataset> datasets, Job j) {
     Optional.of(
             datasets.stream()
                 .filter(d -> d.ioType().equals(IoType.INPUT))
@@ -304,11 +302,17 @@ public interface JobDao extends BaseDao {
         .ifPresent(s -> j.setOutputs(s));
   }
 
-  default void setJobData(Run run, Job j) {
-    j.setLatestRun(run);
+  default void setJobData(List<Run> runs, Job j) {
+    if (runs.isEmpty()) {
+      return;
+    }
+
+    Run latestRun = runs.get(0);
+    j.setLatestRun(latestRun);
+    j.setLatestRuns(runs);
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     j.setInputs(
-        datasetVersionDao.findInputDatasetVersionsFor(run.getId().getValue()).stream()
+        datasetVersionDao.findInputDatasetVersionsFor(latestRun.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(
@@ -316,7 +320,7 @@ public interface JobDao extends BaseDao {
                         DatasetName.of(ds.getDatasetName())))
             .collect(Collectors.toSet()));
     j.setOutputs(
-        datasetVersionDao.findOutputDatasetVersionsFor(run.getId().getValue()).stream()
+        datasetVersionDao.findOutputDatasetVersionsFor(latestRun.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(
