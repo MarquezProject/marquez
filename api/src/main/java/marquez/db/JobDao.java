@@ -251,7 +251,6 @@ public interface JobDao extends BaseDao {
       """)
   List<Job> findAll(String namespaceName, String lastRunState, int limit, int offset);
 
-
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
 
