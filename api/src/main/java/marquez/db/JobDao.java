@@ -242,14 +242,15 @@ public interface JobDao extends BaseDao {
           ON f.run_uuid = jv.latest_run_uuid
         LEFT OUTER JOIN job_tags jt
           ON j.uuid  = jt.uuid
-        LEFT OUTER JOIN runs r
+        LEFT JOIN runs r
           ON r.uuid = jv.latest_run_uuid
         WHERE
-            r.current_run_state ilike :lastRunState
+            r.current_run_state ilike :lastRunState OR r IS NULL
         ORDER BY
             j.name
       """)
   List<Job> findAll(String namespaceName, String lastRunState, int limit, int offset);
+
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
