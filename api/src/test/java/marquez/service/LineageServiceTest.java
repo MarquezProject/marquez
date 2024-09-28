@@ -205,7 +205,7 @@ public class LineageServiceTest {
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
 
-    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, "%", 1000, 0);
     jobs =
         jobs.stream()
             .filter(j -> j.getName().getValue().contains("newDownstreamJob"))

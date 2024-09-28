@@ -15,8 +15,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import marquez.common.models.*;
+import marquez.common.models.DatasetId;
+import marquez.common.models.DatasetName;
+import marquez.common.models.JobName;
+import marquez.common.models.JobType;
+import marquez.common.models.NamespaceName;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobDataset;
 import marquez.db.JobVersionDao.JobDatasetMapper;
@@ -270,7 +273,8 @@ public interface JobDao extends BaseDao {
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
-  default List<Job> findAllWithRun(String namespaceName, String lastRunState, int limit, int offset) {
+  default List<Job> findAllWithRun(
+      String namespaceName, String lastRunState, int limit, int offset) {
     RunDao runDao = createRunDao();
     return findAll(namespaceName, lastRunState, limit, offset).stream()
         .peek(

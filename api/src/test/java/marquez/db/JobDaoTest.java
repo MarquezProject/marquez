@@ -106,7 +106,7 @@ public class JobDaoTest {
     JobRow anotherJobSameNamespace =
         createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJob", "a random other job");
 
-    List<Job> jobs = jobDao.findAll(namespace.getName(), 10, 0);
+    List<Job> jobs = jobDao.findAll(namespace.getName(), "%", 10, 0);
 
     // the symlinked job isn't present in the response - only the symlink target and the job with
     // no symlink

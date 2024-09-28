@@ -169,7 +169,8 @@ public class JobResource extends BaseResource {
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), lastRunState, limit, offset);
+    final List<Job> jobs =
+        jobService.findAllWithRun(namespaceName.getValue(), lastRunState, limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
