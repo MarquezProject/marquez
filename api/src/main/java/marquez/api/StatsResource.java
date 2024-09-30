@@ -45,4 +45,34 @@ public class StatsResource {
             ? Response.ok(StatsService.getLastWeekLineageMetrics()).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/jobs")
+  public Response getJobs(@QueryParam("period") Period period) {
+
+    return (Period.DAY.equals(period)
+        ? Response.ok(StatsService.getLastDayJobs()).build()
+        : Period.WEEK.equals(period)
+            ? Response.ok(StatsService.getLastWeekJobs()).build()
+            : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/datasets")
+  public Response getDatasets(@QueryParam("period") Period period) {
+
+    return (Period.DAY.equals(period)
+        ? Response.ok(StatsService.getLastDayDatasets()).build()
+        : Period.WEEK.equals(period)
+            ? Response.ok(StatsService.getLastWeekDatasets()).build()
+            : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
+  }
 }

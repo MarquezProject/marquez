@@ -151,6 +151,7 @@ public final class Columns {
   public static final String COMPLETE = "complete";
   public static final String FAIL = "fail";
   public static final String ABORT = "abort";
+  public static final String COUNT = "count";
 
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {

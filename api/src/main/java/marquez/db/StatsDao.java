@@ -6,12 +6,15 @@
 package marquez.db;
 
 import java.util.List;
+import marquez.db.mappers.IntervalMetricRowMapper;
 import marquez.db.mappers.LineageMetricRowMapper;
+import marquez.db.models.IntervalMetric;
 import marquez.db.models.LineageMetric;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 @RegisterRowMapper(LineageMetricRowMapper.class)
+@RegisterRowMapper(IntervalMetricRowMapper.class)
 public interface StatsDao extends BaseDao {
 
   @SqlQuery(
@@ -69,4 +72,168 @@ public interface StatsDao extends BaseDao {
               ds.start_interval;
           """)
   List<LineageMetric> getLastWeekMetrics();
+
+  @SqlQuery(
+      """
+          WITH hourly_series AS (
+              SELECT
+                  generate_series(
+                          date_trunc('hour', NOW() - INTERVAL '23 hours'),
+                          date_trunc('hour', NOW()),
+                          '1 hour'
+                  ) AS start_interval
+          ),
+               before_count AS (
+                   SELECT
+                       count(*) AS job_count
+                   FROM jobs
+                   WHERE created_at < date_trunc('hour', NOW() - INTERVAL '23 hours')
+               ),
+               hourly_jobs AS (
+                   SELECT
+                       hs.start_interval,
+                       COUNT(j.uuid) AS jobs_in_hour
+                   FROM hourly_series hs
+                            LEFT JOIN jobs j
+                                      ON j.created_at >= hs.start_interval
+                                          AND j.created_at < hs.start_interval + INTERVAL '1 hour'
+                   GROUP BY hs.start_interval
+               ),
+               cumulative_jobs AS (
+                   SELECT
+                       start_interval,
+                       SUM(jobs_in_hour) OVER (ORDER BY start_interval) + (SELECT job_count FROM before_count) AS cumulative_job_count
+                   FROM hourly_jobs
+               )
+          SELECT
+              start_interval,
+              start_interval + INTERVAL '1 hour' AS end_interval,
+              cumulative_job_count AS count
+          FROM cumulative_jobs
+          ORDER BY start_interval;
+          """)
+  List<IntervalMetric> getLastDayJobs();
+
+  @SqlQuery(
+      """
+          WITH daily_series AS (
+              SELECT
+                  generate_series(
+                          date_trunc('day', NOW() - INTERVAL '6 days'),
+                          date_trunc('day', NOW()),
+                          '1 day'
+                  ) AS start_interval
+          ),
+               before_count AS (
+                   SELECT
+                       count(*) AS job_count
+                   FROM jobs
+                   WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
+               ),
+               daily_jobs AS (
+                   SELECT
+                       ds.start_interval,
+                       COUNT(j.uuid) AS jobs_in_day
+                   FROM daily_series ds
+                            LEFT JOIN jobs j
+                                      ON j.created_at >= ds.start_interval
+                                          AND j.created_at < ds.start_interval + INTERVAL '1 day'
+                   GROUP BY ds.start_interval
+               ),
+               cumulative_jobs AS (
+                   SELECT
+                       start_interval,
+                       SUM(jobs_in_day) OVER (ORDER BY start_interval) + (SELECT job_count FROM before_count) AS cumulative_job_count
+                   FROM daily_jobs
+               )
+          SELECT
+              start_interval AS day_start,
+              start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS day_end,
+              cumulative_job_count AS job_count
+          FROM cumulative_jobs
+          ORDER BY start_interval;
+          """)
+  List<IntervalMetric> getLastWeekJobs();
+
+  @SqlQuery(
+      """
+              WITH hourly_series AS (
+                  SELECT
+                      generate_series(
+                              date_trunc('hour', NOW() - INTERVAL '23 hours'),
+                              date_trunc('hour', NOW()),
+                              '1 hour'
+                      ) AS start_interval
+              ),
+                   before_count AS (
+                       SELECT
+                           count(*) AS dataset_count
+                       FROM datasets
+                       WHERE created_at < date_trunc('hour', NOW() - INTERVAL '23 hours')
+                   ),
+                   hourly_datasets AS (
+                       SELECT
+                           hs.start_interval,
+                           COUNT(d.uuid) AS datasets_in_hour
+                       FROM hourly_series hs
+                                LEFT JOIN datasets d
+                                          ON d.created_at >= hs.start_interval
+                                              AND d.created_at < hs.start_interval + INTERVAL '1 hour'
+                       GROUP BY hs.start_interval
+                   ),
+                   cumulative_datasets AS (
+                       SELECT
+                           start_interval,
+                           SUM(datasets_in_hour) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                       FROM hourly_datasets
+                   )
+              SELECT
+                  start_interval,
+                  start_interval + INTERVAL '1 hour' AS end_interval,
+                  cumulative_dataset_count AS count
+              FROM cumulative_datasets
+              ORDER BY start_interval;
+              """)
+  List<IntervalMetric> getLastDayDatasets();
+
+  @SqlQuery(
+      """
+              WITH daily_series AS (
+                  SELECT
+                      generate_series(
+                              date_trunc('day', NOW() - INTERVAL '6 days'),
+                              date_trunc('day', NOW()),
+                              '1 day'
+                      ) AS start_interval
+              ),
+                   before_count AS (
+                       SELECT
+                           count(*) AS dataset_count
+                       FROM datasets
+                       WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
+                   ),
+                   daily_datasets AS (
+                       SELECT
+                           ds.start_interval,
+                           COUNT(d.uuid) AS datasets_in_day
+                       FROM daily_series ds
+                                LEFT JOIN datasets d
+                                          ON d.created_at >= ds.start_interval
+                                              AND d.created_at < ds.start_interval + INTERVAL '1 day'
+                       GROUP BY ds.start_interval
+                   ),
+                   cumulative_datasets AS (
+                       SELECT
+                           start_interval,
+                           SUM(datasets_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                       FROM daily_datasets
+                   )
+              SELECT
+                  start_interval AS day_start,
+                  start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS day_end,
+                  cumulative_dataset_count AS dataset_count
+              FROM cumulative_datasets
+              ORDER BY start_interval;
+              """)
+  List<IntervalMetric> getLastWeekDatasets();
 }
