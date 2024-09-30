@@ -12,6 +12,7 @@ import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import airflow_logo from './airflow.svg'
+import MQTooltip from "../../components/core/tooltip/MQTooltip";
 
 interface Props {
   job: Job
@@ -67,6 +68,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
             {Array.from({ length: 10 }, (_, i) => (
+              <MQTooltip title={stopWatchDuration(Math.random() * 10000)}>
               <Box
                 key={i}
                 display={'flex'}
@@ -79,7 +81,12 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                 minHeight={2}
                 width={5}
                 height={Math.floor(Math.random() * 40)}
+                sx={{
+                  borderTopLeftRadius: theme.shape.borderRadius,
+                  borderTopRightRadius: theme.shape.borderRadius,
+                }}
               />
+              </MQTooltip>
             ))}
           </Box>
         </Box>

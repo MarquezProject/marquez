@@ -24,7 +24,7 @@ export function stopWatchDuration(durationMs: number) {
   if (duration.asSeconds() > 1) {
     return `${duration.minutes()}m ${addLeadingZero(duration.seconds())}s`
   } else {
-    return `${duration.asMilliseconds()} ms`
+    return `${duration.asMilliseconds().toFixed(2)} ms`
   }
 }
 
