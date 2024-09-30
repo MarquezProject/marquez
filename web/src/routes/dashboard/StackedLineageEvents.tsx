@@ -8,6 +8,7 @@ import { pluralize } from '../../helpers/text'
 import { sum } from 'lodash'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/system/Box'
+import MqText from '../../components/core/text/MqText'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React from 'react'
 
@@ -15,7 +16,7 @@ interface Props {
   lineageMetrics: LineageMetric[]
 }
 
-const formatTime = (date: Date) =>
+export const formatTime = (date: Date) =>
   date.toLocaleTimeString([], {
     month: 'short',
     day: 'numeric',
@@ -59,10 +60,14 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
         sx={{
           position: 'absolute',
           top: 8,
-          right: 8,
+          left: 16,
           zIndex: 1,
         }}
-        label={pluralize(totalEvents, 'event', 'events')}
+        label={
+          <MqText font={'mono'} small subdued>
+            {pluralize(totalEvents, 'EVENT', 'EVENTS')}
+          </MqText>
+        }
       ></Chip>
       <ParentSize>
         {(parent) => (

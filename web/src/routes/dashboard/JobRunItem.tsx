@@ -8,11 +8,11 @@ import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
+import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
 import airflow_logo from './airflow.svg'
-import MQTooltip from "../../components/core/tooltip/MQTooltip";
 
 interface Props {
   job: Job
@@ -68,24 +68,23 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
             {Array.from({ length: 10 }, (_, i) => (
-              <MQTooltip title={stopWatchDuration(Math.random() * 10000)}>
-              <Box
-                key={i}
-                display={'flex'}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                bgcolor={
-                  Math.random() > 0.5 ? theme.palette.primary.main : theme.palette.error.main
-                }
-                mr={0.5}
-                minHeight={2}
-                width={5}
-                height={Math.floor(Math.random() * 40)}
-                sx={{
-                  borderTopLeftRadius: theme.shape.borderRadius,
-                  borderTopRightRadius: theme.shape.borderRadius,
-                }}
-              />
+              <MQTooltip key={i} title={stopWatchDuration(Math.random() * 10000)}>
+                <Box
+                  display={'flex'}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                  bgcolor={
+                    Math.random() > 0.5 ? theme.palette.primary.main : theme.palette.error.main
+                  }
+                  mr={0.5}
+                  minHeight={2}
+                  width={5}
+                  height={Math.floor(Math.random() * 40)}
+                  sx={{
+                    borderTopLeftRadius: theme.shape.borderRadius,
+                    borderTopRightRadius: theme.shape.borderRadius,
+                  }}
+                />
               </MQTooltip>
             ))}
           </Box>

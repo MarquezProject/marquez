@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { JobOrDataset, LineageNode } from './lineage'
-import {Nullable} from "./util/Nullable";
+import { Nullable } from './util/Nullable'
 
 export interface Tag {
   name: string

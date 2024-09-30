@@ -17,8 +17,7 @@ const initialState: IJobsByStateState = {
 }
 
 export type IJobsByStateAction = ReturnType<typeof fetchJobsByState> &
-    ReturnType<typeof fetchJobsByStateSuccess>
-
+  ReturnType<typeof fetchJobsByStateSuccess>
 
 export default (state = initialState, action: IJobsByStateAction): IJobsByStateState => {
   const { type, payload } = action

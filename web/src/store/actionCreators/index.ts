@@ -19,6 +19,7 @@ import {
   Search,
   Tag,
 } from '../../types/api'
+import { IntervalMetric } from '../requests/intervalMetrics'
 import { JobOrDataset } from '../../types/lineage'
 import { LineageMetric } from '../requests/lineageMetrics'
 
@@ -557,6 +558,30 @@ export const fetchLineageMetricsSuccess = (lineageMetrics: LineageMetric[]) => (
   payload: lineageMetrics,
 })
 
+export const fetchJobMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_JOB_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchJobMetricsSuccess = (jobMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_JOB_METRICS_SUCCESS,
+  payload: jobMetrics,
+})
+
+export const fetchDatasetMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_DATASET_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchDatasetMetricsSuccess = (datasetMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_DATASET_METRICS_SUCCESS,
+  payload: datasetMetrics,
+})
+
 export const fetchJobsByState = (state: RunState, limit: number, offset: number) => ({
   type: actionTypes.FETCH_JOBS_BY_STATE,
   payload: {
@@ -571,5 +596,5 @@ export const fetchJobsByStateSuccess = (jobs: Job[], totalCount: number) => ({
   payload: {
     jobs,
     totalCount,
-  }
+  },
 })
