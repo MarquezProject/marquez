@@ -60,6 +60,7 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
           position: 'absolute',
           top: 8,
           right: 8,
+          zIndex: 1,
         }}
         label={pluralize(totalEvents, 'event', 'events')}
       ></Chip>
