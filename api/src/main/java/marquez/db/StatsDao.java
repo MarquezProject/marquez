@@ -147,9 +147,9 @@ public interface StatsDao extends BaseDao {
                    FROM daily_jobs
                )
           SELECT
-              start_interval AS day_start,
-              start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS day_end,
-              cumulative_job_count AS job_count
+              start_interval AS start_interval,
+              start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+              cumulative_job_count AS count
           FROM cumulative_jobs
           ORDER BY start_interval;
           """)
@@ -229,9 +229,9 @@ public interface StatsDao extends BaseDao {
                        FROM daily_datasets
                    )
               SELECT
-                  start_interval AS day_start,
-                  start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS day_end,
-                  cumulative_dataset_count AS dataset_count
+                  start_interval AS start_interval,
+                  start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+                  cumulative_dataset_count AS count
               FROM cumulative_datasets
               ORDER BY start_interval;
               """)
