@@ -7,6 +7,7 @@ import { IState } from '../../store/reducers'
 import { IntervalMetric } from '../../store/requests/intervalMetrics'
 import { Job } from '../../types/api'
 import { LineageMetric } from '../../store/requests/lineageMetrics'
+import { MiniGraphContainer } from './MiniGraphContainer'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
@@ -20,13 +21,11 @@ import { useSearchParams } from 'react-router-dom'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
-import MiniGraph from './MiniGraph'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
 import TimelineDrawer from './TimelineDrawer'
-import {formatNumber} from "../../helpers/numbers";
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
@@ -242,7 +241,11 @@ const Dashboard: React.FC = ({
                       {states.map((state) => (
                         <MQTooltip key={state.label} title={state.label}>
                           <Button
-                            onClick={() => setSelectedState(state.label)}
+                            onClick={() =>
+                              selectedState === state.label
+                                ? setSelectedState('')
+                                : setSelectedState(state.label)
+                            }
                             variant={'text'}
                             color={state.bgColor as any}
                             sx={{
@@ -287,50 +290,26 @@ const Dashboard: React.FC = ({
             </Grid>
             <Grid container item alignItems={'flex-start'} xs={12} md={2} spacing={2}>
               <Grid item xs={4} md={12} style={{ paddingTop: 4 }}>
-                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                  <MqText small font={'mono'} subdued>
-                    DATASETS
-                  </MqText>
-                  {datasetMetrics && datasetMetrics.length > 0 && (
-                    <MqText large>{formatNumber(datasetMetrics[datasetMetrics.length - 1].count)}</MqText>
-                  )}
-                </Box>
-                <MiniGraph
-                  intervalMetrics={datasetMetrics}
-                  color={theme.palette.info.main}
+                <MiniGraphContainer
+                  metrics={datasetMetrics}
                   label={'Datasets'}
+                  color={theme.palette.info.main}
                   isLoading={isDatasetMetricsLoading}
                 />
               </Grid>
               <Grid item xs={4} md={12} style={{ paddingTop: 0 }}>
-                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                  <MqText small font={'mono'} subdued>
-                    SOURCES
-                  </MqText>
-                  {sourceMetrics && sourceMetrics.length > 0 && (
-                    <MqText large>{formatNumber(sourceMetrics[sourceMetrics.length - 1].count)}</MqText>
-                  )}
-                </Box>
-                <MiniGraph
-                  intervalMetrics={sourceMetrics}
-                  color={theme.palette.warning.main}
+                <MiniGraphContainer
+                  metrics={sourceMetrics}
                   label={'Sources'}
+                  color={theme.palette.warning.main}
                   isLoading={isSourceMetricsLoading}
                 />
               </Grid>
               <Grid item xs={4} md={12} style={{ paddingTop: 0 }}>
-                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                  <MqText small font={'mono'} subdued>
-                    JOBS
-                  </MqText>
-                  {jobMetrics && jobMetrics.length > 0 && (
-                    <MqText large>{formatNumber(jobMetrics[jobMetrics.length - 1].count)}</MqText>
-                  )}
-                </Box>
-                <MiniGraph
-                  intervalMetrics={jobMetrics}
-                  color={theme.palette.primary.main}
+                <MiniGraphContainer
+                  metrics={jobMetrics}
                   label={'Jobs'}
+                  color={theme.palette.primary.main}
                   isLoading={isJobMetricsLoading}
                 />
               </Grid>
@@ -361,155 +340,6 @@ const Dashboard: React.FC = ({
                 ))}
               </Box>
             </Grid>
-            {/* <Grid item sm={12} md={4}>
-              <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                <MqText subdued>RECENT ACTIVITY</MqText>
-                <Button
-                  disableRipple
-                  size={'small'}
-                  sx={{ mr: 2 }}
-                  endIcon={<ChevronRight />}
-                  onClick={() => setTimelineOpen(true)}
-                >
-                  See More
-                </Button>
-              </Box>
-              <Timeline
-                sx={{
-                  p: 0,
-                  m: 0,
-                  [`& .${timelineItemClasses.root}`]: {
-                    margin: 0,
-                    padding: 0,
-                  },
-
-                  [`& .${timelineItemClasses.root}:before`]: {
-                    flex: 0,
-                    padding: 0,
-                  },
-                }}
-              >
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color='primary'>
-                      <RunCircleOutlined color={'secondary'} />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:30 AM
-                    </MqText>
-                    <MqText inline link>
-                      delivery_time_7_days
-                    </MqText>
-                    <MqText inline> completed in 3m 40s</MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color={'primary'}>
-                      <Code color={'secondary'} />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:27 AM
-                    </MqText>
-                    <MqText link inline>
-                      delivery_time_7_days{' '}
-                    </MqText>
-                    <MqText inline>
-                      source code modified. New version e5af47b5-b1fa-49a6-8d3f-8a255e4fe787 created
-                      caused by the following:
-                      <List dense sx={{ p: 0 }}>
-                        <ListItem dense>
-                          <Box width={54}>
-                            <MqText small inline subdued>
-                              ADDED
-                            </MqText>
-                          </Box>
-                          <MqText inline small font={'mono'}>
-                            order_address_id
-                          </MqText>
-                        </ListItem>
-                        <ListItem dense>
-                          <Box width={54}>
-                            <MqText small inline subdued>
-                              REMOVED
-                            </MqText>
-                          </Box>
-                          <MqText small font={'mono'}>
-                            order_address
-                          </MqText>
-                        </ListItem>
-                      </List>
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color={'info'}>
-                      <Computer color={'secondary'} />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:24 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color={'primary'}>
-                      <Source color={'secondary'} />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:18 AM
-                    </MqText>
-                    <MqText inline link>
-                      {' '}
-                      orders_july_2023
-                    </MqText>
-                    <MqText inline> added to food_delivery_db.</MqText>
-                  </TimelineContent>
-                </TimelineItem>
-                <TimelineItem>
-                  <TimelineSeparator>
-                    <TimelineDot color={'info'}>
-                      <Computer color={'secondary'} />
-                    </TimelineDot>
-                    <TimelineConnector />
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <MqText subdued sx={{ mr: 1 }} inline>
-                      10:24 AM
-                    </MqText>
-                    <MqText inline>
-                      The job{' '}
-                      <MqText inline link>
-                        delivery_time_7_days
-                      </MqText>{' '}
-                      successfully completed, creating two datasets in 3 minutes and 4 minutes 30
-                      seconds, respectively.
-                    </MqText>
-                  </TimelineContent>
-                </TimelineItem>
-              </Timeline>
-            </Grid> */}
           </Grid>
         </Box>
       </Container>

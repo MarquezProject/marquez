@@ -114,7 +114,14 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
               },
             ]}
             margin={{ left: 16, right: 16, top: 12, bottom: 0 }}
-            yAxis={[{ scaleType: 'linear', disableLine: true, disableTicks: true, max: Math.ceil(tallest * 1.25) }]}
+            yAxis={[
+              {
+                scaleType: 'linear',
+                disableLine: true,
+                disableTicks: true,
+                max: Math.ceil(tallest * 1.25),
+              },
+            ]}
             xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
             bottomAxis={null}
             leftAxis={null}
