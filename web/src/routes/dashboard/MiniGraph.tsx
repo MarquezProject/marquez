@@ -61,7 +61,7 @@ const MiniGraph: React.FC<Props> = ({ intervalMetrics, isLoading, color, label }
               hidden: true,
             },
           }}
-          margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+          margin={{ left: 6, right: 6, top: 6, bottom: 6 }}
         />
       )}
     </ParentSize>

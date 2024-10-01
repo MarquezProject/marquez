@@ -26,6 +26,7 @@ import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
 import TimelineDrawer from './TimelineDrawer'
+import {formatNumber} from "../../helpers/numbers";
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
@@ -128,8 +129,10 @@ const Dashboard: React.FC = ({
       const intervalId = setInterval(() => {
         const currentSearchParams = searchParams.get('timeframe')
         fetchLineageMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+        fetchJobMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+        fetchDatasetMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+        fetchSourceMetrics(currentSearchParams === 'week' ? 'week' : 'day')
       }, intervalTime)
-
       return () => clearInterval(intervalId)
     }
 
@@ -289,7 +292,7 @@ const Dashboard: React.FC = ({
                     DATASETS
                   </MqText>
                   {datasetMetrics && datasetMetrics.length > 0 && (
-                    <MqText large>{datasetMetrics[datasetMetrics.length - 1].count}</MqText>
+                    <MqText large>{formatNumber(datasetMetrics[datasetMetrics.length - 1].count)}</MqText>
                   )}
                 </Box>
                 <MiniGraph
@@ -305,7 +308,7 @@ const Dashboard: React.FC = ({
                     SOURCES
                   </MqText>
                   {sourceMetrics && sourceMetrics.length > 0 && (
-                    <MqText large>{sourceMetrics[sourceMetrics.length - 1].count}</MqText>
+                    <MqText large>{formatNumber(sourceMetrics[sourceMetrics.length - 1].count)}</MqText>
                   )}
                 </Box>
                 <MiniGraph
@@ -321,7 +324,7 @@ const Dashboard: React.FC = ({
                     JOBS
                   </MqText>
                   {jobMetrics && jobMetrics.length > 0 && (
-                    <MqText large>{jobMetrics[jobMetrics.length - 1].count}</MqText>
+                    <MqText large>{formatNumber(jobMetrics[jobMetrics.length - 1].count)}</MqText>
                   )}
                 </Box>
                 <MiniGraph
