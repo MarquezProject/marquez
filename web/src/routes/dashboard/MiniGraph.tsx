@@ -13,13 +13,14 @@ interface Props {
   intervalMetrics?: IntervalMetric[]
   color: string
   label: string
+  isLoading: boolean
 }
 
-const HEIGHT = 54
+const HEIGHT = 52
 
-const MiniGraph: React.FC<Props> = ({ intervalMetrics, color, label }) => {
-  if (!intervalMetrics) {
-    return <Skeleton height={HEIGHT} width={'100%'} />
+const MiniGraph: React.FC<Props> = ({ intervalMetrics, isLoading, color, label }) => {
+  if (!intervalMetrics || isLoading) {
+    return <Skeleton height={HEIGHT + 1} width={'100%'} />
   }
   const isWeek = intervalMetrics.length === 7
 

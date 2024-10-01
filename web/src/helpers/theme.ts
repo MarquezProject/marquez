@@ -42,6 +42,9 @@ export const theme = createTheme({
     warning: {
       main: '#7D7D7D',
     },
+    success: {
+      main: '#FFB74D',
+    },
     info: {
       main: '#9c98ec',
     },

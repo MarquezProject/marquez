@@ -14,6 +14,7 @@ import {
   fetchJobMetrics,
   fetchJobs,
   fetchLineageMetrics,
+  fetchSourceMetrics,
 } from '../../store/actionCreators'
 import { useSearchParams } from 'react-router-dom'
 import JobRunItem from './JobRunItem'
@@ -33,6 +34,10 @@ interface StateProps {
   isJobsLoading: boolean
   jobMetrics: IntervalMetric[]
   datasetMetrics: IntervalMetric[]
+  sourceMetrics: IntervalMetric[]
+  isSourceMetricsLoading: boolean
+  isJobMetricsLoading: boolean
+  isDatasetMetricsLoading: boolean
 }
 
 interface DispatchProps {
@@ -40,6 +45,7 @@ interface DispatchProps {
   fetchJobMetrics: typeof fetchJobMetrics
   fetchDatasetMetrics: typeof fetchDatasetMetrics
   fetchJobs: typeof fetchJobs
+  fetchSourceMetrics: typeof fetchSourceMetrics
 }
 
 const TIMEFRAMES = ['24 Hours', '7 Days']
@@ -70,8 +76,13 @@ const Dashboard: React.FC = ({
   fetchJobs,
   fetchJobMetrics,
   fetchDatasetMetrics,
+  fetchSourceMetrics,
   jobMetrics,
   datasetMetrics,
+  sourceMetrics,
+  isJobMetricsLoading,
+  isDatasetMetricsLoading,
+  isSourceMetricsLoading,
 }: StateProps & DispatchProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [timeframe, setTimeframe] = React.useState(
@@ -97,10 +108,12 @@ const Dashboard: React.FC = ({
       fetchLineageMetrics('day')
       fetchJobMetrics('day')
       fetchDatasetMetrics('day')
+      fetchSourceMetrics('day')
     } else if (timeframe === '7 Days') {
       fetchLineageMetrics('week')
       fetchJobMetrics('week')
       fetchDatasetMetrics('week')
+      fetchSourceMetrics('week')
     }
   }, [timeframe])
 
@@ -270,7 +283,7 @@ const Dashboard: React.FC = ({
               )}
             </Grid>
             <Grid container item alignItems={'flex-start'} xs={12} md={2} spacing={2}>
-              <Grid item xs={12} style={{ paddingTop: 0 }}>
+              <Grid item xs={4} md={12} style={{ paddingTop: 4 }}>
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                   <MqText small font={'mono'} subdued>
                     DATASETS
@@ -283,9 +296,26 @@ const Dashboard: React.FC = ({
                   intervalMetrics={datasetMetrics}
                   color={theme.palette.info.main}
                   label={'Datasets'}
+                  isLoading={isDatasetMetricsLoading}
                 />
               </Grid>
-              <Grid item xs={12} style={{ paddingTop: 0 }}>
+              <Grid item xs={4} md={12} style={{ paddingTop: 0 }}>
+                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                  <MqText small font={'mono'} subdued>
+                    SOURCES
+                  </MqText>
+                  {sourceMetrics && sourceMetrics.length > 0 && (
+                    <MqText large>{sourceMetrics[sourceMetrics.length - 1].count}</MqText>
+                  )}
+                </Box>
+                <MiniGraph
+                  intervalMetrics={sourceMetrics}
+                  color={theme.palette.success.main}
+                  label={'Sources'}
+                  isLoading={isSourceMetricsLoading}
+                />
+              </Grid>
+              <Grid item xs={4} md={12} style={{ paddingTop: 0 }}>
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                   <MqText small font={'mono'} subdued>
                     JOBS
@@ -298,21 +328,7 @@ const Dashboard: React.FC = ({
                   intervalMetrics={jobMetrics}
                   color={theme.palette.primary.main}
                   label={'Jobs'}
-                />
-              </Grid>
-              <Grid item xs={12} style={{ paddingTop: 0 }}>
-                <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
-                  <MqText small font={'mono'} subdued>
-                    JOBS
-                  </MqText>
-                  {jobMetrics && jobMetrics.length > 0 && (
-                    <MqText large>{jobMetrics[jobMetrics.length - 1].count}</MqText>
-                  )}
-                </Box>
-                <MiniGraph
-                  intervalMetrics={jobMetrics}
-                  color={theme.palette.primary.main}
-                  label={'Jobs'}
+                  isLoading={isJobMetricsLoading}
                 />
               </Grid>
             </Grid>
@@ -507,6 +523,8 @@ const mapStateToProps = (state: IState) => ({
   isJobMetricsLoading: state.jobMetrics.isLoading,
   datasetMetrics: state.datasetMetrics.data,
   isDatasetMetricsLoading: state.datasetMetrics.isLoading,
+  sourceMetrics: state.sourceMetrics.data,
+  isSourceMetricsLoading: state.sourceMetrics.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -514,6 +532,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     {
       fetchLineageMetrics: fetchLineageMetrics,
       fetchJobMetrics: fetchJobMetrics,
+      fetchSourceMetrics: fetchSourceMetrics,
       fetchDatasetMetrics: fetchDatasetMetrics,
       fetchJobs: fetchJobs,
     },

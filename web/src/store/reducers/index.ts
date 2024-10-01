@@ -23,6 +23,7 @@ import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatase
 import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import runs, { IRunsState } from './runs'
 import search, { ISearchState } from './search'
+import sourceMetrics, { ISourceMetricsState } from './sourceMetrics'
 import tags, { ITagsState } from './tags'
 
 export interface IState {
@@ -46,6 +47,7 @@ export interface IState {
   jobsByState: IJobsByStateState
   jobMetrics: IJobMetricsState
   datasetMetrics: IDatasetMetricsState
+  sourceMetrics: ISourceMetricsState
 }
 
 export default (history: History): Reducer =>
@@ -70,4 +72,5 @@ export default (history: History): Reducer =>
     jobsByState,
     jobMetrics,
     datasetMetrics,
+    sourceMetrics,
   })

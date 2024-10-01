@@ -8,7 +8,7 @@ export interface IntervalMetric {
 }
 
 export const getIntervalMetrics = async (payload: {
-  asset: 'jobs' | 'datasets'
+  asset: 'jobs' | 'datasets' | 'sources'
   unit: 'day' | 'week'
 }) => {
   const url = `${API_URL}/stats/${payload.asset}?period=${payload.unit.toUpperCase()}`

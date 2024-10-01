@@ -32,6 +32,7 @@ import {
   FETCH_RUNS,
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
+  FETCH_SOURCE_METRICS,
 } from '../actionCreators/actionTypes'
 import {
   ColumnLineageGraph,
@@ -110,6 +111,7 @@ import {
   fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
+  fetchSourceMetricsSuccess,
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
@@ -549,6 +551,21 @@ export function* fetchDatasetMetricsSaga() {
   }
 }
 
+export function* fetchSourceMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_SOURCE_METRICS)
+      const intervalMetrics: IntervalMetric[] = yield call(getIntervalMetrics, {
+        ...payload,
+        asset: 'sources',
+      })
+      yield put(fetchSourceMetricsSuccess(intervalMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting source metrics'))
+    }
+  }
+}
+
 export function* fetchJobsByState() {
   while (true) {
     try {
@@ -598,6 +615,7 @@ export default function* rootSaga(): Generator {
     fetchJobsByState(),
     fetchJobMetricsSaga(),
     fetchDatasetMetricsSaga(),
+    fetchSourceMetricsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

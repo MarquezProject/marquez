@@ -582,6 +582,18 @@ export const fetchDatasetMetricsSuccess = (datasetMetrics: IntervalMetric[]) => 
   payload: datasetMetrics,
 })
 
+export const fetchSourceMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_SOURCE_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchSourceMetricsSuccess = (sourceMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_SOURCE_METRICS_SUCCESS,
+  payload: sourceMetrics,
+})
+
 export const fetchJobsByState = (state: RunState, limit: number, offset: number) => ({
   type: actionTypes.FETCH_JOBS_BY_STATE,
   payload: {
