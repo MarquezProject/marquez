@@ -71,7 +71,7 @@ jobs:
   unit-test-web:
     working_directory: ~/marquez/web
     docker:
-      - image: cimg/node:18.16.0
+      - image: circleci/node:20
     environment:
       TZ: 'America/New_York'
     steps:
