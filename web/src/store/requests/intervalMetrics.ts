@@ -11,6 +11,7 @@ export const getIntervalMetrics = async (payload: {
   asset: 'jobs' | 'datasets' | 'sources'
   unit: 'day' | 'week'
 }) => {
-  const url = `${API_URL}/stats/${payload.asset}?period=${payload.unit.toUpperCase()}`
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const url = `${API_URL}/stats/${payload.asset}?period=${payload.unit.toUpperCase()}&timezone=${timezone}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchIntervalMetrics')
 }
