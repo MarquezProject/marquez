@@ -236,4 +236,86 @@ public interface StatsDao extends BaseDao {
               ORDER BY start_interval;
               """)
   List<IntervalMetric> getLastWeekDatasets();
+
+  @SqlQuery(
+      """
+                  WITH hourly_series AS (
+                      SELECT
+                          generate_series(
+                                  date_trunc('hour', NOW() - INTERVAL '23 hours'),
+                                  date_trunc('hour', NOW()),
+                                  '1 hour'
+                          ) AS start_interval
+                  ),
+                       before_count AS (
+                           SELECT
+                               count(*) AS dataset_count
+                           FROM sources
+                           WHERE created_at < date_trunc('hour', NOW() - INTERVAL '23 hours')
+                       ),
+                       hourly_sources AS (
+                           SELECT
+                               hs.start_interval,
+                               COUNT(s.uuid) AS sources_in_hour
+                           FROM hourly_series hs
+                                    LEFT JOIN sources s
+                                              ON s.created_at >= hs.start_interval
+                                                  AND s.created_at < hs.start_interval + INTERVAL '1 hour'
+                           GROUP BY hs.start_interval
+                       ),
+                       cumulative_sources AS (
+                           SELECT
+                               start_interval,
+                               SUM(sources_in_hour) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                           FROM hourly_sources
+                       )
+                  SELECT
+                      start_interval,
+                      start_interval + INTERVAL '1 hour' AS end_interval,
+                      cumulative_dataset_count AS count
+                  FROM cumulative_sources
+                  ORDER BY start_interval;
+                  """)
+  List<IntervalMetric> getLastDaySources();
+
+  @SqlQuery(
+      """
+                  WITH daily_series AS (
+                      SELECT
+                          generate_series(
+                                  date_trunc('day', NOW() - INTERVAL '6 days'),
+                                  date_trunc('day', NOW()),
+                                  '1 day'
+                          ) AS start_interval
+                  ),
+                       before_count AS (
+                           SELECT
+                               count(*) AS dataset_count
+                           FROM sources
+                           WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
+                       ),
+                       daily_sources AS (
+                           SELECT
+                               ds.start_interval,
+                               COUNT(s.uuid) AS sources_in_day
+                           FROM daily_series ds
+                                    LEFT JOIN sources s
+                                              ON s.created_at >= ds.start_interval
+                                                  AND s.created_at < ds.start_interval + INTERVAL '1 day'
+                           GROUP BY ds.start_interval
+                       ),
+                       cumulative_sources AS (
+                           SELECT
+                               start_interval,
+                               SUM(sources_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                           FROM daily_sources
+                       )
+                  SELECT
+                      start_interval AS start_interval,
+                      start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+                      cumulative_dataset_count AS count
+                  FROM cumulative_sources
+                  ORDER BY start_interval;
+                  """)
+  List<IntervalMetric> getLastWeekSources();
 }

@@ -40,4 +40,12 @@ public class StatsService {
   public List<IntervalMetric> getLastWeekDatasets() {
     return this.statsDao.getLastWeekDatasets();
   }
+
+  public List<IntervalMetric> getLastDaySources() {
+    return this.statsDao.getLastDaySources();
+  }
+
+  public List<IntervalMetric> getLastWeekSources() {
+    return this.statsDao.getLastWeekSources();
+  }
 }
