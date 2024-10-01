@@ -45,6 +45,8 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
   const abortData = lineageMetrics.map((item) => item.abort)
   const totalEvents = sum(failData) + sum(startData) + sum(completeData) + sum(abortData)
 
+  const tallest = Math.max(...[...failData, ...startData, ...completeData, ...abortData])
+
   return (
     <Box
       mx={'-16px'}
@@ -111,7 +113,8 @@ const StackedLineageEvents = ({ lineageMetrics }: Props) => {
                 label: 'Aborted',
               },
             ]}
-            margin={{ left: 16, right: 16, top: 6, bottom: 0 }}
+            margin={{ left: 16, right: 16, top: 12, bottom: 0 }}
+            yAxis={[{ scaleType: 'linear', disableLine: true, disableTicks: true, max: Math.ceil(tallest * 1.25) }]}
             xAxis={[{ data: labels, scaleType: 'point', disableLine: true, disableTicks: true }]}
             bottomAxis={null}
             leftAxis={null}
