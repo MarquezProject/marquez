@@ -19,11 +19,52 @@ import java.util.List;
 import java.util.Set;
 import marquez.db.models.LineageMetric;
 import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.testing.junit5.JdbiExtension;
+import org.jdbi.v3.testing.junit5.tc.JdbiTestcontainersExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-@Tag("IntegrationTests")
-public class StatsTest extends DbTest {
+@Tag("DataAccessTests, IntegrationTests")
+@Testcontainers
+public class StatsTest {
+  static final DockerImageName POSTGRES_16 = DockerImageName.parse("postgres:16");
+
+  @Container
+  @Order(1)
+  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>(POSTGRES_16);
+
+  // Defined statically to significantly improve overall test execution.
+  @RegisterExtension
+  @Order(2)
+  static final JdbiExtension jdbiExtension =
+      JdbiTestcontainersExtension.instance(DB_CONTAINER)
+          .withPlugin(new SqlObjectPlugin())
+          .withPlugin(new PostgresPlugin())
+          .withPlugin(new Jackson2Plugin())
+          .withInitializer(
+              (source, handle) -> {
+                // Apply migrations.
+                DbMigration.migrateDbOrError(source);
+              });
+
+  // Wraps test database connection.
+  static TestingDb DB;
+
+  @BeforeAll
+  public static void setUpOnce() {
+    // Wrap jdbi configured for running container.
+    DB = TestingDb.newInstance(jdbiExtension.getJdbi());
+  }
 
   @Test
   public void testGetStatsForLastDay() {

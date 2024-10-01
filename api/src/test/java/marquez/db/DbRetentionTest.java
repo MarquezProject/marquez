@@ -40,18 +40,60 @@ import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.testing.junit5.JdbiExtension;
+import org.jdbi.v3.testing.junit5.tc.JdbiTestcontainersExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
+import org.testcontainers.utility.DockerImageName;
 
 /** The test suite for {@link DbRetention}. */
-@Tag("IntegrationTests")
-public class DbRetentionTest extends DbTest {
+@Tag("DataAccessTests, IntegrationTests")
+@Testcontainers
+public class DbRetentionTest {
   private static final int NUMBER_OF_ROWS_PER_BATCH = 10;
   private static final int RETENTION_DAYS = 30;
   private static final boolean DRY_RUN = true;
   private static final Instant OLDER_THAN_X_DAYS = Instant.now().minus(RETENTION_DAYS + 1, DAYS);
   private static final Instant LAST_X_DAYS = Instant.now().minus(RETENTION_DAYS - 1, DAYS);
+
+  static final DockerImageName POSTGRES_16 = DockerImageName.parse("postgres:16");
+
+  @Container
+  @Order(1)
+  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>(POSTGRES_16);
+
+  // Defined statically to significantly improve overall test execution.
+  @RegisterExtension
+  @Order(2)
+  static final JdbiExtension jdbiExtension =
+      JdbiTestcontainersExtension.instance(DB_CONTAINER)
+          .withPlugin(new SqlObjectPlugin())
+          .withPlugin(new PostgresPlugin())
+          .withPlugin(new Jackson2Plugin())
+          .withInitializer(
+              (source, handle) -> {
+                // Apply migrations.
+                DbMigration.migrateDbOrError(source);
+              });
+
+  // Wraps test database connection.
+  static TestingDb DB;
+
+  @BeforeAll
+  public static void setUpOnce() {
+    // Wrap jdbi configured for running container.
+    DB = TestingDb.newInstance(jdbiExtension.getJdbi());
+  }
 
   @Test
   public void testRetentionOnDbOrErrorWithJobsOlderThanXDays() {
