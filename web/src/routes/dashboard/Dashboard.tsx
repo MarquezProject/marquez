@@ -313,7 +313,7 @@ const Dashboard: React.FC = ({
                 </Box>
                 <MiniGraph
                   intervalMetrics={sourceMetrics}
-                  color={theme.palette.success.main}
+                  color={theme.palette.warning.main}
                   label={'Sources'}
                   isLoading={isSourceMetricsLoading}
                 />
