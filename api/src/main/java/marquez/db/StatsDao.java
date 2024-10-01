@@ -116,44 +116,49 @@ public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
-          WITH daily_series AS (
-              SELECT
-                  generate_series(
-                          date_trunc('day', NOW() - INTERVAL '6 days'),
-                          date_trunc('day', NOW()),
-                          '1 day'
-                  ) AS start_interval
-          ),
-               before_count AS (
-                   SELECT
-                       count(*) AS job_count
-                   FROM jobs
-                   WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
-               ),
-               daily_jobs AS (
-                   SELECT
-                       ds.start_interval,
-                       COUNT(j.uuid) AS jobs_in_day
-                   FROM daily_series ds
-                            LEFT JOIN jobs j
-                                      ON j.created_at >= ds.start_interval
-                                          AND j.created_at < ds.start_interval + INTERVAL '1 day'
-                   GROUP BY ds.start_interval
-               ),
-               cumulative_jobs AS (
-                   SELECT
-                       start_interval,
-                       SUM(jobs_in_day) OVER (ORDER BY start_interval) + (SELECT job_count FROM before_count) AS cumulative_job_count
-                   FROM daily_jobs
-               )
-          SELECT
-              start_interval AS start_interval,
-              start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
-              cumulative_job_count AS count
-          FROM cumulative_jobs
-          ORDER BY start_interval;
+        WITH local_now AS (
+            SELECT (NOW() AT TIME ZONE :timezone) AS local_now
+        ),
+             daily_series AS (
+                 SELECT
+                     generate_series(
+                             date_trunc('day', ln.local_now - INTERVAL '6 days'),  -- Start at the beginning of 6 days ago in the desired timezone
+                             date_trunc('day', ln.local_now),   -- End at the beginning of the next day in the desired timezone
+                             '1 day'
+                     ) AS start_interval
+                 FROM local_now ln
+             ),
+             before_count AS (
+                 SELECT
+                     count(*) AS job_count
+                 FROM jobs, local_now ln
+                 WHERE (jobs.created_at AT TIME ZONE :timezone) < date_trunc('day', ln.local_now - INTERVAL '6 days')
+             ),
+             daily_jobs AS (
+                 SELECT
+                     ds.start_interval,
+                     COUNT(j.uuid) AS jobs_in_day
+                 FROM daily_series ds
+                          LEFT JOIN jobs j
+                                    ON (j.created_at AT TIME ZONE :timezone) >= ds.start_interval
+                                        AND (j.created_at AT TIME ZONE :timezone) < ds.start_interval + INTERVAL '1 day'
+                 GROUP BY ds.start_interval
+             ),
+             cumulative_jobs AS (
+                 SELECT
+                     start_interval,
+                     SUM(jobs_in_day) OVER (ORDER BY start_interval)
+                         + (SELECT job_count FROM before_count) AS cumulative_job_count
+                 FROM daily_jobs
+             )
+        SELECT
+            start_interval AS start_interval,
+            start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+            cumulative_job_count AS count
+        FROM cumulative_jobs
+        ORDER BY start_interval;
           """)
-  List<IntervalMetric> getLastWeekJobs();
+  List<IntervalMetric> getLastWeekJobs(String timezone);
 
   @SqlQuery(
       """
@@ -198,44 +203,49 @@ public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
-              WITH daily_series AS (
-                  SELECT
-                      generate_series(
-                              date_trunc('day', NOW() - INTERVAL '6 days'),
-                              date_trunc('day', NOW()),
-                              '1 day'
-                      ) AS start_interval
-              ),
-                   before_count AS (
-                       SELECT
-                           count(*) AS dataset_count
-                       FROM datasets
-                       WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
-                   ),
-                   daily_datasets AS (
-                       SELECT
-                           ds.start_interval,
-                           COUNT(d.uuid) AS datasets_in_day
-                       FROM daily_series ds
-                                LEFT JOIN datasets d
-                                          ON d.created_at >= ds.start_interval
-                                              AND d.created_at < ds.start_interval + INTERVAL '1 day'
-                       GROUP BY ds.start_interval
-                   ),
-                   cumulative_datasets AS (
-                       SELECT
-                           start_interval,
-                           SUM(datasets_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
-                       FROM daily_datasets
-                   )
-              SELECT
-                  start_interval AS start_interval,
-                  start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
-                  cumulative_dataset_count AS count
-              FROM cumulative_datasets
-              ORDER BY start_interval;
-              """)
-  List<IntervalMetric> getLastWeekDatasets();
+        WITH local_now AS (
+            SELECT (NOW() AT TIME ZONE :timezone) AS local_now
+        ),
+             daily_series AS (
+                 SELECT
+                     generate_series(
+                             date_trunc('day', ln.local_now - INTERVAL '6 days'),         -- Start at the beginning of 6 days ago in the desired timezone
+                             date_trunc('day', ln.local_now                   ),          -- End at the beginning of the next day in the desired timezone
+                             '1 day'
+                     ) AS start_interval
+                 FROM local_now ln
+             ),
+             before_count AS (
+                 SELECT
+                     count(*) AS dataset_count
+                 FROM datasets d
+                          CROSS JOIN local_now ln
+                 WHERE (d.created_at AT TIME ZONE :timezone) < date_trunc('day', ln.local_now - INTERVAL '6 days')
+             ),
+             daily_datasets AS (
+                 SELECT
+                     ds.start_interval,
+                     COUNT(d.uuid) AS datasets_in_day
+                 FROM daily_series ds
+                          LEFT JOIN datasets d
+                                    ON (d.created_at AT TIME ZONE :timezone) >= ds.start_interval
+                                        AND (d.created_at AT TIME ZONE :timezone) < ds.start_interval + INTERVAL '1 day'
+                 GROUP BY ds.start_interval
+             ),
+             cumulative_datasets AS (
+                 SELECT
+                     start_interval,
+                     SUM(datasets_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                 FROM daily_datasets
+             )
+        SELECT
+            start_interval AS start_interval,
+            start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+            cumulative_dataset_count AS count
+        FROM cumulative_datasets
+        ORDER BY start_interval;
+        """)
+  List<IntervalMetric> getLastWeekDatasets(String timezone);
 
   @SqlQuery(
       """
@@ -280,42 +290,47 @@ public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
-                  WITH daily_series AS (
-                      SELECT
-                          generate_series(
-                                  date_trunc('day', NOW() - INTERVAL '6 days'),
-                                  date_trunc('day', NOW()),
-                                  '1 day'
-                          ) AS start_interval
-                  ),
-                       before_count AS (
-                           SELECT
-                               count(*) AS dataset_count
-                           FROM sources
-                           WHERE created_at < date_trunc('day', NOW() - INTERVAL '6 days')
-                       ),
-                       daily_sources AS (
-                           SELECT
-                               ds.start_interval,
-                               COUNT(s.uuid) AS sources_in_day
-                           FROM daily_series ds
-                                    LEFT JOIN sources s
-                                              ON s.created_at >= ds.start_interval
-                                                  AND s.created_at < ds.start_interval + INTERVAL '1 day'
-                           GROUP BY ds.start_interval
-                       ),
-                       cumulative_sources AS (
-                           SELECT
-                               start_interval,
-                               SUM(sources_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
-                           FROM daily_sources
-                       )
-                  SELECT
-                      start_interval AS start_interval,
-                      start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
-                      cumulative_dataset_count AS count
-                  FROM cumulative_sources
-                  ORDER BY start_interval;
-                  """)
-  List<IntervalMetric> getLastWeekSources();
+        WITH local_now AS (
+            SELECT (NOW() AT TIME ZONE :timezone) AS local_now
+        ),
+             daily_series AS (
+                 SELECT
+                     generate_series(
+                             date_trunc('day', ln.local_now - INTERVAL '6 days'),       -- Start at the beginning of 6 days ago in the desired timezone
+                             date_trunc('day', ln.local_now),                           -- End at the beginning of the next day in the desired timezone
+                             '1 day'
+                     ) AS start_interval
+                 FROM local_now ln
+             ),
+             before_count AS (
+                 SELECT
+                     count(*) AS dataset_count
+                 FROM sources s
+                          CROSS JOIN local_now ln
+                 WHERE (s.created_at AT TIME ZONE :timezone) < date_trunc('day', ln.local_now - INTERVAL '6 days')
+             ),
+             daily_sources AS (
+                 SELECT
+                     ds.start_interval,
+                     COUNT(s.uuid) AS sources_in_day
+                 FROM daily_series ds
+                          LEFT JOIN sources s
+                                    ON (s.created_at AT TIME ZONE :timezone) >= ds.start_interval
+                                        AND (s.created_at AT TIME ZONE :timezone) < ds.start_interval + INTERVAL '1 day'
+                 GROUP BY ds.start_interval
+             ),
+             cumulative_sources AS (
+                 SELECT
+                     start_interval,
+                     SUM(sources_in_day) OVER (ORDER BY start_interval) + (SELECT dataset_count FROM before_count) AS cumulative_dataset_count
+                 FROM daily_sources
+             )
+        SELECT
+            start_interval AS start_interval,
+            start_interval + INTERVAL '1 day' - INTERVAL '1 second' AS end_interval,
+            cumulative_dataset_count AS count
+        FROM cumulative_sources
+        ORDER BY start_interval;
+        """)
+  List<IntervalMetric> getLastWeekSources(String timezone);
 }

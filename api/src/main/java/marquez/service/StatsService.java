@@ -29,23 +29,23 @@ public class StatsService {
     return this.statsDao.getLastDayJobs();
   }
 
-  public List<IntervalMetric> getLastWeekJobs() {
-    return this.statsDao.getLastWeekJobs();
+  public List<IntervalMetric> getLastWeekJobs(String timezone) {
+    return this.statsDao.getLastWeekJobs(timezone);
   }
 
   public List<IntervalMetric> getLastDayDatasets() {
     return this.statsDao.getLastDayDatasets();
   }
 
-  public List<IntervalMetric> getLastWeekDatasets() {
-    return this.statsDao.getLastWeekDatasets();
+  public List<IntervalMetric> getLastWeekDatasets(String timezone) {
+    return this.statsDao.getLastWeekDatasets(timezone);
   }
 
   public List<IntervalMetric> getLastDaySources() {
     return this.statsDao.getLastDaySources();
   }
 
-  public List<IntervalMetric> getLastWeekSources() {
-    return this.statsDao.getLastWeekSources();
+  public List<IntervalMetric> getLastWeekSources(String timezone) {
+    return this.statsDao.getLastWeekSources(timezone);
   }
 }

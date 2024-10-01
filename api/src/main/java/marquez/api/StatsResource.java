@@ -52,12 +52,13 @@ public class StatsResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/jobs")
-  public Response getJobs(@QueryParam("period") Period period) {
+  public Response getJobs(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
 
     return (Period.DAY.equals(period)
         ? Response.ok(StatsService.getLastDayJobs()).build()
         : Period.WEEK.equals(period)
-            ? Response.ok(StatsService.getLastWeekJobs()).build()
+            ? Response.ok(StatsService.getLastWeekJobs(timezone)).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
 
@@ -67,12 +68,13 @@ public class StatsResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/datasets")
-  public Response getDatasets(@QueryParam("period") Period period) {
+  public Response getDatasets(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
 
     return (Period.DAY.equals(period)
         ? Response.ok(StatsService.getLastDayDatasets()).build()
         : Period.WEEK.equals(period)
-            ? Response.ok(StatsService.getLastWeekDatasets()).build()
+            ? Response.ok(StatsService.getLastWeekDatasets(timezone)).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
 
@@ -82,12 +84,13 @@ public class StatsResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/sources")
-  public Response getSources(@QueryParam("period") Period period) {
+  public Response getSources(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
 
     return (Period.DAY.equals(period)
         ? Response.ok(StatsService.getLastDaySources()).build()
         : Period.WEEK.equals(period)
-            ? Response.ok(StatsService.getLastWeekSources()).build()
+            ? Response.ok(StatsService.getLastWeekSources(timezone)).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
 }
