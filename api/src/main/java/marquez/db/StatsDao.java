@@ -157,7 +157,7 @@ public interface StatsDao extends BaseDao {
             cumulative_job_count AS count
         FROM cumulative_jobs
         ORDER BY start_interval;
-          """)
+        """)
   List<IntervalMetric> getLastWeekJobs(String timezone);
 
   @SqlQuery(
