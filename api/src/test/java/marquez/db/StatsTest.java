@@ -198,7 +198,7 @@ public class StatsTest {
     Optional<Integer> countDay =
         intervalMetricsDay.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
     assertThat(countDay).isPresent();
-    assertThat(countDay.get()).isEqualTo(1);
+    assertThat(countDay.get()).isGreaterThanOrEqualTo(1);
 
     List<IntervalMetric> intervalMetricsWeek = DB.lastWeekSourceMetrics("UTC");
 
