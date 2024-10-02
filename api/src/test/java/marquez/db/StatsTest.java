@@ -8,6 +8,10 @@ package marquez.db;
 import static marquez.api.models.ApiModelGenerator.newRunEvents;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.db.models.DbModelGenerator.newDatasetRowWith;
+import static marquez.db.models.DbModelGenerator.newJobRowWith;
+import static marquez.db.models.DbModelGenerator.newNamespaceRow;
+import static marquez.db.models.DbModelGenerator.newSourceRow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -16,8 +20,14 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import marquez.db.models.DatasetRow;
+import marquez.db.models.IntervalMetric;
+import marquez.db.models.JobRow;
 import marquez.db.models.LineageMetric;
+import marquez.db.models.NamespaceRow;
+import marquez.db.models.SourceRow;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
@@ -67,7 +77,7 @@ public class StatsTest {
   }
 
   @Test
-  public void testGetStatsForLastDay() {
+  public void testGetStatsForLineageEvents() {
     // (1) Configure OL.
     final URI olProducer = URI.create("https://test.com/test");
     final OpenLineage ol = new OpenLineage(olProducer);
@@ -107,5 +117,94 @@ public class StatsTest {
     assertThat(lastWeekLineageMetrics).isNotEmpty();
     assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 2).getComplete())
         .isEqualTo(dayEvents);
+  }
+
+  @Test
+  public void testGetStatsForJobs() {
+
+    // (1) Insert a new namespace.
+    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
+
+    // (2) Insert a new job.
+    final JobRow jobRow = DB.upsert(newJobRowWith(namespaceRow.getUuid(), namespaceRow.getName()));
+    DB.upsert(jobRow);
+
+    // (3) Retrieve last day and last week job metrics.
+    List<IntervalMetric> intervalMetricsDay = DB.lastDayJobMetrics();
+    assertThat(intervalMetricsDay).isNotEmpty();
+
+    Optional<Integer> countDay =
+        intervalMetricsDay.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countDay).isPresent();
+    assertThat(countDay.get()).isEqualTo(1);
+
+    List<IntervalMetric> intervalMetricsWeek = DB.lastWeekJobMetrics("UTC");
+    assertThat(intervalMetricsWeek).isNotEmpty();
+
+    Optional<Integer> countWeek =
+        intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countWeek).isPresent();
+    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
+  }
+
+  @Test
+  public void testGetStatsForDatasets() {
+    // (1) Insert a new namespace.
+    final NamespaceRow namespaceRow = DB.upsert(newNamespaceRow());
+
+    // (2) Insert a new source.
+    final SourceRow sourceRow = DB.upsert(newSourceRow());
+    DB.upsert(sourceRow);
+
+    // (3) Insert a new dataset.
+    final DatasetRow datasetRow =
+        DB.upsert(
+            newDatasetRowWith(
+                namespaceRow.getUuid(),
+                namespaceRow.getName(),
+                sourceRow.getUuid(),
+                sourceRow.getName()));
+    DB.upsert(datasetRow);
+
+    // (4) Retrieve last day and last week dataset metrics.
+    List<IntervalMetric> intervalMetricsDay = DB.lastDayDatasetMetrics();
+    assertThat(intervalMetricsDay).isNotEmpty();
+
+    Optional<Integer> countDay =
+        intervalMetricsDay.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countDay).isPresent();
+    assertThat(countDay.get()).isEqualTo(1);
+
+    List<IntervalMetric> intervalMetricsWeek = DB.lastWeekDatasetMetrics("UTC");
+    assertThat(intervalMetricsWeek).isNotEmpty();
+
+    Optional<Integer> countWeek =
+        intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countWeek).isPresent();
+    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
+  }
+
+  @Test
+  public void testGetStatsForSources() {
+
+    // (1) Insert a new source.
+    final SourceRow sourceRow = DB.upsert(newSourceRow());
+    DB.upsert(sourceRow);
+
+    // (2) Retrieve last day source metrics.
+    List<IntervalMetric> intervalMetricsDay = DB.lastDaySourceMetrics();
+    assertThat(intervalMetricsDay).isNotEmpty();
+
+    Optional<Integer> countDay =
+        intervalMetricsDay.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countDay).isPresent();
+    assertThat(countDay.get()).isEqualTo(1);
+
+    List<IntervalMetric> intervalMetricsWeek = DB.lastWeekSourceMetrics("UTC");
+
+    Optional<Integer> countWeek =
+        intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
+    assertThat(countWeek).isPresent();
+    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
   }
 }
