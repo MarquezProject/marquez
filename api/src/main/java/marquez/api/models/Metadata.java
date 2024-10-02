@@ -19,10 +19,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import marquez.common.Utils;
+import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
 import marquez.common.models.DatasetVersionId;
+import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.JobVersionId;
@@ -112,6 +113,10 @@ public final class Metadata {
       return runBuilder.build();
     }
 
+    public Optional<ParentRun> getParent() {
+      return Optional.ofNullable(parent);
+    }
+
     public Optional<Instant> getNominalStartTime() {
       return Optional.ofNullable(nominalStartTime);
     }
@@ -146,10 +151,11 @@ public final class Metadata {
   @Builder
   @ToString
   public static final class Job {
-    @Getter private final JobVersionId versionId;
+    @Getter private final JobId id;
     @Getter private final JobType type;
     @Getter private final JobName name;
     @Getter private final NamespaceName namespace;
+    @Getter private final JobVersionId versionId;
     @Nullable private final String description;
     @Nullable private final URI location;
     @Nullable private final IO io;
@@ -162,15 +168,16 @@ public final class Metadata {
         @Nullable final List<OpenLineage.OutputDataset> outputs) {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
+      final JobId jobId = JobId.of(namespaceName, jobName);
       final Optional<URI> jobLocation = Facets.locationFor(job);
       final IO io = IO.newInstanceWith(run, inputs, outputs);
 
       // ...
-      final JobVersionId jobVersionId =
-          VersionId.forJob(namespaceName, jobName, jobLocation.orElse(null), io);
+      final JobVersionId jobVersionId = VersionId.forJob(jobId, jobLocation.orElse(null), io);
 
       // ...
       return Job.builder()
+          .id(jobId)
           .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
@@ -186,15 +193,16 @@ public final class Metadata {
       final OpenLineage.Job job = event.getJob();
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
+      final JobId jobId = JobId.of(namespaceName, jobName);
       final Optional<URI> jobLocation = Facets.locationFor(job);
       final IO io = IO.newInstanceWith(event.getInputs(), event.getOutputs());
 
       // ...
-      final JobVersionId jobVersionId =
-          Utils.newJobVersionWith(namespaceName, jobName, jobLocation.orElse(null), io);
+      final JobVersionId jobVersionId = VersionId.forJob(jobId, jobLocation.orElse(null), io);
 
       // ...
       return Job.builder()
+          .id(jobId)
           .type(JobType.BATCH)
           .name(jobName)
           .namespace(namespaceName)
@@ -222,6 +230,7 @@ public final class Metadata {
   @ToString
   @EqualsAndHashCode
   public static final class Dataset {
+    @Getter private final DatasetId id;
     @Getter private final DatasetType type;
     @Getter private final DatasetName name;
     @Getter private final NamespaceName namespace;
@@ -245,11 +254,16 @@ public final class Metadata {
       final NamespaceName namespaceName = NamespaceName.of(dataset.getNamespace());
       final DatasetName datasetName = DatasetName.of(dataset.getName());
       final Dataset.Schema datasetSchema = Facets.schemaFor(dataset).orElse(null);
+      final DatasetId datasetId = new DatasetId(namespaceName, datasetName);
+      final Dataset.Source source = Facets.sourceFor(dataset);
+
+      // ...
       final DatasetVersionId datasetVersionId =
-          VersionId.forDataset(run, namespaceName, datasetName, datasetSchema);
+          VersionId.forDataset(datasetId, datasetSchema, source);
 
       // ...
       return Dataset.builder()
+          .id(datasetId)
           .type(DB_TABLE)
           .name(datasetName)
           .namespace(namespaceName)
@@ -291,6 +305,7 @@ public final class Metadata {
   }
 
   /* ... */
+  @ToString
   public static final class IO {
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
@@ -366,6 +381,7 @@ public final class Metadata {
 
     Facets() {}
 
+    @SuppressWarnings("unchecked")
     static Optional<ParentRun> parentRunFor(@NonNull final OpenLineage.Run run) {
       return Optional.ofNullable(run.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(PARENT))
@@ -420,6 +436,7 @@ public final class Metadata {
           .map(facet -> (String) facet.getAdditionalProperties().get(DESCRIPTION));
     }
 
+    @SuppressWarnings("unchecked")
     static Optional<Dataset.Schema> schemaFor(@NonNull final OpenLineage.Dataset dataset) {
       return Optional.ofNullable(dataset.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(SCHEMA))
