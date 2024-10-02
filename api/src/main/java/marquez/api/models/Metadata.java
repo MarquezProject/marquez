@@ -38,7 +38,30 @@ public final class Metadata {
   /** ... */
   @Builder
   @ToString
+  public static final class ParentRun {
+    @Getter private final RunId id;
+    @Nullable private final ParentRun.Job job;
+
+    /* ... */
+    public static ParentRun newInstanceWith(
+        @NonNull final RunId id, @NonNull final ParentRun.Job job) {
+      return null;
+    }
+
+    /** ... */
+    @Builder
+    @ToString
+    public static final class Job {
+      @Getter private final JobName name;
+      @Getter private final NamespaceName namespace;
+    }
+  }
+
+  /** ... */
+  @Builder
+  @ToString
   public static final class Run {
+    @Nullable private final ParentRun parent;
     @Getter private final RunId id;
     @Getter private final RunState state;
     @Getter private final Instant transitionedOn;
@@ -62,6 +85,7 @@ public final class Metadata {
       final Instant runTransitionedOnAsUtc = toUtc(event.getEventTime());
       final RunBuilder runBuilder =
           Run.builder()
+              .parent(Facets.parentRunFor(run).orElse(null))
               .id(runId)
               .state(runState)
               .transitionedOn(runTransitionedOnAsUtc)
@@ -319,6 +343,13 @@ public final class Metadata {
     static final String SOURCE_CODE_LOCATION = "sourceCodeLocation";
     static final String URL = "url";
 
+    static final String PARENT = "parent";
+    static final String PARENT_RUN = "run";
+    static final String PARENT_RUN_ID = "runId";
+    static final String PARENT_JOB = "job";
+    static final String PARENT_JOB_NAME = "name";
+    static final String PARENT_JOB_NAMESPACE = "namespace";
+
     static final String RUN_NOMINAL_TIME = "nominalTime";
     static final String RUN_NOMINAL_START_TIME = "nominalStartTime";
     static final String RUN_NOMINAL_END_TIME = "nominalEndTime";
@@ -334,6 +365,33 @@ public final class Metadata {
     static final String SOURCE_CONNECTION_URL = "uri";
 
     Facets() {}
+
+    static Optional<ParentRun> parentRunFor(@NonNull final OpenLineage.Run run) {
+      return Optional.ofNullable(run.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(PARENT))
+          .map(facets -> (Map<String, Object>) facets.getAdditionalProperties().get(PARENT_RUN_ID))
+          .flatMap(
+              facets -> {
+                final Optional<RunId> parentRunId =
+                    Optional.ofNullable(facets.get(PARENT_RUN))
+                        .map(parentFacets -> (Map<String, Object>) facets)
+                        .map(parentFacets -> parentFacets.get(PARENT_RUN_ID))
+                        .map(parentFacet -> new RunId((String) parentFacet));
+
+                final Optional<ParentRun.Job> parentJob =
+                    Optional.ofNullable(facets.get(PARENT_JOB))
+                        .map(parentFacets -> (Map<String, Object>) parentFacets)
+                        .map(
+                            parentFacet ->
+                                new ParentRun.Job(
+                                    JobName.of((String) parentFacet.get(PARENT_JOB_NAME)),
+                                    NamespaceName.of(
+                                        (String) parentFacet.get(PARENT_JOB_NAMESPACE))));
+
+                return parentRunId.flatMap(
+                    runId -> parentJob.map(job -> ParentRun.newInstanceWith(runId, job)));
+              });
+    }
 
     static Optional<Instant> nominalStartTimeFor(@NonNull final OpenLineage.Run run) {
       return Optional.ofNullable(run.getFacets())
@@ -353,7 +411,7 @@ public final class Metadata {
       return Optional.ofNullable(job.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(SOURCE_CODE_LOCATION))
           .map(facets -> (String) facets.getAdditionalProperties().get(URL))
-          .map(facet -> URI.create(facet));
+          .map(URI::create);
     }
 
     static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {
@@ -391,13 +449,13 @@ public final class Metadata {
           Optional.ofNullable(dataset.getFacets())
               .map(facets -> facets.getAdditionalProperties().get(SOURCE))
               .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_NAME))
-              .map(facet -> SourceName.of(facet))
+              .map(SourceName::of)
               .orElseThrow();
       final URI connectionUrl =
           Optional.ofNullable(dataset.getFacets())
               .map(facets -> facets.getAdditionalProperties().get(SOURCE))
               .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_CONNECTION_URL))
-              .map(facet -> URI.create(facet))
+              .map(URI::create)
               .orElseThrow();
 
       return Dataset.Source.builder().name(sourceName).connectionUrl(connectionUrl).build();
