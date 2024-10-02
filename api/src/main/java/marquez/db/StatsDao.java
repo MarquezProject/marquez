@@ -66,33 +66,43 @@ public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
-        WITH day_series AS (SELECT generate_series(
-                                           DATE_TRUNC('day', NOW() - INTERVAL '6 days'), -- Start 6 days ago + current day
-                                           DATE_TRUNC('day', NOW()), -- End at the start of today
-                                           '1 day'
-                                   ) AS start_interval)
-        SELECT ds.start_interval,
-               ds.start_interval + INTERVAL '1 day'           AS end_interval,
-               COALESCE(current_day.fail, mv.fail, 0)         AS fail,
-               COALESCE(current_day.start, mv.start, 0)       AS start,
-               COALESCE(current_day.complete, mv.complete, 0) AS complete,
-               COALESCE(current_day.abort, mv.abort, 0)       AS abort
+        WITH local_now AS (
+            SELECT (NOW() AT TIME ZONE :timezone) AS local_now
+        ),
+             day_series AS (
+                 SELECT generate_series(
+                                DATE_TRUNC('day', ln.local_now - INTERVAL '6 days'),
+                                DATE_TRUNC('day', ln.local_now),
+                                '1 day'
+                        ) AS start_interval
+                 FROM local_now ln
+             )
+        SELECT
+            ds.start_interval,
+            ds.start_interval + INTERVAL '1 day' AS end_interval,
+            COALESCE(current_day.fail, mv.fail, 0) AS fail,
+            COALESCE(current_day.start, mv.start, 0) AS start,
+            COALESCE(current_day.complete, mv.complete, 0) AS complete,
+            COALESCE(current_day.abort, mv.abort, 0) AS abort
         FROM day_series ds
-                 LEFT JOIN
-             lineage_events_by_type_daily_view mv
-             ON
-                 ds.start_interval = mv.start_interval
-                 left join (SELECT DATE_TRUNC('day', NOW())                                         AS start_interval,
-                                   DATE_TRUNC('day', NOW()) + INTERVAL '1 day'                      AS end_interval,
-                                   COALESCE(SUM(CASE WHEN state = 'FAIL' THEN 1 ELSE 0 END), 0)     AS fail,
-                                   COALESCE(SUM(CASE WHEN state = 'START' THEN 1 ELSE 0 END), 0)    AS start,
-                                   COALESCE(SUM(CASE WHEN state = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS complete,
-                                   COALESCE(SUM(CASE WHEN state = 'ABORT' THEN 1 ELSE 0 END), 0)    AS abort
-                            FROM current_day_lineage_metrics
-                            WHERE event_time >= DATE_TRUNC('day', now())
-                              AND event_time < DATE_TRUNC('day', now()) + INTERVAL '1 day') current_day
-                           on ds.start_interval = current_day.start_interval
+                 LEFT JOIN lineage_events_by_type_daily_view mv
+                           ON ds.start_interval = (mv.start_interval AT TIME ZONE 'UTC') AT TIME ZONE :timezone
+                 LEFT JOIN (
+            SELECT
+                DATE_TRUNC('day', ln.local_now) AS start_interval,
+                DATE_TRUNC('day', ln.local_now) + INTERVAL '1 day' AS end_interval,
+                COALESCE(SUM(CASE WHEN state = 'FAIL' THEN 1 ELSE 0 END), 0) AS fail,
+                COALESCE(SUM(CASE WHEN state = 'START' THEN 1 ELSE 0 END), 0) AS start,
+                COALESCE(SUM(CASE WHEN state = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS complete,
+                COALESCE(SUM(CASE WHEN state = 'ABORT' THEN 1 ELSE 0 END), 0) AS abort
+            FROM current_day_lineage_metrics
+                     CROSS JOIN local_now ln
+            WHERE (event_time AT TIME ZONE :timezone) >= DATE_TRUNC('day', ln.local_now)
+              AND (event_time AT TIME ZONE :timezone) < DATE_TRUNC('day', ln.local_now) + INTERVAL '1 day'
+            GROUP BY DATE_TRUNC('day', ln.local_now)
+        ) current_day
+                           ON ds.start_interval = current_day.start_interval
         ORDER BY ds.start_interval;
         """)
-  List<LineageMetric> getLastWeekMetrics();
+  List<LineageMetric> getLastWeekMetrics(String timezone);
 }

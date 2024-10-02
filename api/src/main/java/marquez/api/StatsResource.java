@@ -37,12 +37,12 @@ public class StatsResource {
   @GET
   @Produces(APPLICATION_JSON)
   @Path("/lineage-events")
-  public Response getStats(@QueryParam("period") Period period) {
-
+  public Response getStats(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
     return (Period.DAY.equals(period)
         ? Response.ok(StatsService.getLastDayLineageMetrics()).build()
         : Period.WEEK.equals(period)
-            ? Response.ok(StatsService.getLastWeekLineageMetrics()).build()
+            ? Response.ok(StatsService.getLastWeekLineageMetrics(timezone)).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
 }
