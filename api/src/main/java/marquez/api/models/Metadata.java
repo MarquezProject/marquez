@@ -41,12 +41,12 @@ public final class Metadata {
   @ToString
   public static final class ParentRun {
     @Getter private final RunId id;
-    @Nullable private final ParentRun.Job job;
+    @Getter private final ParentRun.Job job;
 
     /* ... */
     public static ParentRun newInstanceWith(
         @NonNull final RunId id, @NonNull final ParentRun.Job job) {
-      return null;
+      return ParentRun.builder().id(id).job(job).build();
     }
 
     /** ... */
@@ -354,9 +354,9 @@ public final class Metadata {
   static class Facets {
     static final String DOCUMENTATION = "documentation";
     static final String DESCRIPTION = "description";
-
-    static final String SOURCE_CODE_LOCATION = "sourceCodeLocation";
     static final String URL = "url";
+
+    static final String JOB_SOURCE_CODE_LOCATION = "sourceCodeLocation";
 
     static final String PARENT = "parent";
     static final String PARENT_RUN = "run";
@@ -385,12 +385,12 @@ public final class Metadata {
     static Optional<ParentRun> parentRunFor(@NonNull final OpenLineage.Run run) {
       return Optional.ofNullable(run.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(PARENT))
-          .map(facets -> (Map<String, Object>) facets.getAdditionalProperties().get(PARENT_RUN_ID))
+          .map(OpenLineage.RunFacet::getAdditionalProperties)
           .flatMap(
               facets -> {
                 final Optional<RunId> parentRunId =
                     Optional.ofNullable(facets.get(PARENT_RUN))
-                        .map(parentFacets -> (Map<String, Object>) facets)
+                        .map(parentFacets -> (Map<String, Object>) parentFacets)
                         .map(parentFacets -> parentFacets.get(PARENT_RUN_ID))
                         .map(parentFacet -> new RunId((String) parentFacet));
 
@@ -425,7 +425,7 @@ public final class Metadata {
 
     static Optional<URI> locationFor(@NonNull final OpenLineage.Job job) {
       return Optional.ofNullable(job.getFacets())
-          .map(facets -> facets.getAdditionalProperties().get(SOURCE_CODE_LOCATION))
+          .map(facets -> facets.getAdditionalProperties().get(JOB_SOURCE_CODE_LOCATION))
           .map(facets -> (String) facets.getAdditionalProperties().get(URL))
           .map(URI::create);
     }
