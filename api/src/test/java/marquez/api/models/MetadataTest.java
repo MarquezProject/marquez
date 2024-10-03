@@ -1,6 +1,7 @@
 package marquez.api.models;
 
 import static io.openlineage.server.OpenLineage.RunEvent.EventType.COMPLETE;
+import static marquez.common.Utils.toJson;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
@@ -49,6 +50,7 @@ public class MetadataTest {
   // ...
   private static final NamespaceName PARENT_JOB_NAMESPACE = newNamespaceName();
   private static final JobName PARENT_JOB_NAME = newJobName();
+  private static final JobId PARENT_JOB_ID = JobId.of(PARENT_JOB_NAMESPACE, PARENT_JOB_NAME);
   private static final NamespaceName JOB_NAMESPACE = newNamespaceName();
   private static final JobName JOB_NAME = newJobName();
   private static final JobId JOB_ID = JobId.of(JOB_NAMESPACE, JOB_NAME);
@@ -101,6 +103,10 @@ public class MetadataTest {
     final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
     assertThat(io.getInputs()).isEmpty();
     assertThat(io.getOutputs()).isEmpty();
+
+    // (3) ...
+    assertThat(run.getRawMeta()).isEqualTo(toJson(runEvent));
+    assertThat(run.getProducer()).isEqualTo(runEvent.getProducer());
   }
 
   @Test
@@ -136,9 +142,14 @@ public class MetadataTest {
     // (4) ...
     final Metadata.ParentRun parentRun = run.getParent().orElseThrow(AssertionError::new);
     assertThat(parentRun.getId()).isEqualTo(PARENT_RUN_ID);
-    assertThat(parentRun.getJob().getName()).isEqualTo(PARENT_JOB_NAME);
-    assertThat(parentRun.getJob().getNamespace()).isEqualTo(PARENT_JOB_NAMESPACE);
+    assertThat(parentRun.getJob().getId()).isEqualTo(PARENT_JOB_ID);
   }
+
+  @Test
+  public void testNewRunWithInputDatasetsOnly() {}
+
+  @Test
+  public void testNewRunWithOutputDatasetsOnly() {}
 
   @Test
   public void testNewRunWithNominalStartAndEndTime() {

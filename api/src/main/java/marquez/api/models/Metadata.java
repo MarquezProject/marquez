@@ -44,8 +44,7 @@ public final class Metadata {
     @Getter private final ParentRun.Job job;
 
     /* ... */
-    public static ParentRun newInstanceWith(
-        @NonNull final RunId id, @NonNull final ParentRun.Job job) {
+    static ParentRun newInstanceWith(@NonNull final RunId id, @NonNull final ParentRun.Job job) {
       return ParentRun.builder().id(id).job(job).build();
     }
 
@@ -53,6 +52,7 @@ public final class Metadata {
     @Builder
     @ToString
     public static final class Job {
+      @Getter private final JobId id;
       @Getter private final JobName name;
       @Getter private final NamespaceName namespace;
     }
@@ -71,10 +71,8 @@ public final class Metadata {
     @Nullable private final Instant nominalStartTime;
     @Nullable private final Instant nominalEndTime;
     @Nullable private final String externalId;
-
     @Getter private final Job job;
     @Nullable private final IO io;
-
     @Getter private final String rawMeta;
     @Getter private final URI producer;
 
@@ -398,11 +396,14 @@ public final class Metadata {
                     Optional.ofNullable(facets.get(PARENT_JOB))
                         .map(parentFacets -> (Map<String, Object>) parentFacets)
                         .map(
-                            parentFacet ->
-                                new ParentRun.Job(
-                                    JobName.of((String) parentFacet.get(PARENT_JOB_NAME)),
-                                    NamespaceName.of(
-                                        (String) parentFacet.get(PARENT_JOB_NAMESPACE))));
+                            parentFacets -> {
+                              final JobName jobName =
+                                  JobName.of((String) parentFacets.get(PARENT_JOB_NAME));
+                              final NamespaceName namespaceName =
+                                  NamespaceName.of((String) parentFacets.get(PARENT_JOB_NAMESPACE));
+                              final JobId jobId = JobId.of(namespaceName, jobName);
+                              return new ParentRun.Job(jobId, jobName, namespaceName);
+                            });
 
                 return parentRunId.flatMap(
                     runId -> parentJob.map(job -> ParentRun.newInstanceWith(runId, job)));
