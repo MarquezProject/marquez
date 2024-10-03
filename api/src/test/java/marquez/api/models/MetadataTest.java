@@ -2,10 +2,14 @@ package marquez.api.models;
 
 import static io.openlineage.server.OpenLineage.RunEvent.EventType.COMPLETE;
 import static marquez.common.Utils.toJson;
+import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
+import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newNominalStartTime;
 import static marquez.common.models.CommonModelGenerator.newRunId;
+import static marquez.common.models.CommonModelGenerator.newSourceName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,12 +19,16 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
+import marquez.common.models.DatasetName;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.common.models.SourceName;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -40,12 +48,8 @@ public class MetadataTest {
   private static final RunState RUN_COMPLETED = RunState.COMPLETED;
   private static final Instant RUN_TRANSITIONED_ON =
       RUN_EVENT_TIME.withZoneSameInstant(ZoneOffset.UTC).toInstant();
-  // Nominal start time: Monday, 8:00 AM
-  private static final Instant RUN_NOMINAL_START_TIME =
-      ZonedDateTime.of(2024, 10, 7, 8, 0, 0, 0, ZoneOffset.UTC).toInstant();
-  // Nominal end time: Monday, 10:00 AM
-  private static final Instant RUN_NOMINAL_END_TIME =
-      ZonedDateTime.of(2024, 10, 7, 10, 0, 0, 0, ZoneOffset.UTC).toInstant();
+  private static final Instant RUN_NOMINAL_START_TIME = newNominalStartTime();
+  private static final Instant RUN_NOMINAL_END_TIME = RUN_NOMINAL_START_TIME.plusSeconds(3600);
 
   // ...
   private static final NamespaceName PARENT_JOB_NAMESPACE = newNamespaceName();
@@ -56,6 +60,16 @@ public class MetadataTest {
   private static final JobId JOB_ID = JobId.of(JOB_NAMESPACE, JOB_NAME);
   private static final URI JOB_SOURCE_CODE_LOCATION = URI.create("http://test.com/job");
   private static final String JOB_DESCRIPTION = newDescription();
+
+  // ...
+  private static final SourceName SOURCE_NAME = newSourceName();
+  private static final URI SOURCE_CONNECTION_URL = newConnectionUrl();
+  private static final Condition<Metadata.Dataset.Source> EQ_TO_SOURCE_IN_FACET =
+      new Condition<>(
+          source ->
+              source.getName().equals(SOURCE_NAME)
+                  && source.getConnectionUrl().equals(SOURCE_CONNECTION_URL),
+          "source name starts with 'source'");
 
   // ...
   private OpenLineage.RunEvent runEvent;
@@ -146,6 +160,73 @@ public class MetadataTest {
   }
 
   @Test
+  public void testNewRunWithIO() {
+    // (1) ...
+    final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
+    final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
+    final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
+    final Map<String, Object> sourceFacets = mock(Map.class);
+
+    when(ioFacetsWithSource.getAdditionalProperties()).thenReturn(ioFacets);
+    when(ioFacets.get(Metadata.Facets.SOURCE)).thenReturn(sourceFacet);
+    when(sourceFacet.getAdditionalProperties()).thenReturn(sourceFacets);
+    when(sourceFacets.get(Metadata.Facets.SOURCE_NAME)).thenReturn(SOURCE_NAME.getValue());
+    when(sourceFacets.get(Metadata.Facets.SOURCE_CONNECTION_URL))
+        .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
+
+    // ...
+    final NamespaceName namespace0 = newNamespaceName();
+    final NamespaceName namespace1 = newNamespaceName();
+
+    final DatasetName dataset0 = newDatasetName();
+    final DatasetName dataset1 = newDatasetName();
+    final DatasetName dataset2 = newDatasetName();
+    final DatasetName dataset3 = newDatasetName();
+
+    final OpenLineage.InputDataset input0 = mock(OpenLineage.InputDataset.class);
+    final OpenLineage.InputDataset input1 = mock(OpenLineage.InputDataset.class);
+    final OpenLineage.InputDataset input2 = mock(OpenLineage.InputDataset.class);
+
+    when(input0.getNamespace()).thenReturn(namespace0.getValue());
+    when(input0.getName()).thenReturn(dataset0.getValue());
+    when(input0.getFacets()).thenReturn(ioFacetsWithSource);
+    when(input1.getNamespace()).thenReturn(namespace0.getValue());
+    when(input1.getName()).thenReturn(dataset1.getValue());
+    when(input1.getFacets()).thenReturn(ioFacetsWithSource);
+    when(input2.getNamespace()).thenReturn(namespace0.getValue());
+    when(input2.getName()).thenReturn(dataset2.getValue());
+    when(input2.getFacets()).thenReturn(ioFacetsWithSource);
+
+    final List<OpenLineage.InputDataset> inputs = List.of(input0, input1, input2);
+
+    // (2) ...
+    final OpenLineage.OutputDataset output0 = mock(OpenLineage.OutputDataset.class);
+
+    when(output0.getNamespace()).thenReturn(namespace1.getValue());
+    when(output0.getName()).thenReturn(dataset3.getValue());
+    when(output0.getFacets()).thenReturn(ioFacetsWithSource);
+
+    final List<OpenLineage.OutputDataset> outputs = List.of(output0);
+
+    // (3) ...
+    when(runEvent.getInputs()).thenReturn(inputs);
+    when(runEvent.getOutputs()).thenReturn(outputs);
+
+    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    assertThat(run).isNotNull();
+    assertThat(run.getId()).isEqualTo(RUN_ID);
+
+    // (4) ...
+    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
+    assertThat(io.getInputs()).isNotEmpty();
+    assertThat(io.getInputs())
+        .extracting(Metadata.Dataset::getSource)
+        .isNotNull()
+        .are(EQ_TO_SOURCE_IN_FACET);
+    assertThat(io.getOutputs()).isNotEmpty();
+  }
+
+  @Test
   public void testNewRunWithInputDatasetsOnly() {}
 
   @Test
@@ -206,6 +287,7 @@ public class MetadataTest {
     // (4) ...
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
+    assertThat(job.getId()).isEqualTo(JOB_ID);
     assertThat(job.getLocation()).hasValue(JOB_SOURCE_CODE_LOCATION);
   }
 
@@ -234,6 +316,7 @@ public class MetadataTest {
     // (4) ...
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
+    assertThat(job.getId()).isEqualTo(JOB_ID);
     assertThat(job.getDescription()).hasValue(JOB_DESCRIPTION);
   }
 }

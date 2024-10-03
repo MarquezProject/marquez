@@ -463,20 +463,26 @@ public final class Metadata {
     }
 
     static Dataset.Source sourceFor(@NonNull final OpenLineage.Dataset dataset) {
-      final SourceName sourceName =
-          Optional.ofNullable(dataset.getFacets())
-              .map(facets -> facets.getAdditionalProperties().get(SOURCE))
-              .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_NAME))
-              .map(SourceName::of)
-              .orElseThrow();
-      final URI connectionUrl =
-          Optional.ofNullable(dataset.getFacets())
-              .map(facets -> facets.getAdditionalProperties().get(SOURCE))
-              .map(facets -> (String) facets.getAdditionalProperties().get(SOURCE_CONNECTION_URL))
-              .map(URI::create)
-              .orElseThrow();
-
-      return Dataset.Source.builder().name(sourceName).connectionUrl(connectionUrl).build();
+      return Optional.ofNullable(dataset.getFacets())
+          .map(facets -> facets.getAdditionalProperties().get(SOURCE))
+          .map(
+              facet -> {
+                final SourceName sourceName =
+                    Optional.ofNullable((String) facet.getAdditionalProperties().get(SOURCE_NAME))
+                        .map(SourceName::of)
+                        .orElseThrow();
+                final URI connectionUrl =
+                    Optional.ofNullable(
+                            (String) facet.getAdditionalProperties().get(SOURCE_CONNECTION_URL))
+                        .map(URI::create)
+                        .orElseThrow();
+                // ...
+                return Dataset.Source.builder()
+                    .name(sourceName)
+                    .connectionUrl(connectionUrl)
+                    .build();
+              })
+          .orElseThrow();
     }
   }
 }
