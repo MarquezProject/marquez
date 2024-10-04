@@ -38,7 +38,7 @@ metadata.json
 .java-version
 
 # Dependent Helm charts
-chart/charts/
+marquez/charts/
 
 # Dev
 changes.txt
