@@ -1,13 +1,16 @@
 package marquez.api.models;
 
 import static io.openlineage.server.OpenLineage.RunEvent.EventType.COMPLETE;
+import static marquez.api.models.ApiModelGenerator.newNominalStartTime;
+import static marquez.api.models.ApiModelGenerator.newProducer;
+import static marquez.api.models.ApiModelGenerator.newSchemaUrl;
 import static marquez.common.Utils.toJson;
 import static marquez.common.models.CommonModelGenerator.newConnectionUrl;
 import static marquez.common.models.CommonModelGenerator.newDatasetName;
 import static marquez.common.models.CommonModelGenerator.newDescription;
 import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
-import static marquez.common.models.CommonModelGenerator.newNominalStartTime;
 import static marquez.common.models.CommonModelGenerator.newRunId;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import io.openlineage.server.OpenLineage;
 import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -36,32 +40,28 @@ import org.junit.jupiter.api.Test;
 /** The test suite for {@link Metadata}. */
 @Tag("UnitTests")
 public class MetadataTest {
-  // ...
   private static final OpenLineage.RunEvent.EventType RUN_EVENT_TYPE = COMPLETE;
   private static final ZonedDateTime RUN_EVENT_TIME = ZonedDateTime.now();
-  private static final URI RUN_EVENT_SCHEMA_URL = URI.create("http://test.com/schema");
-  private static final URI RUN_EVENT_PRODUCER = URI.create("http://test.com/producer");
+  private static final URI RUN_EVENT_SCHEMA_URL = newSchemaUrl();
+  private static final URI RUN_EVENT_PRODUCER = newProducer();
 
-  // ...
   private static final RunId PARENT_RUN_ID = newRunId();
   private static final RunId RUN_ID = newRunId();
   private static final RunState RUN_COMPLETED = RunState.COMPLETED;
   private static final Instant RUN_TRANSITIONED_ON =
       RUN_EVENT_TIME.withZoneSameInstant(ZoneOffset.UTC).toInstant();
   private static final Instant RUN_NOMINAL_START_TIME = newNominalStartTime();
-  private static final Instant RUN_NOMINAL_END_TIME = RUN_NOMINAL_START_TIME.plusSeconds(3600);
+  private static final Instant RUN_NOMINAL_END_TIME = RUN_NOMINAL_START_TIME.plusSeconds(3600); //
 
-  // ...
   private static final NamespaceName PARENT_JOB_NAMESPACE = newNamespaceName();
   private static final JobName PARENT_JOB_NAME = newJobName();
   private static final JobId PARENT_JOB_ID = JobId.of(PARENT_JOB_NAMESPACE, PARENT_JOB_NAME);
   private static final NamespaceName JOB_NAMESPACE = newNamespaceName();
   private static final JobName JOB_NAME = newJobName();
   private static final JobId JOB_ID = JobId.of(JOB_NAMESPACE, JOB_NAME);
-  private static final URI JOB_SOURCE_CODE_LOCATION = URI.create("http://test.com/job");
+  private static final URL JOB_SOURCE_CODE_LOCATION = newLocation();
   private static final String JOB_DESCRIPTION = newDescription();
 
-  // ...
   private static final SourceName SOURCE_NAME = newSourceName();
   private static final URI SOURCE_CONNECTION_URL = newConnectionUrl();
   private static final Condition<Metadata.Dataset.Source> EQ_TO_SOURCE_IN_FACET =
@@ -382,8 +382,8 @@ public class MetadataTest {
         .thenReturn(jobSourceCodeLocationFacet);
     when(jobSourceCodeLocationFacet.getAdditionalProperties())
         .thenReturn(jobSourceCodeLocationFacets);
-    when(jobSourceCodeLocationFacets.get(Metadata.Facets.URL))
-        .thenReturn(JOB_SOURCE_CODE_LOCATION.toASCIIString());
+    when(jobSourceCodeLocationFacets.get(Metadata.Facets.JOB_SOURCE_CODE_URL))
+        .thenReturn(JOB_SOURCE_CODE_LOCATION.toString());
 
     // (2) ...
     when(job.getFacets()).thenReturn(jobFacetsWithSourceCodeLocation);

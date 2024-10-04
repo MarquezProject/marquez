@@ -1,6 +1,6 @@
 package marquez.api.models;
 
-import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
@@ -22,7 +22,7 @@ public class VersionId {
   }
 
   public static JobVersionId forJob(
-      @NonNull final JobId jobId, @Nullable final URI jobLocation, @Nullable final Metadata.IO io) {
+      @NonNull final JobId jobId, @Nullable final URL jobLocation, @Nullable final Metadata.IO io) {
     return JobVersionId.builder()
         .namespace(jobId.getNamespace())
         .name(jobId.getName())

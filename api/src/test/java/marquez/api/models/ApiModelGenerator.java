@@ -19,8 +19,10 @@ import static marquez.common.models.CommonModelGenerator.newRunId;
 import com.google.common.collect.ImmutableList;
 import io.openlineage.client.OpenLineage;
 import io.openlineage.client.OpenLineageClient;
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -263,5 +265,17 @@ public final class ApiModelGenerator extends Generator {
   /** ... */
   static ZonedDateTime newNominalTimeWith(@NonNull final ZoneId zoneId) {
     return Instant.now().atZone(zoneId);
+  }
+
+  static URI newSchemaUrl() {
+    return URI.create("http://test.com/schema");
+  }
+
+  static URI newProducer() {
+    return URI.create("http://test.com/producer");
+  }
+
+  static Instant newNominalStartTime() {
+    return ZonedDateTime.of(2024, 10, 7, 10, 0, 0, 0, ZoneOffset.UTC).toInstant();
   }
 }

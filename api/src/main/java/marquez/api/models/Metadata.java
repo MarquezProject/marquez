@@ -7,6 +7,7 @@ import static marquez.common.models.DatasetType.DB_TABLE;
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.server.OpenLineage;
 import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -19,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
@@ -155,7 +157,7 @@ public final class Metadata {
     @Getter private final NamespaceName namespace;
     @Getter private final JobVersionId versionId;
     @Nullable private final String description;
-    @Nullable private final URI location;
+    @Nullable private final URL location;
     @Nullable private final IO io;
 
     /* ... */
@@ -167,7 +169,7 @@ public final class Metadata {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       final JobId jobId = JobId.of(namespaceName, jobName);
-      final Optional<URI> jobLocation = Facets.locationFor(job);
+      final Optional<URL> jobLocation = Facets.locationFor(job);
       final IO io = IO.newInstanceWith(run, inputs, outputs);
 
       // ...
@@ -192,7 +194,7 @@ public final class Metadata {
       final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
       final JobName jobName = JobName.of(job.getName());
       final JobId jobId = JobId.of(namespaceName, jobName);
-      final Optional<URI> jobLocation = Facets.locationFor(job);
+      final Optional<URL> jobLocation = Facets.locationFor(job);
       final IO io = IO.newInstanceWith(event.getInputs(), event.getOutputs());
 
       // ...
@@ -215,7 +217,7 @@ public final class Metadata {
       return Optional.ofNullable(description);
     }
 
-    public Optional<URI> getLocation() {
+    public Optional<URL> getLocation() {
       return Optional.ofNullable(location);
     }
 
@@ -352,8 +354,8 @@ public final class Metadata {
   static class Facets {
     static final String DOCUMENTATION = "documentation";
     static final String DESCRIPTION = "description";
-    static final String URL = "url";
 
+    static final String JOB_SOURCE_CODE_URL = "url";
     static final String JOB_SOURCE_CODE_LOCATION = "sourceCodeLocation";
 
     static final String PARENT = "parent";
@@ -424,11 +426,11 @@ public final class Metadata {
           .map(facet -> ZonedDateTime.parse(facet).withZoneSameInstant(ZoneOffset.UTC).toInstant());
     }
 
-    static Optional<URI> locationFor(@NonNull final OpenLineage.Job job) {
+    static Optional<URL> locationFor(@NonNull final OpenLineage.Job job) {
       return Optional.ofNullable(job.getFacets())
           .map(facets -> facets.getAdditionalProperties().get(JOB_SOURCE_CODE_LOCATION))
-          .map(facets -> (String) facets.getAdditionalProperties().get(URL))
-          .map(URI::create);
+          .map(facets -> (String) facets.getAdditionalProperties().get(JOB_SOURCE_CODE_URL))
+          .map(Utils::toUrl);
     }
 
     static Optional<String> descriptionFor(@NonNull final OpenLineage.Job job) {

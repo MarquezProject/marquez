@@ -12,9 +12,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -179,9 +176,5 @@ public final class CommonModelGenerator extends Generator {
 
   public static String newExternalId() {
     return "test_external_id" + newId();
-  }
-
-  public static Instant newNominalStartTime() {
-    return ZonedDateTime.of(2024, 10, 7, 10, 0, 0, 0, ZoneOffset.UTC).toInstant();
   }
 }
