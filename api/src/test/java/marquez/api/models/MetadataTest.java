@@ -220,10 +220,22 @@ public class MetadataTest {
     final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
     assertThat(io.getInputs()).isNotEmpty();
     assertThat(io.getInputs())
+        .extracting(Metadata.Dataset::getName)
+        .isNotNull()
+        .containsExactly(dataset0, dataset1, dataset2);
+    assertThat(io.getInputs())
         .extracting(Metadata.Dataset::getSource)
         .isNotNull()
         .are(EQ_TO_SOURCE_IN_FACET);
     assertThat(io.getOutputs()).isNotEmpty();
+    assertThat(io.getOutputs())
+        .extracting(Metadata.Dataset::getName)
+        .isNotNull()
+        .containsExactly(dataset3);
+    assertThat(io.getOutputs())
+        .extracting(Metadata.Dataset::getSource)
+        .isNotNull()
+        .are(EQ_TO_SOURCE_IN_FACET);
   }
 
   @Test
