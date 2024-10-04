@@ -239,10 +239,107 @@ public class MetadataTest {
   }
 
   @Test
-  public void testNewRunWithInputDatasetsOnly() {}
+  public void testNewRunWithInputDatasetsOnly() {
+    // (1) ...
+    final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
+    final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
+    final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
+    final Map<String, Object> sourceFacets = mock(Map.class);
+
+    when(ioFacetsWithSource.getAdditionalProperties()).thenReturn(ioFacets);
+    when(ioFacets.get(Metadata.Facets.SOURCE)).thenReturn(sourceFacet);
+    when(sourceFacet.getAdditionalProperties()).thenReturn(sourceFacets);
+    when(sourceFacets.get(Metadata.Facets.SOURCE_NAME)).thenReturn(SOURCE_NAME.getValue());
+    when(sourceFacets.get(Metadata.Facets.SOURCE_CONNECTION_URL))
+        .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
+
+    // ...
+    final NamespaceName namespace0 = newNamespaceName();
+
+    final DatasetName dataset0 = newDatasetName();
+    final DatasetName dataset1 = newDatasetName();
+
+    final OpenLineage.InputDataset input0 = mock(OpenLineage.InputDataset.class);
+    final OpenLineage.InputDataset input1 = mock(OpenLineage.InputDataset.class);
+
+    when(input0.getNamespace()).thenReturn(namespace0.getValue());
+    when(input0.getName()).thenReturn(dataset0.getValue());
+    when(input0.getFacets()).thenReturn(ioFacetsWithSource);
+    when(input1.getNamespace()).thenReturn(namespace0.getValue());
+    when(input1.getName()).thenReturn(dataset1.getValue());
+    when(input1.getFacets()).thenReturn(ioFacetsWithSource);
+
+    final List<OpenLineage.InputDataset> inputs = List.of(input0, input1);
+
+    // (3) ...
+    when(runEvent.getInputs()).thenReturn(inputs);
+
+    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    assertThat(run).isNotNull();
+    assertThat(run.getId()).isEqualTo(RUN_ID);
+
+    // (4) ...
+    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
+    assertThat(io.getInputs()).isNotEmpty();
+    assertThat(io.getInputs())
+        .extracting(Metadata.Dataset::getName)
+        .isNotNull()
+        .containsExactly(dataset0, dataset1);
+    assertThat(io.getInputs())
+        .extracting(Metadata.Dataset::getSource)
+        .isNotNull()
+        .are(EQ_TO_SOURCE_IN_FACET);
+    assertThat(io.getOutputs()).isEmpty();
+  }
 
   @Test
-  public void testNewRunWithOutputDatasetsOnly() {}
+  public void testNewRunWithOutputDatasetsOnly() {
+    // (1) ...
+    final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
+    final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
+    final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
+    final Map<String, Object> sourceFacets = mock(Map.class);
+
+    when(ioFacetsWithSource.getAdditionalProperties()).thenReturn(ioFacets);
+    when(ioFacets.get(Metadata.Facets.SOURCE)).thenReturn(sourceFacet);
+    when(sourceFacet.getAdditionalProperties()).thenReturn(sourceFacets);
+    when(sourceFacets.get(Metadata.Facets.SOURCE_NAME)).thenReturn(SOURCE_NAME.getValue());
+    when(sourceFacets.get(Metadata.Facets.SOURCE_CONNECTION_URL))
+        .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
+
+    // ...
+    final NamespaceName namespace0 = newNamespaceName();
+    final DatasetName dataset0 = newDatasetName();
+
+    // (2) ...
+    final OpenLineage.OutputDataset output0 = mock(OpenLineage.OutputDataset.class);
+
+    when(output0.getNamespace()).thenReturn(namespace0.getValue());
+    when(output0.getName()).thenReturn(dataset0.getValue());
+    when(output0.getFacets()).thenReturn(ioFacetsWithSource);
+
+    final List<OpenLineage.OutputDataset> outputs = List.of(output0);
+
+    // (3) ...
+    when(runEvent.getOutputs()).thenReturn(outputs);
+
+    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    assertThat(run).isNotNull();
+    assertThat(run.getId()).isEqualTo(RUN_ID);
+
+    // (4) ...
+    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
+    assertThat(io.getInputs()).isEmpty();
+    assertThat(io.getOutputs()).isNotEmpty();
+    assertThat(io.getOutputs())
+        .extracting(Metadata.Dataset::getName)
+        .isNotNull()
+        .containsExactly(dataset0);
+    assertThat(io.getOutputs())
+        .extracting(Metadata.Dataset::getSource)
+        .isNotNull()
+        .are(EQ_TO_SOURCE_IN_FACET);
+  }
 
   @Test
   public void testNewRunWithNominalStartAndEndTime() {
