@@ -39,6 +39,14 @@ public class StatsResource {
   @Path("/lineage-events")
   public Response getStats(
       @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
+
+    // Check if the period is WEEK and timezone is missing
+    if (Period.WEEK.equals(period) && (timezone == null || timezone.isEmpty())) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Timezone must be specified for period 'WEEK'")
+          .build();
+    }
+
     return (Period.DAY.equals(period)
         ? Response.ok(StatsService.getLastDayLineageMetrics()).build()
         : Period.WEEK.equals(period)

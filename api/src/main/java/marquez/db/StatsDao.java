@@ -95,8 +95,7 @@ public interface StatsDao extends BaseDao {
                 COALESCE(SUM(CASE WHEN state = 'START' THEN 1 ELSE 0 END), 0) AS start,
                 COALESCE(SUM(CASE WHEN state = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS complete,
                 COALESCE(SUM(CASE WHEN state = 'ABORT' THEN 1 ELSE 0 END), 0) AS abort
-            FROM current_day_lineage_metrics
-                     CROSS JOIN local_now ln
+            FROM current_day_lineage_metrics, local_now
             WHERE (event_time AT TIME ZONE :timezone) >= DATE_TRUNC('day', ln.local_now)
               AND (event_time AT TIME ZONE :timezone) < DATE_TRUNC('day', ln.local_now) + INTERVAL '1 day'
             GROUP BY DATE_TRUNC('day', ln.local_now)
