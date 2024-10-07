@@ -17,10 +17,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import marquez.common.models.JobType;
+import marquez.common.models.RunState;
 import marquez.db.models.DbModelGenerator;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
@@ -106,7 +109,10 @@ public class JobDaoTest {
     JobRow anotherJobSameNamespace =
         createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJob", "a random other job");
 
-    List<Job> jobs = jobDao.findAll(namespace.getName(), "%", 10, 0);
+    List<RunState> runStates = new ArrayList<>();
+    Collections.addAll(runStates, RunState.values());
+
+    List<Job> jobs = jobDao.findAll(namespace.getName(), runStates, 10, 0);
 
     // the symlinked job isn't present in the response - only the symlink target and the job with
     // no symlink

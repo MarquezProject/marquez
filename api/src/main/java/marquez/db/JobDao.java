@@ -20,6 +20,7 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunState;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobDataset;
 import marquez.db.JobVersionDao.JobDatasetMapper;
@@ -32,6 +33,7 @@ import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
@@ -245,11 +247,15 @@ public interface JobDao extends BaseDao {
         LEFT JOIN runs r
           ON r.uuid = jv.latest_run_uuid
         WHERE
-            r.current_run_state ilike :lastRunState OR r IS NULL
+         (r.current_run_state IN (<lastRunStates>) OR r.uuid IS NULL)
         ORDER BY
             j.name
       """)
-  List<Job> findAll(String namespaceName, String lastRunState, int limit, int offset);
+  List<Job> findAll(
+      String namespaceName,
+      @BindList("lastRunStates") List<RunState> lastRunStates,
+      int limit,
+      int offset);
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
@@ -274,9 +280,9 @@ public interface JobDao extends BaseDao {
   int countFor(String namespaceName);
 
   default List<Job> findAllWithRun(
-      String namespaceName, String lastRunState, int limit, int offset) {
+      String namespaceName, List<RunState> lastRunStates, int limit, int offset) {
     RunDao runDao = createRunDao();
-    return findAll(namespaceName, lastRunState, limit, offset).stream()
+    return findAll(namespaceName, lastRunStates, limit, offset).stream()
         .peek(
             j -> {
               List<Run> runs = runDao.findByLatestJob(namespaceName, j.getName().getValue(), 10, 0);
