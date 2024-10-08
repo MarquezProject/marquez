@@ -254,8 +254,8 @@ final class TestingDb {
     return delegate.onDemand(StatsDao.class).getLastDayMetrics();
   }
 
-  List<LineageMetric> lastWeekLineageMetrics() {
-    return delegate.onDemand(StatsDao.class).getLastWeekMetrics();
+  List<LineageMetric> lastWeekLineageMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekMetrics(timezone);
   }
 
   List<IntervalMetric> lastDayJobMetrics() {

@@ -121,7 +121,7 @@ public class StatsTest {
     }
 
     List<LineageMetric> lastDayLineageMetrics = DB.lastDayLineageMetrics();
-    List<LineageMetric> lastWeekLineageMetrics = DB.lastWeekLineageMetrics();
+    List<LineageMetric> lastWeekLineageMetrics = DB.lastWeekLineageMetrics("UTC");
 
     assertThat(lastDayLineageMetrics).isNotEmpty();
     assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 1).getComplete())

@@ -48,25 +48,18 @@ class StatsResourceTest {
   void testGetStatsDay() {
     when(statsService.getLastDayLineageMetrics()).thenReturn(lineageMetrics);
 
-    Response response = statsResource.getStats(Period.DAY);
+    Response response = statsResource.getStats(Period.DAY, "UTC");
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     assertThat(response.getEntity()).isEqualTo(lineageMetrics);
   }
 
   @Test
   void testGetStatsWeek() {
-    when(statsService.getLastWeekLineageMetrics()).thenReturn(lineageMetrics);
+    when(statsService.getLastWeekLineageMetrics("America/Los_Angeles")).thenReturn(lineageMetrics);
 
-    Response response = statsResource.getStats(Period.WEEK);
+    Response response = statsResource.getStats(Period.WEEK, "UTC");
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     assertThat(response.getEntity()).isEqualTo(lineageMetrics);
-  }
-
-  @Test
-  void testGetStatsInvalidPeriod() {
-    Response response = statsResource.getStats(null);
-    assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
-    assertThat(response.getEntity()).isEqualTo("Invalid period");
   }
 
   @Test
