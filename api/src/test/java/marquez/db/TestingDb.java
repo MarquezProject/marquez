@@ -10,6 +10,7 @@ import static marquez.common.models.CommonModelGenerator.newFields;
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.client.OpenLineage;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
+import marquez.db.models.LineageMetric;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -245,5 +247,13 @@ final class TestingDb {
   /** Obtain a new {@link Handle} by delegating to underlying {@code jdbi}. */
   Handle open() {
     return delegate.open();
+  }
+
+  List<LineageMetric> lastDayLineageMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayMetrics();
+  }
+
+  List<LineageMetric> lastWeekLineageMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastWeekMetrics();
   }
 }

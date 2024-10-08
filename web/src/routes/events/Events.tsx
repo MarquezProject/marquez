@@ -185,7 +185,7 @@ const Events: React.FC<EventsProps> = ({
             <Box>
               <Box display={'flex'} alignItems={'center'}>
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
-                {isEventsLoading && (
+                {!isEventsLoading && (
                   <Chip
                     size={'small'}
                     variant={'outlined'}

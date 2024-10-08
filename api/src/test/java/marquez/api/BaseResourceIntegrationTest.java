@@ -16,7 +16,6 @@ import static marquez.common.models.CommonModelGenerator.newLocation;
 import static marquez.common.models.CommonModelGenerator.newNamespaceName;
 import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.common.models.CommonModelGenerator.newSourceName;
-import static marquez.db.DbTest.POSTGRES_14;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -59,7 +58,7 @@ abstract class BaseResourceIntegrationTest {
   static final String ERROR_FAIL_IF_NOT_IN = "Expected '%s' in '%s'.";
 
   @Container
-  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>(POSTGRES_14);
+  static final PostgreSQLContainer<?> DB_CONTAINER = new PostgreSQLContainer<>("postgres:14");
 
   static {
     DB_CONTAINER.start();
