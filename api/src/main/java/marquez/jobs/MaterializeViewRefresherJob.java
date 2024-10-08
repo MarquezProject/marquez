@@ -53,25 +53,19 @@ public class MaterializeViewRefresherJob extends AbstractScheduledService implem
       jdbi.useHandle(
           handle -> {
             handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_hourly_view");
-            handle.execute("DELETE FROM current_hour_lineage_metrics");
           });
       log.info("Materialized view `lineage_events_by_type_hourly_view` refreshed.");
-      log.info("Deleting from `current_hour_lineage_metrics` table.");
 
       if (java.time.LocalTime.now().getHour() == 0) {
         jdbi.useHandle(
             handle -> {
               handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_daily_view");
-              handle.execute("DELETE FROM current_day_lineage_metrics");
             });
         log.info("Materialized view `lineage_events_by_type_daily_view` refreshed.");
-        log.info("Deleting from `current_day_lineage_metrics` table.");
       }
 
     } catch (Exception error) {
-      log.error(
-          "Failed to materialize views and clean up current tables. Retrying on next run...",
-          error);
+      log.error("Failed to materialize views. Retrying on next run...", error);
     }
   }
 
