@@ -20,6 +20,7 @@ import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.IntervalMetric;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
 import marquez.db.models.LineageMetric;
@@ -253,7 +254,31 @@ final class TestingDb {
     return delegate.onDemand(StatsDao.class).getLastDayMetrics();
   }
 
-  List<LineageMetric> lastWeekLineageMetrics() {
-    return delegate.onDemand(StatsDao.class).getLastWeekMetrics();
+  List<LineageMetric> lastWeekLineageMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekMetrics(timezone);
+  }
+
+  List<IntervalMetric> lastDayJobMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayJobs();
+  }
+
+  List<IntervalMetric> lastWeekJobMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekJobs(timezone);
+  }
+
+  List<IntervalMetric> lastDayDatasetMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayDatasets();
+  }
+
+  List<IntervalMetric> lastWeekDatasetMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekDatasets(timezone);
+  }
+
+  List<IntervalMetric> lastDaySourceMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDaySources();
+  }
+
+  List<IntervalMetric> lastWeekSourceMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekSources(timezone);
   }
 }

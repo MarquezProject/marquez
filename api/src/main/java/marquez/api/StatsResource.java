@@ -53,4 +53,52 @@ public class StatsResource {
             ? Response.ok(StatsService.getLastWeekLineageMetrics(timezone)).build()
             : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
   }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/jobs")
+  public Response getJobs(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
+
+    return (Period.DAY.equals(period)
+        ? Response.ok(StatsService.getLastDayJobs()).build()
+        : Period.WEEK.equals(period)
+            ? Response.ok(StatsService.getLastWeekJobs(timezone)).build()
+            : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/datasets")
+  public Response getDatasets(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
+
+    return (Period.DAY.equals(period)
+        ? Response.ok(StatsService.getLastDayDatasets()).build()
+        : Period.WEEK.equals(period)
+            ? Response.ok(StatsService.getLastWeekDatasets(timezone)).build()
+            : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
+  @Produces(APPLICATION_JSON)
+  @Path("/sources")
+  public Response getSources(
+      @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
+
+    return (Period.DAY.equals(period)
+        ? Response.ok(StatsService.getLastDaySources()).build()
+        : Period.WEEK.equals(period)
+            ? Response.ok(StatsService.getLastWeekSources(timezone)).build()
+            : Response.status(Response.Status.BAD_REQUEST).entity("Invalid period").build());
+  }
 }

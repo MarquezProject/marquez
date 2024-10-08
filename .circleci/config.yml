@@ -71,7 +71,8 @@ jobs:
   unit-test-web:
     working_directory: ~/marquez/web
     docker:
-      - image: cimg/node:18.16.0
+      - image: cimg/node:22.9.0
+    resource_class: large
     environment:
       TZ: 'America/New_York'
     steps:
