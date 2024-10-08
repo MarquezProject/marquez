@@ -16,8 +16,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.dropwizard.jersey.jsr310.ZonedDateTimeParam;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletionException;
@@ -70,12 +68,6 @@ public class OpenLineageResource extends BaseResource {
   public void create(@Valid @NotNull BaseEvent event, @Suspended final AsyncResponse asyncResponse)
       throws JsonProcessingException, SQLException {
     if (event instanceof LineageEvent) {
-
-      Instant eventTime =
-          ((LineageEvent) event).getEventTime().withZoneSameInstant(ZoneId.of("UTC")).toInstant();
-      String eventType = ((LineageEvent) event).getEventType();
-      serviceFactory.getStatsService().createCurrentDayLineageMetric(eventTime, eventType);
-      serviceFactory.getStatsService().createCurrentHourLineageMetric(eventTime, eventType);
       if (serviceFactory.getSearchService().isEnabled()) {
         serviceFactory.getSearchService().indexEvent((LineageEvent) event);
       }
