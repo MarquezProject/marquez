@@ -71,6 +71,7 @@ public final class JobMapper implements RowMapper<Job> {
             // Latest Run is resolved in the JobDao. This can be brought in via a join and
             //  and a jsonb but custom deserializers will need to be introduced
             null,
+            null,
             facetsOrNull,
             uuidOrNull(results, Columns.CURRENT_VERSION_UUID),
             getLabels(facetsOrNull),

@@ -1596,6 +1596,10 @@ components:
           type: string
         latestRun:
           $ref: '#/components/schemas/Run'
+        latestRuns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Run'
         facets:
           $ref: '#/components/schemas/JobFacets'
         currentVersion:
@@ -1617,6 +1621,7 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
+        latestRuns: []
         facets: {}
         currentVersion: "b1d626a2-6d3a-475e-9ecf-943176d4a8c6"
 
