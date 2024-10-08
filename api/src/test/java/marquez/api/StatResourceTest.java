@@ -55,7 +55,7 @@ class StatsResourceTest {
 
   @Test
   void testGetStatsWeek() {
-    when(statsService.getLastWeekLineageMetrics("America/Los_Angeles")).thenReturn(lineageMetrics);
+    when(statsService.getLastWeekLineageMetrics("UTC")).thenReturn(lineageMetrics);
 
     Response response = statsResource.getStats(Period.WEEK, "UTC");
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

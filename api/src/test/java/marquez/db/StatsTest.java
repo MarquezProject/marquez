@@ -113,7 +113,14 @@ public class StatsTest {
             ol, Instant.now().minus(2, ChronoUnit.DAYS), namespaceName, jobName, dayEvents);
     DB.insertAll(dayEventSet);
 
-    // (4) Materialize views to flush out view data.
+    // (5) Create some 10 second old OL events.
+    int secondEvents = 1;
+    final Set<OpenLineage.RunEvent> secondEventSet =
+        newRunEvents(
+            ol, Instant.now().minus(10, ChronoUnit.SECONDS), namespaceName, jobName, secondEvents);
+    DB.insertAll(secondEventSet);
+
+    // (6) Materialize views to flush out view data.
     try (final Handle handle = DB.open()) {
       DbTestUtils.materializeViews(handle);
     } catch (Exception e) {
@@ -124,12 +131,16 @@ public class StatsTest {
     List<LineageMetric> lastWeekLineageMetrics = DB.lastWeekLineageMetrics("UTC");
 
     assertThat(lastDayLineageMetrics).isNotEmpty();
-    assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 1).getComplete())
+    assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 2).getComplete())
         .isEqualTo(hourEvents);
+    assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 1).getComplete())
+        .isEqualTo(secondEvents);
 
     assertThat(lastWeekLineageMetrics).isNotEmpty();
-    assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 2).getComplete())
+    assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 3).getComplete())
         .isEqualTo(dayEvents);
+    assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 1).getComplete())
+        .isEqualTo(secondEvents + hourEvents);
   }
 
   @Test
