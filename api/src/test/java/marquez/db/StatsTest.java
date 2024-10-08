@@ -34,10 +34,8 @@ import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.jdbi.v3.testing.junit5.JdbiExtension;
 import org.jdbi.v3.testing.junit5.tc.JdbiTestcontainersExtension;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -75,6 +73,18 @@ public class StatsTest {
     // Wrap jdbi configured for running container.
     DB = TestingDb.newInstance(jdbiExtension.getJdbi());
   }
+
+  @AfterEach
+    public void tearDown() {
+        try (final Handle handle = DB.open()) {
+        handle.execute("DELETE FROM lineage_events");
+        handle.execute("DELETE FROM job_versions");
+        handle.execute("DELETE FROM jobs");
+        handle.execute("DELETE FROM datasets");
+        handle.execute("DELETE FROM sources");
+        handle.execute("DELETE FROM namespaces");
+        }
+    }
 
   @Test
   public void testGetStatsForLineageEvents() {
@@ -144,7 +154,7 @@ public class StatsTest {
     Optional<Integer> countWeek =
         intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
     assertThat(countWeek).isPresent();
-    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
+    assertThat(countWeek.get()).isEqualTo(1);
   }
 
   @Test
@@ -181,7 +191,7 @@ public class StatsTest {
     Optional<Integer> countWeek =
         intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
     assertThat(countWeek).isPresent();
-    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
+    assertThat(countWeek.get()).isEqualTo(1);
   }
 
   @Test
@@ -205,6 +215,6 @@ public class StatsTest {
     Optional<Integer> countWeek =
         intervalMetricsWeek.stream().map(IntervalMetric::getCount).reduce(Integer::sum);
     assertThat(countWeek).isPresent();
-    assertThat(countWeek.get()).isGreaterThanOrEqualTo(1);
+    assertThat(countWeek.get()).isEqualTo(1);
   }
 }
