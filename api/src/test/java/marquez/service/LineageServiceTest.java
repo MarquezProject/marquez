@@ -11,6 +11,7 @@ import static marquez.db.LineageTestUtils.writeDownstreamLineage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.OutputDatasetVersion;
+import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
 import marquez.db.LineageDao;
@@ -205,7 +207,10 @@ public class LineageServiceTest {
                 new NamespaceName(NAMESPACE),
                 new DatasetName("outputData<-readJob0<-commonDataset")));
 
-    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, 1000, 0);
+    List<RunState> runStates = new ArrayList<>();
+    Collections.addAll(runStates, RunState.values());
+
+    List<Job> jobs = jobDao.findAllWithRun(NAMESPACE, runStates, 1000, 0);
     jobs =
         jobs.stream()
             .filter(j -> j.getName().getValue().contains("newDownstreamJob"))

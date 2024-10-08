@@ -21,8 +21,8 @@ public class StatsService {
     return this.statsDao.getLastDayMetrics();
   }
 
-  public List<LineageMetric> getLastWeekLineageMetrics() {
-    return this.statsDao.getLastWeekMetrics();
+  public List<LineageMetric> getLastWeekLineageMetrics(String timezone) {
+    return this.statsDao.getLastWeekMetrics(timezone);
   }
 
   public List<IntervalMetric> getLastDayJobs() {
