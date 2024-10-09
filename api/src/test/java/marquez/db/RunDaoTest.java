@@ -165,10 +165,9 @@ class RunDaoTest {
     TreeSet<RunRow> sortedRuns =
         new TreeSet<>(Comparator.comparing(RunRow::getUpdatedAt).reversed());
     sortedRuns.addAll(runs);
-    Optional<Run> byLatestJob = runDao.findByLatestJob(jobRow.getNamespaceName(), jobRow.getName());
+    Run byLatestJob =
+        runDao.findByLatestJob(jobRow.getNamespaceName(), jobRow.getName(), 1, 0).get(0);
     assertThat(byLatestJob)
-        .isPresent()
-        .get()
         .hasFieldOrPropertyWithValue("id", new RunId(sortedRuns.first().getUuid()));
 
     JobRow newTargetJob =
@@ -183,10 +182,11 @@ class RunDaoTest {
         jobMeta.getDescription().orElse(null));
 
     // get the latest run for the *newTargetJob*. It should be the same as the old job's latest run
-    byLatestJob = runDao.findByLatestJob(newTargetJob.getNamespaceName(), newTargetJob.getName());
+    byLatestJob =
+        runDao
+            .findByLatestJob(newTargetJob.getNamespaceName(), newTargetJob.getName(), 1, 0)
+            .get(0);
     assertThat(byLatestJob)
-        .isPresent()
-        .get()
         .hasFieldOrPropertyWithValue("id", new RunId(sortedRuns.first().getUuid()));
   }
 
