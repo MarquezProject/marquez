@@ -57,7 +57,7 @@ subprojects {
         junit5Version = '5.10.2'
         lombokVersion = '1.18.34'
         mockitoVersion = '5.4.0'
-        openlineageVersion = '1.13.1'
+        openlineageVersion = '1.23.0'
         slf4jVersion = '1.7.36'
         postgresqlVersion = '42.6.0'
     }
