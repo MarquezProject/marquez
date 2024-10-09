@@ -49,7 +49,7 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
 
 1. Navigate to the AWS [RDS](https://console.aws.amazon.com/rds/home) page and create a PostgreSQL database, leaving the database template as **Production**.
 2. Use `marquez` as the database identifier and set the master username to `marquez`.
-3. Choose a master password to use later in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L32)  in `values.yaml`).
+3. Choose a master password to use later in your Helm deployment (see [password](https://github.com/MarquezProject/marquez/blob/main/charts/marquez/values.yaml#L32)  in `values.yaml`).
 4. Leave public access to the database **off**.
 5. Choose the same VPC where your AWS EKS cluster resides.
 6. In a separate tab, navigate to the AWS EKS cluster page and make note of the security group attached to your cluster.
@@ -82,7 +82,7 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
 1. Get Marquez:
 
    ```bash
-   $ git clone git@github.com:MarquezProject/marquez.git && cd chart
+   $ git clone git@github.com:MarquezProject/marquez.git && cd charts/marquez
    ```
 
 2. Install Marquez:
@@ -97,7 +97,7 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
      --wait
    ```
 
-   > **Note:** To avoid overriding deployment settings via the command line, update the [marquez.db](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L27) section of the Marquez Helm chart's `values.yaml` to include the AWS RDS `host`, `username`, and `password` in your deployment.
+   > **Note:** To avoid overriding deployment settings via the command line, update the [marquez.db](https://github.com/MarquezProject/marquez/blob/main/charts/marquez/values.yaml#L27) section of the Marquez Helm chart's `values.yaml` to include the AWS RDS `host`, `username`, and `password` in your deployment.
 
 3. Verify all the pods have come up correctly:
 

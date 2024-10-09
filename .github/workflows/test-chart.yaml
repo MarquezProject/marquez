@@ -3,8 +3,8 @@ name: test-chart
 on:
   pull_request:
     paths:
-      - 'chart/**'
-      - '!chart/**.md'
+      - 'charts/**'
+      - '!charts/**.md'
 
 jobs:
   lint-test-chart:

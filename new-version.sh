@@ -126,8 +126,8 @@ fi
 sed -i "" "s/version=.*/version=${RELEASE_VERSION}/g" gradle.properties
 
 # (2) Bump version in helm chart
-sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./chart/Chart.yaml
-sed -i "" -E -e "/postgresql/,\$b" -e "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./chart/values.yaml
+sed -i "" "s/^version:.*/version: ${RELEASE_VERSION}/g" ./charts/marquez/Chart.yaml
+sed -i "" -E -e "/postgresql/,\$b" -e "s/tag:.*/tag: ${RELEASE_VERSION}/g" ./charts/marquez/values.yaml
 
 # (3) Bump version in scripts
 sed -i "" "s/VERSION=.*/VERSION=${RELEASE_VERSION}/g" ./docker/up.sh
