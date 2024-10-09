@@ -271,12 +271,18 @@ export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS,
 })
 
-export const fetchJobs = (namespace: string, limit: number, offset: number) => ({
+export const fetchJobs = (
+  namespace: string,
+  limit: number,
+  offset: number,
+  lastRunStates?: RunState
+) => ({
   type: actionTypes.FETCH_JOBS,
   payload: {
     namespace,
     limit,
     offset,
+    lastRunStates,
   },
 })
 

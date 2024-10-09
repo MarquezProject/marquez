@@ -20,7 +20,7 @@ interface Props {
 
 const JobRunItem: React.FC<Props> = ({ job }) => {
   const longestRun = useMemo(
-    () => job.latestRuns.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
+    () => job.latestRuns?.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
     [job.latestRuns]
   )
   return (
@@ -72,7 +72,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
             {/*pad 10 - latestRuns length with a small grey bar*/}
-            {Array.from({ length: 10 - job.latestRuns.length }, (_, i) => (
+            {Array.from({ length: 10 - job.latestRuns?.length || 10 }, (_, i) => (
               <Box
                 key={i}
                 bgcolor={'divider'}
@@ -85,7 +85,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                 }}
               />
             ))}
-            {job.latestRuns.map((run) => (
+            {job.latestRuns?.map((run) => (
               <MQTooltip
                 key={run.id}
                 title={
@@ -137,12 +137,16 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
         <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
         <Box>
           <MqText subdued>STATUS</MqText>
-          <MqStatus label={job.latestRun.state} color={runStateColor(job.latestRun.state)} />
+          {job.latestRun ? (
+            <MqStatus label={job.latestRun.state} color={runStateColor(job.latestRun.state)} />
+          ) : (
+            <MqStatus label={'N/A'} color={runStateColor('NEW')} />
+          )}
         </Box>
         <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
         <Box>
           <MqText subdued>LAST RUN</MqText>
-          <MqText>{stopWatchDuration(job.latestRun.durationMs)}</MqText>
+          <MqText>{job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}</MqText>
         </Box>
         <Box display={{ sm: 'none', md: 'inline-flex' }}>
           <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />

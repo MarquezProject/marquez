@@ -5,7 +5,7 @@ import { ChevronRight } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { IntervalMetric } from '../../store/requests/intervalMetrics'
-import { Job } from '../../types/api'
+import { Job, RunState } from '../../types/api'
 import { LineageMetric } from '../../store/requests/lineageMetrics'
 import { MiniGraphContainer } from './MiniGraphContainer'
 import { Nullable } from '../../types/util/Nullable'
@@ -19,14 +19,16 @@ import {
   fetchSourceMetrics,
 } from '../../store/actionCreators'
 import { useSearchParams } from 'react-router-dom'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
+import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqText from '../../components/core/text/MqText'
+import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
-import TimelineDrawer from './TimelineDrawer'
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
@@ -63,11 +65,11 @@ const INTERVAL_TO_MS_MAP: Record<RefreshInterval, number> = {
   Never: 0,
 }
 
-const states = [
-  { label: 'Started', color: theme.palette.info.main, bgColor: 'secondary' },
-  { label: 'Completed', color: theme.palette.primary.main, bgColor: 'primary' },
-  { label: 'Failed', color: theme.palette.error.main, bgColor: 'error' },
-  { label: 'Aborted', color: theme.palette.secondary.main, bgColor: 'secondary' },
+const states: { label: RunState; color: string; bgColor: string }[] = [
+  { label: 'NEW', color: theme.palette.info.main, bgColor: 'secondary' },
+  { label: 'COMPLETED', color: theme.palette.primary.main, bgColor: 'primary' },
+  { label: 'FAILED', color: theme.palette.error.main, bgColor: 'error' },
+  { label: 'ABORTED', color: theme.palette.secondary.main, bgColor: 'secondary' },
 ]
 
 const Dashboard: React.FC = ({
@@ -76,6 +78,7 @@ const Dashboard: React.FC = ({
   isLineageMetricsLoading,
   jobs,
   fetchJobs,
+  isJobsLoading,
   fetchJobMetrics,
   fetchDatasetMetrics,
   fetchSourceMetrics,
@@ -92,8 +95,7 @@ const Dashboard: React.FC = ({
     searchParams.get('timeframe') === 'week' ? '7 Days' : '24 Hours'
   )
   const [intervalKey, setIntervalKey] = React.useState<RefreshInterval>('30s')
-
-  const [selectedState, setSelectedState] = React.useState('FAIL')
+  const [selectedState, setSelectedState] = React.useState<Nullable<RunState>>(null)
   const [jobsDrawerOpen, setJobsDrawerOpen] = React.useState(false)
   const [timelineOpen, setTimelineOpen] = React.useState(false)
 
@@ -121,14 +123,10 @@ const Dashboard: React.FC = ({
   }, [timeframe])
 
   useEffect(() => {
-    fetchJobs('food_delivery', JOB_RUN_LIMIT, 0)
-  }, [])
-
-  useEffect(() => {
     if (selectedNamespace) {
-      fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0)
+      fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
     }
-  }, [selectedNamespace])
+  }, [selectedNamespace, selectedState])
 
   useEffect(() => {
     const intervalTime = INTERVAL_TO_MS_MAP[intervalKey]
@@ -196,11 +194,7 @@ const Dashboard: React.FC = ({
             height: `calc(100vh - ${HEADER_HEIGHT}px)`,
           },
         }}
-      >
-        <Box>
-          <TimelineDrawer />
-        </Box>
-      </Drawer>
+      ></Drawer>
       <Container maxWidth={'lg'}>
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <MqText heading>DataOps</MqText>
@@ -257,7 +251,7 @@ const Dashboard: React.FC = ({
                           <Button
                             onClick={() =>
                               selectedState === state.label
-                                ? setSelectedState('')
+                                ? setSelectedState(null)
                                 : setSelectedState(state.label)
                             }
                             variant={'text'}
@@ -283,11 +277,11 @@ const Dashboard: React.FC = ({
                               />
                               {(() => {
                                 switch (state.label) {
-                                  case 'Failed':
+                                  case 'FAILED':
                                     return failed
-                                  case 'Completed':
+                                  case 'COMPLETED':
                                     return completed
-                                  case 'Aborted':
+                                  case 'ABORTED':
                                     return aborted
                                   default:
                                     return started
@@ -340,18 +334,45 @@ const Dashboard: React.FC = ({
               >
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                   <MqText subheading>Jobs</MqText>
-                  <Button
-                    disableRipple
-                    size={'small'}
-                    endIcon={<ChevronRight />}
-                    onClick={() => setJobsDrawerOpen(true)}
-                  >
-                    See More
-                  </Button>
+                  <Box display={'flex'} alignItems={'center'}>
+                    {isJobsLoading && <CircularProgress size={16} color={'primary'} />}
+                    <NamespaceSelect />
+                    <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
+                    <Button
+                      disableRipple
+                      size={'small'}
+                      endIcon={<ChevronRight />}
+                      onClick={() => setJobsDrawerOpen(true)}
+                    >
+                      See More
+                    </Button>
+                  </Box>
                 </Box>
                 {jobs.slice(0, JOB_RUN_LIMIT).map((job) => (
                   <JobRunItem key={job.id.namespace + job.id.name} job={job} />
                 ))}
+                {!isJobsLoading && jobs.length === 0 && (
+                  <MqEmpty title={'No jobs found'}>
+                    <>
+                      <MqText subdued>
+                        {
+                          'Try changing namespaces, run state, or consulting our documentation to add jobs.'
+                        }
+                      </MqText>
+                      <Button
+                        color={'primary'}
+                        size={'small'}
+                        onClick={() => {
+                          if (selectedNamespace) {
+                            fetchJobs(selectedNamespace, 4, 0)
+                          }
+                        }}
+                      >
+                        Refresh
+                      </Button>
+                    </>
+                  </MqEmpty>
+                )}
               </Box>
             </Grid>
           </Grid>

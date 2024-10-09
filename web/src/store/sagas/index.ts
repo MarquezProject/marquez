@@ -220,7 +220,13 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
+      const response: Jobs = yield call(
+        getJobs,
+        payload.namespace,
+        payload.limit,
+        payload.offset,
+        payload.lastRunStates
+      )
       yield put(fetchJobsSuccess(response.jobs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))

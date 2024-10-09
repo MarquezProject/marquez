@@ -5,9 +5,17 @@ import { API_URL } from '../../globals'
 import { Jobs, RunState } from '../../types/api'
 import { genericFetchWrapper } from './index'
 
-export const getJobs = async (namespace: string, limit = 25, offset = 0) => {
+export const getJobs = async (
+  namespace: string,
+  limit = 25,
+  offset = 0,
+  lastRunStates?: RunState
+) => {
   const encodedNamespace = encodeURIComponent(namespace)
-  const url = `${API_URL}/namespaces/${encodedNamespace}/jobs?limit=${limit}&offset=${offset}`
+  let url = `${API_URL}/namespaces/${encodedNamespace}/jobs?limit=${limit}&offset=${offset}`
+  if (lastRunStates) {
+    url += `&lastRunStates=${lastRunStates}`
+  }
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchJobs').then((r: Jobs) => {
     return { totalCount: r.totalCount, jobs: r.jobs.map((j) => ({ ...j, namespace: namespace })) }
   })
