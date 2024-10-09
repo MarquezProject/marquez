@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2024 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
