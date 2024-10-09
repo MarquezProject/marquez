@@ -72,31 +72,32 @@ public class MetadataTest {
                   && source.getConnectionUrl().equals(SOURCE_CONNECTION_URL),
           "source name starts with 'source'");
 
-  private OpenLineage.RunEvent runEvent;
-  private OpenLineage.Run run;
-  private OpenLineage.Job job;
+  // Mocks
+  private OpenLineage.RunEvent mockRunEvent;
+  private OpenLineage.Run mockRun;
+  private OpenLineage.Job mockJob;
 
   @BeforeEach
   public void setUp() {
-    runEvent = mock(OpenLineage.RunEvent.class);
-    when(runEvent.getEventType()).thenReturn(RUN_EVENT_TYPE);
-    when(runEvent.getEventTime()).thenReturn(RUN_EVENT_TIME);
-    when(runEvent.getSchemaURL()).thenReturn(RUN_EVENT_SCHEMA_URL);
-    when(runEvent.getProducer()).thenReturn(RUN_EVENT_PRODUCER);
+    mockRunEvent = mock(OpenLineage.RunEvent.class);
+    when(mockRunEvent.getEventType()).thenReturn(RUN_EVENT_TYPE);
+    when(mockRunEvent.getEventTime()).thenReturn(RUN_EVENT_TIME);
+    when(mockRunEvent.getSchemaURL()).thenReturn(RUN_EVENT_SCHEMA_URL);
+    when(mockRunEvent.getProducer()).thenReturn(RUN_EVENT_PRODUCER);
 
-    run = mock(OpenLineage.Run.class);
-    when(run.getRunId()).thenReturn(RUN_ID.getValue());
-    when(runEvent.getRun()).thenReturn(run);
+    mockRun = mock(OpenLineage.Run.class);
+    when(mockRun.getRunId()).thenReturn(RUN_ID.getValue());
+    when(mockRunEvent.getRun()).thenReturn(mockRun);
 
-    job = mock(OpenLineage.Job.class);
-    when(job.getName()).thenReturn(JOB_NAME.getValue());
-    when(job.getNamespace()).thenReturn(JOB_NAMESPACE.getValue());
-    when(runEvent.getJob()).thenReturn(job);
+    mockJob = mock(OpenLineage.Job.class);
+    when(mockJob.getName()).thenReturn(JOB_NAME.getValue());
+    when(mockJob.getNamespace()).thenReturn(JOB_NAMESPACE.getValue());
+    when(mockRunEvent.getJob()).thenReturn(mockJob);
   }
 
   @Test
   public void testNewRun() {
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
 
     assertThat(run).isNotNull();
     assertThat(run.getParent()).isEmpty();
@@ -109,18 +110,19 @@ public class MetadataTest {
     assertThat(run.getNominalEndTime()).isEmpty();
     assertThat(run.getExternalId()).isEmpty();
     assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
-
-    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
-    assertThat(io.getInputs()).isEmpty();
-    assertThat(io.getOutputs()).isEmpty();
-
-    assertThat(run.getRawMeta()).isEqualTo(toJson(runEvent));
-    assertThat(run.getProducer()).isEqualTo(runEvent.getProducer());
+    assertThat(run.getRawMeta()).isEqualTo(toJson(mockRunEvent));
+    assertThat(run.getProducer()).isEqualTo(mockRunEvent.getProducer());
+    assertThat(run.getIo())
+        .hasValueSatisfying(
+            io -> {
+              assertThat(io.getInputs()).isEmpty();
+              assertThat(io.getOutputs()).isEmpty();
+            });
   }
 
   @Test
   public void testNewRunWithParent() {
-    // (1) Add
+    // (1) Add parent to run facets.
     final OpenLineage.RunFacets runFacetsWithParent = mock(OpenLineage.RunFacets.class);
     final Map<String, OpenLineage.RunFacet> runFacets = mock(Map.class);
     final OpenLineage.RunFacet parentFacet = mock(OpenLineage.RunFacet.class);
@@ -140,15 +142,16 @@ public class MetadataTest {
     when(parentJobFacets.get(Metadata.Facets.Run.PARENT_JOB_NAMESPACE))
         .thenReturn(PARENT_JOB_NAMESPACE.getValue());
 
-    // (2) ...
-    when(run.getFacets()).thenReturn(runFacetsWithParent);
+    // (2) Return run facets with parent.
+    when(mockRun.getFacets()).thenReturn(runFacetsWithParent);
 
-    // (3) ...
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (3) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
+    // (4) Ensure unique ID of run for parent.
     final Metadata.ParentRun parentRun = run.getParent().orElseThrow(AssertionError::new);
     assertThat(parentRun.getId()).isEqualTo(PARENT_RUN_ID);
     assertThat(parentRun.getJob().getId()).isEqualTo(PARENT_JOB_ID);
@@ -156,7 +159,7 @@ public class MetadataTest {
 
   @Test
   public void testNewRunWithIO() {
-    // (1) ...
+    // (1) Add source to I/O facet for run.
     final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
     final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
     final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
@@ -169,7 +172,7 @@ public class MetadataTest {
     when(sourceFacets.get(Metadata.Facets.Dataset.SOURCE_CONNECTION_URI))
         .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
 
-    // ...
+    // (2) I/O
     final NamespaceName namespace0 = newNamespaceName();
     final NamespaceName namespace1 = newNamespaceName();
 
@@ -194,7 +197,6 @@ public class MetadataTest {
 
     final List<OpenLineage.InputDataset> inputs = List.of(input0, input1, input2);
 
-    // (2) ...
     final OpenLineage.OutputDataset output0 = mock(OpenLineage.OutputDataset.class);
 
     when(output0.getNamespace()).thenReturn(namespace1.getValue());
@@ -203,39 +205,44 @@ public class MetadataTest {
 
     final List<OpenLineage.OutputDataset> outputs = List.of(output0);
 
-    // (3) ...
-    when(runEvent.getInputs()).thenReturn(inputs);
-    when(runEvent.getOutputs()).thenReturn(outputs);
+    // (3) Return I/O facets with source for run.
+    when(mockRunEvent.getInputs()).thenReturn(inputs);
+    when(mockRunEvent.getOutputs()).thenReturn(outputs);
 
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (4) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
-    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
-    assertThat(io.getInputs()).isNotEmpty();
-    assertThat(io.getInputs())
-        .extracting(Metadata.Dataset::getName)
-        .isNotNull()
-        .containsExactly(dataset0, dataset1, dataset2);
-    assertThat(io.getInputs())
-        .extracting(Metadata.Dataset::getSource)
-        .isNotNull()
-        .are(EQ_TO_SOURCE_IN_FACET);
-    assertThat(io.getOutputs()).isNotEmpty();
-    assertThat(io.getOutputs())
-        .extracting(Metadata.Dataset::getName)
-        .isNotNull()
-        .containsExactly(dataset3);
-    assertThat(io.getOutputs())
-        .extracting(Metadata.Dataset::getSource)
-        .isNotNull()
-        .are(EQ_TO_SOURCE_IN_FACET);
+    // (5) Ensure source of I/O for run.
+    assertThat(run.getIo())
+        .hasValueSatisfying(
+            io -> {
+              assertThat(io.getInputs()).isNotEmpty();
+              assertThat(io.getInputs())
+                  .extracting(Metadata.Dataset::getName)
+                  .isNotNull()
+                  .containsExactly(dataset0, dataset1, dataset2);
+              assertThat(io.getInputs())
+                  .extracting(Metadata.Dataset::getSource)
+                  .isNotNull()
+                  .are(EQ_TO_SOURCE_IN_FACET);
+              assertThat(io.getOutputs()).isNotEmpty();
+              assertThat(io.getOutputs())
+                  .extracting(Metadata.Dataset::getName)
+                  .isNotNull()
+                  .containsExactly(dataset3);
+              assertThat(io.getOutputs())
+                  .extracting(Metadata.Dataset::getSource)
+                  .isNotNull()
+                  .are(EQ_TO_SOURCE_IN_FACET);
+            });
   }
 
   @Test
   public void testNewRunWithInputDatasetsOnly() {
-    // (1) ...
+    // (1) Add source to I/O facet for run.
     final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
     final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
     final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
@@ -248,7 +255,7 @@ public class MetadataTest {
     when(sourceFacets.get(Metadata.Facets.Dataset.SOURCE_CONNECTION_URI))
         .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
 
-    // ...
+    // (2) I/O
     final NamespaceName namespace0 = newNamespaceName();
 
     final DatasetName dataset0 = newDatasetName();
@@ -266,30 +273,35 @@ public class MetadataTest {
 
     final List<OpenLineage.InputDataset> inputs = List.of(input0, input1);
 
-    // (3) ...
-    when(runEvent.getInputs()).thenReturn(inputs);
+    // (3) Return I/O facets with source for run (inputs only).
+    when(mockRunEvent.getInputs()).thenReturn(inputs);
 
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (4) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
-    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
-    assertThat(io.getInputs()).isNotEmpty();
-    assertThat(io.getInputs())
-        .extracting(Metadata.Dataset::getName)
-        .isNotNull()
-        .containsExactly(dataset0, dataset1);
-    assertThat(io.getInputs())
-        .extracting(Metadata.Dataset::getSource)
-        .isNotNull()
-        .are(EQ_TO_SOURCE_IN_FACET);
-    assertThat(io.getOutputs()).isEmpty();
+    // (5) Ensure source of I/O for run.
+    assertThat(run.getIo())
+        .hasValueSatisfying(
+            io -> {
+              assertThat(io.getInputs()).isNotEmpty();
+              assertThat(io.getInputs())
+                  .extracting(Metadata.Dataset::getName)
+                  .isNotNull()
+                  .containsExactly(dataset0, dataset1);
+              assertThat(io.getInputs())
+                  .extracting(Metadata.Dataset::getSource)
+                  .isNotNull()
+                  .are(EQ_TO_SOURCE_IN_FACET);
+              assertThat(io.getOutputs()).isEmpty();
+            });
   }
 
   @Test
   public void testNewRunWithOutputDatasetsOnly() {
-    // (1) ...
+    // (1) Add source to I/O facet for run.
     final OpenLineage.DatasetFacets ioFacetsWithSource = mock(OpenLineage.DatasetFacets.class);
     final Map<String, OpenLineage.DatasetFacet> ioFacets = mock(Map.class);
     final OpenLineage.DatasetFacet sourceFacet = mock(OpenLineage.DatasetFacet.class);
@@ -302,11 +314,10 @@ public class MetadataTest {
     when(sourceFacets.get(Metadata.Facets.Dataset.SOURCE_CONNECTION_URI))
         .thenReturn(SOURCE_CONNECTION_URL.toASCIIString());
 
-    // ...
+    // (2) I/O
     final NamespaceName namespace0 = newNamespaceName();
     final DatasetName dataset0 = newDatasetName();
 
-    // (2) ...
     final OpenLineage.OutputDataset output0 = mock(OpenLineage.OutputDataset.class);
 
     when(output0.getNamespace()).thenReturn(namespace0.getValue());
@@ -315,30 +326,35 @@ public class MetadataTest {
 
     final List<OpenLineage.OutputDataset> outputs = List.of(output0);
 
-    // (3) ...
-    when(runEvent.getOutputs()).thenReturn(outputs);
+    // (3) Return I/O facets with source for run (outputs only).
+    when(mockRunEvent.getOutputs()).thenReturn(outputs);
 
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (4) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
-    final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
-    assertThat(io.getInputs()).isEmpty();
-    assertThat(io.getOutputs()).isNotEmpty();
-    assertThat(io.getOutputs())
-        .extracting(Metadata.Dataset::getName)
-        .isNotNull()
-        .containsExactly(dataset0);
-    assertThat(io.getOutputs())
-        .extracting(Metadata.Dataset::getSource)
-        .isNotNull()
-        .are(EQ_TO_SOURCE_IN_FACET);
+    // (5) Ensure source of I/O for run.
+    assertThat(run.getIo())
+        .hasValueSatisfying(
+            io -> {
+              assertThat(io.getInputs()).isEmpty();
+              assertThat(io.getOutputs()).isNotEmpty();
+              assertThat(io.getOutputs())
+                  .extracting(Metadata.Dataset::getName)
+                  .isNotNull()
+                  .containsExactly(dataset0);
+              assertThat(io.getOutputs())
+                  .extracting(Metadata.Dataset::getSource)
+                  .isNotNull()
+                  .are(EQ_TO_SOURCE_IN_FACET);
+            });
   }
 
   @Test
   public void testNewRunWithNominalStartAndEndTime() {
-    // (1) ...
+    // (1) Add nominal start and end time to run facets.
     final OpenLineage.RunFacets runFacetsWithNominalStartAndEndTime =
         mock(OpenLineage.RunFacets.class);
     final Map<String, OpenLineage.RunFacet> runFacets = mock(Map.class);
@@ -353,11 +369,11 @@ public class MetadataTest {
     when(runNominalTimeFacets.get(Metadata.Facets.Run.NOMINAL_END_TIME))
         .thenReturn(RUN_NOMINAL_END_TIME.toString());
 
-    // (2) ...
-    when(run.getFacets()).thenReturn(runFacetsWithNominalStartAndEndTime);
+    // (2) Return run facets with nominal start and end time.
+    when(mockRun.getFacets()).thenReturn(runFacetsWithNominalStartAndEndTime);
 
-    // (3) ...
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (3) Ensure nominal start and end time for run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
     assertThat(run.getNominalStartTime()).hasValue(RUN_NOMINAL_START_TIME);
@@ -366,7 +382,7 @@ public class MetadataTest {
 
   @Test
   public void testNewJobWithSourceCodeLocation() {
-    // (1) ...
+    // (1) Add source code location to job facets for run.
     final OpenLineage.JobFacets jobFacetsWithSourceCodeLocation = mock(OpenLineage.JobFacets.class);
     final Map<String, OpenLineage.JobFacet> jobFacets = mock(Map.class);
     final OpenLineage.JobFacet jobSourceCodeLocationFacet = mock(OpenLineage.JobFacet.class);
@@ -382,15 +398,16 @@ public class MetadataTest {
     when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.SOURCE_CODE_URL))
         .thenReturn(JOB_SOURCE_CODE_LOCATION.toString());
 
-    // (2) ...
-    when(job.getFacets()).thenReturn(jobFacetsWithSourceCodeLocation);
+    // (2) Return job facets with source code location for run.
+    when(mockJob.getFacets()).thenReturn(jobFacetsWithSourceCodeLocation);
 
-    // (3) ...
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (3) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
+    // (4) Ensure source code location for job.
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
     assertThat(job.getId()).isEqualTo(JOB_ID);
@@ -405,7 +422,7 @@ public class MetadataTest {
 
   @Test
   public void testNewJobWithDocumentation() {
-    // (1) ...
+    // (1) Add documentation to job facets for run.
     final OpenLineage.JobFacets jobFacetsWithDocumentation = mock(OpenLineage.JobFacets.class);
     final Map<String, OpenLineage.JobFacet> jobFacets = mock(Map.class);
     final OpenLineage.JobFacet jobSourceCodeLocationFacet = mock(OpenLineage.JobFacet.class);
@@ -418,15 +435,16 @@ public class MetadataTest {
     when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.DESCRIPTION))
         .thenReturn(JOB_DESCRIPTION);
 
-    // (2) ...
-    when(job.getFacets()).thenReturn(jobFacetsWithDocumentation);
+    // (2) // (2) Return job facets with documentation for run.
+    when(mockJob.getFacets()).thenReturn(jobFacetsWithDocumentation);
 
-    // (3) ...
-    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+    // (3) Ensure unique ID of run.
+    final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
+    assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (4) ...
+    // (4) Ensure documentation for job.
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
     assertThat(job.getId()).isEqualTo(JOB_ID);
