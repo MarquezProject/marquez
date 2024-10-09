@@ -1,4 +1,4 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import { APPLICATION_ERROR, DIALOG_TOGGLE } from '../actionCreators/actionTypes'
@@ -34,7 +34,7 @@ export default (state = initialState, action: IToggleExpandAction) => {
   }
   switch (action.type) {
     case APPLICATION_ERROR:
-      return { ...state, error: action.payload.message, success: '' }
+      return { ...state, error: action.payload.message, dialogIsOpen: true, success: '' }
     case DIALOG_TOGGLE:
       return { ...state, dialogIsOpen: !state.dialogIsOpen, editWarningField: action.payload.field }
     default:

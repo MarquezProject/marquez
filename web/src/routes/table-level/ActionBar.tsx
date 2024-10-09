@@ -2,6 +2,7 @@ import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import { Divider, FormControlLabel, Switch, TextField } from '@mui/material'
 import { fetchLineage } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
+import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
@@ -68,12 +69,14 @@ export const ActionBar = ({
         <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
         <Box>
           <MqText subdued>Namespace</MqText>
-          <MqText font={'mono'}>{namespace || 'Unknown namespace name'}</MqText>
+          <MqText font={'mono'}>
+            {namespace ? truncateText(namespace, 40) : 'Unknown namespace name'}
+          </MqText>
         </Box>
         <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
         <Box>
           <MqText subdued>Name</MqText>
-          <MqText font={'mono'}>{name || 'Unknown dataset name'}</MqText>
+          <MqText font={'mono'}>{name ? truncateText(name, 40) : 'Unknown dataset name'}</MqText>
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
@@ -94,6 +97,7 @@ export const ActionBar = ({
         <TextField
           id='column-level-depth'
           type='number'
+          inputProps={{ min: 0 }}
           label='Depth'
           variant='outlined'
           size='small'

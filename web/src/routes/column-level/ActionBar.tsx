@@ -76,6 +76,7 @@ export const ActionBar = ({ fetchColumnLineage, depth, setDepth }: ActionBarProp
         <TextField
           id='column-level-depth'
           type='number'
+          inputProps={{ min: 0 }}
           label='Depth'
           variant='outlined'
           size='small'

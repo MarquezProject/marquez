@@ -7,6 +7,8 @@ import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Events,
   Facets,
   Job,
@@ -71,19 +73,40 @@ export const fetchDatasetSuccess = (dataset: Dataset) => ({
   },
 })
 
-export const fetchDatasetVersions = (namespace: string, name: string) => ({
+export const fetchDatasetVersions = (
+  namespace: string,
+  name: string,
+  limit: number,
+  offset: number
+) => ({
   type: actionTypes.FETCH_DATASET_VERSIONS,
+  payload: {
+    namespace,
+    name,
+    limit,
+    offset,
+  },
+})
+
+export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[], totalCount: number) => ({
+  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
+  payload: { versions, totalCount },
+})
+
+export const fetchInitialDatasetVersions = (namespace: string, name: string) => ({
+  type: actionTypes.FETCH_INITIAL_DATASET_VERSIONS,
   payload: {
     namespace,
     name,
   },
 })
 
-export const fetchDatasetVersionsSuccess = (versions: DatasetVersion[]) => ({
-  type: actionTypes.FETCH_DATASET_VERSIONS_SUCCESS,
-  payload: {
-    versions,
-  },
+export const fetchInitialDatasetVersionsSuccess = (
+  versions: DatasetVersion[],
+  totalCount: number
+) => ({
+  type: actionTypes.FETCH_INITIAL_DATASET_VERSIONS_SUCCESS,
+  payload: { versions, totalCount },
 })
 
 export const resetDatasetVersions = () => ({
@@ -106,6 +129,24 @@ export const deleteDatasetSuccess = (datasetName: string) => ({
   type: actionTypes.DELETE_DATASET_SUCCESS,
   payload: {
     datasetName,
+  },
+})
+
+export const deleteJobTag = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.DELETE_JOB_TAG,
+  payload: {
+    namespace,
+    jobName,
+    tag,
+  },
+})
+
+export const deleteJobTagSuccess = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.DELETE_JOB_TAG_SUCCESS,
+  payload: {
+    jobName,
+    namespace,
+    tag,
   },
 })
 
@@ -154,6 +195,24 @@ export const deleteDatasetFieldTagSuccess = (
     namespace,
     tag,
     field,
+  },
+})
+
+export const addJobTag = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.ADD_JOB_TAG,
+  payload: {
+    namespace,
+    jobName,
+    tag,
+  },
+})
+
+export const addJobTagSuccess = (namespace: string, jobName: string, tag: string) => ({
+  type: actionTypes.ADD_JOB_TAG_SUCCESS,
+  payload: {
+    jobName,
+    namespace,
+    tag,
   },
 })
 
@@ -218,11 +277,26 @@ export const fetchJobs = (namespace: string, limit: number, offset: number) => (
   },
 })
 
+export const fetchJobTags = (namespace: string, job: string) => ({
+  type: actionTypes.FETCH_JOB_TAGS,
+  payload: {
+    namespace,
+    job,
+  },
+})
+
 export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
     jobs,
     totalCount,
+  },
+})
+
+export const fetchJobTagsSuccess = (jobTags: string[]) => ({
+  type: actionTypes.FETCH_JOB_TAGS_SUCCESS,
+  payload: {
+    jobTags,
   },
 })
 
@@ -245,18 +319,36 @@ export const deleteJobSuccess = (jobName: string) => ({
   },
 })
 
-export const fetchRuns = (jobName: string, namespace: string) => ({
+export const fetchRuns = (jobName: string, namespace: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_RUNS,
+  payload: {
+    jobName,
+    namespace,
+    limit,
+    offset,
+  },
+})
+
+export const fetchRunsSuccess = (jobName: string, jobRuns: Run[], totalCount: number) => ({
+  type: actionTypes.FETCH_RUNS_SUCCESS,
+  payload: {
+    jobName,
+    runs: jobRuns,
+    totalCount,
+  },
+})
+
+export const fetchLatestRuns = (jobName: string, namespace: string) => ({
+  type: actionTypes.FETCH_LATEST_RUNS,
   payload: {
     jobName,
     namespace,
   },
 })
 
-export const fetchRunsSuccess = (jobName: string, jobRuns: Run[]) => ({
-  type: actionTypes.FETCH_RUNS_SUCCESS,
+export const fetchLatestRunsSuccess = (jobRuns: Run[]) => ({
+  type: actionTypes.FETCH_LATEST_RUNS_SUCCESS,
   payload: {
-    jobName,
     runs: jobRuns,
   },
 })
@@ -425,4 +517,28 @@ export const fetchSearchSuccess = (search: Search) => ({
 export const setColumnLineageGraphDepth = (depth: number) => ({
   type: actionTypes.SET_COLUMN_LINEAGE_GRAPH_DEPTH,
   payload: depth,
+})
+
+export const fetchOpenSearchJobs = (q: string) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_JOBS,
+  payload: {
+    q,
+  },
+})
+
+export const fetchOpenSearchJobsSuccess = (search: OpenSearchResultJobs) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_JOBS_SUCCESS,
+  payload: search,
+})
+
+export const fetchOpenSearchDatasets = (q: string) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_DATASETS,
+  payload: {
+    q,
+  },
+})
+
+export const fetchOpenSearchDatasetsSuccess = (search: OpenSearchResultDatasets) => ({
+  type: actionTypes.FETCH_OPEN_SEARCH_DATASETS_SUCCESS,
+  payload: search,
 })

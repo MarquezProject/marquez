@@ -17,8 +17,10 @@ import marquez.service.LineageService;
 import marquez.service.NamespaceService;
 import marquez.service.OpenLineageService;
 import marquez.service.RunService;
+import marquez.service.SearchService;
 import marquez.service.ServiceFactory;
 import marquez.service.SourceService;
+import marquez.service.StatsService;
 import marquez.service.TagService;
 
 public class ApiTestUtils {
@@ -57,6 +59,10 @@ public class ApiTestUtils {
             (SourceService) mocks.getOrDefault(SourceService.class, (mock(SourceService.class))))
         .datasetService(
             (DatasetService) mocks.getOrDefault(DatasetService.class, (mock(DatasetService.class))))
+        .searchService(
+            (SearchService) mocks.getOrDefault(SearchService.class, (mock(SearchService.class))))
+        .statsService(
+            (StatsService) mocks.getOrDefault(StatsService.class, (mock(StatsService.class))))
         .build();
   }
 }

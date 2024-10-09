@@ -13,12 +13,12 @@ import {
   TableRow,
   createTheme,
 } from '@mui/material'
-import { ChevronLeftRounded, ChevronRightRounded, Refresh } from '@mui/icons-material'
 import { Dataset } from '../../types/api'
 import { HEADER_HEIGHT } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqScreenLoad } from '../../components/core/screen-load/MqScreenLoad'
 import { Nullable } from '../../types/util/Nullable'
+import { Refresh } from '@mui/icons-material'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
@@ -28,6 +28,7 @@ import {
 } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { truncateText } from '../../helpers/text'
 import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
@@ -35,6 +36,7 @@ import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
+import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
@@ -202,11 +204,11 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 dataset.name
                               )}`}
                             >
-                              {dataset.name}
+                              {truncateText(dataset.name, 40)}
                             </MqText>
                           </TableCell>
                           <TableCell align='left'>
-                            <MqText>{dataset.namespace}</MqText>
+                            <MqText>{truncateText(dataset.namespace, 40)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText>{dataset.sourceName}</MqText>
@@ -251,41 +253,13 @@ const Datasets: React.FC<DatasetsProps> = ({
                     })}
                 </TableBody>
               </Table>
-              <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
-                <MqText subdued>
-                  <>
-                    {PAGE_SIZE * state.page + 1} -{' '}
-                    {Math.min(PAGE_SIZE * (state.page + 1), totalCount)} of {totalCount}
-                  </>
-                </MqText>
-                <MQTooltip title={i18next.t('events_route.previous_page')}>
-                  <span>
-                    <IconButton
-                      sx={{
-                        marginLeft: theme.spacing(2),
-                      }}
-                      color='primary'
-                      disabled={state.page === 0}
-                      onClick={() => handleClickPage('prev')}
-                      size='large'
-                    >
-                      <ChevronLeftRounded />
-                    </IconButton>
-                  </span>
-                </MQTooltip>
-                <MQTooltip title={i18next.t('events_route.next_page')}>
-                  <span>
-                    <IconButton
-                      color='primary'
-                      onClick={() => handleClickPage('next')}
-                      size='large'
-                      disabled={state.page === Math.ceil(totalCount / PAGE_SIZE) - 1}
-                    >
-                      <ChevronRightRounded />
-                    </IconButton>
-                  </span>
-                </MQTooltip>
-              </Box>
+              <MqPaging
+                pageSize={PAGE_SIZE}
+                currentPage={state.page}
+                totalCount={totalCount}
+                incrementPage={() => handleClickPage('next')}
+                decrementPage={() => handleClickPage('prev')}
+              />
             </>
           )}
         </>

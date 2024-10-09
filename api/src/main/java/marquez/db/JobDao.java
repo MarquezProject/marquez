@@ -20,17 +20,20 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
+import marquez.common.models.RunState;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobDataset;
 import marquez.db.JobVersionDao.JobDatasetMapper;
 import marquez.db.mappers.JobMapper;
 import marquez.db.mappers.JobRowMapper;
+import marquez.db.mappers.RunMapper;
 import marquez.db.models.JobRow;
 import marquez.db.models.NamespaceRow;
 import marquez.service.models.Job;
 import marquez.service.models.JobMeta;
 import marquez.service.models.Run;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.postgresql.util.PGobject;
@@ -38,6 +41,7 @@ import org.postgresql.util.PGobject;
 @RegisterRowMapper(JobRowMapper.class)
 @RegisterRowMapper(JobMapper.class)
 @RegisterRowMapper(JobDatasetMapper.class)
+@RegisterRowMapper(RunMapper.class)
 public interface JobDao extends BaseDao {
 
   @SqlQuery(
@@ -62,10 +66,14 @@ public interface JobDao extends BaseDao {
       """
         WITH job_versions_facets AS (
             SELECT
-                job_version_uuid
-            ,   JSON_AGG(facet) as facets
+                f.job_version_uuid
+            ,   JSON_AGG(f.facet) as facets
             FROM
-                job_facets
+                job_facets f
+            LEFT JOIN
+                jobs_view j on j.current_version_uuid = f.job_version_uuid
+            WHERE
+                j.namespace_name=:namespaceName AND (j.name=:jobName OR :jobName = ANY(j.aliases))
             GROUP BY
                 job_version_uuid
         ),
@@ -134,14 +142,10 @@ public interface JobDao extends BaseDao {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
-          Optional<Run> run = createRunDao().findByLatestJob(namespaceName, jobName);
-          run.ifPresentOrElse(
-              r -> this.setJobData(r, j),
-              () ->
-                  this.setJobData(
-                      createJobVersionDao()
-                          .findCurrentInputOutputDatasetsFor(namespaceName, jobName),
-                      j));
+          List<Run> runs = createRunDao().findByLatestJob(namespaceName, jobName, 1, 0);
+          this.setJobData(runs, j);
+          this.setJobDataset(
+              createJobVersionDao().findCurrentInputOutputDatasetsFor(namespaceName, jobName), j);
         });
     return job;
   }
@@ -240,31 +244,54 @@ public interface JobDao extends BaseDao {
           ON f.run_uuid = jv.latest_run_uuid
         LEFT OUTER JOIN job_tags jt
           ON j.uuid  = jt.uuid
+        LEFT JOIN runs r
+          ON r.uuid = jv.latest_run_uuid
+        WHERE
+         (r.current_run_state IN (<lastRunStates>) OR r.uuid IS NULL)
         ORDER BY
             j.name
       """)
-  List<Job> findAll(String namespaceName, int limit, int offset);
+  List<Job> findAll(
+      String namespaceName,
+      @BindList("lastRunStates") List<RunState> lastRunStates,
+      int limit,
+      int offset);
 
   @SqlQuery("SELECT count(*) FROM jobs_view AS j WHERE symlink_target_uuid IS NULL")
   int count();
+
+  @SqlQuery(
+      """
+      select
+          count(*)
+      from
+          runs
+      where
+          namespace_name = :namespaceName
+      and
+          job_name = :job
+      ;
+      """)
+  int countJobRuns(String namespaceName, String job);
 
   @SqlQuery(
       "SELECT count(*) FROM jobs_view AS j WHERE j.namespace_name = :namespaceName\n"
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
-  default List<Job> findAllWithRun(String namespaceName, int limit, int offset) {
+  default List<Job> findAllWithRun(
+      String namespaceName, List<RunState> lastRunStates, int limit, int offset) {
     RunDao runDao = createRunDao();
-    return findAll(namespaceName, limit, offset).stream()
+    return findAll(namespaceName, lastRunStates, limit, offset).stream()
         .peek(
-            j ->
-                runDao
-                    .findByLatestJob(namespaceName, j.getName().getValue())
-                    .ifPresent(run -> this.setJobData(run, j)))
-        .collect(Collectors.toList());
+            j -> {
+              List<Run> runs = runDao.findByLatestJob(namespaceName, j.getName().getValue(), 10, 0);
+              this.setJobData(runs, j);
+            })
+        .toList();
   }
 
-  default void setJobData(List<JobDataset> datasets, Job j) {
+  default void setJobDataset(List<JobDataset> datasets, Job j) {
     Optional.of(
             datasets.stream()
                 .filter(d -> d.ioType().equals(IoType.INPUT))
@@ -286,11 +313,17 @@ public interface JobDao extends BaseDao {
         .ifPresent(s -> j.setOutputs(s));
   }
 
-  default void setJobData(Run run, Job j) {
-    j.setLatestRun(run);
+  default void setJobData(List<Run> runs, Job j) {
+    if (runs.isEmpty()) {
+      return;
+    }
+
+    Run latestRun = runs.get(0);
+    j.setLatestRun(latestRun);
+    j.setLatestRuns(runs);
     DatasetVersionDao datasetVersionDao = createDatasetVersionDao();
     j.setInputs(
-        datasetVersionDao.findInputDatasetVersionsFor(run.getId().getValue()).stream()
+        datasetVersionDao.findInputDatasetVersionsFor(latestRun.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(
@@ -298,7 +331,7 @@ public interface JobDao extends BaseDao {
                         DatasetName.of(ds.getDatasetName())))
             .collect(Collectors.toSet()));
     j.setOutputs(
-        datasetVersionDao.findOutputDatasetVersionsFor(run.getId().getValue()).stream()
+        datasetVersionDao.findOutputDatasetVersionsFor(latestRun.getId().getValue()).stream()
             .map(
                 ds ->
                     new DatasetId(

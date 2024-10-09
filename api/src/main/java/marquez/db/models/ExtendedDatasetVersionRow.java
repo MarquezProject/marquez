@@ -25,12 +25,21 @@ public class ExtendedDatasetVersionRow extends DatasetVersionRow {
       @NonNull Instant createdAt,
       @NonNull UUID datasetUuid,
       @NonNull UUID version,
+      @Nullable UUID schemaVersionUuid,
       @Nullable String lifecycleState,
       UUID runUuid,
       @NonNull final String namespaceName,
       @NonNull final String datasetName) {
     super(
-        uuid, createdAt, datasetUuid, version, lifecycleState, runUuid, namespaceName, datasetName);
+        uuid,
+        createdAt,
+        datasetUuid,
+        version,
+        schemaVersionUuid,
+        lifecycleState,
+        runUuid,
+        namespaceName,
+        datasetName);
     this.namespaceName = namespaceName;
     this.datasetName = datasetName;
   }

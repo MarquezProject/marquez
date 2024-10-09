@@ -27,6 +27,7 @@ public final class DatasetVersionRowMapper implements RowMapper<DatasetVersionRo
         timestampOrThrow(results, Columns.CREATED_AT),
         uuidOrThrow(results, Columns.DATASET_UUID),
         uuidOrThrow(results, Columns.VERSION),
+        uuidOrNull(results, Columns.DATASET_SCHEMA_VERSION_UUID),
         stringOrNull(results, Columns.LIFECYCLE_STATE),
         uuidOrNull(results, Columns.RUN_UUID),
         stringOrNull(results, Columns.NAMESPACE_NAME),

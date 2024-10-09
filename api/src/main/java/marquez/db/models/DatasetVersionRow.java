@@ -23,10 +23,15 @@ public class DatasetVersionRow {
   @Getter @NonNull private final Instant createdAt;
   @Getter @NonNull private final UUID datasetUuid;
   @Getter @NonNull private final UUID version;
+  @Nullable private final UUID schemaVersionUuid;
   @Getter @Nullable private final String lifecycleState;
   @Nullable private final UUID runUuid;
   @Getter @Nullable private final String namespaceName;
   @Getter @Nullable private final String datasetName;
+
+  public Optional<UUID> getSchemaVersionUuid() {
+    return Optional.ofNullable(schemaVersionUuid);
+  }
 
   public Optional<UUID> getRunUuid() {
     return Optional.ofNullable(runUuid);

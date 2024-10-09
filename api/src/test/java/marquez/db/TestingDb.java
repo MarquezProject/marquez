@@ -10,6 +10,7 @@ import static marquez.common.models.CommonModelGenerator.newFields;
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.client.OpenLineage;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -19,8 +20,10 @@ import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;
 import marquez.db.models.DatasetRow;
 import marquez.db.models.DatasetVersionRow;
+import marquez.db.models.IntervalMetric;
 import marquez.db.models.JobRow;
 import marquez.db.models.JobVersionRow;
+import marquez.db.models.LineageMetric;
 import marquez.db.models.NamespaceRow;
 import marquez.db.models.RunArgsRow;
 import marquez.db.models.RunRow;
@@ -134,6 +137,7 @@ final class TestingDb {
                 row.getCreatedAt(),
                 row.getDatasetUuid(),
                 row.getVersion(),
+                row.getSchemaVersionUuid().orElse(null),
                 row.getRunUuid().orElseThrow(),
                 Columns.toPgObject(newFields(4)),
                 row.getNamespaceName(),
@@ -244,5 +248,37 @@ final class TestingDb {
   /** Obtain a new {@link Handle} by delegating to underlying {@code jdbi}. */
   Handle open() {
     return delegate.open();
+  }
+
+  List<LineageMetric> lastDayLineageMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayMetrics();
+  }
+
+  List<LineageMetric> lastWeekLineageMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekMetrics(timezone);
+  }
+
+  List<IntervalMetric> lastDayJobMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayJobs();
+  }
+
+  List<IntervalMetric> lastWeekJobMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekJobs(timezone);
+  }
+
+  List<IntervalMetric> lastDayDatasetMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDayDatasets();
+  }
+
+  List<IntervalMetric> lastWeekDatasetMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekDatasets(timezone);
+  }
+
+  List<IntervalMetric> lastDaySourceMetrics() {
+    return delegate.onDemand(StatsDao.class).getLastDaySources();
+  }
+
+  List<IntervalMetric> lastWeekSourceMetrics(String timezone) {
+    return delegate.onDemand(StatsDao.class).getLastWeekSources(timezone);
   }
 }

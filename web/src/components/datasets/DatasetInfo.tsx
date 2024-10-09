@@ -44,9 +44,11 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, run, dataset, fetchJobFacets, resetFacets, showTags } = props
   const i18next = require('i18next')
   const dsNamespace = useSelector(
-    (state: IState) => state.datasetVersions.result.versions[0].namespace
+    (state: IState) => state.datasetVersions.initDsVersion.versions[0].namespace
   )
-  const dsName = useSelector((state: IState) => state.datasetVersions.result.versions[0].name)
+  const dsName = useSelector(
+    (state: IState) => state.datasetVersions.initDsVersion.versions[0].name
+  )
 
   useEffect(() => {
     run && fetchJobFacets(run.id)
@@ -114,7 +116,7 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                         <TableCell align='left'>
                           <Chip
                             size={'small'}
-                            label={<MqText font={'mono'}>{field.type}</MqText>}
+                            label={<MqText font={'mono'} small>{field.type || 'N/A'}</MqText>}
                             variant={'outlined'}
                           />
                         </TableCell>
@@ -138,11 +140,11 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                                 disabled={!hasColumnLineage}
                                 size={'small'}
                                 component={Link}
-                                to={`/datasets/column-level/${dataset.namespace}/${
-                                  dataset.name
-                                }?column=${encodeURIComponent(
+                                to={`/datasets/column-level/${encodeURIComponent(
+                                  dataset.namespace
+                                )}/${encodeURIComponent(dataset.name)}?column=${encodeURIComponent(
                                   encodeQueryString(dataset.namespace, dataset.name, field.name)
-                                )}&columnName=${field.name}`}
+                                )}&columnName=${encodeURIComponent(field.name)}`}
                               >
                                 <SplitscreenIcon />
                               </IconButton>

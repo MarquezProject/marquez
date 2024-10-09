@@ -11,7 +11,10 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static marquez.db.LineageTestUtils.createLineageRow;
 import static marquez.db.LineageTestUtils.newDatasetFacet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.openlineage.client.OpenLineage;
 import java.net.URI;
@@ -20,9 +23,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.Getter;
 import marquez.api.JdbiUtils;
+import marquez.common.models.DatasetName;
+import marquez.common.models.Field;
+import marquez.common.models.NamespaceName;
+import marquez.common.models.RunId;
+import marquez.common.models.SourceName;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.models.DatasetVersion;
+import marquez.service.models.DbTableMeta;
 import marquez.service.models.LineageEvent;
 import marquez.service.models.LineageEvent.Dataset;
 import marquez.service.models.LineageEvent.JobFacet;
@@ -39,6 +50,7 @@ class DatasetDaoTest {
 
   public static final String DATASET = "commonDataset";
   private static DatasetDao datasetDao;
+  private static DatasetVersionDao datasetVersionDao;
   private static OpenLineageDao openLineageDao;
 
   private final JobFacet jobFacet = JobFacet.builder().build();
@@ -49,6 +61,7 @@ class DatasetDaoTest {
   public static void setUpOnce(Jdbi jdbi) {
     DatasetDaoTest.jdbi = jdbi;
     datasetDao = jdbi.onDemand(DatasetDao.class);
+    datasetVersionDao = jdbi.onDemand(DatasetVersionDao.class);
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
   }
 
@@ -65,6 +78,46 @@ class DatasetDaoTest {
   @AfterEach
   public void tearDown(Jdbi jdbi) {
     JdbiUtils.cleanDatabase(jdbi);
+  }
+
+  @Test
+  void testUpsertMetadataMultipleRuns() {
+    marquez.service.models.Dataset firstResult =
+        datasetDao.upsertDatasetMeta(
+            new NamespaceName(NAMESPACE),
+            new DatasetName(DATASET),
+            new DbTableMeta(
+                new DatasetName(DATASET),
+                new SourceName("default"),
+                ImmutableList.of(
+                    new Field("field1", "TEXT", null, null),
+                    new Field("field2", "TEXT", null, null)),
+                null,
+                null,
+                new RunId(UUID.randomUUID())));
+
+    marquez.service.models.Dataset secondResult =
+        datasetDao.upsertDatasetMeta(
+            new NamespaceName(NAMESPACE),
+            new DatasetName(DATASET),
+            new DbTableMeta(
+                new DatasetName(DATASET),
+                new SourceName("default"),
+                ImmutableList.of(
+                    new Field("field1", "TEXT", null, null),
+                    new Field("field2", "TEXT", null, null)),
+                null,
+                null,
+                new RunId(UUID.randomUUID())));
+
+    // Same dataset id, different dataset versions, but same schema version
+    assertEquals(firstResult.getId(), secondResult.getId());
+    assertNotEquals(firstResult.getCurrentVersion(), secondResult.getCurrentVersion());
+    assertEquals(resolveSchemaVersion(firstResult), resolveSchemaVersion(secondResult));
+
+    // test count of dataset versions
+    int jobCount = datasetVersionDao.countDatasetVersions(NAMESPACE, DATASET);
+    assertEquals(jobCount, 2);
   }
 
   @Test
@@ -261,6 +314,7 @@ class DatasetDaoTest {
 
     Optional<marquez.service.models.Dataset> datasetByName =
         datasetDao.findDatasetByName(NAMESPACE, DATASET);
+
     assertThat(datasetByName)
         .isPresent()
         .get()
@@ -621,6 +675,13 @@ class DatasetDaoTest {
                 "http://test.producer/",
                 "_schemaURL",
                 "http://test.schema/"));
+  }
+
+  private Optional<UUID> resolveSchemaVersion(marquez.service.models.Dataset dataset) {
+    return dataset
+        .getCurrentVersion()
+        .flatMap(versionUuid -> datasetVersionDao.findByUuid(versionUuid))
+        .flatMap(DatasetVersion::getCurrentSchemaVersion);
   }
 
   @Getter

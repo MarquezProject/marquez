@@ -12,6 +12,8 @@ import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -42,6 +44,7 @@ import marquez.common.models.FacetType;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
+import marquez.common.models.RunState;
 import marquez.common.models.TagName;
 import marquez.common.models.Version;
 import marquez.db.JobFacetsDao;
@@ -164,11 +167,19 @@ public class JobResource extends BaseResource {
   @Produces(APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
+      @QueryParam("lastRunStates") List<RunState> lastRunStates,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
     throwIfNotExists(namespaceName);
 
-    final List<Job> jobs = jobService.findAllWithRun(namespaceName.getValue(), limit, offset);
+    // default to all run states if not specified
+    if (lastRunStates.isEmpty()) {
+      lastRunStates = new ArrayList<>();
+      Collections.addAll(lastRunStates, RunState.values());
+    }
+
+    final List<Job> jobs =
+        jobService.findAllWithRun(namespaceName.getValue(), lastRunStates, limit, offset);
     final int totalCount = jobService.countFor(namespaceName.getValue());
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
@@ -238,7 +249,8 @@ public class JobResource extends BaseResource {
 
     final List<Run> runs =
         runService.findAll(namespaceName.getValue(), jobName.getValue(), limit, offset);
-    return Response.ok(new Runs(runs)).build();
+    final int totalCount = jobService.countJobRuns(namespaceName.getValue(), jobName.getValue());
+    return Response.ok(new Runs(runs, totalCount)).build();
   }
 
   @Path("/jobs/runs/{id}")
@@ -329,5 +341,8 @@ public class JobResource extends BaseResource {
     @NonNull
     @JsonProperty("runs")
     List<Run> value;
+
+    @JsonProperty("totalCount")
+    int totalCount;
   }
 }

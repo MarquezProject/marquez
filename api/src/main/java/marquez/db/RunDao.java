@@ -410,6 +410,8 @@ public interface RunDao extends BaseDao {
                   Instant.now(),
                   dsRow.get().getUuid(),
                   version,
+                  // this path does not upsert dataset_fields, therefore no schema version created
+                  null,
                   runUuid,
                   datasetVersionDao.toPgObjectFields(d.getFields()),
                   d.getNamespace().getValue(),
@@ -508,15 +510,15 @@ public interface RunDao extends BaseDao {
   @SqlQuery(
       BASE_FIND_RUN_SQL
           + """
-      WHERE r.uuid=(
+      WHERE r.uuid IN (
         SELECT r.uuid FROM runs_view r
         INNER JOIN jobs_view j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
         WHERE j.namespace_name=:namespace AND (j.name=:jobName OR j.name=ANY(j.aliases))
         ORDER BY transitioned_at DESC
-        LIMIT 1
+        LIMIT :limit OFFSET :offset
       )
       """)
-  Optional<Run> findByLatestJob(String namespace, String jobName);
+  List<Run> findByLatestJob(String namespace, String jobName, int limit, int offset);
 
   @Builder
   record RunUpsert(

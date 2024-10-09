@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.48.0-SNAPSHOT
+  version: 0.50.0-SNAPSHOT
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -1279,7 +1279,7 @@ components:
         name: my-dataset
         physicalName: public.mytable
         createdAt: 2019-05-09T19:49:24.201361Z
-        upodatedAt: 2019-05-09T19:49:24.201361Z
+        updatedAt: 2019-05-09T19:49:24.201361Z
         namespace: my-namespace
         sourceName: my-source
         fields: [
@@ -1551,6 +1551,15 @@ components:
         name:
           description: The name of the job.
           type: string
+        simpleName:
+          description: The shortened name of the job.
+          type: string
+        parentJobName:
+          description: The name of the parent job.
+          type: string
+        parentJobUuid:
+          description: The UUID of the parent job.
+          type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
@@ -1587,6 +1596,10 @@ components:
           type: string
         latestRun:
           $ref: '#/components/schemas/Run'
+        latestRuns:
+          type: array
+          items:
+            $ref: '#/components/schemas/Run'
         facets:
           $ref: '#/components/schemas/JobFacets'
         currentVersion:
@@ -1608,6 +1621,7 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
+        latestRuns: []
         facets: {}
         currentVersion: "b1d626a2-6d3a-475e-9ecf-943176d4a8c6"
 

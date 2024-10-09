@@ -17,6 +17,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLContext;
 import lombok.Getter;
@@ -59,15 +60,17 @@ class MarquezHttp implements Closeable {
 
   static MarquezHttp create(
       @Nullable SSLContext sslContext,
+      @Nullable Consumer<HttpClientBuilder> httpCustomizer,
       @NonNull final MarquezClient.Version version,
       @Nullable final String apiKey) {
     final UserAgent userAgent = UserAgent.of(version);
-    final CloseableHttpClient http =
-        HttpClientBuilder.create()
-            .setUserAgent(userAgent.getValue())
-            .setSSLContext(sslContext)
-            .build();
-    return new MarquezHttp(http, apiKey);
+    final HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+    httpClientBuilder.setUserAgent(userAgent.getValue());
+    httpClientBuilder.setSSLContext(sslContext);
+    if (httpCustomizer != null) {
+      httpCustomizer.accept(httpClientBuilder);
+    }
+    return new MarquezHttp(httpClientBuilder.build(), apiKey);
   }
 
   String post(URL url) {

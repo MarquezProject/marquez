@@ -61,6 +61,7 @@ public final class JobMapper implements RowMapper<Job> {
             JobName.of(stringOrThrow(results, Columns.NAME)),
             stringOrThrow(results, Columns.SIMPLE_NAME),
             stringOrNull(results, Columns.PARENT_JOB_NAME),
+            uuidOrNull(results, Columns.PARENT_JOB_UUID),
             timestampOrThrow(results, Columns.CREATED_AT),
             timestampOrThrow(results, Columns.UPDATED_AT),
             getDatasetFromJsonOrNull(results, "current_inputs"),
@@ -69,6 +70,7 @@ public final class JobMapper implements RowMapper<Job> {
             stringOrNull(results, Columns.DESCRIPTION),
             // Latest Run is resolved in the JobDao. This can be brought in via a join and
             //  and a jsonb but custom deserializers will need to be introduced
+            null,
             null,
             facetsOrNull,
             uuidOrNull(results, Columns.CURRENT_VERSION_UUID),

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { JobOrDataset, LineageNode } from './lineage'
+import {Nullable} from "./util/Nullable";
 
 export interface Tag {
   name: string
@@ -101,6 +102,7 @@ interface InputFields {
 }
 
 export interface DatasetVersions {
+  totalCount: number
   versions: DatasetVersion[]
 }
 
@@ -149,7 +151,7 @@ export type DatasetType = 'DB_TABLE' | 'STREAM'
 
 export interface Field {
   name: string
-  type: string
+  type: Nullable<string>
   tags: string[]
   description: string
 }
@@ -171,6 +173,7 @@ export interface Job {
   location: string
   description: string
   latestRun: Run
+  tags: string[]
 }
 
 export interface JobId {
@@ -182,6 +185,7 @@ export type JobType = 'BATCH' | 'STREAM' | 'SERVICE'
 
 export interface Runs {
   runs: Run[]
+  totalCount: number
 }
 
 export interface Run {
@@ -278,4 +282,154 @@ export interface ColumnLineageInEdge {
 export interface ColumnLineageOutEdge {
   origin: string
   destination: string
+}
+
+// OpenSearch
+
+// jobs
+interface SourceCodeFacet {
+  language: string
+  _producer: string
+  _schemaURL: string
+  sourceCode: string
+}
+
+interface OpenSearchFacet {
+  sourceCode?: SourceCodeFacet
+}
+
+interface JobHit {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: EventType
+  type: string
+  facets?: OpenSearchFacet
+  runFacets: OpenSearchRunFacet
+}
+
+interface SparkLogicalPlan {
+  _producer: string
+  _schemaURL: string
+  plan: Plan[]
+}
+
+interface Plan {
+  class: string
+  numChildren: number
+  ifPartitionNotExists?: boolean
+  partitionColumns?: any[]
+  query?: number
+  outputColumnNames?: string
+  output?: AttributeReference[][]
+  isStreaming?: boolean
+}
+
+interface AttributeReference {
+  class: string
+  numChildren: number
+  name: string
+  dataType: string
+  nullable: boolean
+  metadata: Record<string, any>
+  exprId: ExprId
+  qualifier: any[]
+}
+
+interface ExprId {
+  productClass: string
+  id: number
+  jvmId: string
+}
+
+interface SparkVersion {
+  _producer: string
+  _schemaURL: string
+  sparkVersion: string
+  openlineageSparkVersion: string
+}
+
+interface ProcessingEngine {
+  _producer: string
+  _schemaURL: string
+  version: string
+  name: string
+  openlineageAdapterVersion: string
+}
+
+interface EnvironmentProperties {
+  _producer: string
+  _schemaURL: string
+  environmentProperties: Record<string, any>
+}
+
+interface OpenSearchRunFacet {
+  'spark.logicalPlan'?: SparkLogicalPlan
+  spark_version?: SparkVersion
+  processing_engine?: ProcessingEngine
+  'environment-properties'?: EnvironmentProperties
+}
+
+interface JobHighlight {
+  'facets.sourceCode.sourceCode'?: string[]
+}
+
+export interface OpenSearchResultJobs {
+  hits: JobHit[]
+  highlights: JobHighlight[]
+}
+
+// datasets
+type DatasetHighlight = {
+  [key: string]: string[]
+}
+
+type SearchInputField = {
+  namespace: string
+  name: string
+  field: string
+}
+
+type ColumnLineageField = {
+  inputFields: SearchInputField[]
+  transformationDescription: string
+  transformationType: string
+}
+
+type SchemaField = {
+  name: string
+  type: string
+  fields: any[]
+}
+
+type SchemaFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: SchemaField[]
+}
+
+type ColumnLineageFacet = {
+  _producer: string
+  _schemaURL: string
+  fields: {
+    [key: string]: ColumnLineageField
+  }
+}
+
+type OpenSearchDatasetFacets = {
+  schema?: SchemaFacet
+  columnLineage?: ColumnLineageFacet
+}
+
+type DatasetHit = {
+  run_id: string
+  name: string
+  namespace: string
+  eventType: string
+  facets?: OpenSearchDatasetFacets
+}
+
+export type OpenSearchResultDatasets = {
+  hits: DatasetHit[]
+  highlights: DatasetHighlight[]
 }

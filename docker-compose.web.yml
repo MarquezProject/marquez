@@ -3,9 +3,15 @@ services:
   web:
     image: "marquezproject/marquez-web:${TAG}"
     container_name: marquez-web
+    build:
+      context: .
+      args:
+        REACT_APP_ADVANCED_SEARCH: ${SEARCH_ENABLED}
     environment:
       - MARQUEZ_HOST=api
       - MARQUEZ_PORT=${API_PORT}
+      - WEB_PORT=${WEB_PORT}
+      - REACT_APP_ADVANCED_SEARCH=${SEARCH_ENABLED}
     ports:
       - "${WEB_PORT}:${WEB_PORT}"
     depends_on:

@@ -16,6 +16,7 @@ import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React from 'react'
+import {runStateColor} from "../../helpers/nodes";
 
 interface StateProps {
   lineage: LineageGraph
@@ -84,11 +85,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
             </MqText>
             <MqStatus
               label={job.latestRun?.state || 'N/A'}
-              color={
-                job.latestRun?.state === 'COMPLETED'
-                  ? theme.palette.primary.main
-                  : theme.palette.error.main
-              }
+              color={job.latestRun?.state ? runStateColor(job.latestRun?.state) : theme.palette.primary.main}
             />
           </Box>
         </Box>

@@ -85,9 +85,9 @@ public class MarquezHttpTest {
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null));
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, API_KEY));
     assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null));
-    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null, null));
+    assertThatNullPointerException().isThrownBy(() -> MarquezHttp.create(null, null, null, null));
     assertThatNullPointerException()
-        .isThrownBy(() -> MarquezHttp.create(SSLContext.getDefault(), null, API_KEY));
+        .isThrownBy(() -> MarquezHttp.create(SSLContext.getDefault(), null, null, API_KEY));
   }
 
   @Test
