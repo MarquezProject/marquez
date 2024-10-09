@@ -97,8 +97,10 @@ public class MetadataTest {
 
   @Test
   public void testNewRun() {
+    // (1) Return Metadata.Run instance for run event.
     final Metadata.Run run = Metadata.Run.forEvent(mockRunEvent);
 
+    // (2) Ensure run metadata for run event.
     assertThat(run).isNotNull();
     assertThat(run.getParent()).isEmpty();
     assertThat(run.getId()).isEqualTo(RUN_ID);
@@ -411,7 +413,6 @@ public class MetadataTest {
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
     assertThat(job.getId()).isEqualTo(JOB_ID);
-    assertThat(job.getSourceCodeLocation()).isNotEmpty();
     assertThat(job.getSourceCodeLocation())
         .hasValueSatisfying(
             sourceCodeLocation -> {
@@ -435,7 +436,7 @@ public class MetadataTest {
     when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.DESCRIPTION))
         .thenReturn(JOB_DESCRIPTION);
 
-    // (2) // (2) Return job facets with documentation for run.
+    // (2) Return job facets with documentation for run.
     when(mockJob.getFacets()).thenReturn(jobFacetsWithDocumentation);
 
     // (3) Ensure unique ID of run.
