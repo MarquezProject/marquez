@@ -3,11 +3,12 @@
 import { Box } from '@mui/system'
 import { Chip, Divider } from '@mui/material'
 import { Job } from '../../types/api'
+import { encodeNode, runStateColor } from '../../helpers/nodes'
 import { formatUpdatedAt } from '../../helpers'
-import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
+import { useNavigate } from 'react-router-dom'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const JobRunItem: React.FC<Props> = ({ job }) => {
+  const navigate = useNavigate()
   const longestRun = useMemo(
     () => job.latestRuns?.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
     [job.latestRuns]
@@ -30,6 +32,9 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
       border={1}
       borderColor={'divider'}
       borderRadius={2}
+      onClick={() => {
+        navigate(`/lineage/${encodeNode('JOB', job.namespace, job.name)}`)
+      }}
       sx={{
         cursor: 'pointer',
         transition: 'background-color 0.3s',

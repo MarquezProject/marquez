@@ -25,8 +25,8 @@ import MqStatus from '../../core/status/MqStatus'
 import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
-import spark_logo from './spark-logo.svg'
 import dbt_logo from './dbt-logo.svg'
+import spark_logo from './spark-logo.svg'
 
 interface StateProps {
   openSearchJobs: IOpenSearchJobsState
@@ -51,7 +51,7 @@ const LOGO_MAP = {
   spark: spark_logo,
   airflow: airflow_logo,
   dbt: dbt_logo,
-};
+}
 
 function parseStringToSegments(input: string): TextSegment[] {
   return input.split(/(<em>.*?<\/em>)/).map((segment) => {
@@ -221,12 +221,16 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
                       {'Integration'}
                     </MqText>
                     {(() => {
-                      const engineName = hit.runFacets.processing_engine.name.toLowerCase();
+                      const engineName = hit.runFacets.processing_engine.name.toLowerCase()
                       return LOGO_MAP[engineName as keyof typeof LOGO_MAP] ? (
-                        <img src={LOGO_MAP[engineName as keyof typeof LOGO_MAP]} height={24} alt={engineName.charAt(0).toUpperCase() + engineName.slice(1)} />
+                        <img
+                          src={LOGO_MAP[engineName as keyof typeof LOGO_MAP]}
+                          height={24}
+                          alt={engineName.charAt(0).toUpperCase() + engineName.slice(1)}
+                        />
                       ) : (
                         <Chip size={'small'} label={hit.runFacets?.processing_engine.name} />
-                      );
+                      )
                     })()}
                   </Box>
                 </>
