@@ -139,13 +139,11 @@ public final class Metadata {
       return Optional.ofNullable(io);
     }
 
-    /** ... */
     static Instant toUtc(@NonNull final ZonedDateTime transitionedOn) {
       return transitionedOn.withZoneSameInstant(ZoneOffset.UTC).toInstant();
     }
   }
 
-  /** ... */
   @Builder
   @ToString
   public static final class Job {
@@ -159,7 +157,6 @@ public final class Metadata {
     @Nullable private final SourceCodeLocation sourceCodeLocation;
     @Nullable private final IO io;
 
-    /* ... */
     public static Job newInstanceWith(
         @NonNull final OpenLineage.Run run,
         @NonNull final OpenLineage.Job job,
@@ -168,7 +165,6 @@ public final class Metadata {
       return newJobWith(job, IO.newInstanceWith(run, inputs, outputs));
     }
 
-    /* ... */
     public static Job forEvent(@NonNull final OpenLineage.JobEvent event) {
       return newJobWith(event.getJob(), IO.newInstanceWith(event.getInputs(), event.getOutputs()));
     }
@@ -265,39 +261,32 @@ public final class Metadata {
     @Nullable private final Schema schema;
     @Getter private final Source source;
 
-    /* ... */
     public static Dataset forEvent(@NonNull final OpenLineage.DatasetEvent event) {
       return newInstanceWith(null, event.getDataset());
     }
 
-    /* ... */
     static Dataset newInstanceFor(@NonNull final OpenLineage.Dataset dataset) {
       return newInstanceWith(null, dataset);
     }
 
-    /* ... */
     static Dataset newInstanceWith(
         @Nullable final OpenLineage.Run run, @NonNull final OpenLineage.Dataset dataset) {
-      final NamespaceName namespaceName = NamespaceName.of(dataset.getNamespace());
-      final DatasetName datasetName = DatasetName.of(dataset.getName());
-      final Dataset.Schema datasetSchema = Facets.schemaFor(dataset).orElse(null);
-      final DatasetId datasetId = new DatasetId(namespaceName, datasetName);
+      final DatasetId datasetId =
+          new DatasetId(
+              NamespaceName.of(dataset.getNamespace()), DatasetName.of(dataset.getName()));
+      final Dataset.DatasetBuilder datasetBuilder =
+          Dataset.builder()
+              .id(datasetId)
+              .type(DB_TABLE)
+              .name(datasetId.getName())
+              .namespace(datasetId.getNamespace());
+
       final Dataset.Source source = Facets.sourceFor(dataset);
-
-      // ...
+      final Optional<Dataset.Schema> datasetSchema = Facets.schemaFor(dataset);
       final DatasetVersionId datasetVersionId =
-          VersionId.forDataset(datasetId, datasetSchema, source);
+          VersionId.forDataset(datasetId, datasetSchema.orElse(null), source);
 
-      // ...
-      return Dataset.builder()
-          .id(datasetId)
-          .type(DB_TABLE)
-          .name(datasetName)
-          .namespace(namespaceName)
-          .versionId(datasetVersionId)
-          .schema(datasetSchema)
-          .source(Facets.sourceFor(dataset))
-          .build();
+      return datasetBuilder.source(source).versionId(datasetVersionId).build();
     }
 
     @Builder
@@ -331,26 +320,22 @@ public final class Metadata {
     }
   }
 
-  /* ... */
   @ToString
   public static final class IO {
     @Getter ImmutableSet<Dataset> inputs;
     @Getter ImmutableSet<Dataset> outputs;
 
-    /* ... */
     IO(@NonNull final ImmutableSet<Dataset> inputs, @NonNull final ImmutableSet<Dataset> outputs) {
       this.inputs = inputs;
       this.outputs = outputs;
     }
 
-    /* ... */
     public static IO newInstanceWith(
         @NonNull final List<OpenLineage.InputDataset> inputs,
         @NonNull final List<OpenLineage.OutputDataset> outputs) {
       return newInstanceWith(null, inputs, outputs);
     }
 
-    /* ... */
     public static IO newInstanceWith(
         @Nullable final OpenLineage.Run run,
         @NonNull final List<OpenLineage.InputDataset> inputs,
@@ -366,8 +351,7 @@ public final class Metadata {
       return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
   }
-
-  /* ... */
+  
   static class Facets {
     static final class Job {
       static final String SOURCE_CODE = "sourceCode";
