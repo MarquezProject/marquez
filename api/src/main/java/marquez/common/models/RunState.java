@@ -18,7 +18,7 @@ public enum RunState {
   OTHER;
 
   /* Returns true if this state is running. */
-  public boolean isStarting() {
+  public boolean isRunning() {
     return this == RUNNING;
   }
 
@@ -33,8 +33,8 @@ public enum RunState {
   }
 
   /* ... */
-  public static RunState forType(@NonNull OpenLineage.RunEvent.EventType olEventType) {
-    switch (olEventType) {
+  public static RunState forType(@NonNull OpenLineage.RunEvent.EventType type) {
+    switch (type) {
       case START:
       case RUNNING:
         return RUNNING;
@@ -47,6 +47,6 @@ public enum RunState {
       case OTHER:
         return OTHER;
     }
-    throw new IllegalArgumentException("Unknown 'OpenLineage.RunEvent.EventType': " + olEventType);
+    throw new IllegalArgumentException("Unknown 'OpenLineage.RunEvent.EventType': " + type);
   }
 }

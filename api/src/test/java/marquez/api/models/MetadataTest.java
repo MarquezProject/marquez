@@ -71,26 +71,22 @@ public class MetadataTest {
                   && source.getConnectionUrl().equals(SOURCE_CONNECTION_URL),
           "source name starts with 'source'");
 
-  // ...
   private OpenLineage.RunEvent runEvent;
   private OpenLineage.Run run;
   private OpenLineage.Job job;
 
   @BeforeEach
   public void setUp() {
-    // (1) ...
     runEvent = mock(OpenLineage.RunEvent.class);
     when(runEvent.getEventType()).thenReturn(RUN_EVENT_TYPE);
     when(runEvent.getEventTime()).thenReturn(RUN_EVENT_TIME);
     when(runEvent.getSchemaURL()).thenReturn(RUN_EVENT_SCHEMA_URL);
     when(runEvent.getProducer()).thenReturn(RUN_EVENT_PRODUCER);
 
-    // (2) ...
     run = mock(OpenLineage.Run.class);
     when(run.getRunId()).thenReturn(RUN_ID.getValue());
     when(runEvent.getRun()).thenReturn(run);
 
-    // (3) ...
     job = mock(OpenLineage.Job.class);
     when(job.getName()).thenReturn(JOB_NAME.getValue());
     when(job.getNamespace()).thenReturn(JOB_NAMESPACE.getValue());
@@ -99,8 +95,8 @@ public class MetadataTest {
 
   @Test
   public void testNewRun() {
-    // (1) ...
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
+
     assertThat(run).isNotNull();
     assertThat(run.getParent()).isEmpty();
     assertThat(run.getId()).isEqualTo(RUN_ID);
@@ -113,19 +109,17 @@ public class MetadataTest {
     assertThat(run.getExternalId()).isEmpty();
     assertThat(run.getJob().getId()).isEqualTo(JOB_ID);
 
-    // (2) ...
     final Metadata.IO io = run.getIo().orElseThrow(AssertionError::new);
     assertThat(io.getInputs()).isEmpty();
     assertThat(io.getOutputs()).isEmpty();
 
-    // (3) ...
     assertThat(run.getRawMeta()).isEqualTo(toJson(runEvent));
     assertThat(run.getProducer()).isEqualTo(runEvent.getProducer());
   }
 
   @Test
   public void testNewRunWithParent() {
-    // (1) ...
+    // (1) Add
     final OpenLineage.RunFacets runFacetsWithParent = mock(OpenLineage.RunFacets.class);
     final Map<String, OpenLineage.RunFacet> runFacets = mock(Map.class);
     final OpenLineage.RunFacet parentFacet = mock(OpenLineage.RunFacet.class);
@@ -149,7 +143,7 @@ public class MetadataTest {
     when(run.getFacets()).thenReturn(runFacetsWithParent);
 
     // (3) ...
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
@@ -212,7 +206,7 @@ public class MetadataTest {
     when(runEvent.getInputs()).thenReturn(inputs);
     when(runEvent.getOutputs()).thenReturn(outputs);
 
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
@@ -274,7 +268,7 @@ public class MetadataTest {
     // (3) ...
     when(runEvent.getInputs()).thenReturn(inputs);
 
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
@@ -323,7 +317,7 @@ public class MetadataTest {
     // (3) ...
     when(runEvent.getOutputs()).thenReturn(outputs);
 
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
@@ -362,7 +356,7 @@ public class MetadataTest {
     when(run.getFacets()).thenReturn(runFacetsWithNominalStartAndEndTime);
 
     // (3) ...
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
     assertThat(run.getNominalStartTime()).hasValue(RUN_NOMINAL_START_TIME);
@@ -389,7 +383,7 @@ public class MetadataTest {
     when(job.getFacets()).thenReturn(jobFacetsWithSourceCodeLocation);
 
     // (3) ...
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
@@ -418,7 +412,7 @@ public class MetadataTest {
     when(job.getFacets()).thenReturn(jobFacetsWithDocumentation);
 
     // (3) ...
-    final Metadata.Run run = Metadata.Run.newInstanceFor(runEvent);
+    final Metadata.Run run = Metadata.Run.forEvent(runEvent);
     assertThat(run).isNotNull();
     assertThat(run.getId()).isEqualTo(RUN_ID);
 
