@@ -103,7 +103,8 @@ public final class Metadata {
         runBuilder.endedAt(runTransitionedOnAsUtc);
       }
 
-      final Job job = Job.newInstance(run, event.getJob(), event.getInputs(), event.getOutputs());
+      final Job job =
+          Job.newInstanceWith(run, event.getJob(), event.getInputs(), event.getOutputs());
 
       runBuilder.job(job);
       runBuilder.io(job.getIo().orElse(null));
@@ -159,7 +160,7 @@ public final class Metadata {
     @Nullable private final IO io;
 
     /* ... */
-    public static Job newInstance(
+    public static Job newInstanceWith(
         @NonNull final OpenLineage.Run run,
         @NonNull final OpenLineage.Job job,
         @NonNull final List<OpenLineage.InputDataset> inputs,
@@ -174,7 +175,6 @@ public final class Metadata {
 
     static Job newJobWith(@NonNull final OpenLineage.Job job, @NonNull Metadata.IO io) {
       final JobId jobId = JobId.of(NamespaceName.of(job.getNamespace()), JobName.of(job.getName()));
-
       final Job.JobBuilder jobBuilder =
           Job.builder()
               .id(jobId)

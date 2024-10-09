@@ -59,6 +59,7 @@ public class MetadataTest {
   private static final NamespaceName JOB_NAMESPACE = newNamespaceName();
   private static final JobName JOB_NAME = newJobName();
   private static final JobId JOB_ID = JobId.of(JOB_NAMESPACE, JOB_NAME);
+  private static final String JOB_SOURCE_CODE_TYPE = "java";
   private static final URL JOB_SOURCE_CODE_LOCATION = newLocation();
   private static final String JOB_DESCRIPTION = newDescription();
 
@@ -376,6 +377,8 @@ public class MetadataTest {
         .thenReturn(jobSourceCodeLocationFacet);
     when(jobSourceCodeLocationFacet.getAdditionalProperties())
         .thenReturn(jobSourceCodeLocationFacets);
+    when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.SOURCE_CODE_TYPE))
+        .thenReturn(JOB_SOURCE_CODE_TYPE);
     when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.SOURCE_CODE_URL))
         .thenReturn(JOB_SOURCE_CODE_LOCATION.toString());
 
@@ -391,7 +394,13 @@ public class MetadataTest {
     final Metadata.Job job = run.getJob();
     assertThat(job).isNotNull();
     assertThat(job.getId()).isEqualTo(JOB_ID);
-    // assertThat(job.getLocation()).hasValue(JOB_SOURCE_CODE_LOCATION);
+    assertThat(job.getSourceCodeLocation()).isNotEmpty();
+    assertThat(job.getSourceCodeLocation())
+        .hasValueSatisfying(
+            sourceCodeLocation -> {
+              assertThat(sourceCodeLocation.getType()).isEqualTo(JOB_SOURCE_CODE_TYPE);
+              assertThat(sourceCodeLocation.getUrl()).isEqualTo(JOB_SOURCE_CODE_LOCATION);
+            });
   }
 
   @Test
@@ -406,7 +415,7 @@ public class MetadataTest {
     when(jobFacets.get(Metadata.Facets.Job.DOCUMENTATION)).thenReturn(jobSourceCodeLocationFacet);
     when(jobSourceCodeLocationFacet.getAdditionalProperties())
         .thenReturn(jobSourceCodeLocationFacets);
-    when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.DOCUMENTATION))
+    when(jobSourceCodeLocationFacets.get(Metadata.Facets.Job.DESCRIPTION))
         .thenReturn(JOB_DESCRIPTION);
 
     // (2) ...
