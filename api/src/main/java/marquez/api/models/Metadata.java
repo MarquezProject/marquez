@@ -351,7 +351,7 @@ public final class Metadata {
       return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
   }
-  
+
   static class Facets {
     static final class Job {
       static final String SOURCE_CODE = "sourceCode";
