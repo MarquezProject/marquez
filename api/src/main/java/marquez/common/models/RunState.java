@@ -18,7 +18,7 @@ public enum RunState {
   OTHER;
 
   /* Returns true if this state is running. */
-  public boolean isRunning() {
+  public boolean isStarting() {
     return this == RUNNING;
   }
 

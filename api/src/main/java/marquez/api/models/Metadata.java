@@ -97,7 +97,7 @@ public final class Metadata {
               .rawMeta(toJson(event))
               .producer(event.getProducer());
 
-      if (runState.isRunning()) {
+      if (runState.isStarting()) {
         runBuilder.startedAt(runTransitionedOnAsUtc);
       } else if (runState.isDone()) {
         runBuilder.endedAt(runTransitionedOnAsUtc);
@@ -162,57 +162,37 @@ public final class Metadata {
     public static Job newInstance(
         @NonNull final OpenLineage.Run run,
         @NonNull final OpenLineage.Job job,
-        @Nullable final List<OpenLineage.InputDataset> inputs,
-        @Nullable final List<OpenLineage.OutputDataset> outputs) {
-      final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
-      final JobName jobName = JobName.of(job.getName());
-      final JobId jobId = JobId.of(namespaceName, jobName);
-      final Optional<SourceCode> jobSourceCode = Facets.sourceCodeFor(job);
-      final Optional<SourceCodeLocation> jobSourceCodeLocation = Facets.sourceCodeLocationFor(job);
-      final IO io = IO.newInstanceWith(run, inputs, outputs);
-
-      // ...
-      final JobVersionId jobVersionId = VersionId.forJob(jobId, jobLocation.orElse(null), io);
-
-      return Job.builder()
-          .id(jobId)
-          .type(JobType.BATCH)
-          .name(jobName)
-          .namespace(namespaceName)
-          .versionId(jobVersionId)
-          .description(Facets.descriptionFor(job).orElse(null))
-          .sourceCode(jobSourceCode.orElse(null))
-          .sourceCodeLocation(jobSourceCodeLocation.orElse(null))
-          .io(io)
-          .build();
+        @NonNull final List<OpenLineage.InputDataset> inputs,
+        @NonNull final List<OpenLineage.OutputDataset> outputs) {
+      return newJobWith(job, IO.newInstanceWith(run, inputs, outputs));
     }
 
     /* ... */
     public static Job forEvent(@NonNull final OpenLineage.JobEvent event) {
-      final OpenLineage.Job job = event.getJob();
-      final NamespaceName namespaceName = NamespaceName.of(job.getNamespace());
-      final JobName jobName = JobName.of(job.getName());
-      final JobId jobId = JobId.of(namespaceName, jobName);
-      final Optional<SourceCode> jobSourceCode = Facets.sourceCodeFor(job);
-      final Optional<SourceCodeLocation> jobSourceCodeLocation = Facets.sourceCodeLocationFor(job);
-      final IO io = IO.newInstanceWith(event.getInputs(), event.getOutputs());
+      return newJobWith(event.getJob(), IO.newInstanceWith(event.getInputs(), event.getOutputs()));
+    }
 
-      // ...
+    static Job newJobWith(@NonNull final OpenLineage.Job job, @NonNull Metadata.IO io) {
+      final JobId jobId = JobId.of(NamespaceName.of(job.getNamespace()), JobName.of(job.getName()));
+
+      final Job.JobBuilder jobBuilder =
+          Job.builder()
+              .id(jobId)
+              .type(JobType.BATCH)
+              .name(jobId.getName())
+              .namespace(jobId.getNamespace())
+              .io(io);
+
+      Facets.descriptionFor(job).ifPresent(jobBuilder::description);
+      Facets.sourceCodeFor(job).ifPresent(jobBuilder::sourceCode);
+
+      final Optional<SourceCodeLocation> jobSourceCodeLocation = Facets.sourceCodeLocationFor(job);
+      jobSourceCodeLocation.ifPresent(jobBuilder::sourceCodeLocation);
+
       final JobVersionId jobVersionId =
           VersionId.forJob(jobId, jobSourceCodeLocation.orElse(null), io);
 
-      // ...
-      return Job.builder()
-          .id(jobId)
-          .type(JobType.BATCH)
-          .name(jobName)
-          .namespace(namespaceName)
-          .versionId(jobVersionId)
-          .description(Facets.descriptionFor(job).orElse(null))
-          .sourceCode(jobSourceCode.orElse(null))
-          .sourceCodeLocation(jobSourceCodeLocation.orElse(null))
-          .io(io)
-          .build();
+      return jobBuilder.versionId(jobVersionId).build();
     }
 
     public Optional<String> getDescription() {
@@ -364,35 +344,25 @@ public final class Metadata {
     }
 
     /* ... */
-    public static @Nullable IO newInstanceWith(
-        @Nullable final List<OpenLineage.InputDataset> inputs,
-        @Nullable final List<OpenLineage.OutputDataset> outputs) {
+    public static IO newInstanceWith(
+        @NonNull final List<OpenLineage.InputDataset> inputs,
+        @NonNull final List<OpenLineage.OutputDataset> outputs) {
       return newInstanceWith(null, inputs, outputs);
     }
 
     /* ... */
-    public static @Nullable IO newInstanceWith(
+    public static IO newInstanceWith(
         @Nullable final OpenLineage.Run run,
-        @Nullable final List<OpenLineage.InputDataset> inputs,
-        @Nullable final List<OpenLineage.OutputDataset> outputs) {
-      if (inputs == null && outputs == null) {
-        // ...
-        return null;
-      }
-
+        @NonNull final List<OpenLineage.InputDataset> inputs,
+        @NonNull final List<OpenLineage.OutputDataset> outputs) {
       final ImmutableSet.Builder<Dataset> inputsBuilder = ImmutableSet.builder();
-      if (inputs != null) {
-        for (final OpenLineage.InputDataset input : inputs) {
-          inputsBuilder.add(Dataset.newInstanceFor(input));
-        }
+      for (final OpenLineage.InputDataset input : inputs) {
+        inputsBuilder.add(Dataset.newInstanceFor(input));
       }
       final ImmutableSet.Builder<Dataset> outputsBuilder = ImmutableSet.builder();
-      if (outputs != null) {
-        for (final OpenLineage.OutputDataset output : outputs) {
-          outputsBuilder.add(Dataset.newInstanceWith(run, output));
-        }
+      for (final OpenLineage.OutputDataset output : outputs) {
+        outputsBuilder.add(Dataset.newInstanceWith(run, output));
       }
-
       return new IO(inputsBuilder.build(), outputsBuilder.build());
     }
   }
