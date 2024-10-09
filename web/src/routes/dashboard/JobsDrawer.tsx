@@ -1,10 +1,54 @@
+import * as Redux from 'redux'
 import { Box } from '@mui/system'
+import { IState } from '../../store/reducers'
+import { Job } from '../../types/api'
+import { Nullable } from '../../types/util/Nullable'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { fetchJobs } from '../../store/actionCreators'
 import { theme } from '../../helpers/theme'
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
+import JobRunItem from './JobRunItem'
+import MqPaging from '../../components/paging/MqPaging'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, { useEffect } from 'react'
 const WIDTH = 800
+const PAGE_SIZE = 10
 
-const JobsDrawer = () => {
+interface StateProps {
+  jobs: Job[]
+  isJobsLoading: boolean
+  jobCount: number
+  selectedNamespace: Nullable<string>
+}
+
+interface DispatchProps {
+  fetchJobs: typeof fetchJobs
+}
+
+type JobsDrawerProps = StateProps & DispatchProps
+
+const JobsDrawer = ({
+  jobs,
+  isJobsLoading,
+  jobCount,
+  fetchJobs,
+  selectedNamespace,
+}: JobsDrawerProps) => {
+  const [page, setPage] = React.useState<number>(0)
+
+  useEffect(() => {
+    if (selectedNamespace) {
+      fetchJobs(selectedNamespace, PAGE_SIZE, page * PAGE_SIZE)
+    }
+  }, [selectedNamespace, page])
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    const directionPage = direction === 'next' ? page + 1 : page - 1
+    fetchJobs(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    setPage(directionPage)
+  }
+
   return (
     <Box width={`${WIDTH}px`}>
       <Box px={2}>
@@ -19,14 +63,44 @@ const JobsDrawer = () => {
         >
           <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} pb={2}>
             <MqText font={'mono'} heading>
-              Job Runs
+              Jobs
             </MqText>
+            <MqPaging
+              pageSize={PAGE_SIZE}
+              currentPage={page}
+              totalCount={jobCount}
+              incrementPage={() => handleClickPage('next')}
+              decrementPage={() => handleClickPage('prev')}
+            />
           </Box>
         </Box>
-        <Box></Box>
+        <Box>
+          {jobs.map((job) => (
+            <JobRunItem key={job.id.namespace + job.id.name} job={job} />
+          ))}
+          {isJobsLoading && (
+            <Box display={'flex'} justifyContent={'center'}>
+              <CircularProgress />
+            </Box>
+          )}
+        </Box>
       </Box>
     </Box>
   )
 }
+const mapStateToProps = (state: IState) => ({
+  jobs: state.jobs.result,
+  jobCount: state.jobs.totalCount,
+  isJobsLoading: state.jobs.isLoading,
+  selectedNamespace: state.namespaces.selectedNamespace,
+})
 
-export default JobsDrawer
+const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
+  bindActionCreators(
+    {
+      fetchJobs: fetchJobs,
+    },
+    dispatch
+  )
+
+export default connect(mapStateToProps, mapDispatchToProps)(JobsDrawer)

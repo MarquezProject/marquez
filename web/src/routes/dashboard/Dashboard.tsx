@@ -8,6 +8,7 @@ import { IntervalMetric } from '../../store/requests/intervalMetrics'
 import { Job } from '../../types/api'
 import { LineageMetric } from '../../store/requests/lineageMetrics'
 import { MiniGraphContainer } from './MiniGraphContainer'
+import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
@@ -38,6 +39,7 @@ interface StateProps {
   isSourceMetricsLoading: boolean
   isJobMetricsLoading: boolean
   isDatasetMetricsLoading: boolean
+  selectedNamespace: Nullable<string>
 }
 
 interface DispatchProps {
@@ -83,6 +85,7 @@ const Dashboard: React.FC = ({
   isJobMetricsLoading,
   isDatasetMetricsLoading,
   isSourceMetricsLoading,
+  selectedNamespace,
 }: StateProps & DispatchProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [timeframe, setTimeframe] = React.useState(
@@ -122,6 +125,12 @@ const Dashboard: React.FC = ({
   }, [])
 
   useEffect(() => {
+    if (selectedNamespace) {
+      fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0)
+    }
+  }, [selectedNamespace])
+
+  useEffect(() => {
     const intervalTime = INTERVAL_TO_MS_MAP[intervalKey]
 
     if (intervalTime > 0) {
@@ -156,7 +165,12 @@ const Dashboard: React.FC = ({
       <Drawer
         anchor={'right'}
         open={jobsDrawerOpen}
-        onClose={() => setJobsDrawerOpen(false)}
+        onClose={() => {
+          setJobsDrawerOpen(false)
+          if (selectedNamespace) {
+            fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0)
+          }
+        }}
         PaperProps={{
           sx: {
             backgroundColor: theme.palette.background.default,
@@ -335,7 +349,7 @@ const Dashboard: React.FC = ({
                     See More
                   </Button>
                 </Box>
-                {jobs.map((job) => (
+                {jobs.slice(0, JOB_RUN_LIMIT).map((job) => (
                   <JobRunItem key={job.id.namespace + job.id.name} job={job} />
                 ))}
               </Box>
@@ -358,6 +372,7 @@ const mapStateToProps = (state: IState) => ({
   isDatasetMetricsLoading: state.datasetMetrics.isLoading,
   sourceMetrics: state.sourceMetrics.data,
   isSourceMetricsLoading: state.sourceMetrics.isLoading,
+  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

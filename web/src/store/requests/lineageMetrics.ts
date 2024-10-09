@@ -11,6 +11,7 @@ export interface LineageMetric {
 }
 
 export const getLineageMetrics = async (payload: { unit: 'day' | 'week' }) => {
-  const url = `${API_URL}/stats/lineage-events?period=${payload.unit.toUpperCase()}`
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const url = `${API_URL}/stats/lineage-events?period=${payload.unit.toUpperCase()}&timezone=${timezone}`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchLineageMetrics')
 }

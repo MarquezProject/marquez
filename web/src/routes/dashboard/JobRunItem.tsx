@@ -11,7 +11,7 @@ import { truncateText } from '../../helpers/text'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, { useMemo } from 'react'
 import airflow_logo from './airflow.svg'
 
 interface Props {
@@ -19,6 +19,10 @@ interface Props {
 }
 
 const JobRunItem: React.FC<Props> = ({ job }) => {
+  const longestRun = useMemo(
+    () => job.latestRuns.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
+    [job.latestRuns]
+  )
   return (
     <Box
       p={2}
@@ -67,19 +71,41 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
         <Box>
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
-            {Array.from({ length: 10 }, (_, i) => (
-              <MQTooltip key={i} title={stopWatchDuration(Math.random() * 10000)}>
+            {/*pad 10 - latestRuns length with a small grey bar*/}
+            {Array.from({ length: 10 - job.latestRuns.length }, (_, i) => (
+              <Box
+                key={i}
+                bgcolor={'divider'}
+                mr={0.5}
+                minHeight={2}
+                width={5}
+                sx={{
+                  borderTopLeftRadius: theme.shape.borderRadius,
+                  borderTopRightRadius: theme.shape.borderRadius,
+                }}
+              />
+            ))}
+            {job.latestRuns.map((run) => (
+              <MQTooltip
+                key={run.id}
+                title={
+                  <>
+                    <MqStatus label={job.latestRun?.state} color={runStateColor(run.state)} />
+                    <MqText sx={{ textAlign: 'center' }} subdued>
+                      {stopWatchDuration(Math.random() * 10000)}
+                    </MqText>
+                  </>
+                }
+              >
                 <Box
                   display={'flex'}
                   alignItems={'center'}
                   justifyContent={'space-between'}
-                  bgcolor={
-                    Math.random() > 0.5 ? theme.palette.primary.main : theme.palette.error.main
-                  }
+                  bgcolor={runStateColor(run.state)}
                   mr={0.5}
                   minHeight={2}
                   width={5}
-                  height={Math.floor(Math.random() * 40)}
+                  height={(run.durationMs / longestRun.durationMs) * 40}
                   sx={{
                     borderTopLeftRadius: theme.shape.borderRadius,
                     borderTopRightRadius: theme.shape.borderRadius,

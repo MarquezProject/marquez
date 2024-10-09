@@ -173,6 +173,7 @@ export interface Job {
   location: string
   description: string
   latestRun: Run
+  latestRuns: Run[]
   tags: string[]
 }
 
