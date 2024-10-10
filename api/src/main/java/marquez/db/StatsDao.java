@@ -50,43 +50,44 @@ public interface StatsDao extends BaseDao {
 
   @SqlQuery(
       """
-        WITH local_now AS (
-            SELECT (NOW() AT TIME ZONE :timezone) AS local_now
-        ),
-             day_series AS (
-                 SELECT generate_series(
-                                DATE_TRUNC('day', ln.local_now - INTERVAL '6 days'),
-                                DATE_TRUNC('day', ln.local_now),
-                                '1 day'
-                        ) AS start_interval
-                 FROM local_now ln
-             )
-        SELECT
-            ds.start_interval,
-            ds.start_interval + INTERVAL '1 day' AS end_interval,
-            COALESCE(current_day.fail, mv.fail, 0) AS fail,
-            COALESCE(current_day.start, mv.start, 0) AS start,
-            COALESCE(current_day.complete, mv.complete, 0) AS complete,
-            COALESCE(current_day.abort, mv.abort, 0) AS abort
-        FROM day_series ds
-                 LEFT JOIN lineage_events_by_type_daily_view mv
-                           ON ds.start_interval = (mv.start_interval AT TIME ZONE 'UTC') AT TIME ZONE :timezone
-                 LEFT JOIN (
-            SELECT
-                DATE_TRUNC('day', ln.local_now) AS start_interval,
-                DATE_TRUNC('day', ln.local_now) + INTERVAL '1 day' AS end_interval,
-                COALESCE(SUM(CASE WHEN event_type = 'FAIL' THEN 1 ELSE 0 END), 0) AS fail,
-                COALESCE(SUM(CASE WHEN event_type = 'START' THEN 1 ELSE 0 END), 0) AS start,
-                COALESCE(SUM(CASE WHEN event_type = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS complete,
-                COALESCE(SUM(CASE WHEN event_type = 'ABORT' THEN 1 ELSE 0 END), 0) AS abort
-            FROM lineage_events, local_now ln
-            WHERE (event_time AT TIME ZONE :timezone) >= DATE_TRUNC('day', ln.local_now)
-              AND (event_time AT TIME ZONE :timezone) < DATE_TRUNC('day', ln.local_now) + INTERVAL '1 day'
-            GROUP BY DATE_TRUNC('day', ln.local_now)
-        ) current_day
-                           ON ds.start_interval = current_day.start_interval
-        ORDER BY ds.start_interval;
-        """)
+              WITH date_bounds AS (SELECT DATE_TRUNC('day', NOW() AT TIME ZONE :timezone) - INTERVAL '6 days' AS start_date,
+                                          DATE_TRUNC('day', NOW() AT TIME ZONE :timezone) + INTERVAL '1 day'  AS end_date),
+                   day_series AS (SELECT start_date + INTERVAL '1 day' * n AS day
+                                  FROM date_bounds,
+                                       generate_series(0, 6) AS n),
+                   metrics AS (SELECT DATE_TRUNC('day', mv.start_interval AT TIME ZONE :timezone) AS day,
+                                      SUM(mv.fail)                                                AS fail,
+                                      SUM(mv.start)                                               AS start,
+                                      SUM(mv.complete)                                            AS complete,
+                                      SUM(mv.abort)                                               AS abort
+                               FROM lineage_events_by_type_hourly_view AS mv,
+                                    date_bounds
+                               WHERE mv.start_interval >= (start_date AT TIME ZONE :timezone)
+                                 AND mv.start_interval < (end_date AT TIME ZONE :timezone)
+                               GROUP BY day)
+              SELECT ds.day                                  AS start_interval,
+                     ds.day + INTERVAL '1 day'               AS end_interval,
+                     COALESCE(today.fail, m.fail, 0)         AS fail,
+                     COALESCE(today.start, m.start, 0)       AS start,
+                     COALESCE(today.complete, m.complete, 0) AS complete,
+                     COALESCE(today.abort, m.abort, 0)       AS abort
+              FROM day_series ds
+                       LEFT JOIN metrics m ON m.day = ds.day
+                       left outer join (WITH local_now AS (SELECT DATE_TRUNC('day', now() at time zone :timezone) AS time)
+                                        SELECT local_now.time                                                 AS start_interval,
+                                               local_now.time + INTERVAL '1 day'                              AS end_interval,
+                                               COALESCE(SUM(CASE WHEN event_type = 'FAIL' THEN 1 END), 0)     AS fail,
+                                               COALESCE(SUM(CASE WHEN event_type = 'START' THEN 1 END), 0)    AS start,
+                                               COALESCE(SUM(CASE WHEN event_type = 'COMPLETE' THEN 1 END), 0) AS complete,
+                                               COALESCE(SUM(CASE WHEN event_type = 'ABORT' THEN 1 END), 0)    AS abort
+                                        FROM lineage_events le,
+                                             local_now
+                                        WHERE (le.event_time AT TIME ZONE :timezone) >= local_now.time
+                                          AND (le.event_time AT TIME ZONE :timezone) < local_now.time + INTERVAL '1 day'
+                                        GROUP BY local_now.time) as today on
+                  ds.day = today.start_interval
+              ORDER BY ds.day;
+              """)
   List<LineageMetric> getLastWeekMetrics(String timezone);
 
   @SqlQuery(
