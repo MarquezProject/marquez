@@ -28,6 +28,10 @@ public class JobId {
     return new JobId(namespaceName, jobName);
   }
 
+  public static JobId of(final String namespaceNameString, final String jobNameString) {
+    return new JobId(NamespaceName.of(namespaceNameString), JobName.of(jobNameString));
+  }
+
   public NamespaceName getNamespace() {
     return namespaceName;
   }

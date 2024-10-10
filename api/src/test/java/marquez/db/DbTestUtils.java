@@ -422,6 +422,5 @@ final class DbTestUtils {
    */
   public static void materializeViews(@NonNull final Handle handle) {
     handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_hourly_view");
-    handle.execute("REFRESH MATERIALIZED VIEW lineage_events_by_type_daily_view");
   }
 }
