@@ -13,7 +13,6 @@ import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React, { useMemo } from 'react'
-import airflow_logo from './airflow.svg'
 
 interface Props {
   job: Job
@@ -54,22 +53,6 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           {job.tags.length > 3 && (
             <Chip sx={{ mr: 1 }} size={'small'} label={`+ ${job.tags.length - 3}`} />
           )}
-        </Box>
-        <Box>
-          <Chip
-            variant={'outlined'}
-            size={'small'}
-            icon={
-              <img
-                style={{ marginLeft: 8 }}
-                src={airflow_logo}
-                height={12}
-                width={12}
-                alt='Airflow Logo'
-              />
-            }
-            label='Airflow'
-          />
         </Box>
       </Box>
       <Box display={'flex'}>
