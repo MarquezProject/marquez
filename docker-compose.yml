@@ -12,8 +12,6 @@ services:
       - "${API_ADMIN_PORT}:${API_ADMIN_PORT}"
     volumes:
       - data:/opt/marquez
-    links:
-      - "db:postgres"
     depends_on:
       - db
     entrypoint: ["/opt/marquez/wait-for-it.sh", "db:${POSTGRES_PORT}", "--", "./entrypoint.sh"]

@@ -45,6 +45,11 @@ subprojects {
         archivesBaseName = 'marquez-api'
     }
 
+    project(':search') {
+        apply plugin: 'application'
+        archivesBaseName = 'marquez-search'
+    }
+
     project(':clients:java') {
         apply plugin: 'java-library'
         archivesBaseName = 'marquez-java'
