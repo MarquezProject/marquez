@@ -14,13 +14,13 @@ export const MqInputBase: React.FC<MqInputBaseProps> = (props) => {
     <InputBase
       {...props}
       sx={{
-        ...props.sx,
         borderRadius: theme.spacing(4),
         position: 'relative',
         backgroundColor: 'transparent',
         fontSize: 16,
         padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
         transition: theme.transitions.create(['border-color', 'box-shadow']),
+        ...props.sx,
       }}
     />
   )

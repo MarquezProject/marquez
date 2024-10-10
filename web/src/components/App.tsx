@@ -15,6 +15,7 @@ import { composeWithDevTools } from '@redux-devtools/extension'
 import { createBrowserHistory } from 'history'
 import { theme } from '../helpers/theme'
 import ColumnLevel from '../routes/column-level/ColumnLevel'
+import Dashboard from '../routes/dashboard/Dashboard'
 import Datasets from '../routes/datasets/Datasets'
 import Events from '../routes/events/Events'
 import Header from './header/Header'
@@ -62,7 +63,8 @@ const App = (): ReactElement => {
                     <Header />
                   </Container>
                   <Routes>
-                    <Route path={'/'} element={<Jobs />} />
+                    <Route path={'/'} element={<Dashboard />} />
+                    <Route path={'/jobs'} element={<Jobs />} />
                     <Route path={'/datasets'} element={<Datasets />} />
                     <Route path={'/events'} element={<Events />} />
                     <Route

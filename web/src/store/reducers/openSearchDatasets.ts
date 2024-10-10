@@ -1,8 +1,8 @@
-import { OpenSearchResultDatasets } from '../../types/api'
 import {
   FETCH_OPEN_SEARCH_DATASETS,
   FETCH_OPEN_SEARCH_DATASETS_SUCCESS,
 } from '../actionCreators/actionTypes'
+import { OpenSearchResultDatasets } from '../../types/api'
 import { fetchOpenSearchDatasets, fetchOpenSearchDatasetsSuccess } from '../actionCreators'
 
 export type IOpenSearchDatasetsState = {

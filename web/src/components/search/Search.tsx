@@ -6,16 +6,16 @@ import { Close, SearchOutlined } from '@mui/icons-material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
+import { REACT_APP_ADVANCED_SEARCH } from '../../globals'
 import { connect } from 'react-redux'
 import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
-import OpenSearch from './open-search/OpenSearch'
 import IconButton from '@mui/material/IconButton'
+import OpenSearch from './open-search/OpenSearch'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
-import { REACT_APP_ADVANCED_SEARCH } from "../../globals";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -114,7 +114,8 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
           spellCheck={false}
           sx={{
             zIndex: theme.zIndex.appBar + 2,
-            height: '64px',
+            height: HEADER_HEIGHT - 1,
+            paddingRight: theme.spacing(3),
           }}
           inputRef={inputRef}
           fullWidth={true}
@@ -181,7 +182,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                 }}
               >
                 <Box
-                  mt={'64px'}
+                  mt={`${HEADER_HEIGHT - 1}px`}
                   borderTop={1}
                   borderColor={'divider'}
                   overflow={'auto'}
