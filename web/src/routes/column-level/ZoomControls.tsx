@@ -26,7 +26,7 @@ export const ZoomControls = ({
       position={'absolute'}
       right={0}
       zIndex={1}
-      borderColor={theme.palette.grey[500]}
+      borderColor={theme.palette.grey[800]}
     >
       <MQTooltip title={'Zoom in'} placement={'left'}>
         <IconButton size='small' onClick={() => handleScaleZoom('in')}>

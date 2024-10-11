@@ -25,8 +25,8 @@ import MqStatus from '../../core/status/MqStatus'
 import MqText from '../../core/text/MqText'
 import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
-import spark_logo from './spark-logo.svg'
 import dbt_logo from './dbt-logo.svg'
+import spark_logo from './spark-logo.svg'
 
 interface StateProps {
   openSearchJobs: IOpenSearchJobsState
@@ -51,7 +51,7 @@ const LOGO_MAP = {
   spark: spark_logo,
   airflow: airflow_logo,
   dbt: dbt_logo,
-};
+}
 
 function parseStringToSegments(input: string): TextSegment[] {
   return input.split(/(<em>.*?<\/em>)/).map((segment) => {
@@ -121,7 +121,8 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
         const jobHit = openSearchJobs.data.hits[selectedIndex]
         navigate(`/lineage/${encodeNode('JOB', jobHit.namespace, jobHit.name)}`)
       } else {
-        const datasetHit = openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
+        const datasetHit =
+          openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
         navigate(`/lineage/${encodeNode('DATASET', datasetHit.namespace, datasetHit.name)}`)
       }
     }
@@ -129,20 +130,19 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
 
   const debouncedFetchJobs = useCallback(
     debounce(async (searchTerm) => {
-      fetchOpenSearchJobs(searchTerm);
-      setIsDebouncing(false); // Set loading to false after the fetch completes
+      fetchOpenSearchJobs(searchTerm)
+      setIsDebouncing(false) // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
-  );
-
+  )
 
   const debouncedFetchDatasets = useCallback(
     debounce(async (searchTerm) => {
-      fetchOpenSearchDatasets(searchTerm);
-      setIsDebouncing(false); // Set loading to false after the fetch completes
+      fetchOpenSearchDatasets(searchTerm)
+      setIsDebouncing(false) // Set loading to false after the fetch completes
     }, DEBOUNCE_TIME_MS),
     []
-  );
+  )
 
   useEffect(() => {
     setIsDebouncing(true)
@@ -154,7 +154,11 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
     setSelectedIndex(null)
   }, [openSearchJobs.data.hits, openSearchDatasets.data.hits])
 
-  if (openSearchJobs.data.hits.length === 0 && openSearchDatasets.data.hits.length === 0 && !isDebouncing) {
+  if (
+    openSearchJobs.data.hits.length === 0 &&
+    openSearchDatasets.data.hits.length === 0 &&
+    !isDebouncing
+  ) {
     return (
       <Box my={4}>
         <MqEmpty title={'No Hits'} body={'Keep typing or try a more precise search.'} />
@@ -217,12 +221,16 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
                       {'Integration'}
                     </MqText>
                     {(() => {
-                      const engineName = hit.runFacets.processing_engine.name.toLowerCase();
+                      const engineName = hit.runFacets.processing_engine.name.toLowerCase()
                       return LOGO_MAP[engineName as keyof typeof LOGO_MAP] ? (
-                        <img src={LOGO_MAP[engineName as keyof typeof LOGO_MAP]} height={24} alt={engineName.charAt(0).toUpperCase() + engineName.slice(1)} />
+                        <img
+                          src={LOGO_MAP[engineName as keyof typeof LOGO_MAP]}
+                          height={24}
+                          alt={engineName.charAt(0).toUpperCase() + engineName.slice(1)}
+                        />
                       ) : (
                         <Chip size={'small'} label={hit.runFacets?.processing_engine.name} />
-                      );
+                      )
                     })()}
                   </Box>
                 </>
@@ -376,7 +384,11 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
                             key={field.name}
                             label={field.name}
                             variant={'outlined'}
-                            color={field.name.toLowerCase().includes(search.toLowerCase()) ? 'primary' : 'default'}
+                            color={
+                              field.name.toLowerCase().includes(search.toLowerCase())
+                                ? 'primary'
+                                : 'default'
+                            }
                             size={'small'}
                             sx={{ mr: 1 }}
                           />

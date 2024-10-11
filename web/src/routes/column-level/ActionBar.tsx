@@ -1,7 +1,7 @@
 import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import { Divider, TextField } from '@mui/material'
+import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { fetchColumnLineage } from '../../store/actionCreators'
-import { theme } from '../../helpers/theme'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
@@ -29,7 +29,7 @@ export const ActionBar = ({ fetchColumnLineage, depth, setDepth }: ActionBarProp
         borderStyle: 'dashed',
       }}
       display={'flex'}
-      height={'64px'}
+      height={HEADER_HEIGHT - 1}
       justifyContent={'space-between'}
       alignItems={'center'}
       px={2}

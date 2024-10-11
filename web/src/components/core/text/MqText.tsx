@@ -29,6 +29,7 @@ interface OwnProps {
   linkTo?: string
   font?: 'primary' | 'mono'
   small?: boolean
+  large?: boolean
   bottomMargin?: boolean
   block?: boolean
   sx?: SxProps
@@ -58,6 +59,7 @@ const MqText: React.FC<MqTextProps> = ({
   highlight,
   color,
   small,
+  large,
   block,
   onClick,
   sx,
@@ -126,6 +128,10 @@ const MqText: React.FC<MqTextProps> = ({
       fontSize: '.625rem',
       lineHeight: 'inherit',
     },
+    large: {
+      fontSize: '1.25rem',
+      lineHeight: 'inherit',
+    },
     paragraph: {
       marginBottom: theme.spacing(2),
     },
@@ -146,6 +152,7 @@ const MqText: React.FC<MqTextProps> = ({
     inverse ? classesObject.inverse : {},
     inline ? classesObject.inline : {},
     small ? classesObject.small : {},
+    large ? classesObject.large : {},
     link ? classesObject.link : {},
     block ? classesObject.block : {},
     paragraph ? classesObject.paragraph : {},

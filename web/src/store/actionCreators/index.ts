@@ -7,18 +7,21 @@ import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
-  OpenSearchResultDatasets,
-  OpenSearchResultJobs,
   Events,
   Facets,
   Job,
   LineageGraph,
   Namespace,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Run,
+  RunState,
   Search,
   Tag,
 } from '../../types/api'
+import { IntervalMetric } from '../requests/intervalMetrics'
 import { JobOrDataset } from '../../types/lineage'
+import { LineageMetric } from '../requests/lineageMetrics'
 
 export const fetchEvents = (after: string, before: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_EVENTS,
@@ -268,12 +271,18 @@ export const resetDatasets = () => ({
   type: actionTypes.RESET_DATASETS,
 })
 
-export const fetchJobs = (namespace: string, limit: number, offset: number) => ({
+export const fetchJobs = (
+  namespace: string,
+  limit: number,
+  offset: number,
+  lastRunStates?: RunState
+) => ({
   type: actionTypes.FETCH_JOBS,
   payload: {
     namespace,
     limit,
     offset,
+    lastRunStates,
   },
 })
 
@@ -541,4 +550,69 @@ export const fetchOpenSearchDatasets = (q: string) => ({
 export const fetchOpenSearchDatasetsSuccess = (search: OpenSearchResultDatasets) => ({
   type: actionTypes.FETCH_OPEN_SEARCH_DATASETS_SUCCESS,
   payload: search,
+})
+
+export const fetchLineageMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_LINEAGE_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchLineageMetricsSuccess = (lineageMetrics: LineageMetric[]) => ({
+  type: actionTypes.FETCH_LINEAGE_METRICS_SUCCESS,
+  payload: lineageMetrics,
+})
+
+export const fetchJobMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_JOB_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchJobMetricsSuccess = (jobMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_JOB_METRICS_SUCCESS,
+  payload: jobMetrics,
+})
+
+export const fetchDatasetMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_DATASET_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchDatasetMetricsSuccess = (datasetMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_DATASET_METRICS_SUCCESS,
+  payload: datasetMetrics,
+})
+
+export const fetchSourceMetrics = (unit: 'day' | 'week') => ({
+  type: actionTypes.FETCH_SOURCE_METRICS,
+  payload: {
+    unit,
+  },
+})
+
+export const fetchSourceMetricsSuccess = (sourceMetrics: IntervalMetric[]) => ({
+  type: actionTypes.FETCH_SOURCE_METRICS_SUCCESS,
+  payload: sourceMetrics,
+})
+
+export const fetchJobsByState = (state: RunState, limit: number, offset: number) => ({
+  type: actionTypes.FETCH_JOBS_BY_STATE,
+  payload: {
+    state,
+    limit,
+    offset,
+  },
+})
+
+export const fetchJobsByStateSuccess = (jobs: Job[], totalCount: number) => ({
+  type: actionTypes.FETCH_JOBS_BY_STATE_SUCCESS,
+  payload: {
+    jobs,
+    totalCount,
+  },
 })

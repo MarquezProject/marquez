@@ -7,18 +7,23 @@ import { Reducer, combineReducers } from 'redux'
 import { createRouterReducer } from '@lagunovsky/redux-react-router'
 import columnLineage from './columnLineage'
 import dataset, { IDatasetState } from './dataset'
+import datasetMetrics, { IDatasetMetricsState } from './datasetMetrics'
 import datasetVersions, { IDatasetVersionsState } from './datasetVersions'
 import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'
-import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatasets'
-import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import events, { IEventsState } from './events'
 import facets, { IFacetsState } from './facets'
+import jobMetrics, { IJobMetricsState } from './jobMetrics'
 import jobs, { IJobsState } from './jobs'
+import jobsByState, { IJobsByStateState } from './jobsByState'
 import lineage, { ILineageState } from './lineage'
+import lineageMetrics, { ILineageMetricsState } from './lineageMetrics'
 import namespaces, { INamespacesState } from './namespaces'
+import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatasets'
+import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import runs, { IRunsState } from './runs'
 import search, { ISearchState } from './search'
+import sourceMetrics, { ISourceMetricsState } from './sourceMetrics'
 import tags, { ITagsState } from './tags'
 
 export interface IState {
@@ -38,6 +43,11 @@ export interface IState {
   columnLineage: IColumnLineageState
   search: ISearchState
   facets: IFacetsState
+  lineageMetrics: ILineageMetricsState
+  jobsByState: IJobsByStateState
+  jobMetrics: IJobMetricsState
+  datasetMetrics: IDatasetMetricsState
+  sourceMetrics: ISourceMetricsState
 }
 
 export default (history: History): Reducer =>
@@ -58,4 +68,9 @@ export default (history: History): Reducer =>
     openSearchDatasets,
     facets,
     tags,
+    lineageMetrics,
+    jobsByState,
+    jobMetrics,
+    datasetMetrics,
+    sourceMetrics,
   })

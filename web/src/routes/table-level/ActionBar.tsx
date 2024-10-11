@@ -1,7 +1,7 @@
 import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import { Divider, FormControlLabel, Switch, TextField } from '@mui/material'
+import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { fetchLineage } from '../../store/actionCreators'
-import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
@@ -44,7 +44,7 @@ export const ActionBar = ({
         borderStyle: 'dashed',
       }}
       display={'flex'}
-      height={'64px'}
+      height={HEADER_HEIGHT - 1}
       justifyContent={'space-between'}
       alignItems={'center'}
       px={2}

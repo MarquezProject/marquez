@@ -15,32 +15,37 @@ import {
   FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
+  FETCH_DATASET_METRICS,
   FETCH_DATASET_VERSIONS,
-  FETCH_OPEN_SEARCH_DATASETS,
-  FETCH_OPEN_SEARCH_JOBS,
   FETCH_EVENTS,
   FETCH_INITIAL_DATASET_VERSIONS,
   FETCH_JOBS,
+  FETCH_JOBS_BY_STATE,
   FETCH_JOB_FACETS,
+  FETCH_JOB_METRICS,
   FETCH_JOB_TAGS,
   FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
+  FETCH_LINEAGE_METRICS,
+  FETCH_OPEN_SEARCH_DATASETS,
+  FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
+  FETCH_SOURCE_METRICS,
 } from '../actionCreators/actionTypes'
 import {
   ColumnLineageGraph,
   Dataset,
   DatasetVersions,
   Datasets,
-  OpenSearchResultDatasets,
-  OpenSearchResultJobs,
   Events,
   Facets,
   Jobs,
   LineageGraph,
   Namespaces,
+  OpenSearchResultDatasets,
+  OpenSearchResultJobs,
   Runs,
   Tags,
 } from '../../types/api'
@@ -51,6 +56,8 @@ const call: any = Effects.call
 import { Job } from '../../types/api'
 import { Search } from '../../types/api'
 
+import { IntervalMetric, getIntervalMetrics } from '../requests/intervalMetrics'
+import { LineageMetric, getLineageMetrics } from '../requests/lineageMetrics'
 import {
   addDatasetFieldTag,
   addDatasetTag,
@@ -68,6 +75,7 @@ import {
   getJob,
   getJobFacets,
   getJobs,
+  getJobsByState,
   getNamespaces,
   getRunFacets,
   getRuns,
@@ -85,26 +93,30 @@ import {
   deleteJobSuccess,
   deleteJobTagSuccess,
   fetchColumnLineageSuccess,
+  fetchDatasetMetricsSuccess,
   fetchDatasetSuccess,
   fetchDatasetVersionsSuccess,
   fetchDatasetsSuccess,
-  fetchOpenSearchDatasetsSuccess,
-  fetchOpenSearchJobsSuccess,
   fetchEventsSuccess,
   fetchFacetsSuccess,
   fetchInitialDatasetVersionsSuccess,
+  fetchJobMetricsSuccess,
   fetchJobTagsSuccess,
   fetchJobsSuccess,
   fetchLatestRunsSuccess,
+  fetchLineageMetricsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
+  fetchOpenSearchDatasetsSuccess,
+  fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
   fetchSearchSuccess,
+  fetchSourceMetricsSuccess,
   fetchTagsSuccess,
 } from '../actionCreators'
 import { getColumnLineage } from '../requests/columnlineage'
-import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
 import { getLineage } from '../requests/lineage'
+import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
 
 export function* fetchTags() {
   try {
@@ -208,7 +220,13 @@ export function* fetchJobsSaga() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_JOBS)
-      const response: Jobs = yield call(getJobs, payload.namespace, payload.limit, payload.offset)
+      const response: Jobs = yield call(
+        getJobs,
+        payload.namespace,
+        payload.limit,
+        payload.offset,
+        payload.lastRunStates
+      )
       yield put(fetchJobsSuccess(response.jobs, response.totalCount))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
@@ -497,6 +515,80 @@ export function* fetchOpenSearchDatasetsSaga() {
   }
 }
 
+export function* fetchLineageMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_LINEAGE_METRICS)
+      const lineageMetrics: LineageMetric[] = yield call(getLineageMetrics, payload)
+      yield put(fetchLineageMetricsSuccess(lineageMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting lineage metrics'))
+    }
+  }
+}
+
+export function* fetchJobMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOB_METRICS)
+      const intervalMetrics: IntervalMetric[] = yield call(getIntervalMetrics, {
+        ...payload,
+        asset: 'jobs',
+      })
+      yield put(fetchJobMetricsSuccess(intervalMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting job metrics'))
+    }
+  }
+}
+
+export function* fetchDatasetMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_DATASET_METRICS)
+      const intervalMetrics: IntervalMetric[] = yield call(getIntervalMetrics, {
+        ...payload,
+        asset: 'datasets',
+      })
+      yield put(fetchDatasetMetricsSuccess(intervalMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting dataset metrics'))
+    }
+  }
+}
+
+export function* fetchSourceMetricsSaga() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_SOURCE_METRICS)
+      const intervalMetrics: IntervalMetric[] = yield call(getIntervalMetrics, {
+        ...payload,
+        asset: 'sources',
+      })
+      yield put(fetchSourceMetricsSuccess(intervalMetrics))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting source metrics'))
+    }
+  }
+}
+
+export function* fetchJobsByState() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_JOBS_BY_STATE)
+      const response: Jobs = yield call(
+        getJobsByState,
+        payload.runState,
+        payload.limit,
+        payload.offset
+      )
+      yield put(fetchJobsSuccess(response.jobs, response.totalCount))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting jobs by state'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -525,6 +617,11 @@ export default function* rootSaga(): Generator {
     addDatasetFieldTagSaga(),
     addTagsSaga(),
     fetchJobTagsSaga(),
+    fetchLineageMetricsSaga(),
+    fetchJobsByState(),
+    fetchJobMetricsSaga(),
+    fetchDatasetMetricsSaga(),
+    fetchSourceMetricsSaga(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

@@ -49,7 +49,6 @@ const MqDatePicker: React.FC<DatePickerProps> = ({
           },
         },
         '.MuiOutlinedInput-notchedOutline': {
-          border: `2px solid ${theme.palette.common.white}`,
           borderRadius: theme.spacing(4),
           '> legend': {
             marginLeft: theme.spacing(2),

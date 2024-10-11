@@ -1,7 +1,10 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { FETCH_OPEN_SEARCH_JOBS, FETCH_OPEN_SEARCH_JOBS_SUCCESS } from '../actionCreators/actionTypes'
+import {
+  FETCH_OPEN_SEARCH_JOBS,
+  FETCH_OPEN_SEARCH_JOBS_SUCCESS,
+} from '../actionCreators/actionTypes'
 
 import { OpenSearchResultJobs } from '../../types/api'
 import { fetchOpenSearchJobs, fetchOpenSearchJobsSuccess } from '../actionCreators'

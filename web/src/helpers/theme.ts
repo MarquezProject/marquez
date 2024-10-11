@@ -40,7 +40,10 @@ export const theme = createTheme({
       main: '#ee7b7b',
     },
     warning: {
-      main: '#7D7D7D',
+      main: '#FFB74D',
+    },
+    success: {
+      main: '#4CAF50',
     },
     info: {
       main: '#9c98ec',

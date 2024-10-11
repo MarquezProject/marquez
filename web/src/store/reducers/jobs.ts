@@ -10,12 +10,12 @@ import {
   FETCH_JOB_TAGS_SUCCESS,
   RESET_JOBS,
 } from '../actionCreators/actionTypes'
-import { IJob } from '../../types'
+import { Job } from '../../types/api'
 import { deleteJob, fetchJobTagsSuccess, fetchJobsSuccess } from '../actionCreators'
 
 export type IJobsState = {
   isLoading: boolean
-  result: IJob[]
+  result: Job[]
   totalCount: number
   init: boolean
   deletedJobName: string

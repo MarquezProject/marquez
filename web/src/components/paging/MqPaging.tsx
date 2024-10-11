@@ -22,7 +22,7 @@ interface Props {
 const MqPaging: FunctionComponent<Props> = (props) => {
   const { pageSize, currentPage, incrementPage, decrementPage, totalCount } = props
   return (
-    <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'} mb={2}>
+    <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'}>
       <MqText subdued>
         <>
           {pageSize * currentPage + 1} - {Math.min(pageSize * (currentPage + 1), totalCount)} of{' '}
