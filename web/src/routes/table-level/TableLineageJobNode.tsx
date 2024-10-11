@@ -122,10 +122,9 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
         width={24}
         sx={{
           rx: 4,
-          fill:
-            node.data.job.latestRun?.state === 'COMPLETED'
-              ? theme.palette.primary.main
-              : theme.palette.error.main,
+          fill: node.data.job.latestRun
+            ? runStateColor(node.data.job.latestRun.state)
+            : theme.palette.secondary.main,
         }}
       />
       <FontAwesomeIcon
