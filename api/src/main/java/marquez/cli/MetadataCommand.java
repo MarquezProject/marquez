@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -65,6 +66,7 @@ public final class MetadataCommand extends Command {
 
   /* Default runs. */
   private static final int DEFAULT_RUNS = 25;
+  private static final int DEFAULT_RUN_EXECUTIONS = 10;
   private static final int DEFAULT_RUN_DURATION = 300; // 5.minutes
 
   /* Default bytes. */
@@ -79,8 +81,10 @@ public final class MetadataCommand extends Command {
 
   /* Args for metadata command. */
   private static final String CMD_ARG_METADATA_RUNS = "runs";
+  private static final String CMD_ARG_METADATA_RUN_EXECUTIONS = "run-executions";
   private static final String CMD_ARG_METADATA_RUN_DURATION = "run-duration";
-  private static final String CMD_ARG_METADATA_EVENT_TIME = "event-time";
+  private static final String CMD_ARG_METADATA_EVENT_START_TIME = "event-start-time";
+  private static final String CMD_ARG_METADATA_EVENT_END_TIME = "event-end-time";
   private static final String CMD_ARG_METADATA_BYTES_PER_EVENT = "bytes-per-event";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
 
@@ -109,20 +113,33 @@ public final class MetadataCommand extends Command {
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RUNS)
-        .help("limits OL run events up to N");
+        .help("limits OL runs up to N");
+    subparser
+        .addArgument("--run-executions")
+        .dest("run-executions")
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_RUN_EXECUTIONS)
+        .help("limits OL run executions per job up to N");
     subparser
         .addArgument("--run-duration")
         .dest("run-duration")
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RUN_DURATION)
-        .help("the duration (in seconds) OL run event");
+        .help("the total OL run duration (in seconds) per job");
     subparser
-        .addArgument("--event-time")
-        .dest("event-time")
+        .addArgument("--event-start-time")
+        .dest("event-start-time")
         .type(String.class)
         .required(false)
-        .help("the event time of OL run event");
+        .help("the OL run event start time (as UTC ISO); timestamp format: 'YYYY-MM-DDTHH:MM:SSZ'");
+    subparser
+        .addArgument("--event-end-time")
+        .dest("event-end-time")
+        .type(String.class)
+        .required(false)
+        .help("the OL run event end time (as UTC ISO); timestamp format: 'YYYY-MM-DDTHH:MM:SSZ'");
     subparser
         .addArgument("--bytes-per-event")
         .dest("bytes-per-event")
@@ -142,25 +159,40 @@ public final class MetadataCommand extends Command {
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
-    final int runDuration = namespace.getInt(CMD_ARG_METADATA_RUN_DURATION);
-    final String eventTime = namespace.getString(CMD_ARG_METADATA_EVENT_TIME);
+    final int runExecutions = namespace.getInt(CMD_ARG_METADATA_RUN_EXECUTIONS);
+    final int runDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_RUN_DURATION);
+    final String eventStartTime = namespace.getString(CMD_ARG_METADATA_EVENT_START_TIME);
+    final String eventEndTime = namespace.getString(CMD_ARG_METADATA_EVENT_END_TIME);
     final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_EVENT);
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
     // Generate, then write events to metadata file.
-    writeOlEvents(newOlEvents(runs, runDuration, eventTime, bytesPerEvent), output);
+    writeOlEvents(
+        newOlEvents(
+            runs,
+            runExecutions,
+            runDurationPerExecution,
+            eventStartTime,
+            eventEndTime,
+            bytesPerEvent),
+        output);
   }
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
       final int numOfRuns,
-      final int runDuration,
-      @Nullable final String eventTime,
+      final int runExecutions,
+      final int runDurationPerExecution,
+      @Nullable final String eventStartTime,
+      @Nullable final String eventEndTime,
       final int bytesPerEvent) {
     System.out.format(
         "Generating '%d' runs, each COMPLETE event will have a size of '~%d' (bytes)...\n",
         numOfRuns, bytesPerEvent);
-    return Stream.generate(() -> newOlRunEvents(runDuration, eventTime, bytesPerEvent))
+    return Stream.generate(
+            () ->
+                newOlRunEvents(
+                    runDurationPerExecution, eventStartTime, eventEndTime, bytesPerEvent))
         .limit(numOfRuns)
         .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.complete()))
         .collect(toImmutableList());
@@ -171,11 +203,17 @@ public final class MetadataCommand extends Command {
    * and {@code COMPLETE} event for a given run.
    */
   private static RunEvents newOlRunEvents(
-      final int runDuration, @Nullable final String eventTime, final int bytesPerEvent) {
+      final int runDuration,
+      @Nullable final String eventStartTime,
+      @Nullable final String eventEndTime,
+      final int bytesPerEvent) {
     // (1) Generate start and end time for run.
-    final ZonedDateTime eventTimeStart =
-        (eventTime == null) ? newEventTime() : ZonedDateTime.parse(eventTime);
-    final ZonedDateTime eventTimeEnd = eventTimeStart.plusSeconds(runDuration);
+    final ZonedDateTime eventStartTimeWithTz =
+        Optional.ofNullable(eventStartTime).map(ZonedDateTime::parse).orElse(newEventTimeAsUtc());
+    final ZonedDateTime eventEndTimeWithTz =
+        Optional.ofNullable(eventEndTime)
+            .map(ZonedDateTime::parse)
+            .orElse(eventStartTimeWithTz.plusSeconds(runDuration));
 
     // (2) Generate run with an optional parent run, then the job.
     final OpenLineage.Run olRun = newRun(hasParentRunOrNot());
@@ -212,7 +250,7 @@ public final class MetadataCommand extends Command {
     return new RunEvents(
         OL.newRunEventBuilder()
             .eventType(START)
-            .eventTime(eventTimeStart)
+            .eventTime(eventStartTimeWithTz)
             .run(olRun)
             .job(olJob)
             .inputs(newInputs(numOfInputs, numOfFieldsInSchemaForInputs))
@@ -220,7 +258,7 @@ public final class MetadataCommand extends Command {
             .build(),
         OL.newRunEventBuilder()
             .eventType(COMPLETE)
-            .eventTime(eventTimeEnd)
+            .eventTime(eventEndTimeWithTz)
             .run(olRun)
             .job(olJob)
             .build());
@@ -372,7 +410,7 @@ public final class MetadataCommand extends Command {
   }
 
   /** Returns a new {@code event} time. */
-  private static ZonedDateTime newEventTime() {
+  private static ZonedDateTime newEventTimeAsUtc() {
     return ZonedDateTime.now(UTC);
   }
 
