@@ -1,4 +1,4 @@
-CREATE VIEW OR REPLACE datasets_view AS
+CREATE OR REPLACE VIEW datasets_view AS
 SELECT d.uuid,
     d.type,
     d.created_at,
