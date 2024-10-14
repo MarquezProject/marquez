@@ -264,7 +264,7 @@ public final class MetadataCommand extends Command {
             })
         .limit(runs)
         .flatMap(runEvents -> runEvents)
-        .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventType))
+        .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventTime))
         .collect(toImmutableList());
   }
 
