@@ -5,10 +5,13 @@
 
 package marquez.cli;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static io.openlineage.client.OpenLineage.RunEvent.EventType.COMPLETE;
+import static io.openlineage.client.OpenLineage.RunEvent.EventType.FAIL;
 import static io.openlineage.client.OpenLineage.RunEvent.EventType.START;
 import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.cli.Command;
@@ -21,12 +24,13 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.common.Utils;
@@ -55,6 +59,11 @@ import net.sourceforge.argparse4j.inf.Subparser;
  */
 @Slf4j
 public final class MetadataCommand extends Command {
+  /* Used for event randomization. */
+  private static final Random RANDOM = new Random();
+  private static final ZoneId AMERICA_LOS_ANGELES = ZoneId.of("America/Los_Angeles");
+  private static final List<String> FIELD_TYPES = ImmutableList.of("VARCHAR", "TEXT", "INTEGER");
+
   /* Used to calculate (approximate) total bytes per event. */
   private static final int BYTES_PER_RUN = 578;
   private static final int BYTES_PER_JOB = 58;
@@ -66,8 +75,19 @@ public final class MetadataCommand extends Command {
 
   /* Default runs. */
   private static final int DEFAULT_RUNS = 25;
-  private static final int DEFAULT_RUN_EXECUTIONS = 10;
-  private static final int DEFAULT_RUN_DURATION = 300; // 5.minutes
+  private static final int DEFAULT_MIN_RUN_DURATION = 300; // 5.minutes
+  private static final int DEFAULT_MAX_RUN_DURATION = 900; // 15.minutes
+  private static final int DEFAULT_RUN_DURATION =
+      DEFAULT_MIN_RUN_DURATION
+          + RANDOM.nextInt(
+              DEFAULT_MAX_RUN_DURATION
+                  - DEFAULT_MIN_RUN_DURATION
+                  + 1); // Between 5.minutes and 15.minutes
+  private static final int DEFAULT_RUNS_PER_JOB = 10;
+  private static final int DEFAULT_MAX_RUNS_FAILS_PER_JOB = 2;
+  private static final ZonedDateTime DEFAULT_RUNS_START_TIME = newEventTimeAsUtc();
+  private static final ZonedDateTime DEFAULT_RUNS_END_TIME =
+      DEFAULT_RUNS_START_TIME.plusSeconds(DEFAULT_RUN_DURATION);
 
   /* Default bytes. */
   private static final int DEFAULT_BYTES_PER_EVENT =
@@ -81,17 +101,14 @@ public final class MetadataCommand extends Command {
 
   /* Args for metadata command. */
   private static final String CMD_ARG_METADATA_RUNS = "runs";
-  private static final String CMD_ARG_METADATA_RUN_EXECUTIONS = "run-executions";
-  private static final String CMD_ARG_METADATA_RUN_DURATION = "run-duration";
-  private static final String CMD_ARG_METADATA_EVENT_START_TIME = "event-start-time";
-  private static final String CMD_ARG_METADATA_EVENT_END_TIME = "event-end-time";
+  private static final String CMD_ARG_METADATA_RUNS_PER_JOB = "run-per-job";
+  private static final String CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB = "max-run-fails-per-job";
+  private static final String CMD_ARG_METADATA_MIN_RUN_DURATION = "min-run-duration";
+  private static final String CMD_ARG_METADATA_MAX_RUN_DURATION = "max-run-duration";
+  private static final String CMD_ARG_METADATA_RUN_START_TIME = "run-start-time";
+  private static final String CMD_ARG_METADATA_RUN_END_TIME = "run-end-time";
   private static final String CMD_ARG_METADATA_BYTES_PER_EVENT = "bytes-per-event";
   private static final String CMD_ARG_METADATA_OUTPUT = "output";
-
-  /* Used for event randomization. */
-  private static final Random RANDOM = new Random();
-  private static final ZoneId AMERICA_LOS_ANGELES = ZoneId.of("America/Los_Angeles");
-  private static final List<String> FIELD_TYPES = ImmutableList.of("VARCHAR", "TEXT", "INTEGER");
 
   private static final String OL_NAMESPACE = newNamespaceName().getValue();
   private static final OpenLineage OL =
@@ -115,54 +132,82 @@ public final class MetadataCommand extends Command {
         .setDefault(DEFAULT_RUNS)
         .help("limits OL runs up to N");
     subparser
-        .addArgument("--run-executions")
-        .dest("run-executions")
+        .addArgument("--runs-per-job")
+        .dest("run-per-job")
         .type(Integer.class)
         .required(false)
-        .setDefault(DEFAULT_RUN_EXECUTIONS)
+        .setDefault(DEFAULT_RUNS_PER_JOB)
         .help("limits OL run executions per job up to N");
     subparser
-        .addArgument("--run-duration")
-        .dest("run-duration")
+        .addArgument("--max-run-fails-per-job")
+        .dest("max-run-fails-per-job")
         .type(Integer.class)
         .required(false)
-        .setDefault(DEFAULT_RUN_DURATION)
-        .help("the total OL run duration (in seconds) per job");
+        .setDefault(DEFAULT_MAX_RUNS_FAILS_PER_JOB)
+        .help("maximum OL run fails per job");
     subparser
-        .addArgument("--event-start-time")
-        .dest("event-start-time")
+        .addArgument("--min-run-duration")
+        .dest("min-run-duration")
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_MIN_RUN_DURATION)
+        .help("minimum OL run duration (in seconds) per execution");
+    subparser
+        .addArgument("--max-run-duration")
+        .dest("max-run-duration")
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_MAX_RUN_DURATION)
+        .help("maximum OL run duration (in seconds) per execution");
+    subparser
+        .addArgument("--run-start-time")
+        .dest("run-start-time")
         .type(String.class)
         .required(false)
-        .help("the OL run event start time (as UTC ISO); timestamp format: 'YYYY-MM-DDTHH:MM:SSZ'");
+        .setDefault(DEFAULT_RUNS_START_TIME)
+        .help(
+            "specifies the OL run start time in UTC ISO ('YYYY-MM-DDTHH:MM:SSZ');\n"
+                + "used for the initial OL run, with subsequent runs starting relative to the\n"
+                + "initial start time.");
     subparser
-        .addArgument("--event-end-time")
-        .dest("event-end-time")
+        .addArgument("--run-end-time")
+        .dest("run-end-time")
         .type(String.class)
         .required(false)
-        .help("the OL run event end time (as UTC ISO); timestamp format: 'YYYY-MM-DDTHH:MM:SSZ'");
+        .setDefault(DEFAULT_RUNS_END_TIME)
+        .help(
+            "specifies the OL run end time in UTC ISO ('YYYY-MM-DDTHH:MM:SSZ');\n"
+                + "used for the initial OL run, with subsequent runs ending relative to the\n"
+                + "initial end time.");
     subparser
         .addArgument("--bytes-per-event")
         .dest("bytes-per-event")
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_BYTES_PER_EVENT)
-        .help("size (in bytes) per OL run event");
+        .help("size (in bytes) per OL event");
     subparser
         .addArgument("-o", "--output")
         .dest("output")
         .type(String.class)
         .required(false)
-        .help("the output metadata file")
+        .help("output metadata file")
         .setDefault(DEFAULT_OUTPUT);
   }
 
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
-    final int runExecutions = namespace.getInt(CMD_ARG_METADATA_RUN_EXECUTIONS);
-    final int runDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_RUN_DURATION);
-    final String eventStartTime = namespace.getString(CMD_ARG_METADATA_EVENT_START_TIME);
-    final String eventEndTime = namespace.getString(CMD_ARG_METADATA_EVENT_END_TIME);
+    final int runsPerJob = namespace.getInt(CMD_ARG_METADATA_RUNS_PER_JOB);
+    final int maxRunFailsPerJob = namespace.getInt(CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB);
+    final int minRunDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_MIN_RUN_DURATION);
+    final int maxRunDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_MAX_RUN_DURATION);
+    final ZonedDateTime runStartTime =
+        ZonedDateTime.parse(
+            namespace.getString(CMD_ARG_METADATA_RUN_START_TIME), ISO_ZONED_DATE_TIME);
+    final ZonedDateTime runEndTime =
+        ZonedDateTime.parse(
+            namespace.getString(CMD_ARG_METADATA_RUN_END_TIME), ISO_ZONED_DATE_TIME);
     final int bytesPerEvent = namespace.getInt(CMD_ARG_METADATA_BYTES_PER_EVENT);
     final String output = namespace.getString(CMD_ARG_METADATA_OUTPUT);
 
@@ -170,31 +215,56 @@ public final class MetadataCommand extends Command {
     writeOlEvents(
         newOlEvents(
             runs,
-            runExecutions,
-            runDurationPerExecution,
-            eventStartTime,
-            eventEndTime,
+            runsPerJob,
+            maxRunFailsPerJob,
+            minRunDurationPerExecution,
+            maxRunDurationPerExecution,
+            runStartTime,
+            runEndTime,
             bytesPerEvent),
         output);
   }
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
-      final int numOfRuns,
-      final int runExecutions,
-      final int runDurationPerExecution,
-      @Nullable final String eventStartTime,
-      @Nullable final String eventEndTime,
+      final int runs,
+      final int runsPerJob,
+      final int maxRunFailsPerJob,
+      final int minRunDurationPerExecution,
+      final int maxRunDurationPerExecution,
+      @NonNull final ZonedDateTime runStartTime,
+      @NonNull final ZonedDateTime runEndTime,
       final int bytesPerEvent) {
+    checkArgument(maxRunFailsPerJob <= runsPerJob);
+    checkArgument(minRunDurationPerExecution <= maxRunDurationPerExecution);
+    checkArgument(runStartTime.isBefore(runEndTime));
     System.out.format(
-        "Generating '%d' runs, each COMPLETE event will have a size of '~%d' (bytes)...\n",
-        numOfRuns, bytesPerEvent);
+        "Generating '%d' runs, each COMPLETE/FAIL event will have a size of '~%d' (bytes)...\n",
+        runs, bytesPerEvent);
     return Stream.generate(
-            () ->
-                newOlRunEvents(
-                    runDurationPerExecution, eventStartTime, eventEndTime, bytesPerEvent))
-        .limit(numOfRuns)
-        .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.complete()))
+            () -> {
+              final RunAttemptsForJob runsForJob =
+                  newRunAttemptsForJobWith(
+                      runsPerJob,
+                      maxRunFailsPerJob,
+                      minRunDurationPerExecution,
+                      maxRunDurationPerExecution,
+                      runStartTime,
+                      runEndTime);
+              return runsForJob.attempts().stream()
+                  .map(
+                      runAttempt ->
+                          newOlRunEvents(
+                              runsForJob.job(),
+                              runAttempt.endState(),
+                              runAttempt.startedAt(),
+                              runAttempt.endedAt(),
+                              bytesPerEvent))
+                  .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.end()));
+            })
+        .limit(runs)
+        .flatMap(runEvents -> runEvents)
+        .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventType))
         .collect(toImmutableList());
   }
 
@@ -203,33 +273,25 @@ public final class MetadataCommand extends Command {
    * and {@code COMPLETE} event for a given run.
    */
   private static RunEvents newOlRunEvents(
-      final int runDuration,
-      @Nullable final String eventStartTime,
-      @Nullable final String eventEndTime,
+      @NonNull OpenLineage.Job job,
+      @NonNull final OpenLineage.RunEvent.EventType runEndState,
+      @NonNull final ZonedDateTime runStartTime,
+      @NonNull final ZonedDateTime runEndTime,
       final int bytesPerEvent) {
-    // (1) Generate start and end time for run.
-    final ZonedDateTime eventStartTimeWithTz =
-        Optional.ofNullable(eventStartTime).map(ZonedDateTime::parse).orElse(newEventTimeAsUtc());
-    final ZonedDateTime eventEndTimeWithTz =
-        Optional.ofNullable(eventEndTime)
-            .map(ZonedDateTime::parse)
-            .orElse(eventStartTimeWithTz.plusSeconds(runDuration));
+    // (1) Generate run.
+    final OpenLineage.Run run = newRun();
 
-    // (2) Generate run with an optional parent run, then the job.
-    final OpenLineage.Run olRun = newRun(hasParentRunOrNot());
-    final OpenLineage.Job olJob = newJob();
-
-    // (3) Generate number of I/O for run.
+    // (2) Generate number of I/O for run.
     int numOfInputs = RANDOM.nextInt(DEFAULT_NUM_OF_IO_PER_EVENT);
     int numOfOutputs = DEFAULT_NUM_OF_IO_PER_EVENT - numOfInputs;
 
-    // (4) Generate number of schema fields per I/O for run.
+    // (3) Generate number of schema fields per I/O for run.
     final int numOfFieldsInSchemaForInputs =
         RANDOM.nextInt(DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT);
     final int numOfFieldsInSchemaForOutputs =
         DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT - numOfFieldsInSchemaForInputs;
 
-    // (5) Generate an event of N bytes if provided; otherwise use default.
+    // (4) Generate an event of N bytes if provided; otherwise use default.
     if (bytesPerEvent > DEFAULT_BYTES_PER_EVENT) {
       // Bytes per event:
       // +------------+-----------+-------------------+
@@ -238,29 +300,29 @@ public final class MetadataCommand extends Command {
       // |->  578B  <-|->  78B  <-|->(256B x N) x P <-|
       // where, N is number of fields per schema, and P is number of I/O per event.
       //
-      // (6) Calculate the total I/O per event to equal the bytes per event.
+      // (5) Calculate the total I/O per event to equal the bytes per event.
       final int numOfInputsAndOutputsForEvent =
           (bytesPerEvent - BYTES_PER_RUN - BYTES_PER_JOB)
               / (DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT * BYTES_PER_FIELD_IN_SCHEMA);
 
-      // (7) Update the number of I/O to generate for run based on calculation.
+      // (6) Update the number of I/O to generate for run based on calculation.
       numOfInputs = RANDOM.nextInt(numOfInputsAndOutputsForEvent);
       numOfOutputs = numOfInputsAndOutputsForEvent - numOfInputs;
     }
     return new RunEvents(
         OL.newRunEventBuilder()
             .eventType(START)
-            .eventTime(eventStartTimeWithTz)
-            .run(olRun)
-            .job(olJob)
+            .eventTime(runStartTime)
+            .run(run)
+            .job(job)
             .inputs(newInputs(numOfInputs, numOfFieldsInSchemaForInputs))
             .outputs(newOutputs(numOfOutputs, numOfFieldsInSchemaForOutputs))
             .build(),
         OL.newRunEventBuilder()
-            .eventType(COMPLETE)
-            .eventTime(eventEndTimeWithTz)
-            .run(olRun)
-            .job(olJob)
+            .eventType(runEndState)
+            .eventTime(runEndTime)
+            .run(run)
+            .job(job)
             .build());
   }
 
@@ -283,38 +345,17 @@ public final class MetadataCommand extends Command {
     }
   }
 
-  /**
-   * Returns a new {@link OpenLineage.Run} object. A {@code parent} run will be associated with
-   * {@code child} run if {@code hasParentRun} is {@code true}; otherwise, the {@code child} run
-   * will not have a {@code parent} run.
-   */
-  private static OpenLineage.Run newRun(final boolean hasParentRun) {
+  /** Returns a new {@link OpenLineage.Run} object. */
+  private static OpenLineage.Run newRun() {
     return OL.newRun(
         newRunId().getValue(),
         OL.newRunFacetsBuilder()
-            .parent(
-                hasParentRun
-                    ? OL.newParentRunFacetBuilder().run(newParentRun()).job(newParentJob()).build()
-                    : null)
             .nominalTime(
                 OL.newNominalTimeRunFacetBuilder()
                     .nominalStartTime(newNominalTime())
                     .nominalEndTime(newNominalTime().plusHours(1))
                     .build())
             .build());
-  }
-
-  /** Returns a new {@link OpenLineage.ParentRunFacetRun} object. */
-  private static OpenLineage.ParentRunFacetRun newParentRun() {
-    return OL.newParentRunFacetRunBuilder().runId(newRunId().getValue()).build();
-  }
-
-  /** Returns a new {@link OpenLineage.ParentRunFacetJob} object. */
-  private static OpenLineage.ParentRunFacetJob newParentJob() {
-    return OL.newParentRunFacetJobBuilder()
-        .namespace(OL_NAMESPACE)
-        .name(newJobName().getValue())
-        .build();
   }
 
   /** Returns a new {@link OpenLineage.Job} object. */
@@ -414,15 +455,51 @@ public final class MetadataCommand extends Command {
     return ZonedDateTime.now(UTC);
   }
 
-  /** Returns {@code true} if parent run should be generated; {@code false} otherwise. */
-  private static boolean hasParentRunOrNot() {
-    return RANDOM.nextBoolean();
-  }
-
   private static int newId() {
     return RANDOM.nextInt(Integer.MAX_VALUE - 1);
   }
 
+  private static RunAttemptsForJob newRunAttemptsForJobWith(
+      final int runsPerJob,
+      final int maxRunFailsPerJob,
+      final int minRunDurationPerExecution,
+      final int maxRunDurationPerExecution,
+      @NonNull ZonedDateTime runStartTime,
+      @NonNull ZonedDateTime runEndTime) {
+    // (1) Generate COMPLETEs runs for job up to N.
+    final List<OpenLineage.RunEvent.EventType> completeOrFail =
+        IntStream.range(0, runsPerJob).mapToObj(run -> COMPLETE).collect(Collectors.toList());
+
+    // (2) Randomly assign FAIL runs for job by replacing COMPLETEs.
+    RANDOM
+        .ints(0, runsPerJob)
+        .distinct()
+        .limit(maxRunFailsPerJob) // Limit FAILs allowed up to N
+        .forEach(run -> completeOrFail.set(run, FAIL));
+
+    // (3) ...
+    final ImmutableList.Builder<RunAttempt> runAttempts = ImmutableList.builder();
+    for (OpenLineage.RunEvent.EventType runEndState : completeOrFail) {
+      int durationToAdd =
+          minRunDurationPerExecution
+              + RANDOM.nextInt(maxRunDurationPerExecution - minRunDurationPerExecution + 1);
+      runAttempts.add(new RunAttempt(runEndState, runStartTime, runEndTime));
+      runStartTime = runEndTime;
+      runEndTime = runStartTime.plusSeconds(durationToAdd);
+    }
+
+    return new RunAttemptsForJob(newJob(), runAttempts.build());
+  }
+
+  /** A container class for job run attempt info. */
+  record RunAttemptsForJob(@NonNull OpenLineage.Job job, @NonNull List<RunAttempt> attempts) {}
+
+  /** A container class for run attempt info. */
+  record RunAttempt(
+      OpenLineage.RunEvent.EventType endState,
+      @NonNull ZonedDateTime startedAt,
+      @NonNull ZonedDateTime endedAt) {}
+
   /** A container class for run info. */
-  record RunEvents(@NonNull OpenLineage.RunEvent start, @NonNull OpenLineage.RunEvent complete) {}
+  record RunEvents(@NonNull OpenLineage.RunEvent start, @NonNull OpenLineage.RunEvent end) {}
 }
