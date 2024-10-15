@@ -80,7 +80,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                   key={run.id}
                   title={
                     <>
-                      <MqStatus label={job.latestRun?.state} color={runStateColor(run.state)} />
+                      <MqStatus label={run?.state} color={runStateColor(run.state)} />
                       <MqText sx={{ textAlign: 'center' }} subdued>
                         {run && run.durationMs ? stopWatchDuration(run.durationMs) : 'N/A'}
                       </MqText>

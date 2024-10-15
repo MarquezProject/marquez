@@ -28,6 +28,7 @@ export default function SplitButton({ options, onClick }: Props) {
     index: number
   ) => {
     setSelectedIndex(index)
+    onClick(options[index])
     setOpen(false)
   }
 
