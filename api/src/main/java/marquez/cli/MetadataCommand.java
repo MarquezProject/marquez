@@ -24,6 +24,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
@@ -80,6 +81,7 @@ public final class MetadataCommand extends Command {
 
   /* Default runs. */
   private static final int DEFAULT_JOBS = 5;
+  private static final int DEFAULT_RUNS_ACTIVE = 0;
   private static final int DEFAULT_MIN_RUN_DURATION = 300; // 5.minutes
   private static final int DEFAULT_MAX_RUN_DURATION = 900; // 15.minutes
   private static final int DEFAULT_RUN_DURATION =
@@ -107,6 +109,7 @@ public final class MetadataCommand extends Command {
   /* Args for metadata command. */
   private static final String CMD_ARG_METADATA_JOBS = "jobs";
   private static final String CMD_ARG_METADATA_RUNS_PER_JOB = "runs-per-job";
+  private static final String CMD_ARG_METADATA_RUNS_ACTIVE = "runs-active";
   private static final String CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB = "max-run-fails-per-job";
   private static final String CMD_ARG_METADATA_MIN_RUN_DURATION = "min-run-duration";
   private static final String CMD_ARG_METADATA_MAX_RUN_DURATION = "max-run-duration";
@@ -143,6 +146,13 @@ public final class MetadataCommand extends Command {
         .required(false)
         .setDefault(DEFAULT_RUNS_PER_JOB)
         .help("limits OL run executions per job up to N");
+    subparser
+        .addArgument("--runs-active")
+        .dest("runs-active")
+        .type(Integer.class)
+        .required(false)
+        .setDefault(DEFAULT_RUNS_ACTIVE)
+        .help("limits OL run executions marked as active (='RUNNING') up to N");
     subparser
         .addArgument("--max-run-fails-per-job")
         .dest("max-run-fails-per-job")
@@ -203,6 +213,7 @@ public final class MetadataCommand extends Command {
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
     final int jobs = namespace.getInt(CMD_ARG_METADATA_JOBS);
+    final int runsActive = namespace.getInt(CMD_ARG_METADATA_RUNS_ACTIVE);
     final int runsPerJob = namespace.getInt(CMD_ARG_METADATA_RUNS_PER_JOB);
     final int maxRunFailsPerJob = namespace.getInt(CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB);
     final int minRunDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_MIN_RUN_DURATION);
@@ -220,6 +231,7 @@ public final class MetadataCommand extends Command {
     writeOlEvents(
         newOlEvents(
             jobs,
+            runsActive,
             runsPerJob,
             maxRunFailsPerJob,
             minRunDurationPerExecution,
@@ -233,6 +245,7 @@ public final class MetadataCommand extends Command {
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
       final int jobs,
+      final int runsActive,
       final int runsPerJob,
       final int maxRunFailsPerJob,
       final int minRunDurationPerExecution,
@@ -246,31 +259,50 @@ public final class MetadataCommand extends Command {
     System.out.format(
         "Generating runs '%d' per job, each COMPLETE/FAIL run event will have a size of '~%d' (bytes)...\n",
         runsPerJob, bytesPerEvent);
-    return Stream.generate(
-            () -> {
-              final RunAttemptsForJob runsForJob =
-                  newRunAttemptsForJobWith(
-                      runsPerJob,
-                      maxRunFailsPerJob,
-                      minRunDurationPerExecution,
-                      maxRunDurationPerExecution,
-                      runStartTime,
-                      runEndTime);
-              return runsForJob.attempts().stream()
-                  .map(
-                      runAttempt ->
-                          newOlRunEvents(
-                              runsForJob.job(),
-                              runAttempt.endState(),
-                              runAttempt.startedAt(),
-                              runAttempt.endedAt(),
-                              bytesPerEvent))
-                  .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.end()));
-            })
-        .limit(jobs)
-        .flatMap(runEvents -> runEvents)
-        .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventTime))
-        .collect(toImmutableList());
+    final List<OpenLineage.RunEvent> runEvents =
+        Stream.generate(
+                () -> {
+                  final RunAttemptsForJob runsForJob =
+                      newRunAttemptsForJobWith(
+                          runsPerJob,
+                          maxRunFailsPerJob,
+                          minRunDurationPerExecution,
+                          maxRunDurationPerExecution,
+                          runStartTime,
+                          runEndTime);
+                  return runsForJob.attempts().stream()
+                      .map(
+                          runAttempt ->
+                              newOlRunEvents(
+                                  runsForJob.job(),
+                                  runAttempt.endState(),
+                                  runAttempt.startedAt(),
+                                  runAttempt.endedAt(),
+                                  bytesPerEvent))
+                      .flatMap(e -> Stream.of(e.start(), e.end()));
+                })
+            .limit(jobs)
+            .flatMap(e -> e)
+            .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventTime))
+            .collect(Collectors.toList());
+
+    final ArrayList<String> jobsWithRunActive = new ArrayList<>();
+    final int markActive = Math.min(runsActive, jobs);
+    final int[] markedAsActive = {0};
+    runEvents.removeIf(
+        runEvent -> {
+          final String jobName = runEvent.getJob().getName();
+          if (markedAsActive[0] < markActive
+              && !jobsWithRunActive.contains(jobName)
+              && runEvent.getEventType() == COMPLETE) {
+            jobsWithRunActive.add(jobName); // Last run marked as active for job.
+            markedAsActive[0]++;
+            return true;
+          }
+          return false; // Skip
+        });
+
+    return runEvents;
   }
 
   /**
