@@ -79,7 +79,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     resetRuns,
     deleteJob,
     dialogToggle,
-    latestRuns,
     display,
     tabIndex,
     setTabIndex,
