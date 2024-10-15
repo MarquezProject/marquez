@@ -20,7 +20,7 @@ interface Props {
 
 const JobRunItem: React.FC<Props> = ({ job }) => {
   const navigate = useNavigate()
-  const reversedRuns = [...(job.latestRuns || [])].reverse();
+  const reversedRuns = [...(job.latestRuns || [])].reverse()
   const longestRun = useMemo(
     () => job.latestRuns?.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
     [job.latestRuns]
@@ -80,9 +80,9 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                   key={run.id}
                   title={
                     <>
-                      <MqStatus label={job.latestRun?.state} color={runStateColor(run.state)}/>
-                      <MqText sx={{textAlign: 'center'}} subdued>
-                        {run ? stopWatchDuration(run.durationMs) : 'N/A'}
+                      <MqStatus label={job.latestRun?.state} color={runStateColor(run.state)} />
+                      <MqText sx={{ textAlign: 'center' }} subdued>
+                        {run && run.durationMs ? stopWatchDuration(run.durationMs) : 'N/A'}
                       </MqText>
                     </>
                   }
@@ -102,7 +102,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                     }}
                   />
                 </MQTooltip>
-              );
+              )
             })}
           </Box>
         </Box>
@@ -137,7 +137,11 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
         <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
         <Box>
           <MqText subdued>LAST RUN</MqText>
-          <MqText>{job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}</MqText>
+          <MqText>
+            {job.latestRun && job.latestRun.durationMs
+              ? stopWatchDuration(job.latestRun.durationMs)
+              : 'N/A'}
+          </MqText>
         </Box>
         <Box display={{ sm: 'none', md: 'inline-flex' }}>
           <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />

@@ -34,6 +34,7 @@ import {
 } from '../../store/actionCreators'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { formatUpdatedAt } from '../../helpers'
+import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
 import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -48,7 +49,6 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import RunInfo from './RunInfo'
 import Runs from './Runs'
-import {runStateColor} from "../../helpers/nodes";
 
 interface DispatchProps {
   fetchLatestRuns: typeof fetchLatestRuns
@@ -259,7 +259,16 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<DirectionsRun color={'disabled'} />}
             label={'Running Status'.toUpperCase()}
-            value={<MqStatus label={job.latestRun?.state} color={job.latestRun?.state ?  runStateColor(job.latestRun.state) : theme.palette.secondary.main} />}
+            value={
+              <MqStatus
+                label={job.latestRun?.state}
+                color={
+                  job.latestRun?.state
+                    ? runStateColor(job.latestRun.state)
+                    : theme.palette.secondary.main
+                }
+              />
+            }
           />
         </Grid>
         <Grid item xs={3}>
