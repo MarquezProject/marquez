@@ -48,13 +48,18 @@ import net.sourceforge.argparse4j.inf.Subparser;
  *
  * <h2>Usage</h2>
  *
- * For example, the following command will generate {@code metadata.json} with {@code 10} runs
- * ({@code 20} events in total), where each START event will have a size of {@code ~16384} bytes;
- * events will be written to {@code metadata.json} in the {@code current} directory. You may specify
- * the location of {@code metadata.json} by using the command-line argument {@code --output}.
+ * For example, the following command will generate {@code metadata.json} with {@code 10} jobs,
+ * {@code 5} runs per job and a maximum of {@code 2} run failures ({@code 100} run events in total),
+ * where each START event will have a size of {@code ~16384} bytes; events will be written to {@code
+ * metadata.json} in the {@code current} directory. You may specify the location of {@code
+ * metadata.json} by using the command-line argument {@code --output}.
  *
  * <pre>{@code
- * java -jar marquez-api.jar metadata --runs 10 --bytes-per-event 16384
+ * java -jar marquez-api.jar metadata \
+ *   --jobs 10 \
+ *   --runs-per-job 5 \
+ *   --max-run-fails-per-job 2 \
+ *   --bytes-per-event 16384
  * }</pre>
  */
 @Slf4j
@@ -74,7 +79,7 @@ public final class MetadataCommand extends Command {
   private static final int DEFAULT_NUM_OF_FIELDS_IN_SCHEMA_PER_EVENT = 16;
 
   /* Default runs. */
-  private static final int DEFAULT_RUNS = 25;
+  private static final int DEFAULT_JOBS = 5;
   private static final int DEFAULT_MIN_RUN_DURATION = 300; // 5.minutes
   private static final int DEFAULT_MAX_RUN_DURATION = 900; // 15.minutes
   private static final int DEFAULT_RUN_DURATION =
@@ -100,8 +105,8 @@ public final class MetadataCommand extends Command {
   private static final String DEFAULT_OUTPUT = "metadata.json";
 
   /* Args for metadata command. */
-  private static final String CMD_ARG_METADATA_RUNS = "runs";
-  private static final String CMD_ARG_METADATA_RUNS_PER_JOB = "run-per-job";
+  private static final String CMD_ARG_METADATA_JOBS = "jobs";
+  private static final String CMD_ARG_METADATA_RUNS_PER_JOB = "runs-per-job";
   private static final String CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB = "max-run-fails-per-job";
   private static final String CMD_ARG_METADATA_MIN_RUN_DURATION = "min-run-duration";
   private static final String CMD_ARG_METADATA_MAX_RUN_DURATION = "max-run-duration";
@@ -125,15 +130,15 @@ public final class MetadataCommand extends Command {
   @Override
   public void configure(@NonNull Subparser subparser) {
     subparser
-        .addArgument("--runs")
-        .dest("runs")
+        .addArgument("--jobs")
+        .dest("jobs")
         .type(Integer.class)
         .required(false)
-        .setDefault(DEFAULT_RUNS)
-        .help("limits OL runs up to N");
+        .setDefault(DEFAULT_JOBS)
+        .help("limits OL jobs up to N");
     subparser
         .addArgument("--runs-per-job")
-        .dest("run-per-job")
+        .dest("runs-per-job")
         .type(Integer.class)
         .required(false)
         .setDefault(DEFAULT_RUNS_PER_JOB)
@@ -197,7 +202,7 @@ public final class MetadataCommand extends Command {
 
   @Override
   public void run(@NonNull Bootstrap<?> bootstrap, @NonNull Namespace namespace) {
-    final int runs = namespace.getInt(CMD_ARG_METADATA_RUNS);
+    final int jobs = namespace.getInt(CMD_ARG_METADATA_JOBS);
     final int runsPerJob = namespace.getInt(CMD_ARG_METADATA_RUNS_PER_JOB);
     final int maxRunFailsPerJob = namespace.getInt(CMD_ARG_METADATA_MAX_RUN_FAILS_PER_JOB);
     final int minRunDurationPerExecution = namespace.getInt(CMD_ARG_METADATA_MIN_RUN_DURATION);
@@ -214,7 +219,7 @@ public final class MetadataCommand extends Command {
     // Generate, then write events to metadata file.
     writeOlEvents(
         newOlEvents(
-            runs,
+            jobs,
             runsPerJob,
             maxRunFailsPerJob,
             minRunDurationPerExecution,
@@ -227,7 +232,7 @@ public final class MetadataCommand extends Command {
 
   /** Returns new {@link OpenLineage.RunEvent} objects with random values. */
   private static List<OpenLineage.RunEvent> newOlEvents(
-      final int runs,
+      final int jobs,
       final int runsPerJob,
       final int maxRunFailsPerJob,
       final int minRunDurationPerExecution,
@@ -239,8 +244,8 @@ public final class MetadataCommand extends Command {
     checkArgument(minRunDurationPerExecution <= maxRunDurationPerExecution);
     checkArgument(runStartTime.isBefore(runEndTime));
     System.out.format(
-        "Generating '%d' runs, each COMPLETE/FAIL event will have a size of '~%d' (bytes)...\n",
-        runs, bytesPerEvent);
+        "Generating runs '%d' per job, each COMPLETE/FAIL run event will have a size of '~%d' (bytes)...\n",
+        runsPerJob, bytesPerEvent);
     return Stream.generate(
             () -> {
               final RunAttemptsForJob runsForJob =
@@ -262,7 +267,7 @@ public final class MetadataCommand extends Command {
                               bytesPerEvent))
                   .flatMap(runEvents -> Stream.of(runEvents.start(), runEvents.end()));
             })
-        .limit(runs)
+        .limit(jobs)
         .flatMap(runEvents -> runEvents)
         .sorted(Comparator.comparing(OpenLineage.RunEvent::getEventTime))
         .collect(toImmutableList());
@@ -477,15 +482,15 @@ public final class MetadataCommand extends Command {
         .limit(maxRunFailsPerJob) // Limit FAILs allowed up to N
         .forEach(run -> completeOrFail.set(run, FAIL));
 
-    // (3) ...
+    // (3) Adjust run start and end times relative to the initial start and end time.
     final ImmutableList.Builder<RunAttempt> runAttempts = ImmutableList.builder();
     for (OpenLineage.RunEvent.EventType runEndState : completeOrFail) {
-      int durationToAdd =
+      runAttempts.add(new RunAttempt(runEndState, runStartTime, runEndTime));
+      int nextRunAttemptDurationInSeconds =
           minRunDurationPerExecution
               + RANDOM.nextInt(maxRunDurationPerExecution - minRunDurationPerExecution + 1);
-      runAttempts.add(new RunAttempt(runEndState, runStartTime, runEndTime));
       runStartTime = runEndTime;
-      runEndTime = runStartTime.plusSeconds(durationToAdd);
+      runEndTime = runStartTime.plusSeconds(nextRunAttemptDurationInSeconds);
     }
 
     return new RunAttemptsForJob(newJob(), runAttempts.build());
