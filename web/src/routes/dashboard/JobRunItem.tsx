@@ -60,7 +60,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
             {/*pad 10 - latestRuns length with a small grey bar*/}
-            {Array.from({ length: 10 - job.latestRuns?.length || 10 }, (_, i) => (
+            {Array.from({ length: 10 - job.latestRuns?.length || 0 }, (_, i) => (
               <Box
                 key={i}
                 bgcolor={'divider'}
@@ -73,14 +73,14 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                 }}
               />
             ))}
-            {job.latestRuns?.map((run) => (
+            {job.latestRuns?.reverse().map((run) => (
               <MQTooltip
                 key={run.id}
                 title={
                   <>
                     <MqStatus label={job.latestRun?.state} color={runStateColor(run.state)} />
                     <MqText sx={{ textAlign: 'center' }} subdued>
-                      {stopWatchDuration(Math.random() * 10000)}
+                      {run ? stopWatchDuration(run.durationMs) : 'N/A'}
                     </MqText>
                   </>
                 }

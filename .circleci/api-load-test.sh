@@ -99,7 +99,7 @@ log "http API server is ready!"
 
 # (5) Use metadata command to generate random dataset, job, and run metadata
 log "generate load test metadata (${METADATA_FILE}):"
-java -jar "${MARQUEZ_JAR}" metadata --runs 10 --bytes-per-event 16384 --output "${METADATA_FILE}"
+java -jar "${MARQUEZ_JAR}" metadata --jobs 100 --bytes-per-event 16384 --output "${METADATA_FILE}"
 
 # Display CPU/MEM
 cpu_and_mem_info
