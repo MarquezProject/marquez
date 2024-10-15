@@ -257,8 +257,7 @@ public final class MetadataCommand extends Command {
     checkArgument(minRunDurationPerExecution <= maxRunDurationPerExecution);
     checkArgument(runStartTime.isBefore(runEndTime));
     System.out.format(
-        "Generating runs '%d' per job, each COMPLETE/FAIL run event will have a size of '~%d' (bytes)...\n",
-        runsPerJob, bytesPerEvent);
+        ">> generating '%d' jobs with '%d' runs per job\n", jobs, runsPerJob, bytesPerEvent);
     final List<OpenLineage.RunEvent> runEvents =
         Stream.generate(
                 () -> {
@@ -288,19 +287,17 @@ public final class MetadataCommand extends Command {
 
     final ArrayList<String> jobsWithRunActive = new ArrayList<>();
     final int markActive = Math.min(runsActive, jobs);
-    final int[] markedAsActive = {0};
-    runEvents.removeIf(
-        runEvent -> {
-          final String jobName = runEvent.getJob().getName();
-          if (markedAsActive[0] < markActive
-              && !jobsWithRunActive.contains(jobName)
-              && runEvent.getEventType() == COMPLETE) {
-            jobsWithRunActive.add(jobName); // Last run marked as active for job.
-            markedAsActive[0]++;
-            return true;
-          }
-          return false; // Skip
-        });
+
+    for (int i = runEvents.size() - 1; i >= 0; i--) {
+      final OpenLineage.RunEvent runEvent = runEvents.get(i);
+      final String jobName = runEvent.getJob().getName();
+      if (jobsWithRunActive.size() < markActive
+          && !jobsWithRunActive.contains(jobName)
+          && runEvent.getEventType() == COMPLETE) {
+        runEvents.remove(i);
+        jobsWithRunActive.add(jobName); // Last run marked as active for job.
+      }
+    }
 
     return runEvents;
   }
@@ -366,7 +363,7 @@ public final class MetadataCommand extends Command {
   /** Write {@link OpenLineage.RunEvent}s to the specified {@code output}. */
   private static void writeOlEvents(
       @NonNull final List<OpenLineage.RunEvent> olEvents, @NonNull final String output) {
-    System.out.format("Writing '%d' events to: '%s'\n", olEvents.size(), output);
+    System.out.format(">> writing '%d' events to: '%s'\n", olEvents.size(), output);
     FileWriter fileWriter;
     PrintWriter printWriter = null;
     try {

@@ -73,7 +73,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
                 }}
               />
             ))}
-            {job.latestRuns?.map((run) => (
+            {job.latestRuns?.reverse().map((run) => (
               <MQTooltip
                 key={run.id}
                 title={
