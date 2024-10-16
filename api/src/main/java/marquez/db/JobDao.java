@@ -211,7 +211,7 @@ public interface JobDao extends BaseDao {
         FROM runs AS r
         INNER JOIN (
           SELECT job_uuid, MAX(transitioned_at) AS latest_transitioned_at
-          FROM AS runs
+          FROM runs
           GROUP BY job_uuid
         ) AS latest_run
         ON r.job_uuid = latest_run.job_uuid AND r.transitioned_at = latest_run.latest_transitioned_at
@@ -225,9 +225,9 @@ public interface JobDao extends BaseDao {
         ON jv.uuid = j.current_version_uuid
       LEFT OUTER JOIN facets_temp AS f
         ON f.run_uuid = jv.latest_run_uuid
-      LEFT OUTER JOIN job_tags jt
+      LEFT OUTER JOIN job_tags AS jt
         ON j.uuid  = jt.uuid
-      LEFT JOIN latest_runs r
+      LEFT JOIN latest_runs AS r
         ON r.job_uuid = j.uuid
       WHERE
         r.current_run_state IN (<lastRunStates>)
