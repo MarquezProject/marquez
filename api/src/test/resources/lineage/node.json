@@ -1,5 +1,5 @@
 {
-  "id": "dataset:namespace:commonDataset",
+  "id": "dataset&namespace&commonDataset",
   "type": "DATASET",
   "data": {
     "id": {
@@ -39,14 +39,14 @@
   },
   "inEdges": [
     {
-      "origin": "job:namespace:writeJob",
-      "destination": "dataset:namespace:commonDataset"
+      "origin": "job&namespace&writeJob",
+      "destination": "dataset&namespace&commonDataset"
     }
   ],
   "outEdges": [
     {
-      "origin": "dataset:namespace:commonDataset",
-      "destination": "job:namespace:readJob19<-commonDataset"
+      "origin": "dataset&namespace&commonDataset",
+      "destination": "job&namespace&readJob19<-commonDataset"
     }
   ]
 }

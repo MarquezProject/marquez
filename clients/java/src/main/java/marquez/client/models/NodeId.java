@@ -26,7 +26,7 @@ import lombok.ToString;
 @JsonDeserialize(converter = NodeId.FromValue.class)
 @JsonSerialize(converter = NodeId.ToValue.class)
 public final class NodeId implements Comparable<NodeId> {
-  public static final String ID_DELIM = ":";
+  public static final String ID_DELIM = "&";
   public static final Joiner ID_JOINER = Joiner.on(ID_DELIM);
 
   private static final String ID_PREFX_DATASET = "dataset";
@@ -36,7 +36,7 @@ public final class NodeId implements Comparable<NodeId> {
   private static final Pattern ID_PATTERN =
       Pattern.compile(
           String.format(
-              "^(%s|%s|%s|%s):.*$",
+              "^(%s|%s|%s|%s)&.*$",
               ID_PREFX_DATASET, ID_PREFX_DATASET_FIELD, ID_PREFX_JOB, ID_PREFX_RUN));
 
   public static final String VERSION_DELIM = "#";
@@ -136,10 +136,9 @@ public final class NodeId implements Comparable<NodeId> {
     return value.contains(VERSION_DELIM);
   }
 
-  @JsonIgnore
   private String[] parts(int expectedParts, String expectedType) {
 
-    // dead simple splitting by token- matches most ids
+    // Simple splitting by token - matches most IDs
     String[] parts = value.split(ID_DELIM + "|" + VERSION_DELIM);
     if (parts.length < expectedParts) {
       throw new UnsupportedOperationException(
@@ -149,15 +148,20 @@ public final class NodeId implements Comparable<NodeId> {
     } else if (parts.length == expectedParts) {
       return parts;
     } else {
-      // try to avoid matching colons in URIs- e.g., scheme://authority and host:port patterns
-      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+))");
+      // Avoid matching colons in URIs (e.g., '://')
+      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//))");
       Matcher matcher = p.matcher(value);
       String[] returnParts = new String[expectedParts];
 
       int index;
       int prevIndex = 0;
       for (int i = 0; i < expectedParts - 1; i++) {
-        matcher.find();
+        if (!matcher.find()) {
+          throw new UnsupportedOperationException(
+                  String.format(
+                          "Expected NodeId of type %s with %s parts. Got: %s",
+                          expectedType, expectedParts, getValue()));
+        }
         index = matcher.start();
         returnParts[i] = value.substring(prevIndex, index);
         prevIndex = matcher.end();

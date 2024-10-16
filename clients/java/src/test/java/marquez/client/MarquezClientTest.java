@@ -1108,7 +1108,7 @@ public class MarquezClientTest {
   public void testGetLineage() throws Exception {
     MarquezClient.Lineage lineage = new MarquezClient.Lineage(ImmutableSet.of(LINEAGE_NODE));
     String lineageJson = lineage.toJson();
-    when(http.get(buildUrlFor("/lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20")))
+    when(http.get(buildUrlFor("/lineage?nodeId=dataset%26namespace%26dataset&depth=20")))
         .thenReturn(lineageJson);
 
     Node retrievedNode =
@@ -1124,7 +1124,7 @@ public class MarquezClientTest {
     String lineageJson = lineage.toJson();
     when(http.get(
             buildUrlFor(
-                "/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=false")))
+                "/column-lineage?nodeId=dataset%26namespace%26dataset&depth=20&withDownstream=false")))
         .thenReturn(lineageJson);
 
     Node retrievedNode =

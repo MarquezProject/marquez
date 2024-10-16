@@ -46,21 +46,21 @@ public class MarquezUrlTest {
   @Test
   void testToLineageUrl() {
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20",
+        "http://marquez:5000/api/v1/lineage?nodeId=dataset%26namespace%26dataset&depth=20",
         marquezUrl.toLineageUrl(NodeId.of(new DatasetId("namespace", "dataset")), 20).toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield&depth=20",
+        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%26namespace%26dataset%26field&depth=20",
         marquezUrl
             .toLineageUrl(NodeId.of(new DatasetFieldId("namespace", "dataset", "field")), 20)
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=job%3Anamespace%3Ajob&depth=20",
+        "http://marquez:5000/api/v1/lineage?nodeId=job%26namespace%26job&depth=20",
         marquezUrl.toLineageUrl(NodeId.of(new JobId("namespace", "job")), 20).toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=dataset%3Anamespace%3Adataset%23"
+        "http://marquez:5000/api/v1/lineage?nodeId=dataset%26namespace%26dataset%23"
             + version
             + "&depth=20",
         marquezUrl
@@ -70,7 +70,7 @@ public class MarquezUrlTest {
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield%23"
+        "http://marquez:5000/api/v1/lineage?nodeId=datasetField%26namespace%26dataset%26field%23"
             + version
             + "&depth=20",
         marquezUrl
@@ -82,7 +82,7 @@ public class MarquezUrlTest {
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/lineage?nodeId=job%3Anamespace%3Ajob%23"
+        "http://marquez:5000/api/v1/lineage?nodeId=job%26namespace%26job%23"
             + version
             + "&depth=20",
         marquezUrl
@@ -94,26 +94,26 @@ public class MarquezUrlTest {
   @Test
   void testToColumnLineageUrl() {
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%3Anamespace%3Adataset&depth=20&withDownstream=true",
+        "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%26namespace%26dataset&depth=20&withDownstream=true",
         marquezUrl
             .toColumnLineageUrl(NodeId.of(new DatasetId("namespace", "dataset")), 20, true)
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield&depth=20&withDownstream=true",
+        "http://marquez:5000/api/v1/column-lineage?nodeId=datasetField%26namespace%26dataset%26field&depth=20&withDownstream=true",
         marquezUrl
             .toColumnLineageUrl(
                 NodeId.of(new DatasetFieldId("namespace", "dataset", "field")), 20, true)
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=job%3Anamespace%3Ajob&depth=20&withDownstream=true",
+        "http://marquez:5000/api/v1/column-lineage?nodeId=job%26namespace%26job&depth=20&withDownstream=true",
         marquezUrl
             .toColumnLineageUrl(NodeId.of(new JobId("namespace", "job")), 20, true)
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%3Anamespace%3Adataset%23"
+        "http://marquez:5000/api/v1/column-lineage?nodeId=dataset%26namespace%26dataset%23"
             + version
             + "&depth=20&withDownstream=true",
         marquezUrl
@@ -124,7 +124,7 @@ public class MarquezUrlTest {
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=datasetField%3Anamespace%3Adataset%3Afield%23"
+        "http://marquez:5000/api/v1/column-lineage?nodeId=datasetField%26namespace%26dataset%26field%23"
             + version
             + "&depth=20&withDownstream=true",
         marquezUrl
@@ -137,7 +137,7 @@ public class MarquezUrlTest {
             .toString());
 
     Assertions.assertEquals(
-        "http://marquez:5000/api/v1/column-lineage?nodeId=job%3Anamespace%3Ajob%23"
+        "http://marquez:5000/api/v1/column-lineage?nodeId=job%26namespace%26job%23"
             + version
             + "&depth=20&withDownstream=true",
         marquezUrl

@@ -63,7 +63,7 @@ class OpenLineageResourceTest {
     final Lineage lineage =
         UNDER_TEST
             .target("/api/v1/lineage")
-            .queryParam("nodeId", "job:test-namespace:test-job")
+            .queryParam("nodeId", "job&test-namespace&test-job")
             .request()
             .get()
             .readEntity(Lineage.class);

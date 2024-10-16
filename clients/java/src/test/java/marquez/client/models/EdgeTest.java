@@ -14,8 +14,8 @@ public class EdgeTest {
   /** Dummy compareTo test to avoid codeCov pitfalls. */
   @Test
   public void testCompareTo() {
-    Edge edge1 = new Edge(NodeId.of("dataset:a.a"), NodeId.of("dataset:b.b"));
-    Edge edge2 = new Edge(NodeId.of("dataset:a.a"), NodeId.of("dataset:a.a"));
+    Edge edge1 = new Edge(NodeId.of("dataset&a.a"), NodeId.of("dataset&b.b"));
+    Edge edge2 = new Edge(NodeId.of("dataset&a.a"), NodeId.of("dataset&a.a"));
 
     assertThat(edge1.compareTo(edge2)).isGreaterThan(0);
   }

@@ -39,7 +39,7 @@ import marquez.service.models.LineageEvent.Job;
 @JsonDeserialize(converter = NodeId.FromValue.class)
 @JsonSerialize(converter = NodeId.ToValue.class)
 public final class NodeId implements Comparable<NodeId> {
-  public static final String ID_DELIM = ":";
+  public static final String ID_DELIM = "&";
   public static final Joiner ID_JOINER = Joiner.on(ID_DELIM);
 
   private static final String ID_PREFX_DATASET = "dataset";
@@ -49,7 +49,7 @@ public final class NodeId implements Comparable<NodeId> {
   private static final Pattern ID_PATTERN =
       Pattern.compile(
           String.format(
-              "^(%s|%s|%s|%s):.*$",
+              "^(%s|%s|%s|%s)&.*$",
               ID_PREFX_DATASET, ID_PREFX_DATASET_FIELD, ID_PREFX_JOB, ID_PREFX_RUN));
 
   public static final String VERSION_DELIM = "#";

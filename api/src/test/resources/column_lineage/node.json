@@ -1,5 +1,5 @@
 {
-  "id": "datasetField:namespace:commonDataset:columnA",
+  "id": "datasetField&namespace&commonDataset&columnA",
   "type": "DATASET_FIELD",
   "data": {
     "namespace": "namespace",
@@ -14,14 +14,14 @@
   },
   "inEdges": [
     {
-      "origin": "datasetField:namespace:otherDataset:columnB",
-      "destination": "datasetField:namespace:commonDataset:columnA"
+      "origin": "datasetField&namespace&otherDataset&columnB",
+      "destination": "datasetField&namespace&commonDataset&columnA"
     }
   ],
   "outEdges": [
     {
-      "origin": "datasetField:namespace:commonDataset:columnA",
-      "destination": "datasetField:namespace:otherDataset:columnC"
+      "origin": "datasetField&namespace&commonDataset&columnA",
+      "destination": "datasetField&namespace&otherDataset&columnC"
     }
   ]
 }

@@ -21,7 +21,7 @@ public class NodeTest {
     final String input =
         """
             {
-                "id": "datasetField:snowflake://matillion.eu-central-1:FROSTY_BORG.ETLD.Do11yJiraIssues:Assignee",
+                "id": "datasetField&snowflake://matillion.eu-central-1&FROSTY_BORG.ETLD.Do11yJiraIssues:Assignee",
                 "type": "DATASET_FIELD",
                 "data": {
                     "type": "DATASET_FIELD",
@@ -47,7 +47,7 @@ public class NodeTest {
     final String input =
         """
         {
-            "id": "datasetField:snowflake://matillion.eu-central-1:FROSTY_BORG.ETLD.Do11yJiraIssues:Assignee",
+            "id": "datasetField&snowflake://matillion.eu-central-1&FROSTY_BORG.ETLD.Do11yJiraIssuesAssignee",
             "type": "DATASET_FIELD",
             "data": {
                 "namespace": "snowflake://matillion.eu-central-1",
@@ -72,7 +72,7 @@ public class NodeTest {
     final String input =
         """
             {
-                "id": "dataset:namespace:table",
+                "id": "dataset&namespace&table",
                 "type": "DATASET",
                 "data": {
                     "id": {
@@ -105,7 +105,7 @@ public class NodeTest {
     final String input =
         """
             {
-               "id": "job:namespace:job",
+               "id": "job&namespace&job",
                "type": "JOB",
                "data": {
                    "id": {

@@ -54,7 +54,7 @@ public class ColumnLineageResourceTest {
     final Lineage lineage =
         UNDER_TEST
             .target("/api/v1/column-lineage")
-            .queryParam("nodeId", "datasetField:namespace:commonDataset:col_a")
+            .queryParam("nodeId", "datasetField&namespace&commonDataset&col_a")
             .request()
             .get()
             .readEntity(Lineage.class);
@@ -67,7 +67,7 @@ public class ColumnLineageResourceTest {
     final Lineage lineage =
         UNDER_TEST
             .target("/api/v1/column-lineage")
-            .queryParam("nodeId", "dataset:namespace:commonDataset")
+            .queryParam("nodeId", "dataset&namespace&commonDataset")
             .request()
             .get()
             .readEntity(Lineage.class);
@@ -82,7 +82,7 @@ public class ColumnLineageResourceTest {
                 .target("/api/v1/column-lineage")
                 .queryParam(
                     "nodeId",
-                    "dataset:namespace:commonDataset#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+                    "dataset&namespace&commonDataset#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
                 .queryParam("withDownstream", "true")
                 .request()
                 .get()
