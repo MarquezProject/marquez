@@ -173,78 +173,67 @@ public interface JobDao extends BaseDao {
       """
         WITH jobs_view_page
         AS (
-          SELECT
-            *
-          FROM
-            jobs_view AS j
-          WHERE
-            j.namespace_name = :namespaceName
+          SELECT *
+          FROM jobs_view AS j
+          WHERE j.namespace_name = :namespaceName
         ),
         job_versions_temp AS (
-          SELECT
-            *
-          FROM
-            job_versions AS j
-          WHERE
-            j.namespace_name = :namespaceName
+          SELECT *
+          FROM job_versions AS j
+          WHERE j.namespace_name = :namespaceName
         ),
         facets_temp AS (
-        SELECT
-          run_uuid,
-            JSON_AGG(e.facet) AS facets
+        SELECT run_uuid, JSON_AGG(e.facet) AS facets
         FROM (
-            SELECT
-              jf.run_uuid,
-                jf.facet
-            FROM
-              job_facets_view AS jf
+            SELECT jf.run_uuid, jf.facet
+            FROM job_facets_view AS jf
             INNER JOIN job_versions_temp jv2
               ON jv2.latest_run_uuid = jf.run_uuid
             INNER JOIN jobs_view_page j2
               ON j2.current_version_uuid = jv2.uuid
-            ORDER BY
-              lineage_event_time ASC
-            ) e
+            ORDER BY lineage_event_time ASC
+            ) AS e
         GROUP BY e.run_uuid
         ),
         job_tags as (
-          SELECT
-              j.uuid
-          ,   ARRAY_AGG(t.name) as tags
-          FROM
-              jobs j
-          INNER JOIN
-              jobs_tag_mapping jtm
-          ON
-              jtm.job_uuid = j.uuid
-          AND
-              j.namespace_name = :namespaceName
-          INNER JOIN
-              tags t
-          ON
-              jtm.tag_uuid = t.uuid
+          SELECT j.uuid, ARRAY_AGG(t.name) AS tags
+          FROM jobs AS j
+          INNER JOIN jobs_tag_mapping AS jtm
+          ON jtm.job_uuid = j.uuid
+          AND j.namespace_name = :namespaceName
+          INNER JOIN tags AS t
+          ON jtm.tag_uuid = t.uuid
           GROUP BY
           j.uuid
+      ),
+      latest_runs AS (
+        SELECT r.*
+        FROM runs AS r
+        INNER JOIN (
+          SELECT job_uuid, MAX(transitioned_at) AS latest_transitioned_at
+          FROM AS runs
+          GROUP BY job_uuid
+        ) AS latest_run
+        ON r.job_uuid = latest_run.job_uuid AND r.transitioned_at = latest_run.latest_transitioned_at
       )
-        SELECT
-          j.*,
-          f.facets,
-          COALESCE(jt.tags, ARRAY[]::VARCHAR[]) AS tags
-        FROM
-          jobs_view_page AS j
-        LEFT OUTER JOIN job_versions_temp AS jv
-          ON jv.uuid = j.current_version_uuid
-        LEFT OUTER JOIN facets_temp AS f
-          ON f.run_uuid = jv.latest_run_uuid
-        LEFT OUTER JOIN job_tags jt
-          ON j.uuid  = jt.uuid
-        LEFT JOIN runs r
-          ON r.uuid = jv.latest_run_uuid
-        WHERE
-         (r.current_run_state IN (<lastRunStates>) OR r.uuid IS NULL)
-        ORDER BY
-          j.updated_at DESC
-        LIMIT :limit OFFSET :offset
+      SELECT
+        j.*,
+        f.facets,
+        COALESCE(jt.tags, ARRAY[]::VARCHAR[]) AS tags
+      FROM jobs_view_page AS j
+      LEFT OUTER JOIN job_versions_temp AS jv
+        ON jv.uuid = j.current_version_uuid
+      LEFT OUTER JOIN facets_temp AS f
+        ON f.run_uuid = jv.latest_run_uuid
+      LEFT OUTER JOIN job_tags jt
+        ON j.uuid  = jt.uuid
+      LEFT JOIN latest_runs r
+        ON r.job_uuid = j.uuid
+      WHERE
+        r.current_run_state IN (<lastRunStates>)
+      ORDER BY
+        j.updated_at DESC
+      LIMIT :limit OFFSET :offset
       """)
   List<Job> findAll(
       String namespaceName,
