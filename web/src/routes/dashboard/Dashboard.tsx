@@ -66,7 +66,7 @@ const INTERVAL_TO_MS_MAP: Record<RefreshInterval, number> = {
 }
 
 const states: { label: RunState; color: string; bgColor: string }[] = [
-  { label: 'NEW', color: theme.palette.info.main, bgColor: 'secondary' },
+  { label: 'RUNNING', color: theme.palette.info.main, bgColor: 'secondary' },
   { label: 'COMPLETED', color: theme.palette.primary.main, bgColor: 'primary' },
   { label: 'FAILED', color: theme.palette.error.main, bgColor: 'error' },
   { label: 'ABORTED', color: theme.palette.secondary.main, bgColor: 'secondary' },
@@ -141,8 +141,7 @@ const Dashboard: React.FC = ({
       }, intervalTime)
       return () => clearInterval(intervalId)
     }
-
-    return
+    return () => clearInterval(0)
   }, [intervalKey, searchParams])
 
   const metrics = lineageMetrics.reduce(

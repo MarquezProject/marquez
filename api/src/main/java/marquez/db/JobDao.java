@@ -179,12 +179,6 @@ public interface JobDao extends BaseDao {
             jobs_view AS j
           WHERE
             j.namespace_name = :namespaceName
-          ORDER BY
-            j.name
-          LIMIT
-            :limit
-          OFFSET
-            :offset
         ),
         job_versions_temp AS (
           SELECT
@@ -249,7 +243,8 @@ public interface JobDao extends BaseDao {
         WHERE
          (r.current_run_state IN (<lastRunStates>) OR r.uuid IS NULL)
         ORDER BY
-            j.name
+          j.updated_at DESC
+        LIMIT :limit OFFSET :offset
       """)
   List<Job> findAll(
       String namespaceName,
