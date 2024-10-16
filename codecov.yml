@@ -9,4 +9,4 @@ ignore:
   - "api/src/main/java/marquez/db/migrations/V44_1__UpdateRunsWithJobUUID.java"
   - "api/src/main/java/marquez/db/migrations/V44_2__BackfillAirflowParentRuns.java"
   - "api/src/main/java/marquez/db/migrations/V44_3_BackfillJobsWithParents.java"
-  - "api/src/main/java/marquez/cli/DbMigrationCommand.java"
+  - "api/src/main/java/marquez/cli/DbMigrateCommand.java"
