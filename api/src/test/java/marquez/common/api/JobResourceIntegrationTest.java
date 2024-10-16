@@ -50,6 +50,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_listJobs() {
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build()); // Legacy
     List<Job> jobs = client.listJobs(NAMESPACE_NAME);
     assertThat(jobs).hasSizeGreaterThan(0);
   }
@@ -224,6 +225,7 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   @Test
   public void testApp_deleteJob() {
     client.createJob(NAMESPACE_NAME, JOB_NAME, JOB_META);
+    client.createRun(NAMESPACE_NAME, JOB_NAME, RunMeta.builder().build()); // Legacy
 
     List<Job> jobs = client.listJobs(NAMESPACE_NAME);
     assertThat(jobs).hasSizeGreaterThan(0);

@@ -5,8 +5,12 @@
 
 package marquez.db;
 
+import static marquez.common.models.CommonModelGenerator.newJobName;
+import static marquez.common.models.CommonModelGenerator.newNamespaceName;
+import static marquez.common.models.CommonModelGenerator.newOwnerName;
 import static marquez.db.DbTestUtils.createJobWithSymlinkTarget;
 import static marquez.db.DbTestUtils.createJobWithoutSymlinkTarget;
+import static marquez.db.DbTestUtils.newRun;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,6 +90,7 @@ public class JobDaoTest {
   public void testFindSymlinkedJobRowByName() {
     JobRow targetJob =
         createJobWithoutSymlinkTarget(jdbi, namespace, "targetJob", "the target of the symlink");
+    newRun(jdbi, targetJob); // Legacy
     JobRow symlinkJob =
         createJobWithSymlinkTarget(
             jdbi, namespace, "symlinkJob", targetJob.getUuid(), "the symlink job");
@@ -103,11 +108,13 @@ public class JobDaoTest {
   public void testFindAll() {
     JobRow targetJob =
         createJobWithoutSymlinkTarget(jdbi, namespace, "targetJob", "the target of the symlink");
+    newRun(jdbi, targetJob); // Legacy
     JobRow symlinkJob =
         createJobWithSymlinkTarget(
             jdbi, namespace, "symlinkJob", targetJob.getUuid(), "the symlink job");
     JobRow anotherJobSameNamespace =
         createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJob", "a random other job");
+    newRun(jdbi, anotherJobSameNamespace); // Legacy
 
     List<RunState> runStates = new ArrayList<>();
     Collections.addAll(runStates, RunState.values());
@@ -126,23 +133,38 @@ public class JobDaoTest {
 
   @Test
   public void testCountFor() {
+    NamespaceRow namespace0 =
+        namespaceDao.upsertNamespaceRow(
+            UUID.randomUUID(),
+            Instant.now(),
+            newNamespaceName().getValue(),
+            newOwnerName().getValue());
+
     JobRow targetJob =
-        createJobWithoutSymlinkTarget(jdbi, namespace, "targetJob", "the target of the symlink");
+        createJobWithoutSymlinkTarget(jdbi, namespace0, "targetJob", "the target of the symlink");
+    newRun(jdbi, targetJob); // Legacy
     createJobWithSymlinkTarget(
-        jdbi, namespace, "symlinkJob", targetJob.getUuid(), "the symlink job");
-    createJobWithoutSymlinkTarget(jdbi, namespace, "anotherJob", "a random other job");
-    createJobWithoutSymlinkTarget(jdbi, namespace, "aThirdJob", "a random third job");
+        jdbi, namespace0, "symlinkJob", targetJob.getUuid(), "the symlink job");
+
+    JobRow job0 =
+        createJobWithoutSymlinkTarget(
+            jdbi, namespace0, newJobName().getValue(), "a random other job");
+    JobRow job1 =
+        createJobWithoutSymlinkTarget(
+            jdbi, namespace0, newJobName().getValue(), "a random third job");
+    newRun(jdbi, job0); // Legacy
+    newRun(jdbi, job1); // Legacy
 
     NamespaceRow anotherNamespace =
         namespaceDao.upsertNamespaceRow(
-            UUID.randomUUID(), Instant.now(), "anotherNamespace", getClass().getName());
+            UUID.randomUUID(), Instant.now(), newNamespaceName().getValue(), getClass().getName());
     createJobWithSymlinkTarget(
-        jdbi, anotherNamespace, "othernamespacejob", null, "job in another namespace");
+        jdbi, anotherNamespace, newJobName().getValue(), null, "job in another namespace");
 
     assertThat(jobDao.count()).isEqualTo(4);
 
-    assertThat(jobDao.countFor(namespace.getName())).isEqualTo(3);
-    assertThat(jobDao.countJobRuns(namespace.getName(), "targetJob")).isEqualTo(0);
+    assertThat(jobDao.countFor(namespace0.getName())).isEqualTo(3);
+    assertThat(jobDao.countJobRuns(namespace0.getName(), "targetJob")).isEqualTo(1);
   }
 
   @Test
