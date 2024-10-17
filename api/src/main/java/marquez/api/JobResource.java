@@ -15,6 +15,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -163,6 +164,19 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
+  @Path("/jobs")
+  @Produces(APPLICATION_JSON)
+  public Response list(
+      @QueryParam("lastRunStates") List<RunState> lastRunStates,
+      @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
+      @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
+    return list(null, lastRunStates, limit, offset);
+  }
+
+  @Timed
+  @ResponseMetered
+  @ExceptionMetered
+  @GET
   @Path("/namespaces/{namespace}/jobs")
   @Produces(APPLICATION_JSON)
   public Response list(
@@ -170,7 +184,8 @@ public class JobResource extends BaseResource {
       @QueryParam("lastRunStates") List<RunState> lastRunStates,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
       @QueryParam("offset") @DefaultValue("0") @Min(value = 0) int offset) {
-    throwIfNotExists(namespaceName);
+    final Optional<NamespaceName> namespaceOrNull = Optional.ofNullable(namespaceName);
+    final String namespace = namespaceOrNull.map(NamespaceName::getValue).orElse(null);
 
     // default to all run states if not specified
     if (lastRunStates.isEmpty()) {
@@ -178,9 +193,8 @@ public class JobResource extends BaseResource {
       Collections.addAll(lastRunStates, RunState.values());
     }
 
-    final List<Job> jobs =
-        jobService.findAllWithRun(namespaceName.getValue(), lastRunStates, limit, offset);
-    final int totalCount = jobService.countFor(namespaceName.getValue());
+    final List<Job> jobs = jobService.findAllWithRun(namespace, lastRunStates, limit, offset);
+    final int totalCount = jobService.countFor(namespace);
     return Response.ok(new ResultsPage<>("jobs", jobs, totalCount)).build();
   }
 
