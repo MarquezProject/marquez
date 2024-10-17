@@ -22,6 +22,7 @@ import {
 import { IntervalMetric } from '../requests/intervalMetrics'
 import { JobOrDataset } from '../../types/lineage'
 import { LineageMetric } from '../requests/lineageMetrics'
+import {Nullable} from "../../types/util/Nullable";
 
 export const fetchEvents = (after: string, before: string, limit: number, offset: number) => ({
   type: actionTypes.FETCH_EVENTS,
@@ -272,7 +273,7 @@ export const resetDatasets = () => ({
 })
 
 export const fetchJobs = (
-  namespace: string,
+  namespace: Nullable<string>,
   limit: number,
   offset: number,
   lastRunStates?: RunState
