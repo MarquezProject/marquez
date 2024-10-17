@@ -19,11 +19,11 @@ import {
   FETCH_DATASET_VERSIONS,
   FETCH_EVENTS,
   FETCH_INITIAL_DATASET_VERSIONS,
+  FETCH_JOB,
   FETCH_JOBS,
   FETCH_JOBS_BY_STATE,
   FETCH_JOB_FACETS,
   FETCH_JOB_METRICS,
-  FETCH_JOB_TAGS,
   FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
   FETCH_LINEAGE_METRICS,
@@ -101,7 +101,7 @@ import {
   fetchFacetsSuccess,
   fetchInitialDatasetVersionsSuccess,
   fetchJobMetricsSuccess,
-  fetchJobTagsSuccess,
+  fetchJobSuccess,
   fetchJobsSuccess,
   fetchLatestRunsSuccess,
   fetchLineageMetricsSuccess,
@@ -234,12 +234,12 @@ export function* fetchJobsSaga() {
   }
 }
 
-export function* fetchJobTagsSaga() {
+export function* fetchJobSaga() {
   while (true) {
     try {
-      const { payload } = yield take(FETCH_JOB_TAGS)
+      const { payload } = yield take(FETCH_JOB)
       const response: Job = yield call(getJob, payload.namespace, payload.job)
-      yield put(fetchJobTagsSuccess(response.tags))
+      yield put(fetchJobSuccess(response))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching job runs'))
     }
@@ -616,7 +616,7 @@ export default function* rootSaga(): Generator {
     deleteDatasetFieldTagSaga(),
     addDatasetFieldTagSaga(),
     addTagsSaga(),
-    fetchJobTagsSaga(),
+    fetchJobSaga(),
     fetchLineageMetricsSaga(),
     fetchJobsByState(),
     fetchJobMetricsSaga(),

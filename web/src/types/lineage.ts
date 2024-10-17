@@ -35,6 +35,7 @@ export interface LineageJob {
   outputs: { namespace: string; name: string }[]
   location: string
   description: string
+  simpleName: string
   latestRun: Nullable<Run>
   parentJobName: Nullable<string>
   parentJobUuid: Nullable<string>
