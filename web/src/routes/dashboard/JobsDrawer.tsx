@@ -2,7 +2,6 @@ import * as Redux from 'redux'
 import { Box } from '@mui/system'
 import { IState } from '../../store/reducers'
 import { Job } from '../../types/api'
-import { Nullable } from '../../types/util/Nullable'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { fetchJobs } from '../../store/actionCreators'
@@ -19,7 +18,6 @@ interface StateProps {
   jobs: Job[]
   isJobsLoading: boolean
   jobCount: number
-  selectedNamespace: Nullable<string>
 }
 
 interface DispatchProps {
@@ -28,24 +26,16 @@ interface DispatchProps {
 
 type JobsDrawerProps = StateProps & DispatchProps
 
-const JobsDrawer = ({
-  jobs,
-  isJobsLoading,
-  jobCount,
-  fetchJobs,
-  selectedNamespace,
-}: JobsDrawerProps) => {
+const JobsDrawer = ({ jobs, isJobsLoading, jobCount, fetchJobs }: JobsDrawerProps) => {
   const [page, setPage] = React.useState<number>(0)
 
   useEffect(() => {
-    if (selectedNamespace) {
-      fetchJobs(selectedNamespace, PAGE_SIZE, page * PAGE_SIZE)
-    }
-  }, [selectedNamespace, page])
+    fetchJobs(null, PAGE_SIZE, page * PAGE_SIZE)
+  }, [page])
 
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? page + 1 : page - 1
-    fetchJobs(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    fetchJobs(null, PAGE_SIZE, directionPage * PAGE_SIZE)
     setPage(directionPage)
   }
 
@@ -92,7 +82,6 @@ const mapStateToProps = (state: IState) => ({
   jobs: state.jobs.result,
   jobCount: state.jobs.totalCount,
   isJobsLoading: state.jobs.isLoading,
-  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

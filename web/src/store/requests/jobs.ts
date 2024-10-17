@@ -3,21 +3,25 @@
 
 import { API_URL } from '../../globals'
 import { Jobs, RunState } from '../../types/api'
+import { Nullable } from '../../types/util/Nullable'
 import { genericFetchWrapper } from './index'
 
 export const getJobs = async (
-  namespace: string,
+  namespace: Nullable<string>,
   limit = 25,
   offset = 0,
   lastRunStates?: RunState
 ) => {
-  const encodedNamespace = encodeURIComponent(namespace)
-  let url = `${API_URL}/namespaces/${encodedNamespace}/jobs?limit=${limit}&offset=${offset}`
+  let url = `${API_URL}/jobs?limit=${limit}&offset=${offset}`
+  if (namespace) {
+    const encodedNamespace = encodeURIComponent(namespace)
+    url = `${API_URL}/namespaces/${encodedNamespace}/jobs?limit=${limit}&offset=${offset}`
+  }
   if (lastRunStates) {
     url += `&lastRunStates=${lastRunStates}`
   }
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchJobs').then((r: Jobs) => {
-    return { totalCount: r.totalCount, jobs: r.jobs.map((j) => ({ ...j, namespace: namespace })) }
+    return { totalCount: r.totalCount, jobs: r.jobs }
   })
 }
 

@@ -25,7 +25,6 @@ import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
 import MqText from '../../components/core/text/MqText'
-import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
@@ -41,7 +40,6 @@ interface StateProps {
   isSourceMetricsLoading: boolean
   isJobMetricsLoading: boolean
   isDatasetMetricsLoading: boolean
-  selectedNamespace: Nullable<string>
 }
 
 interface DispatchProps {
@@ -56,7 +54,7 @@ const TIMEFRAMES = ['24 Hours', '7 Days']
 type RefreshInterval = '30s' | '5m' | '10m' | 'Never'
 const REFRESH_INTERVALS: RefreshInterval[] = ['30s', '5m', '10m', 'Never']
 
-const JOB_RUN_LIMIT = 4
+const JOB_RUN_LIMIT = 10
 
 const INTERVAL_TO_MS_MAP: Record<RefreshInterval, number> = {
   '30s': 30000,
@@ -88,7 +86,6 @@ const Dashboard: React.FC = ({
   isJobMetricsLoading,
   isDatasetMetricsLoading,
   isSourceMetricsLoading,
-  selectedNamespace,
 }: StateProps & DispatchProps) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [timeframe, setTimeframe] = React.useState(
@@ -123,10 +120,8 @@ const Dashboard: React.FC = ({
   }, [timeframe])
 
   useEffect(() => {
-    if (selectedNamespace) {
-      fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
-    }
-  }, [selectedNamespace, selectedState])
+    fetchJobs(null, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
+  }, [selectedState])
 
   useEffect(() => {
     const intervalTime = INTERVAL_TO_MS_MAP[intervalKey]
@@ -164,9 +159,7 @@ const Dashboard: React.FC = ({
         open={jobsDrawerOpen}
         onClose={() => {
           setJobsDrawerOpen(false)
-          if (selectedNamespace) {
-            fetchJobs(selectedNamespace, JOB_RUN_LIMIT, 0)
-          }
+          fetchJobs(null, JOB_RUN_LIMIT, 0)
         }}
         PaperProps={{
           sx: {
@@ -334,9 +327,9 @@ const Dashboard: React.FC = ({
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                   <MqText subheading>Jobs</MqText>
                   <Box display={'flex'} alignItems={'center'}>
-                    {isJobsLoading && <CircularProgress size={16} color={'primary'} />}
-                    <NamespaceSelect />
-                    <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
+                    {isJobsLoading && (
+                      <CircularProgress sx={{ mr: 2 }} size={16} color={'primary'} />
+                    )}
                     <Button
                       disableRipple
                       size={'small'}
@@ -362,9 +355,7 @@ const Dashboard: React.FC = ({
                         color={'primary'}
                         size={'small'}
                         onClick={() => {
-                          if (selectedNamespace) {
-                            fetchJobs(selectedNamespace, 4, 0)
-                          }
+                          fetchJobs(null, JOB_RUN_LIMIT, 0)
                         }}
                       >
                         Refresh
@@ -392,7 +383,6 @@ const mapStateToProps = (state: IState) => ({
   isDatasetMetricsLoading: state.datasetMetrics.isLoading,
   sourceMetrics: state.sourceMetrics.data,
   isSourceMetricsLoading: state.sourceMetrics.isLoading,
-  selectedNamespace: state.namespaces.selectedNamespace,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
