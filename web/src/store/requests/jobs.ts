@@ -21,7 +21,7 @@ export const getJobs = async (
     url += `&lastRunStates=${lastRunStates}`
   }
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchJobs').then((r: Jobs) => {
-    return { totalCount: r.totalCount, jobs: r.jobs.map((j) => ({ ...j, namespace: namespace })) }
+    return { totalCount: r.totalCount, jobs: r.jobs }
   })
 }
 
