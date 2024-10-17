@@ -179,7 +179,7 @@ public interface JobDao extends BaseDao {
           FROM
             jobs_view AS j
           WHERE
-            j.namespace_name = :namespaceName
+            (:namespaceName IS NULL OR j.namespace_name = :namespaceName)
         ),
         job_versions_temp AS (
           SELECT
@@ -187,7 +187,7 @@ public interface JobDao extends BaseDao {
           FROM
             job_versions AS j
           WHERE
-            j.namespace_name = :namespaceName
+            (:namespaceName IS NULL OR j.namespace_name = :namespaceName)
         ),
         facets_temp AS (
         SELECT
@@ -219,7 +219,7 @@ public interface JobDao extends BaseDao {
           ON
               jtm.job_uuid = j.uuid
           AND
-              j.namespace_name = :namespaceName
+              (:namespaceName IS NULL OR j.namespace_name = :namespaceName)
           INNER JOIN
               tags t
           ON
@@ -271,7 +271,7 @@ public interface JobDao extends BaseDao {
   int countJobRuns(String namespaceName, String job);
 
   @SqlQuery(
-      "SELECT count(*) FROM jobs_view AS j WHERE j.namespace_name = :namespaceName\n"
+      "SELECT count(*) FROM jobs_view AS j WHERE (:namespaceName IS NULL OR j.namespace_name = :namespaceName)\n"
           + "AND symlink_target_uuid IS NULL")
   int countFor(String namespaceName);
 
@@ -281,7 +281,9 @@ public interface JobDao extends BaseDao {
     return findAll(namespaceName, lastRunStates, limit, offset).stream()
         .peek(
             j -> {
-              List<Run> runs = runDao.findByLatestJob(namespaceName, j.getName().getValue(), 10, 0);
+              List<Run> runs =
+                  runDao.findByLatestJob(
+                      j.getNamespace().getValue(), j.getName().getValue(), 10, 0);
               this.setJobData(runs, j);
             })
         .toList();
