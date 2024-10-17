@@ -7,7 +7,7 @@ import { encodeNode, runStateColor } from '../../helpers/nodes'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import { theme } from '../../helpers/theme'
-import { truncateText } from '../../helpers/text'
+import {pluralize, truncateText} from '../../helpers/text'
 import { useNavigate } from 'react-router-dom'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
@@ -147,7 +147,9 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
           <Box>
             <MqText subdued>TYPE</MqText>
-            <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+            <MqText font={'mono'}>
+              {job.type}
+            </MqText>
           </Box>
         </Box>
       </Box>

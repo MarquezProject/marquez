@@ -95,6 +95,7 @@ public final class Columns {
   public static final String PARENT_JOB_UUID = "parent_job_uuid";
   public static final String SIMPLE_NAME = "simple_name";
   public static final String SYMLINK_TARGET_UUID = "symlink_target_uuid";
+  public static final String CURRENT_RUN_UUID = "current_run_uuid";
 
   /* JOB VERSION I/O ROW COLUMNS */
   public static final String INPUT_UUIDS = "input_uuids";

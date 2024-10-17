@@ -212,7 +212,8 @@ public class JobDaoTest {
             null,
             null,
             null,
-            inputs);
+            inputs,
+            null);
 
     String childJob2Name = "child2";
     JobRow childJob2 =
@@ -227,7 +228,8 @@ public class JobDaoTest {
             null,
             null,
             null,
-            inputs);
+            inputs,
+            null);
 
     // the job queried is returned, since there is no symlink
     String jobFqn = parentJobName + "." + childJob1Name;

@@ -17,7 +17,8 @@ SELECT j.uuid,
        j.current_inputs,
        j.symlink_target_uuid,
        j.parent_job_uuid::char(36) AS parent_job_uuid_string,
-       j.aliases
+       j.aliases,
+       j.current_run_uuid
 FROM jobs j
 LEFT JOIN jobs p ON j.parent_job_uuid=p.uuid
 WHERE j.is_hidden IS FALSE AND j.symlink_target_uuid IS NULL;
@@ -40,7 +41,7 @@ BEGIN
     END IF;
     INSERT INTO jobs (uuid, type, created_at, updated_at, namespace_uuid, name, simple_name, description,
                       current_version_uuid, namespace_name, current_job_context_uuid,
-                      current_location, current_inputs, symlink_target_uuid, parent_job_uuid,
+                      current_location, current_inputs, symlink_target_uuid, parent_job_uuid, current_run_uuid,
                       is_hidden)
     SELECT NEW.uuid,
            NEW.type,
@@ -57,6 +58,7 @@ BEGIN
            NEW.current_inputs,
            NEW.symlink_target_uuid,
            NEW.parent_job_uuid,
+           NEW.current_run_uuid,
            false
     ON CONFLICT (namespace_uuid, name)
         DO UPDATE SET updated_at               = now(),
@@ -72,6 +74,7 @@ BEGIN
                       -- update the symlink target if null. otherwise, keep the old value
                       symlink_target_uuid      = COALESCE(jobs.symlink_target_uuid,
                                                           EXCLUDED.symlink_target_uuid),
+                      current_run_uuid           = EXCLUDED.current_run_uuid,
                       is_hidden                = false
                       -- the SELECT statement below will get the OLD symlink_target_uuid in case of update and the NEW
                       -- version in case of insert
