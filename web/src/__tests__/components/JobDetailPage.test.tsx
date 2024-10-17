@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react'
-import Box from '@mui/material/Box'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 import { render, screen } from '@testing-library/react';
 import { within } from '@testing-library/dom'
 
@@ -19,6 +16,7 @@ jest.mock('react-router-dom', () => ({
 }))
 
 import { useParams } from 'react-router-dom'
+import {lineageJob} from "../__mocks__/LineageJob";
 
 test.skip('JobDetailPage Component', () => {
   describe('when there is no match for the jobName in url params', () => {
@@ -26,7 +24,7 @@ test.skip('JobDetailPage Component', () => {
     //   jobName: 'job.nomatch'
     // }))
 
-    render(<JobDetailPage />)
+    render(<JobDetailPage lineageJob={lineageJob} />)
 
     it('should render', () => {
       expect(screen).toBeInTheDocument()
@@ -203,7 +201,7 @@ test.skip('JobDetailPage Component', () => {
     //   jobName: job.name
     // }))
 
-    render(<JobDetailPage />)
+    render(<JobDetailPage lineageJob={lineageJob} />)
 
     screen.setProps({
       jobs: jobs.map(j => (j.name === job.name ? job : j)),
@@ -257,7 +255,7 @@ test.skip('JobDetailPage Component', () => {
       //   jobName: job.name
       // }))
 
-      render(<JobDetailPage />)
+      render(<JobDetailPage lineageJob={lineageJob} />)
 
       screen.setProps({
         jobs: jobs.map(j => (j.name === job.name ? job : j)),

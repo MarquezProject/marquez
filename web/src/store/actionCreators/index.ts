@@ -287,14 +287,6 @@ export const fetchJobs = (
   },
 })
 
-export const fetchJobTags = (namespace: string, job: string) => ({
-  type: actionTypes.FETCH_JOB_TAGS,
-  payload: {
-    namespace,
-    job,
-  },
-})
-
 export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   type: actionTypes.FETCH_JOBS_SUCCESS,
   payload: {
@@ -303,10 +295,18 @@ export const fetchJobsSuccess = (jobs: Job[], totalCount: number) => ({
   },
 })
 
-export const fetchJobTagsSuccess = (jobTags: string[]) => ({
-  type: actionTypes.FETCH_JOB_TAGS_SUCCESS,
+export const fetchJob = (namespace: string, job: string) => ({
+  type: actionTypes.FETCH_JOB,
   payload: {
-    jobTags,
+    namespace,
+    job,
+  },
+})
+
+export const fetchJobSuccess = (job: Job) => ({
+  type: actionTypes.FETCH_JOB_SUCCESS,
+  payload: {
+    job,
   },
 })
 

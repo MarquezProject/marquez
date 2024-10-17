@@ -175,6 +175,8 @@ export interface Job {
   latestRun: Run
   latestRuns: Run[]
   tags: string[]
+  parentJobName: Nullable<string>
+  parentJobUuid: Nullable<string>
 }
 
 export interface JobId {
