@@ -147,9 +147,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
           <Box>
             <MqText subdued>TYPE</MqText>
-            <MqText font={'mono'}>
-              {job.type}
-            </MqText>
+            <MqText font={'mono'}>{job.type}</MqText>
           </Box>
         </Box>
       </Box>

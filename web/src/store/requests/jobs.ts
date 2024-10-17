@@ -3,8 +3,8 @@
 
 import { API_URL } from '../../globals'
 import { Jobs, RunState } from '../../types/api'
+import { Nullable } from '../../types/util/Nullable'
 import { genericFetchWrapper } from './index'
-import {Nullable} from "../../types/util/Nullable";
 
 export const getJobs = async (
   namespace: Nullable<string>,

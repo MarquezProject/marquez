@@ -120,7 +120,7 @@ const Dashboard: React.FC = ({
   }, [timeframe])
 
   useEffect(() => {
-      fetchJobs(null, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
+    fetchJobs(null, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
   }, [selectedState])
 
   useEffect(() => {
@@ -327,7 +327,9 @@ const Dashboard: React.FC = ({
                 <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
                   <MqText subheading>Jobs</MqText>
                   <Box display={'flex'} alignItems={'center'}>
-                    {isJobsLoading && <CircularProgress sx={{mr: 2}} size={16} color={'primary'} />}
+                    {isJobsLoading && (
+                      <CircularProgress sx={{ mr: 2 }} size={16} color={'primary'} />
+                    )}
                     <Button
                       disableRipple
                       size={'small'}
@@ -353,7 +355,7 @@ const Dashboard: React.FC = ({
                         color={'primary'}
                         size={'small'}
                         onClick={() => {
-                            fetchJobs(null, JOB_RUN_LIMIT, 0)
+                          fetchJobs(null, JOB_RUN_LIMIT, 0)
                         }}
                       >
                         Refresh
