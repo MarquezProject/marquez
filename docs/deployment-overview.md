@@ -12,7 +12,7 @@ Marquez uses [Helm](https://helm.sh) to manage deployments onto [Kubernetes](htt
 
 ### `TLS/HTTPS`
 
-To enable HTTPS traffic when deploying Marquez onto Kubernetes, use the flag [`ingress.enabled`](https://github.com/MarquezProject/marquez/tree/main/chart#ingress-parameters) to configure the ingress controller. To secure ingress traffic, use the [`ingress.tls`](https://github.com/MarquezProject/marquez/tree/main/chart#ingress-parameters) section to define your TLS `secret` and `hosts` (see `ingress` in the chart's base [`values.yaml`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L183) for more details).
+To enable HTTPS traffic when deploying Marquez onto Kubernetes, use the flag [`ingress.enabled`](https://github.com/MarquezProject/marquez/tree/main/charts/marquez/#ingress-parameters) to configure the ingress controller. To secure ingress traffic, use the [`ingress.tls`](https://github.com/MarquezProject/marquez/tree/main/chart#ingress-parameters) section to define your TLS `secret` and `hosts` (see `ingress` in the chart's base [`values.yaml`](https://github.com/MarquezProject/marquez/blob/main/chart/values.yaml#L183) for more details).
 
 ## Database
 
