@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import marquez.common.Utils;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
@@ -235,7 +236,8 @@ public interface OpenLineageDao extends BaseDao {
             namespace,
             null,
             null,
-            Optional.empty());
+            Optional.empty(),
+            null);
 
     bag.setJob(job);
 
@@ -304,6 +306,8 @@ public interface OpenLineageDao extends BaseDao {
         Optional.ofNullable(event.getRun()).map(Run::getFacets).map(RunFacet::getParent);
     Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
 
+    final UUID runUuid = runToUuid(event.getRun().getRunId());
+
     JobRow job =
         buildJobFromEvent(
             event.getJob(),
@@ -316,7 +320,8 @@ public interface OpenLineageDao extends BaseDao {
             namespace,
             nominalStartTime,
             nominalEndTime,
-            parentRun);
+            parentRun,
+            runUuid);
 
     bag.setJob(job);
 
@@ -327,7 +332,6 @@ public interface OpenLineageDao extends BaseDao {
                 UUID.randomUUID(), now, Utils.toJson(runArgsMap), Utils.checksumFor(runArgsMap));
     bag.setRunArgs(runArgs);
 
-    final UUID runUuid = runToUuid(event.getRun().getRunId());
     RunRow run;
     RunUpsert.RunUpsertBuilder runUpsertBuilder =
         RunUpsert.builder()
@@ -509,7 +513,8 @@ public interface OpenLineageDao extends BaseDao {
       NamespaceRow namespace,
       Instant nominalStartTime,
       Instant nominalEndTime,
-      Optional<ParentRunFacet> parentRun) {
+      Optional<ParentRunFacet> parentRun,
+      @Nullable UUID runUuid) {
     Logger log = LoggerFactory.getLogger(OpenLineageDao.class);
     String description =
         Optional.ofNullable(job.getFacets())
@@ -523,10 +528,10 @@ public interface OpenLineageDao extends BaseDao {
             .flatMap(s -> Optional.ofNullable(s.getUrl()))
             .orElse(null);
 
-    Optional<UUID> parentUuid = parentRun.map(Utils::findParentRunUuid);
+    Optional<UUID> parentRunUuid = parentRun.map(Utils::findParentRunUuid);
     Optional<JobRow> parentJob =
-        parentUuid.map(
-            uuid ->
+        parentRunUuid.map(
+            parentRunUuidFound ->
                 findParentJobRow(
                     job,
                     eventTime,
@@ -537,7 +542,7 @@ public interface OpenLineageDao extends BaseDao {
                     nominalEndTime,
                     log,
                     parentRun.get(),
-                    uuid));
+                    parentRunUuidFound));
 
     // construct the simple name of the job by removing the parent prefix plus the dot '.' separator
     String jobName =
@@ -570,7 +575,8 @@ public interface OpenLineageDao extends BaseDao {
                     description,
                     location,
                     null,
-                    jobDao.toJson(toDatasetId(inputs), mapper)))
+                    jobDao.toJson(toDatasetId(inputs), mapper),
+                    parent.getCurrentRunUuid().orElse(null)))
         .orElseGet(
             () ->
                 jobDao.upsertJob(
@@ -583,7 +589,8 @@ public interface OpenLineageDao extends BaseDao {
                     description,
                     location,
                     null,
-                    jobDao.toJson(toDatasetId(inputs), mapper)));
+                    jobDao.toJson(toDatasetId(inputs), mapper),
+                    runUuid));
   }
 
   private JobRow findParentJobRow(
@@ -596,7 +603,7 @@ public interface OpenLineageDao extends BaseDao {
       Instant nominalEndTime,
       Logger log,
       ParentRunFacet facet,
-      UUID uuid) {
+      UUID parentRunUuid) {
     try {
       log.debug("Found parent run event {}", facet);
       PGobject inputs = new PGobject();
@@ -604,7 +611,7 @@ public interface OpenLineageDao extends BaseDao {
       inputs.setValue("[]");
       JobRow parentJobRow =
           createRunDao()
-              .findJobRowByRunUuid(uuid)
+              .findJobRowByRunUuid(parentRunUuid)
               .map(
                   j -> {
                     String parentJobName =
@@ -617,18 +624,20 @@ public interface OpenLineageDao extends BaseDao {
                     } else {
                       // Addresses an Airflow integration bug that generated conflicting run UUIDs
                       // for DAGs that had the same name, but ran in different namespaces.
-                      UUID parentRunUuid =
+                      UUID parentRunUuidNoConflict =
                           Utils.toNameBasedUuid(
-                              facet.getJob().getNamespace(), parentJobName, uuid.toString());
+                              facet.getJob().getNamespace(),
+                              parentJobName,
+                              parentRunUuid.toString());
                       log.warn(
                           "Parent Run id {} has a different job name '{}.{}' from facet '{}.{}'. "
                               + "Assuming Run UUID conflict and generating a new UUID {}",
-                          uuid,
+                          parentRunUuid,
                           j.getNamespaceName(),
                           j.getName(),
                           facet.getJob().getNamespace(),
                           facet.getJob().getName(),
-                          parentRunUuid);
+                          parentRunUuidNoConflict);
                       return createParentJobRunRecord(
                           job,
                           eventTime,
@@ -637,7 +646,7 @@ public interface OpenLineageDao extends BaseDao {
                           location,
                           nominalStartTime,
                           nominalEndTime,
-                          parentRunUuid,
+                          parentRunUuidNoConflict,
                           facet,
                           inputs);
                     }
@@ -652,7 +661,7 @@ public interface OpenLineageDao extends BaseDao {
                           location,
                           nominalStartTime,
                           nominalEndTime,
-                          uuid,
+                          parentRunUuid,
                           facet,
                           inputs));
       log.debug("Found parent job record {}", parentJobRow);
@@ -670,7 +679,7 @@ public interface OpenLineageDao extends BaseDao {
       String location,
       Instant nominalStartTime,
       Instant nominalEndTime,
-      UUID uuid,
+      UUID parentRunUuid,
       ParentRunFacet facet,
       PGobject inputs) {
     Instant now = eventTime.withZoneSameInstant(ZoneId.of("UTC")).toInstant();
@@ -691,7 +700,8 @@ public interface OpenLineageDao extends BaseDao {
                 null,
                 location,
                 null,
-                inputs);
+                inputs,
+                parentRunUuid);
     log.info("Created new parent job record {}", newParentJobRow);
 
     RunArgsRow argsRow =
@@ -702,7 +712,7 @@ public interface OpenLineageDao extends BaseDao {
     RunDao runDao = createRunDao();
     RunRow newRow =
         runDao.upsert(
-            uuid,
+            parentRunUuid,
             null,
             facet.getRun().getRunId(),
             now,
@@ -719,14 +729,14 @@ public interface OpenLineageDao extends BaseDao {
     log.info("Created new parent run record {}", newRow);
 
     runState
-        .map(rs -> createRunStateDao().upsert(UUID.randomUUID(), now, uuid, rs))
+        .map(rs -> createRunStateDao().upsert(UUID.randomUUID(), now, parentRunUuid, rs))
         .ifPresent(
             runStateRow -> {
               UUID runStateUuid = runStateRow.getUuid();
               if (RunState.valueOf(runStateRow.getState()).isDone()) {
-                runDao.updateEndState(uuid, now, runStateUuid);
+                runDao.updateEndState(parentRunUuid, now, runStateUuid);
               } else {
-                runDao.updateStartState(uuid, now, runStateUuid);
+                runDao.updateStartState(parentRunUuid, now, runStateUuid);
               }
             });
 

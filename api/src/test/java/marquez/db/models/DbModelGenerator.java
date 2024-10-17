@@ -230,6 +230,7 @@ public final class DbModelGenerator extends Generator {
         null,
         newLocation().toString(),
         null,
+        null,
         null);
   }
 

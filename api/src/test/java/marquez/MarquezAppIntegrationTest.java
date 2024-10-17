@@ -750,7 +750,8 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             jobRow.getDescription().orElse(null),
             jobRow.getLocation(),
             null,
-            inputs);
+            inputs,
+            null);
     // symlink the old job to point to the new one that has a parent uuid
     jobDao.upsertJob(
         jobRow.getUuid(),

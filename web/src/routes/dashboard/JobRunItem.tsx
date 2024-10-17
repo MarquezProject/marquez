@@ -147,7 +147,9 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <Divider sx={{ mx: 2 }} flexItem orientation={'vertical'} />
           <Box>
             <MqText subdued>TYPE</MqText>
-            <Chip size={'small'} color={'primary'} variant={'outlined'} label={'BATCH'} />
+            <MqText font={'mono'}>
+              {job.type}
+            </MqText>
           </Box>
         </Box>
       </Box>
