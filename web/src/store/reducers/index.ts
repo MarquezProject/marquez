@@ -13,6 +13,7 @@ import datasets, { IDatasetsState } from './datasets'
 import display, { IDisplayState } from './display'
 import events, { IEventsState } from './events'
 import facets, { IFacetsState } from './facets'
+import job, { IJobState } from './job'
 import jobMetrics, { IJobMetricsState } from './jobMetrics'
 import jobs, { IJobsState } from './jobs'
 import jobsByState, { IJobsByStateState } from './jobsByState'
@@ -35,6 +36,7 @@ export interface IState {
   openSearchDatasets: IOpenSearchDatasetsState
   events: IEventsState
   jobs: IJobsState
+  job: IJobState
   runs: IRunsState
   namespaces: INamespacesState
   display: IDisplayState
@@ -59,6 +61,7 @@ export default (history: History): Reducer =>
     datasetVersions,
     events,
     jobs,
+    job,
     runs,
     namespaces,
     display,

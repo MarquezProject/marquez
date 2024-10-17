@@ -20,7 +20,6 @@ import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.RunId;
 import marquez.common.models.RunState;
 import marquez.db.JobVersionDao.IoType;
 import marquez.db.JobVersionDao.JobDataset;
@@ -143,7 +142,7 @@ public interface JobDao extends BaseDao {
     Optional<Job> job = findJobByName(namespaceName, jobName);
     job.ifPresent(
         j -> {
-          List<Run> runs = createRunDao().findByLatestJob(namespaceName, jobName, 1, 0);
+          List<Run> runs = createRunDao().findByLatestJob(namespaceName, jobName, 10, 0);
           this.setJobData(runs, j);
           this.setJobDataset(
               createJobVersionDao().findCurrentInputOutputDatasetsFor(namespaceName, jobName), j);
@@ -240,7 +239,7 @@ public interface JobDao extends BaseDao {
         LEFT OUTER JOIN job_tags jt
           ON j.uuid  = jt.uuid
         LEFT JOIN runs r
-          ON r.uuid = j.current_run_uuid
+          ON r.uuid = jv.latest_run_uuid
         WHERE
          (r.current_run_state IN (<lastRunStates>) OR r.uuid IS NULL)
         ORDER BY
@@ -362,8 +361,7 @@ public interface JobDao extends BaseDao {
         jobMeta.getDescription().orElse(null),
         toUrlString(jobMeta.getLocation().orElse(null)),
         symlinkTargetUuid,
-        toJson(jobMeta.getInputs(), mapper),
-        jobMeta.getRunId().map(RunId::getValue).orElse(null));
+        toJson(jobMeta.getInputs(), mapper));
   }
 
   default String toUrlString(URL url) {
@@ -382,31 +380,6 @@ public interface JobDao extends BaseDao {
     } catch (Exception e) {
       return null;
     }
-  }
-
-  default JobRow upsertJob(
-      UUID uuid,
-      JobType type,
-      Instant now,
-      UUID namespaceUuid,
-      String namespaceName,
-      String name,
-      String description,
-      String location,
-      UUID symlinkTargetId,
-      PGobject inputs) {
-    return upsertJob(
-        uuid,
-        type,
-        now,
-        namespaceUuid,
-        namespaceName,
-        name,
-        description,
-        location,
-        symlinkTargetId,
-        inputs,
-        null);
   }
 
   /*
@@ -429,8 +402,7 @@ public interface JobDao extends BaseDao {
           current_location,
           current_inputs,
           symlink_target_uuid,
-          parent_job_uuid_string,
-          current_run_uuid
+          parent_job_uuid_string
         ) VALUES (
           :uuid,
           :type,
@@ -443,8 +415,7 @@ public interface JobDao extends BaseDao {
           :location,
           :inputs,
           :symlinkTargetId,
-          '',
-          :currentRunUuid
+          ''
         ) RETURNING *
       """)
   JobRow upsertJob(
@@ -457,8 +428,7 @@ public interface JobDao extends BaseDao {
       String description,
       String location,
       UUID symlinkTargetId,
-      PGobject inputs,
-      UUID currentRunUuid);
+      PGobject inputs);
 
   /*
    * Note: following SQL never executes. There is database trigger on `jobs_view`
@@ -480,8 +450,7 @@ public interface JobDao extends BaseDao {
           description,
           current_location,
           current_inputs,
-          symlink_target_uuid,
-          current_run_uuid
+          symlink_target_uuid
         ) VALUES (
           :uuid,
           :parentJobUuid,
@@ -494,8 +463,7 @@ public interface JobDao extends BaseDao {
           :description,
           :location,
           :inputs,
-          :symlinkTargetId,
-          :currentRunUuid
+          :symlinkTargetId
         )
         RETURNING *
       """)
@@ -510,8 +478,7 @@ public interface JobDao extends BaseDao {
       String description,
       String location,
       UUID symlinkTargetId,
-      PGobject inputs,
-      UUID currentRunUuid);
+      PGobject inputs);
 
   @SqlUpdate(
       """

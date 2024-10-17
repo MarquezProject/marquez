@@ -36,7 +36,7 @@ const TableLevelDrawer = ({ lineageGraph }: StateProps & DispatchProps) => {
       {dataset ? (
         <DatasetDetailPage lineageDataset={dataset} />
       ) : (
-        <>{job && <JobDetailPage job={job} />}</>
+        <>{job && <JobDetailPage lineageJob={job} />}</>
       )}
     </Box>
   )

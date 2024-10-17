@@ -17,16 +17,17 @@ import {
 } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
+import { Job, Run } from '../../types/api'
 import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
-import { Run } from '../../types/api'
+import { Nullable } from '../../types/util/Nullable'
 import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
   deleteJob,
   dialogToggle,
-  fetchJobTags,
+  fetchJob,
   fetchLatestRuns,
   resetJobs,
   resetRuns,
@@ -57,15 +58,16 @@ interface DispatchProps {
   deleteJob: typeof deleteJob
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
-  fetchJobTags: typeof fetchJobTags
+  fetchJob: typeof fetchJob
 }
 
 type IProps = {
-  job: LineageJob
+  lineageJob: LineageJob
+  job: Nullable<Job>
+  isJobLoading: boolean
   jobs: IState['jobs']
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
-  jobTags: string[]
   latestRuns: Run[]
   isLatestRunsLoading: boolean
 } & DispatchProps
@@ -74,6 +76,8 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   const theme = createTheme(useTheme())
   const {
     job,
+    isJobLoading,
+    lineageJob,
     jobs,
     fetchLatestRuns,
     resetRuns,
@@ -82,23 +86,22 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     display,
     tabIndex,
     setTabIndex,
-    jobTags,
-    fetchJobTags,
+    fetchJob,
     isLatestRunsLoading,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
 
-  const handleChange = (event: ChangeEvent, newValue: number) => {
+  const handleChange = (_: ChangeEvent, newValue: number) => {
     setTabIndex(newValue)
   }
 
   const i18next = require('i18next')
 
   useEffect(() => {
-    fetchJobTags(job.namespace, job.name)
-    fetchLatestRuns(job.name, job.namespace)
-  }, [job.name])
+    fetchJob(lineageJob.namespace, lineageJob.name)
+    fetchLatestRuns(lineageJob.name, lineageJob.namespace)
+  }, [lineageJob.name])
 
   useEffect(() => {
     if (jobs.deletedJobName) {
@@ -115,13 +118,23 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     }
   }, [])
 
-  if (jobs.isLoading || isLatestRunsLoading) {
+  if (!job || isJobLoading || isLatestRunsLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
       </Box>
     )
   }
+
+  const lastFinished = (() => {
+    const last = job.latestRuns.find((run) => run.state !== 'RUNNING')
+    return last ? formatUpdatedAt(last.endedAt) : 'N/A'
+  })()
+
+  const lastRuntime = (() => {
+    const last = job.latestRuns.find((run) => run.state !== 'RUNNING')
+    return last ? stopWatchDuration(last.durationMs) : 'N/A'
+  })()
 
   return (
     <Box px={2} display='flex' flexDirection='column' justifyContent='space-between'>
@@ -231,7 +244,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<Speed color={'disabled'} />}
             label={'Last Runtime'.toUpperCase()}
-            value={job.latestRun ? stopWatchDuration(job.latestRun.durationMs) : 'N/A'}
+            value={lastRuntime}
           />
         </Grid>
         <Grid item xs={3}>
@@ -252,7 +265,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<SportsScore color={'disabled'} />}
             label={'Last Finished'.toUpperCase()}
-            value={job.latestRun ? formatUpdatedAt(job.latestRun.endedAt) : 'N/A'}
+            value={lastFinished}
           />
         </Grid>
         <Grid item xs={3}>
@@ -288,7 +301,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Grid>
       </Grid>
       <Divider sx={{ my: 1 }} />
-      <JobTags jobTags={jobTags} jobName={job.name} namespace={job.namespace} />
+      <JobTags jobTags={job.tags} jobName={job.name} namespace={job.namespace} />
       <Box
         mb={2}
         display={'flex'}
@@ -321,7 +334,8 @@ const mapStateToProps = (state: IState) => ({
   display: state.display,
   jobs: state.jobs,
   tabIndex: state.lineage.tabIndex,
-  jobTags: state.jobs.jobTags,
+  job: state.job.result,
+  isJobLoading: state.job.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -333,7 +347,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
       deleteJob: deleteJob,
       dialogToggle: dialogToggle,
       setTabIndex: setTabIndex,
-      fetchJobTags: fetchJobTags,
+      fetchJob: fetchJob,
     },
     dispatch
   )

@@ -6,12 +6,10 @@ import {
   DELETE_JOB_SUCCESS,
   FETCH_JOBS,
   FETCH_JOBS_SUCCESS,
-  FETCH_JOB_TAGS,
-  FETCH_JOB_TAGS_SUCCESS,
   RESET_JOBS,
 } from '../actionCreators/actionTypes'
 import { Job } from '../../types/api'
-import { deleteJob, fetchJobTagsSuccess, fetchJobsSuccess } from '../actionCreators'
+import { deleteJob, fetchJobsSuccess } from '../actionCreators'
 
 export type IJobsState = {
   isLoading: boolean
@@ -31,9 +29,7 @@ export const initialState: IJobsState = {
   jobTags: [],
 }
 
-export type IJobsAction = ReturnType<typeof fetchJobsSuccess> &
-  ReturnType<typeof deleteJob> &
-  ReturnType<typeof fetchJobTagsSuccess>
+export type IJobsAction = ReturnType<typeof fetchJobsSuccess> & ReturnType<typeof deleteJob>
 
 export default (state = initialState, action: IJobsAction): IJobsState => {
   const { type, payload } = action
@@ -55,14 +51,6 @@ export default (state = initialState, action: IJobsAction): IJobsState => {
       return { ...state, result: state.result.filter((e) => e.name !== payload.jobName) }
     case DELETE_JOB_SUCCESS:
       return { ...state, deletedJobName: payload.jobName }
-    case FETCH_JOB_TAGS:
-      return { ...state, isLoading: true }
-    case FETCH_JOB_TAGS_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        jobTags: payload.jobTags,
-      }
     default:
       return state
   }
