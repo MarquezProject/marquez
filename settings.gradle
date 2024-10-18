@@ -15,4 +15,5 @@
 rootProject.name = 'marquez'
 
 include 'api'
+include 'search'
 include 'clients:java'
