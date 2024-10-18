@@ -112,7 +112,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 * [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
 * [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
-* [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
+* [`chart`](https://github.com/MarquezProject/marquez/tree/main/charts/marquez): helm chart
 
 > **Note:** The `integrations` module was removed in [`0.21.0`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#removed), so please use an OpenLineage [integration](https://openlineage.io/integration) to collect lineage events easily.
 
