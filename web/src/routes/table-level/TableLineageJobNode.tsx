@@ -88,7 +88,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               color={
                 job.latestRun?.state
                   ? runStateColor(job.latestRun?.state)
-                  : theme.palette.primary.main
+                  : theme.palette.secondary.main
               }
             />
           </Box>
