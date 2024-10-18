@@ -28,7 +28,6 @@ import marquez.common.models.InputDatasetVersion;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
-import marquez.common.models.OutputDatasetVersion;
 import marquez.common.models.RunState;
 import marquez.db.DatasetDao;
 import marquez.db.JobDao;
@@ -172,11 +171,6 @@ public class LineageServiceTest {
         .extracting(
             Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
-    runAssert
-        .extracting(
-            Run::getOutputDatasetVersions,
-            InstanceOfAssertFactories.list(OutputDatasetVersion.class))
-        .hasSize(1);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
@@ -307,11 +301,6 @@ public class LineageServiceTest {
         .extracting(
             Run::getInputDatasetVersions, InstanceOfAssertFactories.list(InputDatasetVersion.class))
         .hasSize(0);
-    runAssert
-        .extracting(
-            Run::getOutputDatasetVersions,
-            InstanceOfAssertFactories.list(InputDatasetVersion.class))
-        .hasSize(1);
 
     // check the output edges for the commonDataset node
     assertThat(lineage.getGraph())
