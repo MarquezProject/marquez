@@ -61,7 +61,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
           <MqText subdued>LAST 10 RUNS</MqText>
           <Box display={'flex'} height={40} alignItems={'flex-end'}>
             {/*pad 10 - latestRuns length with a small grey bar*/}
-            {Array.from({ length: 10 - job.latestRuns?.length || 0 }, (_, i) => (
+            {Array.from({ length: 10 - (job.latestRuns?.length || 0) }, (_, i) => (
               <Box
                 key={i}
                 bgcolor={'divider'}
