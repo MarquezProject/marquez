@@ -515,7 +515,7 @@ public interface RunDao extends BaseDao {
         INNER JOIN jobs_view j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
         WHERE j.namespace_name=:namespace AND (j.name=:jobName OR j.name=ANY(j.aliases))
       )
-      ORDER BY transitioned_at DESC
+      ORDER BY transitioned_at DESC, started_at DESC
       LIMIT :limit OFFSET :offset
       """)
   List<Run> findByLatestJob(String namespace, String jobName, int limit, int offset);

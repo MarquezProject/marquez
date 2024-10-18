@@ -64,7 +64,7 @@ public class LineageService extends DelegatingLineageDao {
   }
 
   // TODO make input parameters easily extendable if adding more options like 'withJobFacets'
-  public Lineage lineage(NodeId nodeId, int depth, boolean withRunFacets) {
+  public Lineage lineage(NodeId nodeId, int depth) {
     log.debug("Attempting to get lineage for node '{}' with depth '{}'", nodeId.getValue(), depth);
     Optional<UUID> optionalUUID = getJobUuid(nodeId);
     if (optionalUUID.isEmpty()) {
@@ -90,10 +90,7 @@ public class LineageService extends DelegatingLineageDao {
     }
 
     List<Run> runs =
-        withRunFacets
-            ? getCurrentRunsWithFacets(
-                jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()))
-            : getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
+        getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
 
     for (JobData j : jobData) {
       if (j.getLatestRun().isEmpty()) {
