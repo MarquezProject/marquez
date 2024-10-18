@@ -127,12 +127,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   const lastFinished = (() => {
-    const last = job.latestRuns.find((run) => run.state !== 'RUNNING')
+    const last = job.latestRuns?.find((run) => run.state !== 'RUNNING')
     return last ? formatUpdatedAt(last.endedAt) : 'N/A'
   })()
 
   const lastRuntime = (() => {
-    const last = job.latestRuns.find((run) => run.state !== 'RUNNING')
+    const last = job.latestRuns?.find((run) => run.state !== 'RUNNING')
     return last ? stopWatchDuration(last.durationMs) : 'N/A'
   })()
 
@@ -274,7 +274,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
             label={'Running Status'.toUpperCase()}
             value={
               <MqStatus
-                label={job.latestRun?.state}
+                label={job.latestRun?.state || 'N/A'}
                 color={
                   job.latestRun?.state
                     ? runStateColor(job.latestRun.state)
