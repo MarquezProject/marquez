@@ -1,33 +1,19 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
-import * as Redux from 'redux'
 import { Box, Chip, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { Dataset, Field, Run } from '../../types/api'
-import { IState } from '../../store/reducers'
+import { Dataset, Field } from '../../types/api'
 import { Link } from 'react-router-dom'
-import { connect, useSelector } from 'react-redux'
 import { encodeQueryString } from '../../routes/column-level/ColumnLineageColumnNode'
-import { fetchJobFacets, resetFacets } from '../../store/actionCreators'
 import DatasetTags from './DatasetTags'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { FunctionComponent } from 'react'
 import SplitscreenIcon from '@mui/icons-material/Splitscreen'
 
-export interface DispatchProps {
-  fetchJobFacets: typeof fetchJobFacets
-  resetFacets: typeof resetFacets
-}
-
-interface JobFacets {
-  [key: string]: object
-}
-
 export interface JobFacetsProps {
-  jobFacets: JobFacets
   isCurrentVersion?: boolean
   dataset: Dataset
 }
@@ -35,31 +21,12 @@ export interface JobFacetsProps {
 type DatasetInfoProps = {
   datasetFields: Field[]
   facets?: object
-  run?: Run
   showTags?: boolean
-} & JobFacetsProps &
-  DispatchProps
+} & JobFacetsProps
 
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
-  const { datasetFields, facets, run, dataset, fetchJobFacets, resetFacets, showTags } = props
+  const { datasetFields, facets, dataset, showTags } = props
   const i18next = require('i18next')
-  const dsNamespace = useSelector(
-    (state: IState) => state.datasetVersions.initDsVersion.versions[0].namespace
-  )
-  const dsName = useSelector(
-    (state: IState) => state.datasetVersions.initDsVersion.versions[0].name
-  )
-
-  useEffect(() => {
-    run && fetchJobFacets(run.id)
-  }, [run])
-
-  useEffect(
-    () => () => {
-      resetFacets()
-    },
-    []
-  )
 
   return (
     <Box>
@@ -159,8 +126,8 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                       {showTags && (
                         <TableCell align='left'>
                           <DatasetTags
-                            namespace={dsNamespace}
-                            datasetName={dsName}
+                            namespace={dataset.namespace}
+                            datasetName={dataset.name}
                             datasetTags={field.tags}
                             datasetField={field.name}
                           />
@@ -186,17 +153,4 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   )
 }
 
-const mapStateToProps = (state: IState) => ({
-  jobFacets: state.facets.result,
-})
-
-const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
-  Redux.bindActionCreators(
-    {
-      fetchJobFacets: fetchJobFacets,
-      resetFacets: resetFacets,
-    },
-    dispatch
-  )
-
-export default connect(mapStateToProps, mapDispatchToProps)(DatasetInfo)
+export default DatasetInfo
