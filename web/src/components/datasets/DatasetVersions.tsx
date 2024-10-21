@@ -96,7 +96,6 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
           dataset={dataset}
           datasetFields={infoView.fields}
           facets={infoView.facets}
-          run={infoView.createdByRun}
         />
       </>
     )
