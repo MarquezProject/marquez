@@ -56,6 +56,7 @@ import StorageIcon from '@mui/icons-material/Storage'
 interface StateProps {
   lineageDataset: LineageDataset
   dataset: Dataset
+  isDatasetLoading: boolean
   initVersions: DatasetVersion[]
   initVersionsLoading: boolean
   datasets: IState['datasets']
@@ -86,6 +87,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
     dataset,
+    isDatasetLoading,
     display,
     fetchDataset,
     resetDataset,
@@ -118,7 +120,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   useEffect(() => {
     fetchInitialDatasetVersions(lineageDataset.namespace, lineageDataset.name)
     fetchDataset(lineageDataset.namespace, lineageDataset.name)
-  }, [lineageDataset.name, showTags])
+  }, [lineageDataset.name])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
@@ -131,7 +133,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (initVersionsLoading && initVersions.length === 0) {
+  if (!dataset || isDatasetLoading || (initVersionsLoading && initVersions.length === 0)) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -144,10 +146,9 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   const firstVersion = initVersions[0]
-  const { name, tags, description } = firstVersion
-  const facetsStatus = datasetFacetsStatus(firstVersion.facets)
-
-  const assertions = datasetFacetsQualityAssertions(firstVersion.facets)
+  const { name, tags, description } = dataset
+  const facetsStatus = datasetFacetsStatus(dataset.facets)
+  const assertions = datasetFacetsQualityAssertions(dataset.facets)
 
   return (
     <Box px={2}>
@@ -229,21 +230,21 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           <MqInfo
             icon={<CalendarIcon color={'disabled'} />}
             label={'Updated at'.toUpperCase()}
-            value={formatUpdatedAt(firstVersion.createdAt)}
+            value={formatUpdatedAt(dataset.createdAt)}
           />
         </Grid>
         <Grid item xs={6}>
           <MqInfo
             icon={<StorageIcon color={'disabled'} />}
             label={'Dataset Type'.toUpperCase()}
-            value={<MqText font={'mono'}>{firstVersion.type}</MqText>}
+            value={<MqText font={'mono'}>{dataset.type}</MqText>}
           />
         </Grid>
         <Grid item xs={6}>
           <MqInfo
             icon={<ListIcon color={'disabled'} />}
             label={'Fields'.toUpperCase()}
-            value={`${firstVersion.fields.length} columns`}
+            value={`${dataset.fields.length} columns`}
           />
         </Grid>
         <Grid item xs={6}>
@@ -338,8 +339,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
       {tabIndex === 0 && (
         <DatasetInfo
           dataset={dataset}
-          datasetFields={firstVersion.fields}
-          facets={firstVersion.facets}
+          datasetFields={dataset.fields}
+          facets={dataset.facets}
           run={firstVersion.createdByRun}
           showTags={showTags}
           isCurrentVersion
@@ -353,6 +354,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
   dataset: state.dataset.result,
+  isDatasetLoading: state.dataset.isLoading,
   display: state.display,
   initVersions: state.datasetVersions.initDsVersion.versions,
   initVersionsLoading: state.datasetVersions.isInitDsVerLoading,
