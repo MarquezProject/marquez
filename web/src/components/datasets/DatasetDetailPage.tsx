@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
-import { Dataset, DatasetVersion } from '../../types/api'
+import { Dataset } from '../../types/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
@@ -28,7 +28,6 @@ import {
   deleteDataset,
   dialogToggle,
   fetchDataset,
-  fetchInitialDatasetVersions,
   resetDataset,
   resetDatasetVersions,
   setTabIndex,
@@ -57,15 +56,12 @@ interface StateProps {
   lineageDataset: LineageDataset
   dataset: Dataset
   isDatasetLoading: boolean
-  initVersions: DatasetVersion[]
-  initVersionsLoading: boolean
   datasets: IState['datasets']
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
 }
 
 interface DispatchProps {
-  fetchInitialDatasetVersions: typeof fetchInitialDatasetVersions
   fetchDataset: typeof fetchDataset
   resetDatasetVersions: typeof resetDatasetVersions
   resetDataset: typeof resetDataset
@@ -92,11 +88,8 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     fetchDataset,
     resetDataset,
     resetDatasetVersions,
-    fetchInitialDatasetVersions,
     deleteDataset,
     dialogToggle,
-    initVersions,
-    initVersionsLoading,
     lineageDataset,
     tabIndex,
     setTabIndex,
@@ -118,7 +111,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 
   // might need to map first version to its own state
   useEffect(() => {
-    fetchInitialDatasetVersions(lineageDataset.namespace, lineageDataset.name)
     fetchDataset(lineageDataset.namespace, lineageDataset.name)
   }, [lineageDataset.name])
 
@@ -133,7 +125,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (!dataset || isDatasetLoading || (initVersionsLoading && initVersions.length === 0)) {
+  if (!dataset || isDatasetLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -141,11 +133,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     )
   }
 
-  if (initVersions.length === 0) {
-    return null
-  }
-
-  const firstVersion = initVersions[0]
   const { name, tags, description } = dataset
   const facetsStatus = datasetFacetsStatus(dataset.facets)
   const assertions = datasetFacetsQualityAssertions(dataset.facets)
@@ -328,7 +315,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
                   checked={showTags}
                   onChange={() => setShowTags(!showTags)}
                   inputProps={{ 'aria-label': 'toggle show tags' }}
-                  disabled={initVersionsLoading}
+                  disabled={isDatasetLoading}
                 />
               }
               label={i18next.t('datasets.show_field_tags')}
@@ -341,7 +328,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           dataset={dataset}
           datasetFields={dataset.fields}
           facets={dataset.facets}
-          run={firstVersion.createdByRun}
           showTags={showTags}
           isCurrentVersion
         />
@@ -356,15 +342,12 @@ const mapStateToProps = (state: IState) => ({
   dataset: state.dataset.result,
   isDatasetLoading: state.dataset.isLoading,
   display: state.display,
-  initVersions: state.datasetVersions.initDsVersion.versions,
-  initVersionsLoading: state.datasetVersions.isInitDsVerLoading,
   tabIndex: state.lineage.tabIndex,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
-      fetchInitialDatasetVersions: fetchInitialDatasetVersions,
       fetchDataset: fetchDataset,
       resetDatasetVersions: resetDatasetVersions,
       resetDataset: resetDataset,
