@@ -44,6 +44,8 @@ interface StateProps {
   lineageDataset: LineageDataset
   dataset: Dataset
   isDatasetLoading: boolean
+  initVersions: DatasetVersion[]
+  initVersionsLoading: boolean
   datasets: IState['datasets']
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
@@ -71,6 +73,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
     dataset,
+    isDatasetLoading,
     isDatasetLoading,
     display,
     fetchDataset,
@@ -101,6 +104,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   useEffect(() => {
     fetchDataset(lineageDataset.namespace, lineageDataset.name)
   }, [lineageDataset.name])
+  }, [lineageDataset.name])
 
   // if the dataset is deleted then redirect to datasets end point
   useEffect(() => {
@@ -113,7 +117,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (!dataset || isDatasetLoading) {
+  if (!dataset || isDatasetLoading || (initVersionsLoading && initVersions.length === 0)) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -121,6 +125,11 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     )
   }
 
+  if (initVersions.length === 0) {
+    return null
+  }
+
+  const firstVersion = initVersions[0]
   const { name, tags, description } = dataset
   const facetsStatus = datasetFacetsStatus(dataset.facets)
   const assertions = datasetFacetsQualityAssertions(dataset.facets)
@@ -178,6 +187,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             icon={<CalendarIcon color={'disabled'} />}
             label={'Updated at'.toUpperCase()}
             value={formatUpdatedAt(dataset.createdAt)}
+            value={formatUpdatedAt(dataset.createdAt)}
           />
         </Grid>
         <Grid item xs={6}>
@@ -185,12 +195,14 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             icon={<StorageIcon color={'disabled'} />}
             label={'Dataset Type'.toUpperCase()}
             value={<MqText font={'mono'}>{dataset.type}</MqText>}
+            value={<MqText font={'mono'}>{dataset.type}</MqText>}
           />
         </Grid>
         <Grid item xs={6}>
           <MqInfo
             icon={<ListIcon color={'disabled'} />}
             label={'Fields'.toUpperCase()}
+            value={`${dataset.fields.length} columns`}
             value={`${dataset.fields.length} columns`}
           />
         </Grid>
@@ -288,6 +300,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           dataset={dataset}
           datasetFields={dataset.fields}
           facets={dataset.facets}
+          run={firstVersion.createdByRun}
           showTags={showTags}
           isCurrentVersion
         />
@@ -300,6 +313,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
 const mapStateToProps = (state: IState) => ({
   datasets: state.datasets,
   dataset: state.dataset.result,
+  isDatasetLoading: state.dataset.isLoading,
   isDatasetLoading: state.dataset.isLoading,
   display: state.display,
   tabIndex: state.lineage.tabIndex,
