@@ -296,7 +296,13 @@ const Events: React.FC<EventsProps> = ({
                         >
                           <TableCell align='left'>
                             <Box display={'flex'} alignItems={'center'}>
-                              <MqText font={'mono'}>{event.run.runId.substring(0, 8)}...</MqText>
+                              <MQTooltip title={event.run.runId}>
+                                <Box>
+                                  <MqText font={'mono'}>
+                                    {event.run.runId.substring(0, 8)}...
+                                  </MqText>
+                                </Box>
+                              </MQTooltip>
                               <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>

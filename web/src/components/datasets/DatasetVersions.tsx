@@ -92,11 +92,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
-        <DatasetInfo
-          dataset={dataset}
-          datasetFields={infoView.fields}
-          facets={infoView.facets}
-        />
+        <DatasetInfo dataset={dataset} datasetFields={infoView.fields} facets={infoView.facets} />
       </>
     )
   }
