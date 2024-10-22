@@ -2,17 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import * as Redux from 'redux'
-import {
-  Box,
-  Button,
-  Divider,
-  FormControlLabel,
-  Grid,
-  Switch,
-  Tab,
-  Tabs,
-  createTheme,
-} from '@mui/material'
+import { Box, Divider, FormControlLabel, Grid, Switch, Tab, Tabs, createTheme } from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import { CircularProgress } from '@mui/material'
 import { Dataset, DatasetVersion } from '../../types/api'
@@ -20,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
-import { alpha } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
@@ -43,7 +32,6 @@ import CloseIcon from '@mui/icons-material/Close'
 import DatasetInfo from './DatasetInfo'
 import DatasetTags from './DatasetTags'
 import DatasetVersions from './DatasetVersions'
-import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import ListIcon from '@mui/icons-material/List'
 import MQTooltip from '../core/tooltip/MQTooltip'
@@ -86,13 +74,10 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
   const {
     datasets,
     dataset,
-    display,
     fetchDataset,
     resetDataset,
     resetDatasetVersions,
     fetchInitialDatasetVersions,
-    deleteDataset,
-    dialogToggle,
     initVersions,
     initVersionsLoading,
     lineageDataset,
@@ -190,34 +175,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
             </Box>
           </Box>
           <Box display={'flex'} alignItems={'center'}>
-            <Box mr={1}>
-              <Button
-                variant='outlined'
-                size={'small'}
-                sx={{
-                  borderColor: theme.palette.error.main,
-                  color: theme.palette.error.main,
-                  '&:hover': {
-                    borderColor: alpha(theme.palette.error.main, 0.3),
-                    backgroundColor: alpha(theme.palette.error.main, 0.3),
-                  },
-                }}
-                onClick={() => {
-                  props.dialogToggle('')
-                }}
-              >
-                {i18next.t('datasets.dialog_delete')}
-              </Button>
-              <Dialog
-                dialogIsOpen={display.dialogIsOpen}
-                dialogToggle={dialogToggle}
-                title={i18next.t('jobs.dialog_confirmation_title')}
-                ignoreWarning={() => {
-                  deleteDataset(lineageDataset.name, lineageDataset.namespace)
-                  props.dialogToggle('')
-                }}
-              />
-            </Box>
             <IconButton onClick={() => setSearchParams({})}>
               <CloseIcon fontSize={'small'} />
             </IconButton>
