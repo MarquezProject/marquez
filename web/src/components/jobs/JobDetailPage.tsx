@@ -21,9 +21,9 @@ import { Job, Run } from '../../types/api'
 import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
 import { Nullable } from '../../types/util/Nullable'
-import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { createTheme } from '@mui/material/styles'
 import {
   deleteJob,
   dialogToggle,
@@ -41,7 +41,6 @@ import { truncateText } from '../../helpers/text'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import CloseIcon from '@mui/icons-material/Close'
-import Dialog from '../Dialog'
 import IconButton from '@mui/material/IconButton'
 import JobTags from './JobTags'
 import MQTooltip from '../core/tooltip/MQTooltip'
@@ -81,9 +80,6 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     jobs,
     fetchLatestRuns,
     resetRuns,
-    deleteJob,
-    dialogToggle,
-    display,
     tabIndex,
     setTabIndex,
     fetchJob,
@@ -179,35 +175,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
             )}
           </Box>
           <Box display={'flex'} alignItems={'center'}>
-            <Box mr={1}>
-              <Button
-                variant='outlined'
-                size={'small'}
-                sx={{
-                  borderColor: theme.palette.error.main,
-                  color: theme.palette.error.main,
-                  '&:hover': {
-                    borderColor: alpha(theme.palette.error.main, 0.3),
-                    backgroundColor: alpha(theme.palette.error.main, 0.3),
-                  },
-                }}
-                onClick={() => {
-                  props.dialogToggle('')
-                }}
-              >
-                {i18next.t('jobs.dialog_delete')}
-              </Button>
-              <Dialog
-                dialogIsOpen={display.dialogIsOpen}
-                dialogToggle={dialogToggle}
-                title={i18next.t('jobs.dialog_confirmation_title')}
-                ignoreWarning={() => {
-                  deleteJob(job.name, job.namespace)
-                  props.dialogToggle('')
-                }}
-              />
-            </Box>
-            <Box mr={1}>
+            <Box mr={4}>
               <Button
                 size={'small'}
                 variant='outlined'
