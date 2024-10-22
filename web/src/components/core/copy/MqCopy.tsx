@@ -31,6 +31,9 @@ const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
             navigator.clipboard.writeText(string)
             setOpen(true)
             setHasCopied(true)
+            setTimeout(() => {
+              setHasCopied(false)
+            }, 3000)
           }}
           aria-label='copy'
           size={'small'}
