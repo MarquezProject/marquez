@@ -241,11 +241,11 @@ public class SearchService {
   }
 
   private void index(IndexRequest<Map<String, Object>> request) {
-//    try {
-//      this.openSearchClient.index(request);
-//    } catch (IOException e) {
-//      log.error("Failed to index event OpenSearch not available.", e);
-//    }
+    try {
+      this.openSearchClient.index(request);
+    } catch (IOException e) {
+      log.error("Failed to index event OpenSearch not available.", e);
+    }
   }
 
   public boolean isEnabled() {
