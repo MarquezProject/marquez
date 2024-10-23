@@ -157,7 +157,7 @@ fi
 
 # Create docker volumes for Marquez
 if [[ "${NO_VOLUMES}" = "false" ]]; then
-  ./docker/volumes.sh marquez
+  ./docker/volumes.sh $(basename "$project_root")
 fi
 
 # Enable search in UI an API if search container is enabled
