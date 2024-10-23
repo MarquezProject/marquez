@@ -1,6 +1,6 @@
 # Proposals
 
-Marquez uses a _multi_-project structure and contains the modules [`api`](https://github.com/MarquezProject/marquez/tree/main/api), [`web`](https://github.com/MarquezProject/marquez/tree/main/web), [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients), and [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart). Below, we describe the process for proposing, documenting, and implementing changes to Marquez.
+Marquez uses a _multi_-project structure and contains the modules [`api`](https://github.com/MarquezProject/marquez/tree/main/api), [`web`](https://github.com/MarquezProject/marquez/tree/main/web), [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients), and [`chart`](https://github.com/MarquezProject/marquez/tree/main/charts/marquez). Below, we describe the process for proposing, documenting, and implementing changes to Marquez.
 
 
 ## Submitting a Proposal for Review

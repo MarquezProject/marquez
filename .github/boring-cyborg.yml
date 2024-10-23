@@ -7,7 +7,7 @@ labelPRBasedOnFilePath:
 
   # Add 'chart' to any changes within 'chart' folder or any subfolders
     chart:
-      - chart/**/*
+      - charts/**/*
 
   # Add 'docs' to any changes to `.md` files in root or within 'docs' folder, subfolders
     docs:
