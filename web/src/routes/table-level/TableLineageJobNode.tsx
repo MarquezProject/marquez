@@ -10,7 +10,7 @@ import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { formatUpdatedAt } from '../../helpers'
 import { runStateColor } from '../../helpers/nodes'
 import { theme } from '../../helpers/theme'
-import { truncateText } from '../../helpers/text'
+import { truncateText, truncateTextFront } from '../../helpers/text'
 import { useNavigate, useParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
@@ -49,7 +49,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.namespace, 40)}
+              {truncateTextFront(job.namespace, 40)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -57,7 +57,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(job.name, 40)}
+              {truncateTextFront(job.name, 40)}
             </MqText>
           </Box>
           {job.description && (

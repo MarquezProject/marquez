@@ -15,7 +15,7 @@ import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpe
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
-import { truncateText } from '../../helpers/text'
+import { truncateText, truncateTextFront } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/system/Box'
 import IconButton from '@mui/material/IconButton'
@@ -72,7 +72,7 @@ const TableLineageDatasetNode = ({
               Namespace:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(lineageDataset.namespace, 40)}
+              {truncateTextFront(lineageDataset.namespace, 40)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -80,7 +80,7 @@ const TableLineageDatasetNode = ({
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateText(lineageDataset.name, 40)}
+              {truncateTextFront(lineageDataset.name, 40)}
             </MqText>
           </Box>
           {lineageDataset.description && (
