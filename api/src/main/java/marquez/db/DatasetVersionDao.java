@@ -277,7 +277,6 @@ public interface DatasetVersionDao extends BaseDao {
       	) f ON f.dataset_version_uuid = dv.uuid
       	WHERE dv.namespace_name = :namespaceName
             AND dv.dataset_name = :datasetName
-      	LIMIT :limit OFFSET :offset
         ),
         dataset_symlinks_names as (
           SELECT DISTINCT dataset_uuid, name
@@ -295,6 +294,7 @@ public interface DatasetVersionDao extends BaseDao {
             created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid
         ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
   """)
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 
