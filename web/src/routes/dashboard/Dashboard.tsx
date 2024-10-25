@@ -151,6 +151,15 @@ const Dashboard: React.FC = ({
     { failed: 0, started: 0, completed: 0, aborted: 0 }
   )
 
+  const refresh = () => {
+    const currentSearchParams = searchParams.get('timeframe')
+    fetchJobs(null, JOB_RUN_LIMIT, 0)
+    fetchLineageMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+    fetchJobMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+    fetchDatasetMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+    fetchSourceMetrics(currentSearchParams === 'week' ? 'week' : 'day')
+  }
+
   const { failed, started, completed, aborted } = metrics
 
   return (
@@ -196,6 +205,7 @@ const Dashboard: React.FC = ({
               <MqText subdued>REFRESH</MqText>
               <SplitButton
                 options={REFRESH_INTERVALS}
+                onRefresh={() => refresh()}
                 onClick={(option) => {
                   setIntervalKey(option as RefreshInterval)
                 }}
@@ -331,16 +341,6 @@ const Dashboard: React.FC = ({
                     {isJobsLoading && (
                       <CircularProgress sx={{ mr: 2 }} size={16} color={'primary'} />
                     )}
-                    <IconButton
-                      sx={{ mr: 2 }}
-                      color={'primary'}
-                      size={'small'}
-                      onClick={() => {
-                        fetchJobs(null, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
-                      }}
-                    >
-                      <Refresh fontSize={'small'} />
-                    </IconButton>
                     <Button
                       disableRipple
                       size={'small'}
@@ -362,15 +362,6 @@ const Dashboard: React.FC = ({
                           'Try changing namespaces, run state, or consulting our documentation to add jobs.'
                         }
                       </MqText>
-                      <Button
-                        color={'primary'}
-                        size={'small'}
-                        onClick={() => {
-                          fetchJobs(null, JOB_RUN_LIMIT, 0)
-                        }}
-                      >
-                        Refresh
-                      </Button>
                     </>
                   </MqEmpty>
                 )}
