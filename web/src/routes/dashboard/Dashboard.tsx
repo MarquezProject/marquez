@@ -1,7 +1,7 @@
 import * as Redux from 'redux'
 import { Box, Stack } from '@mui/system'
 import { Button, ButtonGroup, Container, Divider, Drawer, Grid, Skeleton } from '@mui/material'
-import { ChevronRight } from '@mui/icons-material'
+import { ChevronRight, Refresh } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { IntervalMetric } from '../../store/requests/intervalMetrics'
@@ -20,6 +20,7 @@ import {
 } from '../../store/actionCreators'
 import { useSearchParams } from 'react-router-dom'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
+import IconButton from '@mui/material/IconButton'
 import JobRunItem from './JobRunItem'
 import JobsDrawer from './JobsDrawer'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
@@ -330,6 +331,16 @@ const Dashboard: React.FC = ({
                     {isJobsLoading && (
                       <CircularProgress sx={{ mr: 2 }} size={16} color={'primary'} />
                     )}
+                    <IconButton
+                      sx={{ mr: 2 }}
+                      color={'primary'}
+                      size={'small'}
+                      onClick={() => {
+                        fetchJobs(null, JOB_RUN_LIMIT, 0, selectedState ? selectedState : undefined)
+                      }}
+                    >
+                      <Refresh fontSize={'small'} />
+                    </IconButton>
                     <Button
                       disableRipple
                       size={'small'}

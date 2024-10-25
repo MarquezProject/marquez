@@ -313,9 +313,7 @@ const Events: React.FC<EventsProps> = ({
                           </TableCell>
                           <TableCell align='left'>
                             <MQTooltip title={event.job.namespace}>
-                              <Box display={'inline'}>
-                                {truncateText(event.job.namespace, 40)}
-                              </Box>
+                              <Box display={'inline'}>{truncateText(event.job.namespace, 40)}</Box>
                             </MQTooltip>
                           </TableCell>
                           <TableCell align='left'>
