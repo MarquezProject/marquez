@@ -151,7 +151,7 @@ i18next
             empty_body: 'Try changing dates or consulting our documentation to add events.',
           },
           events_columns: {
-            id: 'ID',
+            id: 'RUN_ID',
             state: 'STATE',
             name: 'NAME',
             namespace: 'NAMESPACE',
