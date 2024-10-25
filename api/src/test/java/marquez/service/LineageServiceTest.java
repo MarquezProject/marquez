@@ -36,6 +36,7 @@ import marquez.db.LineageTestUtils;
 import marquez.db.LineageTestUtils.DatasetConsumerJob;
 import marquez.db.LineageTestUtils.JobLineage;
 import marquez.db.OpenLineageDao;
+import marquez.db.RunDao;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.LineageService.UpstreamRunLineage;
@@ -86,7 +87,8 @@ public class LineageServiceTest {
   public static void setUpOnce(Jdbi jdbi) {
     LineageServiceTest.jdbi = jdbi;
     lineageDao = jdbi.onDemand(LineageDao.class);
-    lineageService = new LineageService(lineageDao, jdbi.onDemand(JobDao.class));
+    lineageService =
+        new LineageService(lineageDao, jdbi.onDemand(JobDao.class), jdbi.onDemand(RunDao.class));
     openLineageDao = jdbi.onDemand(OpenLineageDao.class);
     datasetDao = jdbi.onDemand(DatasetDao.class);
     jobDao = jdbi.onDemand(JobDao.class);

@@ -35,6 +35,7 @@ public class JobData implements NodeData {
   @NonNull String simpleName;
   @Nullable String parentJobName;
   @Nullable UUID parentJobUuid;
+  @Getter @Nullable UUID currentRunUuid;
   @NonNull Instant createdAt;
   @NonNull Instant updatedAt;
   @NonNull NamespaceName namespace;

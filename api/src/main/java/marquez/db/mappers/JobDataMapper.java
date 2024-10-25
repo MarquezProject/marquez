@@ -41,6 +41,7 @@ public class JobDataMapper implements RowMapper<JobData> {
         stringOrThrow(results, Columns.SIMPLE_NAME),
         stringOrNull(results, Columns.PARENT_JOB_NAME),
         uuidOrNull(results, Columns.PARENT_JOB_UUID),
+        uuidOrNull(results, Columns.CURRENT_RUN_UUID),
         timestampOrThrow(results, Columns.CREATED_AT),
         timestampOrThrow(results, Columns.UPDATED_AT),
         NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),
