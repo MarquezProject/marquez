@@ -1,0 +1,57 @@
+{
+    "name": "@types/express-session",
+    "version": "1.18.0",
+    "description": "TypeScript definitions for express-session",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/express-session",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Hiroki Horiuchi",
+            "githubUsername": "horiuchi",
+            "url": "https://github.com/horiuchi"
+        },
+        {
+            "name": "Jacob Bogers",
+            "githubUsername": "jacobbogers",
+            "url": "https://github.com/jacobbogers"
+        },
+        {
+            "name": "Naoto Yokoyama",
+            "githubUsername": "builtinnya",
+            "url": "https://github.com/builtinnya"
+        },
+        {
+            "name": "Ryan Cannon",
+            "githubUsername": "ry7n",
+            "url": "https://github.com/ry7n"
+        },
+        {
+            "name": "Tom Spencer",
+            "githubUsername": "fiznool",
+            "url": "https://github.com/fiznool"
+        },
+        {
+            "name": "Piotr Błażejewicz",
+            "githubUsername": "peterblazejewicz",
+            "url": "https://github.com/peterblazejewicz"
+        },
+        {
+            "name": "Ravi van Rooijen",
+            "githubUsername": "HoldYourWaffle",
+            "url": "https://github.com/HoldYourWaffle"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/express-session"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/express": "*"
+    },
+    "typesPublisherContentHash": "d2eafc3037eb746a0592bb0ff07e6ab9e965e6460f319eecb844a696b4e4850f",
+    "typeScriptVersion": "4.6"
+}
