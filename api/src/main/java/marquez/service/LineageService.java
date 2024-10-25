@@ -36,6 +36,7 @@ import marquez.db.LineageDao;
 import marquez.db.LineageDao.DatasetSummary;
 import marquez.db.LineageDao.JobSummary;
 import marquez.db.LineageDao.RunSummary;
+import marquez.db.RunDao;
 import marquez.db.models.JobRow;
 import marquez.service.DelegatingDaos.DelegatingLineageDao;
 import marquez.service.LineageService.UpstreamRunLineage;
@@ -58,9 +59,12 @@ public class LineageService extends DelegatingLineageDao {
 
   private final JobDao jobDao;
 
-  public LineageService(LineageDao delegate, JobDao jobDao) {
+  private final RunDao runDao;
+
+  public LineageService(LineageDao delegate, JobDao jobDao, RunDao runDao) {
     super(delegate);
     this.jobDao = jobDao;
+    this.runDao = runDao;
   }
 
   // TODO make input parameters easily extendable if adding more options like 'withJobFacets'
@@ -89,20 +93,11 @@ public class LineageService extends DelegatingLineageDao {
       return toLineageWithOrphanDataset(nodeId.asDatasetId());
     }
 
-    List<Run> runs =
-        getCurrentRuns(jobData.stream().map(JobData::getUuid).collect(Collectors.toSet()));
-
     for (JobData j : jobData) {
-      if (j.getLatestRun().isEmpty()) {
-        for (Run run : runs) {
-          if (j.getName().getValue().equalsIgnoreCase(run.getJobName())
-              && j.getNamespace().getValue().equalsIgnoreCase(run.getNamespaceName())) {
-            j.setLatestRun(run);
-            break;
-          }
-        }
-      }
+      Optional<Run> run = runDao.findRunByUuid(j.getCurrentRunUuid());
+      run.ifPresent(j::setLatestRun);
     }
+
     Set<UUID> datasetIds =
         jobData.stream()
             .flatMap(jd -> Stream.concat(jd.getInputUuids().stream(), jd.getOutputUuids().stream()))

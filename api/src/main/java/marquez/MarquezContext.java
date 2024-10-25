@@ -153,7 +153,7 @@ public final class MarquezContext {
     this.tagService = new TagService(baseDao);
     this.tagService.init(tags);
     this.openLineageService = new OpenLineageService(baseDao, runService);
-    this.lineageService = new LineageService(lineageDao, jobDao);
+    this.lineageService = new LineageService(lineageDao, jobDao, runDao);
     this.columnLineageService = new ColumnLineageService(columnLineageDao, datasetFieldDao);
     this.searchService = new SearchService(searchConfig);
     this.statsService = new StatsService(statsDao);
