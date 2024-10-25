@@ -22,7 +22,7 @@ plugins {
 dependencies {
     implementation "io.dropwizard:dropwizard-jackson:${dropwizardVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 
     testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
