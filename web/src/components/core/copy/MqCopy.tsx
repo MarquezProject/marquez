@@ -37,7 +37,7 @@ const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
           }}
           aria-label='copy'
           size={'small'}
-          color={'primary'}
+          color={'secondary'}
         >
           {hasCopied ? <Check fontSize={'small'} /> : <ContentCopyIcon fontSize={'small'} />}
         </IconButton>
