@@ -24,6 +24,7 @@ import { formatUpdatedAt } from '../../helpers'
 import { runStateColor } from '../../helpers/nodes'
 import { stopWatchDuration } from '../../helpers/time'
 import { useTheme } from '@emotion/react'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqCode from '../core/code/MqCode'
 import MqCopy from '../core/copy/MqCopy'
 import MqEmpty from '../core/empty/MqEmpty'
@@ -156,7 +157,11 @@ const Runs: FunctionComponent<RunsProps & DispatchProps> = (props) => {
               >
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
-                    {run.id.substring(0, 8)}...
+                    <MQTooltip title={run.id}>
+                      <Box>
+                        <MqText font={'mono'}>{run.id.substring(0, 8)}...</MqText>
+                      </Box>
+                    </MQTooltip>
                     <MqCopy string={run.id} />
                   </Box>
                 </TableCell>

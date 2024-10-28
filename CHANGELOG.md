@@ -1,6 +1,45 @@
 # Changelog
 
-## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.48.0...HEAD)
+## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.50.0...HEAD)
+
+## [0.50.0](https://github.com/MarquezProject/marquez/compare/0.49.0...0.50.0) - 2024-10-23
+
+### Added
+
+* Web: **New** _Data Observability_ dashboard for _stats_ on OpenLineage events (`24hrs`, past `7.days`); views are also available for _sources_, _datasets_, and _jobs_; **new** job list view has also been introduced displaying the latest `N` runs (and duration) for a given job [`#2913`](https://github.com/MarquezProject/marquez/pull/2913) [@phixMe](https://github.com/phixMe)
+* Web: `404` page [`#2890`](https://github.com/MarquezProject/marquez/pull/2890) [@phixMe](https://github.com/phixMe)
+* Web: Display _parent_ job (if present) in _job_ panel [`#2868`](https://github.com/MarquezProject/marquez/pull/2868) [@phixMe](https://github.com/phixMe)
+* Web: Allow override of `web.port` via `WEB_PORT` environment variable [`#2838`](https://github.com/MarquezProject/marquez/pull/2838) [@bidlako](https://github.com/bidlako)
+* Web: Allow _nullable_ columns for schema in _dataset_ panel (use `N/A`) [`#2896`](https://github.com/MarquezProject/marquez/pull/2896) [@phixMe](https://github.com/phixMe)
+* Web: Better feedback when lineage events are loading [`#2916`](https://github.com/MarquezProject/marquez/pull/2916) [@NisargChokshi45](https://github.com/NisargChokshi45)
+* API: `Job` object will now return `Job.latestRuns` (latest `N` runs) and `Job.latestRun` (last run to execute) [`#2901`](https://github.com/MarquezProject/marquez/pull/2901) [@phixMe](https://github.com/phixMe)
+* API: Use `io.openlineage.server.*` pkg and **class** [`Metadata`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/api/models/Metadata.java) (utility class for `OpenLineage.RunEvent`) [`#2853`](https://github.com/MarquezProject/marquez/pull/2853) [@wslulciuc](https://github.com/wslulciuc)
+* API: Use `TIMESTAMPTZ` for _timestamps_ in database; supports _Data Observability_ dashboard with timezone of user [`#2924`](https://github.com/MarquezProject/marquez/pull/2924) [@wslulciuc](https://github.com/wslulciuc)
+* API: Set `current_run_uuid` in **table** `jobs` optimizing query for `JobDao.findAll()` [`#2929`](https://github.com/MarquezProject/marquez/pull/2929) [@wslulciuc](https://github.com/wslulciuc)
+* API: **New** `GET` `/api/v1/jobs` [`#2930`](https://github.com/MarquezProject/marquez/pull/2930) [@wslulciuc](https://github.com/wslulciuc)
+* CLI: **New** cmd args for [`cli.MetadataCommand`](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/cli/MetadataCommand.java) [`#2923`](https://github.com/MarquezProject/marquez/pull/2923) [@wslulciuc](https://github.com/wslulciuc)
+  * `--jobs`: _limits OL jobs up to N (default: 5)_
+  * `--runs-per-job`: _limits OL run executions per job up to N (default: 10)_
+  * `--runs-active`: _limits OL run executions marked as active (='RUNNING') up to N_
+  * `--max-run-fails-per-job`: _maximum OL run fails per job (default: 2)_
+  * `--min-run-duration`: _minimum OL run duration (in seconds) per execution (default: 300)_
+  * `--run-start-time`: _specifies the OL run start time in UTC ISO ('YYYY-MM-DDTHH:MM:SSZ'); used for the initial OL run, with subsequent runs starting relative to the initial start time. (default: 2024-10-15T01:00:11.080828Z)_
+  * `--run-end-time`: _specifies the OL run end time in UTC ISO ('YYYY-MM-DDTHH:MM:SSZ'); used for the initial OL run, with subsequent runs ending relative to the initial end time. (default: 2024-10-15T01:07:25.080828Z)_
+
+### Fixed
+
+* Web: Better rendering of long text [`#2942`](https://github.com/MarquezProject/marquez/pull/2942) [@phixMe](https://github.com/phixMe)
+* Web: Display full `runID` and check icon when copied [`#2940`](https://github.com/MarquezProject/marquez/pull/2940) [`#2941`](https://github.com/MarquezProject/marquez/pull/2941) [@wslulciuc](https://github.com/wslulciuc) [@phixMe](https://github.com/phixMe)
+* Web: Use **DatasetVersionAPI** to display latest schema and remove extra job facets API call in _dataset_ panel [`#2938`](https://github.com/MarquezProject/marquez/pull/2938) [@phixMe](https://github.com/phixMe)
+* Web: Use **DatasetAPI** for data quality assertions in _dataset_ panel [`#2937`](https://github.com/MarquezProject/marquez/pull/2937) [@phixMe](https://github.com/phixMe)
+* Web: Fill-in _job_ node in lineage graph with correct color for `JobEvent`s [`#2934`](https://github.com/MarquezProject/marquez/pull/2934) [@phixMe](https://github.com/phixMe)
+* Web: Fill-in _job_ node in lineage graph with correct color for run states `RUNNING`, `COMPLETED`, etc [`#2897`](https://github.com/MarquezProject/marquez/pull/2897) [@phixMe](https://github.com/phixMe)
+* API: Pagination for `DatasetVersion.findAll()`; not all dataset versions were returned for `GET` `/api/v1/namespaces/{namespace}/datasets/{dataset}/versions` [`#2944`](https://github.com/MarquezProject/marquez/pull/2945) [@inanalper](https://github.com/inanalper)
+* API: `null` namespace and dataset name in **view** `dataset_view` for old versions; use **table** `dataset_versions` instead in column lineage query [#2881](https://github.com/MarquezProject/marquez/pull/2881) [@sophiely](https://github.com/sophiely)
+* API: Missing `DELETE CASCADE` on **table** `job_facets` [`#2878`](https://github.com/MarquezProject/marquez/pull/2878) [@mattwparas](https://github.com/mattwparas)
+* API: Ensure `Job.latestRun` in `Job` object is set for runs in a `RUNNING` state; before `Job.latestRun` was set only for a run in a _done_ state (`COMPLETED` / `FAILED`) [`#2933`](https://github.com/MarquezProject/marquez/pull/2933) [@phixMe](https://github.com/phixMe)
+* CLI: Repurpose cmd `db-migrate` to run all pending database migrations, no longer coupling migrations with HTTP server startup [`#2936`](https://github.com/MarquezProject/marquez/pull/2936) [@davidjgoss](https://github.com/davidjgoss)
+* Chart: Missing common `labels` for `deployment.replicas` [`#2877`](https://github.com/MarquezProject/marquez/pull/2877) [@alaturqua](https://github.com/alaturqua)
 
 ## [0.49.0](https://github.com/MarquezProject/marquez/compare/0.48.0...0.49.0) - 2024-08-07
 

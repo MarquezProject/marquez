@@ -66,7 +66,7 @@ type EventsProps = StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 50
 const EVENTS_HEADER_HEIGHT = 64
 
 const Events: React.FC<EventsProps> = ({
@@ -296,7 +296,7 @@ const Events: React.FC<EventsProps> = ({
                         >
                           <TableCell align='left'>
                             <Box display={'flex'} alignItems={'center'}>
-                              <MqText font={'mono'}>{event.run.runId.substring(0, 8)}...</MqText>
+                              <MqText font={'mono'}>{event.run.runId}</MqText>
                               <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>
@@ -306,9 +306,15 @@ const Events: React.FC<EventsProps> = ({
                               label={event.eventType}
                             />
                           </TableCell>
-                          <TableCell align='left'>{truncateText(event.job.name, 40)}</TableCell>
                           <TableCell align='left'>
-                            <MqText> {truncateText(event.job.namespace, 40)}</MqText>
+                            <MQTooltip title={event.job.name}>
+                              <Box display={'inline'}>{truncateText(event.job.name, 40)}</Box>
+                            </MQTooltip>
+                          </TableCell>
+                          <TableCell align='left'>
+                            <MQTooltip title={event.job.namespace}>
+                              <Box display={'inline'}>{truncateText(event.job.namespace, 40)}</Box>
+                            </MQTooltip>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText>{formatUpdatedAt(event.eventTime)}</MqText>

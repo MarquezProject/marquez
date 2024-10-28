@@ -20,7 +20,7 @@ marquez:
   image:
     registry: docker.io
     repository: marquezproject/marquez
-    tag: 0.49.0
+    tag: 0.50.0
     pullPolicy: IfNotPresent
   ## Name of the existing secret containing credentials for the Marquez installation.
   ## When this is specified, it will take precedence over the values configured in the 'db' section.
@@ -80,7 +80,7 @@ web:
   image:
     registry: docker.io
     repository: marquezproject/marquez-web
-    tag: 0.49.0
+    tag: 0.50.0
     pullPolicy: IfNotPresent
   ## Marquez website will run on this port
   ##

@@ -6,7 +6,7 @@
 # Requirements:
 #   * You're on the 'main' branch
 #   * You've installed 'bump2version'
-#   * You've installed 'redoc-cli'
+#   * You've installed 'redocly'
 #
 # Usage: $ ./new-version.sh --release-version RELEASE_VERSION --next-version NEXT_VERSION
 
@@ -59,9 +59,9 @@ if [[ ! $(type -P bump2version) ]]; then
   exit 1;
 fi
 
-# Verify redoc-cli is installed
-if [[ ! $(type -P redoc-cli) ]]; then
-  echo "redoc-cli not installed! Please see https://redoc.ly/docs/redoc/quickstart/cli"
+# Verify redocly is installed
+if [[ ! $(type -P redocly) ]]; then
+  echo "redocly not installed! Please see https://redoc.ly/docs/redoc/quickstart/cli"
   exit 1;
 fi
 
@@ -140,7 +140,7 @@ sed -i "" "s/<version>.*/<version>${RELEASE_VERSION}<\/version>/g" ./clients/jav
 sed -i "" "s/marquez-java:.*/marquez-java:${RELEASE_VERSION}/g" ./clients/java/README.md
 
 # (5) Bundle openAPI docs
-redoc-cli bundle spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
+redocly build-docs spec/openapi.yml --output docs/openapi.html --title "Marquez API Reference"
 
 # (6) Prepare release commit
 git commit -sam "Prepare for release ${RELEASE_VERSION}" --no-verify

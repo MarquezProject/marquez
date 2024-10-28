@@ -25,7 +25,7 @@ public final class DbMigration {
   public static void migrateDbOrError(
       @NonNull final FlywayFactory flywayFactory,
       @NonNull final DataSource source,
-      final boolean migrateDbOnStartup) {
+      final boolean migrateNow) {
     final Flyway flyway = flywayFactory.build(source);
     // Only attempt a database migration if there are pending changes to be applied,
     // or on the initialization of a new database. Otherwise, error on pending changes
@@ -33,7 +33,7 @@ public final class DbMigration {
     if (!hasPendingDbMigrations(flyway)) {
       log.info("No pending migrations found, skipping...");
       return;
-    } else if (!migrateDbOnStartup && hasDbMigrationsApplied(flyway)) {
+    } else if (!migrateNow && hasDbMigrationsApplied(flyway)) {
       errorOnPendingDbMigrations(flyway);
     }
     // Attempt to perform a database migration. An exception is thrown on failed migration attempts

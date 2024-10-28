@@ -23,6 +23,7 @@ import { formatUpdatedAt } from '../../helpers'
 import { useTheme } from '@emotion/react'
 import DatasetInfo from './DatasetInfo'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MqCopy from '../core/copy/MqCopy'
 import MqPaging from '../paging/MqPaging'
 import MqText from '../core/text/MqText'
@@ -92,12 +93,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </Box>
-        <DatasetInfo
-          dataset={dataset}
-          datasetFields={infoView.fields}
-          facets={infoView.facets}
-          run={infoView.createdByRun}
-        />
+        <DatasetInfo dataset={dataset} datasetFields={infoView.fields} facets={infoView.facets} />
       </>
     )
   }
@@ -149,7 +145,9 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
               >
                 <TableCell align='left'>
                   <Box display={'flex'} alignItems={'center'}>
-                    {version.version.substring(0, 8)}...
+                    <MQTooltip title={version.version}>
+                      <MqText font={'mono'}>{version.version.substring(0, 8)}...</MqText>
+                    </MQTooltip>
                     <MqCopy string={version.version} />
                   </Box>
                 </TableCell>
@@ -159,7 +157,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
                   <Box display={'flex'} alignItems={'center'}>
                     {version.createdByRun ? (
                       <>
-                        {version.createdByRun.id.substring(0, 8)}...
+                        <MqText font={'mono'}>{version.createdByRun.id.substring(0, 8)}...</MqText>
                         <MqCopy string={version.createdByRun.id} />
                       </>
                     ) : (

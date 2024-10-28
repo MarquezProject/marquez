@@ -51,15 +51,15 @@ subprojects {
     }
 
     ext {
-        assertjVersion = '3.25.3'
+        assertjVersion = '3.26.3'
         dropwizardVersion = '2.1.12'
         jacocoVersion = '0.8.12'
         junit5Version = '5.10.2'
         lombokVersion = '1.18.34'
         mockitoVersion = '5.4.0'
-        openlineageVersion = '1.13.1'
+        openlineageVersion = '1.23.0'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.6.0'
+        postgresqlVersion = '42.7.4'
     }
 
     dependencies {

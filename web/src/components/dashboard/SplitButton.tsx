@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { Refresh } from '@mui/icons-material'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Grow from '@mui/material/Grow'
+import MQTooltip from '../core/tooltip/MQTooltip'
 import MenuItem from '@mui/material/MenuItem'
 import MenuList from '@mui/material/MenuList'
 import Paper from '@mui/material/Paper'
@@ -12,9 +14,10 @@ import Popper from '@mui/material/Popper'
 interface Props {
   options: string[]
   onClick: (option: string) => void
+  onRefresh?: () => void
 }
 
-export default function SplitButton({ options, onClick }: Props) {
+export default function SplitButton({ options, onClick, onRefresh }: Props) {
   const [open, setOpen] = React.useState(false)
   const anchorRef = React.useRef<HTMLDivElement>(null)
   const [selectedIndex, setSelectedIndex] = React.useState(0)
@@ -66,6 +69,11 @@ export default function SplitButton({ options, onClick }: Props) {
         >
           <ArrowDropDownIcon />
         </Button>
+        <MQTooltip title={'Refresh'}>
+          <Button size={'small'} color={'secondary'} onClick={onRefresh}>
+            <Refresh fontSize={'small'} />
+          </Button>
+        </MQTooltip>
       </ButtonGroup>
       <Popper
         sx={{
