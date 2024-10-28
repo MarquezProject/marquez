@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="pfx00cb5227-d9d0-1d4b-bdb2-c7ad6c3c6906" Version="2.0" IssueInstant="2014-07-18T01:13:06Z" Destination="http://idp.example.com/SingleLogoutService.php">
+    <saml:Issuer>http://sp.example.com/demo1/metadata.php</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+    <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+  <ds:Reference URI="#pfx00cb5227-d9d0-1d4b-bdb2-c7ad6c3c6906"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>myTkSwwgK+Lcx5JZukoHggbFBVA=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>ayMUV7pPijoh7ocMnIz2GPYK7Y4Olib+U1mIUX0o7uU22m+ZGUP2HkmvC7bIZ4N3MFyeUyPuEBTDdFtLaENTWzovGMNRXDSypNI5UwobGqAFu16BY9lL5uJ/6HAAEgayxaY5kVMEY4VmNUpNCIE0WMpzA91bnElbEFsxi6G8sUj49oDFYncbOHilThLoe0dPQxB7N1wfX73k5nZ/hkEPlbwvENJRRojvwlbcn7crviYRzbzJPa31iMKmaSTaoS7cIV0Q8V1jYuQV29Y4eNwbVa4ZGu06by5CFXHYZoev0zyEoOTCNgQuF72zxzOmzDF5yEH5fWPE0QwUhf8MMGOtGg==</ds:SignatureValue>
+<ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDtTCCAp2gAwIBAgIJAKg4VeVcIDz1MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwHhcNMTUwODEzMDE1NDIwWhcNMTUwOTEyMDE1NDIwWjBFMQswCQYDVQQGEwJVUzETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxG3ouM7U+fXbJt69X1H6d4UNg/uRr06pFuU9RkfIwNC+yaXyptqB3ynXKsL7BFt4DCd0fflRvJAx3feJIDp16wN9GDVHcufWMYPhh2j5HcTW/j9JoIJzGhJyvO00YKBt+hHy83iN1SdChKv5y0iSyiPP5GnqFw+ayyHoM6hSO0PqBou1Xb0ZSIE+DHosBnvVna5w2AiPY4xrJl9yZHZ4Q7DfMiYTgstjETio4bX+6oLiBnYktn7DjdEslqhffVme4PuBxNojI+uCeg/sn4QVLd/iogMJfDWNuLD8326Mi/FE9cCRvFlvAiMSaebMI3zPaySsxTK7Zgj5TpEbmbHI9wIDAQABo4GnMIGkMB0GA1UdDgQWBBSVGgvoW4MhMuzBGce29PY8vSzHFzB1BgNVHSMEbjBsgBSVGgvoW4MhMuzBGce29PY8vSzHF6FJpEcwRTELMAkGA1UEBhMCVVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAKg4VeVcIDz1MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAJu1rqs+anD74dbdwgd3CnqnQsQDJiEXmBhG2leaGt3ve9b/9gKaJg2pyb2NyppDe1uLqh6nNXDuzg1oNZrPz5pJL/eCXPl7FhxhMUi04TtLf8LeNTCIWYZiFuO4pmhohHcv8kRvYR1+6SkLTC8j/TZerm7qvesSiTQFNapa1eNdVQ8nFwVkEtWl+JzKEM1BlRcn42sjJkijeFp7DpI7pU+PnYeiaXpRv5pJo8ogM1iFxN+SnfEs0EuQ7fhKIG9aHKi7bKZ7L6SyX7MDIGLeulEU6lf5D9BfXNmcMambiS0pXhL2QXajt96UBq8FT2KNXY8XNtR4y6MyyCzhaiZZcc8=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature>
+    <saml:EncryptedID>
+        <xenc:EncryptedData xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" Type="http://www.w3.org/2001/04/xmlenc#Element">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+            <dsig:KeyInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+                <xenc:EncryptedKey>
+                    <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/>
+                    <xenc:CipherData>
+                        <xenc:CipherValue>Rtg5L09Un3DdhYBFJvYp4w1WGKHIi0Umf9PaFdiSL2r+1NK+Z76NwhR4vsIu1lq2BJEX1ZMTEJ/kitF/PgEqeAOGyLu80dmXyNbhKwbEZrbv+dYx5vJ21nHIbLeeknNB70XsGFtcrWbCqt2r6/e5wFxD7HglPmxWEzNgz5SGEki35MWqtCbfX8lTCsnKFEKU9GfaHYIfPZzf/szwJZVGJps5HI/k7wuKbfS/U8odxsyWX73//+rkduhF9j5Iq95+xd1KRrxcuyvfYsXH5SWcnXt2nIlHWuCDHVNILoWDvskvOyGTP1e+8K+W2sgptoA98D6NJb+k+x/TCD1eFbce5w==</xenc:CipherValue>
+                    </xenc:CipherData>
+                </xenc:EncryptedKey>
+            </dsig:KeyInfo>
+            <xenc:CipherData>
+                <xenc:CipherValue>hbSadp3tEX/QyaTsIpChQQat89Yc3shCc6728DoS4qzdrsswHIUoBjp5hKDjlECJBQvXSNFV3vYn93pm44/fl0Z3yTqKkt6eUI3lZQ3ZsVfzVwkNT2jAnZom+OThhVfb1vcpN62tDmGI2dLxzZAvOuvmuG52qambAnZ6hR4FevVyCww5AkD86x8Q8OWYUTwPsggDOuQEbDyMXG4YoRpUag9boTMoUcidmUQaeO6omLzr/Mg1P0xY8fkVetVh63L1T6Kp+6c17bSIW1q4e8SazujVoQZ5eCJP4DQHAvmmcEs=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedData>
+    </saml:EncryptedID>
+    <samlp:SessionIndex>1</samlp:SessionIndex>
+</samlp:LogoutRequest>

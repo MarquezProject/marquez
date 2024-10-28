@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Route, Navigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import logging from '../../config/logging';
 
 // Mock function to check SAML authentication status
-const isAuthenticated = () => {
-    // Check if a valid session or token exists
-    const token = sessionStorage.getItem('samlToken');
-    if (!token) {
-      return false;
-    }
-  
-    // Checks if token is expired
-    const tokenExpiration = sessionStorage.getItem('samlTokenExpiration');
-    return !(tokenExpiration && new Date(tokenExpiration) < new Date());
+const isAuthenticated = async () => {
+  try {
+    const response = await axios.get('http://localhost:1337/whoami', { withCredentials: true });
+    logging.info(response.data.user, 'SAML');
+    return response.data.user && response.data.user.nameID;
+  } catch (error) {
+    logging.error(error, 'SAML');
+    return false;
+  }
 };
 
 interface ProtectedRouteProps {
@@ -22,11 +23,27 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component, ...rest }) => {
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await isAuthenticated();
+      setAuthenticated(auth);
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <Route
       {...rest}
       element={
-        isAuthenticated() ? (
+        authenticated ? (
           <Component />
         ) : (
           <Navigate to="/login" state={{ from: location }} />
@@ -35,13 +52,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ component: Component, .
     />
   );
 };
-ProtectedRoute.propTypes = {
-  component: PropTypes.func.isRequired,
-};
 
 ProtectedRoute.propTypes = {
   component: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired,
 };
 
 export default ProtectedRoute;

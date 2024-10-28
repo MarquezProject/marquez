@@ -1,25 +1,31 @@
 {
   "name": "web-server",
   "version": "1.0.0",
-  "main": "source/server.js",
+  "main": "dist/server.js", 
+  "type": "commonjs", 
   "scripts": {
-    "start": "node source/server.js",
-    "build": "tsc",
-    "dev": "ts-node-dev --respawn source/server.ts"
+    "start": "node dist/server.js", 
+    "build": "tsc", 
+    "dev": "ts-node-dev --respawn src/server.ts" 
   },
   "dependencies": {
+    "dotenv": "^8.6.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "passport": "^0.4.1",
-    "passport-saml": "^1.3.5",
-    "dotenv": "^8.2.0"
+    "passport-saml": "^1.3.5"
   },
   "devDependencies": {
+    "@types/dotenv": "^8.2.3",
     "@types/express": "^4.17.11",
     "@types/express-session": "^1.17.3",
     "@types/node": "^14.14.31",
-    "typescript": "^4.1.5",
+    "@types/passport": "^1.0.16",
     "ts-node": "^9.1.1",
-    "ts-node-dev": "^1.1.1"
-  }
+    "ts-node-dev": "^1.1.1",
+    "typescript": "^4.1.5"
+  },
+  "description": "auth2 credentials validation",
+  "author": "Jonathan Moraes",
+  "license": "ISC"
 }

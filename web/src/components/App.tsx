@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Box, Container, CssBaseline } from '@mui/material';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
@@ -25,14 +25,6 @@ import createRootReducer from '../store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../store/sagas';
 import ProtectedRoute from '../routes/protected-route/ProtectedRoute';
-import axios from 'axios';
-import logging from '../config/logging';
-
-interface IApplicationProps {
-  // Define the props that the Application component will receive
-  // For example:
-  title: string;
-}
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -50,47 +42,6 @@ const store = createStore(
 sagaMiddleware.run(rootSaga);
 
 const TITLE = 'Marquez';
-
-interface IApplicationProps {
-  title: string;
-}
-
-const Application: React.FunctionComponent<IApplicationProps> = (props) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [email, setEmail] = useState<string>('');
-
-  useEffect(() => {
-    logging.info('Initiating SAML check.', 'SAML');
-
-    axios({
-      method: 'GET',
-      url: 'http://localhost:3000',
-      withCredentials: true,
-    })
-      .then((response) => {
-        logging.info(response.data.user, 'SAML');
-
-        if (response.data.user.nameID) {
-          setEmail(response.data.user.nameID);
-          setLoading(false);
-        } else {
-          RedirectToLogin();
-        }
-      })
-      .catch((error) => {
-        logging.error(error, 'SAML');
-        RedirectToLogin();
-      });
-  }, []);
-
-  const RedirectToLogin = () => {
-    window.location.replace('http://localhost:3000/login');
-  };
-
-  if (loading) return <p>Loading ...</p>;
-
-  return <p>Hello {email}!</p>;
-};
 
 const App = (): ReactElement => {
   return (
@@ -110,19 +61,21 @@ const App = (): ReactElement => {
                     <Header />
                   </Container>
                   <Routes>
-                    <Route path={'/'} element={<Dashboard />} />
-                    <Route path={'/jobs'} element={<Jobs />} />
-                    <Route path={'/datasets'} element={<Datasets />} />
-                    <Route path={'/events'} element={<Events />} />
+                    <Route path={'/'} element={<ProtectedRoute component={Dashboard} />} />
+                    <Route path={'/jobs'} element={<ProtectedRoute component={Jobs} />} />
+                    <Route path={'/datasets'} element={<ProtectedRoute component={Datasets} />} />
+                    <Route path={'/events'} element={<ProtectedRoute component={Events} />} />
                     <Route
                       path={'/datasets/column-level/:namespace/:name'}
-                      element={<ColumnLevel />}
+                      element={<ProtectedRoute component={ColumnLevel} />}
                     />
-                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
+                    <Route
+                      path={'/lineage/:nodeType/:namespace/:name'}
+                      element={<ProtectedRoute component={TableLevel} />}
+                    />
                     <Route path='*' element={<NotFound />} />
                   </Routes>
                   <Toast />
-                  <Application title="Marquez" /> {/* Integrate the Application component */}
                 </Box>
               </LocalizationProvider>
             </ThemeProvider>

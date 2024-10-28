@@ -1,0 +1,38 @@
+{
+  "name": "xpath",
+  "version": "0.0.27",
+  "description": "DOM 3 XPath implemention and helper for node.js.",
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "author": {
+    "name": "Cameron McCormack"
+  },
+  "contributors": [
+    {
+      "name": "goto100"
+    },
+    {
+      "name": "James Rishe"
+    }
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "nodeunit": ">=0.6.4",
+    "xmldom": "^0.1.19"
+  },
+  "typings": "./xpath.d.ts",
+  "scripts": {
+    "test": "./node_modules/.bin/nodeunit test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goto100/xpath.git"
+  },
+  "main": "./xpath.js",
+  "keywords": [
+    "xpath",
+    "xml"
+  ],
+  "license": "MIT"
+}
