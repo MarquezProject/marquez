@@ -23,5 +23,5 @@
       "addLabels": ["dependencies", "renovate"]
     }
   ],
-  "ignorePaths": ["**/chart/**", "**/dev/**"]
+  "ignorePaths": ["**/chart/**", "**/dev/**", "**/stats/**"]
 }

@@ -168,14 +168,14 @@ public interface DatasetVersionDao extends BaseDao {
       WITH selected_dataset_versions AS (
           SELECT dv.*
           FROM dataset_versions dv
-          WHERE dv.version = :version
+          WHERE dv.uuid = :version
       ), selected_dataset_version_facets AS (
           SELECT dv.uuid, dv.dataset_name, dv.namespace_name, df.run_uuid, df.lineage_event_time, df.facet
           FROM selected_dataset_versions dv
           LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
-          dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+          dv.created_at, dv.uuid AS current_version_uuid, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
           sv.schema_location, t.tags, f.facets
       FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
@@ -206,7 +206,7 @@ public interface DatasetVersionDao extends BaseDao {
           LEFT JOIN dataset_facets_view df ON df.dataset_version_uuid = dv.uuid  AND (df.type ILIKE 'dataset' OR df.type ILIKE 'unknown' OR df.type ILIKE 'input')
       )
       SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,\s
-          dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+          dv.created_at, dv.uuid AS current_version_uuid, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
           sv.schema_location, t.tags, f.facets
       FROM selected_dataset_versions dv
       LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
@@ -255,7 +255,7 @@ public interface DatasetVersionDao extends BaseDao {
       """
       WITH dataset_info AS (
 	    SELECT d.type, d.name, d.physical_name, d.namespace_name, d.source_name, d.description, dv.lifecycle_state,
-		dv.created_at, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
+		dv.created_at, dv.uuid AS current_version_uuid, dv.version, dv.dataset_schema_version_uuid, dv.fields, dv.run_uuid AS createdByRunUuid,
 		sv.schema_location, t.tags, f.facets, f.lineage_event_time, f.dataset_version_uuid, facet_name
 		FROM dataset_versions dv
 		LEFT JOIN datasets_view d ON d.uuid = dv.dataset_uuid
@@ -277,7 +277,6 @@ public interface DatasetVersionDao extends BaseDao {
       	) f ON f.dataset_version_uuid = dv.uuid
       	WHERE dv.namespace_name = :namespaceName
             AND dv.dataset_name = :datasetName
-      	LIMIT :limit OFFSET :offset
         ),
         dataset_symlinks_names as (
           SELECT DISTINCT dataset_uuid, name
@@ -286,15 +285,16 @@ public interface DatasetVersionDao extends BaseDao {
         )
         SELECT
 	        type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
-            created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
+            created_at, current_version_uuid, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid,
 	        JSONB_AGG(facets ORDER BY lineage_event_time ASC) AS facets
         FROM dataset_info
         WHERE name NOT IN (SELECT name FROM dataset_symlinks_names)
         GROUP BY type, name, physical_name, namespace_name, source_name, description, lifecycle_state,
-            created_at, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
+            created_at, current_version_uuid, version, dataset_schema_version_uuid, fields, createdByRunUuid, schema_location,
             tags, dataset_version_uuid
         ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
   """)
   List<DatasetVersion> findAll(String namespaceName, String datasetName, int limit, int offset);
 

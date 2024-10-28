@@ -51,8 +51,8 @@ dependencies {
     implementation 'com.graphql-java:graphql-java:20.9'
     implementation 'com.graphql-java-kickstart:graphql-java-servlet:12.0.0'
 
-    implementation 'org.opensearch.client:opensearch-rest-client:2.15.0'
-    implementation 'org.opensearch.client:opensearch-java:2.6.0'
+    implementation 'org.opensearch.client:opensearch-rest-client:2.17.1'
+    implementation 'org.opensearch.client:opensearch-java:2.16.0'
 
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"

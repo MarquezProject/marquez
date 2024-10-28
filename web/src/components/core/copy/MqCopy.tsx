@@ -1,6 +1,7 @@
 // Copyright 2018-2023 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
+import { Check } from '@mui/icons-material'
 import { Snackbar } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import IconButton from '@mui/material/IconButton'
@@ -13,6 +14,7 @@ interface MqCopyProps {
 
 const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
   const [open, setOpen] = React.useState(false)
+  const [hasCopied, setHasCopied] = React.useState(false)
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return
@@ -28,12 +30,16 @@ const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
             event.stopPropagation()
             navigator.clipboard.writeText(string)
             setOpen(true)
+            setHasCopied(true)
+            setTimeout(() => {
+              setHasCopied(false)
+            }, 3000)
           }}
           aria-label='copy'
           size={'small'}
-          color={'primary'}
+          color={'secondary'}
         >
-          <ContentCopyIcon fontSize={'small'} />
+          {hasCopied ? <Check fontSize={'small'} /> : <ContentCopyIcon fontSize={'small'} />}
         </IconButton>
       </MQTooltip>
       <Snackbar

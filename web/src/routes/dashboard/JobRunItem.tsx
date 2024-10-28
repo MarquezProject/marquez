@@ -45,9 +45,13 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
     >
       <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'} mb={1}>
         <Box display={'flex'} alignItems={'center'}>
-          <MqText bold font='mono' sx={{ mr: 2 }}>
-            {truncateText(job.name, 40)}
-          </MqText>
+          <MQTooltip title={job.name} placement={'top'}>
+            <Box>
+              <MqText bold font='mono' sx={{ mr: 2 }}>
+                {truncateText(job.name, 75)}
+              </MqText>
+            </Box>
+          </MQTooltip>
           {job.tags.slice(0, 3).map((tag, index) => (
             <Chip key={index} sx={{ mr: 1 }} size={'small'} label={tag} />
           ))}

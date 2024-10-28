@@ -8,9 +8,9 @@
 set -e
 
 # Version of Marquez
-readonly VERSION=0.49.0
+readonly VERSION=0.50.0
 # Build version of Marquez
-readonly BUILD_VERSION=0.49.0
+readonly BUILD_VERSION=0.50.0
 
 title() {
   echo -e "\033[1m${1}\033[0m"
@@ -157,7 +157,7 @@ fi
 
 # Create docker volumes for Marquez
 if [[ "${NO_VOLUMES}" = "false" ]]; then
-  ./docker/volumes.sh marquez
+  ./docker/volumes.sh $(basename "$project_root")
 fi
 
 # Enable search in UI an API if search container is enabled

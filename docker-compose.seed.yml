@@ -9,7 +9,7 @@ services:
     volumes:
       - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
       - ./docker/seed.sh:/usr/src/app/seed.sh
-      - ./docker/metadata.json:/usr/src/app/metadata.json
+      - ./docker/metadata.template.json:/usr/src/app/metadata.template.json
     links:
       - "db:postgres"
     depends_on:

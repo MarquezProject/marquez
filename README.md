@@ -98,8 +98,8 @@ Versions of Marquez are compatible with OpenLineage unless noted otherwise. We e
 | **Marquez**                                                                                      | **OpenLineage**                                               | **Status**    |
 |--------------------------------------------------------------------------------------------------|---------------------------------------------------------------|---------------|
 | [`UNRELEASED`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#unreleased)      | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `CURRENT`     |
-| [`0.49.0`](https://github.com/MarquezProject/marquez/blob/0.49.0/CHANGELOG.md#0490---2024-08-07) | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `RECOMMENDED` |
-| [`0.48.0`](https://github.com/MarquezProject/marquez/blob/0.45.0/CHANGELOG.md#0480---2024-08-05) | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `MAINTENANCE` |
+| [`0.50.0`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#0500---2024-10-23)   | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `RECOMMENDED` |
+| [`0.49.0`](https://github.com/MarquezProject/marquez/blob/0.49.0/CHANGELOG.md#0490---2024-08-07) | [`2-0-2`](https://openlineage.io/spec/2-0-2/OpenLineage.json) | `MAINTENANCE` |
 
 > **Note:** The [`openlineage-python`](https://pypi.org/project/openlineage-python) and [`openlineage-java`](https://central.sonatype.com/artifact/io.openlineage/openlineage-java) libraries will a higher version than the OpenLineage [specification](https://github.com/OpenLineage/OpenLineage/tree/main/spec) as they have different version requirements.
 
