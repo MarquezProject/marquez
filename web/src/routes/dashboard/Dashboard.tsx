@@ -28,6 +28,8 @@ import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
+import Timeline from './Timeline'
+import TimelineDrawer from "./TimelineDrawer";
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
@@ -195,7 +197,9 @@ const Dashboard: React.FC = ({
             height: `calc(100vh - ${HEADER_HEIGHT}px)`,
           },
         }}
-      ></Drawer>
+      >
+        <TimelineDrawer />
+      </Drawer>
       <Container maxWidth={'lg'}>
         <Box pt={2} mb={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
           <MqText heading>DataOps</MqText>
@@ -327,7 +331,7 @@ const Dashboard: React.FC = ({
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item sm={12}>
+            <Grid item xs={12} md={8}>
               <Box
                 mr={{
                   xs: 0,
@@ -365,6 +369,23 @@ const Dashboard: React.FC = ({
                   </MqEmpty>
                 )}
               </Box>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} mb={1}>
+                <MqText subheading>Timeline</MqText>
+                <Box display={'flex'} alignItems={'center'}>
+                  {isJobsLoading && <CircularProgress sx={{ mr: 2 }} size={16} color={'primary'} />}
+                  <Button
+                    disableRipple
+                    size={'small'}
+                    endIcon={<ChevronRight />}
+                    onClick={() => setTimelineOpen(true)}
+                  >
+                    See More
+                  </Button>
+                </Box>
+              </Box>
+              <Timeline />
             </Grid>
           </Grid>
         </Box>

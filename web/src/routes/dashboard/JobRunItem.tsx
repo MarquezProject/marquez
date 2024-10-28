@@ -32,6 +32,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
       border={1}
       borderColor={'divider'}
       borderRadius={2}
+      overflow={'hidden'}
       onClick={() => {
         navigate(`/lineage/${encodeNode('JOB', job.namespace, job.name)}`)
       }}
