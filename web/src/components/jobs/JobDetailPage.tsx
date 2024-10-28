@@ -5,15 +5,27 @@ import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
-import { Box, Button, CircularProgress, Divider, Grid, Tab, Tabs } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  Tab,
+  Tabs,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@mui/material'
 import { CalendarIcon } from '@mui/x-date-pickers'
 import {
+  Check,
   DirectionsRun,
   EscalatorWarning,
+  Feedback,
+  Notifications,
   Speed,
   SportsScore,
   Start,
-  Title,
 } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
@@ -97,6 +109,9 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
   }
 
   const i18next = require('i18next')
+
+  const [notifyOnFailure, setNotifyOnFailure] = React.useState(false)
+  const [notifyOnSuccess, setNotifyOnSuccess] = React.useState(false)
 
   useEffect(() => {
     fetchJob(lineageJob.namespace, lineageJob.name)
@@ -249,9 +264,34 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         </Grid>
         <Grid item xs={3}>
           <MqInfo
-            icon={<Title color={'disabled'} />}
-            label={'Type'.toUpperCase()}
-            value={job.type ? job.type : 'N/A'}
+            icon={<Notifications color={'disabled'} />}
+            label={'Notifications'.toUpperCase()}
+            value={
+              <ToggleButtonGroup exclusive size={'small'}>
+                <MQTooltip title={'Notify on Failure'}>
+                  <ToggleButton
+                    value='check'
+                    size={'small'}
+                    color={'error'}
+                    selected={notifyOnFailure}
+                    onChange={() => setNotifyOnFailure((prevSelected) => !prevSelected)}
+                  >
+                    <Feedback fontSize={'small'} />
+                  </ToggleButton>
+                </MQTooltip>
+                <MQTooltip title={'Notify on Success'}>
+                  <ToggleButton
+                    value='check'
+                    size={'small'}
+                    color={'primary'}
+                    selected={notifyOnSuccess}
+                    onChange={() => setNotifyOnSuccess((prevSelected) => !prevSelected)}
+                  >
+                    <Check fontSize={'small'} />
+                  </ToggleButton>
+                </MQTooltip>
+              </ToggleButtonGroup>
+            }
           />
         </Grid>
         <Grid item xs={3}>
@@ -312,6 +352,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
         <Tabs value={tabIndex} onChange={handleChange} textColor='primary' indicatorColor='primary'>
           <Tab label={i18next.t('jobs.latest_tab')} disableRipple={true} />
           <Tab label={i18next.t('jobs.history_tab')} disableRipple={true} />
+          <Tab label={'Notifications'} disableRipple={true} />
         </Tabs>
       </Box>
       {tabIndex === 0 ? (
