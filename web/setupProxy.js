@@ -3,13 +3,23 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const express = require('express')
 const router = express.Router()
 
+const environmentVariable = (variableName) => {
+  const value = process.env[variableName]
+  if (!value) {
+      console.error(`Error: ${variableName} environment variable is not defined.`)
+      console.error(`Please set ${variableName} and restart the application.`)
+      process.exit(1)
+  }
+  return value
+}
+
 const apiOptions = {
-  target: `http://${process.env.MARQUEZ_HOST}:${process.env.MARQUEZ_PORT}/`
+  target: `http://${(environmentVariable("MARQUEZ_HOST"))}:${environmentVariable("MARQUEZ_PORT")}/`
 }
 const app = express()
 const path = __dirname + '/dist'
 
-const port = process.env.WEB_PORT
+const port = environmentVariable("WEB_PORT")
 
 app.use('/', express.static(path))
 app.use('/datasets', express.static(path))
