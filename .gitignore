@@ -6,6 +6,7 @@
 ./out/*
 .actrc
 .DS_Store
+.dev
 .classpath
 .editorconfig
 .gradle/
