@@ -9,7 +9,7 @@ const config = {
         }
     },
     server: {
-        port: 3000
+        port: 1337
     },
     session: {
         resave: false,

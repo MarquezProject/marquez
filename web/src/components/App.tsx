@@ -8,8 +8,7 @@ import { Provider } from 'react-redux';
 import { ReduxRouter, createRouterMiddleware } from '@lagunovsky/redux-react-router';
 import { Route, Routes } from 'react-router-dom';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
-import { applyMiddleware, createStore } from 'redux';
-import { composeWithDevTools } from '@redux-devtools/extension';
+import { configureStore } from '@reduxjs/toolkit';
 import { createBrowserHistory } from 'history';
 import { theme } from '../helpers/theme';
 import ColumnLevel from '../routes/column-level/ColumnLevel';
@@ -24,7 +23,7 @@ import Toast from './Toast';
 import createRootReducer from '../store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../store/sagas';
-import ProtectedRoute from '../routes/protected-route/ProtectedRoute';
+import withAuth from './withAuth'; 
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -34,11 +33,12 @@ const sagaMiddleware = createSagaMiddleware({
 const history = createBrowserHistory();
 const historyMiddleware = createRouterMiddleware(history);
 
-const store = createStore(
-  createRootReducer(history),
-  composeWithDevTools(applyMiddleware(sagaMiddleware, historyMiddleware))
-);
-
+const store = configureStore({
+  reducer: createRootReducer(history),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(sagaMiddleware, historyMiddleware),
+  devTools: process.env.NODE_ENV !== 'dev',
+});
 sagaMiddleware.run(rootSaga);
 
 const TITLE = 'Marquez';
@@ -61,18 +61,15 @@ const App = (): ReactElement => {
                     <Header />
                   </Container>
                   <Routes>
-                    <Route path={'/'} element={<ProtectedRoute component={Dashboard} />} />
-                    <Route path={'/jobs'} element={<ProtectedRoute component={Jobs} />} />
-                    <Route path={'/datasets'} element={<ProtectedRoute component={Datasets} />} />
-                    <Route path={'/events'} element={<ProtectedRoute component={Events} />} />
+                    <Route path={'/'} element={<Dashboard />} />
+                    <Route path={'/jobs'} element={<Jobs />} />
+                    <Route path={'/datasets'} element={<Datasets />} />
+                    <Route path={'/events'} element={<Events />} />
                     <Route
                       path={'/datasets/column-level/:namespace/:name'}
-                      element={<ProtectedRoute component={ColumnLevel} />}
+                      element={<ColumnLevel />}
                     />
-                    <Route
-                      path={'/lineage/:nodeType/:namespace/:name'}
-                      element={<ProtectedRoute component={TableLevel} />}
-                    />
+                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
                     <Route path='*' element={<NotFound />} />
                   </Routes>
                   <Toast />
@@ -86,4 +83,4 @@ const App = (): ReactElement => {
   );
 };
 
-export default App;
+export default withAuth(App); // Wrap the App component with the HOC

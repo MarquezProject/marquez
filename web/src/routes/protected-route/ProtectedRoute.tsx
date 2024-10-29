@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Route, Navigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import logging from '../../config/logging';
+import logging from '../config/logging';
 
 // Mock function to check SAML authentication status
 const isAuthenticated = async () => {
   try {
     const response = await axios.get('http://localhost:1337/whoami', { withCredentials: true });
     logging.info(response.data.user, 'SAML');
-    return response.data.user && response.data.user.nameID;
+    return response.data.user?.nameID;
   } catch (error) {
     logging.error(error, 'SAML');
     return false;
