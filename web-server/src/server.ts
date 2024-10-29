@@ -45,11 +45,11 @@ router.use((req, res, next) => {
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('http://marquez-web-ui:80/api/v1/lineage');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('http://marquez-web-ui:80/api/v1/lineage');
 });
 
 router.get('/whoami', (req, res, next) => {
