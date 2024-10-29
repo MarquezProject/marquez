@@ -39,7 +39,8 @@ import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import React, { useEffect, useRef } from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useEffect, useRef, useState } from 'react'
 import moment from 'moment'
 
 interface StateProps {
@@ -77,6 +78,8 @@ const Events: React.FC<EventsProps> = ({
   fetchEvents,
   resetEvents,
 }) => {
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(1)
   const [searchParams, setSearchParams] = useSearchParams()
   const [state, setState] = React.useState<EventsState>({
     page: 0,
@@ -86,6 +89,11 @@ const Events: React.FC<EventsProps> = ({
       searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString()),
     dateTo: searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString()),
   })
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1) // Reinicia para a primeira página ao mudar o tamanho
+  }
 
   const mounted = useRef<boolean>(false)
 
@@ -174,8 +182,24 @@ const Events: React.FC<EventsProps> = ({
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
 
+  const getResponsiveText = (text: string, maxLength: number) => {
+    // Captura a largura da tela diretamente
+    const windowWidth = window.innerWidth
+    console.log(windowWidth)
+    // Retorna o texto truncado ou completo com base na largura da tela
+    return windowWidth > 1050 ? text : truncateText(text, maxLength)
+  }
+
   return (
-    <Container maxWidth={'lg'} disableGutters>
+    <Container
+      disableGutters
+      sx={{
+        marginLeft: '0%',
+        '@media (min-width: 1900px)': {
+          maxWidth: '72%',
+        },
+      }}
+    >
       <MqScreenLoad
         loading={!isEventsInit}
         customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
@@ -254,6 +278,8 @@ const Events: React.FC<EventsProps> = ({
               <Table
                 sx={{
                   marginBottom: theme.spacing(2),
+                  width: '137%',
+                  margin: '0 auto', // Centraliza a tabela
                 }}
                 size='small'
               >
@@ -296,7 +322,7 @@ const Events: React.FC<EventsProps> = ({
                         >
                           <TableCell align='left'>
                             <Box display={'flex'} alignItems={'center'}>
-                              <MqText font={'mono'}>{event.run.runId}</MqText>
+                              <MqText font={'mono'}>{event.run.runId.substring(0, 8)}...</MqText>
                               <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>
@@ -306,18 +332,12 @@ const Events: React.FC<EventsProps> = ({
                               label={event.eventType}
                             />
                           </TableCell>
+                          <TableCell align='left'>{truncateText(event.job.name, 40)}</TableCell>
                           <TableCell align='left'>
-                            <MQTooltip title={event.job.name}>
-                              <Box display={'inline'}>{truncateText(event.job.name, 40)}</Box>
-                            </MQTooltip>
+                            <MqText> {truncateText(event.job.namespace, 40)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
-                            <MQTooltip title={event.job.namespace}>
-                              <Box display={'inline'}>{truncateText(event.job.namespace, 40)}</Box>
-                            </MQTooltip>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{formatUpdatedAt(event.eventTime)}</MqText>
+                            <MqText zoomString>{formatUpdatedAt(event.eventTime)}</MqText>
                           </TableCell>
                         </TableRow>
                         {state.rowExpanded === key && (
@@ -352,13 +372,23 @@ const Events: React.FC<EventsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2, marginRight: 4 }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={state.page}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>
