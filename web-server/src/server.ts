@@ -45,11 +45,11 @@ router.use((req, res, next) => {
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://marquez-web-ui:80/api/v1/lineage');
+    return res.redirect(`http://${process.env.MARQUEZ_WEB_UI_HOST}:${process.env.MARQUEZ_WEB_UI_PORT}/api/v1/lineage`);
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://marquez-web-ui:80/api/v1/lineage');
+    return res.redirect(`http://${process.env.MARQUEZ_WEB_UI_HOST}:${process.env.MARQUEZ_WEB_UI_PORT}/api/v1/lineage`);
 });
 
 router.get('/whoami', (req, res, next) => {
