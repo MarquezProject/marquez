@@ -2,6 +2,7 @@
 *.egg-info
 *.iml
 *.swp
+*.pem
 ./**/*.class
 ./out/*
 .actrc

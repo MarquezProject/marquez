@@ -12,7 +12,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
 
       axios({
         method: 'GET',
-        url: `http://${process.env.MARQUEZ_WEB_AUTH_SERVER_HOST}:${process.env.MARQUEZ_WEB_AUTH_SERVER_PORT}/whoami`,
+        url: `http://localhost:1337/whoami`,
         withCredentials: true,
       })
         .then((response) => {
@@ -32,7 +32,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     }, []);
 
     const RedirectToLogin = () => {
-      window.location.replace(`http://${process.env.MARQUEZ_WEB_AUTH_SERVER_HOST}:${process.env.MARQUEZ_WEB_AUTH_SERVER_PORT}/login`);
+      window.location.replace(`http://localhost:1337/login`);
     };
 
     if (loading) return <p>Loading ...</p>;
