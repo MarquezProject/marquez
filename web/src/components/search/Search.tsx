@@ -1,7 +1,7 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Archive, Close, Feedback, Notifications, SearchOutlined } from '@mui/icons-material'
+import { Close, Notifications, SearchOutlined } from '@mui/icons-material'
 import { Badge, Box, Chip, Menu, MenuItem } from '@mui/material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton'
 import OpenSearch from './open-search/OpenSearch'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
+import {Notification} from "./Notification";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -60,11 +61,6 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
   const [open, setOpen] = useState(true)
 
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -150,21 +146,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                 variant={'outlined'}
                 label={'⌘K'}
               />
-
-              <IconButton
-                sx={{
-                  ml: theme.spacing(2),
-                }}
-                id={'notifications'}
-                aria-describedby={'notifications'}
-                onClick={() => {
-                  setPopoverOpen(!popoverOpen)
-                }}
-              >
-                <Badge badgeContent={4} color={'primary'}>
-                  <Notifications cursor={'pointer'} />
-                </Badge>
-              </IconButton>
+              <Notification />
             </>
           }
           onFocus={() => setOpen(true)}
@@ -176,56 +158,11 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
           autoComplete={'off'}
           id={'searchBar'}
         />
-
-        <Menu
-          id={'notifications'}
-          open={popoverOpen}
-          anchorEl={document.getElementById('notifications')}
-          onClose={handleClose}
-          slotProps={{
-            paper: {
-              sx: {
-                backgroundColor: theme.palette.background.default,
-                backgroundImage: 'none',
-              },
-            },
-          }}
-        >
-          <MenuItem>
-            <Feedback color={'error'} fontSize={'small'} />{' '}
-            <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-            <IconButton size={'small'} sx={{ ml: 2 }}>
-              <Archive fontSize={'small'} />
-            </IconButton>
-          </MenuItem>
-          <MenuItem>
-            <Feedback color={'error'} fontSize={'small'} />{' '}
-            <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-            <IconButton size={'small'} sx={{ ml: 2 }}>
-              <Archive fontSize={'small'} />
-            </IconButton>
-          </MenuItem>
-          <MenuItem>
-            <Feedback color={'error'} fontSize={'small'} />{' '}
-            <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-            <IconButton size={'small'} sx={{ ml: 2 }}>
-              <Archive fontSize={'small'} />
-            </IconButton>
-          </MenuItem>
-          <MenuItem>
-            <Feedback color={'error'} fontSize={'small'} />{' '}
-            <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-            <IconButton size={'small'} sx={{ ml: 2 }}>
-              <Archive fontSize={'small'} />
-            </IconButton>
-          </MenuItem>
-        </Menu>
         <ClickAwayListener
           mouseEvent='onMouseDown'
           touchEvent='onTouchStart'
           onClickAway={() => {
             setOpen(false)
-            setPopoverOpen(false)
             setSearch('')
           }}
         >
