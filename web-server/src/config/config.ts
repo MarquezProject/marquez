@@ -1,20 +1,21 @@
 const config = {
     saml: {
-        cert: './src/config/saml.pem',
-        entryPoint: 'https://nubank.okta.com/app/nubank_marquezui_1/exk1zathd6ug5a1dY0h8/sso/saml',
-        issuer: 'http://www.okta.com/exk1zathd6ug5a1dY0h8',
+        cert: process.env.SAML_CERT ?? './src/config/saml.pem',
+        entryPoint: process.env.SAML_ENTRY_POINT ?? 'https://nubank.okta.com/app/nubank_marquezui_1/exk1zathd6ug5a1dY0h8/sso/saml',
+        issuer: process.env.SAML_ISSUER ?? 'http://www.okta.com/exk1zathd6ug5a1dY0h8',
         options: {
             failureRedirect: '/login',
             failureFlash: true
         }
     },
     server: {
-        port: 1337
+        port: process.env.AUTH_SERVER_PORT ?? 1337
     },
     session: {
         resave: false,
         secret: 'supersecretamazingpassword',
-        saveUninitialized: true
+        saveUninitialized: true,
+        cookie: { secure: false }
     }
 };
 
