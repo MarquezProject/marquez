@@ -48,7 +48,7 @@ router.get('/login', passport.authenticate('saml', config.saml.options), (req, r
     return res.redirect(`${process.env.MARQUEZ_WEB_UI_URL}`);
 });
 
-router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
+router.post('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
     return res.redirect(`${process.env.MARQUEZ_WEB_UI_URL}`);
 });
 
