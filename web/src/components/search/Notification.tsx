@@ -44,7 +44,7 @@ export const Notification = () => {
          </ListItemIcon>
          <Box sx={{ flexGrow: 1 }}>
            <ListItemText
-             primary={`oleander-marketing failed to deploy`}
+             primary={`JOB food_delivery delivery_times_7_days failed`}
              secondary={`at 10:24am`}
              primaryTypographyProps={{ variant: 'body2' }}
              secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}

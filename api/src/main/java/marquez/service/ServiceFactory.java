@@ -25,4 +25,5 @@ public class ServiceFactory {
   @NonNull ColumnLineageService columnLineageService;
   @NonNull SearchService searchService;
   @NonNull StatsService statsService;
+  @NonNull AlertService alertService;
 }

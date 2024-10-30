@@ -6,6 +6,7 @@
 package marquez.db;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import java.math.BigDecimal;
@@ -154,6 +155,12 @@ public final class Columns {
   public static final String ABORT = "abort";
   public static final String COUNT = "count";
 
+  /* ALERT ROW COLUMNS */
+  public static final String CONFIG = "config";
+  public static final String ENTITY_TYPE = "entity_type";
+  public static final String ENTITY_UUID = "entity_uuid";
+  public static final String ARCHIVED_AT = "archived_at";
+
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {
       return null;
@@ -172,6 +179,19 @@ public final class Columns {
       return null;
     }
     return results.getTimestamp(column).toInstant();
+  }
+
+  public static JsonNode jsonOrNull(final ResultSet results, final String column)
+      throws SQLException {
+    if (results.getObject(column) == null) {
+      return null;
+    }
+    String jsonString = results.getString(column);
+    try {
+      return MAPPER.readTree(jsonString);
+    } catch (Exception e) {
+      throw new SQLException("Failed to parse JSONB column: " + column, e);
+    }
   }
 
   public static Instant timestampOrThrow(final ResultSet results, final String column)

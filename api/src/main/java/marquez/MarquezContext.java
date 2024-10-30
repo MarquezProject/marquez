@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
+import marquez.api.AlertResource;
 import marquez.api.ColumnLineageResource;
 import marquez.api.DatasetResource;
 import marquez.api.JobResource;
@@ -24,6 +25,7 @@ import marquez.api.StatsResource;
 import marquez.api.TagResource;
 import marquez.api.exceptions.JdbiExceptionExceptionMapper;
 import marquez.api.exceptions.JsonProcessingExceptionMapper;
+import marquez.db.AlertDao;
 import marquez.db.BaseDao;
 import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetDao;
@@ -46,6 +48,7 @@ import marquez.db.TagDao;
 import marquez.graphql.GraphqlSchemaBuilder;
 import marquez.graphql.MarquezGraphqlServletBuilder;
 import marquez.search.SearchConfig;
+import marquez.service.AlertService;
 import marquez.service.ColumnLineageService;
 import marquez.service.DatasetFieldService;
 import marquez.service.DatasetService;
@@ -84,6 +87,7 @@ public final class MarquezContext {
   @Getter private final ColumnLineageDao columnLineageDao;
   @Getter private final SearchDao searchDao;
   @Getter private final StatsDao statsDao;
+  @Getter private final AlertDao alertDao;
   @Getter private final List<RunTransitionListener> runTransitionListeners;
 
   @Getter private final NamespaceService namespaceService;
@@ -92,6 +96,7 @@ public final class MarquezContext {
   @Getter private final JobService jobService;
   @Getter private final TagService tagService;
   @Getter private final RunService runService;
+  @Getter private final AlertService alertService;
   @Getter private final OpenLineageService openLineageService;
   @Getter private final LineageService lineageService;
   @Getter private final ColumnLineageService columnLineageService;
@@ -112,6 +117,7 @@ public final class MarquezContext {
   @Getter private final JsonProcessingExceptionMapper jsonException;
   @Getter private final GraphQLHttpServlet graphqlServlet;
   @Getter private final SearchConfig searchConfig;
+  @Getter private final AlertResource alertResource;
 
   private MarquezContext(
       @NonNull final Jdbi jdbi,
@@ -142,12 +148,14 @@ public final class MarquezContext {
     this.columnLineageDao = jdbi.onDemand(ColumnLineageDao.class);
     this.searchDao = jdbi.onDemand(SearchDao.class);
     this.statsDao = jdbi.onDemand(StatsDao.class);
+    this.alertDao = jdbi.onDemand(AlertDao.class);
     this.runTransitionListeners = runTransitionListeners;
 
     this.namespaceService = new NamespaceService(baseDao);
     this.sourceService = new SourceService(baseDao);
     this.runService = new RunService(baseDao, runTransitionListeners);
     this.datasetService = new DatasetService(datasetDao, runService);
+    this.alertService = new AlertService(alertDao);
 
     this.jobService = new JobService(baseDao, runService);
     this.tagService = new TagService(baseDao);
@@ -174,6 +182,7 @@ public final class MarquezContext {
             .datasetFieldService(new DatasetFieldService(baseDao))
             .datasetVersionService(new DatasetVersionService(baseDao))
             .statsService(statsService)
+            .alertService(alertService)
             .build();
     this.namespaceResource = new NamespaceResource(serviceFactory);
     this.sourceResource = new SourceResource(serviceFactory);
@@ -181,6 +190,7 @@ public final class MarquezContext {
     this.columnLineageResource = new ColumnLineageResource(serviceFactory);
     this.jobResource = new JobResource(serviceFactory, jobVersionDao, jobFacetsDao, runFacetsDao);
     this.tagResource = new TagResource(serviceFactory);
+    this.alertResource = new AlertResource(serviceFactory);
     this.openLineageResource = new OpenLineageResource(serviceFactory, openLineageDao);
     this.searchResource = new SearchResource(searchDao);
     this.opsResource = new StatsResource(serviceFactory);
@@ -199,7 +209,8 @@ public final class MarquezContext {
             openLineageResource,
             searchResource,
             v2BetasearchResource,
-            opsResource);
+            opsResource,
+            alertResource);
 
     final MarquezGraphqlServletBuilder servlet = new MarquezGraphqlServletBuilder();
     this.graphqlServlet = servlet.getServlet(new GraphqlSchemaBuilder(jdbi));
