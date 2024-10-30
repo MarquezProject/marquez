@@ -37,7 +37,7 @@ const store = configureStore({
   reducer: createRootReducer(history),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(sagaMiddleware, historyMiddleware),
-  devTools: process.env.NODE_ENV !== 'dev',
+  devTools: true,
 });
 sagaMiddleware.run(rootSaga);
 
