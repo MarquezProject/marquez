@@ -145,6 +145,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                 size={'small'}
                 variant={'outlined'}
                 label={'⌘K'}
+                sx={{ mr: 1 }}
               />
               <Notification />
             </>

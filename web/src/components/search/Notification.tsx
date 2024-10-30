@@ -1,6 +1,6 @@
-import {Badge, Box, Button, Menu, MenuItem} from "@mui/material";
+import {Badge, Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem} from "@mui/material";
 import {theme} from "../../helpers/theme";
-import {Archive, Feedback, Notifications} from "@mui/icons-material";
+import {Archive, Notifications, Warning} from "@mui/icons-material";
 import IconButton from "@mui/material/IconButton";
 import React from "react";
 
@@ -19,7 +19,7 @@ export const Notification = () => {
   const id = open ? 'simple-popover' : undefined;
  return (
    <>
-     <IconButton aria-describedby={id} onClick={handleClick}>
+     <IconButton aria-describedby={id} onClick={handleClick} disableRipple>
        <Badge badgeContent={4} color={'primary'}>
          <Notifications/>
        </Badge>
@@ -38,36 +38,26 @@ export const Notification = () => {
          },
        }}
      >
-       <MenuItem>
-         <Feedback color={'error'} fontSize={'small'} />{' '}
-         <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-         <IconButton size={'small'} sx={{ ml: 2 }}>
-           <Archive fontSize={'small'} />
+       <MenuItem dense disableRipple>
+         <ListItemIcon>
+           <Warning color="error" fontSize="small" />
+         </ListItemIcon>
+         <Box sx={{ flexGrow: 1 }}>
+           <ListItemText
+             primary={`oleander-marketing failed to deploy`}
+             secondary={`at 10:24am`}
+             primaryTypographyProps={{ variant: 'body2' }}
+             secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
+           />
+         </Box>
+         <IconButton size="small" sx={{ ml: 2 }}>
+           <Archive color={'secondary'} fontSize="small" />
          </IconButton>
        </MenuItem>
-       <MenuItem>
-         <Feedback color={'error'} fontSize={'small'} />{' '}
-         <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-         <IconButton size={'small'} sx={{ ml: 2 }}>
-           <Archive fontSize={'small'} />
-         </IconButton>
-       </MenuItem>
-       <MenuItem>
-         <Feedback color={'error'} fontSize={'small'} />{' '}
-         <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-         <IconButton size={'small'} sx={{ ml: 2 }}>
-           <Archive fontSize={'small'} />
-         </IconButton>
-       </MenuItem>
-       <MenuItem>
-         <Feedback color={'error'} fontSize={'small'} />{' '}
-         <Box ml={2}>delivery_times_7_days failed at 10:24 AM</Box>
-         <IconButton size={'small'} sx={{ ml: 2 }}>
-           <Archive fontSize={'small'} />
-         </IconButton>
-       </MenuItem>
-       <MenuItem>
-         <Button>Archive all</Button>
+       <Divider />
+       {/*archive all */}
+       <MenuItem dense disableRipple>
+            Archive all
        </MenuItem>
      </Menu>
    </>
