@@ -28,6 +28,7 @@ examples/airflow/requirements.txt
 examples/airflow/whl
 out/*
 venv
+*.env
 
 # Marquez configuration
 marquez.yml
