@@ -17,7 +17,10 @@ COPY . .
 RUN npm run build \
     && touch /etc/authbind/byport/443 \
     && chown root /etc/authbind/byport/443 \
-    && chmod 777 /etc/authbind/byport/443
+    && chmod 777 /etc/authbind/byport/443 \
+    && touch /etc/authbind/byport/80 \
+    && chown root /etc/authbind/byport/80 \
+    && chmod 777 /etc/authbind/byport/80
 
 # Expose the port the app runs on
 EXPOSE 1337
