@@ -23,7 +23,8 @@ import Toast from './Toast';
 import createRootReducer from '../store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../store/sagas';
-import withAuth from './withAuth'; 
+import withAuth from './withAuth';
+import ErrorBoundary from './ErrorBoundary'; // Import the Error Boundary
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -83,4 +84,8 @@ const App = (): ReactElement => {
   );
 };
 
-export default withAuth(App); // Wrap the App component with the HOC
+export default withAuth(() => (
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+)); // Wrap the App component with the Error Boundary and HOC
