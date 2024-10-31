@@ -35,10 +35,10 @@ import marquez.db.AlertDao;
 import marquez.db.BaseDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
+import marquez.db.models.AlertRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.RunArgsRow;
-import marquez.db.models.AlertRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.UpdateLineageRow;
@@ -140,7 +140,6 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                             event.getProducer()))),
             executor);
 
-
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
                 withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
@@ -183,13 +182,15 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
       buildJobOutputUpdate(update).ifPresent(runService::notify);
       Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "SUCCESS");
       a.ifPresent(
-              alertRow ->
-                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+          alertRow ->
+              alertDao.createNotification(
+                  UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
     } else if (event.getEventType().equalsIgnoreCase("FAIL")) {
       Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "FAIL");
       a.ifPresent(
-              alertRow ->
-                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+          alertRow ->
+              alertDao.createNotification(
+                  UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
     }
   }
 

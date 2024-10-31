@@ -102,7 +102,7 @@ const Notification = ({
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem dense disableRipple>
+        <MenuItem dense disableRipple onClick={() => archiveAllNotifications()}>
           Archive all
         </MenuItem>
       </Menu>

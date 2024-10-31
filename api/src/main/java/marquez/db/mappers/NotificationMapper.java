@@ -2,9 +2,9 @@ package marquez.db.mappers;
 
 import static marquez.db.Columns.jsonOrNull;
 import static marquez.db.Columns.stringOrThrow;
+import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
 import static marquez.db.Columns.uuidOrThrow;
-import static marquez.db.Columns.timestampOrNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
