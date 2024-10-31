@@ -16,5 +16,6 @@ CREATE TABLE IF NOT EXISTS notifications
     uuid        UUID PRIMARY KEY,
     alert_uuid  UUID REFERENCES alerts (uuid) ON DELETE CASCADE,
     created_at  TIMESTAMPTZ NOT NULL,
-    archived_at TIMESTAMPTZ
+    archived_at TIMESTAMPTZ,
+    display_name VARCHAR(256) NOT NULL
 )

@@ -160,6 +160,7 @@ public final class Columns {
   public static final String ENTITY_TYPE = "entity_type";
   public static final String ENTITY_UUID = "entity_uuid";
   public static final String ARCHIVED_AT = "archived_at";
+  public static final String DISPLAY_NAME = "display_name";
 
   public static UUID uuidOrNull(final ResultSet results, final String column) throws SQLException {
     if (results.getObject(column) == null) {

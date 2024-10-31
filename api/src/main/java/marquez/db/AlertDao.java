@@ -48,10 +48,10 @@ public interface AlertDao {
 
   @SqlUpdate(
       """
-        INSERT INTO notifications (uuid, created_at, alert_uuid)
-        VALUES (:uuid, NOW(), :alertUuid)
+        INSERT INTO notifications (uuid, created_at, alert_uuid, display_name)
+        VALUES (:uuid, NOW(), :alertUuid, :displayName)
         """)
-  void createNotification(UUID uuid);
+  void createNotification(UUID uuid, UUID alertUuid, String displayName);
 
   @SqlUpdate("UPDATE notifications SET archived_at = NOW() WHERE uuid = :uuid")
   void archiveNotification(UUID uuid);

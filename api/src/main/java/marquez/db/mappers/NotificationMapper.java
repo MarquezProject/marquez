@@ -24,6 +24,7 @@ public final class NotificationMapper implements RowMapper<NotificationRow> {
         stringOrThrow(results, Columns.ENTITY_TYPE),
         stringOrThrow(results, Columns.NAME),
         stringOrThrow(results, Columns.TYPE),
-        jsonOrNull(results, Columns.CONFIG));
+        jsonOrNull(results, Columns.CONFIG),
+        stringOrThrow(results, Columns.DISPLAY_NAME));
   }
 }

@@ -15,4 +15,5 @@ public class NotificationRow {
   @NonNull String name;
   @NonNull String type;
   JsonNode config;
+  @NonNull String displayName;
 }

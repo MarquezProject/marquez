@@ -26,7 +26,7 @@ import {
   Notifications,
   Speed,
   SportsScore,
-  Start,
+  Start, Warning,
 } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
@@ -300,7 +300,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                         : deleteAlert(failAlert.uuid)
                     }
                   >
-                    <Feedback fontSize={'small'} />
+                    <Warning fontSize={'small'} />
                   </ToggleButton>
                 </MQTooltip>
                 <MQTooltip title={'Notify on Success'}>
