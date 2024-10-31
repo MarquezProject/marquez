@@ -45,6 +45,8 @@ spec:
               value: {{ include "common.names.fullname" . }}
             - name: MARQUEZ_PORT
               value: {{ .Values.service.port | quote }}
+            - name: WEB_PORT
+              value: {{ .Values.web.port | quote }}
           {{- if .Values.web.resources }}
           resources: {{- toYaml .Values.web.resources | nindent 12 }}
           {{- end }}
