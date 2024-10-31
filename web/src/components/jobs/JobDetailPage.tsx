@@ -168,7 +168,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
 
   const failAlert = alerts.find((alert) => alert.entityType === 'job' && alert.type === 'FAIL')
   const successAlert = alerts.find(
-    (alert) => alert.entityType === 'job' && alert.type === 'SUCCESS'
+    (alert) => alert.entityType === 'job' && alert.type === 'COMPLETE'
   )
 
   return (
@@ -311,7 +311,7 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                     selected={!!successAlert}
                     onChange={() =>
                       !successAlert
-                        ? updateAlert(job.uuid, 'job', 'SUCCESS')
+                        ? updateAlert(job.uuid, 'job', 'COMPLETE')
                         : deleteAlert(successAlert.uuid)
                     }
                   >

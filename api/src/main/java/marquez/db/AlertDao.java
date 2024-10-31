@@ -44,7 +44,7 @@ public interface AlertDao {
 
   @SqlQuery(
       """
-        SELECT n.uuid, n.created_at, n.archived_at, a.entity_type, a.entity_uuid, a.type, a.config, n.display_name
+        SELECT n.uuid, n.created_at, n.archived_at, a.entity_type, a.entity_uuid, a.type, a.config, n.display_name, n.link, n.run_uuid
         FROM notifications AS n INNER JOIN alerts AS a ON n.alert_uuid = a.uuid
         WHERE archived_at IS NULL
         ORDER BY n.created_at DESC
@@ -54,10 +54,10 @@ public interface AlertDao {
 
   @SqlUpdate(
       """
-        INSERT INTO notifications (uuid, created_at, alert_uuid, display_name)
-        VALUES (:uuid, NOW(), :alertUuid, :displayName)
+        INSERT INTO notifications (uuid, created_at, alert_uuid, display_name, link, run_uuid)
+        VALUES (:uuid, NOW(), :alertUuid, :displayName, :link, :runUuid)
         """)
-  void createNotification(UUID uuid, UUID alertUuid, String displayName);
+  void createNotification(UUID uuid, UUID alertUuid, String displayName, String link, UUID runUuid);
 
   @SqlUpdate("UPDATE notifications SET archived_at = NOW() WHERE uuid = :uuid")
   void archiveNotification(UUID uuid);

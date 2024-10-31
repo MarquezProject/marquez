@@ -4,6 +4,7 @@ import static marquez.db.Columns.jsonOrNull;
 import static marquez.db.Columns.stringOrThrow;
 import static marquez.db.Columns.timestampOrNull;
 import static marquez.db.Columns.timestampOrThrow;
+import static marquez.db.Columns.uuidOrNull;
 import static marquez.db.Columns.uuidOrThrow;
 
 import java.sql.ResultSet;
@@ -26,6 +27,8 @@ public final class NotificationMapper implements RowMapper<NotificationRow> {
         stringOrThrow(results, Columns.ENTITY_UUID),
         stringOrThrow(results, Columns.TYPE),
         jsonOrNull(results, Columns.CONFIG),
-        stringOrThrow(results, Columns.DISPLAY_NAME));
+        stringOrThrow(results, Columns.DISPLAY_NAME),
+        stringOrThrow(results, Columns.LINK),
+        uuidOrNull(results, Columns.RUN_UUID));
   }
 }

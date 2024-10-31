@@ -17,5 +17,7 @@ CREATE TABLE IF NOT EXISTS notifications
     alert_uuid  UUID REFERENCES alerts (uuid) ON DELETE CASCADE,
     created_at  TIMESTAMPTZ NOT NULL,
     archived_at TIMESTAMPTZ,
-    display_name VARCHAR(256) NOT NULL
+    display_name VARCHAR(256) NOT NULL,
+    link        VARCHAR(256),
+    run_uuid    UUID REFERENCES runs (uuid) ON DELETE CASCADE
 )

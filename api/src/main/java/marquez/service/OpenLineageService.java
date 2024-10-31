@@ -180,17 +180,27 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   private void processAlert(LineageEvent event, UpdateLineageRow update, boolean isStreaming) {
     if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
       buildJobOutputUpdate(update).ifPresent(runService::notify);
-      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "SUCCESS");
+      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "COMPLETE");
       a.ifPresent(
           alertRow ->
               alertDao.createNotification(
-                  UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+                  UUID.randomUUID(),
+                  alertRow.getUuid(),
+                  update.getJob().getName(),
+                  "/lineage/job/%s/%s"
+                      .formatted(update.getJob().getNamespaceName(), update.getJob().getName()),
+                  update.getRun().getUuid()));
     } else if (event.getEventType().equalsIgnoreCase("FAIL")) {
       Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "FAIL");
       a.ifPresent(
           alertRow ->
               alertDao.createNotification(
-                  UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+                  UUID.randomUUID(),
+                  alertRow.getUuid(),
+                  update.getJob().getName(),
+                  "/lineage/job/%s/%s"
+                      .formatted(update.getJob().getNamespaceName(), update.getJob().getName()),
+                  update.getRun().getUuid()));
     }
   }
 

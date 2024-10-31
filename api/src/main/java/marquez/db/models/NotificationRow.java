@@ -16,4 +16,6 @@ public class NotificationRow {
   @NonNull String type;
   JsonNode config;
   @NonNull String displayName;
+  @NonNull String link;
+  UUID runUuid;
 }

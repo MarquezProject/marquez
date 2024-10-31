@@ -12,6 +12,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { formatUpdatedAt } from '../../helpers'
 import { theme } from '../../helpers/theme'
+import { truncateText } from '../../helpers/text'
+import { useNavigate } from 'react-router-dom'
 import IconButton from '@mui/material/IconButton'
 import React from 'react'
 
@@ -35,6 +37,8 @@ const Notification = ({
   archiveAllNotifications,
 }: Props) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
+
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     fetchNotifications()
@@ -83,9 +87,16 @@ const Notification = ({
         }}
       >
         {notifications.map((notification) => (
-          <MenuItem dense disableRipple key={notification.uuid}>
+          <MenuItem
+            dense
+            disableRipple
+            key={notification.uuid}
+            onClick={() => {
+              notification.link && navigate(notification.link)
+            }}
+          >
             <ListItemIcon>
-              {notification.type === 'SUCCESS' ? (
+              {notification.type === 'COMPLETE' ? (
                 <Check color={'primary'} fontSize='small' />
               ) : (
                 <Warning color='error' fontSize='small' />
@@ -93,7 +104,9 @@ const Notification = ({
             </ListItemIcon>
             <Box sx={{ flexGrow: 1 }}>
               <ListItemText
-                primary={`Job ${notification.displayName} has state ${notification.type}`}
+                primary={`Run ${
+                  notification.run_uuid ? truncateText(notification.run_uuid, 8) : ''
+                } for job ${notification.displayName} transitioned to state ${notification.type} `}
                 secondary={`at ${formatUpdatedAt(notification.createdAt)}`}
                 primaryTypographyProps={{ variant: 'body2' }}
                 secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
