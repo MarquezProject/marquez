@@ -1,6 +1,6 @@
 tasks:
   - command: |
-      DOCKER_BUILDKIT=1 ./docker/up.sh --seed
+      DOCKER_BUILDKIT=1 ./docker/up.sh --seed --no-search
 ports:
   - port: 3000
     visibility: public
