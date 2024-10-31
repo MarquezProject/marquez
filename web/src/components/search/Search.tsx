@@ -13,10 +13,10 @@ import BaseSearch from './base-search/BaseSearch'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import IconButton from '@mui/material/IconButton'
+import Notification from './Notification'
 import OpenSearch from './open-search/OpenSearch'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
-import Notification from "./Notification";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {

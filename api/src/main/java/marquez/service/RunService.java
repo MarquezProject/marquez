@@ -112,13 +112,6 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
                 buildRunOutputs(bagOfJobVersionInfo.getOutputs())));
       }
 
-      // Create a notification on successful job runs if there is an alert registered
-      Optional<AlertRow> alert = alertDao.find("job", jobRow.getUuid(), "SUCCESS");
-
-      alert.ifPresent(
-          alertRow ->
-              alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), jobRow.getName()));
-
       notify(
           new JobInputUpdate(
               RunId.of(runRow.getUuid()),

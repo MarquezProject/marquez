@@ -44,7 +44,7 @@ public interface AlertDao {
 
   @SqlQuery(
       """
-        SELECT n.uuid, n.created_at, n.archived_at, a.entity_type, a.entity_uuid, a.type, a.config
+        SELECT n.uuid, n.created_at, n.archived_at, a.entity_type, a.entity_uuid, a.type, a.config, n.display_name
         FROM notifications AS n INNER JOIN alerts AS a ON n.alert_uuid = a.uuid
         WHERE archived_at IS NULL
         ORDER BY n.created_at DESC

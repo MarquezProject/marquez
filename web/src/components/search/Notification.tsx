@@ -1,15 +1,16 @@
 import * as Redux from 'redux'
-import { Archive, Notifications, Warning } from '@mui/icons-material'
+import { Archive, Check, Notifications, Warning } from '@mui/icons-material'
 import { Badge, Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Notification } from '../../types/api'
 import {
   archiveAllNotifications,
   archiveNotification,
-  fetchNotifications
+  fetchNotifications,
 } from '../../store/actionCreators'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { formatUpdatedAt } from '../../helpers'
 import { theme } from '../../helpers/theme'
 import IconButton from '@mui/material/IconButton'
 import React from 'react'
@@ -36,8 +37,6 @@ const Notification = ({
 }: Props) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null)
 
-  console.log(notifications);
-
   React.useEffect(() => {
     fetchNotifications()
   }, [fetchNotifications])
@@ -55,7 +54,10 @@ const Notification = ({
   return (
     <>
       <IconButton aria-describedby={id} onClick={handleClick} disableRipple>
-        <Badge badgeContent={4} color={'primary'}>
+        <Badge
+          badgeContent={notifications.length}
+          color={notifications.length === 0 ? 'secondary' : 'error'}
+        >
           <Notifications />
         </Badge>
       </IconButton>
@@ -76,17 +78,25 @@ const Notification = ({
         {notifications.map((notification) => (
           <MenuItem dense disableRipple key={notification.uuid}>
             <ListItemIcon>
-              <Warning color='error' fontSize='small' />
+              {notification.type === 'SUCCESS' ? (
+                <Check color={'primary'} fontSize='small' />
+              ) : (
+                <Warning color='error' fontSize='small' />
+              )}
             </ListItemIcon>
             <Box sx={{ flexGrow: 1 }}>
               <ListItemText
                 primary={`Job ${notification.displayName} has state ${notification.type}`}
-                secondary={`at ${notification.createdAt}`}
+                secondary={`at ${formatUpdatedAt(notification.createdAt)}`}
                 primaryTypographyProps={{ variant: 'body2' }}
                 secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
               />
             </Box>
-            <IconButton size='small' sx={{ ml: 2 }} onClick={() => archiveNotification(notification.uuid)}>
+            <IconButton
+              size='small'
+              sx={{ ml: 2 }}
+              onClick={() => archiveNotification(notification.uuid)}
+            >
               <Archive color={'secondary'} fontSize='small' />
             </IconButton>
           </MenuItem>

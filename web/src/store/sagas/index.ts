@@ -51,6 +51,7 @@ import {
   Jobs,
   LineageGraph,
   Namespaces,
+  Notification,
   OpenSearchResultDatasets,
   OpenSearchResultJobs,
   Runs,
@@ -654,9 +655,9 @@ export function* removeAlert() {
 export function* fetchNotifications() {
   while (true) {
     try {
-      const { payload } = yield take(FETCH_NOTIFICATIONS)
-      yield call(getNotifications)
-      yield put(fetchNotificationsSuccess(payload))
+      yield take(FETCH_NOTIFICATIONS)
+      const response: Notification[] = yield call(getNotifications)
+      yield put(fetchNotificationsSuccess(response))
     } catch (e) {
       yield put(applicationError('Something went wrong while getting notifications'))
     }
@@ -723,6 +724,9 @@ export default function* rootSaga(): Generator {
     fetchAlerts(),
     updateAlert(),
     removeAlert(),
+    fetchNotifications(),
+    removeNotification(),
+    removeAllNotifications(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

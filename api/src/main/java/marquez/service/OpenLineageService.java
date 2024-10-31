@@ -31,12 +31,14 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.db.AlertDao;
 import marquez.db.BaseDao;
 import marquez.db.DatasetDao;
 import marquez.db.DatasetVersionDao;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.JobRow;
 import marquez.db.models.RunArgsRow;
+import marquez.db.models.AlertRow;
 import marquez.db.models.RunRow;
 import marquez.db.models.RunStateRow;
 import marquez.db.models.UpdateLineageRow;
@@ -54,6 +56,7 @@ import marquez.service.models.RunMeta;
 public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao {
   private final RunService runService;
   private final DatasetVersionDao datasetVersionDao;
+  private final AlertDao alertDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
 
   private final Executor executor;
@@ -66,6 +69,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     super(baseDao.createOpenLineageDao());
     this.runService = runService;
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
+    this.alertDao = baseDao.createAlertDao();
     this.executor = executor;
   }
 
@@ -136,11 +140,17 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                             event.getProducer()))),
             executor);
 
+
+    System.out.println("LINEAGE EVENT");
+
+
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
                 withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
             .thenAccept(
                 (update) -> {
+
+                  System.out.println("MARQUEZ EVENT");
                   if (event.getEventType() != null) {
                     boolean isStreaming =
                         Optional.ofNullable(event.getJob())
@@ -148,6 +158,14 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                             .orElse(false);
                     if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
                       buildJobOutputUpdate(update).ifPresent(runService::notify);
+
+                      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "SUCCESS");
+                      System.out.println(update.getJob().getUuid());
+                      System.out.println("AlertRow: " + a.isPresent());
+                      a.ifPresent(
+                              alertRow ->
+                                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+
                     }
                     buildJobInputUpdate(update).ifPresent(runService::notify);
                     buildRunTransition(update).ifPresent(runService::notify);
