@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS alerts
     config      JSONB
 );
 
-CREATE INDEX IF NOT EXISTS alerts_entity_uuid_entity_type_inx ON alerts (entity_uuid, entity_type);
+CREATE UNIQUE INDEX IF NOT EXISTS alerts_entity_uuid_entity_type_inx ON alerts (entity_uuid, entity_type);
 CREATE UNIQUE INDEX IF NOT EXISTS alerts_entity_uuid_entity_type_type_inx ON alerts (entity_uuid, entity_type, type);
 
 CREATE TABLE IF NOT EXISTS notifications

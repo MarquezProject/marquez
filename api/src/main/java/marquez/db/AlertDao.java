@@ -17,24 +17,24 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface AlertDao {
 
   @SqlQuery("SELECT * FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid")
-  List<AlertRow> findAll(String entityType, String entityUuid);
+  List<AlertRow> findAll(String entityType, UUID entityUuid);
 
   @SqlUpdate(
       "DELETE FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid AND type = :type")
-  void delete(String entityType, String entityUuid, String type);
+  void delete(String entityType, UUID entityUuid, String type);
 
   @SqlQuery(
       """
-            INSERT INTO alerts (id, created_at, entity_type, entity_uuid, type, config)
-            VALUES (:id, :createdAt, :entityType, :entityUuid, :type, :config)
+            INSERT INTO alerts (uuid, created_at, entity_type, entity_uuid, type, config)
+            VALUES (:uuid, :createdAt, :entityType, :entityUuid, :type, :config)
             ON CONFLICT (entity_type, entity_uuid, type) DO UPDATE
             SET created_at = EXCLUDED.created_at, config = EXCLUDED.config
             RETURNING *""")
   AlertRow upsert(
-      UUID id,
+      UUID uuid,
       Instant createdAt,
       String entityType,
-      String entityUuid,
+      UUID entityUuid,
       String type,
       JsonNode config);
 
@@ -47,8 +47,15 @@ public interface AlertDao {
         """)
   List<NotificationRow> listNotifications();
 
-  @SqlUpdate("UPDATE notifications SET archived_at = NOW() WHERE id = :id")
-  void archiveNotification(UUID id);
+  @SqlUpdate(
+      """
+        INSERT INTO notifications (uuid, created_at, alert_uuid)
+        VALUES (:uuid, NOW(), :alertUuid)
+        """)
+  void createNotification(UUID uuid);
+
+  @SqlUpdate("UPDATE notifications SET archived_at = NOW() WHERE uuid = :uuid")
+  void archiveNotification(UUID uuid);
 
   @SqlUpdate("UPDATE notifications SET archived_at = NOW() WHERE archived_at IS NULL")
   void archiveAllNotifications();

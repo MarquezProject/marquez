@@ -19,15 +19,16 @@ public class AlertService {
   }
 
   public List<AlertRow> findAll(String entityType, String entityUuid) {
-    return alertDao.findAll(entityType, entityUuid);
+    return alertDao.findAll(entityType, UUID.fromString(entityUuid));
   }
 
   public AlertRow upsert(String entityType, String entityUuid, String type, JsonNode config) {
-    return alertDao.upsert(UUID.randomUUID(), Instant.now(), entityType, entityUuid, type, config);
+    return alertDao.upsert(
+        UUID.randomUUID(), Instant.now(), entityType, UUID.fromString(entityUuid), type, config);
   }
 
   public void delete(String entityType, String entityUuid, String type) {
-    alertDao.delete(entityType, entityUuid, type);
+    alertDao.delete(entityType, UUID.fromString(entityUuid), type);
   }
 
   public List<NotificationRow> listNotifications() {

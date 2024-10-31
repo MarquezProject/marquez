@@ -13,5 +13,5 @@ public class AlertRow {
   @NonNull String entityType;
   @NonNull String name;
   @NonNull String type;
-  @NonNull JsonNode config;
+  JsonNode config;
 }

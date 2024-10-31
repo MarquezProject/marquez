@@ -49,7 +49,6 @@ public class AlertResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @POST
-  @Path("/create")
   @Consumes(APPLICATION_JSON)
   @Produces(APPLICATION_JSON)
   public Response create(
@@ -64,7 +63,6 @@ public class AlertResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @DELETE
-  @Path("/delete")
   @Produces(APPLICATION_JSON)
   public Response delete(
       @NonNull @QueryParam("entityType") String entityType,
