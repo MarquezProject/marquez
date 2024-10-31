@@ -84,8 +84,10 @@ const App = (): ReactElement => {
   );
 };
 
-export default withAuth(() => (
+const WrappedApp = process.env.REACT_APP_ENABLE_AUTH === 'true' ? withAuth(App) : App;
+
+export default () => (
   <ErrorBoundary>
-    <App />
+    <WrappedApp />
   </ErrorBoundary>
-)); // Wrap the App component with the Error Boundary and HOC
+); // Wrap the App component with the Error Boundary and HOC

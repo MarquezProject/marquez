@@ -8,34 +8,40 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     const [authenticated, setAuthenticated] = useState<boolean>(false);
 
     useEffect(() => {
-      logging.info('Initiating SAML check.', 'SAML');
+      if (process.env.REACT_APP_ENABLE_AUTH === 'true') {
+        logging.info('Initiating SAML check.', 'SAML');
 
-      axios({
-        method: 'GET',
-        url: 'http://' + `${process.env.MARQUEZ_WEB_AUTH_SERVER_HOST}:${process.env.MARQUEZ_WEB_AUTH_SERVER_PORT}`+ '/whoami',
-        withCredentials: true,
-      })
-        .then((response) => {
-          logging.info(response.data.user, 'SAML');
-
-          if (response.data.user.nameID) {
-            setAuthenticated(true);
-            setLoading(false);
-          } else {
-            RedirectToLogin();
-          }
+        axios({
+          method: 'GET',
+          url: `http://localhost:1337/whoami`,
+          withCredentials: true,
         })
-        .catch((error) => {
-          logging.error(error, 'SAML');
-          RedirectToLogin();
-        });
+          .then((response) => {
+            logging.info(response.data.user, 'SAML');
+
+            if (response.data.user.nameID) {
+              setAuthenticated(true);
+              setLoading(false);
+            } else {
+              RedirectToLogin();
+            }
+          })
+          .catch((error) => {
+            logging.error(error, 'SAML');
+            RedirectToLogin();
+          });
+      } else {
+        // If authentication is disabled, set authenticated to true
+        setAuthenticated(true);
+        setLoading(false);
+      }
     }, []);
 
     const RedirectToLogin = () => {
-      window.location.replace('http://' + `${process.env.MARQUEZ_WEB_AUTH_SERVER_HOST}:${process.env.MARQUEZ_WEB_AUTH_SERVER_PORT}`+ '/login');
+      window.location.replace(`http://localhost:1337/login`);
     };
 
-    if (loading) return <p>Loading ...</p>;
+    if (loading) return <p>Loading...</p>;
 
     if (!authenticated) return null;
 

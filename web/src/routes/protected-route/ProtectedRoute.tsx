@@ -7,7 +7,7 @@ import logging from '../config/logging';
 // Mock function to check SAML authentication status
 const isAuthenticated = async () => {
   try {
-    const response = await axios.get('http://'+ `${process.env.MARQUEZ_WEB_AUTH_SERVER_HOST}:${process.env.MARQUEZ_WEB_AUTH_SERVER_PORT}`+ '/whoami', { withCredentials: true });
+    const response = await axios.get('http://localhost:1337/whoami', { withCredentials: true });
     logging.info(response.data.user, 'SAML');
     return response.data.user?.nameID;
   } catch (error) {

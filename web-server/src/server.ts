@@ -45,12 +45,14 @@ router.use((req, res, next) => {
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect(`${process.env.MARQUEZ_WEB_UI_URL}`);
+    return res.redirect('http://localhost:3000');
 });
 
+// `${process.env.MARQUEZ_WEB_UI_URL}`
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect(`${process.env.MARQUEZ_WEB_UI_URL}`);
+    return res.redirect('http://localhost:3000');
 });
+// `${process.env.MARQUEZ_WEB_UI_URL}`
 
 router.get('/whoami', (req, res, next) => {
     if (!req.isAuthenticated()) {
