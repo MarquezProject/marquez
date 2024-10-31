@@ -84,17 +84,11 @@ const App = (): ReactElement => {
   );
 };
 
-export default App;
+const WrappedApp = withAuth(App);
 
-// const WrappedApp = withAuth(App);
+export default () => (
+  <ErrorBoundary>
+    <WrappedApp />
+  </ErrorBoundary>
+);
 
-// Wrap the App component with the Error Boundary and HOC
-// export default () => (
-//   <ErrorBoundary>
-//     <WrappedApp />
-//   </ErrorBoundary>
-// ); 
-
-// function composeWithDevTools(arg0: any): any {
-//   throw new Error('Function not implemented.');
-// }

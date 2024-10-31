@@ -45,12 +45,12 @@ router.use((req, res, next) => {
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('http://staging-marquez-web.nubank.world');
 });
 
 // `${process.env.MARQUEZ_WEB_UI_URL}`
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('http://staging-marquez-web.nubank.world');
 });
 // `${process.env.MARQUEZ_WEB_UI_URL}`
 
