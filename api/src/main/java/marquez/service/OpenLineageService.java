@@ -141,32 +141,18 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
             executor);
 
 
-    System.out.println("LINEAGE EVENT");
-
-
     CompletableFuture<Void> marquez =
         CompletableFuture.supplyAsync(
                 withSentry(withMdc(() -> updateMarquezModel(event, mapper))), executor)
             .thenAccept(
                 (update) -> {
-
-                  System.out.println("MARQUEZ EVENT");
                   if (event.getEventType() != null) {
                     boolean isStreaming =
                         Optional.ofNullable(event.getJob())
                             .map(j -> j.isStreamingJob())
                             .orElse(false);
-                    if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
-                      buildJobOutputUpdate(update).ifPresent(runService::notify);
 
-                      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "SUCCESS");
-                      System.out.println(update.getJob().getUuid());
-                      System.out.println("AlertRow: " + a.isPresent());
-                      a.ifPresent(
-                              alertRow ->
-                                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
-
-                    }
+                    processAlert(event, update, isStreaming);
                     buildJobInputUpdate(update).ifPresent(runService::notify);
                     buildRunTransition(update).ifPresent(runService::notify);
                   }
@@ -190,6 +176,21 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
       runUuid = UUID.nameUUIDFromBytes(run.getRunId().getBytes(StandardCharsets.UTF_8));
     }
     return runUuid;
+  }
+
+  private void processAlert(LineageEvent event, UpdateLineageRow update, boolean isStreaming) {
+    if (event.getEventType().equalsIgnoreCase("COMPLETE") || isStreaming) {
+      buildJobOutputUpdate(update).ifPresent(runService::notify);
+      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "SUCCESS");
+      a.ifPresent(
+              alertRow ->
+                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+    } else if (event.getEventType().equalsIgnoreCase("FAIL")) {
+      Optional<AlertRow> a = alertDao.find("job", update.getJob().getUuid(), "FAIL");
+      a.ifPresent(
+              alertRow ->
+                      alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), update.getJob().getName()));
+    }
   }
 
   private Optional<JobOutputUpdate> buildJobOutputUpdate(UpdateLineageRow record) {

@@ -48,6 +48,7 @@ public interface AlertDao {
         FROM notifications AS n INNER JOIN alerts AS a ON n.alert_uuid = a.uuid
         WHERE archived_at IS NULL
         ORDER BY n.created_at DESC
+        limit 100
         """)
   List<NotificationRow> listNotifications();
 
