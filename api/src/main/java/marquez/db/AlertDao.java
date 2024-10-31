@@ -19,9 +19,8 @@ public interface AlertDao {
   @SqlQuery("SELECT * FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid")
   List<AlertRow> findAll(String entityType, UUID entityUuid);
 
-  @SqlUpdate(
-      "DELETE FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid AND type = :type")
-  void delete(String entityType, UUID entityUuid, String type);
+  @SqlUpdate("DELETE FROM alerts WHERE uuid = :uuid")
+  void delete(UUID uuid);
 
   @SqlQuery(
       """

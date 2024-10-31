@@ -30,6 +30,7 @@ import marquez.common.models.TagName;
 @EqualsAndHashCode
 @ToString
 public final class Job {
+  @Getter private final UUID uuid;
   @Getter private final JobId id;
   @Getter private final JobType type;
   @Getter private final JobName name;
@@ -51,6 +52,7 @@ public final class Job {
   @Getter @Nullable private final ImmutableSet<TagName> tags;
 
   public Job(
+      @NonNull final UUID uuid,
       @NonNull final JobId id,
       @NonNull final JobType type,
       @NonNull final JobName name,
@@ -69,6 +71,7 @@ public final class Job {
       @Nullable UUID currentVersion,
       @Nullable ImmutableList<String> labels,
       @Nullable final ImmutableSet<TagName> tags) {
+    this.uuid = uuid;
     this.id = id;
     this.type = type;
     this.name = name;

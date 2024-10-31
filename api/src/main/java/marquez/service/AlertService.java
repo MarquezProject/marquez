@@ -27,8 +27,8 @@ public class AlertService {
         UUID.randomUUID(), Instant.now(), entityType, UUID.fromString(entityUuid), type, config);
   }
 
-  public void delete(String entityType, String entityUuid, String type) {
-    alertDao.delete(entityType, UUID.fromString(entityUuid), type);
+  public void delete(UUID uuid) {
+    alertDao.delete(uuid);
   }
 
   public List<NotificationRow> listNotifications() {

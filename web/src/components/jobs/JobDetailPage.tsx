@@ -5,6 +5,7 @@ import React, { ChangeEvent, FunctionComponent, useEffect } from 'react'
 
 import '../../i18n/config'
 import * as Redux from 'redux'
+import { Alert, Job, Run } from '../../types/api'
 import {
   Box,
   Button,
@@ -29,7 +30,6 @@ import {
 } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
-import { Job, Run } from '../../types/api'
 import { LineageJob } from '../../types/lineage'
 import { MqInfo } from '../core/info/MqInfo'
 import { Nullable } from '../../types/util/Nullable'
@@ -37,13 +37,16 @@ import { alpha, createTheme } from '@mui/material/styles'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import {
+  deleteAlert,
   deleteJob,
   dialogToggle,
+  fetchAlerts,
   fetchJob,
   fetchLatestRuns,
   resetJobs,
   resetRuns,
   setTabIndex,
+  updateAlert,
 } from '../../store/actionCreators'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { formatUpdatedAt } from '../../helpers'
@@ -71,6 +74,9 @@ interface DispatchProps {
   dialogToggle: typeof dialogToggle
   setTabIndex: typeof setTabIndex
   fetchJob: typeof fetchJob
+  fetchAlerts: typeof fetchAlerts
+  updateAlert: typeof updateAlert
+  deleteAlert: typeof deleteAlert
 }
 
 type IProps = {
@@ -82,6 +88,8 @@ type IProps = {
   tabIndex: IState['lineage']['tabIndex']
   latestRuns: Run[]
   isLatestRunsLoading: boolean
+  alerts: Alert[]
+  isAlertsLoading: boolean
 } & DispatchProps
 
 const JobDetailPage: FunctionComponent<IProps> = (props) => {
@@ -100,6 +108,10 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex,
     fetchJob,
     isLatestRunsLoading,
+    alerts,
+    fetchAlerts,
+    updateAlert,
+    deleteAlert,
   } = props
   const navigate = useNavigate()
   const [_, setSearchParams] = useSearchParams()
@@ -110,13 +122,16 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
 
   const i18next = require('i18next')
 
-  const [notifyOnFailure, setNotifyOnFailure] = React.useState(false)
-  const [notifyOnSuccess, setNotifyOnSuccess] = React.useState(false)
-
   useEffect(() => {
     fetchJob(lineageJob.namespace, lineageJob.name)
     fetchLatestRuns(lineageJob.name, lineageJob.namespace)
   }, [lineageJob.name])
+
+  useEffect(() => {
+    if (job) {
+      fetchAlerts(job.uuid, 'job')
+    }
+  }, [job])
 
   useEffect(() => {
     if (jobs.deletedJobName) {
@@ -150,6 +165,11 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
     const last = job.latestRuns?.find((run) => run.state !== 'RUNNING')
     return last ? stopWatchDuration(last.durationMs) : 'N/A'
   })()
+
+  const failAlert = alerts.find((alert) => alert.entityType === 'job' && alert.type === 'FAIL')
+  const successAlert = alerts.find(
+    (alert) => alert.entityType === 'job' && alert.type === 'SUCCESS'
+  )
 
   return (
     <Box px={2} display='flex' flexDirection='column' justifyContent='space-between'>
@@ -273,8 +293,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                     value='check'
                     size={'small'}
                     color={'error'}
-                    selected={notifyOnFailure}
-                    onChange={() => setNotifyOnFailure((prevSelected) => !prevSelected)}
+                    selected={!!failAlert}
+                    onChange={() =>
+                      !failAlert
+                        ? updateAlert(job.uuid, 'job', 'FAIL')
+                        : deleteAlert(failAlert.uuid)
+                    }
                   >
                     <Feedback fontSize={'small'} />
                   </ToggleButton>
@@ -284,8 +308,12 @@ const JobDetailPage: FunctionComponent<IProps> = (props) => {
                     value='check'
                     size={'small'}
                     color={'primary'}
-                    selected={notifyOnSuccess}
-                    onChange={() => setNotifyOnSuccess((prevSelected) => !prevSelected)}
+                    selected={!!successAlert}
+                    onChange={() =>
+                      !successAlert
+                        ? updateAlert(job.uuid, 'job', 'SUCCESS')
+                        : deleteAlert(successAlert.uuid)
+                    }
                   >
                     <Check fontSize={'small'} />
                   </ToggleButton>
@@ -377,11 +405,16 @@ const mapStateToProps = (state: IState) => ({
   tabIndex: state.lineage.tabIndex,
   job: state.job.result,
   isJobLoading: state.job.isLoading,
+  alerts: state.alerts.alerts,
+  isAlertsLoading: state.alerts.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
   bindActionCreators(
     {
+      fetchAlerts: fetchAlerts,
+      updateAlert: updateAlert,
+      deleteAlert: deleteAlert,
       fetchLatestRuns: fetchLatestRuns,
       resetRuns: resetRuns,
       resetJobs: resetJobs,

@@ -53,6 +53,7 @@ public final class JobMapper implements RowMapper<Job> {
     ImmutableMap<String, Object> facetsOrNull = toFacetsOrNull(results, Columns.FACETS);
     Job job =
         new Job(
+            uuidOrNull(results, Columns.ROW_UUID),
             new JobId(
                 NamespaceName.of(stringOrThrow(results, Columns.NAMESPACE_NAME)),
                 JobName.of(stringOrThrow(results, Columns.NAME))),

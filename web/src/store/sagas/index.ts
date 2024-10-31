@@ -7,11 +7,13 @@ import {
   ADD_DATASET_TAG,
   ADD_JOB_TAG,
   ADD_TAGS,
+  DELETE_ALERT,
   DELETE_DATASET,
   DELETE_DATASET_FIELD_TAG,
   DELETE_DATASET_TAG,
   DELETE_JOB,
   DELETE_JOB_TAG,
+  FETCH_ALERTS,
   FETCH_COLUMN_LINEAGE,
   FETCH_DATASET,
   FETCH_DATASETS,
@@ -33,8 +35,10 @@ import {
   FETCH_RUN_FACETS,
   FETCH_SEARCH,
   FETCH_SOURCE_METRICS,
+  UPDATE_ALERT,
 } from '../actionCreators/actionTypes'
 import {
+  Alert,
   ColumnLineageGraph,
   Dataset,
   DatasetVersions,
@@ -87,11 +91,13 @@ import {
   addJobTagSuccess,
   addTagsSuccess,
   applicationError,
+  deleteAlertSuccess,
   deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
   deleteDatasetTagSuccess,
   deleteJobSuccess,
   deleteJobTagSuccess,
+  fetchAlertsSuccess,
   fetchColumnLineageSuccess,
   fetchDatasetMetricsSuccess,
   fetchDatasetSuccess,
@@ -113,7 +119,9 @@ import {
   fetchSearchSuccess,
   fetchSourceMetricsSuccess,
   fetchTagsSuccess,
+  updateAlertSuccess,
 } from '../actionCreators'
+import { deleteAlert, getAlerts, postAlert } from '../requests/alerts'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
@@ -589,6 +597,47 @@ export function* fetchJobsByState() {
   }
 }
 
+export function* fetchAlerts() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_ALERTS)
+      const response: Alert[] = yield call(getAlerts, payload.entityType, payload.entityUuid)
+      yield put(fetchAlertsSuccess(response))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting alerts'))
+    }
+  }
+}
+
+export function* updateAlert() {
+  while (true) {
+    try {
+      const { payload } = yield take(UPDATE_ALERT)
+      const response: Alert = yield call(
+        postAlert,
+        payload.entityType,
+        payload.entityUuid,
+        payload.type
+      )
+      yield put(updateAlertSuccess(response))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting updating alerts'))
+    }
+  }
+}
+
+export function* removeAlert() {
+  while (true) {
+    try {
+      const { payload } = yield take(DELETE_ALERT)
+      yield call(deleteAlert, payload.uuid)
+      yield put(deleteAlertSuccess(payload.uuid))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while deleting an alert'))
+    }
+  }
+}
+
 export default function* rootSaga(): Generator {
   const sagasThatAreKickedOffImmediately = [fetchNamespaces(), fetchTags()]
   const sagasThatWatchForAction = [
@@ -622,6 +671,9 @@ export default function* rootSaga(): Generator {
     fetchJobMetricsSaga(),
     fetchDatasetMetricsSaga(),
     fetchSourceMetricsSaga(),
+    fetchAlerts(),
+    updateAlert(),
+    removeAlert(),
   ]
 
   yield all([...sagasThatAreKickedOffImmediately, ...sagasThatWatchForAction])

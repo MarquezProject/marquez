@@ -162,6 +162,7 @@ export interface Jobs {
 }
 
 export interface Job {
+  uuid: string
   id: JobId
   type: JobType
   name: string
@@ -435,4 +436,23 @@ type DatasetHit = {
 export type OpenSearchResultDatasets = {
   hits: DatasetHit[]
   highlights: DatasetHighlight[]
+}
+
+export interface Alert {
+  uuid: string
+  createdAt: string
+  name: string
+  entityType: string
+  type: string
+  config: Nullable<object>
+}
+
+export interface Notification {
+  uuid: string
+  createdAt: string
+  archivedAt: string
+  name: string
+  type: string
+  alertUuid: string
+  config: Nullable<object>
 }

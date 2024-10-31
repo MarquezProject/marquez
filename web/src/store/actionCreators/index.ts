@@ -4,6 +4,7 @@
 import * as actionTypes from './actionTypes'
 
 import {
+  Alert,
   ColumnLineageGraph,
   Dataset,
   DatasetVersion,
@@ -615,5 +616,46 @@ export const fetchJobsByStateSuccess = (jobs: Job[], totalCount: number) => ({
   payload: {
     jobs,
     totalCount,
+  },
+})
+
+export const fetchAlerts = (entityUuid: string, entityType: string) => ({
+  type: actionTypes.FETCH_ALERTS,
+  payload: {
+    entityUuid,
+    entityType,
+  },
+})
+
+export const fetchAlertsSuccess = (alerts: Alert[]) => ({
+  type: actionTypes.FETCH_ALERTS_SUCCESS,
+  payload: alerts,
+})
+
+export const updateAlert = (entityUuid: string, entityType: string, type: string) => ({
+  type: actionTypes.UPDATE_ALERT,
+  payload: {
+    entityUuid,
+    entityType,
+    type,
+  },
+})
+
+export const updateAlertSuccess = (alert: Alert) => ({
+  type: actionTypes.UPDATE_ALERT_SUCCESS,
+  payload: alert,
+})
+
+export const deleteAlert = (uuid: string) => ({
+  type: actionTypes.DELETE_ALERT,
+  payload: {
+    uuid,
+  },
+})
+
+export const deleteAlertSuccess = (uuid: string) => ({
+  type: actionTypes.DELETE_ALERT_SUCCESS,
+  payload: {
+    uuid,
   },
 })

@@ -5,6 +5,7 @@ import { History } from 'history'
 import { IColumnLineageState } from '../requests/columnlineage'
 import { Reducer, combineReducers } from 'redux'
 import { createRouterReducer } from '@lagunovsky/redux-react-router'
+import alerts, { IAlertState } from './alerts'
 import columnLineage from './columnLineage'
 import dataset, { IDatasetState } from './dataset'
 import datasetMetrics, { IDatasetMetricsState } from './datasetMetrics'
@@ -28,6 +29,7 @@ import sourceMetrics, { ISourceMetricsState } from './sourceMetrics'
 import tags, { ITagsState } from './tags'
 
 export interface IState {
+  alerts: IAlertState
   tags: ITagsState
   datasets: IDatasetsState
   dataset: IDatasetState
@@ -76,4 +78,5 @@ export default (history: History): Reducer =>
     jobMetrics,
     datasetMetrics,
     sourceMetrics,
+    alerts,
   })

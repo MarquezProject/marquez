@@ -64,11 +64,8 @@ public class AlertResource extends BaseResource {
   @ExceptionMetered
   @DELETE
   @Produces(APPLICATION_JSON)
-  public Response delete(
-      @NonNull @QueryParam("entityType") String entityType,
-      @NonNull @QueryParam("entityUuid") String entityUuid,
-      @NonNull @QueryParam("type") String type) {
-    alertService.delete(entityType, entityUuid, type);
+  public Response delete(@NonNull @QueryParam("uuid") UUID uuid) {
+    alertService.delete(uuid);
     return Response.noContent().build();
   }
 

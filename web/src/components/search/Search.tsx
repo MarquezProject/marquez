@@ -1,11 +1,12 @@
 // Copyright 2018-2024 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
-import { Close, Notifications, SearchOutlined } from '@mui/icons-material'
-import { Badge, Box, Chip, Menu, MenuItem } from '@mui/material'
+import { Box, Chip } from '@mui/material'
+import { Close, SearchOutlined } from '@mui/icons-material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
+import { Notification } from './Notification'
 import { REACT_APP_ADVANCED_SEARCH } from '../../globals'
 import { connect } from 'react-redux'
 import { useLocation } from 'react-router'
@@ -16,7 +17,6 @@ import IconButton from '@mui/material/IconButton'
 import OpenSearch from './open-search/OpenSearch'
 import React, { useEffect, useRef, useState } from 'react'
 import SearchPlaceholder from './SearchPlaceholder'
-import {Notification} from "./Notification";
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -59,8 +59,6 @@ interface StateProps {
 const Search: React.FC = ({ isLoading }: StateProps) => {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(true)
-
-  const [popoverOpen, setPopoverOpen] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
 
