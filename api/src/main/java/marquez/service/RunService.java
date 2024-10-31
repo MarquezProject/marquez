@@ -13,6 +13,8 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -26,11 +28,13 @@ import marquez.common.models.JobVersionId;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
 import marquez.common.models.RunState;
+import marquez.db.AlertDao;
 import marquez.db.BaseDao;
 import marquez.db.JobDao;
 import marquez.db.JobVersionDao;
 import marquez.db.JobVersionDao.BagOfJobVersionInfo;
 import marquez.db.RunStateDao;
+import marquez.db.models.AlertRow;
 import marquez.db.models.ExtendedDatasetVersionRow;
 import marquez.db.models.ExtendedRunRow;
 import marquez.db.models.JobRow;
@@ -50,6 +54,7 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
   private final RunStateDao runStateDao;
   private final Collection<RunTransitionListener> runTransitionListeners;
   private final JobDao jobDao;
+  private final AlertDao alertDao;
 
   public RunService(
       @NonNull BaseDao baseDao, Collection<RunTransitionListener> runTransitionListeners) {
@@ -58,6 +63,7 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
     this.runStateDao = baseDao.createRunStateDao();
     this.runTransitionListeners = runTransitionListeners;
     this.jobDao = baseDao.createJobDao();
+    this.alertDao = baseDao.createAlertDao();
   }
 
   /**
@@ -105,6 +111,13 @@ public class RunService extends DelegatingDaos.DelegatingRunDao {
                 NamespaceName.of(runRow.getNamespaceName()),
                 buildRunOutputs(bagOfJobVersionInfo.getOutputs())));
       }
+
+      // Create a notification on successful job runs if there is an alert registered
+      Optional<AlertRow> alert = alertDao.find("job", jobRow.getUuid(), "SUCCESS");
+
+      alert.ifPresent(
+          alertRow ->
+              alertDao.createNotification(UUID.randomUUID(), alertRow.getUuid(), jobRow.getName()));
 
       notify(
           new JobInputUpdate(

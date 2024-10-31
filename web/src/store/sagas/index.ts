@@ -7,6 +7,8 @@ import {
   ADD_DATASET_TAG,
   ADD_JOB_TAG,
   ADD_TAGS,
+  ARCHIVE_ALL_NOTIFICATIONS,
+  ARCHIVE_NOTIFICATION,
   DELETE_ALERT,
   DELETE_DATASET,
   DELETE_DATASET_FIELD_TAG,
@@ -29,6 +31,7 @@ import {
   FETCH_LATEST_RUNS,
   FETCH_LINEAGE,
   FETCH_LINEAGE_METRICS,
+  FETCH_NOTIFICATIONS,
   FETCH_OPEN_SEARCH_DATASETS,
   FETCH_OPEN_SEARCH_JOBS,
   FETCH_RUNS,
@@ -91,6 +94,8 @@ import {
   addJobTagSuccess,
   addTagsSuccess,
   applicationError,
+  archiveAllNotificationsSuccess,
+  archiveNotificationSuccess,
   deleteAlertSuccess,
   deleteDatasetFieldTagSuccess,
   deleteDatasetSuccess,
@@ -113,6 +118,7 @@ import {
   fetchLineageMetricsSuccess,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
+  fetchNotificationsSuccess,
   fetchOpenSearchDatasetsSuccess,
   fetchOpenSearchJobsSuccess,
   fetchRunsSuccess,
@@ -121,7 +127,14 @@ import {
   fetchTagsSuccess,
   updateAlertSuccess,
 } from '../actionCreators'
-import { deleteAlert, getAlerts, postAlert } from '../requests/alerts'
+import {
+  archiveAllNotifications,
+  archiveNotification,
+  deleteAlert,
+  getAlerts,
+  getNotifications,
+  postAlert,
+} from '../requests/alerts'
 import { getColumnLineage } from '../requests/columnlineage'
 import { getLineage } from '../requests/lineage'
 import { getOpenSearchDatasets, getOpenSearchJobs, getSearch } from '../requests/search'
@@ -634,6 +647,42 @@ export function* removeAlert() {
       yield put(deleteAlertSuccess(payload.uuid))
     } catch (e) {
       yield put(applicationError('Something went wrong while deleting an alert'))
+    }
+  }
+}
+
+export function* fetchNotifications() {
+  while (true) {
+    try {
+      const { payload } = yield take(FETCH_NOTIFICATIONS)
+      yield call(getNotifications)
+      yield put(fetchNotificationsSuccess(payload))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while getting notifications'))
+    }
+  }
+}
+
+export function* removeNotification() {
+  while (true) {
+    try {
+      const { payload } = yield take(ARCHIVE_NOTIFICATION)
+      yield call(archiveNotification, payload.uuid)
+      yield put(archiveNotificationSuccess(payload.uuid))
+    } catch (e) {
+      yield put(applicationError('Something went wrong while archiving a notification'))
+    }
+  }
+}
+
+export function* removeAllNotifications() {
+  while (true) {
+    try {
+      yield take(ARCHIVE_ALL_NOTIFICATIONS)
+      yield call(archiveAllNotifications)
+      yield put(archiveAllNotificationsSuccess())
+    } catch (e) {
+      yield put(applicationError('Something went wrong while archiving all notifications'))
     }
   }
 }

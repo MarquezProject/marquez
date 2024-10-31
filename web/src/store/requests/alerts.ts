@@ -25,3 +25,18 @@ export const deleteAlert = async (uuid: string) => {
   const url = `${API_URL}/alerts?uuid=${uuid}`
   return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteAlert')
 }
+
+export const getNotifications = async () => {
+  const url = `${API_URL}/alerts/notifications`
+  return genericFetchWrapper(url, { method: 'GET' }, 'fetchNotifications')
+}
+
+export const archiveNotification = async (uuid: string) => {
+  const url = `${API_URL}/alerts/notifications/archive?uuid=${uuid}`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'deleteNotification')
+}
+
+export const archiveAllNotifications = async () => {
+  const url = `${API_URL}/alerts/notifications/archive-all`
+  return genericFetchWrapper(url, { method: 'DELETE' }, 'archiveAllNotifications')
+}

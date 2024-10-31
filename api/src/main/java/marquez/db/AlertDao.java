@@ -3,6 +3,7 @@ package marquez.db;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import marquez.db.mappers.AlertMapper;
 import marquez.db.mappers.NotificationMapper;
@@ -18,6 +19,10 @@ public interface AlertDao {
 
   @SqlQuery("SELECT * FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid")
   List<AlertRow> findAll(String entityType, UUID entityUuid);
+
+  @SqlQuery(
+      "SELECT * FROM alerts WHERE entity_type = :entityType AND entity_uuid = :entityUuid AND type = :type limit 1")
+  Optional<AlertRow> find(String entityType, UUID entityUuid, String type);
 
   @SqlUpdate("DELETE FROM alerts WHERE uuid = :uuid")
   void delete(UUID uuid);

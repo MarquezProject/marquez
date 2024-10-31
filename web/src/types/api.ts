@@ -451,7 +451,7 @@ export interface Notification {
   uuid: string
   createdAt: string
   archivedAt: string
-  name: string
+  displayName: string
   type: string
   alertUuid: string
   config: Nullable<object>

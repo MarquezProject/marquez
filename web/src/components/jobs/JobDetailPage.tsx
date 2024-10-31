@@ -22,11 +22,11 @@ import {
   Check,
   DirectionsRun,
   EscalatorWarning,
-  Feedback,
   Notifications,
   Speed,
   SportsScore,
-  Start, Warning,
+  Start,
+  Warning,
 } from '@mui/icons-material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'

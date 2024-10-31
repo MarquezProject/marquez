@@ -21,6 +21,7 @@ import jobsByState, { IJobsByStateState } from './jobsByState'
 import lineage, { ILineageState } from './lineage'
 import lineageMetrics, { ILineageMetricsState } from './lineageMetrics'
 import namespaces, { INamespacesState } from './namespaces'
+import notifications, { INotificationState } from './notifications'
 import openSearchDatasets, { IOpenSearchDatasetsState } from './openSearchDatasets'
 import openSearchJobs, { IOpenSearchJobsState } from './openSearch'
 import runs, { IRunsState } from './runs'
@@ -30,6 +31,7 @@ import tags, { ITagsState } from './tags'
 
 export interface IState {
   alerts: IAlertState
+  notifications: INotificationState
   tags: ITagsState
   datasets: IDatasetsState
   dataset: IDatasetState
@@ -79,4 +81,5 @@ export default (history: History): Reducer =>
     datasetMetrics,
     sourceMetrics,
     alerts,
+    notifications,
   })

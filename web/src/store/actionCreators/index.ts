@@ -13,6 +13,7 @@ import {
   Job,
   LineageGraph,
   Namespace,
+  Notification,
   OpenSearchResultDatasets,
   OpenSearchResultJobs,
   Run,
@@ -658,4 +659,35 @@ export const deleteAlertSuccess = (uuid: string) => ({
   payload: {
     uuid,
   },
+})
+
+export const fetchNotifications = () => ({
+  type: actionTypes.FETCH_NOTIFICATIONS,
+})
+
+export const fetchNotificationsSuccess = (notifications: Notification[]) => ({
+  type: actionTypes.FETCH_NOTIFICATIONS_SUCCESS,
+  payload: notifications,
+})
+
+export const archiveNotification = (uuid: string) => ({
+  type: actionTypes.ARCHIVE_NOTIFICATION,
+  payload: {
+    uuid,
+  },
+})
+
+export const archiveNotificationSuccess = (uuid: string) => ({
+  type: actionTypes.ARCHIVE_NOTIFICATION_SUCCESS,
+  payload: {
+    uuid,
+  },
+})
+
+export const archiveAllNotifications = () => ({
+  type: actionTypes.ARCHIVE_ALL_NOTIFICATIONS,
+})
+
+export const archiveAllNotificationsSuccess = () => ({
+  type: actionTypes.ARCHIVE_ALL_NOTIFICATIONS_SUCCESS,
 })
