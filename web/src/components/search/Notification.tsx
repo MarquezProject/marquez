@@ -115,7 +115,11 @@ const Notification = ({
             <IconButton
               size='small'
               sx={{ ml: 2 }}
-              onClick={() => archiveNotification(notification.uuid)}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                return archiveNotification(notification.uuid);
+              }}
             >
               <Archive color={'secondary'} fontSize='small' />
             </IconButton>
