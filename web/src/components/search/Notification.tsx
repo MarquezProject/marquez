@@ -30,7 +30,6 @@ interface Props extends StateProps, DispatchProps {}
 
 const Notification = ({
   notifications,
-  areNotificationsLoading,
   fetchNotifications,
   archiveNotification,
   archiveAllNotifications,
@@ -39,6 +38,14 @@ const Notification = ({
 
   React.useEffect(() => {
     fetchNotifications()
+  }, [fetchNotifications])
+
+  // refresh every 30 seconds
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNotifications()
+    }, 30000)
+    return () => clearInterval(interval)
   }, [fetchNotifications])
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -50,7 +57,7 @@ const Notification = ({
   }
 
   const open = Boolean(anchorEl)
-  const id = open ? 'simple-popover' : undefined
+  const id = open ? 'notification-popover' : undefined
   return (
     <>
       <IconButton aria-describedby={id} onClick={handleClick} disableRipple>
