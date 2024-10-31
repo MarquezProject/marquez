@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import { ReduxRouter, createRouterMiddleware } from '@lagunovsky/redux-react-router';
 import { Route, Routes } from 'react-router-dom';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
+import { applyMiddleware, createStore } from 'redux';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import { configureStore } from '@reduxjs/toolkit';
 import { createBrowserHistory } from 'history';
 import { theme } from '../helpers/theme';
@@ -34,12 +36,10 @@ const sagaMiddleware = createSagaMiddleware({
 const history = createBrowserHistory();
 const historyMiddleware = createRouterMiddleware(history);
 
-const store = configureStore({
-  reducer: createRootReducer(history),
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(sagaMiddleware, historyMiddleware),
-  devTools: true,
-});
+const store = createStore(
+  createRootReducer(history),
+  composeWithDevTools(applyMiddleware(sagaMiddleware, historyMiddleware))
+)
 sagaMiddleware.run(rootSaga);
 
 const TITLE = 'Marquez';
@@ -84,10 +84,17 @@ const App = (): ReactElement => {
   );
 };
 
-const WrappedApp = process.env.REACT_APP_ENABLE_AUTH === 'true' ? withAuth(App) : App;
+export default App;
 
-export default () => (
-  <ErrorBoundary>
-    <WrappedApp />
-  </ErrorBoundary>
-); // Wrap the App component with the Error Boundary and HOC
+// const WrappedApp = withAuth(App);
+
+// Wrap the App component with the Error Boundary and HOC
+// export default () => (
+//   <ErrorBoundary>
+//     <WrappedApp />
+//   </ErrorBoundary>
+// ); 
+
+// function composeWithDevTools(arg0: any): any {
+//   throw new Error('Function not implemented.');
+// }
