@@ -26,8 +26,8 @@ router.use((req, res, next) => {
 router.use(session(config.session));
 router.use(passport.initialize());
 router.use(passport.session());
-router.use(express.urlencoded({ extended: false })); // Replaces Body Parser
-router.use(express.json()); // Replaces Body Parser
+router.use(express.urlencoded({ extended: false }));
+router.use(express.json()); 
 
 /** Rules of our API */
 router.use((req, res, next) => {
@@ -48,11 +48,9 @@ router.get('/login', passport.authenticate('saml', config.saml.options), (req, r
     return res.redirect('http://staging-marquez-web.nubank.world');
 });
 
-// `${process.env.MARQUEZ_WEB_UI_URL}`
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
     return res.redirect('http://staging-marquez-web.nubank.world');
 });
-// `${process.env.MARQUEZ_WEB_UI_URL}`
 
 router.get('/whoami', (req, res, next) => {
     if (!req.isAuthenticated()) {
