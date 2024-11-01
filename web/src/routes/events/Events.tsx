@@ -272,7 +272,7 @@ const Events: React.FC<EventsProps> = ({
                 sx={{
                   marginBottom: theme.spacing(2),
                   width: '137%',
-                  margin: '0 auto', // Centraliza a tabela
+                  margin: '0 auto',
                 }}
                 size='small'
               >
