@@ -74,11 +74,12 @@ const Jobs: React.FC<JobsProps> = ({
   const [pageSize, setPageSize] = useState(20)
   const [currentPage, setCurrentPage] = useState(1)
 
+  // Adicione o `pageSize` e `currentPage` como dependências no useEffect
   React.useEffect(() => {
     if (selectedNamespace) {
-      fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
+      fetchJobs(selectedNamespace, pageSize, (currentPage - 1) * pageSize)
     }
-  }, [selectedNamespace, state.page])
+  }, [selectedNamespace, pageSize, currentPage]) // Adicione as dependências pageSize e currentPage
 
   React.useEffect(() => {
     return () => {
@@ -100,7 +101,7 @@ const Jobs: React.FC<JobsProps> = ({
     setPageSize(newPageSize)
     setCurrentPage(1)
 
-    fetchJobs(selectedNamespace || '', pageSize, state.page)
+    fetchJobs(selectedNamespace, newPageSize, currentPage)
   }
 
   const i18next = require('i18next')
@@ -204,7 +205,7 @@ const Jobs: React.FC<JobsProps> = ({
                             link
                             linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
                           >
-                            {truncateText(job.name, 80)}
+                            {truncateText(job.name, 170)}
                           </MqText>
                         </TableCell>
                         <TableCell align='left'>

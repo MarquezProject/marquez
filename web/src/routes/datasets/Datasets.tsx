@@ -86,7 +86,7 @@ const Datasets: React.FC<DatasetsProps> = ({
     if (selectedNamespace) {
       fetchDatasets(selectedNamespace, pageSize, currentPage * pageSize)
     }
-  }, [selectedNamespace, state.page])
+  }, [selectedNamespace, pageSize, currentPage])
 
   React.useEffect(() => {
     return () => {
@@ -108,7 +108,7 @@ const Datasets: React.FC<DatasetsProps> = ({
     setPageSize(newPageSize)
     setCurrentPage(1)
 
-    fetchDatasets(selectedNamespace || '', pageSize, state.page * pageSize)
+    fetchDatasets(selectedNamespace || '', newPageSize, currentPage)
   }
 
   const i18next = require('i18next')
@@ -227,7 +227,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 dataset.name
                               )}`}
                             >
-                              {truncateText(dataset.name, 80)}
+                              {truncateText(dataset.name, 170)}
                             </MqText>
                           </TableCell>
                           <TableCell align='left'>
