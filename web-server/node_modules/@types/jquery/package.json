@@ -1,0 +1,133 @@
+{
+    "name": "@types/jquery",
+    "version": "3.5.32",
+    "description": "TypeScript definitions for jquery",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/jquery",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Leonard Thieu",
+            "githubUsername": "leonard-thieu",
+            "url": "https://github.com/leonard-thieu"
+        },
+        {
+            "name": "Boris Yankov",
+            "githubUsername": "borisyankov",
+            "url": "https://github.com/borisyankov"
+        },
+        {
+            "name": "Christian Hoffmeister",
+            "githubUsername": "choffmeister",
+            "url": "https://github.com/choffmeister"
+        },
+        {
+            "name": "Steve Fenton",
+            "githubUsername": "Steve-Fenton",
+            "url": "https://github.com/Steve-Fenton"
+        },
+        {
+            "name": "Diullei Gomes",
+            "githubUsername": "Diullei",
+            "url": "https://github.com/Diullei"
+        },
+        {
+            "name": "Tass Iliopoulos",
+            "githubUsername": "tasoili",
+            "url": "https://github.com/tasoili"
+        },
+        {
+            "name": "Sean Hill",
+            "githubUsername": "seanski",
+            "url": "https://github.com/seanski"
+        },
+        {
+            "name": "Guus Goossens",
+            "githubUsername": "Guuz",
+            "url": "https://github.com/Guuz"
+        },
+        {
+            "name": "Kelly Summerlin",
+            "githubUsername": "ksummerlin",
+            "url": "https://github.com/ksummerlin"
+        },
+        {
+            "name": "Basarat Ali Syed",
+            "githubUsername": "basarat",
+            "url": "https://github.com/basarat"
+        },
+        {
+            "name": "Nicholas Wolverson",
+            "githubUsername": "nwolverson",
+            "url": "https://github.com/nwolverson"
+        },
+        {
+            "name": "Derek Cicerone",
+            "githubUsername": "derekcicerone",
+            "url": "https://github.com/derekcicerone"
+        },
+        {
+            "name": "Andrew Gaspar",
+            "githubUsername": "AndrewGaspar",
+            "url": "https://github.com/AndrewGaspar"
+        },
+        {
+            "name": "Seikichi Kondo",
+            "githubUsername": "seikichi",
+            "url": "https://github.com/seikichi"
+        },
+        {
+            "name": "Benjamin Jackman",
+            "githubUsername": "benjaminjackman",
+            "url": "https://github.com/benjaminjackman"
+        },
+        {
+            "name": "Josh Strobl",
+            "githubUsername": "JoshStrobl",
+            "url": "https://github.com/JoshStrobl"
+        },
+        {
+            "name": "John Reilly",
+            "githubUsername": "johnnyreilly",
+            "url": "https://github.com/johnnyreilly"
+        },
+        {
+            "name": "Dick van den Brink",
+            "githubUsername": "DickvdBrink",
+            "url": "https://github.com/DickvdBrink"
+        },
+        {
+            "name": "Thomas Schulz",
+            "githubUsername": "King2500",
+            "url": "https://github.com/King2500"
+        },
+        {
+            "name": "Terry Mun",
+            "githubUsername": "terrymun",
+            "url": "https://github.com/terrymun"
+        },
+        {
+            "name": "Martin Badin",
+            "githubUsername": "martin-badin",
+            "url": "https://github.com/martin-badin"
+        },
+        {
+            "name": "Chris Frewin",
+            "githubUsername": "princefishthrower",
+            "url": "https://github.com/princefishthrower"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/jquery"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/sizzle": "*"
+    },
+    "peerDependencies": {},
+    "typesPublisherContentHash": "6be8791febca4b139d557a33a9f61b3ae57b9fc52f3a4c4aba963f773e3f7766",
+    "typeScriptVersion": "4.8"
+}
