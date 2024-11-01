@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import logging from '../routes/config/logging';
-import { url } from 'inspector';
 
 const withAuth = (WrappedComponent: React.ComponentType) => {
   const AuthComponent: React.FC = (props) => {
@@ -32,7 +31,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     }, []);
 
     const RedirectToLogin = () => {
-      window.location.replace(`https://staging-marquez-web-auth-server.nubank.world/login`);
+      window.location.replace('https://staging-marquez-web-auth-server.nubank.world/login');
     };
 
     if (loading) return <p>Loading ...</p>;
