@@ -78,7 +78,7 @@ const Datasets: React.FC<DatasetsProps> = ({
   }
   const [state, setState] = React.useState<DatasetsState>(defaultState)
   const [pageSize, setPageSize] = useState(20)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(0)
 
   const theme = createTheme(useTheme())
 
@@ -106,9 +106,9 @@ const Datasets: React.FC<DatasetsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(1)
+    setCurrentPage(0)
 
-    fetchDatasets(selectedNamespace || '', newPageSize, currentPage)
+    fetchDatasets(selectedNamespace || '', pageSize, state.page * pageSize)
   }
 
   const i18next = require('i18next')

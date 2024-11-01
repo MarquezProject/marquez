@@ -78,7 +78,7 @@ const Events: React.FC<EventsProps> = ({
   resetEvents,
 }) => {
   const [pageSize, setPageSize] = useState(20)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(0)
   const [searchParams, setSearchParams] = useSearchParams()
   const [state, setState] = React.useState<EventsState>({
     page: 0,
@@ -91,7 +91,7 @@ const Events: React.FC<EventsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(1)
+    setCurrentPage(0)
 
     const dateFromISO = new Date(state.dateFrom).toISOString()
     const dateToISO = new Date(state.dateTo).toISOString()
@@ -180,7 +180,7 @@ const Events: React.FC<EventsProps> = ({
       searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
     const dateTo =
       searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(dateFrom, dateTo, pageSize, currentPage * pageSize)
+    fetchEvents(dateFrom, dateTo, pageSize, currentPage)
   }
 
   const i18next = require('i18next')

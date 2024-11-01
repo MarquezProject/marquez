@@ -99,7 +99,7 @@ const Jobs: React.FC<JobsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(1)
+    setCurrentPage(0)
 
     fetchJobs(selectedNamespace, newPageSize, currentPage)
   }
