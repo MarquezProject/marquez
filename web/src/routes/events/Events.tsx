@@ -93,7 +93,10 @@ const Events: React.FC<EventsProps> = ({
     setPageSize(newPageSize)
     setCurrentPage(1)
 
-    fetchEvents(state.dateFrom, state.dateTo, newPageSize, currentPage)
+    const dateFromISO = new Date(state.dateFrom).toISOString()
+    const dateToISO = new Date(state.dateTo).toISOString()
+
+    fetchEvents(dateFromISO, dateToISO, newPageSize, currentPage)
   }
 
   const mounted = useRef<boolean>(false)
