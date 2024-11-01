@@ -31,8 +31,9 @@ import MqEmpty from '../core/empty/MqEmpty'
 import MqPaging from '../paging/MqPaging'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent, SetStateAction } from 'react'
+import React, {FunctionComponent, SetStateAction, useMemo} from 'react'
 import RunInfo from './RunInfo'
+import {theme} from "../../helpers/theme";
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -119,26 +120,6 @@ const Runs: FunctionComponent<RunsProps & DispatchProps> = (props) => {
                 {i18next.t('runs_columns.state')}
               </MqText>
             </TableCell>
-            <TableCell align='left'>
-              <MqText subheading inline>
-                {i18next.t('runs_columns.created_at')}
-              </MqText>
-            </TableCell>
-            <TableCell align='left'>
-              <MqText subheading inline>
-                {i18next.t('runs_columns.started_at')}
-              </MqText>
-            </TableCell>
-            <TableCell align='left'>
-              <MqText subheading inline>
-                {i18next.t('runs_columns.ended_at')}
-              </MqText>
-            </TableCell>
-            <TableCell align='left'>
-              <MqText subheading inline>
-                {i18next.t('runs_columns.duration')}
-              </MqText>
-            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -168,10 +149,6 @@ const Runs: FunctionComponent<RunsProps & DispatchProps> = (props) => {
                 <TableCell align='left'>
                   <MqStatus color={runStateColor(run.state)} label={run.state} />
                 </TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.createdAt)}</TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.startedAt)}</TableCell>
-                <TableCell align='left'>{formatUpdatedAt(run.endedAt)}</TableCell>
-                <TableCell align='left'>{stopWatchDuration(run.durationMs)}</TableCell>
               </TableRow>
             ) : (
               <TableRow

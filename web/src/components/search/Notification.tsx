@@ -1,5 +1,5 @@
 import * as Redux from 'redux'
-import { Archive, Check, Notifications, Warning } from '@mui/icons-material'
+import { Archive, Cancel, CheckCircle, Notifications } from '@mui/icons-material'
 import { Badge, Box, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
 import { IState } from '../../store/reducers'
 import { Notification } from '../../types/api'
@@ -12,9 +12,11 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { formatUpdatedAt } from '../../helpers'
 import { theme } from '../../helpers/theme'
-import { truncateText } from '../../helpers/text'
+import { truncateText, truncateTextFront } from '../../helpers/text'
 import { useNavigate } from 'react-router-dom'
 import IconButton from '@mui/material/IconButton'
+import MQTooltip from '../core/tooltip/MQTooltip'
+import MqText from '../core/text/MqText'
 import React from 'react'
 
 interface StateProps {
@@ -64,10 +66,15 @@ const Notification = ({
   const id = open ? 'notification-popover' : undefined
   return (
     <>
-      <IconButton aria-describedby={id} onClick={handleClick} disableRipple>
+      <IconButton
+        aria-describedby={id}
+        onClick={handleClick}
+        disableRipple
+        disabled={notifications.length === 0}
+      >
         <Badge
           badgeContent={notifications.length}
-          color={notifications.length === 0 ? 'secondary' : 'error'}
+          color={notifications.length === 0 ? 'secondary' : 'warning'}
         >
           <Notifications />
         </Badge>
@@ -97,32 +104,57 @@ const Notification = ({
           >
             <ListItemIcon>
               {notification.type === 'COMPLETE' ? (
-                <Check color={'primary'} fontSize='small' />
+                <CheckCircle color={'primary'} fontSize='small' />
               ) : (
-                <Warning color='error' fontSize='small' />
+                <Cancel color='error' fontSize='small' />
               )}
             </ListItemIcon>
             <Box sx={{ flexGrow: 1 }}>
               <ListItemText
-                primary={`Run ${
-                  notification.run_uuid ? truncateText(notification.run_uuid, 8) : ''
-                } for job ${notification.displayName} transitioned to state ${notification.type} `}
+                primary={
+                  <>
+                    <MqText subdued inline>
+                      Run{' '}
+                    </MqText>
+                    {notification.runUuid ? (
+                      <MQTooltip title={notification.runUuid}>
+                        <Box display={'inline'}>
+                          <MqText inline>{truncateText(notification.runUuid, 8)}</MqText>
+                        </Box>
+                      </MQTooltip>
+                    ) : (
+                      ''
+                    )}
+                    <MqText subdued inline>
+                      {' '}
+                      for job{' '}
+                    </MqText>
+                    {truncateTextFront(notification.displayName, 16)}
+                    <MqText subdued inline>
+                      {' '}
+                      transitioned to state{' '}
+                    </MqText>
+                    {notification.type}
+                  </>
+                }
                 secondary={`at ${formatUpdatedAt(notification.createdAt)}`}
                 primaryTypographyProps={{ variant: 'body2' }}
                 secondaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
               />
             </Box>
-            <IconButton
-              size='small'
-              sx={{ ml: 2 }}
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                return archiveNotification(notification.uuid);
-              }}
-            >
-              <Archive color={'secondary'} fontSize='small' />
-            </IconButton>
+            <MQTooltip title={'Archive'}>
+              <IconButton
+                size='small'
+                sx={{ ml: 2 }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  return archiveNotification(notification.uuid)
+                }}
+              >
+                <Archive color={'secondary'} fontSize='small' />
+              </IconButton>
+            </MQTooltip>
           </MenuItem>
         ))}
         <Divider />

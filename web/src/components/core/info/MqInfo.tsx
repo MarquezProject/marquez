@@ -26,3 +26,29 @@ export const MqInfo: React.FC<MqInfoProps> = ({ icon, label, value }) => {
     </Box>
   )
 }
+
+interface MqInfoHorizontalProps {
+  label: string
+  value: ReactElement | string | number
+}
+
+export const MqInfoHorizontal: React.FC<MqInfoHorizontalProps> = ({ label, value }) => {
+  return (
+    <Box
+      display={'flex'}
+      justifyContent={'space-between'}
+      alignItems={'center'}
+      py={1}
+      sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}
+    >
+      <Box display={'flex'} alignItems={'center'}>
+        <Box>
+          <MqText subdued>{label}</MqText>
+        </Box>
+      </Box>
+      <Box display={'flex'} alignItems={'center'}>
+        <MqText bold>{value}</MqText>
+      </Box>
+    </Box>
+  )
+}

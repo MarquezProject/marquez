@@ -10,7 +10,8 @@ import DatasetDetailPage from '../../components/datasets/DatasetDetailPage'
 import JobDetailPage from '../../components/jobs/JobDetailPage'
 import React from 'react'
 
-const WIDTH = 800
+const DATASET_WIDTH = 800
+const JOB_WIDTH = 400
 
 interface StateProps {
   lineageGraph: LineageGraph
@@ -32,7 +33,7 @@ const TableLevelDrawer = ({ lineageGraph }: StateProps & DispatchProps) => {
   }
 
   return (
-    <Box width={`${WIDTH}px`}>
+    <Box width={`${dataset ? DATASET_WIDTH : JOB_WIDTH}px`}>
       {dataset ? (
         <DatasetDetailPage lineageDataset={dataset} />
       ) : (

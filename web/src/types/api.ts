@@ -456,5 +456,5 @@ export interface Notification {
   alertUuid: string
   config: Nullable<object>
   link: Nullable<string>
-  run_uuid: Nullable<string>
+  runUuid: Nullable<string>
 }
