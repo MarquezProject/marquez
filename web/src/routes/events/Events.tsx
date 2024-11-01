@@ -177,7 +177,7 @@ const Events: React.FC<EventsProps> = ({
       searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
     const dateTo =
       searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(dateFrom, dateTo, pageSize, state.page * pageSize)
+    fetchEvents(dateFrom, dateTo, pageSize, currentPage * pageSize)
   }
 
   const i18next = require('i18next')
@@ -185,11 +185,12 @@ const Events: React.FC<EventsProps> = ({
 
   return (
     <Container
+      maxWidth={'xl'}
       disableGutters
       sx={{
         marginLeft: '0%',
         '@media (min-width: 1900px)': {
-          maxWidth: '72%',
+          maxWidth: '100%',
         },
       }}
     >
@@ -198,7 +199,7 @@ const Events: React.FC<EventsProps> = ({
         customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
       >
         <>
-          <Box p={2} display={'flex'} justifyContent={'space-between'} width={'130%'}>
+          <Box p={2} display={'flex'} justifyContent={'space-between'}>
             <Box>
               <Box display={'flex'} alignItems={'center'}>
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
@@ -271,8 +272,8 @@ const Events: React.FC<EventsProps> = ({
               <Table
                 sx={{
                   marginBottom: theme.spacing(2),
-                  width: '137%',
-                  margin: '0 auto',
+                  width: '100%',
+                  margin: '0 auto', // Centraliza a tabela
                 }}
                 size='small'
               >
@@ -370,7 +371,7 @@ const Events: React.FC<EventsProps> = ({
                 display='flex'
                 alignItems='center'
                 justifyContent='flex-end'
-                sx={{ marginTop: 2, marginRight: '-385px' }}
+                sx={{ marginTop: 2 }}
               >
                 <MqPaging
                   pageSize={pageSize}

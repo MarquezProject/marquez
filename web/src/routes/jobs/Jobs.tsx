@@ -100,13 +100,13 @@ const Jobs: React.FC<JobsProps> = ({
     setPageSize(newPageSize)
     setCurrentPage(1)
 
-    fetchJobs(selectedNamespace || '', pageSize, currentPage)
+    fetchJobs(selectedNamespace || '', pageSize, state.page)
   }
 
   const i18next = require('i18next')
   return (
     <Container
-      maxWidth={'lg'}
+      maxWidth={'xl'}
       disableGutters
       sx={{
         marginLeft: '0%',
@@ -115,13 +115,7 @@ const Jobs: React.FC<JobsProps> = ({
         },
       }}
     >
-      <Box
-        p={2}
-        display={'flex'}
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        width={'130%'}
-      >
+      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
           {!isJobsLoading && (
@@ -181,13 +175,7 @@ const Jobs: React.FC<JobsProps> = ({
             </Box>
           ) : (
             <>
-              <Table
-                size='small'
-                sx={{
-                  width: '137%',
-                  margin: '0 auto',
-                }}
-              >
+              <Table size='small'>
                 <TableHead>
                   <TableRow>
                     <TableCell key={i18next.t('jobs_route.name_col')} align='left'>
@@ -249,7 +237,7 @@ const Jobs: React.FC<JobsProps> = ({
                 display='flex'
                 alignItems='center'
                 justifyContent='flex-end'
-                sx={{ marginTop: 2, marginRight: '-385px' }}
+                sx={{ marginTop: 2 }}
               >
                 <MqPaging
                   pageSize={pageSize}

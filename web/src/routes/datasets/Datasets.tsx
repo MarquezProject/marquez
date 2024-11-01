@@ -108,13 +108,13 @@ const Datasets: React.FC<DatasetsProps> = ({
     setPageSize(newPageSize)
     setCurrentPage(1)
 
-    fetchDatasets('', pageSize, state.page * pageSize)
+    fetchDatasets(selectedNamespace || '', pageSize, state.page * pageSize)
   }
 
   const i18next = require('i18next')
   return (
     <Container
-      maxWidth={'lg'}
+      maxWidth={'xl'}
       disableGutters
       sx={{
         marginLeft: '0%',
@@ -123,13 +123,7 @@ const Datasets: React.FC<DatasetsProps> = ({
         },
       }}
     >
-      <Box
-        p={2}
-        display={'flex'}
-        justifyContent={'space-between'}
-        alignItems={'center'}
-        width={'130%'}
-      >
+      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
           {!isDatasetsLoading && (
@@ -190,8 +184,6 @@ const Datasets: React.FC<DatasetsProps> = ({
               <Table
                 sx={{
                   marginBottom: theme.spacing(2),
-                  width: '137%',
-                  margin: '0 auto',
                 }}
                 size='small'
               >
@@ -289,7 +281,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                 display='flex'
                 alignItems='center'
                 justifyContent='flex-end'
-                sx={{ marginTop: 2, marginRight: '-385px' }}
+                sx={{ marginTop: 2, marginLeft: 2 }}
               >
                 <MqPaging
                   pageSize={pageSize}
