@@ -1,4 +1,4 @@
-import http from 'http';
+import https from 'https';
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -9,7 +9,7 @@ import './config/passport';
 const router = express();
 
 /** Server Handling */
-const httpServer = http.createServer(router);
+const httpServer = https.createServer(router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -45,11 +45,11 @@ router.use((req, res, next) => {
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://staging-marquez-web.nubank.world');
+    return res.redirect('https://staging-marquez-web.nubank.world');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://staging-marquez-web.nubank.world');
+    return res.redirect('https://staging-marquez-web.nubank.world');
 });
 
 router.get('/whoami', (req, res, next) => {
