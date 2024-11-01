@@ -67,7 +67,6 @@ type EventsProps = StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
-const PAGE_SIZE = 50
 const EVENTS_HEADER_HEIGHT = 64
 
 const Events: React.FC<EventsProps> = ({
@@ -92,7 +91,9 @@ const Events: React.FC<EventsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(1) // Reinicia para a primeira página ao mudar o tamanho
+    setCurrentPage(1)
+
+    fetchEvents(state.dateFrom, state.dateTo, newPageSize, currentPage)
   }
 
   const mounted = useRef<boolean>(false)
@@ -100,7 +101,7 @@ const Events: React.FC<EventsProps> = ({
   useEffect(() => {
     if (!mounted.current) {
       // on mount
-      fetchEvents(state.dateFrom, state.dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+      fetchEvents(state.dateFrom, state.dateTo, pageSize, state.page * pageSize)
       mounted.current = true
     } else {
       // on update
@@ -136,8 +137,8 @@ const Events: React.FC<EventsProps> = ({
     fetchEvents(
       formatDateAPIQuery(isDirectionFrom ? e.toDate() : state.dateFrom),
       formatDateAPIQuery(isDirectionFrom ? state.dateTo : e.toDate()),
-      PAGE_SIZE,
-      state.page * PAGE_SIZE
+      pageSize,
+      state.page * pageSize
     )
 
     const params: { [key: string]: string } = {}
@@ -157,8 +158,8 @@ const Events: React.FC<EventsProps> = ({
     fetchEvents(
       formatDateAPIQuery(state.dateFrom),
       formatDateAPIQuery(state.dateTo),
-      PAGE_SIZE,
-      directionPage * PAGE_SIZE
+      pageSize,
+      directionPage * pageSize
     )
     // reset page scroll
     window.scrollTo(0, 0)
@@ -176,19 +177,11 @@ const Events: React.FC<EventsProps> = ({
       searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
     const dateTo =
       searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(dateFrom, dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+    fetchEvents(dateFrom, dateTo, pageSize, state.page * pageSize)
   }
 
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
-
-  const getResponsiveText = (text: string, maxLength: number) => {
-    // Captura a largura da tela diretamente
-    const windowWidth = window.innerWidth
-    console.log(windowWidth)
-    // Retorna o texto truncado ou completo com base na largura da tela
-    return windowWidth > 1050 ? text : truncateText(text, maxLength)
-  }
 
   return (
     <Container
@@ -205,7 +198,7 @@ const Events: React.FC<EventsProps> = ({
         customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
       >
         <>
-          <Box p={2} display={'flex'} justifyContent={'space-between'}>
+          <Box p={2} display={'flex'} justifyContent={'space-between'} width={'130%'}>
             <Box>
               <Box display={'flex'} alignItems={'center'}>
                 <MqText heading>{i18next.t('events_route.title')}</MqText>
@@ -322,7 +315,7 @@ const Events: React.FC<EventsProps> = ({
                         >
                           <TableCell align='left'>
                             <Box display={'flex'} alignItems={'center'}>
-                              <MqText font={'mono'}>{event.run.runId.substring(0, 8)}...</MqText>
+                              <MqText font={'mono'}>{event.run.runId}</MqText>
                               <MqCopy string={event.run.runId} />
                             </Box>
                           </TableCell>
@@ -332,9 +325,9 @@ const Events: React.FC<EventsProps> = ({
                               label={event.eventType}
                             />
                           </TableCell>
-                          <TableCell align='left'>{truncateText(event.job.name, 40)}</TableCell>
+                          <TableCell align='left'>{truncateText(event.job.name, 170)}</TableCell>
                           <TableCell align='left'>
-                            <MqText> {truncateText(event.job.namespace, 40)}</MqText>
+                            <MqText> {truncateText(event.job.namespace, 96)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
                             <MqText zoomString>{formatUpdatedAt(event.eventTime)}</MqText>
@@ -377,7 +370,7 @@ const Events: React.FC<EventsProps> = ({
                 display='flex'
                 alignItems='center'
                 justifyContent='flex-end'
-                sx={{ marginTop: 2, marginRight: 4 }}
+                sx={{ marginTop: 2, marginRight: '-385px' }}
               >
                 <MqPaging
                   pageSize={pageSize}

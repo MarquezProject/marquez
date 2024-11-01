@@ -18,12 +18,6 @@ export const MqScreenLoad: React.FC<MqScreenLoadProps> = ({ loading, children, c
       display={'flex'}
       justifyContent={'center'}
       alignItems={'center'}
-      sx={{
-        '@media (min-width: 1900px)': {
-          // Quando a largura da viewport for menor que 1930px
-          width: '10vh',
-        },
-      }}
     >
       <CircularProgress color='primary' />
     </Box>

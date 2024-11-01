@@ -1,4 +1,3 @@
-// src/components/PageSizeSelector.tsx
 import { Button, Menu, MenuItem } from '@mui/material'
 import React, { useState } from 'react'
 
@@ -19,7 +18,7 @@ const PageSizeSelector: React.FC<PageSizeSelectorProps> = ({ onChange, initialPa
 
   const handleMenuItemClick = (option: number) => {
     setPageSize(option)
-    onChange(option) // Chama a função de callback com o valor selecionado
+    onChange(option)
     setAnchorEl(null)
   }
 
@@ -30,13 +29,13 @@ const PageSizeSelector: React.FC<PageSizeSelectorProps> = ({ onChange, initialPa
   return (
     <>
       <Button variant='outlined' color='primary' onClick={handleButtonClick}>
-        Itens por página: {pageSize}
+        Items per page: {pageSize}
       </Button>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {PAGE_OPTIONS.map((option) => (
           <MenuItem key={option} onClick={() => handleMenuItemClick(option)}>
-            {option} itens por página
+            {option} items per page
           </MenuItem>
         ))}
       </Menu>

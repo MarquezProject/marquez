@@ -34,7 +34,8 @@ import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
-import React from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useState } from 'react'
 
 interface StateProps {
   jobs: Job[]
@@ -55,7 +56,6 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const PAGE_SIZE = 20
 const JOB_HEADER_HEIGHT = 64
 
 const Jobs: React.FC<JobsProps> = ({
@@ -71,10 +71,12 @@ const Jobs: React.FC<JobsProps> = ({
     page: 0,
   }
   const [state, setState] = React.useState<JobsState>(defaultState)
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(1)
 
   React.useEffect(() => {
     if (selectedNamespace) {
-      fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+      fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
     }
   }, [selectedNamespace, state.page])
 
@@ -88,16 +90,38 @@ const Jobs: React.FC<JobsProps> = ({
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
-    fetchJobs(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    fetchJobs(selectedNamespace || '', pageSize, directionPage * pageSize)
     // reset page scroll
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
   }
 
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1)
+
+    fetchJobs(selectedNamespace || '', pageSize, currentPage)
+  }
+
   const i18next = require('i18next')
   return (
-    <Container maxWidth={'lg'} disableGutters>
-      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+    <Container
+      maxWidth={'lg'}
+      disableGutters
+      sx={{
+        marginLeft: '0%',
+        '@media (min-width: 1900px)': {
+          maxWidth: '72%',
+        },
+      }}
+    >
+      <Box
+        p={2}
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        width={'130%'}
+      >
         <Box display={'flex'}>
           <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
           {!isJobsLoading && (
@@ -110,21 +134,23 @@ const Jobs: React.FC<JobsProps> = ({
             ></Chip>
           )}
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
-          {isJobsLoading && <CircularProgress size={16} />}
-          <NamespaceSelect />
-          <MQTooltip title={'Refresh'}>
+        <Box display='flex' alignItems='center'>
+          <Box display='flex' alignItems='center' flexGrow={1}>
+            {isJobsLoading && <CircularProgress size={16} />}
+            <NamespaceSelect />
+          </Box>
+          <MQTooltip title='Refresh'>
             <IconButton
               sx={{ ml: 2 }}
-              color={'primary'}
-              size={'small'}
+              color='primary'
+              size='small'
               onClick={() => {
                 if (selectedNamespace) {
-                  fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                  fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
                 }
               }}
             >
-              <Refresh fontSize={'small'} />
+              <Refresh fontSize='small' />
             </IconButton>
           </MQTooltip>
         </Box>
@@ -144,7 +170,7 @@ const Jobs: React.FC<JobsProps> = ({
                     size={'small'}
                     onClick={() => {
                       if (selectedNamespace) {
-                        fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                        fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
                       }
                     }}
                   >
@@ -155,7 +181,13 @@ const Jobs: React.FC<JobsProps> = ({
             </Box>
           ) : (
             <>
-              <Table size='small'>
+              <Table
+                size='small'
+                sx={{
+                  width: '137%',
+                  margin: '0 auto',
+                }}
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell key={i18next.t('jobs_route.name_col')} align='left'>
@@ -184,7 +216,7 @@ const Jobs: React.FC<JobsProps> = ({
                             link
                             linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
                           >
-                            {truncateText(job.name, 40)}
+                            {truncateText(job.name, 80)}
                           </MqText>
                         </TableCell>
                         <TableCell align='left'>
@@ -213,13 +245,22 @@ const Jobs: React.FC<JobsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2, marginRight: '-385px' }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={state.page}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>

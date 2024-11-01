@@ -40,7 +40,8 @@ import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
-import React from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useState } from 'react'
 
 interface StateProps {
   datasets: Dataset[]
@@ -61,7 +62,6 @@ interface DispatchProps {
 
 type DatasetsProps = StateProps & DispatchProps
 
-const PAGE_SIZE = 20
 const DATASET_HEADER_HEIGHT = 64
 
 const Datasets: React.FC<DatasetsProps> = ({
@@ -77,12 +77,14 @@ const Datasets: React.FC<DatasetsProps> = ({
     page: 0,
   }
   const [state, setState] = React.useState<DatasetsState>(defaultState)
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const theme = createTheme(useTheme())
 
   React.useEffect(() => {
     if (selectedNamespace) {
-      fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+      fetchDatasets(selectedNamespace, pageSize, currentPage * pageSize)
     }
   }, [selectedNamespace, state.page])
 
@@ -96,16 +98,38 @@ const Datasets: React.FC<DatasetsProps> = ({
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
 
-    fetchDatasets(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    fetchDatasets(selectedNamespace || '', pageSize, directionPage * pageSize)
     // reset page scroll
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
   }
 
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize)
+    setCurrentPage(1)
+
+    fetchDatasets('', pageSize, state.page * pageSize)
+  }
+
   const i18next = require('i18next')
   return (
-    <Container maxWidth={'lg'} disableGutters>
-      <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+    <Container
+      maxWidth={'lg'}
+      disableGutters
+      sx={{
+        marginLeft: '0%',
+        '@media (min-width: 1900px)': {
+          maxWidth: '72%',
+        },
+      }}
+    >
+      <Box
+        p={2}
+        display={'flex'}
+        justifyContent={'space-between'}
+        alignItems={'center'}
+        width={'130%'}
+      >
         <Box display={'flex'}>
           <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
           {!isDatasetsLoading && (
@@ -128,7 +152,7 @@ const Datasets: React.FC<DatasetsProps> = ({
               size={'small'}
               onClick={() => {
                 if (selectedNamespace) {
-                  fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                  fetchDatasets(selectedNamespace, pageSize, state.page * pageSize)
                 }
               }}
             >
@@ -152,7 +176,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                     size={'small'}
                     onClick={() => {
                       if (selectedNamespace) {
-                        fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                        fetchDatasets(selectedNamespace, pageSize, state.page * pageSize)
                       }
                     }}
                   >
@@ -163,7 +187,14 @@ const Datasets: React.FC<DatasetsProps> = ({
             </Box>
           ) : (
             <>
-              <Table size='small'>
+              <Table
+                sx={{
+                  marginBottom: theme.spacing(2),
+                  width: '137%',
+                  margin: '0 auto',
+                }}
+                size='small'
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell key={i18next.t('datasets_route.name_col')} align='left'>
@@ -204,7 +235,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 dataset.name
                               )}`}
                             >
-                              {truncateText(dataset.name, 40)}
+                              {truncateText(dataset.name, 80)}
                             </MqText>
                           </TableCell>
                           <TableCell align='left'>
@@ -253,13 +284,22 @@ const Datasets: React.FC<DatasetsProps> = ({
                     })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2, marginRight: '-385px' }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={state.page}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>
