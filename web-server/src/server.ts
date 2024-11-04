@@ -6,8 +6,12 @@ import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
 import cors from 'cors';
+import morgan from 'morgan';
 
 const router = express();
+
+/** Use morgan for logging HTTP requests */
+router.use(morgan('combined'));
 
 /** Server Handling */
 const httpServer = https.createServer(router);
