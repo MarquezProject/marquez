@@ -1,0 +1,6 @@
+{
+  "sideEffects": false,
+  "module": "./index.js",
+  "main": "../node/throttle/index.js",
+  "types": "./index.d.ts"
+}

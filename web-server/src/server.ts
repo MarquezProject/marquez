@@ -5,6 +5,7 @@ import passport from 'passport';
 import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
+import cors from 'cors';
 
 const router = express();
 
@@ -30,18 +31,21 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json()); 
 
 /** Rules of our API */
-router.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', req.header('origin'));
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Credentials', 'true');
+const corsOptions = {
+    allowedOrigins: ['*'],
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        if (corsOptions.allowedOrigins.indexOf('*') !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+};
 
-    if (req.method == 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
-        return res.status(200).json({});
-    }
-
-    next();
-});
+router.use(cors(corsOptions));
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {

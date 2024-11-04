@@ -1,0 +1,12 @@
+{
+    "name": "@types/axios",
+    "version": "0.14.4",
+    "description": "Stub TypeScript definitions entry for axios, which provides its own types definitions",
+    "main": "",
+    "scripts": {},
+    "license": "MIT",
+    "dependencies": {
+        "axios": "*"
+    },
+    "deprecated": "This is a stub types definition. axios provides its own type definitions, so you do not need this installed."
+}

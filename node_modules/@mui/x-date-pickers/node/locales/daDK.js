@@ -1,0 +1,80 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.daDK = void 0;
+var _getPickersLocalization = require("./utils/getPickersLocalization");
+// maps TimeView to its translation
+const timeViews = {
+  hours: 'Timer',
+  minutes: 'Minutter',
+  seconds: 'Sekunder',
+  meridiem: 'Meridiem'
+};
+const daDKPickers = {
+  // Calendar navigation
+  previousMonth: 'Forrige måned',
+  nextMonth: 'Næste måned',
+  // View navigation
+  openPreviousView: 'Åben forrige visning',
+  openNextView: 'Åben næste visning',
+  calendarViewSwitchingButtonAriaLabel: view => view === 'year' ? 'årsvisning er åben, skift til kalendervisning' : 'kalendervisning er åben, skift til årsvisning',
+  // DateRange labels
+  start: 'Start',
+  end: 'Slut',
+  startDate: 'Start dato',
+  startTime: 'Start tid',
+  endDate: 'Slut date',
+  endTime: 'Slut tid',
+  // Action bar
+  cancelButtonLabel: 'Annuller',
+  clearButtonLabel: 'Ryd',
+  okButtonLabel: 'OK',
+  todayButtonLabel: 'I dag',
+  // Toolbar titles
+  datePickerToolbarTitle: 'Vælg dato',
+  dateTimePickerToolbarTitle: 'Vælg dato & tidspunkt',
+  timePickerToolbarTitle: 'Vælg tidspunkt',
+  dateRangePickerToolbarTitle: 'Vælg datointerval',
+  // Clock labels
+  clockLabelText: (view, time, utils, formattedTime) => `Vælg ${timeViews[view] ?? view}. ${!formattedTime && (time === null || !utils.isValid(time)) ? 'Intet tidspunkt valgt' : `Valgte tidspunkt er ${formattedTime ?? utils.format(time, 'fullTime')}`}`,
+  hoursClockNumberText: hours => `${hours} timer`,
+  minutesClockNumberText: minutes => `${minutes} minutter`,
+  secondsClockNumberText: seconds => `${seconds} sekunder`,
+  // Digital clock labels
+  selectViewText: view => `Vælg ${timeViews[view]}`,
+  // Calendar labels
+  calendarWeekNumberHeaderLabel: 'Ugenummer',
+  calendarWeekNumberHeaderText: '#',
+  calendarWeekNumberAriaLabelText: weekNumber => `Uge ${weekNumber}`,
+  calendarWeekNumberText: weekNumber => `${weekNumber}`,
+  // Open picker labels
+  openDatePickerDialogue: (value, utils, formattedDate) => formattedDate || value !== null && utils.isValid(value) ? `Vælg dato, valgte dato er ${formattedDate ?? utils.format(value, 'fullDate')}` : 'Vælg dato',
+  openTimePickerDialogue: (value, utils, formattedTime) => formattedTime || value !== null && utils.isValid(value) ? `Vælg tidspunkt, valgte tidspunkt er ${formattedTime ?? utils.format(value, 'fullTime')}` : 'Vælg tidspunkt',
+  fieldClearLabel: 'ryd felt',
+  // Table labels
+  timeTableLabel: 'vælg tidspunkt',
+  dateTableLabel: 'vælg dato',
+  // Field section placeholders
+  fieldYearPlaceholder: params => 'Y'.repeat(params.digitAmount),
+  fieldMonthPlaceholder: params => params.contentType === 'letter' ? 'MMMM' : 'MM',
+  fieldDayPlaceholder: () => 'DD',
+  fieldWeekDayPlaceholder: params => params.contentType === 'letter' ? 'EEEE' : 'EE',
+  fieldHoursPlaceholder: () => 'hh',
+  fieldMinutesPlaceholder: () => 'mm',
+  fieldSecondsPlaceholder: () => 'ss',
+  fieldMeridiemPlaceholder: () => 'aa',
+  // View names
+  year: 'år',
+  month: 'måned',
+  day: 'dag',
+  weekDay: 'ugedag',
+  hours: 'timer',
+  minutes: 'minutter',
+  seconds: 'sekunder',
+  meridiem: 'middag',
+  // Common
+  empty: 'tom'
+};
+const daDK = exports.daDK = (0, _getPickersLocalization.getPickersLocalization)(daDKPickers);

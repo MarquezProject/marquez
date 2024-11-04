@@ -1,0 +1,74 @@
+import { getPickersLocalization } from "./utils/getPickersLocalization.js";
+// Translation map for Clock Label
+const timeViews = {
+  hours: 'часы',
+  minutes: 'минуты',
+  seconds: 'секунды',
+  meridiem: 'меридием'
+};
+const ruRUPickers = {
+  // Calendar navigation
+  previousMonth: 'Предыдущий месяц',
+  nextMonth: 'Следующий месяц',
+  // View navigation
+  openPreviousView: 'Открыть предыдущий вид',
+  openNextView: 'Открыть следующий вид',
+  calendarViewSwitchingButtonAriaLabel: view => view === 'year' ? 'открыт годовой вид, переключить на календарный вид' : 'открыт календарный вид, переключить на годовой вид',
+  // DateRange labels
+  start: 'Начало',
+  end: 'Конец',
+  startDate: 'Начальная дата',
+  startTime: 'Начальное время',
+  endDate: 'Конечная дата',
+  endTime: 'Конечное время',
+  // Action bar
+  cancelButtonLabel: 'Отмена',
+  clearButtonLabel: 'Очистить',
+  okButtonLabel: 'Ок',
+  todayButtonLabel: 'Сегодня',
+  // Toolbar titles
+  datePickerToolbarTitle: 'Выбрать дату',
+  dateTimePickerToolbarTitle: 'Выбрать дату и время',
+  timePickerToolbarTitle: 'Выбрать время',
+  dateRangePickerToolbarTitle: 'Выбрать период',
+  // Clock labels
+  clockLabelText: (view, time, utils, formattedTime) => `Выбрать ${timeViews[view]}. ${!formattedTime && (time === null || !utils.isValid(time)) ? 'Время не выбрано' : `Выбрано время ${formattedTime ?? utils.format(time, 'fullTime')}`}`,
+  hoursClockNumberText: hours => `${hours} часов`,
+  minutesClockNumberText: minutes => `${minutes} минут`,
+  secondsClockNumberText: seconds => `${seconds} секунд`,
+  // Digital clock labels
+  selectViewText: view => `Выбрать ${timeViews[view]}`,
+  // Calendar labels
+  calendarWeekNumberHeaderLabel: 'Номер недели',
+  calendarWeekNumberHeaderText: '№',
+  calendarWeekNumberAriaLabelText: weekNumber => `Неделя ${weekNumber}`,
+  calendarWeekNumberText: weekNumber => `${weekNumber}`,
+  // Open picker labels
+  openDatePickerDialogue: (value, utils, formattedDate) => formattedDate || value !== null && utils.isValid(value) ? `Выберите дату, выбрана дата ${formattedDate ?? utils.format(value, 'fullDate')}` : 'Выберите дату',
+  openTimePickerDialogue: (value, utils, formattedTime) => formattedTime || value !== null && utils.isValid(value) ? `Выберите время, выбрано время ${formattedTime ?? utils.format(value, 'fullTime')}` : 'Выберите время',
+  fieldClearLabel: 'Очистить значение',
+  // Table labels
+  timeTableLabel: 'выбрать время',
+  dateTableLabel: 'выбрать дату',
+  // Field section placeholders
+  fieldYearPlaceholder: params => 'Г'.repeat(params.digitAmount),
+  fieldMonthPlaceholder: params => params.contentType === 'letter' ? 'ММММ' : 'ММ',
+  fieldDayPlaceholder: () => 'ДД',
+  fieldWeekDayPlaceholder: params => params.contentType === 'letter' ? 'ДДДД' : 'ДД',
+  fieldHoursPlaceholder: () => 'чч',
+  fieldMinutesPlaceholder: () => 'мм',
+  fieldSecondsPlaceholder: () => 'сс',
+  fieldMeridiemPlaceholder: () => '(д|п)п',
+  // View names
+  year: 'Год',
+  month: 'Месяц',
+  day: 'День',
+  weekDay: 'День недели',
+  hours: 'Часы',
+  minutes: 'Минуты',
+  seconds: 'Секунды',
+  meridiem: 'Меридием',
+  // Common
+  empty: 'Пустой'
+};
+export const ruRU = getPickersLocalization(ruRUPickers);

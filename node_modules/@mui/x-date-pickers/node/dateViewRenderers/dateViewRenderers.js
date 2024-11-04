@@ -1,0 +1,91 @@
+"use strict";
+
+var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard").default;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.renderDateViewCalendar = void 0;
+var React = _interopRequireWildcard(require("react"));
+var _DateCalendar = require("../DateCalendar");
+var _dateUtils = require("../internals/utils/date-utils");
+var _jsxRuntime = require("react/jsx-runtime");
+const renderDateViewCalendar = ({
+  view,
+  onViewChange,
+  views,
+  focusedView,
+  onFocusedViewChange,
+  value,
+  defaultValue,
+  referenceDate,
+  onChange,
+  className,
+  classes,
+  disableFuture,
+  disablePast,
+  minDate,
+  maxDate,
+  shouldDisableDate,
+  shouldDisableMonth,
+  shouldDisableYear,
+  reduceAnimations,
+  onMonthChange,
+  monthsPerRow,
+  onYearChange,
+  yearsOrder,
+  yearsPerRow,
+  slots,
+  slotProps,
+  loading,
+  renderLoading,
+  disableHighlightToday,
+  readOnly,
+  disabled,
+  showDaysOutsideCurrentMonth,
+  dayOfWeekFormatter,
+  sx,
+  autoFocus,
+  fixedWeekNumber,
+  displayWeekNumber,
+  timezone
+}) => /*#__PURE__*/(0, _jsxRuntime.jsx)(_DateCalendar.DateCalendar, {
+  view: view,
+  onViewChange: onViewChange,
+  views: views.filter(_dateUtils.isDatePickerView),
+  focusedView: focusedView && (0, _dateUtils.isDatePickerView)(focusedView) ? focusedView : null,
+  onFocusedViewChange: onFocusedViewChange,
+  value: value,
+  defaultValue: defaultValue,
+  referenceDate: referenceDate,
+  onChange: onChange,
+  className: className,
+  classes: classes,
+  disableFuture: disableFuture,
+  disablePast: disablePast,
+  minDate: minDate,
+  maxDate: maxDate,
+  shouldDisableDate: shouldDisableDate,
+  shouldDisableMonth: shouldDisableMonth,
+  shouldDisableYear: shouldDisableYear,
+  reduceAnimations: reduceAnimations,
+  onMonthChange: onMonthChange,
+  monthsPerRow: monthsPerRow,
+  onYearChange: onYearChange,
+  yearsOrder: yearsOrder,
+  yearsPerRow: yearsPerRow,
+  slots: slots,
+  slotProps: slotProps,
+  loading: loading,
+  renderLoading: renderLoading,
+  disableHighlightToday: disableHighlightToday,
+  readOnly: readOnly,
+  disabled: disabled,
+  showDaysOutsideCurrentMonth: showDaysOutsideCurrentMonth,
+  dayOfWeekFormatter: dayOfWeekFormatter,
+  sx: sx,
+  autoFocus: autoFocus,
+  fixedWeekNumber: fixedWeekNumber,
+  displayWeekNumber: displayWeekNumber,
+  timezone: timezone
+});
+exports.renderDateViewCalendar = renderDateViewCalendar;

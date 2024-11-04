@@ -1,0 +1,70 @@
+{
+  "name": "@redux-saga/delay-p",
+  "version": "1.2.1",
+  "description": "Promisified setTimeout",
+  "main": "./dist/redux-saga-delay-p.cjs.js",
+  "module": "./dist/redux-saga-delay-p.esm.js",
+  "typings": "./index.d.ts",
+  "files": [
+    "dist",
+    "*.d.ts",
+    "import-condition-proxy.mjs"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./dist/redux-saga-delay-p.esm.js",
+      "import": "./import-condition-proxy.mjs",
+      "default": "./dist/redux-saga-delay-p.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prebuild": "yarn clean",
+    "build": "rollup -c",
+    "prepare": "yarn build"
+  },
+  "repository": "https://github.com/redux-saga/redux-saga/tree/main/packages/delay-p",
+  "keywords": [
+    "promise",
+    "resolve",
+    "delay",
+    "defer",
+    "wait",
+    "stall",
+    "timeout",
+    "settimeout",
+    "event",
+    "loop",
+    "next",
+    "tick",
+    "delay",
+    "async",
+    "await",
+    "promises",
+    "bluebird"
+  ],
+  "author": "Yassine ELOUAFI <yelouafi@gmail.com>",
+  "contributors": [
+    "Mateusz Burzyński <mateuszburzynski@gmail.com> (https://github.com/Andarist)",
+    "Mikhail Shustov <restrry@gmail.com> (https://github.com/restrry)",
+    "Shi Feichao <842351815@qq.com> (https://github.com/shinima)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/redux-saga/redux-saga/issues"
+  },
+  "homepage": "https://redux-saga.js.org/",
+  "dependencies": {
+    "@redux-saga/symbols": "^1.1.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-babel": "5.0.0-alpha.0"
+  }
+}

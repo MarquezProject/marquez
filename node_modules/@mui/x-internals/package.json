@@ -1,0 +1,44 @@
+{
+  "name": "@mui/x-internals",
+  "version": "7.21.0",
+  "description": "Utility functions for the MUI X packages (internal use only).",
+  "author": "MUI Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mui/mui-x/issues"
+  },
+  "homepage": "https://mui.com/x/",
+  "sideEffects": false,
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/mui-org"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "build"
+  },
+  "keywords": [
+    "react",
+    "react-component",
+    "material-ui",
+    "mui",
+    "mui-x",
+    "utils"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mui/mui-x.git",
+    "directory": "packages/x-internals"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.25.7",
+    "@mui/utils": "^5.16.6 || ^6.0.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "private": false
+}

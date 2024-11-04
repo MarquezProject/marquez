@@ -1,0 +1,35 @@
+{
+  "name": "@redux-saga/types",
+  "version": "1.2.1",
+  "description": "Shared types used by `redux-saga` packages.",
+  "types": "./index.d.ts",
+  "typesVersions": {
+    ">=3.6": {
+      "*": [
+        "./types/ts3.6/*"
+      ]
+    },
+    ">=3.2": {
+      "*": [
+        "./types/*"
+      ]
+    }
+  },
+  "files": [
+    "types"
+  ],
+  "repository": "https://github.com/redux-saga/redux-saga/tree/main/packages/types",
+  "keywords": [],
+  "author": "Yassine ELOUAFI <yelouafi@gmail.com>",
+  "contributors": [
+    "Mateusz Burzyński <mateuszburzynski@gmail.com> (https://github.com/Andarist)",
+    "Mikhail Shustov <restrry@gmail.com> (https://github.com/restrry)",
+    "Shi Feichao <842351815@qq.com> (https://github.com/shinima)",
+    "Daniel Lytkin <dan.lytkin@gmail.com (https://github.com/aikoven)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/redux-saga/redux-saga/issues"
+  },
+  "homepage": "https://redux-saga.js.org/"
+}

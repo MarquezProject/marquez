@@ -1,0 +1,6 @@
+{
+  "sideEffects": false,
+  "module": "../esm/merge/index.js",
+  "main": "./index.js",
+  "types": "./index.d.ts"
+}

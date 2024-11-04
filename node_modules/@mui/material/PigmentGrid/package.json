@@ -1,0 +1,6 @@
+{
+  "sideEffects": false,
+  "module": "./index.js",
+  "main": "../node/PigmentGrid/index.js",
+  "types": "./index.d.ts"
+}

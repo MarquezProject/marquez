@@ -1,0 +1,110 @@
+{
+  "name": "@redux-saga/core",
+  "version": "1.3.0",
+  "description": "Saga middleware for Redux to handle Side Effects",
+  "main": "./dist/redux-saga-core.cjs.js",
+  "module": "./dist/redux-saga-core.esm.js",
+  "files": [
+    "dist",
+    "effects",
+    "types",
+    "import-condition-proxy.mjs"
+  ],
+  "exports": {
+    "./effects": {
+      "types": "./types/ts4.2/effects.d.ts",
+      "module": "./dist/redux-saga-effects.esm.js",
+      "default": "./dist/redux-saga-effects.cjs.js"
+    },
+    ".": {
+      "types": "./types/ts4.2/index.d.ts",
+      "module": "./dist/redux-saga-core.esm.js",
+      "import": "./import-condition-proxy.mjs",
+      "default": "./dist/redux-saga-core.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test": "yarn test:types && yarn test:jest",
+    "test:jest": "jest",
+    "test:types": "dtslint types/ts4.2",
+    "clean": "rimraf dist",
+    "prebuild": "yarn clean",
+    "build": "rollup -c",
+    "postbuild": "node ./scripts/createProxyCjsEntries.js",
+    "prepare": "yarn build",
+    "preversion": "npm test"
+  },
+  "repository": "https://github.com/redux-saga/redux-saga/tree/main/packages/core",
+  "keywords": [
+    "javascript",
+    "redux",
+    "middleware",
+    "saga",
+    "effects",
+    "side effects"
+  ],
+  "author": "Yassine ELOUAFI <yelouafi@gmail.com>",
+  "contributors": [
+    "Mateusz Burzyński <mateuszburzynski@gmail.com> (https://github.com/Andarist)",
+    "Mikhail Shustov <restrry@gmail.com> (https://github.com/restrry)",
+    "Shi Feichao <842351815@qq.com> (https://github.com/shinima)",
+    "Daniel Lytkin <dan.lytkin@gmail.com (https://github.com/aikoven)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/redux-saga/redux-saga/issues"
+  },
+  "homepage": "https://redux-saga.js.org/",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/redux-saga"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.6.3",
+    "@redux-saga/deferred": "^1.2.1",
+    "@redux-saga/delay-p": "^1.2.1",
+    "@redux-saga/is": "^1.1.3",
+    "@redux-saga/symbols": "^1.1.3",
+    "@redux-saga/types": "^1.2.1",
+    "typescript-tuple": "^2.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/polyfill": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
+    "babel-7-jest": "^21.3.3",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "dtslint": "3.5.2",
+    "jest": "^23.5.0",
+    "lerna-alias": "^3.0.2",
+    "mitt": "^1.1.2",
+    "redux": "^4.0.4",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-alias": "^1.4.0",
+    "rollup-plugin-babel": "5.0.0-alpha.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "typescript": "^3.6.4"
+  },
+  "types": "./index.d.ts",
+  "typesVersions": {
+    ">=4.2": {
+      "*": [
+        "./types/ts4.2/*"
+      ]
+    },
+    ">=3.6": {
+      "*": [
+        "./types/ts3.6/*"
+      ]
+    },
+    ">=3.2": {
+      "*": [
+        "./types/*"
+      ]
+    }
+  }
+}

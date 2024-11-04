@@ -1,0 +1,54 @@
+{
+  "name": "@redux-saga/deferred",
+  "version": "1.2.1",
+  "description": "Helper for creating \"exposed\" promise object (with resolve & reject methods).",
+  "main": "./dist/redux-saga-deferred.cjs.js",
+  "module": "./dist/redux-saga-deferred.esm.js",
+  "typings": "./index.d.ts",
+  "files": [
+    "dist",
+    "*.d.ts",
+    "import-condition-proxy.mjs"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "module": "./dist/redux-saga-deferred.esm.js",
+      "import": "./import-condition-proxy.mjs",
+      "default": "./dist/redux-saga-deferred.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "prebuild": "yarn clean",
+    "build": "rollup -c",
+    "prepare": "yarn build"
+  },
+  "repository": "https://github.com/redux-saga/redux-saga/tree/main/packages/deferred",
+  "keywords": [
+    "promise",
+    "resolve",
+    "reject",
+    "defer"
+  ],
+  "author": "Yassine ELOUAFI <yelouafi@gmail.com>",
+  "contributors": [
+    "Mateusz Burzyński <mateuszburzynski@gmail.com> (https://github.com/Andarist)",
+    "Mikhail Shustov <restrry@gmail.com> (https://github.com/restrry)",
+    "Shi Feichao <842351815@qq.com> (https://github.com/shinima)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/redux-saga/redux-saga/issues"
+  },
+  "homepage": "https://redux-saga.js.org/",
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.23.1",
+    "rollup-plugin-babel": "5.0.0-alpha.0"
+  }
+}
