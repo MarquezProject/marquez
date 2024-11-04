@@ -6,15 +6,11 @@ import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
 import cors from 'cors';
-import morgan from 'morgan';
 
 const router = express();
 
-/** Use morgan for logging HTTP requests */
-router.use(morgan('combined'));
-
 /** Server Handling */
-const httpServer = https.createServer(router);
+const httpsServer = https.createServer(router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -89,4 +85,4 @@ router.use((req, res, next) => {
     });
 });
 
-httpServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port}`));
+httpsServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port}`));

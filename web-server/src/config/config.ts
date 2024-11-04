@@ -13,18 +13,18 @@ const config = {
     },
     session: {
         resave: false,
-        secret: process.env.SESSION_SECRET || 'supersecretamazingpassword',
+        secret: process.env.SESSION_SECRET,
         saveUninitialized: true,
         cookie: { secure: false }
     }
 };
 
 export const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*',
-    allowedOrigins: (process.env.CORS_ALLOWED_ORIGINS || '').split(','),
-    methods: process.env.CORS_METHODS || 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: process.env.CORS_ALLOWED_HEADERS || 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-    credentials: process.env.CORS_CREDENTIALS === 'true'
+    origin: '*',
+    allowedOrigins: ('').split(','),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    credentials: 'true'
 };
 
 export default config;
