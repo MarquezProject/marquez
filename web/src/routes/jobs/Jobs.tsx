@@ -72,14 +72,13 @@ const Jobs: React.FC<JobsProps> = ({
   }
   const [state, setState] = React.useState<JobsState>(defaultState)
   const [pageSize, setPageSize] = useState(20)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(0)
 
-  // Adicione o `pageSize` e `currentPage` como dependências no useEffect
   React.useEffect(() => {
     if (selectedNamespace) {
-      fetchJobs(selectedNamespace, pageSize, (currentPage - 1) * pageSize)
+      fetchJobs(selectedNamespace, pageSize, currentPage * pageSize)
     }
-  }, [selectedNamespace, pageSize, currentPage]) // Adicione as dependências pageSize e currentPage
+  }, [selectedNamespace, pageSize, currentPage])
 
   React.useEffect(() => {
     return () => {
@@ -99,23 +98,14 @@ const Jobs: React.FC<JobsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(0)
+    setCurrentPage(currentPage)
 
     fetchJobs(selectedNamespace, newPageSize, currentPage)
   }
 
   const i18next = require('i18next')
   return (
-    <Container
-      maxWidth={'xl'}
-      disableGutters
-      sx={{
-        marginLeft: '0%',
-        '@media (min-width: 1900px)': {
-          maxWidth: '72%',
-        },
-      }}
-    >
+    <Container maxWidth={'xl'} disableGutters>
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
@@ -165,7 +155,7 @@ const Jobs: React.FC<JobsProps> = ({
                     size={'small'}
                     onClick={() => {
                       if (selectedNamespace) {
-                        fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
+                        fetchJobs(selectedNamespace, pageSize, currentPage * pageSize)
                       }
                     }}
                   >

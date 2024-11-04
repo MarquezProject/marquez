@@ -106,23 +106,14 @@ const Datasets: React.FC<DatasetsProps> = ({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize)
-    setCurrentPage(0)
+    setCurrentPage(currentPage)
 
-    fetchDatasets(selectedNamespace || '', pageSize, state.page * pageSize)
+    fetchDatasets(selectedNamespace || '', newPageSize, currentPage)
   }
 
   const i18next = require('i18next')
   return (
-    <Container
-      maxWidth={'xl'}
-      disableGutters
-      sx={{
-        marginLeft: '0%',
-        '@media (min-width: 1900px)': {
-          maxWidth: '72%',
-        },
-      }}
-    >
+    <Container maxWidth={'xl'} disableGutters>
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
