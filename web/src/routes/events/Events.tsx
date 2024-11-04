@@ -176,11 +176,11 @@ const Events: React.FC<EventsProps> = ({
   }
 
   const refresh = () => {
-    const dateFrom =
-      searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
-    const dateTo =
-      searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(dateFrom, dateTo, pageSize, currentPage)
+    // const dateFrom =
+    //   searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
+    // const dateTo =
+    //   searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
+    fetchEvents(state.dateFrom, state.dateTo, pageSize, state.page * pageSize)
   }
 
   const i18next = require('i18next')
