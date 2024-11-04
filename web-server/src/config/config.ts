@@ -13,7 +13,7 @@ const config = {
     },
     session: {
         resave: false,
-        secret: process.env.SESSION_SECRET,
+        secret: 'supersecretamazingpassword',
         saveUninitialized: true,
         cookie: { secure: false }
     }
