@@ -14,7 +14,8 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "passport": "^0.4.1",
-    "passport-saml": "^1.3.5"
+    "passport-saml": "^1.3.5",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
