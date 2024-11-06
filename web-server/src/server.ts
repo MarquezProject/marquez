@@ -1,4 +1,4 @@
-import https from 'https';
+import http from 'http';
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -10,7 +10,7 @@ import cors from 'cors';
 const router = express();
 
 /** Server Handling */
-const httpsServer = https.createServer(router);
+const httpServer = http.createServer(router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -49,11 +49,11 @@ router.use(cors(corsOptions));
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('https://staging-marquez-web.nubank.world');
+    return res.redirect('http://localhost:3000');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('https://staging-marquez-web.nubank.world');
+    return res.redirect('http://localhost:3000');
 });
 
 router.get('/whoami', (req, res, next) => {
@@ -85,4 +85,4 @@ router.use((req, res, next) => {
     });
 });
 
-httpsServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port}`));
+httpServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port}`));

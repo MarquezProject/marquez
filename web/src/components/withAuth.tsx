@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
       logging.info('Initiating SAML check.', 'SAML');
       axios({
         method: 'GET',
-        url: 'https://staging-marquez-web-auth-server.nubank.world/whoami',
+        url: 'http://localhost:1337/whoami',
         withCredentials: true,
       })
         .then((response) => {
@@ -31,7 +31,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     }, []);
 
     const RedirectToLogin = () => {
-      window.location.replace('https://staging-marquez-web-auth-server.nubank.world/login');
+      window.location.replace('http://localhost:1337/login');
     };
 
     if (loading) return <p>Loading ...</p>;
