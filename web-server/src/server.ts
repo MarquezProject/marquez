@@ -49,11 +49,11 @@ router.use(cors(corsOptions));
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('https://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('http://localhost:3000');
+    return res.redirect('https://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
 router.get('/whoami', (req, res, next) => {

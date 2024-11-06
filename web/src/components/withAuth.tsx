@@ -11,7 +11,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
       logging.info('Initiating SAML check.', 'SAML');
       axios({
         method: 'GET',
-        url: 'http://localhost:1337/whoami',
+        url: 'http://a2c309e8def534afa843c0d5bc61f788-fd91484ebb3b3116.elb.us-west-2.amazonaws.com/whoami',
         withCredentials: true,
       })
         .then((response) => {
@@ -31,7 +31,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
     }, []);
 
     const RedirectToLogin = () => {
-      window.location.replace('http://localhost:1337/login');
+      window.location.replace('http://a2c309e8def534afa843c0d5bc61f788-fd91484ebb3b3116.elb.us-west-2.amazonaws.com/login');
     };
 
     if (loading) return <p>Loading ...</p>;
