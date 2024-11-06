@@ -90,13 +90,52 @@ const Events: React.FC<EventsProps> = ({
   })
 
   const handlePageSizeChange = (newPageSize: number) => {
+    // Recalcula o offset atual com base na página atual e no pageSize antigo
+    const currentOffset = currentPage * pageSize
+
+    // Calcula a nova página de acordo com o offset e o novo pageSize
+    const newCurrentPage = Math.floor(currentOffset / newPageSize)
+
     setPageSize(newPageSize)
-    setCurrentPage(0)
+    setCurrentPage(newCurrentPage)
+
+    // Atualiza o searchParams com o novo pageSize e página recalculada
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: newCurrentPage.toString(),
+    })
 
     const dateFromISO = new Date(state.dateFrom).toISOString()
     const dateToISO = new Date(state.dateTo).toISOString()
 
-    fetchEvents(dateFromISO, dateToISO, newPageSize, currentPage)
+    fetchEvents(dateFromISO, dateToISO, newPageSize, newCurrentPage * newPageSize)
+  }
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
+
+    // Impede que a página fique negativa
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+
+    // Atualize o searchParams para refletir a nova página
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: directionPage.toString(),
+    })
+
+    fetchEvents(
+      formatDateAPIQuery(state.dateFrom),
+      formatDateAPIQuery(state.dateTo),
+      pageSize,
+      directionPage * pageSize
+    )
+
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
   }
 
   const mounted = useRef<boolean>(false)
@@ -155,20 +194,6 @@ const Events: React.FC<EventsProps> = ({
     } as any)
   }
 
-  const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
-
-    fetchEvents(
-      formatDateAPIQuery(state.dateFrom),
-      formatDateAPIQuery(state.dateTo),
-      pageSize,
-      directionPage * pageSize
-    )
-    // reset page scroll
-    window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage, rowExpanded: null })
-  }
-
   const handleDownloadPayload = (data: Event) => {
     const title = `${data.job.name}-${data.eventType}-${data.run.runId}`
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
@@ -176,11 +201,15 @@ const Events: React.FC<EventsProps> = ({
   }
 
   const refresh = () => {
-    // const dateFrom =
-    //   searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
-    // const dateTo =
-    //   searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(state.dateFrom, state.dateTo, pageSize, state.page * pageSize)
+    const dateFrom =
+      searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
+    const dateTo =
+      searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
+
+    // Pega a página atual dos parâmetros ou usa o estado local.
+    const page = parseInt(searchParams.get('page') || '0', 10)
+
+    fetchEvents(dateFrom, dateTo, pageSize, page * pageSize)
   }
 
   const i18next = require('i18next')
@@ -378,7 +407,7 @@ const Events: React.FC<EventsProps> = ({
               >
                 <MqPaging
                   pageSize={pageSize}
-                  currentPage={state.page}
+                  currentPage={currentPage}
                   totalCount={totalCount}
                   incrementPage={() => handleClickPage('next')}
                   decrementPage={() => handleClickPage('prev')}
