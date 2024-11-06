@@ -29,6 +29,7 @@ import {
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { truncateText } from '../../helpers/text'
+import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
@@ -79,6 +80,7 @@ const Datasets: React.FC<DatasetsProps> = ({
   const [state, setState] = React.useState<DatasetsState>(defaultState)
   const [pageSize, setPageSize] = useState(20)
   const [currentPage, setCurrentPage] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const theme = createTheme(useTheme())
 
@@ -96,10 +98,20 @@ const Datasets: React.FC<DatasetsProps> = ({
   }, [])
 
   const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
+
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: directionPage.toString(),
+    })
 
     fetchDatasets(selectedNamespace || '', pageSize, directionPage * pageSize)
-    // reset page scroll
+
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
   }
@@ -276,7 +288,7 @@ const Datasets: React.FC<DatasetsProps> = ({
               >
                 <MqPaging
                   pageSize={pageSize}
-                  currentPage={state.page}
+                  currentPage={currentPage}
                   totalCount={totalCount}
                   incrementPage={() => handleClickPage('next')}
                   decrementPage={() => handleClickPage('prev')}

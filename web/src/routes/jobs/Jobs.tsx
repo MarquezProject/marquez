@@ -25,6 +25,7 @@ import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import { truncateText } from '../../helpers/text'
+import { useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
@@ -73,6 +74,41 @@ const Jobs: React.FC<JobsProps> = ({
   const [state, setState] = React.useState<JobsState>(defaultState)
   const [pageSize, setPageSize] = useState(20)
   const [currentPage, setCurrentPage] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    const currentOffset = currentPage * pageSize
+    const newCurrentPage = Math.floor(currentOffset / newPageSize)
+
+    setPageSize(newPageSize)
+    setCurrentPage(newCurrentPage)
+
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: newCurrentPage.toString(),
+    })
+
+    fetchJobs(selectedNamespace, newPageSize, newCurrentPage * newPageSize)
+  }
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
+
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: directionPage.toString(),
+    })
+
+    fetchJobs(selectedNamespace, pageSize, directionPage * pageSize)
+
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
+  }
 
   React.useEffect(() => {
     if (selectedNamespace) {
@@ -82,26 +118,9 @@ const Jobs: React.FC<JobsProps> = ({
 
   React.useEffect(() => {
     return () => {
-      // on unmount
       resetJobs()
     }
   }, [])
-
-  const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
-
-    fetchJobs(selectedNamespace || '', pageSize, directionPage * pageSize)
-    // reset page scroll
-    window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage })
-  }
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(currentPage)
-
-    fetchJobs(selectedNamespace, newPageSize, currentPage)
-  }
 
   const i18next = require('i18next')
   return (
@@ -232,7 +251,7 @@ const Jobs: React.FC<JobsProps> = ({
               >
                 <MqPaging
                   pageSize={pageSize}
-                  currentPage={state.page}
+                  currentPage={currentPage}
                   totalCount={totalCount}
                   incrementPage={() => handleClickPage('next')}
                   decrementPage={() => handleClickPage('prev')}

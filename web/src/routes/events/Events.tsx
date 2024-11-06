@@ -90,16 +90,13 @@ const Events: React.FC<EventsProps> = ({
   })
 
   const handlePageSizeChange = (newPageSize: number) => {
-    // Recalcula o offset atual com base na página atual e no pageSize antigo
     const currentOffset = currentPage * pageSize
 
-    // Calcula a nova página de acordo com o offset e o novo pageSize
     const newCurrentPage = Math.floor(currentOffset / newPageSize)
 
     setPageSize(newPageSize)
     setCurrentPage(newCurrentPage)
 
-    // Atualiza o searchParams com o novo pageSize e página recalculada
     setSearchParams({
       ...Object.fromEntries(searchParams),
       page: newCurrentPage.toString(),
@@ -206,7 +203,6 @@ const Events: React.FC<EventsProps> = ({
     const dateTo =
       searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
 
-    // Pega a página atual dos parâmetros ou usa o estado local.
     const page = parseInt(searchParams.get('page') || '0', 10)
 
     fetchEvents(dateFrom, dateTo, pageSize, page * pageSize)
@@ -216,16 +212,7 @@ const Events: React.FC<EventsProps> = ({
   const theme = createTheme(useTheme())
 
   return (
-    <Container
-      maxWidth={'xl'}
-      disableGutters
-      sx={{
-        marginLeft: '0%',
-        '@media (min-width: 1900px)': {
-          maxWidth: '100%',
-        },
-      }}
-    >
+    <Container maxWidth={'xl'} disableGutters>
       <MqScreenLoad
         loading={!isEventsInit}
         customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
