@@ -27,11 +27,14 @@ passport.use(
             cert: fs.readFileSync(config.saml.cert, 'utf-8'),
             logoutUrl: 'https://nubank.okta.com',
         },
-        (expressUser: any, done: any) => {
+        (profile: any, done: any) => {
+            const expressUser = {
+                id: profile.nameID,
+                email: profile.email,
+            };
             if (!savedUsers.includes(expressUser)) {
                 savedUsers.push(expressUser);
             }
-
             return done(null, expressUser);
         }
     )

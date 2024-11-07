@@ -9,26 +9,14 @@ const config = {
         }
     },
     server: {
-        port: 1337,
-        ssl: {
-            key: './src/config/server.key',
-            cert: './src/config/server.crt'
-        },
+        port: 1337
     },
     session: {
         resave: false,
         secret: 'supersecretamazingpassword',
         saveUninitialized: true,
-        cookie: { secure: true }
+        cookie: { secure: false }
     }
-};
-
-export const corsOptions = {
-    origin: '*',
-    allowedOrigins: ('').split(','),
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-    credentials: 'true'
 };
 
 export default config;

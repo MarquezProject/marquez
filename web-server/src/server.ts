@@ -1,24 +1,15 @@
-import https from 'https';
-import fs from 'fs';
+import http from 'http';
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
-import cors from 'cors';
 
 const router = express();
+router.set('trust proxy', true);
 
-/** Server Handling */
-// Read SSL certificate and key
-const sslOptions = {
-    key: fs.readFileSync(config.server.ssl.key),
-    cert: fs.readFileSync(config.server.ssl.cert)
-};
-
-/** Create HTTPS server with SSL options */
-const httpsServer = https.createServer(sslOptions, router);
+const httpServer = http.createServer(router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -31,36 +22,20 @@ router.use((req, res, next) => {
     next();
 });
 
-/** Rules of our API */
-const corsOptions = {
-    allowedOrigins: ['*'],
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-        if (corsOptions.allowedOrigins.indexOf('*') !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-};
-
 /** Parse the body of the request / Passport */
 router.use(session(config.session));
 router.use(passport.initialize());
 router.use(passport.session());
 router.use(express.urlencoded({ extended: false }));
 router.use(express.json()); 
-router.use(cors(corsOptions));
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('https://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
+    return res.redirect('http://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
-    return res.redirect('https://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
+    return res.redirect('http://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
 router.get('/whoami', (req, res, next) => {
@@ -94,11 +69,11 @@ router.use((req, res, next) => {
 
 /** Handle Graceful Shutdown */
 process.on('SIGTERM', () => {
-    logging.info('SIGTERM signal received: closing HTTPS server');
-    httpsServer.close(() => {
-        logging.info('HTTPS server closed');
+    logging.info('SIGTERM signal received: closing http server');
+    httpServer.close(() => {
+        logging.info('http server closed');
         process.exit(0);
     });
 });
 
-httpsServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port} with HTTPS`));
+httpServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port} with http`));
