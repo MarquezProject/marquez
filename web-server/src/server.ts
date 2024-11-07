@@ -17,8 +17,8 @@ const sslOptions = {
     cert: fs.readFileSync(config.server.ssl.cert)
 };
 
-/** Server Handling */
-const httpsServer = https.createServer(router);
+/** Create HTTPS server with SSL options */
+const httpsServer = https.createServer(sslOptions, router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -30,13 +30,6 @@ router.use((req, res, next) => {
 
     next();
 });
-
-/** Parse the body of the request / Passport */
-router.use(session(config.session));
-router.use(passport.initialize());
-router.use(passport.session());
-router.use(express.urlencoded({ extended: false }));
-router.use(express.json()); 
 
 /** Rules of our API */
 const corsOptions = {
@@ -53,6 +46,12 @@ const corsOptions = {
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
 };
 
+/** Parse the body of the request / Passport */
+router.use(session(config.session));
+router.use(passport.initialize());
+router.use(passport.session());
+router.use(express.urlencoded({ extended: false }));
+router.use(express.json()); 
 router.use(cors(corsOptions));
 
 /** Passport & SAML Routes */
