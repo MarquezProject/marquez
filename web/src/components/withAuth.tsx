@@ -18,6 +18,7 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
           logging.info(response.data.user, 'SAML');
           
           if (response.data.user.nameID) {
+            logging.info(`Authenticated user: ${response.data.user.nameId}`, 'SAML');
             setAuthenticated(true);
             setLoading(false);
           } else {
@@ -26,16 +27,19 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
         })
         .catch((error) => {
           logging.error(error, 'SAML');
-          RedirectToLogin();
+          setError('Authentication failed. Redirecting to login...');
+          setTimeout(RedirectToLogin, 3000); // Redireciona após 3 segundos
         });
     }, []);
 
+    const [error, setError] = useState<string | null>(null);
+    
     const RedirectToLogin = () => {
       window.location.replace('http://a2c309e8def534afa843c0d5bc61f788-fd91484ebb3b3116.elb.us-west-2.amazonaws.com/login');
     };
 
     if (loading) return <p>Loading from Marquez withAuth class...</p>;
-
+    if (error) return <p>{error}</p>;
     if (!authenticated) 
       return null;
 
@@ -46,3 +50,4 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
 };
 
 export default withAuth;
+

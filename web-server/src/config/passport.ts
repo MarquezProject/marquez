@@ -4,17 +4,17 @@ import { Strategy } from 'passport-saml';
 import config from './config';
 import logging from './logging';
 
-const savedUsers: Express.User[] = [];
+// Utilizar um Set para armazenar e-mails dos usuários
+const savedUsers: Set<string> = new Set();
 
-passport.serializeUser<Express.User>((expressUser, done) => {
-    logging.info(expressUser, 'Serialize User');
-    done(null, expressUser);
+passport.serializeUser<string>((userEmail, done) => {
+    logging.info(userEmail, 'Serialize User');
+    done(null);
 });
 
-passport.deserializeUser<Express.User>((expressUser, done) => {
-    logging.info(expressUser, 'Deserialize User');
-
-    done(null, expressUser);
+passport.deserializeUser<string>((userEmail, done) => {
+    logging.info(userEmail, 'Deserialize User');
+    done(null, userEmail);
 });
 
 passport.use(
@@ -26,17 +26,21 @@ passport.use(
             entryPoint: config.saml.entryPoint,
             cert: fs.readFileSync(config.saml.cert, 'utf-8'),
             logoutUrl: 'https://nubank.okta.com',
-            acceptedClockSkewMs: 11100000
+            acceptedClockSkewMs: 11100000 // 3 horas e 5 minutos
         },
         (profile: any, done: any) => {
-            const expressUser = {
-                id: profile.nameID,
-                email: profile.email,
-            };
-            if (!savedUsers.includes(expressUser)) {
-                savedUsers.push(expressUser);
+            try {
+                const userEmail: string = profile.email;
+
+                if (!savedUsers.has(userEmail)) {
+                    savedUsers.add(userEmail);
+                }
+
+                return done(null, userEmail);
+            } catch (error) {
+                logging.error(error, 'SAML Strategy Error');
+                return done(error, null);
             }
-            return done(null, expressUser);
         }
     )
 );

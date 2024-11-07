@@ -15,7 +15,11 @@ const config = {
         resave: false,
         secret: 'supersecretamazingpassword',
         saveUninitialized: true,
-        cookie: { secure: false }
+        cookie: { 
+            secure: false,
+            httpOnly: true,
+            sameSite: 'lax' 
+        }
     }
 };
 

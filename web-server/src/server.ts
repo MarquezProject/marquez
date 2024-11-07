@@ -5,7 +5,6 @@ import passport from 'passport';
 import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
-import { log } from 'console';
 
 const router = express();
 router.set('trust proxy', true);
@@ -24,7 +23,13 @@ router.use((req, res, next) => {
 });
 
 /** Parse the body of the request / Passport */
-router.use(session(config.session));
+router.use(session({
+    ...config.session,
+    cookie: {
+        ...config.session.cookie,
+        sameSite: 'lax' // or 'strict', 'none', or a boolean value
+    }
+}));
 router.use(passport.initialize());
 router.use(passport.session());
 router.use(express.urlencoded({ extended: false }));
