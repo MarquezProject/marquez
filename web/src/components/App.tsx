@@ -10,7 +10,6 @@ import { Route, Routes } from 'react-router-dom';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from '@redux-devtools/extension';
-import { configureStore } from '@reduxjs/toolkit';
 import { createBrowserHistory } from 'history';
 import { theme } from '../helpers/theme';
 import ColumnLevel from '../routes/column-level/ColumnLevel';
@@ -25,8 +24,8 @@ import Toast from './Toast';
 import createRootReducer from '../store/reducers';
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from '../store/sagas';
-import withAuth from './withAuth';
-import ErrorBoundary from './ErrorBoundary'; // Import the Error Boundary
+import ErrorBoundary from './ErrorBoundary'; 
+import { UserProvider } from '../context/UserContext';
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -56,25 +55,27 @@ const App = (): ReactElement => {
                   <title>{TITLE}</title>
                 </Helmet>
                 <CssBaseline />
-                <Box ml={'80px'}>
-                  <Sidenav />
-                  <Container maxWidth={'lg'} disableGutters={true}>
-                    <Header />
-                  </Container>
-                  <Routes>
-                    <Route path={'/'} element={<Dashboard />} />
-                    <Route path={'/jobs'} element={<Jobs />} />
-                    <Route path={'/datasets'} element={<Datasets />} />
-                    <Route path={'/events'} element={<Events />} />
-                    <Route
-                      path={'/datasets/column-level/:namespace/:name'}
-                      element={<ColumnLevel />}
-                    />
-                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
-                    <Route path='*' element={<NotFound />} />
-                  </Routes>
-                  <Toast />
-                </Box>
+                <UserProvider>
+                  <Box ml={'80px'}>
+                    <Sidenav />
+                    <Container maxWidth={'lg'} disableGutters={true}>
+                      <Header />
+                    </Container>
+                    <Routes>
+                      <Route path={'/'} element={<Dashboard />} />
+                      <Route path={'/jobs'} element={<Jobs />} />
+                      <Route path={'/datasets'} element={<Datasets />} />
+                      <Route path={'/events'} element={<Events />} />
+                      <Route
+                        path={'/datasets/column-level/:namespace/:name'}
+                        element={<ColumnLevel />}
+                      />
+                      <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
+                      <Route path='*' element={<NotFound />} />
+                    </Routes>
+                    <Toast />
+                  </Box>
+                </UserProvider>
               </LocalizationProvider>
             </ThemeProvider>
           </StyledEngineProvider>
@@ -84,11 +85,9 @@ const App = (): ReactElement => {
   );
 };
 
-const WrappedApp = withAuth(App);
-
 export default () => (
   <ErrorBoundary>
-    <WrappedApp />
+    <App />
   </ErrorBoundary>
 );
 
