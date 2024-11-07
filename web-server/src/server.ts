@@ -1,4 +1,5 @@
-import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -10,7 +11,14 @@ import cors from 'cors';
 const router = express();
 
 /** Server Handling */
-const httpServer = http.createServer(router);
+// Read SSL certificate and key
+const sslOptions = {
+    key: fs.readFileSync(config.server.ssl.key),
+    cert: fs.readFileSync(config.server.ssl.cert)
+};
+
+/** Server Handling */
+const httpsServer = https.createServer(router);
 
 /** Log the request */
 router.use((req, res, next) => {
@@ -73,7 +81,7 @@ router.get('/whoami', (req, res, next) => {
 
 /** Health Check */
 router.get('/healthcheck', (req, res, next) => {
-    return res.status(200).json({ messgae: 'Server is running!' });
+    return res.status(200).json({ messgae: 'Server is up and running!' });
 });
 
 /** Error handling */
@@ -85,4 +93,4 @@ router.use((req, res, next) => {
     });
 });
 
-httpServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port}`));
+httpsServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port} with HTTPS`));

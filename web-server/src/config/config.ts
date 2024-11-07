@@ -9,13 +9,17 @@ const config = {
         }
     },
     server: {
-        port: 1337
+        port: 1337,
+        ssl: {
+            key: './src/config/server.key',
+            cert: './src/config/server.crt'
+        },
     },
     session: {
         resave: false,
         secret: 'supersecretamazingpassword',
         saveUninitialized: true,
-        cookie: { secure: false }
+        cookie: { secure: true }
     }
 };
 

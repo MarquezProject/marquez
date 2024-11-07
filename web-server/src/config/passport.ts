@@ -21,10 +21,11 @@ passport.use(
     new Strategy(
         {
             issuer: config.saml.issuer,
-            protocol: 'http://',
+            protocol: 'https://',
             path: '/login/callback',
             entryPoint: config.saml.entryPoint,
-            cert: fs.readFileSync(config.saml.cert, 'utf-8')
+            cert: fs.readFileSync(config.saml.cert, 'utf-8'),
+            logoutUrl: 'https://nubank.okta.com',
         },
         (expressUser: any, done: any) => {
             if (!savedUsers.includes(expressUser)) {
