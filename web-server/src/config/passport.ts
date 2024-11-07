@@ -26,6 +26,7 @@ passport.use(
             entryPoint: config.saml.entryPoint,
             cert: fs.readFileSync(config.saml.cert, 'utf-8'),
             logoutUrl: 'https://nubank.okta.com',
+            acceptedClockSkewMs: 11100000
         },
         (profile: any, done: any) => {
             const expressUser = {

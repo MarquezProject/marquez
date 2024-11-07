@@ -5,6 +5,7 @@ import passport from 'passport';
 import logging from './config/logging';
 import config from './config/config';
 import './config/passport';
+import { log } from 'console';
 
 const router = express();
 router.set('trust proxy', true);
@@ -31,10 +32,12 @@ router.use(express.json());
 
 /** Passport & SAML Routes */
 router.get('/login', passport.authenticate('saml', config.saml.options), (req, res, next) => {
+    logging.info('Trying to redirect to login');
     return res.redirect('http://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
 router.post('/login/callback', passport.authenticate('saml', config.saml.options), (req, res, next) => {
+    logging.info('Trying to redirect to Marquez UI');
     return res.redirect('http://acec0e16141394e81af6a6eb748d23e7-b55d2dceb7142392.elb.us-west-2.amazonaws.com');
 });
 
