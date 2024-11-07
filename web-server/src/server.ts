@@ -92,4 +92,13 @@ router.use((req, res, next) => {
     });
 });
 
+/** Handle Graceful Shutdown */
+process.on('SIGTERM', () => {
+    logging.info('SIGTERM signal received: closing HTTPS server');
+    httpsServer.close(() => {
+        logging.info('HTTPS server closed');
+        process.exit(0);
+    });
+});
+
 httpsServer.listen(config.server.port, () => logging.info(`Server is running on port ${config.server.port} with HTTPS`));
