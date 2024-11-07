@@ -29,7 +29,6 @@ import {
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { truncateText } from '../../helpers/text'
-import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
@@ -80,7 +79,6 @@ const Datasets: React.FC<DatasetsProps> = ({
   const [state, setState] = React.useState<DatasetsState>(defaultState)
   const [pageSize, setPageSize] = useState(20)
   const [currentPage, setCurrentPage] = useState(0)
-  const [searchParams, setSearchParams] = useSearchParams()
 
   const theme = createTheme(useTheme())
 
@@ -97,30 +95,28 @@ const Datasets: React.FC<DatasetsProps> = ({
     }
   }, [])
 
+  const handlePageSizeChange = (newPageSize: number) => {
+    const newCurrentPage = Math.floor((currentPage * pageSize) / newPageSize)
+    setPageSize(newPageSize)
+    setCurrentPage(newCurrentPage)
+
+    fetchDatasets(selectedNamespace || '', newPageSize, newCurrentPage * newPageSize)
+  }
+
   const handleClickPage = (direction: 'prev' | 'next') => {
     let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
 
+    // Impede que a página fique negativa
     if (directionPage < 0) {
       directionPage = 0
     }
 
     setCurrentPage(directionPage)
-    setSearchParams({
-      ...Object.fromEntries(searchParams),
-      page: directionPage.toString(),
-    })
 
     fetchDatasets(selectedNamespace || '', pageSize, directionPage * pageSize)
-
+    // reset page scroll
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
-  }
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    setPageSize(newPageSize)
-    setCurrentPage(currentPage)
-
-    fetchDatasets(selectedNamespace || '', newPageSize, currentPage)
   }
 
   const i18next = require('i18next')
