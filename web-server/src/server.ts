@@ -80,7 +80,7 @@ router.get('/whoami', (req, res, next) => {
 
 /** Health Check */
 router.get('/healthcheck', (req, res, next) => {
-    return res.status(200).json({ messgae: 'Server is up and running!' });
+    return res.status(200).json({ message: 'Server is up and running!' });
 });
 
 /** Error handling */
