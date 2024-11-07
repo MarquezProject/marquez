@@ -34,10 +34,10 @@ const withAuth = (WrappedComponent: React.ComponentType) => {
       window.location.replace('http://a2c309e8def534afa843c0d5bc61f788-fd91484ebb3b3116.elb.us-west-2.amazonaws.com/login');
     };
 
-    if (loading) return <p>Loading ...</p>;
+    if (loading) return <p>Loading from Marquez withAuth class...</p>;
 
     if (!authenticated) 
-      return <h1>You are not authenticated!</h1>;
+      return null;
 
     return <WrappedComponent {...props} />;
   };
