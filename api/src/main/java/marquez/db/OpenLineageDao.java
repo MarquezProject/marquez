@@ -815,6 +815,9 @@ public interface OpenLineageDao extends BaseDao {
   }
 
   default String getUrlOrNull(String uri) {
+    if (uri == null) {
+      return "";
+    }
     try {
       return new URI(uri).toASCIIString();
     } catch (URISyntaxException e) {
