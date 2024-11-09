@@ -43,12 +43,12 @@ app.get('/whoami', (req, res) => {
 });
 
 /** Health Check */
-app.get('/healthcheck', (req, res) => {
+app.get('/proxy/healthcheck/', (req, res) => {
     return res.status(200).json({ message: 'Server is up and running!' });
 });
 
 /** Additional API Routes */
-app.get('/api/data', (req, res) => {
+app.get('/proxy/', (req, res) => {
     if (!req.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -71,5 +71,5 @@ process.on('SIGTERM', () => {
     });
 });
 
-httpServer.listen(config.server.port, () => 
-    logging.info(`Server is running on port ${config.server.port} with http`));
+httpServer.listen(config.server.port, '0.0.0.0', () => 
+    logging.info(`Server is running on port ${config.server.port}`));

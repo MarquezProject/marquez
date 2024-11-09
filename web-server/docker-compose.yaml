@@ -15,7 +15,9 @@ services:
     tty: true
     depends_on:
       - api
-      
+    networks:
+      - app-network
+
 # marquez-web-server
   proxy:
     build:
@@ -25,6 +27,10 @@ services:
       - "1337:1337"
     environment:
       - SESSION_SECRET=your_secret_key
+    depends_on:
+      - web
+    networks:
+      - app-network
 
 # Postgres database for Marquez
   db:
@@ -40,6 +46,8 @@ services:
       - MARQUEZ_PASSWORD=marquez
     volumes:
       - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - app-network
 
 # Marquez as an OpenLineage Client
   api:
@@ -55,6 +63,8 @@ services:
     depends_on:
       - db
     entrypoint: [ "./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh" ]
+    networks:
+      - app-network
 
   # OAuth2 proxy
   oauth2-proxy:
@@ -63,7 +73,7 @@ services:
       dockerfile: Dockerfile
     container_name: oauth2-proxy
     # volumes:
-    #   - ./configs/oauth2_proxy.cfg:/etc/oauth2_proxy.cfg
+    #   - ./docker/oauth2-proxy/oauth2_proxy.cfg:/etc/oauth2_proxy.cfg
     ports:
       - "4180:4180"
     env_file:
@@ -90,6 +100,9 @@ services:
     #   - OAUTH2_PROXY_COOKIE_REFRESH=60m
     depends_on:
       - web
+      - proxy
+    networks:
+      - app-network
 
   nginx:
     build:
@@ -101,11 +114,17 @@ services:
       - "443:443"
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certs/certs/certs:/etc/nginx/certs:ro
+      - ./docker/nginx/certs/certs:/etc/nginx/certs:ro
       - ./docker/nginx/logs:/var/log/nginx
-    environment:
-      - BASIC_AUTH_USER=testuser
-      - BASIC_AUTH_PASSWORD=password
+    # environment:
+    #   - BASIC_AUTH_USER=testuser
+    #   - BASIC_AUTH_PASSWORD=password
     depends_on:
       - oauth2-proxy
       - web
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
