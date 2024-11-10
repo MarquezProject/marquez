@@ -153,9 +153,9 @@ public interface DatasetFacetsDao {
   default void insertInputDatasetFacetsFor(
       @NonNull UUID datasetUuid,
       @NonNull UUID datasetVersionUuid,
-      @NonNull UUID runUuid,
+      @Nullable UUID runUuid,
       @NonNull Instant lineageEventTime,
-      @NonNull String lineageEventType,
+      @Nullable String lineageEventType,
       @NonNull LineageEvent.InputDatasetFacets inputFacets) {
     final Instant now = Instant.now();
 
@@ -179,9 +179,9 @@ public interface DatasetFacetsDao {
   default void insertOutputDatasetFacetsFor(
       @NonNull UUID datasetUuid,
       @NonNull UUID datasetVersionUuid,
-      @NonNull UUID runUuid,
+      @Nullable UUID runUuid,
       @NonNull Instant lineageEventTime,
-      @NonNull String lineageEventType,
+      @Nullable String lineageEventType,
       @NonNull LineageEvent.OutputDatasetFacets outputFacets) {
     final Instant now = Instant.now();
 
