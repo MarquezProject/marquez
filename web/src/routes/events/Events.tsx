@@ -39,7 +39,8 @@ import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
-import React, { useEffect, useRef } from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useEffect, useRef, useState } from 'react'
 import moment from 'moment'
 
 interface StateProps {
@@ -66,7 +67,6 @@ type EventsProps = StateProps & DispatchProps
 
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
-const PAGE_SIZE = 50
 const EVENTS_HEADER_HEIGHT = 64
 
 const Events: React.FC<EventsProps> = ({
@@ -77,6 +77,8 @@ const Events: React.FC<EventsProps> = ({
   fetchEvents,
   resetEvents,
 }) => {
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(0)
   const [searchParams, setSearchParams] = useSearchParams()
   const [state, setState] = React.useState<EventsState>({
     page: 0,
@@ -87,12 +89,58 @@ const Events: React.FC<EventsProps> = ({
     dateTo: searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString()),
   })
 
+  const handlePageSizeChange = (newPageSize: number) => {
+    const currentOffset = currentPage * pageSize
+
+    const newCurrentPage = Math.floor(currentOffset / newPageSize)
+
+    setPageSize(newPageSize)
+    setCurrentPage(newCurrentPage)
+
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: newCurrentPage.toString(),
+    })
+
+    const dateFromISO = new Date(state.dateFrom).toISOString()
+    const dateToISO = new Date(state.dateTo).toISOString()
+
+    fetchEvents(dateFromISO, dateToISO, newPageSize, newCurrentPage * newPageSize)
+  }
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
+
+    // Impede que a página fique negativa
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+
+    // Atualize o searchParams para refletir a nova página
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: directionPage.toString(),
+    })
+
+    fetchEvents(
+      formatDateAPIQuery(state.dateFrom),
+      formatDateAPIQuery(state.dateTo),
+      pageSize,
+      directionPage * pageSize
+    )
+
+    window.scrollTo(0, 0)
+    setState({ ...state, page: directionPage })
+  }
+
   const mounted = useRef<boolean>(false)
 
   useEffect(() => {
     if (!mounted.current) {
       // on mount
-      fetchEvents(state.dateFrom, state.dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+      fetchEvents(state.dateFrom, state.dateTo, pageSize, state.page * pageSize)
       mounted.current = true
     } else {
       // on update
@@ -128,8 +176,8 @@ const Events: React.FC<EventsProps> = ({
     fetchEvents(
       formatDateAPIQuery(isDirectionFrom ? e.toDate() : state.dateFrom),
       formatDateAPIQuery(isDirectionFrom ? state.dateTo : e.toDate()),
-      PAGE_SIZE,
-      state.page * PAGE_SIZE
+      pageSize,
+      state.page * pageSize
     )
 
     const params: { [key: string]: string } = {}
@@ -143,20 +191,6 @@ const Events: React.FC<EventsProps> = ({
     } as any)
   }
 
-  const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
-
-    fetchEvents(
-      formatDateAPIQuery(state.dateFrom),
-      formatDateAPIQuery(state.dateTo),
-      PAGE_SIZE,
-      directionPage * PAGE_SIZE
-    )
-    // reset page scroll
-    window.scrollTo(0, 0)
-    setState({ ...state, page: directionPage, rowExpanded: null })
-  }
-
   const handleDownloadPayload = (data: Event) => {
     const title = `${data.job.name}-${data.eventType}-${data.run.runId}`
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
@@ -168,14 +202,17 @@ const Events: React.FC<EventsProps> = ({
       searchParams.get('dateFrom') || formatDateAPIQuery(moment().startOf('day').toString())
     const dateTo =
       searchParams.get('dateTo') || formatDateAPIQuery(moment().endOf('day').toString())
-    fetchEvents(dateFrom, dateTo, PAGE_SIZE, state.page * PAGE_SIZE)
+
+    const page = parseInt(searchParams.get('page') || '0', 10)
+
+    fetchEvents(dateFrom, dateTo, pageSize, page * pageSize)
   }
 
   const i18next = require('i18next')
   const theme = createTheme(useTheme())
 
   return (
-    <Container maxWidth={'lg'} disableGutters>
+    <Container maxWidth={'xl'} disableGutters>
       <MqScreenLoad
         loading={!isEventsInit}
         customHeight={`calc(100vh - ${HEADER_HEIGHT}px - ${EVENTS_HEADER_HEIGHT}px)`}
@@ -254,6 +291,8 @@ const Events: React.FC<EventsProps> = ({
               <Table
                 sx={{
                   marginBottom: theme.spacing(2),
+                  width: '100%',
+                  margin: '0 auto', // Centraliza a tabela
                 }}
                 size='small'
               >
@@ -306,18 +345,12 @@ const Events: React.FC<EventsProps> = ({
                               label={event.eventType}
                             />
                           </TableCell>
+                          <TableCell align='left'>{truncateText(event.job.name, 170)}</TableCell>
                           <TableCell align='left'>
-                            <MQTooltip title={event.job.name}>
-                              <Box display={'inline'}>{truncateText(event.job.name, 40)}</Box>
-                            </MQTooltip>
+                            <MqText> {truncateText(event.job.namespace, 96)}</MqText>
                           </TableCell>
                           <TableCell align='left'>
-                            <MQTooltip title={event.job.namespace}>
-                              <Box display={'inline'}>{truncateText(event.job.namespace, 40)}</Box>
-                            </MQTooltip>
-                          </TableCell>
-                          <TableCell align='left'>
-                            <MqText>{formatUpdatedAt(event.eventTime)}</MqText>
+                            <MqText zoomString>{formatUpdatedAt(event.eventTime)}</MqText>
                           </TableCell>
                         </TableRow>
                         {state.rowExpanded === key && (
@@ -352,13 +385,23 @@ const Events: React.FC<EventsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2 }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={currentPage}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>

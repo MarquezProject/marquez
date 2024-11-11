@@ -59,7 +59,7 @@ const App = (): ReactElement => {
                 <CssBaseline />
                 <Box ml={'80px'}>
                   <Sidenav />
-                  <Container maxWidth={'lg'} disableGutters={true}>
+                  <Container maxWidth={'xl'} disableGutters={true}>
                     <Header />
                   </Container>
                   <Routes>

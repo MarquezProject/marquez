@@ -25,6 +25,7 @@ import { fetchJobs, resetJobs } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { stopWatchDuration } from '../../helpers/time'
 import { truncateText } from '../../helpers/text'
+import { useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import IconButton from '@mui/material/IconButton'
@@ -34,7 +35,8 @@ import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
-import React from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useState } from 'react'
 
 interface StateProps {
   jobs: Job[]
@@ -55,7 +57,6 @@ interface DispatchProps {
 
 type JobsProps = StateProps & DispatchProps
 
-const PAGE_SIZE = 20
 const JOB_HEADER_HEIGHT = 64
 
 const Jobs: React.FC<JobsProps> = ({
@@ -71,32 +72,59 @@ const Jobs: React.FC<JobsProps> = ({
     page: 0,
   }
   const [state, setState] = React.useState<JobsState>(defaultState)
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  React.useEffect(() => {
-    if (selectedNamespace) {
-      fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
-    }
-  }, [selectedNamespace, state.page])
+  const handlePageSizeChange = (newPageSize: number) => {
+    const currentOffset = currentPage * pageSize
+    const newCurrentPage = Math.floor(currentOffset / newPageSize)
 
-  React.useEffect(() => {
-    return () => {
-      // on unmount
-      resetJobs()
-    }
-  }, [])
+    setPageSize(newPageSize)
+    setCurrentPage(newCurrentPage)
+
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: newCurrentPage.toString(),
+    })
+
+    fetchJobs(selectedNamespace, newPageSize, newCurrentPage * newPageSize)
+  }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
 
-    fetchJobs(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
-    // reset page scroll
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+    setSearchParams({
+      ...Object.fromEntries(searchParams),
+      page: directionPage.toString(),
+    })
+
+    fetchJobs(selectedNamespace, pageSize, directionPage * pageSize)
+
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
   }
 
+  React.useEffect(() => {
+    if (selectedNamespace) {
+      fetchJobs(selectedNamespace, pageSize, currentPage * pageSize)
+    }
+  }, [selectedNamespace, pageSize, currentPage])
+
+  React.useEffect(() => {
+    return () => {
+      resetJobs()
+    }
+  }, [])
+
   const i18next = require('i18next')
   return (
-    <Container maxWidth={'lg'} disableGutters>
+    <Container maxWidth={'xl'} disableGutters>
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('jobs_route.heading')}</MqText>
@@ -110,21 +138,23 @@ const Jobs: React.FC<JobsProps> = ({
             ></Chip>
           )}
         </Box>
-        <Box display={'flex'} alignItems={'center'}>
-          {isJobsLoading && <CircularProgress size={16} />}
-          <NamespaceSelect />
-          <MQTooltip title={'Refresh'}>
+        <Box display='flex' alignItems='center'>
+          <Box display='flex' alignItems='center' flexGrow={1}>
+            {isJobsLoading && <CircularProgress size={16} />}
+            <NamespaceSelect />
+          </Box>
+          <MQTooltip title='Refresh'>
             <IconButton
               sx={{ ml: 2 }}
-              color={'primary'}
-              size={'small'}
+              color='primary'
+              size='small'
               onClick={() => {
                 if (selectedNamespace) {
-                  fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                  fetchJobs(selectedNamespace, pageSize, state.page * pageSize)
                 }
               }}
             >
-              <Refresh fontSize={'small'} />
+              <Refresh fontSize='small' />
             </IconButton>
           </MQTooltip>
         </Box>
@@ -144,7 +174,7 @@ const Jobs: React.FC<JobsProps> = ({
                     size={'small'}
                     onClick={() => {
                       if (selectedNamespace) {
-                        fetchJobs(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+                        fetchJobs(selectedNamespace, pageSize, currentPage * pageSize)
                       }
                     }}
                   >
@@ -184,7 +214,7 @@ const Jobs: React.FC<JobsProps> = ({
                             link
                             linkTo={`/lineage/${encodeNode('JOB', job.namespace, job.name)}`}
                           >
-                            {truncateText(job.name, 40)}
+                            {truncateText(job.name, 170)}
                           </MqText>
                         </TableCell>
                         <TableCell align='left'>
@@ -213,13 +243,22 @@ const Jobs: React.FC<JobsProps> = ({
                   })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2 }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={currentPage}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>
