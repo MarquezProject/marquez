@@ -32,44 +32,10 @@ services:
     networks:
       - app-network
 
-# Postgres database for Marquez
-  db:
-    image: postgres:12.1
-    container_name: marquez-db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - MARQUEZ_DB=marquez
-      - MARQUEZ_USER=marquez
-      - MARQUEZ_PASSWORD=marquez
-    volumes:
-      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-    networks:
-      - app-network
-
-# Marquez as an OpenLineage Client
-  api:
-    image: marquezproject/marquez
-    container_name: marquez-api
-    ports:
-      - "5000:5000"
-      - "5001:5001"
-    volumes:
-      - ./docker/wait-for-it.sh:/usr/src/app/wait-for-it.sh
-    links:
-      - "db:postgres"
-    depends_on:
-      - db
-    entrypoint: [ "./wait-for-it.sh", "db:5432", "--", "./entrypoint.sh" ]
-    networks:
-      - app-network
-
   # OAuth2 proxy
   oauth2-proxy:
     build:
-      context: ./docker/oauth2-proxy
+      context: ./oauth2-proxy
       dockerfile: Dockerfile
     container_name: oauth2-proxy
     # volumes:
@@ -78,45 +44,24 @@ services:
       - "4180:4180"
     env_file:
       - .env
-    # environment:
-    #   - OAUTH2_PROXY_PROVIDER=oidc
-    #   - OAUTH2_PROXY_PROVIDER_DISPLAY_NAME=Okta
-    #   - OAUTH2_PROXY_SKIP_PROVIDER_BUTTON=true
-    #   - OAUTH2_PROXY_CLIENT_ID=0oa1zfdpg80bKlXcq0h8
-    #   - OAUTH2_PROXY_CLIENT_SECRET=60WPPh6lomAQhmDH4Rjksa5euuGBKXKco5GYIVZ3n9WHpkvg0WXmapLZNK7K-G5A
-    #   - OAUTH2_PROXY_COOKIE_SECRET=${OAUTH2_PROXY_COOKIE_SECRET}
-    #   - OAUTH2_PROXY_REDIRECT_URL=https://localhost/oauth2/callback
-    #   - OAUTH2_PROXY_OIDC_ISSUER_URL=https://nubank.okta.com/oauth2/default
-    #   - OAUTH2_PROXY_UPSTREAMS=http://web:3000/,http://proxy:1337/proxy/
-    #   - OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
-    #   - OAUTH2_PROXY_EMAIL_DOMAINS=*
-    #   - OAUTH2_PROXY_COOKIE_SECURE=true
-    #   - OAUTH2_PROXY_COOKIE_HTTPONLY=true
-    #   - OAUTH2_PROXY_COOKIE_SAMESITE=lax
-    #   - OAUTH2_PROXY_PASS_USER_HEADERS=true
-    #   - OAUTH2_PROXY_LOG_LEVEL=debug
-    #   - OAUTH2_PROXY_REVERSE_PROXY=true
-    #   - OAUTH2_PROXY_COOKIE_NAME=SESSION
-    #   - OAUTH2_PROXY_COOKIE_REFRESH=60m
     depends_on:
       - web
       - marquez-web-server
-      - redis
     networks:
       - app-network
 
   nginx-proxy:
     build:
-      context: ./docker/nginx
+      context: ./nginx
       dockerfile: Dockerfile
     container_name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/nginx/certs/certs:/etc/nginx/certs:ro
-      - ./docker/nginx/logs:/var/log/nginx
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs/certs:/etc/nginx/certs:ro
+      - ./nginx/logs:/var/log/nginx
     # environment:
     #   - BASIC_AUTH_USER=testuser
     #   - BASIC_AUTH_PASSWORD=password
@@ -126,22 +71,6 @@ services:
     networks:
       - app-network
 
-  # Redis for Session Storage
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - app-network
-    volumes:
-      - redis-data:/data
-    command: ["redis-server", "--appendonly", "yes"]
-
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  redis-data:
-    # driver: local

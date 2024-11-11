@@ -15,4 +15,4 @@ FROM quay.io/oauth2-proxy/oauth2-proxy:v7.2.0
 EXPOSE 4180
 
 # Start OAuth2 Proxy
-CMD ["oauth2-proxy", "/etc/oauth2_proxy.cfg"]
+CMD ["oauth2-proxy"]
