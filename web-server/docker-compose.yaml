@@ -19,7 +19,7 @@ services:
       - app-network
 
 # marquez-web-server
-  proxy:
+  marquez-web-server:
     build:
       dockerfile: ./Dockerfile
     container_name: marquez-web-server
@@ -100,12 +100,12 @@ services:
     #   - OAUTH2_PROXY_COOKIE_REFRESH=60m
     depends_on:
       - web
-      - proxy
+      - marquez-web-server
       - redis
     networks:
       - app-network
 
-  nginx:
+  nginx-proxy:
     build:
       context: ./docker/nginx
       dockerfile: Dockerfile
