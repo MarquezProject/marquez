@@ -101,6 +101,7 @@ services:
     depends_on:
       - web
       - proxy
+      - redis
     networks:
       - app-network
 
@@ -125,6 +126,22 @@ services:
     networks:
       - app-network
 
+  # Redis for Session Storage
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  redis-data:
+    # driver: local

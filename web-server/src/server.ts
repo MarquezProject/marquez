@@ -48,7 +48,7 @@ app.get('/proxy/healthcheck/', (req, res) => {
 });
 
 /** Additional API Routes */
-app.get('/proxy/', (req, res) => {
+app.get('/proxy', (req, res) => {
     if (!req.user) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
