@@ -39,7 +39,7 @@ export const ActionBar = ({
     if (!searchParams.has('isCompact')) {
       searchParams.set('isCompact', 'true')
       setSearchParams(searchParams)
-      setIsCompact(true) // Ativa o modo compacto
+      setIsCompact(true)
     }
   }, [])
 
