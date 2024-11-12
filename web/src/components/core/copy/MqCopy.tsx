@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Check } from '@mui/icons-material'
+import { Check } from '@mui/icons-material'
 import { Snackbar } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import IconButton from '@mui/material/IconButton'
@@ -14,6 +15,7 @@ interface MqCopyProps {
 
 const MqEmpty: React.FC<MqCopyProps> = ({ string }) => {
   const [open, setOpen] = React.useState(false)
+  const [hasCopied, setHasCopied] = React.useState(false)
   const [hasCopied, setHasCopied] = React.useState(false)
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
