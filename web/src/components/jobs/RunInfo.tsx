@@ -42,7 +42,6 @@ type RunInfoProps = {
 
 const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   const { run, jobFacets, fetchJobFacets, resetFacets } = props
-  const i18next = require('i18next')
 
   useEffect(() => {
     fetchJobFacets(run.id)
@@ -65,16 +64,20 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
           language={(jobFacets.sourceCode as SourceCodeFacet)?.language}
         />
       )}
+      {jobFacets && (
+        <Box mt={2}>
+          <Box mb={1}>
+            <MqText subheading>JOB FACETS</MqText>
+          </Box>
+          <MqJsonView data={jobFacets} aria-label={'Job facets'} aria-required='true' />
+        </Box>
+      )}
       {run.facets && (
         <Box mt={2}>
           <Box mb={1}>
-            <MqText subheading>{i18next.t('jobs.runinfo_subhead')}</MqText>
+            <MqText subheading>RUN FACETS</MqText>
           </Box>
-          <MqJsonView
-            data={run.facets}
-            aria-label={i18next.t('jobs.facets_subhead_aria')}
-            aria-required='true'
-          />
+          <MqJsonView data={run.facets} aria-label={'Run facets'} aria-required='true' />
         </Box>
       )}
     </Box>
