@@ -44,8 +44,6 @@ interface StateProps {
   lineageDataset: LineageDataset
   dataset: Dataset
   isDatasetLoading: boolean
-  initVersions: DatasetVersion[]
-  initVersionsLoading: boolean
   datasets: IState['datasets']
   display: IState['display']
   tabIndex: IState['lineage']['tabIndex']
@@ -117,7 +115,7 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     setTabIndex(newValue)
   }
 
-  if (!dataset || isDatasetLoading || (initVersionsLoading && initVersions.length === 0)) {
+  if (!dataset || isDatasetLoading) {
     return (
       <Box display={'flex'} justifyContent={'center'} mt={2}>
         <CircularProgress color='primary' />
@@ -125,11 +123,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
     )
   }
 
-  if (initVersions.length === 0) {
-    return null
-  }
-
-  const firstVersion = initVersions[0]
   const { name, tags, description } = dataset
   const facetsStatus = datasetFacetsStatus(dataset.facets)
   const assertions = datasetFacetsQualityAssertions(dataset.facets)
@@ -300,7 +293,6 @@ const DatasetDetailPage: FunctionComponent<IProps> = (props) => {
           dataset={dataset}
           datasetFields={dataset.fields}
           facets={dataset.facets}
-          run={firstVersion.createdByRun}
           showTags={showTags}
           isCurrentVersion
         />
