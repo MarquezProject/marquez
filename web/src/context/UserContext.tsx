@@ -33,7 +33,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     useEffect(() => {
       const fetchUser = async () => {
         try {
-          const response = await axios.get('/whoami'); // Ensure this endpoint is correctly set up in your backend
+          const response = await axios.get('/whoami'); 
           setUser(response.data.user);
         } catch (err) {
           console.error('Failed to fetch user:', err);
