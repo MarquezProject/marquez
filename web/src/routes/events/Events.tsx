@@ -67,6 +67,7 @@ type EventsProps = StateProps & DispatchProps
 const EVENTS_COLUMNS = ['ID', 'STATE', 'NAME', 'NAMESPACE', 'TIME']
 
 const PAGE_SIZE = 50
+const PAGE_SIZE = 50
 const EVENTS_HEADER_HEIGHT = 64
 
 const Events: React.FC<EventsProps> = ({
