@@ -34,6 +34,15 @@ export const ActionBar = ({
   const { namespace, name } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  React.useEffect(() => {
+    if (!searchParams.has('isCompact')) {
+      searchParams.set('isCompact', 'true')
+      setSearchParams(searchParams)
+      setIsCompact(true)
+    }
+  }, [])
+
   return (
     <Box
       sx={{
@@ -129,7 +138,7 @@ export const ActionBar = ({
             control={
               <Switch
                 size={'small'}
-                value={isCompact}
+                checked={isCompact}
                 defaultChecked={searchParams.get('isCompact') === 'true'}
                 onChange={(_, checked) => {
                   setIsCompact(checked)

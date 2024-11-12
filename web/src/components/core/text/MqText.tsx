@@ -12,6 +12,7 @@ import { useTheme } from '@emotion/react'
 import Link from '@mui/material/Link'
 
 interface OwnProps {
+  zoomString?: boolean
   heading?: boolean
   subheading?: boolean
   bold?: boolean
@@ -40,6 +41,7 @@ interface OwnProps {
 type MqTextProps = OwnProps
 
 const MqText: React.FC<MqTextProps> = ({
+  zoomString,
   heading,
   subheading,
   bold,
@@ -75,6 +77,12 @@ const MqText: React.FC<MqTextProps> = ({
       padding: 0,
       color: theme.palette.common.white,
       fontWeight: 400,
+    },
+    zoomString: {
+      '@media (min-width: 1900px)': {
+        // fontSize: '1.500rem',
+        lineHeight: '1.4',
+      },
     },
     inline: {
       display: 'inline',
@@ -142,6 +150,7 @@ const MqText: React.FC<MqTextProps> = ({
 
   const conditionalClasses = Object.assign(
     {},
+    zoomString ? classesObject.zoomString : {},
     subdued ? classesObject.subdued : {},
     bold ? classesObject.bold : {},
     label ? classesObject.label : {},
