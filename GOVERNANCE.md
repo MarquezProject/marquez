@@ -100,7 +100,7 @@ Or a meeting may be at an organization's offices that are required to maintain a
 
 ## Marquez on Slack
 
-Marquez uses [a Slack community](https://bit.ly/Marquez_Slack_invite) to provide an ongoing dialogue between members.
+Marquez uses [a Slack community](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A) to provide an ongoing dialogue between members.
 This creates a recorded discussion of design decisions and discussions that complement the project meetings.
 
 Follow the link above and register with the Slack service using your email address.

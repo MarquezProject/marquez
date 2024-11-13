@@ -34,7 +34,7 @@ function HomepageHeader() {
                     </Link>
                     <Link
                         className="button button--secondary button--md margin-left--md"
-                        href="https://bit.ly/Marquez_Slack_invite">
+                        href="https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A">
                         <img 
                             className={styles.btn_logos} 
                             src="img/slack.svg" 
