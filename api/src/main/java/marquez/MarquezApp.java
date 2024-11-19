@@ -150,7 +150,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     registerFilters(env, marquezContext);
 
     // Add scheduled jobs to lifecycle.
-    if (config.hasDbRetentionPolicy()) {
+    if (config.isDbRetentionEnabled()) {
       // Add job to apply retention policy to database.
       env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }

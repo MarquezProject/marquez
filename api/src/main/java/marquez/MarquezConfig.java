@@ -5,6 +5,7 @@
 
 package marquez;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import io.dropwizard.Configuration;
@@ -26,8 +27,9 @@ public class MarquezConfig extends Configuration {
   private static final boolean DEFAULT_MIGRATE_ON_STARTUP = true;
   private static final ImmutableSet<Tag> DEFAULT_TAGS = ImmutableSet.of();
 
-  @Getter private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
+  @Getter private boolean readOnly = false;
   @Getter private ImmutableSet<Tag> tags = DEFAULT_TAGS;
+  private boolean migrateOnStartup = DEFAULT_MIGRATE_ON_STARTUP;
 
   @Getter
   @JsonProperty("db")
@@ -58,8 +60,15 @@ public class MarquezConfig extends Configuration {
   @JsonProperty("exclude")
   private ExclusionsConfig exclude = new ExclusionsConfig();
 
-  /** Returns {@code true} if a data retention policy has been configured. */
-  public boolean hasDbRetentionPolicy() {
-    return (dbRetention != null);
+  /** Returns {@code true} if Flyway migrations are configured to run on startup and we're not read only. */
+  @JsonIgnore
+  public boolean isMigrateOnStartup() {
+    return migrateOnStartup && !readOnly;
+  }
+
+  /** Returns {@code true} if a data retention policy has been configured and we're not read only. */
+  @JsonIgnore
+  public boolean isDbRetentionEnabled() {
+    return (dbRetention != null) && !readOnly;
   }
 }
