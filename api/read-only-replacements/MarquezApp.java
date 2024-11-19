@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
 import marquez.api.filter.exclusions.Exclusions;
 import marquez.api.filter.exclusions.ExclusionsConfig;
-import marquez.cli.DbMigrationCommand;
+import marquez.cli.DbMigrateCommand;
 import marquez.cli.DbRetentionCommand;
 import marquez.cli.MetadataCommand;
 import marquez.cli.SeedCommand;
@@ -90,6 +90,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
     // Add CLI commands
+    bootstrap.addCommand(new DbMigrateCommand());
     bootstrap.addCommand(new DbRetentionCommand());
     bootstrap.addCommand(new MetadataCommand());
     bootstrap.addCommand(new SeedCommand());
@@ -200,12 +201,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
     for (final Object resource : context.getResources()) {
       env.jersey().register(resource);
     }
-  }
-
-  @Override
-  protected void addDefaultCommands(Bootstrap<MarquezConfig> bootstrap) {
-    bootstrap.addCommand(new DbMigrationCommand<>(this));
-    super.addDefaultCommands(bootstrap);
   }
 
   private void registerServlets(@NonNull Environment env) {
