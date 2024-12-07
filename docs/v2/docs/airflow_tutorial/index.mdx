@@ -1,5 +1,5 @@
 ---
-title: Airflow Tutorial
+title: Apache Airflow® Tutorial
 template: basepage
 sidebar_position: 2
 ---
@@ -10,7 +10,7 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 1. [Prerequisites](#prerequisites)
 2. [Get and start Marquez](#get-marquez)
-3. [Configure Airflow to send events to Marquez](#configure-airflow)
+3. [Configure Apache Airflow to send events to Marquez](#configure-airflow)
 4. [View Airflow operational analytics and data lineage in Marquez](#view-airflow)
 5. [Next steps](#next-steps)
 6. [Feedback](#feedback)
@@ -184,13 +184,25 @@ The DataOps view offers a high-level view of historical and in-process operation
 
 ![](marquez_dataops.png)
 
-In the Datasets view, you can click on a dataset to inspect a cross-platfrom-capable lineage graph. In this case, you can view the upstream tasks feeding the `airflowsample` table:
+### Datasets lineage graph
+
+In the Datasets view, you can click on a dataset to inspect a cross-platfrom-capable lineage graph. In this case, you can view the upstream tasks feeding the `airflowsample` table in Airflow: 
 
 ![](marquez_graph_wide.png)
+
+:::info
+
+Dependencies in other platforms that modify or consume the same dataset will also appear in the graph.
+
+:::
+
+### Dataset details
 
 Click on the dataset node for a more details, including the schema, the time of the most recent update, and any facets in the OpenLineage event payload: 
 
 ![](marquez_dataset_drawer.png)
+
+### Versioned schema history
 
 Click on the versions tab in the drawer for a versioned schema history:
 
