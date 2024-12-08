@@ -19,7 +19,7 @@ import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 Before you begin, make sure you have installed:
 
-<Tabs groupId="prereqs">
+<Tabs groupId="os">
 <TabItem value="macos" label="MacOS/Linux">
 
 * [Docker 17.05+](https://docs.docker.com/install)
@@ -43,7 +43,7 @@ Before you begin, make sure you have installed:
 
 To checkout the Marquez source code, run:
 
-<Tabs groupId="get">
+<Tabs groupId="os">
 <TabItem value="macos" label="MacOS/Linux">
 
 ```bash
@@ -63,7 +63,7 @@ $ git clone https://github.com/MarquezProject/marquez && cd marquez
 
 Both Airflow and Marquez require port 5432 for their metastores, but the Marquez services are easier to configure. You can also assign the database service to a new port on the fly. To start Marquez using port 2345 for the database, run:
 
-<Tabs groupId="start">
+<Tabs groupId="os">
 <TabItem value="macos" label="MacOS/Linux">
 
 ```bash
@@ -91,27 +91,79 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 
 1. To configure Airflow to emit OpenLineage events to Marquez, you need to define an OpenLineage transport. One way you can do this is by using an environment variable. To use `http` and send events to the Marquez API running locally on port `5000`, run:
 
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
+
 	```bash
 	$ export AIRFLOW__OPENLINEAGE__TRANSPORT='{"type": "http", "url": "http://localhost:5000", "endpoint": "api/v1/lineage"}'
 	```
 
+	</TabItem>
+	<TabItem value="windows" label="Windows">
+
+	```bash
+	$ set AIRFLOW__OPENLINEAGE__TRANSPORT='{"type": "http", "url": "http://localhost:5000", "endpoint": "api/v1/lineage"}'
+	```
+
+	</TabItem>
+	</Tabs>
+
 2. You also need to define a namespace for Airflow jobs. It can be any string. Run:
+
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
 
 	```bash
 	$ export AIRFLOW__OPENLINEAGE__NAMESPACE='my-team-airflow-instance'
 	```
 
+	</TabItem>
+	<TabItem value="windows" label="Windows">
+
+	```bash
+	$ set AIRFLOW__OPENLINEAGE__NAMESPACE='my-team-airflow-instance'
+	```
+
+	</TabItem>
+	</Tabs>
+
 3. To add the required Airflow OpenLineage Provider package to your Airflow environment, run:
+
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
 
 	```bash
 	$ pip install apache-airflow-providers-openlineage
 	```
 
+	</TabItem>
+	<TabItem value="windows" label="Windows">
+
+	```bash
+	$ pip install apache-airflow-providers-openlineage
+	```
+
+	</TabItem>
+	</Tabs>
+
 4. To enable adding a Postgres connection for this tutorial, run:
+
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
 
 	```bash
 	$ pip install apache-airflow-providers-postgres
 	```
+
+	</TabItem>
+	<TabItem value="windows" label="Windows">
+
+	```bash
+	$ pip install apache-airflow-providers-postgres
+	```
+
+	</TabItem>
+	</Tabs>
 
 5. Now add both packages to `requirements.txt`:
 
