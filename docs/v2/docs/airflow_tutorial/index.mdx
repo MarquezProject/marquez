@@ -237,7 +237,7 @@ The DataOps view offers a high-level view of historical and in-process operation
 
 ### Datasets lineage graph
 
-In the Datasets view, click on the dataset to get a cross-platfrom-capable lineage graph. In this case, you will be able to see the upstream tasks across the two DAGs in your environment that feed the `airflowsample` table in Airflow:
+In the Datasets view, click on the dataset to get a cross-platform-capable lineage graph. In this case, you will be able to see the upstream tasks across the two DAGs in your environment that feed the `airflowsample` table in Airflow:
 
 ![](brkn_graph.png)
 
@@ -249,9 +249,13 @@ Dependencies in other platforms that modify or consume the same dataset will als
 
 ### Leveraging the Marquez graph
 
-If data in the `airflowsample` table were to arrive late or become stale (imagine that), you would need to know about all the upstream dependencies in order to diagnose and resolve the issue efficiently.
+When data produced by multiple tools in your data ecosystem arrives late or becomes stale, root-cause analysis is much easier when you know:
+- what jobs and datasets are upstream.
+- what the run status of each upstream job is.
+- how each upstream job has performed recently.
+- whether quality issues have affected upstream datasets.
 
-In the graph, you can click on an upstream job node to see information including:
+In the Marquez lineage graph, you can click on an upstream job node to see information including:
 - the latest run status.
 - the last runtime.
 - the time last started.
@@ -273,4 +277,3 @@ Continue your journey with Marquez by consulting the following resources:
 ## Feedback? {#feedback}
 
 What did you think of this guide? You can reach out to us on [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A) and leave us feedback, or [open a pull request](https://github.com/MarquezProject/marquez/blob/main/CONTRIBUTING.md#submitting-a-pull-request) with your suggestions!
-
