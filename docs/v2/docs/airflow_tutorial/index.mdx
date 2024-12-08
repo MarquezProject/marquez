@@ -61,7 +61,7 @@ $ git clone https://github.com/MarquezProject/marquez && cd marquez
 </TabItem>
 </Tabs>
 
-Both Airflow and Marquez require port 5432 for their metastores, but the Marquez services are much easier to configure, even on the fly. So start Marquez with an alternate port:
+Both Airflow and Marquez require port 5432 for their metastores, but the Marquez services are easier to configure. You can also assign the database service to a new port on the fly. To start Marquez using port 2345 for the database, run:
 
 <Tabs groupId="start">
 <TabItem value="macos" label="MacOS/Linux">
@@ -82,42 +82,47 @@ $ sh ./docker/up.sh --db-port 2345
 </TabItem>
 </Tabs>
 
-To view the Marquez UI and verify it's running, open [http://localhost:3000](http://localhost:3000). The UI allow you to discover dependencies between jobs and the datasets they produce and consume via the lineage graph, view run-level metadata of current and previous job runs, and get a high-level view of current and historical operations.
+To view the Marquez UI and verify it's running, open [http://localhost:3000](http://localhost:3000). The UI allows you to: 
+- cross-platform dependencies, meaning you can see the jobs across the tools in your ecosystem that produce or consume a critical table.
+- view run-level metadata of current and previous job runs, enabling you to see the latest status of a job and the update history of a dataset.
+- get a high-level view of resource usage, allowing you to see trends in your operations.
 
 ## Configure Airflow to send events to Marquez {#configure-airflow}
 
-1. To configure Airflow to emit OpenLineage events to Marquez, you need to define an OpenLineage transport and namespace. This is easy to do using environment variables. Run:
+1. To configure Airflow to emit OpenLineage events to Marquez, you need to define an OpenLineage transport. One way you can do this is by using an environment variable. To use `http` and send events to the Marquez API running locally on port `5000`, run:
 
 	```bash
 	$ export AIRFLOW__OPENLINEAGE__TRANSPORT='{"type": "http", "url": "http://localhost:5000", "endpoint": "api/v1/lineage"}'
 	```
 
+2. You also need to define a namespace for Airflow jobs. It can be any string. Run:
+
 	```bash
 	$ export AIRFLOW__OPENLINEAGE__NAMESPACE='my-team-airflow-instance'
 	```
 
-2. To add the required Airflow OpenLineage Provider package to your Airflow environment, run:
+3. To add the required Airflow OpenLineage Provider package to your Airflow environment, run:
 
 	```bash
 	$ pip install apache-airflow-providers-openlineage
 	```
 
-3. To enable adding a Postgres connection for this tutorial, run:
+4. To enable adding a Postgres connection for this tutorial, run:
 
 	```bash
 	$ pip install apache-airflow-providers-postgres
 	```
 
-4. Now add both packages to `requirements.txt`:
+5. Now add both packages to `requirements.txt`:
 
 	```txt
 	apache-airflow-providers-openlineage
 	apache-airflow-providers-postgres
 	```
 
-5. Create a database in your local Postgres instance and create an Airflow Postgres connection. For help, see: #add URL
+6. Create a database in your local Postgres instance and create an Airflow Postgres connection. For help, see: #add URL
 
-6. Add a flaky DAG to Airflow that will _often_ create a table in the Postgres database:
+7. Add a flaky DAG to Airflow that will _often_ create a table in the Postgres database:
 
 	```py
 	from __future__ import annotations
@@ -128,13 +133,12 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 	from airflow.decorators import dag, task
 	from airflow.operators.empty import EmptyOperator
 	from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+	from airflow.datasets import Dataset
 
-	SQL_1="""CREATE TABLE IF NOT EXISTS airflowsample (
+	SQL="""CREATE TABLE IF NOT EXISTS airflowsample (
 	    col1 VARCHAR(255), 
 	    col2 VARCHAR(255)
 	)"""
-
-	SQL_2="""DROP TABLE airflowsample"""
 
 	@dag(
 	    schedule='@hourly',
@@ -144,75 +148,120 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 	    dag_display_name="Flaky DAG",
 	)
 
-	def flaky_dag():
+	def example_display_name_brkn():
 
 	    sample_task_1 = EmptyOperator(
 	        task_id="sample_task_1",
 	        task_display_name="Sample Task 1",
 	    )
 
-	    @task(
-	        task_display_name="Sample Task 2",
+	    sample_task_2 = SQLExecuteQueryOperator(
+	        task_id="sample_task_3",
+	        sql=SQL,
+	        conn_id="postgres_default",
 	    )
-	    def sample_task_2():
+
+	    @task(
+	        task_display_name="Sample Task 3",
+	        outlets=[Dataset("sample_pg_table")]
+	    )
+	    def sample_task_3():
 	        pers = [0, 60, 120, 'fail']
 	        per = random.choice(pers)
 	        time.sleep(per)
 
-	    sample_task_3 = SQLExecuteQueryOperator(
-	        task_id="sample_task_3",
+	    sample_task_1 >> sample_task_2 >> sample_task_3()
+
+	example_display_name_brkn()
+
+	```
+
+8. Add another DAG that updates (and then drops) the table the above DAG creates:
+
+	```py
+	from __future__ import annotations
+	import time
+	import random
+
+	import pendulum
+	from airflow.decorators import dag, task
+	from airflow.operators.empty import EmptyOperator
+	from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+	from airflow.datasets import Dataset
+
+	SQL_1="INSERT INTO airflowsample (col1) VALUES ('row')"
+
+	SQL_2="DROP TABLE airflowsample"
+
+	@dag(
+	    schedule=[Dataset("sample_pg_table")],
+	    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+	    catchup=False,
+	    tags=["example"],
+	)
+
+	def example_insert_brkn():
+
+	    sample_task_1 = EmptyOperator(
+	        task_id="sample_insert_task_1",
+	        task_display_name="Sample Task 1",
+	    )
+
+	    sample_task_2 = SQLExecuteQueryOperator(
+	        task_id="sample_insert_task_2",
 	        sql=SQL_1,
 	        conn_id="postgres_default",
 	    )
 
-	    sample_task_4 = SQLExecuteQueryOperator(
-	        task_id="sample_task_4",
+	    sample_task_3 = SQLExecuteQueryOperator(
+	        task_id="sample_insert_task_3",
 	        sql=SQL_2,
 	        conn_id="postgres_default",
 	    )
 
-	    sample_task_1 >> sample_task_2() >> sample_task_3 >> sample_task_4
+	    sample_task_1 >> sample_task_2 >> sample_task_3
 
-	flaky_dag()
+	example_insert_brkn()
+
 	```
 
-7. Run your DAG. To verify that the OpenLineage Provider is configured correctly, check the task logs for an `INFO`-level log reporting the transport type you defined: `OpenLineageClient will use http transport`.
+	This DAG is scheduled on the first one using an Airflow Dataset, so it will run automatically when `Flaky DAG` completes a run.
+
+8. Run your DAGs by triggering the `Flaky DAG`. To verify that the OpenLineage Provider is configured correctly, check the task logs for an `INFO`-level log reporting the transport type you defined. In this case, the log will say: `OpenLineageClient will use http transport`.
 
 ## View Airflow operational analytics and data lineage in Marquez {#view-airflow}
 
-The DataOps view offers a high-level view of historical and in-process operations, including task-level run status and runtime information at a glance:
+The DataOps view offers a high-level view of historical and in-process operations, including task-level run status and runtime information:
 
 ![](marquez_dataops.png)
 
 ### Datasets lineage graph
 
-In the Datasets view, you can click on a dataset to inspect a cross-platfrom-capable lineage graph. In this case, you can view the upstream tasks feeding the `airflowsample` table in Airflow: 
+In the Datasets view, click on the dataset to get a cross-platfrom-capable lineage graph. In this case, you will be able to see the upstream tasks across the two DAGs in your environment that feed the `airflowsample` table in Airflow:
 
-![](marquez_graph_wide.png)
+![](brkn_graph.png)
 
 :::info
 
-Dependencies in other platforms that modify or consume the same dataset will also appear in the graph.
+Dependencies in other platforms that modify or consume the same dataset will also appear in this graph.
 
 :::
 
-### Dataset details
+### Leveraging the Marquez graph
 
-Click on the dataset node for a more details, including the schema, the time of the most recent update, and any facets in the OpenLineage event payload: 
+If the `airflowsample` table were to get stale (imagine that), you would need to know about all the upstream dependencies in order to diagnose and resolve the issue efficiently.
 
-![](marquez_dataset_drawer.png)
+In the graph, you can click on an upstream job node to see information including:
+- the latest run status.
+- the last runtime.
+- the time last started.
+- the time last finished.
 
-### Versioned schema history
+![](brkn_detail_lrg.png)
 
-Click on the versions tab in the drawer for a versioned schema history:
+You can also access a versioned table schema history from the Marquez graph, so you can see at a glance if data quality in a critical table has become compromised and when a loss occurred:
 
 ![](marquez_dataset_versions.png)
-
-![](marquez_jobs_drawer.png)
-
-![](marquez_jobs_view.png)
-
-![](marquez_events.png)
 
 ## Next Steps {#next-steps}
 
