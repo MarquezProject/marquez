@@ -120,7 +120,7 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 	apache-airflow-providers-postgres
 	```
 
-6. Create a database in your local Postgres instance and create an Airflow Postgres connection. For help, see: #add URL
+6. Create a database in your local Postgres instance and create an Airflow Postgres connection using the default ID (`postgres_default`). For help with the former, see: [Postgres Documentation](https://www.postgresql.org/docs/). For help with the latter, see: [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#managing-connections).
 
 7. Add a flaky DAG to Airflow that will _often_ create a table in the Postgres database:
 
@@ -176,7 +176,7 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 
 	```
 
-8. Add another DAG that updates (and then drops) the table the above DAG creates:
+8. Add another DAG that updates (and then drops) the Postgres table:
 
 	```py
 	from __future__ import annotations
@@ -249,7 +249,7 @@ Dependencies in other platforms that modify or consume the same dataset will als
 
 ### Leveraging the Marquez graph
 
-If data in the `airflowsample` table were to arrive late (imagine that), you would need to know about all the upstream dependencies in order to diagnose and resolve the issue efficiently.
+If data in the `airflowsample` table were to arrive late or become stale (imagine that), you would need to know about all the upstream dependencies in order to diagnose and resolve the issue efficiently.
 
 In the graph, you can click on an upstream job node to see information including:
 - the latest run status.
