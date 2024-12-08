@@ -165,16 +165,9 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 	</TabItem>
 	</Tabs>
 
-5. Now add both packages to `requirements.txt`:
+5. Create a database in your local Postgres instance and create an Airflow Postgres connection using the default ID (`postgres_default`). For help with the former, see: [Postgres Documentation](https://www.postgresql.org/docs/). For help with the latter, see: [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#managing-connections).
 
-	```txt
-	apache-airflow-providers-openlineage
-	apache-airflow-providers-postgres
-	```
-
-6. Create a database in your local Postgres instance and create an Airflow Postgres connection using the default ID (`postgres_default`). For help with the former, see: [Postgres Documentation](https://www.postgresql.org/docs/). For help with the latter, see: [Managing Connections](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html#managing-connections).
-
-7. Add a flaky DAG to Airflow that will _often_ create a table in the Postgres database:
+6. Add a flaky DAG to Airflow that will _often_ create a table in the Postgres database:
 
 	```py
 	from __future__ import annotations
@@ -228,7 +221,7 @@ To view the Marquez UI and verify it's running, open [http://localhost:3000](htt
 
 	```
 
-8. Add another DAG that updates (and then drops) the Postgres table:
+7. Add another DAG that updates (and then drops) the Postgres table:
 
 	```py
 	from __future__ import annotations
