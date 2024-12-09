@@ -271,7 +271,7 @@ Before you begin, make sure you have installed:
 
 	```
 
-	This DAG is scheduled on the first one using an Airflow Dataset, so it will run automatically when `Flaky DAG` completes a run.
+	This DAG is scheduled on the dataset passed to the `sample_task_3` in the first DAG, so it will run automatically when that DAG completes a run.
 
 8. Run your DAGs by triggering the `Flaky DAG`. To verify that the OpenLineage Provider is configured correctly, check the task logs for an `INFO`-level log reporting the transport type you defined. In this case, the log will say: `OpenLineageClient will use http transport`.
 
