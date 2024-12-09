@@ -41,51 +41,52 @@ Before you begin, make sure you have installed:
 
 ## Get and start Marquez {#get-marquez}
 
-To checkout the Marquez source code, run:
+1. To checkout the Marquez source code, run:
 
-<Tabs groupId="os">
-<TabItem value="macos" label="MacOS/Linux">
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
 
-```bash
-$ git clone https://github.com/MarquezProject/marquez && cd marquez
-```
+	```bash
+	$ git clone https://github.com/MarquezProject/marquez && cd marquez
+	```
 
-</TabItem>
-<TabItem value="windows" label="Windows">
+	</TabItem>
+	<TabItem value="windows" label="Windows">
 
-```bash
-$ git config --global core.autocrlf false
-$ git clone https://github.com/MarquezProject/marquez && cd marquez
-```
+	```bash
+	$ git config --global core.autocrlf false
+	$ git clone https://github.com/MarquezProject/marquez && cd marquez
+	```
 
-</TabItem>
-</Tabs>
+	</TabItem>
+	</Tabs>
 
-Both Airflow and Marquez require port 5432 for their metastores, but the Marquez services are easier to configure. You can also assign the database service to a new port on the fly. To start Marquez using port 2345 for the database, run:
+2. Both Airflow and Marquez require port 5432 for their metastores, but the Marquez services are easier to configure. You can also assign the database service to a new port on the fly. To start Marquez using port 2345 for the database, run:
 
-<Tabs groupId="os">
-<TabItem value="macos" label="MacOS/Linux">
+	<Tabs groupId="os">
+	<TabItem value="macos" label="MacOS/Linux">
 
-```bash
-$ ./docker/up.sh --db-port 2345
-```
+	```bash
+	$ ./docker/up.sh --db-port 2345
+	```
 
-</TabItem>
-<TabItem value="windows" label="Windows">
+	</TabItem>
+	<TabItem value="windows" label="Windows">
 
-Verify that Postgres and Bash are in your `PATH`, then run:
+	Verify that Postgres and Bash are in your `PATH`, then run:
 
-```bash
-$ sh ./docker/up.sh --db-port 2345
-```
+	```bash
+	$ sh ./docker/up.sh --db-port 2345
+	```
 
-</TabItem>
-</Tabs>
+	</TabItem>
+	</Tabs>
 
-To view the Marquez UI and verify it's running, open [http://localhost:3000](http://localhost:3000). The UI allows you to: 
-- cross-platform dependencies, meaning you can see the jobs across the tools in your ecosystem that produce or consume a critical table.
-- view run-level metadata of current and previous job runs, enabling you to see the latest status of a job and the update history of a dataset.
-- get a high-level view of resource usage, allowing you to see trends in your operations.
+3. To view the Marquez UI and verify it's running, open [http://localhost:3000](http://localhost:3000). The UI allows you to: 
+
+	- view cross-platform dependencies, meaning you can see the jobs across the tools in your ecosystem that produce or consume a critical table.
+	- view run-level metadata of current and previous job runs, enabling you to see the latest status of a job and the update history of a dataset.
+	- get a high-level view of resource usage, allowing you to see trends in your operations.
 
 ## Configure Airflow to send events to Marquez {#configure-airflow}
 
