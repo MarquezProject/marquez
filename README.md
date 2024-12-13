@@ -32,6 +32,7 @@ Want to be added? Send a pull request our way!
 * [Datakin](https://datakin.com)
 * [Northwestern Mutual](https://www.northwesternmutual.com)
 * [Ilum](https://ilum.cloud)
+* [CsvPath](https://www.csvpath.org)
 
 ## Try it!
 
