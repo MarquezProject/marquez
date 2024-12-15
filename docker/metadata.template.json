@@ -78,7 +78,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -90,7 +91,8 @@
       "namespace": "food_delivery",
       "name": "etl_menus"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -167,7 +169,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -179,7 +182,8 @@
       "namespace": "food_delivery",
       "name": "etl_categories"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -261,7 +265,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -273,7 +278,8 @@
       "namespace": "food_delivery",
       "name": "etl_menu_items"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -360,7 +366,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -372,7 +379,8 @@
       "namespace": "food_delivery",
       "name": "etl_orders"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -566,7 +574,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -578,7 +587,8 @@
       "namespace": "food_delivery",
       "name": "etl_orders_7_days"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -675,7 +685,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -687,7 +698,8 @@
       "namespace": "food_delivery",
       "name": "etl_customers"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -784,7 +796,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -796,7 +809,8 @@
       "namespace": "food_delivery",
       "name": "etl_order_status"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -919,7 +933,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -931,7 +946,8 @@
       "namespace": "food_delivery",
       "name": "etl_drivers"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -1048,7 +1064,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -1060,7 +1077,8 @@
       "namespace": "food_delivery",
       "name": "etl_restaurants"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -1378,7 +1396,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -1390,7 +1409,8 @@
       "namespace": "food_delivery",
       "name": "etl_delivery_7_days"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -1651,7 +1671,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -1663,7 +1684,8 @@
       "namespace": "food_delivery",
       "name": "delivery_times_7_days"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -1772,7 +1794,8 @@
         }
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -1784,7 +1807,8 @@
       "namespace": "food_delivery",
       "name": "orders_popular_day_of_week"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "START",
@@ -1826,7 +1850,8 @@
         "name": "public.customers"
       }
     ],
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   },
   {
     "eventType": "COMPLETE",
@@ -1838,6 +1863,7 @@
       "namespace": "food_delivery",
       "name": "email_discounts"
     },
-    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json"
+    "producer": "https://github.com/MarquezProject/marquez/blob/main/docker/metadata.json",
+    "schemaURL": "https://openlineage.io/spec/1-0-5/OpenLineage.json#/definitions/RunEvent"
   }
 ]
