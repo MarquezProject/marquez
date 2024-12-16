@@ -2,6 +2,7 @@
 title: Apache Airflow® Tutorial
 template: basepage
 sidebar_position: 2
+description: Get started with Marquez and Airflow.
 ---
 
 import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
@@ -41,7 +42,7 @@ Before you begin, make sure you have installed:
 
 ## Get and start Marquez {#get-marquez}
 
-1. To checkout the Marquez source code, run:
+1. To check out the Marquez source code, run:
 
 	<Tabs groupId="os">
 	<TabItem value="macos" label="MacOS/Linux">
@@ -222,7 +223,7 @@ Before you begin, make sure you have installed:
 
 	```
 
-7. Add another DAG that updates (and then drops) the Postgres table:
+7. Add another DAG that updates and then drops the Postgres table:
 
 	```py
 	from __future__ import annotations
