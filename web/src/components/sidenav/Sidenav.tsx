@@ -138,6 +138,9 @@ const Sidenav: React.FC<SidenavProps> = () => {
               <MenuItem key={'pl'} value={'pl'}>
                 {'pl'}
               </MenuItem>
+              <MenuItem key={'zh'} value={'zh'}>
+                {'zh'}
+              </MenuItem>
             </Select>
           </Box>
         </FormControl>
