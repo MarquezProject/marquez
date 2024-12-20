@@ -20,8 +20,10 @@ import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
+import HelpCenterIcon from '@mui/icons-material/HelpCenter'
+import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
-import marquez_logo from './marquez-icon-white-solid.svg'
+import marquez_logo from './logoNu.svg'
 
 interface SidenavProps {}
 
@@ -73,7 +75,12 @@ const Sidenav: React.FC<SidenavProps> = () => {
             height={HEADER_HEIGHT}
           >
             <Link to='/'>
-              <img src={marquez_logo} height={40} alt='Marquez Logo' />
+              <img
+                src={marquez_logo}
+                height={60}
+                alt='Marquez Logo'
+                style={{ filter: 'invert(1)', marginTop: '10px' }}
+              />
             </Link>
           </Box>
           <Divider sx={{ my: 1 }} />
@@ -108,6 +115,29 @@ const Sidenav: React.FC<SidenavProps> = () => {
             active={location.pathname === '/events'}
           >
             <SVG src={iconSearchArrow} width={'20px'} />
+          </MqIconButton>
+        </Box>
+
+        <Box
+          sx={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        >
+          <MqIconButton
+            id={'documentationButton'}
+            to={'https://nubank.atlassian.net/wiki/spaces/data/pages/264019349541/Nu+Data+Lineage'}
+            title={i18next.t('sidenav.documentation')}
+            active={location.pathname === '/documentation'}
+          >
+            <HelpCenterIcon sx={{ fontSize: 20 }} />
+          </MqIconButton>
+          <MqIconButton
+            id={'supportButton'}
+            to={
+              'https://nubank.atlassian.net/servicedesk/customer/portal/49/group/1943/create/17910'
+            }
+            title={i18next.t('sidenav.support')}
+            active={location.pathname === '/support'}
+          >
+            <SupportAgentIcon sx={{ fontSize: 20 }} />
           </MqIconButton>
         </Box>
         <FormControl
