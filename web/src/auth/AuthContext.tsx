@@ -5,7 +5,7 @@ import { OktaAuth } from '@okta/okta-auth-js';
 export const oktaAuth = new OktaAuth({
   issuer: 'https://nubank.okta.com/oauth2/default',
   clientId: '0oa20d6n6jb6nG5Mn0h8',
-  redirectUri: 'http://localhost:3000/login/callback',
+  redirectUri: 'http://staging-marquez-web-ui.nubank.world/login/callback',
   scopes: ['openid', 'profile', 'email'],
   pkce: true,
   tokenManager: {
