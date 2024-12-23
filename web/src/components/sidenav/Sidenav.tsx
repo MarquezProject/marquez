@@ -23,7 +23,7 @@ import { Dashboard } from '@mui/icons-material'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
-import marquez_logo from './logoNu.svg'
+import nu_logo from './logoNu.svg'
 import { PrivateRoute } from '../PrivateRoute'
 
 interface SidenavProps {}
@@ -78,9 +78,9 @@ const Sidenav: React.FC<SidenavProps> = () => {
             >
               <Link to='/'>
                 <img
-                  src={marquez_logo}
+                  src={nu_logo}
                   height={60}
-                  alt='Marquez Logo'
+                  alt='Nu Logo'
                   style={{ filter: 'invert(1)', marginTop: '10px' }}
                 />
               </Link>

@@ -12,7 +12,7 @@ Marquez is an open source **metadata service** for the **collection**, **aggrega
 [![CircleCI](https://circleci.com/gh/MarquezProject/marquez/tree/main.svg?style=shield)](https://circleci.com/gh/MarquezProject/marquez/tree/main)
 [![codecov](https://codecov.io/gh/MarquezProject/marquez/branch/main/graph/badge.svg)](https://codecov.io/gh/MarquezProject/marquez/branch/main)
 [![status](https://img.shields.io/badge/status-active-brightgreen.svg)](#status)
-[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://bit.ly/Marquez_Slack_invite)
+[![Slack](https://img.shields.io/badge/slack-chat-blue.svg)](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A)
 [![license](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](https://raw.githubusercontent.com/MarquezProject/marquez/main/LICENSE)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![maven](https://img.shields.io/maven-central/v/io.github.marquezproject/marquez-api.svg)](https://search.maven.org/search?q=g:io.github.marquezproject)
@@ -32,6 +32,7 @@ Want to be added? Send a pull request our way!
 * [Datakin](https://datakin.com)
 * [Northwestern Mutual](https://www.northwesternmutual.com)
 * [Ilum](https://ilum.cloud)
+* [CsvPath](https://www.csvpath.org)
 
 ## Try it!
 
@@ -179,7 +180,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 
 * Website: https://marquezproject.ai
 * Source: https://github.com/MarquezProject/marquez
-* Chat: [MarquezProject Slack](https://bit.ly/Marquez_Slack_invite)
+* Chat: [MarquezProject Slack](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A)
 * X: [@MarquezProject](https://twitter.com/MarquezProject)
 
 ## Contributing

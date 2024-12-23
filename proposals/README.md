@@ -20,7 +20,7 @@ Once your proposal has been _`accepted`_, and has been associated with a milesto
 
 ## Questions?
 
-If you need help with the proposal process, please reach out to us on our [slack](https://bit.ly/Marquez_Slack_invite) channel.
+If you need help with the proposal process, please reach out to us on our [slack](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A) channel.
 
 ----
 SPDX-License-Identifier: Apache-2.0

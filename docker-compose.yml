@@ -6,6 +6,7 @@ services:
     environment:
       - MARQUEZ_PORT=${API_PORT}
       - MARQUEZ_ADMIN_PORT=${API_ADMIN_PORT}
+      - POSTGRES_HOST=db
       - SEARCH_ENABLED=${SEARCH_ENABLED}
     ports:
       - "${API_PORT}:${API_PORT}"

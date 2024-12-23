@@ -311,6 +311,11 @@ class OpenLineageDaoTest {
   }
 
   @Test
+  void testGetUrlOrNullReturnsEmptyString() {
+    assertEquals("", dao.getUrlOrNull(null));
+  }
+
+  @Test
   /**
    * When trying to insert new column level lineage data, do not create additional row if triad
    * (dataset_version_uuid, output_column_name and input_field) is the same. Upsert instead.

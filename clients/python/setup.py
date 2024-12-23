@@ -15,6 +15,7 @@ requirements = [
     "six",
     "pyrfc3339",
     "deprecation",
+    "pytz",
 ]
 
 extras_require = {
