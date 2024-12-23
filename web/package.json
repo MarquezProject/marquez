@@ -30,6 +30,7 @@
     "@mui/system": "^5.13.2",
     "@mui/x-charts": "^7.15.0",
     "@mui/x-date-pickers": "^6.5.0",
+    "@okta/okta-auth-js": "^7.9.0",
     "@types/jest": "^29.5.2",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-syntax-highlighter": "^15.5.6",
@@ -127,4 +128,3 @@
     "@types/react": "18.0.28"
   }
 }
-
