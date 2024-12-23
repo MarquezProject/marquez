@@ -1,16 +1,15 @@
+import * as Redux from 'redux'
 import { ChevronLeft } from '@mui/icons-material'
 import { Dataset, LineageGraph } from '../../types/api'
+import { Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
 import { PositionedNode } from '../../../libs/graph'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
 import { TableLineageDatasetNodeData } from './nodes'
-import { connect } from 'react-redux'
-
-import * as Redux from 'redux'
-import { Divider } from '@mui/material'
 import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
@@ -71,8 +70,8 @@ const TableLineageDatasetNode = ({
             <MqText block bold sx={{ mr: 6 }}>
               Namespace:
             </MqText>
-            <MqText block font={'mono'}>
-              {truncateTextFront(lineageDataset.namespace, 40)}
+            <MqText block font={'mono'} sx={{ wordBreak: 'break-all' }}>
+              {truncateTextFront(lineageDataset.namespace, 120)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -80,7 +79,7 @@ const TableLineageDatasetNode = ({
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateTextFront(lineageDataset.name, 40)}
+              {truncateTextFront(lineageDataset.name, 120)}
             </MqText>
           </Box>
           {lineageDataset.description && (
@@ -90,6 +89,16 @@ const TableLineageDatasetNode = ({
               </MqText>
               <MqText block font={'mono'}>
                 {lineageDataset.description}
+              </MqText>
+            </Box>
+          )}
+          {lineageDataset.createdAt && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Created At:
+              </MqText>
+              <MqText block font={'mono'}>
+                {formatUpdatedAt(lineageDataset.createdAt)}
               </MqText>
             </Box>
           )}

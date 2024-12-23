@@ -79,13 +79,13 @@ export const ActionBar = ({
         <Box>
           <MqText subdued>Namespace</MqText>
           <MqText font={'mono'}>
-            {namespace ? truncateText(namespace, 40) : 'Unknown namespace name'}
+            {namespace ? truncateText(namespace, 50) : 'Unknown namespace name'}
           </MqText>
         </Box>
         <Divider orientation='vertical' flexItem sx={{ mx: 2 }} />
         <Box>
           <MqText subdued>Name</MqText>
-          <MqText font={'mono'}>{name ? truncateText(name, 40) : 'Unknown dataset name'}</MqText>
+          <MqText font={'mono'}>{name ? truncateText(name, 190) : 'Unknown dataset name'}</MqText>
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
