@@ -1,7 +1,9 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+
+const { createProxyMiddleware } = require('http-proxy-middleware')
 
 const express = require('express')
 const router = express.Router()
+const path = require('path')
 
 const environmentVariable = (variableName) => {
   const value = process.env[variableName]
@@ -14,27 +16,39 @@ const environmentVariable = (variableName) => {
 }
 
 const apiOptions = {
-  target: `http://${(environmentVariable("MARQUEZ_HOST"))}:${environmentVariable("MARQUEZ_PORT")}/`
+  target: `http://${environmentVariable("MARQUEZ_HOST")}:${environmentVariable("MARQUEZ_PORT")}/`,
+  changeOrigin: true,
 }
+
 const app = express()
-const path = __dirname + '/dist'
+
+const distPath = path.join(__dirname, 'dist')
 
 const port = environmentVariable("WEB_PORT")
 
-app.use('/', express.static(path))
-app.use('/datasets', express.static(path))
-app.use('/events', express.static(path))
-app.use('/lineage/:type/:namespace/:name', express.static(path))
-app.use('/datasets/column-level/:namespace/:name', express.static(path))
-app.use(createProxyMiddleware('/api/v1', apiOptions))
-app.use(createProxyMiddleware('/api/v2beta', apiOptions))
+// Serve static files for specific routes
+app.use('/', express.static(distPath))
+app.use('/datasets', express.static(distPath))
+app.use('/events', express.static(distPath))
+app.use('/lineage', express.static(distPath))
+app.use('/datasets/column-level', express.static(distPath))
 
-router.get('/healthcheck', function (req, res) {
+// Proxy API requests
+app.use('/api/v1', createProxyMiddleware(apiOptions))
+app.use('/api/v2beta', createProxyMiddleware(apiOptions))
+
+// Healthcheck route
+router.get('/healthcheck', (req, res) => {
   res.send('OK')
 })
 
 app.use(router)
 
-app.listen(port, function() {
+// **Catch-All Route to Serve index.html for Client-Side Routing**
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'))
+})
+
+app.listen(port, () => {
   console.log(`App listening on port ${port}!`)
 })

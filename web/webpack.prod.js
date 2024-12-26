@@ -23,6 +23,10 @@ const webpackProd = {
       favicon: 'src/img/favicon.png'
     }),
     new webpack.DefinePlugin({
+      'process.env': {
+        REACT_APP_OKTA_ISSUER: JSON.stringify(process.env.REACT_APP_OKTA_ISSUER),
+        REACT_APP_OKTA_CLIENT_ID: JSON.stringify(process.env.REACT_APP_OKTA_CLIENT_ID),
+      },
       __DEVELOPMENT__: JSON.stringify(false),
       __NODE_ENV__: JSON.stringify('production'),
       __REACT_APP_ADVANCED_SEARCH__: process.env.REACT_APP_ADVANCED_SEARCH === 'true',

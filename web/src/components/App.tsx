@@ -27,6 +27,11 @@ import Toast from './Toast'
 import createRootReducer from '../store/reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from '../store/sagas'
+import { AuthProvider } from '../auth/AuthContext'
+import { PrivateRoute } from './PrivateRoute'
+import Login from './Login'
+import LoginCallback from './LoginCallback'
+import ErrorBoundary from './ErrorBoundary'
 
 const sagaMiddleware = createSagaMiddleware({
   onError: (error, _sagaStackIgnored) => {
@@ -43,45 +48,82 @@ const store = createStore(
 
 sagaMiddleware.run(rootSaga)
 
-const TITLE = 'Marquez'
+const TITLE = 'Nu Data Lineage'
 
 const App = (): ReactElement => {
   return (
-    <Provider store={store}>
-      <HelmetProvider>
-        <ReduxRouter history={history}>
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Helmet>
-                  <title>{TITLE}</title>
-                </Helmet>
-                <CssBaseline />
-                <Box ml={'80px'}>
-                  <Sidenav />
-                  <Container maxWidth={'xl'} disableGutters={true}>
-                    <Header />
-                  </Container>
-                  <Routes>
-                    <Route path={'/'} element={<Dashboard />} />
-                    <Route path={'/jobs'} element={<Jobs />} />
-                    <Route path={'/datasets'} element={<Datasets />} />
-                    <Route path={'/events'} element={<Events />} />
-                    <Route
-                      path={'/datasets/column-level/:namespace/:name'}
-                      element={<ColumnLevel />}
-                    />
-                    <Route path={'/lineage/:nodeType/:namespace/:name'} element={<TableLevel />} />
-                    <Route path='*' element={<NotFound />} />
-                  </Routes>
-                  <Toast />
-                </Box>
-              </LocalizationProvider>
-            </ThemeProvider>
-          </StyledEngineProvider>
-        </ReduxRouter>
-      </HelmetProvider>
-    </Provider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Provider store={store}>
+          <HelmetProvider>
+            <ReduxRouter history={history}>
+              <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Helmet>
+                      <title>{TITLE}</title>
+                    </Helmet>
+                    <CssBaseline />
+                    <Box ml={'80px'}>
+                      <Sidenav />
+                      <Container maxWidth={'xl'} disableGutters={true}>
+                        <Header />
+                      </Container>
+                      <Routes>
+                        <Route path='/login' element={<Login />} />
+                        <Route path='/login/callback' element={<LoginCallback />} />
+                        <Route
+                          path='/'
+                          element={
+                            <PrivateRoute>
+                              <Dashboard /> {/* Add this */}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path={'/jobs'}
+                          element={
+                            <PrivateRoute>
+                              <Jobs />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path={'/datasets'}
+                          element={
+                            <PrivateRoute>
+                              <Datasets />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path={'/events'}
+                          element={
+                            <PrivateRoute>
+                              <Events />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path={'/datasets/column-level/:namespace/:name'}
+                          element={<ColumnLevel />}
+                        />
+                        <Route
+                          path={'/lineage/:nodeType/:namespace/:name'}
+                          element={<TableLevel />}
+                        />
+                        <Route path='*' element={<NotFound />} />
+                      </Routes>
+                      <Toast />
+                    </Box>
+                  </LocalizationProvider>
+                </ThemeProvider>
+              </StyledEngineProvider>
+            </ReduxRouter>
+          </HelmetProvider>
+        </Provider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

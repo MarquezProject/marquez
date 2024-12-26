@@ -24,6 +24,7 @@ import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
 import nu_logo from './logoNu.svg'
+import { PrivateRoute } from '../PrivateRoute'
 
 interface SidenavProps {}
 
@@ -37,142 +38,151 @@ const Sidenav: React.FC<SidenavProps> = () => {
   const location = useLocation()
 
   return (
-    <Drawer
-      sx={{
-        marginTop: `${HEADER_HEIGHT}px`,
-        width: `${DRAWER_WIDTH}px`,
-        flexShrink: 0,
-        whiteSpace: 'nowrap',
-        '& > :first-of-type': {
-          borderRight: 'none',
-        },
-      }}
-      PaperProps={{
-        sx: {
-          backgroundColor: theme.palette.background.default,
-          backgroundImage: 'none',
-        },
-      }}
-      variant='permanent'
-    >
-      <Box
-        position={'relative'}
-        width={DRAWER_WIDTH}
-        display={'flex'}
-        flexDirection={'column'}
-        justifyContent={'space-between'}
-        height={'100%'}
-        pb={2}
+    <PrivateRoute>
+      <Drawer
         sx={{
-          borderRight: `2px dashed ${theme.palette.secondary.main}`,
+          marginTop: `${HEADER_HEIGHT}px`,
+          width: `${DRAWER_WIDTH}px`,
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
+          '& > :first-of-type': {
+            borderRight: 'none',
+          },
         }}
+        PaperProps={{
+          sx: {
+            backgroundColor: theme.palette.background.default,
+            backgroundImage: 'none',
+          },
+        }}
+        variant='permanent'
       >
-        <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
-          <Box
-            display={'flex'}
-            alignItems={'center'}
-            justifyContent={'center'}
-            height={HEADER_HEIGHT}
-          >
-            <Link to='/'>
-              <img
-                src={nu_logo}
-                height={60}
-                alt='Nu Logo'
-                style={{ filter: 'invert(1)', marginTop: '10px' }}
-              />
-            </Link>
-          </Box>
-          <Divider sx={{ my: 1 }} />
-          <MqIconButton
-            to={'/'}
-            id={'homeDrawerButton'}
-            title={i18next.t('sidenav.dataOps')}
-            active={location.pathname === '/'}
-          >
-            <Dashboard />
-          </MqIconButton>
-          <MqIconButton
-            to={'/jobs'}
-            id={'jobsDrawerButton'}
-            title={i18next.t('sidenav.jobs')}
-            active={location.pathname === '/jobs'}
-          >
-            <FontAwesomeIcon icon={faCogs} fontSize={20} />
-          </MqIconButton>
-          <MqIconButton
-            to={'/datasets'}
-            id={'datasetsDrawerButton'}
-            title={i18next.t('sidenav.datasets')}
-            active={location.pathname === '/datasets'}
-          >
-            <FontAwesomeIcon icon={faDatabase} fontSize={20} />
-          </MqIconButton>
-          <MqIconButton
-            id={'eventsButton'}
-            to={'/events'}
-            title={i18next.t('sidenav.events')}
-            active={location.pathname === '/events'}
-          >
-            <SVG src={iconSearchArrow} width={'20px'} />
-          </MqIconButton>
-        </Box>
-
         <Box
-          sx={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        >
-          <MqIconButton
-            id={'documentationButton'}
-            to={'https://nubank.atlassian.net/wiki/spaces/data/pages/264019349541/Nu+Data+Lineage'}
-            title={i18next.t('sidenav.documentation')}
-            active={location.pathname === '/documentation'}
-          >
-            <HelpCenterIcon sx={{ fontSize: 20 }} />
-          </MqIconButton>
-          <MqIconButton
-            id={'supportButton'}
-            to={
-              'https://nubank.atlassian.net/servicedesk/customer/portal/49/group/1943/create/17910'
-            }
-            title={i18next.t('sidenav.support')}
-            active={location.pathname === '/support'}
-          >
-            <SupportAgentIcon sx={{ fontSize: 20 }} />
-          </MqIconButton>
-        </Box>
-        <FormControl
-          variant='outlined'
+          position={'relative'}
+          width={DRAWER_WIDTH}
+          display={'flex'}
+          flexDirection={'column'}
+          justifyContent={'space-between'}
+          height={'100%'}
+          pb={2}
           sx={{
-            maxWidth: '100px',
+            borderRight: `2px dashed ${theme.palette.secondary.main}`,
           }}
         >
-          <Box px={1}>
-            <Select
-              fullWidth
-              value={i18next.resolvedLanguage}
-              onChange={(event) => {
-                changeLanguage(event.target.value as string)
-                window.location.reload()
-              }}
-              input={<MqInputNoIcon />}
+          <Box display={'flex'} flexDirection={'column'} alignItems={'center'}>
+            <Box
+              display={'flex'}
+              alignItems={'center'}
+              justifyContent={'center'}
+              height={HEADER_HEIGHT}
             >
-              <MenuItem key={'en'} value={'en'}>
-                {'en'}
-              </MenuItem>
-              <MenuItem key={'es'} value={'es'}>
-                {'es'}
-              </MenuItem>
-              <MenuItem key={'fr'} value={'fr'}>
-                {'fr'}
-              </MenuItem>
-              <MenuItem key={'pl'} value={'pl'}>
-                {'pl'}
-              </MenuItem>
-            </Select>
+              <Link to='/'>
+                <img
+                  src={nu_logo}
+                  height={60}
+                  alt='Nu Logo'
+                  style={{ filter: 'invert(1)', marginTop: '10px' }}
+                />
+              </Link>
+            </Box>
+            <Divider sx={{ my: 1 }} />
+            <MqIconButton
+              to={'/'}
+              id={'homeDrawerButton'}
+              title={i18next.t('sidenav.dataOps')}
+              active={location.pathname === '/'}
+            >
+              <Dashboard />
+            </MqIconButton>
+            <MqIconButton
+              to={'/jobs'}
+              id={'jobsDrawerButton'}
+              title={i18next.t('sidenav.jobs')}
+              active={location.pathname === '/jobs'}
+            >
+              <FontAwesomeIcon icon={faCogs} fontSize={20} />
+            </MqIconButton>
+            <MqIconButton
+              to={'/datasets'}
+              id={'datasetsDrawerButton'}
+              title={i18next.t('sidenav.datasets')}
+              active={location.pathname === '/datasets'}
+            >
+              <FontAwesomeIcon icon={faDatabase} fontSize={20} />
+            </MqIconButton>
+            <MqIconButton
+              id={'eventsButton'}
+              to={'/events'}
+              title={i18next.t('sidenav.events')}
+              active={location.pathname === '/events'}
+            >
+              <SVG src={iconSearchArrow} width={'20px'} />
+            </MqIconButton>
           </Box>
-        </FormControl>
-      </Box>
-    </Drawer>
+
+          <Box
+            sx={{
+              marginTop: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <MqIconButton
+              id={'documentationButton'}
+              to={
+                'https://nubank.atlassian.net/wiki/spaces/data/pages/264019349541/Nu+Data+Lineage'
+              }
+              title={i18next.t('sidenav.documentation')}
+              active={location.pathname === '/documentation'}
+            >
+              <HelpCenterIcon sx={{ fontSize: 20 }} />
+            </MqIconButton>
+            <MqIconButton
+              id={'supportButton'}
+              to={
+                'https://nubank.atlassian.net/servicedesk/customer/portal/49/group/1943/create/17910'
+              }
+              title={i18next.t('sidenav.support')}
+              active={location.pathname === '/support'}
+            >
+              <SupportAgentIcon sx={{ fontSize: 20 }} />
+            </MqIconButton>
+          </Box>
+          <FormControl
+            variant='outlined'
+            sx={{
+              maxWidth: '100px',
+            }}
+          >
+            <Box px={1}>
+              <Select
+                fullWidth
+                value={i18next.resolvedLanguage}
+                onChange={(event) => {
+                  changeLanguage(event.target.value as string)
+                  window.location.reload()
+                }}
+                input={<MqInputNoIcon />}
+              >
+                <MenuItem key={'en'} value={'en'}>
+                  {'en'}
+                </MenuItem>
+                <MenuItem key={'es'} value={'es'}>
+                  {'es'}
+                </MenuItem>
+                <MenuItem key={'fr'} value={'fr'}>
+                  {'fr'}
+                </MenuItem>
+                <MenuItem key={'pl'} value={'pl'}>
+                  {'pl'}
+                </MenuItem>
+              </Select>
+            </Box>
+          </FormControl>
+        </Box>
+      </Drawer>
+    </PrivateRoute>
   )
 }
 
