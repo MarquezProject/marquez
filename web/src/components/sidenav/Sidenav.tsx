@@ -20,11 +20,11 @@ import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
+import { PrivateRoute } from '../PrivateRoute'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
 import nu_logo from './logoNu.svg'
-import { PrivateRoute } from '../PrivateRoute'
 
 interface SidenavProps {}
 

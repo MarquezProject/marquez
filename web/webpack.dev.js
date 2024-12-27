@@ -18,7 +18,7 @@ const webpackDev = {
       serveIndex: true,
       watch: true,
     },
-    port: 3000,
+    port: 1337,
     devMiddleware: {
       publicPath: '/'
     },
