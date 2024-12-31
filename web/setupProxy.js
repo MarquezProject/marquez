@@ -22,6 +22,7 @@ const path = __dirname + '/dist'
 const port = environmentVariable("WEB_PORT")
 
 app.use('/', express.static(path))
+app.use('/jobs', express.static(path))
 app.use('/datasets', express.static(path))
 app.use('/events', express.static(path))
 app.use('/lineage/:type/:namespace/:name', express.static(path))
