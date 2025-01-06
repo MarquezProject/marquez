@@ -15,11 +15,12 @@ interface OwnProps {
   children: ReactElement
   active: boolean
   to: string
+  target?: string
 }
 
 type IconButtonProps = OwnProps
 
-const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children, to }) => {
+const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children, to, target }) => {
   return (
     <Box
       sx={{
@@ -34,6 +35,7 @@ const MqIconButton: React.FC<IconButtonProps> = ({ id, title, active, children, 
         id={id}
         component={RouterLink}
         to={to}
+        target={target}
         disableRipple={true}
         sx={Object.assign(
           {

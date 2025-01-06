@@ -88,11 +88,11 @@ const Sidenav: React.FC<SidenavProps> = () => {
             <Divider sx={{ my: 1 }} />
             <MqIconButton
               to={'/'}
-              id={'homeDrawerButton'}
-              title={i18next.t('sidenav.dataOps')}
+              id={'datasetsDrawerButton'}
+              title={i18next.t('sidenav.datasets')}
               active={location.pathname === '/'}
             >
-              <Dashboard />
+              <FontAwesomeIcon icon={faDatabase} fontSize={20} />
             </MqIconButton>
             <MqIconButton
               to={'/jobs'}
@@ -102,14 +102,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             >
               <FontAwesomeIcon icon={faCogs} fontSize={20} />
             </MqIconButton>
-            <MqIconButton
-              to={'/datasets'}
-              id={'datasetsDrawerButton'}
-              title={i18next.t('sidenav.datasets')}
-              active={location.pathname === '/datasets'}
-            >
-              <FontAwesomeIcon icon={faDatabase} fontSize={20} />
-            </MqIconButton>
+
             <MqIconButton
               id={'eventsButton'}
               to={'/events'}
@@ -117,6 +110,14 @@ const Sidenav: React.FC<SidenavProps> = () => {
               active={location.pathname === '/events'}
             >
               <SVG src={iconSearchArrow} width={'20px'} />
+            </MqIconButton>
+            <MqIconButton
+              to={'/dashboard'}
+              id={'homeDrawerButton'}
+              title={i18next.t('sidenav.dataOps')}
+              active={location.pathname === '/dashboard'}
+            >
+              <Dashboard />
             </MqIconButton>
           </Box>
 
@@ -133,6 +134,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
               to={
                 'https://nubank.atlassian.net/wiki/spaces/data/pages/264019349541/Nu+Data+Lineage'
               }
+              target='_blank'
               title={i18next.t('sidenav.documentation')}
               active={location.pathname === '/documentation'}
             >
@@ -143,6 +145,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
               to={
                 'https://nubank.atlassian.net/servicedesk/customer/portal/49/group/1943/create/17910'
               }
+              target='_blank'
               title={i18next.t('sidenav.support')}
               active={location.pathname === '/support'}
             >

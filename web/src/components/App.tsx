@@ -76,7 +76,7 @@ const App = (): ReactElement => {
                           path='/'
                           element={
                             <PrivateRoute>
-                              <Dashboard /> {/* Add this */}
+                              <Datasets />
                             </PrivateRoute>
                           }
                         />
@@ -89,10 +89,10 @@ const App = (): ReactElement => {
                           }
                         />
                         <Route
-                          path={'/datasets'}
+                          path={'/dashboard'}
                           element={
                             <PrivateRoute>
-                              <Datasets />
+                              <Dashboard />
                             </PrivateRoute>
                           }
                         />
