@@ -6,6 +6,7 @@ export const oktaAuth = new OktaAuth({
   clientId: '0oa20ehmjv97g8jZP0h8',
   redirectUri: window.location.origin + '/login/callback',
   pkce: true,
+  scopes: ['openid', 'profile', 'email'],
   tokenManager: {
     storage: 'localStorage',
   },
