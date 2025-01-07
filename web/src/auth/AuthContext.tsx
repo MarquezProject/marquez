@@ -2,11 +2,11 @@ import { AuthState, OktaAuth } from '@okta/okta-auth-js'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 export const oktaAuth = new OktaAuth({
-  issuer: 'https://nubank.okta.com/oauth2/default',
-  clientId: '0oa20d6n6jb6nG5Mn0h8',
-  redirectUri: window.location.origin + '/login/callback',
+  issuer: 'https://dev-15036446.okta.com/oauth2/default',
+  clientId: '0oam2eo020yRwwPbu5d7',
+  // redirectUri: window.location.origin + '/login/callback',
+  redirectUri: 'http://localhost:1337/login/callback',
   pkce: true,
-  scopes: ['openid', 'profile', 'email'],
   tokenManager: {
     storage: 'localStorage',
   },
