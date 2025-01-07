@@ -18,7 +18,7 @@ const webpackProd = {
       title: 'Telescope Web',
       hash: true,
       minify: true,
-      inject: false,
+      inject: true,
       template: 'src/index.prod.html',
       favicon: 'src/img/favicon.png'
     }),
