@@ -5,20 +5,27 @@ import { useAuth } from '../auth/AuthContext'
 
 const LoginCallback = () => {
   const navigate = useNavigate()
-  const { oktaAuth } = useAuth()
+  const { oktaAuth, setUser } = useAuth()
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
         await oktaAuth.handleRedirect()
-        navigate('/', { replace: true })
+        const isAuthenticated = await oktaAuth.isAuthenticated()
+        if (isAuthenticated) {
+          const userInfo = await oktaAuth.getUser()
+          setUser(userInfo)
+          navigate('/', { replace: true })
+        } else {
+          navigate('/login')
+        }
       } catch (error) {
         console.error('Error handling redirect:', error)
         navigate('/login')
       }
     }
     handleCallback()
-  }, [oktaAuth, navigate])
+  }, [oktaAuth, setUser, navigate])
 
   return (
     <Box

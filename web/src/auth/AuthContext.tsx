@@ -19,6 +19,7 @@ interface AuthContextType {
   login: () => Promise<void>
   logout: () => Promise<void>
   oktaAuth: OktaAuth
+  setUser: (user: any) => void 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout, oktaAuth }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout, oktaAuth, setUser }}>
       {children}
     </AuthContext.Provider>
   )
