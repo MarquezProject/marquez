@@ -20,7 +20,7 @@ const webpackProd = {
       minify: true,
       inject: false,
       template: 'src/index.prod.html',
-      favicon: 'src/img/favicon.png'
+      favicon: 'src/img/icon.svg'
     }),
     new webpack.DefinePlugin({
       'process.env': {
