@@ -52,3 +52,6 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`App listening on port ${port}!`)
 })
+
+// Auth Variables
+const clientId = environmentVariable("REACT_APP_OKTA_CLIENT_ID")
