@@ -15,18 +15,22 @@ const webpackProd = {
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Telescope Web',
+      title: 'Nu Data Lineage',
       hash: true,
       minify: true,
       inject: false,
       template: 'src/index.prod.html',
-      favicon: 'src/img/icon.svg'
+      favicon: 'src/img/icon.svg',
+      templateParameters: {
+        FAVICON_SVG_URL: process.env.REACT_APP_FAVICON_SVG_URL,
+        FAVICON_PNG_URL: process.env.REACT_APP_FAVICON_PNG_URL
+      }
     }),
     new webpack.DefinePlugin({
-      'process.env': {
-        REACT_APP_OKTA_ISSUER: JSON.stringify(process.env.REACT_APP_OKTA_ISSUER),
-        REACT_APP_OKTA_CLIENT_ID: JSON.stringify(process.env.REACT_APP_OKTA_CLIENT_ID),
-      },
+      'process.env.REACT_APP_OKTA_ISSUER': JSON.stringify(process.env.REACT_APP_OKTA_ISSUER),
+      'process.env.REACT_APP_OKTA_CLIENT_ID': JSON.stringify(process.env.REACT_APP_OKTA_CLIENT_ID),
+      // 'process.env.REACT_APP_FAVICON_PNG_URL': JSON.stringify(process.env.REACT_APP_FAVICON_PNG_URL),
+      // 'process.env.REACT_APP_FAVICON_SVG_URL': JSON.stringify(process.env.REACT_APP_FAVICON_SVG_URL),
       __DEVELOPMENT__: JSON.stringify(false),
       __NODE_ENV__: JSON.stringify('production'),
       __REACT_APP_ADVANCED_SEARCH__: process.env.REACT_APP_ADVANCED_SEARCH === 'true',
