@@ -9,11 +9,7 @@ on:
 
 jobs:
   test-deploy:
-    name: Test deployment    
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./docs
+    name: Test deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,8 +19,9 @@ jobs:
         with:
           node-version: 18
           cache: yarn
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        working-directory: ./docs
       - name: Test build website
         run: yarn build
+        working-directory: ./docs
