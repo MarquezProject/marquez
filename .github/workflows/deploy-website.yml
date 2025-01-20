@@ -31,7 +31,7 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: ./docs/build # Override path to match your build output location
 
   deploy:
     name: Deploy to GitHub Pages
