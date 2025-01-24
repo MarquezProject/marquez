@@ -117,7 +117,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
     try {
       DbMigration.migrateDbOrError(config.getFlywayFactory(), source, config.isMigrateOnStartup());
     } catch (FlywayException errorOnDbMigrate) {
-        throw new FlywayException("Error migrating database", errorOnDbMigrate);
+      throw new FlywayException("Error migrating database", errorOnDbMigrate);
     }
 
     if (isSentryEnabled(config)) {
