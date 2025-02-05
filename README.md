@@ -64,7 +64,7 @@ Start all services:
 $ sh ./docker/up.sh
 ```
 
-> **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide.
+> **Tip:** Use the `--build` flag to build images from source, and/or `--seed` to start Marquez with sample lineage metadata. For a more complete example using the sample metadata, please follow our [quickstart](https://marquezproject.ai/quickstart.html) guide.
 
 > **Note:** Port 5000 is now reserved for MacOS. If running locally on MacOS, you can run `./docker/up.sh --api-port 9000` to configure the API to listen on port 9000 instead. Keep in mind that you will need to update the URLs below with the appropriate port number.
 
@@ -78,7 +78,7 @@ You can open [http://localhost:3000](http://localhost:3000) to begin exploring t
 
 **`HTTP API`**
 
-The Marquez [HTTP API](https://marquezproject.github.io/marquez/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/docs/integrations/about).
+The Marquez [HTTP API](https://marquezproject.ai/openapi.html) listens on port `5000` for all calls and port `5001` for the admin interface. The admin interface exposes helpful endpoints like `/healthcheck` and `/metrics`. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:5001](http://localhost:5001). To begin collecting lineage metadata as OpenLineage events, use the [LineageAPI](https://marquezproject.ai/openapi.html#tag/Lineage/paths/~1lineage/post) or an OpenLineage [integration](https://openlineage.io/docs/integrations/about).
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -90,7 +90,7 @@ To explore metadata via graphql, browse to [http://localhost:5000/graphql-playgr
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
 
-> **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
+> **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.ai/quickstart.html) guide. Below you will find the steps to get up and running from source.
 
 ## Versions and OpenLineage Compatibility
 
@@ -112,7 +112,7 @@ Marquez uses a _multi_-project structure and contains the following modules:
 
 * [`api`](https://github.com/MarquezProject/marquez/tree/main/api): core API used to collect metadata
 * [`web`](https://github.com/MarquezProject/marquez/tree/main/web): web UI used to view metadata
-* [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.github.io/marquez/openapi.html)
+* [`clients`](https://github.com/MarquezProject/marquez/tree/main/clients): clients that implement the HTTP [API](https://marquezproject.ai/openapi.html)
 * [`chart`](https://github.com/MarquezProject/marquez/tree/main/chart): helm chart
 
 > **Note:** The `integrations` module was removed in [`0.21.0`](https://github.com/MarquezProject/marquez/blob/main/CHANGELOG.md#removed), so please use an OpenLineage [integration](https://openlineage.io/integration) to collect lineage events easily.
@@ -168,7 +168,7 @@ By default, Marquez uses the following ports:
 ```bash
 $ ./gradlew :api:runShadow
 ```
-Marquez listens on port `8080` for all API calls and port `8081` for the admin interface. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:8081](http://localhost:8081). We encourage you to familiarize yourself with the [data model](https://marquezproject.github.io/marquez/#data-model) and [APIs](https://marquezproject.github.io/marquez/openapi.html) of Marquez. To run the web UI, please follow the steps outlined [here](https://github.com/MarquezProject/marquez/tree/main/web#development).
+Marquez listens on port `8080` for all API calls and port `8081` for the admin interface. To verify the HTTP API server is running and listening on `localhost`, browse to [http://localhost:8081](http://localhost:8081). We encourage you to familiarize yourself with the [data model](https://marquezproject.ai/#data-model) and [APIs](https://marquezproject.ai/openapi.html) of Marquez. To run the web UI, please follow the steps outlined [here](https://github.com/MarquezProject/marquez/tree/main/web#development).
 
 > **Note:** By default, the HTTP API does not require any form of authentication or authorization.
 
@@ -178,7 +178,7 @@ Marquez listens on port `8080` for all API calls and port `8081` for the admin i
 
 ## Getting Involved
 
-* Website: https://marquezproject.github.io/marquez/
+* Website: https://marquezproject.ai/
 * Source: https://github.com/MarquezProject/marquez
 * Chat: [MarquezProject Slack](https://join.slack.com/t/marquezproject/shared_invite/zt-2iylxasbq-GG_zXNcJdNrhC9uUMr3B7A)
 * X: [@MarquezProject](https://twitter.com/MarquezProject)

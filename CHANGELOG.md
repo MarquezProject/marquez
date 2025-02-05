@@ -814,7 +814,7 @@
 
 ### Added
 
-* Add [deploy](https://marquezproject.github.io/marquez/deployment-overview.html) docs for running Marquez on AWS [@wslulciuc](https://github.com/wslulciuc) [@merobi-hub](https://github.com/merobi-hub)
+* Add [deploy](https://marquezproject.ai/deployment-overview.html) docs for running Marquez on AWS [@wslulciuc](https://github.com/wslulciuc) [@merobi-hub](https://github.com/merobi-hub)
 
 ### Changed
 
@@ -824,10 +824,10 @@
 
 ### Deprecated
 
-* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting source, dataset, and job metadata [@wslulciuc](https://github.com/wslulciuc):
-  * [`/sources`](https://marquezproject.github.io/marquez/openapi.html#tag/Sources/paths/~1sources~1{source}/put) endpoint to collect source metadata
-  * [`/datasets`](https://marquezproject.github.io/marquez/openapi.html#tag/Datasets/paths/~1namespaces~1{namespace}~1datasets~1{dataset}/put) endpoint to collect dataset metadata
-  * [`/jobs`](https://marquezproject.github.io/marquez/openapi.html#tag/Jobs/paths/~1namespaces~1{namespace}~1jobs~1{job}/put) endpoint to collect job metadata
+* The following endpoints have been deprecated and are **scheduled to be removed in** `0.25.0`. Please use the [`/lineage`](https://marquezproject.ai/openapi.html#tag/Lineage/paths/~1lineage/post) endpoint when collecting source, dataset, and job metadata [@wslulciuc](https://github.com/wslulciuc):
+  * [`/sources`](https://marquezproject.ai/openapi.html#tag/Sources/paths/~1sources~1{source}/put) endpoint to collect source metadata
+  * [`/datasets`](https://marquezproject.ai/openapi.html#tag/Datasets/paths/~1namespaces~1{namespace}~1datasets~1{dataset}/put) endpoint to collect dataset metadata
+  * [`/jobs`](https://marquezproject.ai/openapi.html#tag/Jobs/paths/~1namespaces~1{namespace}~1jobs~1{job}/put) endpoint to collect job metadata
 
 ### Fixed
 
@@ -906,7 +906,7 @@
 
 ### Deprecated
 
-* Run API [endpoints](https://marquezproject.github.io/marquez/openapi.html#tag/Jobs) that create or modify a job run (**scheduled to be removed in** `0.19.0`). Please use the **POST** `/api/v1/lineage` [endpoint](https://marquezproject.github.io/marquez/openapi.html#tag/Lineage/paths/~1lineage/post) when collecting job run metadata. [@wslulciuc](https://github.com/wslulciuc)
+* Run API [endpoints](https://marquezproject.ai/openapi.html#tag/Jobs) that create or modify a job run (**scheduled to be removed in** `0.19.0`). Please use the **POST** `/api/v1/lineage` [endpoint](https://marquezproject.ai/openapi.html#tag/Lineage/paths/~1lineage/post) when collecting job run metadata. [@wslulciuc](https://github.com/wslulciuc)
 * Airflow integration, please use the [`openlineage-airflow`](https://pypi.org/project/openlineage-airflow) library instead. [@wslulciuc](https://github.com/wslulciuc)
 * Spark integration, please use the [`openlineage-spark`](https://search.maven.org/artifact/io.openlineage/openlineage-spark) library instead. [@wslulciuc](https://github.com/wslulciuc)
 * Write only clients for `java` and `python` (**scheduled to be removed in** `0.19.0`) [@wslulciuc](https://github.com/wslulciuc)
