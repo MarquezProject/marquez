@@ -12,6 +12,7 @@ import { runStateColor } from '../../helpers/nodes'
 import { theme } from '../../helpers/theme'
 import { truncateText, truncateTextFront } from '../../helpers/text'
 import { useNavigate, useParams } from 'react-router-dom'
+import { trackEvent } from '../../components/ga4'
 import Box from '@mui/system/Box'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
@@ -38,26 +39,27 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
         node.data.job.name
       )}?tableLevelNode=${encodeURIComponent(node.id)}`
     )
+    trackEvent('TableLineageJobNode', 'Click Job Node', node.data.job.name)
   }
 
   const addToToolTip = (job: LineageJob) => {
     return (
       <foreignObject>
-        <Box>
+        <Box maxWidth={'lg'}>
           <Box display={'flex'} justifyContent={'space-between'}>
             <MqText block bold sx={{ mr: 6 }}>
               Namespace:
             </MqText>
-            <MqText block font={'mono'}>
-              {truncateTextFront(job.namespace, 40)}
+            <MqText block font={'mono'} sx={{ wordBreak: 'break-all' }}>
+              {truncateTextFront(job.namespace, 120)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
             <MqText block bold sx={{ mr: 6 }}>
               Name:
             </MqText>
-            <MqText block font={'mono'}>
-              {truncateTextFront(job.name, 40)}
+            <MqText block font={'mono'} sx={{ wordBreak: 'break-all' }}>
+              {truncateTextFront(job.name, 120)}
             </MqText>
           </Box>
           {job.description && (
@@ -65,8 +67,18 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               <MqText block bold sx={{ mr: 6 }}>
                 Description:
               </MqText>
-              <MqText block font={'mono'}>
+              <MqText block font={'mono'} sx={{ wordBreak: 'break-all' }}>
                 {job.description}
+              </MqText>
+            </Box>
+          )}
+          {job.latestRun?.endedAt && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Finished At:
+              </MqText>
+              <MqText block font={'mono'}>
+                {formatUpdatedAt(job.latestRun.endedAt)}
               </MqText>
             </Box>
           )}
@@ -78,6 +90,16 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
               {formatUpdatedAt(job.updatedAt)}
             </MqText>
           </Box>
+          {job.latestRun?.durationMs && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Duration:
+              </MqText>
+              <MqText block font={'mono'}>
+                {`${job.latestRun.durationMs} ms`}
+              </MqText>
+            </Box>
+          )}
           <Divider sx={{ my: 1 }} />
           <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
             <MqText block bold sx={{ mr: 6 }}>

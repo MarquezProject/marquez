@@ -23,6 +23,7 @@ import IconButton from '@mui/material/IconButton'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
+import { trackEvent } from '../../components/ga4'
 
 const i18next = require('i18next')
 
@@ -50,6 +51,24 @@ const ColumnLevelDrawer = ({
       fetchDataset(namespace, dataset)
     }
   }, [])
+
+  useEffect(() => {
+    trackEvent('ColumnLevelDrawer', 'View Column-Level Drawer');
+  }, []);
+
+  useEffect(() => {
+    const dataset = searchParams.get('dataset');
+    const namespace = searchParams.get('namespace');
+    if (dataset && namespace) {
+      fetchDataset(namespace, dataset);
+      trackEvent('ColumnLevelDrawer', 'Fetch Dataset Details', dataset);
+    }
+  }, [searchParams]);
+
+  const handleClose = () => {
+    setSearchParams({});
+    trackEvent('ColumnLevelDrawer', 'Close Drawer');
+  };
 
   if (!columnLineage) {
     return null
@@ -89,11 +108,7 @@ const ColumnLevelDrawer = ({
             </Box>
             <MqText heading>{searchParams.get('dataset')}</MqText>
           </Box>
-          <IconButton
-            onClick={() => {
-              setSearchParams({})
-            }}
-          >
+          <IconButton onClick={handleClose}>
             <CloseIcon fontSize={'small'} />
           </IconButton>
         </Box>

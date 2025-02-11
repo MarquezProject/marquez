@@ -3,6 +3,7 @@
 
 import { Box } from '@mui/material'
 import { theme } from '../../helpers/theme'
+import { trackEvent } from '../ga4'
 import MqText from '../core/text/MqText'
 import React from 'react'
 import Typewriter from './Typewriter'
@@ -15,6 +16,10 @@ interface SearchPlaceholderProps {}
 
 const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
   const i18next = importI18next()
+  React.useEffect(() => {
+    trackEvent('SearchPlaceholder', 'View Search Placeholder')
+  }, [])
+  
   return (
     <Box
       sx={{
@@ -40,10 +45,7 @@ const SearchPlaceholder: React.FC<SearchPlaceholderProps> = () => {
         </MqText>
         <MqText bold inline>
           {' '}
-          <Typewriter
-            words={['Jobs and Datasets…', 'SQL queries…', 'Dataset columns…', 'Source code…']}
-            repeatCount={3}
-          />
+          <Typewriter words={['Jobs and Datasets…']} repeatCount={3} />
         </MqText>
       </Box>
     </Box>

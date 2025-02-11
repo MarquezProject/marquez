@@ -5,24 +5,49 @@ SPDX-License-Identifier: Apache-2.0SPDX-License-Identifier: Apache-2.0
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8"/>
-        <title>Marquez</title>
-        <link rel="icon" href="img/icon.svg" type="image/svg+xml">
-        <link rel="icon" href="img/favicon.png" type="image/png">
-        <base href="/"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link
-                href="https://fonts.googleapis.com/css?family=Inconsolata:400,700|Karla:400,700&display=swap"
-                rel="stylesheet"
-        />
-        <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
-    </head>
 
-    <body>
-        <div id="root"></div>
+<head>
+    <meta charset="UTF-8" />
+    <title>Nu Data Lineage</title>
+    
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-MLNCWHZX');</script>
+    <!-- End Google Tag Manager -->
 
-        <!-- Main -->
-        <script src="./bundle.js"></script>
-    </body>
+    <link rel="icon" href="https://staging-nu-data-lineage.nubank.world/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="https://staging-nu-data-lineage.nubank.world/favicon.png" type="image/png">
+    <base href="/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700|Karla:400,700&display=swap"
+        rel="stylesheet" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MLNCWHZX" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="root"></div>
+
+    <!-- Main -->
+    <script src="./bundle.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P254VPC8VX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-P254VPC8VX');
+    </script>
+</body>
+
 </html>

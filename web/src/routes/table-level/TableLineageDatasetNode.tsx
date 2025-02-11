@@ -1,22 +1,22 @@
+import * as Redux from 'redux'
 import { ChevronLeft } from '@mui/icons-material'
 import { Dataset, LineageGraph } from '../../types/api'
+import { Divider } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IState } from '../../store/reducers'
 import { LineageDataset } from '../../types/lineage'
 import { PositionedNode } from '../../../libs/graph'
 import { THEME_EXTRA, theme } from '../../helpers/theme'
 import { TableLineageDatasetNodeData } from './nodes'
-import { connect } from 'react-redux'
-
-import * as Redux from 'redux'
-import { Divider } from '@mui/material'
 import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import { datasetFacetsQualityAssertions, datasetFacetsStatus } from '../../helpers/nodes'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons/faDatabase'
 import { fetchDataset, resetDataset } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
 import { truncateText, truncateTextFront } from '../../helpers/text'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { trackEvent } from '../../components/ga4'
 import Box from '@mui/system/Box'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
@@ -61,6 +61,25 @@ const TableLineageDatasetNode = ({
         node.data.dataset.name
       )}?tableLevelNode=${encodeURIComponent(node.id)}`
     )
+    trackEvent('TableLineageDatasetNode', 'Click Dataset Node', node.data.dataset.name)
+  }
+
+  const handleCollapseExpand = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    const collapsedNodes = searchParams.get('collapsedNodes')
+    if (collapsedNodes) {
+      const collapsedNodesArray = collapsedNodes.split(',')
+      if (collapsedNodesArray.includes(node.id)) {
+        collapsedNodesArray.splice(collapsedNodesArray.indexOf(node.id), 1)
+      } else {
+        collapsedNodesArray.push(node.id)
+      }
+      searchParams.set('collapsedNodes', collapsedNodesArray.toString())
+    } else {
+      searchParams.set('collapsedNodes', node.id)
+    }
+    setSearchParams(searchParams)
+    trackEvent('TableLineageDatasetNode', isCollapsed ? 'Expand Node' : 'Collapse Node', node.id)
   }
 
   const addToToolTip = (lineageDataset: LineageDataset, dataset: Dataset) => {
@@ -71,8 +90,8 @@ const TableLineageDatasetNode = ({
             <MqText block bold sx={{ mr: 6 }}>
               Namespace:
             </MqText>
-            <MqText block font={'mono'}>
-              {truncateTextFront(lineageDataset.namespace, 40)}
+            <MqText block font={'mono'} sx={{ wordBreak: 'break-all' }}>
+              {truncateTextFront(lineageDataset.namespace, 120)}
             </MqText>
           </Box>
           <Box display={'flex'} justifyContent={'space-between'}>
@@ -80,7 +99,7 @@ const TableLineageDatasetNode = ({
               Name:
             </MqText>
             <MqText block font={'mono'}>
-              {truncateTextFront(lineageDataset.name, 40)}
+              {truncateTextFront(lineageDataset.name, 120)}
             </MqText>
           </Box>
           {lineageDataset.description && (
@@ -90,6 +109,16 @@ const TableLineageDatasetNode = ({
               </MqText>
               <MqText block font={'mono'}>
                 {lineageDataset.description}
+              </MqText>
+            </Box>
+          )}
+          {lineageDataset.createdAt && (
+            <Box display={'flex'} justifyContent={'space-between'}>
+              <MqText block bold sx={{ mr: 6 }}>
+                Created At:
+              </MqText>
+              <MqText block font={'mono'}>
+                {formatUpdatedAt(lineageDataset.createdAt)}
               </MqText>
             </Box>
           )}
@@ -164,24 +193,9 @@ const TableLineageDatasetNode = ({
       />
       <foreignObject width={16} height={24} x={node.width - 18} y={0}>
         <MQTooltip title={isCollapsed ? 'Expand' : 'Collapse'} placement={'top'}>
-          <IconButton
+        <IconButton
             sx={{ width: 10, height: 10 }}
-            onClick={(event) => {
-              event.stopPropagation()
-              const collapsedNodes = searchParams.get('collapsedNodes')
-              if (collapsedNodes) {
-                const collapsedNodesArray = collapsedNodes.split(',')
-                if (collapsedNodesArray.includes(node.id)) {
-                  collapsedNodesArray.splice(collapsedNodesArray.indexOf(node.id), 1)
-                } else {
-                  collapsedNodesArray.push(node.id)
-                }
-                searchParams.set('collapsedNodes', collapsedNodesArray.toString())
-              } else {
-                searchParams.set('collapsedNodes', node.id)
-              }
-              setSearchParams(searchParams)
-            }}
+            onClick={handleCollapseExpand}
           >
             <ChevronLeft
               sx={{

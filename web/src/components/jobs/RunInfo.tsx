@@ -10,6 +10,7 @@ import MqCode from '../core/code/MqCode'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
+import { trackEvent } from '../ga4'
 
 export interface DispatchProps {
   fetchJobFacets: typeof fetchJobFacets
@@ -44,7 +45,12 @@ const RunInfo: FunctionComponent<RunInfoProps> = (props) => {
   const { run, jobFacets, fetchJobFacets, resetFacets } = props
 
   useEffect(() => {
+    trackEvent('RunInfo', 'View Run Information', run.id)
+  }, [run.id])
+
+  useEffect(() => {
     fetchJobFacets(run.id)
+    trackEvent('RunInfo', 'Fetch Job Facets', run.id)
   }, [])
 
   // unmounting

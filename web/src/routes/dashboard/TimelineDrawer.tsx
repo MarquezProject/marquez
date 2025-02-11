@@ -11,11 +11,15 @@ import {
   timelineItemClasses,
 } from '@mui/lab'
 import { theme } from '../../helpers/theme'
+import { trackEvent } from '../../components/ga4'
 import MqText from '../../components/core/text/MqText'
-import React from 'react'
+import React, { useEffect } from 'react'
 const WIDTH = 400
 
 const TimelineDrawer = () => {
+  useEffect(() => {
+    trackEvent('TimelineDrawer', 'View Timeline Drawer');
+  }, []);
   return (
     <Box width={`${WIDTH}px`}>
       <Box px={2}>

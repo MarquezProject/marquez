@@ -10,24 +10,32 @@ import { connect } from 'react-redux'
 import { dialogToggle } from '../store/actionCreators'
 import CloseIcon from '@mui/icons-material/Close'
 import IconButton from '@mui/material/IconButton'
+import { trackEvent } from './ga4'
+import { useEffect } from 'react'
 
 interface IProps {
   error?: string
   success?: string
   isOpen: boolean
 }
-
 interface IDispatchProps {
   dialogToggle: typeof dialogToggle
 }
 
 const Toast = ({ error, success, isOpen, dialogToggle }: IProps & IDispatchProps) => {
+  useEffect(() => {
+    if (isOpen) {
+      trackEvent('Toast', 'Display Toast', error || success || 'No Message')
+    }
+  }, [isOpen])
+
   const handleClose = (_: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
     if (reason === 'clickaway') {
       return
     }
 
     dialogToggle('error')
+    trackEvent('Toast', 'Close Toast', error || success || 'No Message')
   }
 
   const action = (

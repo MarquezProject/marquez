@@ -2,6 +2,7 @@ const { merge } = require('webpack-merge')
 const webpack = require('webpack')
 const webpackShared = require('./webpack.common.js')
 const CopyPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 
 // look for elkjs package folder
@@ -17,7 +18,7 @@ const webpackDev = {
       serveIndex: true,
       watch: true,
     },
-    port: 1337,
+    port: 3000,
     devMiddleware: {
       publicPath: '/'
     },
@@ -40,6 +41,10 @@ const webpackDev = {
   devtool: 'eval-cheap-module-source-map',
   plugins: [
     new webpack.DefinePlugin({
+      'process.env': {
+        REACT_APP_OKTA_ISSUER: JSON.stringify(process.env.REACT_APP_OKTA_ISSUER),
+        REACT_APP_OKTA_CLIENT_ID: JSON.stringify(process.env.REACT_APP_OKTA_CLIENT_ID),
+      },
       __DEVELOPMENT__: JSON.stringify(true),
       __REACT_APP_ADVANCED_SEARCH__: true,
       __API_URL__: JSON.stringify('/api/v1'),
@@ -54,6 +59,11 @@ const webpackDev = {
           { from: path.join(elkjsRoot, 'lib/elk-worker.min.js'), to: 'elk-worker.min.js' },
         ],
       }),
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+        filename: 'index.html',
+        inject: true
+      })
   ]
 }
 

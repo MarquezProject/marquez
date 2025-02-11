@@ -21,6 +21,23 @@ module.exports = {
         }]
       },
       {
+        test: /\.tsx?$/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-env',
+                '@babel/preset-react',
+                '@babel/preset-typescript'
+              ]
+            }
+          },
+          'ts-loader'
+        ],
+        exclude: /node_modules/
+      },
+      {
         test: /\.(png|jpe?g|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'file-loader'
       },
@@ -33,11 +50,6 @@ module.exports = {
             outputPath: 'fonts/'
           }
         }]
-      },
-      // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
-      {
-        test: /\.tsx?$/,
-        loader: "ts-loader"
       },
       {
         test: /\.ico$/,

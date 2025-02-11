@@ -1,13 +1,11 @@
-// Copyright 2018-2023 contributors to the Marquez project
-// SPDX-License-Identifier: Apache-2.0
-
 import { Box } from '@mui/material'
 import { ChevronLeftRounded, ChevronRightRounded } from '@mui/icons-material'
 import { theme } from '../../helpers/theme'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
+import { trackEvent } from '../ga4'
 
 const i18next = require('i18next')
 
@@ -21,6 +19,21 @@ interface Props {
 
 const MqPaging: FunctionComponent<Props> = (props) => {
   const { pageSize, currentPage, incrementPage, decrementPage, totalCount } = props
+
+  useEffect(() => {
+    trackEvent('Paging', 'Viewed Paging')
+  }, [])
+
+  const handleNextPage = () => {
+    incrementPage(1)
+    trackEvent('Paging', 'Next Page Clicked', `Page ${currentPage + 1}`)
+  }
+
+  const handlePreviousPage = () => {
+    decrementPage(1)
+    trackEvent('Paging', 'Previous Page Clicked', `Page ${currentPage - 1}`)
+  }
+
   return (
     <Box display={'flex'} justifyContent={'flex-end'} alignItems={'center'}>
       <MqText subdued>
@@ -37,7 +50,7 @@ const MqPaging: FunctionComponent<Props> = (props) => {
             }}
             color='primary'
             disabled={currentPage === 0}
-            onClick={() => decrementPage(1)}
+            onClick={handlePreviousPage}
             size='small'
           >
             <ChevronLeftRounded />
@@ -48,7 +61,7 @@ const MqPaging: FunctionComponent<Props> = (props) => {
         <span>
           <IconButton
             color='primary'
-            onClick={() => incrementPage(1)}
+            onClick={handleNextPage}
             size='small'
             disabled={currentPage === Math.ceil(totalCount / pageSize) - 1}
           >

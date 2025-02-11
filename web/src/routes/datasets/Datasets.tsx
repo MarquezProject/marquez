@@ -40,7 +40,9 @@ import MqPaging from '../../components/paging/MqPaging'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
-import React from 'react'
+import PageSizeSelector from '../../components/paging/PageSizeSelector'
+import React, { useState } from 'react'
+import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   datasets: Dataset[]
@@ -61,7 +63,6 @@ interface DispatchProps {
 
 type DatasetsProps = StateProps & DispatchProps
 
-const PAGE_SIZE = 20
 const DATASET_HEADER_HEIGHT = 64
 
 const Datasets: React.FC<DatasetsProps> = ({
@@ -77,14 +78,16 @@ const Datasets: React.FC<DatasetsProps> = ({
     page: 0,
   }
   const [state, setState] = React.useState<DatasetsState>(defaultState)
+  const [pageSize, setPageSize] = useState(20)
+  const [currentPage, setCurrentPage] = useState(0)
 
   const theme = createTheme(useTheme())
 
   React.useEffect(() => {
     if (selectedNamespace) {
-      fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+      fetchDatasets(selectedNamespace, pageSize, currentPage * pageSize)
     }
-  }, [selectedNamespace, state.page])
+  }, [selectedNamespace, pageSize, currentPage])
 
   React.useEffect(() => {
     return () => {
@@ -93,18 +96,44 @@ const Datasets: React.FC<DatasetsProps> = ({
     }
   }, [])
 
-  const handleClickPage = (direction: 'prev' | 'next') => {
-    const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
+  const handlePageSizeChange = (newPageSize: number) => {
+    const newCurrentPage = Math.floor((currentPage * pageSize) / newPageSize)
+    setPageSize(newPageSize)
+    setCurrentPage(newCurrentPage)
 
-    fetchDatasets(selectedNamespace || '', PAGE_SIZE, directionPage * PAGE_SIZE)
+    fetchDatasets(selectedNamespace || '', newPageSize, newCurrentPage * newPageSize)
+
+    trackEvent('Datasets', 'Change Page Size', newPageSize.toString())
+  }
+
+  const handleClickPage = (direction: 'prev' | 'next') => {
+    let directionPage = direction === 'next' ? currentPage + 1 : currentPage - 1
+
+    // Impede que a página fique negativa
+    if (directionPage < 0) {
+      directionPage = 0
+    }
+
+    setCurrentPage(directionPage)
+
+    fetchDatasets(selectedNamespace || '', pageSize, directionPage * pageSize)
     // reset page scroll
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
+
+    trackEvent('Datasets', 'Change Page', direction)
   }
+
+  const handleRefresh = () => {
+    if (selectedNamespace) {
+      fetchDatasets(selectedNamespace, pageSize, state.page * pageSize);
+      trackEvent('Datasets', 'Refresh Datasets');
+    }
+  };
 
   const i18next = require('i18next')
   return (
-    <Container maxWidth={'lg'} disableGutters>
+    <Container maxWidth={'xl'} disableGutters>
       <Box p={2} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
         <Box display={'flex'}>
           <MqText heading>{i18next.t('datasets_route.heading')}</MqText>
@@ -122,16 +151,7 @@ const Datasets: React.FC<DatasetsProps> = ({
           {isDatasetsLoading && <CircularProgress size={16} />}
           <NamespaceSelect />
           <MQTooltip title={'Refresh'}>
-            <IconButton
-              sx={{ ml: 2 }}
-              color={'primary'}
-              size={'small'}
-              onClick={() => {
-                if (selectedNamespace) {
-                  fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
-                }
-              }}
-            >
+            <IconButton sx={{ ml: 2 }} color={'primary'} size={'small'} onClick={handleRefresh}>
               <Refresh fontSize={'small'} />
             </IconButton>
           </MQTooltip>
@@ -147,15 +167,7 @@ const Datasets: React.FC<DatasetsProps> = ({
               <MqEmpty title={i18next.t('datasets_route.empty_title')}>
                 <>
                   <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
-                  <Button
-                    color={'primary'}
-                    size={'small'}
-                    onClick={() => {
-                      if (selectedNamespace) {
-                        fetchDatasets(selectedNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
-                      }
-                    }}
-                  >
+                  <Button color={'primary'} size={'small'} onClick={handleRefresh}>
                     Refresh
                   </Button>
                 </>
@@ -163,7 +175,12 @@ const Datasets: React.FC<DatasetsProps> = ({
             </Box>
           ) : (
             <>
-              <Table size='small'>
+              <Table
+                sx={{
+                  marginBottom: theme.spacing(2),
+                }}
+                size='small'
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell key={i18next.t('datasets_route.name_col')} align='left'>
@@ -204,7 +221,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                                 dataset.name
                               )}`}
                             >
-                              {truncateText(dataset.name, 40)}
+                              {truncateText(dataset.name, 170)}
                             </MqText>
                           </TableCell>
                           <TableCell align='left'>
@@ -253,13 +270,22 @@ const Datasets: React.FC<DatasetsProps> = ({
                     })}
                 </TableBody>
               </Table>
-              <MqPaging
-                pageSize={PAGE_SIZE}
-                currentPage={state.page}
-                totalCount={totalCount}
-                incrementPage={() => handleClickPage('next')}
-                decrementPage={() => handleClickPage('prev')}
-              />
+
+              <Box
+                display='flex'
+                alignItems='center'
+                justifyContent='flex-end'
+                sx={{ marginTop: 2, marginLeft: 2 }}
+              >
+                <MqPaging
+                  pageSize={pageSize}
+                  currentPage={currentPage}
+                  totalCount={totalCount}
+                  incrementPage={() => handleClickPage('next')}
+                  decrementPage={() => handleClickPage('prev')}
+                />
+                <PageSizeSelector onChange={handlePageSizeChange} />
+              </Box>
             </>
           )}
         </>

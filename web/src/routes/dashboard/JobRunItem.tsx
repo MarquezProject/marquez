@@ -13,6 +13,7 @@ import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqStatus from '../../components/core/status/MqStatus'
 import MqText from '../../components/core/text/MqText'
 import React, { useMemo } from 'react'
+import { trackEvent } from '../../components/ga4'
 
 interface Props {
   job: Job
@@ -25,6 +26,11 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
     () => job.latestRuns?.reduce((acc, run) => (acc.durationMs > run.durationMs ? acc : run)),
     [job.latestRuns]
   )
+  const handleClick = () => {
+    navigate(`/lineage/${encodeNode('JOB', job.namespace, job.name)}`)
+    trackEvent('JobRunItem', 'Click Job Run Item', job.name)
+  }
+
   return (
     <Box
       p={2}
@@ -32,9 +38,7 @@ const JobRunItem: React.FC<Props> = ({ job }) => {
       border={1}
       borderColor={'divider'}
       borderRadius={2}
-      onClick={() => {
-        navigate(`/lineage/${encodeNode('JOB', job.namespace, job.name)}`)
-      }}
+      onClick={handleClick}
       sx={{
         cursor: 'pointer',
         transition: 'background-color 0.3s',

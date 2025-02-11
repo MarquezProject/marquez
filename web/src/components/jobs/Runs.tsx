@@ -33,6 +33,7 @@ import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
 import RunInfo from './RunInfo'
+import { trackEvent } from '../ga4'
 
 interface DispatchProps {
   fetchRuns: typeof fetchRuns
@@ -64,16 +65,21 @@ const Runs: FunctionComponent<RunsProps & DispatchProps> = (props) => {
   const [infoView, setInfoView] = React.useState<Run | null>(null)
   const handleClick = (newValue: SetStateAction<Run | null>) => {
     setInfoView(newValue)
+    if (newValue) {
+      trackEvent('Runs', 'Click Run', newValue.toString())
+    }
   }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
+    trackEvent('Runs', 'Paginate Runs', direction)
   }
 
   React.useEffect(() => {
     fetchRuns(jobName, jobNamespace, PAGE_SIZE, state.page * PAGE_SIZE)
+    trackEvent('Runs', 'View Runs', jobName)
   }, [state.page])
 
   const theme = createTheme(useTheme())

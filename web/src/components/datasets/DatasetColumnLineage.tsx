@@ -16,6 +16,7 @@ import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../../components/core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, useEffect } from 'react'
+import { trackEvent } from '../ga4'
 
 interface DatasetColumnLineageProps {
   lineageDataset: LineageDataset
@@ -40,6 +41,7 @@ const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
   useEffect(() => {
     if (namespace && name) {
       fetchDataset(namespace, name)
+      trackEvent('DatasetColumnLineage', 'Download File', `${name}-${namespace}`)
     }
   }, [name, namespace])
 
@@ -55,6 +57,7 @@ const DatasetColumnLineage: FunctionComponent<IProps> = (props) => {
     const title = `${lineageDataset.name}-${lineageDataset.namespace}-columnLineage`
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' })
     saveAs(blob, `${title}.json`)
+    trackEvent('DatasetColumnLineage', 'Download File', `${title}.json`)
   }
 
   const columnLineage = dataset?.columnLineage

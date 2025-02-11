@@ -17,6 +17,7 @@ import Box from '@mui/material/Box'
 import ColumnLevelDrawer from './ColumnLevelDrawer'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React, { useEffect, useRef, useState } from 'react'
+import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   columnLineage: ColumnLineageGraph
@@ -39,23 +40,21 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
+  const [withDownstream, setWithDownstream] = useState(
+    searchParams.get('withDownstream') === 'true'
+  )
 
   const graphControls = useRef<ZoomPanControls>()
 
   useEffect(() => {
-    if (name && namespace) {
-      fetchColumnLineage('DATASET', namespace, name, depth)
-    }
-  }, [name, namespace, depth])
+    trackEvent('ColumnLevel', 'View Column-Level Lineage')
+  }, [])
 
-  // const column = searchParams.get('column')
-  // useEffect(() => {
-  //   if (column) {
-  //     graphControls.current?.centerOnPositionedNode(
-  //       `datasetField:${namespace}:${parseColumnLineageNode(column).dataset}`
-  //     )
-  //   }
-  // }, [column])
+  useEffect(() => {
+    if (name && namespace) {
+      fetchColumnLineage('DATASET', namespace, name, depth, withDownstream)
+    }
+  }, [name, namespace, depth, withDownstream])
 
   if (!columnLineage) {
     return <div />
@@ -83,12 +82,21 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   return (
     <>
-      <ActionBar fetchColumnLineage={fetchColumnLineage} depth={depth} setDepth={setDepth} />
+      <ActionBar
+        fetchColumnLineage={fetchColumnLineage}
+        depth={depth}
+        setDepth={setDepth}
+        withDownstream={withDownstream}
+        setWithDownstream={setWithDownstream}
+      />
       <Box height={`calc(100vh - ${HEADER_HEIGHT}px - 64px)`}>
         <Drawer
           anchor={'right'}
           open={!!searchParams.get('dataset')}
-          onClose={() => setSearchParams({})}
+          onClose={() => {
+            setSearchParams({})
+            trackEvent('ColumnLevel', 'Close Drawer')
+          }}
           PaperProps={{
             sx: {
               backgroundColor: theme.palette.background.default,

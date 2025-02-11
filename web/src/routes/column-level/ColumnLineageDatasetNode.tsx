@@ -5,6 +5,7 @@ import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { theme } from '../../helpers/theme'
 import { truncateText } from '../../helpers/text'
 import { useParams, useSearchParams } from 'react-router-dom'
+import { trackEvent } from '../../components/ga4'
 import Box from '@mui/system/Box'
 import React from 'react'
 
@@ -15,6 +16,20 @@ export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps
   const [searchParams, setSearchParams] = useSearchParams()
   const { namespace, name } = useParams()
   const shine = name === node.data.dataset && namespace === node.data.namespace
+
+  const handleMouseEnter = () => {
+    trackEvent('ColumnLineageDatasetNode', 'Hover Dataset Node', node.data.dataset);
+  };
+
+  const handleClick = () => {
+    setSearchParams({
+      ...searchParams,
+      dataset: node.data.dataset,
+      namespace: node.data.namespace,
+    });
+    trackEvent('ColumnLineageDatasetNode', 'Click Dataset Node', node.data.dataset);
+  };
+
   return (
     <>
       <Box
@@ -30,6 +45,7 @@ export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps
           rx: 4,
           filter: shine ? `drop-shadow( 0 0 4px ${theme.palette.primary.main})` : 'none',
         }}
+        onMouseEnter={handleMouseEnter}
       />
       <Box
         component={'rect'}
@@ -50,13 +66,7 @@ export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps
         fontSize={14}
         stroke={'white'}
         cursor={'pointer'}
-        onClick={() =>
-          setSearchParams({
-            ...searchParams,
-            dataset: node.data.dataset,
-            namespace: node.data.namespace,
-          })
-        }
+        onClick={handleClick}
       >
         {`${truncateText(node.data.dataset, 25)}`}
       </text>

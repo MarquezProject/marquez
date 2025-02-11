@@ -455,7 +455,8 @@ export const fetchLineage = (
   nodeType: JobOrDataset,
   namespace: string,
   name: string,
-  depth: number
+  depth: number,
+  withDownstream: boolean
 ) => ({
   type: actionTypes.FETCH_LINEAGE,
   payload: {
@@ -463,6 +464,7 @@ export const fetchLineage = (
     namespace,
     name,
     depth,
+    withDownstream,
   },
 })
 
@@ -470,7 +472,8 @@ export const fetchColumnLineage = (
   nodeType: JobOrDataset,
   namespace: string,
   name: string,
-  depth: number
+  depth: number,
+  withDownstream: boolean
 ) => ({
   type: actionTypes.FETCH_COLUMN_LINEAGE,
   payload: {
@@ -478,6 +481,7 @@ export const fetchColumnLineage = (
     namespace,
     name,
     depth,
+    withDownstream,
   },
 })
 

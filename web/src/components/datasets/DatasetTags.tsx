@@ -33,6 +33,7 @@ import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import React, { useState } from 'react'
 import Snackbar from '@mui/material/Snackbar'
+import { trackEvent } from '../ga4'
 
 interface DatasetTagsProps {
   namespace: string
@@ -86,6 +87,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     const selectedTagData = tagData.find((tag) => tag.name === value)
     setListTag(value)
     setTagDescription(selectedTagData ? selectedTagData.description : '')
+    trackEvent('DatasetTags', 'Edit Tag', value)
   }
 
   const handleDescriptionChange = (event: any) => {
@@ -127,6 +129,8 @@ const DatasetTags: React.FC<IProps> = (props) => {
     datasetField
       ? deleteDatasetFieldTag(namespace, datasetName, deletedTag, datasetField)
       : deleteDatasetTag(namespace, datasetName, deletedTag)
+
+    trackEvent('DatasetTags', 'Delete Tag', deletedTag)
   }
 
   const addTag = () => {
@@ -135,6 +139,7 @@ const DatasetTags: React.FC<IProps> = (props) => {
     setOpenTagDesc(false)
     setListTag('')
     setTagDescription('')
+    trackEvent('DatasetTags', 'Add Tag', listTag)
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {

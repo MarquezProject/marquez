@@ -1,21 +1,24 @@
-// Copyright 2018-2024 contributors to the Marquez project
-// SPDX-License-Identifier: Apache-2.0
-
-import { Box, Chip } from '@mui/material'
+import React, { useEffect, useRef, useState } from 'react'
+import { Box, Chip, IconButton, CircularProgress } from '@mui/material'
 import { Close, SearchOutlined } from '@mui/icons-material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
-import { IState } from '../../store/reducers'
-import { MqInputBase } from '../core/input-base/MqInputBase'
-import { REACT_APP_ADVANCED_SEARCH } from '../../globals'
 import { connect } from 'react-redux'
 import { useLocation } from 'react-router'
 import BaseSearch from './base-search/BaseSearch'
-import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import IconButton from '@mui/material/IconButton'
 import OpenSearch from './open-search/OpenSearch'
-import React, { useEffect, useRef, useState } from 'react'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
 import SearchPlaceholder from './SearchPlaceholder'
+import { IState } from '../../store/reducers'
+import { MqInputBase } from '../core/input-base/MqInputBase'
+import { trackEvent } from '../ga4'
+
+interface StateProps {
+  isLoading: boolean
+}
+
+interface SearchProps extends StateProps {
+  onSearch: (query: string) => void // Add onSearch prop
+}
 
 const useCmdKShortcut = (callback: () => void) => {
   useEffect(() => {
@@ -51,11 +54,7 @@ const useEscapeShortcut = (callback: () => void) => {
   }, [callback])
 }
 
-interface StateProps {
-  isLoading: boolean
-}
-
-const Search: React.FC = ({ isLoading }: StateProps) => {
+const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
   const [search, setSearch] = useState('')
   const [open, setOpen] = useState(true)
 
@@ -82,6 +81,22 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
     setOpen(false)
     setSearch('')
   }, [location])
+
+  const handleSearch = () => {
+    onSearch(search) // Call onSearch prop
+    trackEvent('Search', 'Perform Search', search)
+  }
+
+  const handleFocus = () => {
+    setOpen(true);
+    trackEvent('Search', 'Focus Search Bar')
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setSearch('')
+    trackEvent('Search', 'Close Search Bar')
+  }
 
   return (
     <Box width={`calc(100vw - ${DRAWER_WIDTH}px)`} position={'relative'} id={'searchContainer'}>
@@ -129,10 +144,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                   color={'secondary'}
                   sx={{ mr: 1 }}
                   size={'small'}
-                  onClick={() => {
-                    setSearch('')
-                    setOpen(false)
-                  }}
+                  onClick={handleClose}
                 >
                   <Close />
                 </IconButton>
@@ -145,10 +157,15 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
               />
             </>
           }
-          onFocus={() => setOpen(true)}
+          onFocus={handleFocus}
           onChange={(event) => {
             setSearch(event.target.value)
             setOpen(true)
+          }}
+          onKeyPress={(event) => {
+            if (event.key === 'Enter') {
+              handleSearch() // Trigger search on Enter key press
+            }
           }}
           value={search}
           autoComplete={'off'}
@@ -157,10 +174,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
         <ClickAwayListener
           mouseEvent='onMouseDown'
           touchEvent='onTouchStart'
-          onClickAway={() => {
-            setOpen(false)
-            setSearch('')
-          }}
+          onClickAway={handleClose}
         >
           <Box>
             {open && search.length > 0 && (
@@ -188,7 +202,7 @@ const Search: React.FC = ({ isLoading }: StateProps) => {
                   overflow={'auto'}
                   maxHeight={`calc(100vh - ${HEADER_HEIGHT}px - 24px)`}
                 >
-                  {REACT_APP_ADVANCED_SEARCH ? (
+                  {process.env.REACT_APP_ADVANCED_SEARCH === 'true' ? (
                     <OpenSearch search={search} />
                   ) : (
                     <BaseSearch search={search} />

@@ -6,8 +6,9 @@ import { LineChart } from '@mui/x-charts'
 import { Skeleton } from '@mui/material'
 import { formatTime } from './StackedLineageEvents'
 import { theme } from '../../helpers/theme'
+import { trackEvent } from '../../components/ga4'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 interface Props {
   intervalMetrics?: IntervalMetric[]
@@ -19,6 +20,9 @@ interface Props {
 const HEIGHT = 52
 
 const MiniGraph: React.FC<Props> = ({ intervalMetrics, isLoading, color, label }) => {
+  useEffect(() => {
+    trackEvent('MiniGraph', 'View Mini Graph', label);
+  }, [label]);
   if (!intervalMetrics || isLoading) {
     return <Skeleton height={HEIGHT + 1} width={'100%'} />
   }

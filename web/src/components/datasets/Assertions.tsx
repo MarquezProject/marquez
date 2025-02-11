@@ -6,6 +6,7 @@ import { theme } from '../../helpers/theme'
 import MqStatus from '../core/status/MqStatus'
 import MqText from '../core/text/MqText'
 import React from 'react'
+import { trackEvent } from '../ga4'
 
 interface OwnProps {
   assertions: Assertion[]
@@ -16,6 +17,7 @@ const Assertions: React.FC<OwnProps> = ({ assertions, hasHeader }) => {
   if (assertions.length === 0) {
     return null
   }
+  trackEvent('Assertions', 'View Assertions Table')
   return (
     <Table size={'small'}>
       {hasHeader && (

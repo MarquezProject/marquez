@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { grey } from '@mui/material/colors'
 import { truncateText } from '../../helpers/text'
 import { useSearchParams } from 'react-router-dom'
+import { trackEvent } from '../../components/ga4'
 import Box from '@mui/system/Box'
 import React from 'react'
 
@@ -22,31 +23,40 @@ export const encodeQueryString = (namespace: string, dataset: string, column: st
 }
 
 const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateProps) => {
+  
   const [searchParams, setSearchParams] = useSearchParams()
   const [shine, setShine] = React.useState(false)
+  const handleMouseEnter = () => {
+    setShine(true);
+    setSearchParams({
+      ...searchParams,
+      column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+      columnName: node.data.column,
+    });
+    trackEvent('ColumnLineageColumnNode', 'Hover Column Node', node.data.column);
+  };
+
+  const handleMouseLeave = () => {
+    setShine(false);
+  };
+
+  const handleClick = () => {
+    setSearchParams({
+      ...searchParams,
+      dataset: node.data.dataset,
+      namespace: node.data.namespace,
+      column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
+      columnName: node.data.column,
+    });
+    trackEvent('ColumnLineageColumnNode', 'Click Column Node', node.data.column);
+  };
+
   return (
     <>
       <Box
-        onMouseEnter={() => {
-          setShine(true)
-          setSearchParams({
-            ...searchParams,
-            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
-            columnName: node.data.column,
-          })
-        }}
-        onMouseLeave={() => {
-          setShine(false)
-        }}
-        onClick={() => {
-          setSearchParams({
-            ...searchParams,
-            dataset: node.data.dataset,
-            namespace: node.data.namespace,
-            column: encodeQueryString(node.data.namespace, node.data.dataset, node.data.column),
-            columnName: node.data.column,
-          })
-        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={handleClick}
         component={'rect'}
         sx={{
           x: 0,

@@ -10,9 +10,11 @@ import { encodeNode } from '../../helpers/nodes'
 import { faCog } from '@fortawesome/free-solid-svg-icons/faCog'
 import { faDatabase } from '@fortawesome/free-solid-svg-icons'
 import { theme } from '../../helpers/theme'
+import { trackEvent } from '../ga4'
 import MqText from '../core/text/MqText'
 import React from 'react'
 import moment from 'moment'
+
 
 interface OwnProps {
   searchResult: SearchResult
@@ -33,12 +35,18 @@ const SearchListItem: React.FC<DkSearchListItemProps> = ({ searchResult, search,
     searchResult.name.length
   )
   const searchMatchIndex = name.toLowerCase().indexOf(search.toLowerCase())
+
+  const handleClick = () => {
+    onClick(searchResult.name)
+    trackEvent('SearchListItem', 'Click Search Result', searchResult.name)
+  }
+
   return (
     <RouterLink
       style={{
         textDecoration: 'none',
       }}
-      onClick={() => onClick(searchResult.name)}
+      onClick={handleClick}
       to={`/lineage/${encodeNode(searchResult.type, searchResult.namespace, searchResult.name)}`}
     >
       <Box

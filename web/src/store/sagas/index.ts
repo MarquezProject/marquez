@@ -165,7 +165,8 @@ export function* fetchColumnLineage() {
         payload.nodeType,
         payload.namespace,
         payload.name,
-        payload.depth
+        payload.depth,
+        payload.withDownstream
       )
       yield put(fetchColumnLineageSuccess(result))
     } catch (e) {

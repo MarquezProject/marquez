@@ -13,7 +13,8 @@ export const getColumnLineage = async (
   nodeType: JobOrDataset,
   namespace: string,
   name: string,
-  depth: number
+  depth: number,
+  withDownstream: boolean
 ) => {
   const encodedNamespace = encodeURIComponent(namespace)
   const encodedName = encodeURIComponent(name)

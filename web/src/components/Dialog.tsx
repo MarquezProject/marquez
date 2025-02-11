@@ -10,7 +10,8 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
+import { trackEvent } from './ga4'
 
 interface IProps {
   dialogIsOpen: boolean
@@ -21,9 +22,21 @@ interface IProps {
 }
 
 const AlertDialog: FunctionComponent<IProps> = (props) => {
+  useEffect(() => {
+    if (props.dialogIsOpen) {
+      trackEvent('Dialog', 'Open Dialog', props.title ?? 'No Title')
+    }
+  }, [props.dialogIsOpen])
+
   const handleClose = () => {
     props.dialogToggle('')
+    trackEvent('Dialog', 'Close Dialog', props.title ?? 'No Title')
   }
+
+  const handleContinue = () => {
+    props.ignoreWarning();
+    trackEvent('Dialog', 'Click Continue', props.title ?? 'No Title');
+  };
 
   const theme = createTheme(useTheme())
 
@@ -51,7 +64,7 @@ const AlertDialog: FunctionComponent<IProps> = (props) => {
           className='dialogButton'
           color='primary'
           variant='outlined'
-          onClick={props.ignoreWarning}
+          onClick={handleContinue}
         >
           Continue
         </Button>

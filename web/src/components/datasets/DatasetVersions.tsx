@@ -28,6 +28,7 @@ import MqCopy from '../core/copy/MqCopy'
 import MqPaging from '../paging/MqPaging'
 import MqText from '../core/text/MqText'
 import React, { FunctionComponent, SetStateAction } from 'react'
+import { trackEvent } from '../ga4'
 
 interface DatasetVersionsProps {
   versions: DatasetVersion[]
@@ -57,12 +58,16 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
 
   const handleClick = (newValue: SetStateAction<DatasetVersion | null>) => {
     setInfoView(newValue)
+    if (newValue) {
+      trackEvent('DatasetVersions', 'Click Version', newValue.name)
+    }
   }
 
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? state.page + 1 : state.page - 1
     window.scrollTo(0, 0)
     setState({ ...state, page: directionPage })
+    trackEvent('DatasetVersions', 'Navigate Page', direction)
   }
 
   const i18next = require('i18next')
@@ -70,6 +75,7 @@ const DatasetVersions: FunctionComponent<DatasetVersionsProps & DispatchProps> =
 
   React.useEffect(() => {
     fetchDatasetVersions(dataset.namespace, dataset.name, PAGE_SIZE, state.page * PAGE_SIZE)
+    trackEvent('DatasetVersions', 'View Dataset Versions', dataset.name)
   }, [state.page])
 
   if (versions.length === 0) {

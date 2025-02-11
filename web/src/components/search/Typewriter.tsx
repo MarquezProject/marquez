@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { trackEvent } from '../ga4'
 
 interface TypewriterProps {
   words: string[]
@@ -20,6 +21,10 @@ const Typewriter: React.FC<TypewriterProps> = ({
   const [wordIndex, setWordIndex] = useState(0)
   const [typingInterval, setTypingInterval] = useState(typingSpeed)
   const [repeatCounter, setRepeatCounter] = useState(0)
+
+  useEffect(() => {
+    trackEvent('Typewriter', 'Start Typing')
+  }, [])
 
   useEffect(() => {
     const handleTyping = () => {
@@ -62,6 +67,12 @@ const Typewriter: React.FC<TypewriterProps> = ({
     repeatCount,
     repeatCounter,
   ])
+
+  useEffect(() => {
+    if (repeatCounter > 0) {
+      trackEvent('Typewriter', 'Complete Cycle', `Cycle ${repeatCounter}`)
+    }
+  }, [repeatCounter])
 
   return <span>{text}</span>
 }

@@ -10,8 +10,9 @@ import MQTooltip from '../core/tooltip/MQTooltip'
 import MqEmpty from '../core/empty/MqEmpty'
 import MqJsonView from '../core/json-view/MqJsonView'
 import MqText from '../core/text/MqText'
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 import SplitscreenIcon from '@mui/icons-material/Splitscreen'
+import { trackEvent } from '../ga4'
 
 export interface JobFacetsProps {
   isCurrentVersion?: boolean
@@ -27,6 +28,10 @@ type DatasetInfoProps = {
 const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
   const { datasetFields, facets, dataset, showTags } = props
   const i18next = require('i18next')
+
+  useEffect(() => {
+    trackEvent('DatasetInfo', 'View Dataset Information', dataset.name);
+  }, [dataset.name]);
 
   return (
     <Box>
@@ -116,6 +121,13 @@ const DatasetInfo: FunctionComponent<DatasetInfoProps> = (props) => {
                                 )}/${encodeURIComponent(dataset.name)}?column=${encodeURIComponent(
                                   encodeQueryString(dataset.namespace, dataset.name, field.name)
                                 )}&columnName=${encodeURIComponent(field.name)}`}
+                                onClick={() =>
+                                  trackEvent(
+                                    'DatasetInfo',
+                                    'Click Column Lineage',
+                                    field.name
+                                  )
+                                }
                               >
                                 <SplitscreenIcon />
                               </IconButton>

@@ -27,6 +27,7 @@ import MQText from '../core/text/MqText'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import React, { ChangeEvent, useState } from 'react'
 import Snackbar from '@mui/material/Snackbar'
+import { trackEvent } from '../ga4'
 
 interface JobTagsProps {
   namespace: string
@@ -67,6 +68,7 @@ const JobTags: React.FC<IProps> = (props) => {
     const selectedTagData = tagData.find((tag) => tag.name === value)
     setListTag(value)
     setTagDescription(selectedTagData ? selectedTagData.description : '')
+    trackEvent('JobTags', 'Edit Tag', value)
   }
 
   const handleDescriptionChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +104,7 @@ const JobTags: React.FC<IProps> = (props) => {
     setSelectedTags(newSelectedTags)
 
     deleteJobTag(namespace, jobName, deletedTag)
+    trackEvent('JobTags', 'Delete Tag', deletedTag)
   }
 
   const addTag = () => {
@@ -110,6 +113,7 @@ const JobTags: React.FC<IProps> = (props) => {
     setOpenTagDesc(false)
     setListTag('')
     setTagDescription('')
+    trackEvent('JobTags', 'Add Tag', listTag)
   }
 
   const formatTags = (tags: string[], tag_desc: Tag[]) => {

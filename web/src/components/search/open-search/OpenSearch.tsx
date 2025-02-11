@@ -27,6 +27,7 @@ import React, { useCallback, useEffect } from 'react'
 import airflow_logo from './airlfow-logo.svg'
 import dbt_logo from './dbt-logo.svg'
 import spark_logo from './spark-logo.svg'
+import { trackEvent } from '../../ga4'
 
 interface StateProps {
   openSearchJobs: IOpenSearchJobsState
@@ -104,6 +105,19 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
   const [isDebouncing, setIsDebouncing] = React.useState<boolean>(true)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (search.length > 0) {
+      fetchOpenSearchJobs(search)
+      trackEvent('OpenSearch', 'Perform Search', search)
+    }
+  }, [search]);
+
+  useEffect(() => {
+    if (openSearchJobs.data.hits.length > 0) {
+      trackEvent('OpenSearch', 'View Search Results', search)
+    }
+  }, [openSearchJobs.data.hits])
+
   useArrowKeys((key) => {
     if (key === 'up') {
       setSelectedIndex(selectedIndex === null ? null : Math.max(selectedIndex - 1, 0))
@@ -124,6 +138,7 @@ const OpenSearch: React.FC<StateProps & DispatchProps & Props> = ({
         const datasetHit =
           openSearchDatasets.data.hits[selectedIndex - openSearchJobs.data.hits.length]
         navigate(`/lineage/${encodeNode('DATASET', datasetHit.namespace, datasetHit.name)}`)
+        trackEvent('OpenSearchDatasets', 'Select Dataset', datasetHit.name)
       }
     }
   })

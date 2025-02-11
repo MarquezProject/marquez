@@ -68,6 +68,8 @@ i18next
             jobs: 'JOBS',
             datasets: 'DATASETS',
             events: 'EVENTS',
+            support: 'SUPPORT',
+            documentation: 'HELP',
           },
           namespace_select: {
             prompt: 'ns',
@@ -202,6 +204,8 @@ i18next
             jobs: 'EMPLOIS',
             datasets: 'JEUX DE DONNÉES',
             events: 'ÉVÉNEMENTS',
+            support: 'SUPPORT',
+            documentation: 'AIDE',
           },
           namespace_select: {
             prompt: 'en',
@@ -336,6 +340,8 @@ i18next
             jobs: 'TRABAJOS',
             datasets: 'CONJUNTOS DE DATOS',
             events: 'EVENTOS',
+            support: 'SOPORTE',
+            documentation: 'AYUDA',
           },
           namespace_select: {
             prompt: 'en',
@@ -470,6 +476,8 @@ i18next
             jobs: 'ZADANIA',
             datasets: 'ZBIORY DANYCH',
             events: 'WYDARZENIA',
+            support: 'WSPIARCIE',
+            documentation: 'POMOC',
           },
           namespace_select: {
             prompt: 'pn',

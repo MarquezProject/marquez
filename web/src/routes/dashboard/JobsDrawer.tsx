@@ -11,6 +11,7 @@ import JobRunItem from './JobRunItem'
 import MqPaging from '../../components/paging/MqPaging'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
+import { trackEvent } from '../../components/ga4'
 const WIDTH = 800
 const PAGE_SIZE = 10
 
@@ -31,12 +32,14 @@ const JobsDrawer = ({ jobs, isJobsLoading, jobCount, fetchJobs }: JobsDrawerProp
 
   useEffect(() => {
     fetchJobs(null, PAGE_SIZE, page * PAGE_SIZE)
+    trackEvent('JobsDrawer', 'View Jobs Drawer')
   }, [page])
 
   const handleClickPage = (direction: 'prev' | 'next') => {
     const directionPage = direction === 'next' ? page + 1 : page - 1
     fetchJobs(null, PAGE_SIZE, directionPage * PAGE_SIZE)
     setPage(directionPage)
+    trackEvent('JobsDrawer', 'Change Page', direction)
   }
 
   return (

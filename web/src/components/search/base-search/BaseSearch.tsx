@@ -15,6 +15,7 @@ import MqChipGroup from '../../core/chip/MqChipGroup'
 import MqText from '../../core/text/MqText'
 import React, { useEffect, useState } from 'react'
 import SearchListItem from '../SearchListItem'
+import { trackEvent } from '../../ga4'
 
 interface BaseSearchProps {
   search: string
@@ -86,11 +87,13 @@ const BaseSearch: React.FC<BaseSearchProps & StateProps & DispatchProps> = ({
   const onSelectFilter = (label: string) => {
     setFilter(label)
     fetchSearch(search, label.toUpperCase(), sort.toUpperCase())
+    trackEvent('BaseSearch', 'Select Filter', label)
   }
 
   const onSelectSortFilter = (label: string) => {
     setSort(label)
     fetchSearch(search, filter.toUpperCase(), label.toUpperCase())
+    trackEvent('BaseSearch', 'Select Sort Option', label);
   }
 
   const searchApi = (q: string, filter = 'ALL', sort = 'NAME') => {
@@ -100,6 +103,7 @@ const BaseSearch: React.FC<BaseSearchProps & StateProps & DispatchProps> = ({
   useEffect(() => {
     if (search.length > 0) {
       searchApi(search, filter, sort)
+      trackEvent('BaseSearch', 'Perform Search', search)
     }
   }, [search, filter, sort])
 

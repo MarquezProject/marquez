@@ -28,6 +28,7 @@ import MqText from '../../components/core/text/MqText'
 import React, { useEffect } from 'react'
 import SplitButton from '../../components/dashboard/SplitButton'
 import StackedLineageEvents from './StackedLineageEvents'
+import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   lineageMetrics: LineageMetric[]
@@ -97,6 +98,10 @@ const Dashboard: React.FC = ({
   const [timelineOpen, setTimelineOpen] = React.useState(false)
 
   useEffect(() => {
+    trackEvent('Dashboard', 'View Dashboard')
+  }, [])
+
+  useEffect(() => {
     const currentSearchParams = searchParams.get('timeframe')
     if (currentSearchParams === 'day' && timeframe !== '24 Hours') {
       setTimeframe('24 Hours')
@@ -161,6 +166,22 @@ const Dashboard: React.FC = ({
 
   const { failed, started, completed, aborted } = metrics
 
+  const handleTimeframeChange = (tf: string) => {
+    setTimeframe(tf)
+    setSearchParams({ timeframe: tf === '7 Days' ? 'week' : 'day' })
+    trackEvent('Dashboard', 'Change Timeframe', tf)
+  }
+
+  const handleRefreshIntervalChange = (option: RefreshInterval) => {
+    setIntervalKey(option)
+    trackEvent('Dashboard', 'Change Refresh Interval', option)
+  };
+
+  const handleSeeMoreClick = () => {
+    setJobsDrawerOpen(true)
+    trackEvent('Dashboard', 'Click See More')
+  }
+
   return (
     <>
       <Drawer
@@ -205,9 +226,7 @@ const Dashboard: React.FC = ({
               <SplitButton
                 options={REFRESH_INTERVALS}
                 onRefresh={() => refresh()}
-                onClick={(option) => {
-                  setIntervalKey(option as RefreshInterval)
-                }}
+                onClick={(option) => handleRefreshIntervalChange(option as RefreshInterval)}
               />
             </Box>
             <Divider sx={{ mx: 2 }} orientation={'vertical'} />
@@ -218,10 +237,7 @@ const Dashboard: React.FC = ({
                   <Button
                     key={tf}
                     variant={timeframe === tf ? 'contained' : 'outlined'}
-                    onClick={() => {
-                      setTimeframe(tf)
-                      setSearchParams({ timeframe: tf === '7 Days' ? 'week' : 'day' })
-                    }}
+                    onClick={() => handleTimeframeChange(tf)}
                   >
                     {tf}
                   </Button>
@@ -344,7 +360,7 @@ const Dashboard: React.FC = ({
                       disableRipple
                       size={'small'}
                       endIcon={<ChevronRight />}
-                      onClick={() => setJobsDrawerOpen(true)}
+                      onClick={handleSeeMoreClick}
                     >
                       See More
                     </Button>

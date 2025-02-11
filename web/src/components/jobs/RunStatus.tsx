@@ -8,6 +8,7 @@ import { runStateColor } from '../../helpers/nodes'
 import { useTheme } from '@emotion/react'
 import MQTooltip from '../core/tooltip/MQTooltip'
 import React, { FunctionComponent } from 'react'
+import { trackEvent } from '../ga4'
 
 interface RunStatusProps {
   run: Run
@@ -16,9 +17,12 @@ interface RunStatusProps {
 const RunStatus: FunctionComponent<RunStatusProps> = (props) => {
   const { run } = props
   const theme = createTheme(useTheme())
+  const handleTooltipOpen = () => {
+    trackEvent('RunStatus', 'View Run Status Tooltip', run.state);
+  };
 
   return (
-    <MQTooltip title={run.state}>
+    <MQTooltip title={run.state} onOpen={handleTooltipOpen}>
       <Box
         mr={1}
         sx={{

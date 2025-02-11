@@ -20,9 +20,13 @@ const webpackProd = {
       minify: true,
       inject: false,
       template: 'src/index.prod.html',
-      favicon: 'src/img/favicon.png'
+      favicon: 'src/img/icon.svg'
     }),
     new webpack.DefinePlugin({
+      'process.env': {
+        REACT_APP_OKTA_ISSUER: JSON.stringify(process.env.REACT_APP_OKTA_ISSUER),
+        REACT_APP_OKTA_CLIENT_ID: JSON.stringify(process.env.REACT_APP_OKTA_CLIENT_ID),
+      },
       __DEVELOPMENT__: JSON.stringify(false),
       __NODE_ENV__: JSON.stringify('production'),
       __REACT_APP_ADVANCED_SEARCH__: process.env.REACT_APP_ADVANCED_SEARCH === 'true',
