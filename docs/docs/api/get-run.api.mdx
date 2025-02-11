@@ -5,7 +5,141 @@ description: "Retrieve a run."
 sidebar_label: "Retrieve a run"
 hide_title: true
 hide_table_of_contents: true
-api: {"operationId":"getRun","description":"Retrieve a run.","tags":["Jobs"],"responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"type":"object","anyOf":[{"type":"object","example":{"id":"870492da-ecfb-4be0-91b9-9a89ddd3db90","createdAt":"2019-05-09T19:49:24.201361Z","updatedAt":"2019-05-09T19:49:24.201361Z","nominalStartTime":null,"nominalEndTime":null,"state":"RUNNING","startedAt":"2019-05-09T15:17:32.690346","endedAt":null,"durationMs":null,"args":{"email":"me@example.com","emailOnFailure":"false","emailOnRetry":"true","retries":"1"},"facets":{}},"title":"IncompleteRun"},{"type":"object"}],"example":{"id":"870492da-ecfb-4be0-91b9-9a89ddd3db90","createdAt":"2019-05-09T19:49:24.201361Z","updatedAt":"2019-05-09T19:49:24.201361Z","nominalStartTime":null,"nominalEndTime":null,"state":"COMPLETED","startedAt":"2019-05-09T15:17:32.690346","endedAt":"2019-05-09T20:05:46.815920Z","durationMs":4250894125,"args":{"email":"me@example.com","emailOnFailure":"false","emailOnRetry":"true","retries":"1"},"context":{"SQL":"SELECT * FROM mytable;"},"facets":{}},"title":"Run"}}}}},"parameters":[{"name":"id","in":"path","description":"The ID of the run.","required":true,"schema":{"type":"string","format":"uuid","example":"ea9badc5-7cb2-49af-9a9f-155771d3a797"}}],"method":"get","path":"/jobs/runs/{id}","servers":[{"url":"http://localhost:5000/api/v1","description":"Local API server"}],"info":{"title":"Marquez","version":"0.41.0-SNAPSHOT","description":"Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.","license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"}},"postman":{"name":"Retrieve a run","description":{"content":"Retrieve a run.","type":"text/plain"},"url":{"path":["jobs","runs",":id"],"host":["{{baseUrl}}"],"query":[],"variable":[{"disabled":false,"description":{"content":"(Required) The ID of the run.","type":"text/plain"},"type":"any","value":"","key":"id"}]},"header":[{"key":"Accept","value":"application/json"}],"method":"GET"}}
+api:
+  {
+    "operationId": "getRun",
+    "description": "Retrieve a run.",
+    "tags": ["Jobs"],
+    "responses":
+      {
+        "200":
+          {
+            "description": "OK",
+            "content":
+              {
+                "application/json":
+                  {
+                    "schema":
+                      {
+                        "type": "object",
+                        "anyOf":
+                          [
+                            {
+                              "type": "object",
+                              "example":
+                                {
+                                  "id": "870492da-ecfb-4be0-91b9-9a89ddd3db90",
+                                  "createdAt": "2019-05-09T19:49:24.201361Z",
+                                  "updatedAt": "2019-05-09T19:49:24.201361Z",
+                                  "nominalStartTime": null,
+                                  "nominalEndTime": null,
+                                  "state": "RUNNING",
+                                  "startedAt": "2019-05-09T15:17:32.690346",
+                                  "endedAt": null,
+                                  "durationMs": null,
+                                  "args":
+                                    {
+                                      "email": "me@example.com",
+                                      "emailOnFailure": "false",
+                                      "emailOnRetry": "true",
+                                      "retries": "1",
+                                    },
+                                  "facets": {},
+                                },
+                              "title": "IncompleteRun",
+                            },
+                            { "type": "object" },
+                          ],
+                        "example":
+                          {
+                            "id": "870492da-ecfb-4be0-91b9-9a89ddd3db90",
+                            "createdAt": "2019-05-09T19:49:24.201361Z",
+                            "updatedAt": "2019-05-09T19:49:24.201361Z",
+                            "nominalStartTime": null,
+                            "nominalEndTime": null,
+                            "state": "COMPLETED",
+                            "startedAt": "2019-05-09T15:17:32.690346",
+                            "endedAt": "2019-05-09T20:05:46.815920Z",
+                            "durationMs": 4250894125,
+                            "args":
+                              {
+                                "email": "me@example.com",
+                                "emailOnFailure": "false",
+                                "emailOnRetry": "true",
+                                "retries": "1",
+                              },
+                            "context": { "SQL": "SELECT * FROM mytable;" },
+                            "facets": {},
+                          },
+                        "title": "Run",
+                      },
+                  },
+              },
+          },
+      },
+    "parameters":
+      [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "The ID of the run.",
+          "required": true,
+          "schema":
+            {
+              "type": "string",
+              "format": "uuid",
+              "example": "ea9badc5-7cb2-49af-9a9f-155771d3a797",
+            },
+        },
+      ],
+    "method": "get",
+    "path": "/jobs/runs/{id}",
+    "servers":
+      [
+        {
+          "url": "http://localhost:5000/api/v1",
+          "description": "Local API server",
+        },
+      ],
+    "info":
+      {
+        "title": "Marquez",
+        "version": "0.50.0",
+        "description": "Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.",
+        "license":
+          {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html",
+          },
+      },
+    "postman":
+      {
+        "name": "Retrieve a run",
+        "description": { "content": "Retrieve a run.", "type": "text/plain" },
+        "url":
+          {
+            "path": ["jobs", "runs", ":id"],
+            "host": ["{{baseUrl}}"],
+            "query": [],
+            "variable":
+              [
+                {
+                  "disabled": false,
+                  "description":
+                    {
+                      "content": "(Required) The ID of the run.",
+                      "type": "text/plain",
+                    },
+                  "type": "any",
+                  "value": "",
+                  "key": "id",
+                },
+              ],
+          },
+        "header": [{ "key": "Accept", "value": "application/json" }],
+        "method": "GET",
+      },
+  }
 sidebar_class_name: "get api-method"
 info_path: docs/api/marquez
 custom_edit_url: null
@@ -21,8 +155,6 @@ import DiscriminatorTabs from "@theme/DiscriminatorTabs";
 import TabItem from "@theme/TabItem";
 
 ## Retrieve a run
-
-
 
 Retrieve a run.
 
@@ -47,4 +179,4 @@ Dataset facets in run context, like `outputFacets`.
 The facets of the run. For a full list of standard run facets, see [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.md#standard-facets).
 
 </div><SchemaItem collapsible={false} name={"description"} required={false} schemaName={""} qualifierMessage={undefined} schema={"A custom facet enables the extension of _dataset_, _job_, and _run_ metadata. A custom facet **must** also have a schema, where a version of the schema is identifiable via a URL. A field within the schema **must** not start with an underscore (`_`)."}></SchemaItem><SchemaItem collapsible={false} name={"allOf"} required={false} schemaName={""} qualifierMessage={undefined} schema={[{"description":"All base facet fields are prefixed with an underscore (`_`) to avoid field naming conflicts defined with other facets.","type":"object","properties":{"_producer":{"description":"URI identifying the producer of this metadata. For example this could be a git url with a given tag or sha","type":"string","format":"uri","example":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"},"_schemaURL":{"description":"The URL to the corresponding version of the schema definition following a $ref URL Reference (see https://swagger.io/docs/specification/using-ref/)","type":"string","format":"uri","example":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.yml#MyCustomJobFacet"}},"required":["_producer","_schemaURL"],"title":"BaseFacet"},{"type":"object","additionalProperties":true}]}></SchemaItem><SchemaItem collapsible={false} name={"title"} required={false} schemaName={""} qualifierMessage={undefined} schema={"CustomFacet"}></SchemaItem></div></details></SchemaItem></TabItem></SchemaTabs></div></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"id\": \"870492da-ecfb-4be0-91b9-9a89ddd3db90\",\n  \"createdAt\": \"2019-05-09T19:49:24.201361Z\",\n  \"updatedAt\": \"2019-05-09T19:49:24.201361Z\",\n  \"nominalStartTime\": null,\n  \"nominalEndTime\": null,\n  \"state\": \"COMPLETED\",\n  \"startedAt\": \"2019-05-09T15:17:32.690346\",\n  \"endedAt\": \"2019-05-09T20:05:46.815920Z\",\n  \"durationMs\": 4250894125,\n  \"args\": {\n    \"email\": \"me@example.com\",\n    \"emailOnFailure\": \"false\",\n    \"emailOnRetry\": \"true\",\n    \"retries\": \"1\"\n  },\n  \"context\": {\n    \"SQL\": \"SELECT * FROM mytable;\"\n  },\n  \"facets\": {}\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem></ApiTabs></div>
-      
+
