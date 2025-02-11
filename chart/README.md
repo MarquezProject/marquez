@@ -87,7 +87,7 @@ helm delete marquez
 | Parameter                        | Description                     | Default   |
 |----------------------------------|---------------------------------|-----------|
 | `postgresql.enabled`             | Deploy PostgreSQL container(s)  | `false`   |
-| `postgresql.image.tag`           | PostgreSQL image version        | `12.1.0`  |
+| `postgresql.image.tag`           | PostgreSQL image version        | `14.0.0`  |
 | `postgresql.auth.username`       | PostgreSQL username             | `buendia` |
 | `postgresql.auth.password`       | PostgreSQL password             | `macondo` |
 | `postgresql.auth.database`       | PostgreSQL database             | `marquez` |
