@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "fraction.js": "^5.2.1"
+  }
+}

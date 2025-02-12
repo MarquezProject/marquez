@@ -12,7 +12,6 @@ export const oktaAuth = new OktaAuth({
     storage: 'localStorage',
   },
 })
-
 interface AuthContextType {
   isAuthenticated: boolean
   user: any
