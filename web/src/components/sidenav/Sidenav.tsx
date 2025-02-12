@@ -1,38 +1,37 @@
-import React from 'react';
-import SVG from 'react-inlinesvg';
-import { Link, useLocation } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme';
-import { Divider, Drawer, createTheme } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCogs, faDatabase } from '@fortawesome/free-solid-svg-icons';
-import MqIconButton from '../core/icon-button/MqIconButton';
-import '../../i18n/config';
-import { FormControl, MenuItem, Select } from '@mui/material';
-import { MqInputNoIcon } from '../core/input-base/MqInputBase';
-import { useTheme } from '@emotion/react';
-import { Dashboard } from '@mui/icons-material';
-import { PrivateRoute } from '../PrivateRoute';
-import HelpCenterIcon from '@mui/icons-material/HelpCenter';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import iconSearchArrow from '../../img/iconSearchArrow.svg';
-import nu_logo from './logoNu.svg';
-import { trackEvent } from '../ga4';
+import '../../i18n/config'
+import { DRAWER_WIDTH, HEADER_HEIGHT } from '../../helpers/theme'
+import { Divider, Drawer, createTheme } from '@mui/material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FormControl, MenuItem, Select } from '@mui/material'
+import { Link, useLocation } from 'react-router-dom'
+import { MqInputNoIcon } from '../core/input-base/MqInputBase'
+import { PrivateRoute } from '../PrivateRoute'
+import { faDatabase } from '@fortawesome/free-solid-svg-icons'
+import { trackEvent } from '../ga4'
+import { useTheme } from '@emotion/react'
+import Box from '@mui/material/Box'
+import HelpCenterIcon from '@mui/icons-material/HelpCenter'
+import MqIconButton from '../core/icon-button/MqIconButton'
+import React from 'react'
+import SVG from 'react-inlinesvg'
+import SupportAgentIcon from '@mui/icons-material/SupportAgent'
+import iconSearchArrow from '../../img/iconSearchArrow.svg'
+import nu_logo from './logoNu.svg'
 
 interface SidenavProps {}
 
 const Sidenav: React.FC<SidenavProps> = () => {
-  const i18next = require('i18next');
+  const i18next = require('i18next')
   const changeLanguage = (lng: string) => {
-    i18next.changeLanguage(lng);
-  };
-  const theme = createTheme(useTheme());
+    i18next.changeLanguage(lng)
+  }
+  const theme = createTheme(useTheme())
 
-  const location = useLocation();
+  const location = useLocation()
 
   const handleNavClick = (category: string, action: string) => {
-    trackEvent(category, action);
-  };
+    trackEvent(category, action)
+  }
 
   return (
     <PrivateRoute>
@@ -92,7 +91,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             >
               <FontAwesomeIcon icon={faDatabase} fontSize={20} />
             </MqIconButton>
-            <MqIconButton
+            {/* <MqIconButton
               to={'/jobs'}
               id={'jobsDrawerButton'}
               title={i18next.t('sidenav.jobs')}
@@ -100,7 +99,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
               onClick={() => handleNavClick('Sidenav', 'Jobs Clicked')}
             >
               <FontAwesomeIcon icon={faCogs} fontSize={20} />
-            </MqIconButton>
+            </MqIconButton> */}
             <MqIconButton
               id={'eventsButton'}
               to={'/events'}
@@ -110,7 +109,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             >
               <SVG src={iconSearchArrow} width={'20px'} />
             </MqIconButton>
-            <MqIconButton
+            {/* <MqIconButton
               to={'/dashboard'}
               id={'homeDrawerButton'}
               title={i18next.t('sidenav.dataOps')}
@@ -118,7 +117,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
               onClick={() => handleNavClick('Sidenav', 'Dashboard Clicked')}
             >
               <Dashboard />
-            </MqIconButton>
+            </MqIconButton> */}
           </Box>
 
           <Box
@@ -165,8 +164,8 @@ const Sidenav: React.FC<SidenavProps> = () => {
                 fullWidth
                 value={i18next.resolvedLanguage}
                 onChange={(event) => {
-                  changeLanguage(event.target.value as string);
-                  window.location.reload();
+                  changeLanguage(event.target.value as string)
+                  window.location.reload()
                 }}
                 input={<MqInputNoIcon />}
               >
@@ -188,7 +187,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
         </Box>
       </Drawer>
     </PrivateRoute>
-  );
-};
+  )
+}
 
-export default Sidenav;
+export default Sidenav
