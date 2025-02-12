@@ -28,6 +28,7 @@ import {
 } from '../../helpers/nodes'
 import { fetchDatasets, resetDatasets } from '../../store/actionCreators'
 import { formatUpdatedAt } from '../../helpers'
+import { trackEvent } from '../../components/ga4'
 import { truncateText } from '../../helpers/text'
 import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
@@ -42,7 +43,6 @@ import MqText from '../../components/core/text/MqText'
 import NamespaceSelect from '../../components/namespace-select/NamespaceSelect'
 import PageSizeSelector from '../../components/paging/PageSizeSelector'
 import React, { useState } from 'react'
-import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   datasets: Dataset[]
@@ -126,10 +126,10 @@ const Datasets: React.FC<DatasetsProps> = ({
 
   const handleRefresh = () => {
     if (selectedNamespace) {
-      fetchDatasets(selectedNamespace, pageSize, state.page * pageSize);
-      trackEvent('Datasets', 'Refresh Datasets');
+      fetchDatasets(selectedNamespace, pageSize, state.page * pageSize)
+      trackEvent('Datasets', 'Refresh Datasets')
     }
-  };
+  }
 
   const i18next = require('i18next')
   return (
@@ -255,7 +255,7 @@ const Datasets: React.FC<DatasetsProps> = ({
                             {dataset.columnLineage ? (
                               <MqText
                                 link
-                                linkTo={`column-level/${encodeURIComponent(
+                                linkTo={`/datasets/column-level/${encodeURIComponent(
                                   encodeURIComponent(dataset.id.namespace)
                                 )}/${encodeURIComponent(dataset.id.name)}`}
                               >
