@@ -1,13 +1,15 @@
-import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import {
+  Alert,
   Box,
   CircularProgress,
   Divider,
   FormControlLabel,
   IconButton,
+  Snackbar,
   Switch,
   TextField,
 } from '@mui/material'
+import { ArrowBackIosRounded, Refresh } from '@mui/icons-material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { fetchLineage } from '../../store/actionCreators'
 import { getLineage } from '../../store/requests/lineage'
@@ -16,7 +18,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqText from '../../components/core/text/MqText'
 import React, { useEffect, useState } from 'react'
-import { trackEvent } from '../../components/ga4'
 
 interface ActionBarProps {
   nodeType: 'DATASET' | 'JOB'
@@ -44,49 +45,41 @@ export const ActionBar = ({
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [loading, setLoading] = useState(false)
-
-  const handleBackClick = () => {
-    navigate(nodeType === 'JOB' ? '/jobs' : '/')
-    trackEvent('ActionBar', 'Click Back Button', nodeType)
-  }
-
-  const handleRefreshClick = () => {
-    if (namespace && name) {
-      fetchLineage(nodeType, namespace, name, depth, true)
-      trackEvent('ActionBar', 'Refresh Lineage', nodeType)
-    }
-  }
-
-  const handleDepthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true)
-
-    const newDepth = isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
-    setDepth(newDepth)
-    searchParams.set('depth', e.target.value)
-    setSearchParams(searchParams)
-
-    if (namespace && name) {
-      await getLineage(nodeType, namespace, name, newDepth)
-    }
-    setLoading(false)
-    trackEvent('ActionBar', 'Change Depth', newDepth.toString())
-  }
-
-  const handleAllDependenciesToggle = (checked: boolean) => {
-    setIsFull(checked)
-    searchParams.set('isFull', checked.toString())
-    setSearchParams(searchParams)
-    trackEvent('ActionBar', 'Toggle All Dependencies', checked.toString())
-  }
-
-  const handleHideColumnNamesToggle = (checked: boolean) => {
-    setIsCompact(checked)
-    searchParams.set('isCompact', checked.toString())
-    setSearchParams(searchParams)
-    trackEvent('ActionBar', 'Toggle Hide Column Names', checked.toString())
-  }
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [maxDepth, setMaxDepth] = useState<number | null>(null)
+  const [prevObjectsCount, setPrevObjectsCount] = useState<number | null>(null)
+  const [prevDepth, setPrevDepth] = useState<number | null>(null)
 
   useEffect(() => {
+    const resetLimitState = () => {
+      setMaxDepth(null)
+      setPrevObjectsCount(null)
+      setPrevDepth(null)
+    }
+
+    const prevName = localStorage.getItem('prevName')
+    if (prevName && prevName !== name) {
+      localStorage.removeItem('maxDepth')
+    }
+
+    localStorage.setItem('prevName', name || '')
+
+    resetLimitState()
+  }, [name])
+
+  useEffect(() => {
+    const storedMaxDepth = localStorage.getItem('maxDepth')
+    if (storedMaxDepth) {
+      const parsedDepth = parseInt(storedMaxDepth)
+      setMaxDepth(parsedDepth)
+
+      if (depth > parsedDepth) {
+        setDepth(parsedDepth)
+        searchParams.set('depth', parsedDepth.toString())
+        setSearchParams(searchParams)
+      }
+    }
+
     if (!searchParams.has('isCompact')) {
       searchParams.set('isCompact', 'true')
       setSearchParams(searchParams)
@@ -94,6 +87,59 @@ export const ActionBar = ({
     }
   }, [])
 
+  const handleDepthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true)
+
+    const newDepth = isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
+
+    if (maxDepth !== null && newDepth > maxDepth) {
+      setDepth(maxDepth)
+      searchParams.set('depth', maxDepth.toString())
+      setSearchParams(searchParams)
+      setOpenSnackbar(true)
+      setTimeout(() => setLoading(false), 2000)
+      return
+    }
+
+    setDepth(newDepth)
+    searchParams.set('depth', e.target.value)
+    setSearchParams(searchParams)
+
+    if (namespace && name) {
+      try {
+        const response = await getLineage(nodeType, namespace, name, newDepth)
+
+        if (Array.isArray(response.graph)) {
+          const totalObjects = response.graph.length
+
+          if (prevObjectsCount !== null && prevObjectsCount === totalObjects) {
+            const newMaxDepth = prevDepth || newDepth
+
+            setDepth(newMaxDepth)
+            searchParams.set('depth', newMaxDepth.toString())
+            setSearchParams(searchParams)
+
+            setMaxDepth(newMaxDepth)
+            localStorage.setItem('maxDepth', newMaxDepth.toString())
+            setOpenSnackbar(true)
+          }
+
+          setPrevObjectsCount(totalObjects)
+          setPrevDepth(newDepth)
+        } else {
+          return
+        }
+      } catch (error) {
+        return
+      }
+    }
+
+    setLoading(false)
+  }
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false)
+  }
   return (
     <Box
       sx={{
@@ -112,7 +158,11 @@ export const ActionBar = ({
     >
       <Box display={'flex'} alignItems={'center'}>
         <MQTooltip title={`Back to ${nodeType === 'JOB' ? 'jobs' : 'datasets'}`}>
-        <IconButton size={'small'} sx={{ mr: 2 }} onClick={handleBackClick}>
+          <IconButton
+            size={'small'}
+            sx={{ mr: 2 }}
+            onClick={() => navigate(nodeType === 'JOB' ? '/jobs' : '/')}
+          >
             <ArrowBackIosRounded fontSize={'small'} />
           </IconButton>
         </MQTooltip>
@@ -137,7 +187,16 @@ export const ActionBar = ({
       </Box>
       <Box display={'flex'} alignItems={'center'}>
         <MQTooltip title={'Refresh'}>
-        <IconButton sx={{ mr: 2 }} color={'primary'} size={'small'} onClick={handleRefreshClick}>
+          <IconButton
+            sx={{ mr: 2 }}
+            color={'primary'}
+            size={'small'}
+            onClick={() => {
+              if (namespace && name) {
+                fetchLineage(nodeType, namespace, name, depth, true)
+              }
+            }}
+          >
             <Refresh fontSize={'small'} />
           </IconButton>
         </MQTooltip>
@@ -168,7 +227,11 @@ export const ActionBar = ({
                   size={'small'}
                   value={isFull}
                   defaultChecked={searchParams.get('isFull') === 'true'}
-                  onChange={(_, checked) => handleAllDependenciesToggle(checked)}
+                  onChange={(_, checked) => {
+                    setIsFull(checked)
+                    searchParams.set('isFull', checked.toString())
+                    setSearchParams(searchParams)
+                  }}
                 />
               }
               label={<MqText font={'mono'}>All dependencies</MqText>}
@@ -181,7 +244,11 @@ export const ActionBar = ({
                   size={'small'}
                   checked={isCompact}
                   defaultChecked={searchParams.get('isCompact') === 'true'}
-                  onChange={(_, checked) => handleHideColumnNamesToggle(checked)}
+                  onChange={(_, checked) => {
+                    setIsCompact(checked)
+                    searchParams.set('isCompact', checked.toString())
+                    setSearchParams(searchParams)
+                  }}
                 />
               }
               label={<MqText font={'mono'}>Hide column names</MqText>}
@@ -189,6 +256,16 @@ export const ActionBar = ({
           </MQTooltip>
         </Box>
       </Box>
+      <Snackbar open={openSnackbar} autoHideDuration={1500} onClose={handleCloseSnackbar}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity='info'
+          variant='filled'
+          sx={{ width: '100%', backgroundColor: '#FFFFFF', color: '#191E26' }}
+        >
+          You’ve reached the maximum depth.
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
