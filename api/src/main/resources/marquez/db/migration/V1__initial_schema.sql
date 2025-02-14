@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-CREATE TABLE namespaces (
+CREATE TABLE IF NOT EXISTS namespaces (
   uuid               UUID PRIMARY KEY,
   created_at         TIMESTAMP NOT NULL,
   updated_at         TIMESTAMP NOT NULL,
@@ -9,13 +9,13 @@ CREATE TABLE namespaces (
   current_owner_name VARCHAR(64)
 );
 
-CREATE TABLE owners (
+CREATE TABLE IF NOT EXISTS owners (
   uuid       UUID PRIMARY KEY,
   created_at TIMESTAMP NOT NULL,
   name       VARCHAR(64) UNIQUE NOT NULL
 );
 
-CREATE TABLE namespace_ownerships (
+CREATE TABLE IF NOT EXISTS namespace_ownerships (
   uuid           UUID PRIMARY KEY,
   started_at     TIMESTAMP NOT NULL,
   ended_at       TIMESTAMP,
@@ -24,7 +24,7 @@ CREATE TABLE namespace_ownerships (
   UNIQUE (namespace_uuid, owner_uuid)
 );
 
-CREATE TABLE sources (
+CREATE TABLE IF NOT EXISTS sources (
   uuid           UUID PRIMARY KEY,
   type           VARCHAR(64) NOT NULL,
   created_at     TIMESTAMP NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE sources (
   UNIQUE (name, connection_url)
 );
 
-CREATE TABLE datasets (
+CREATE TABLE IF NOT EXISTS datasets (
   uuid                 UUID PRIMARY KEY,
   type                 VARCHAR(64) NOT NULL,
   created_at           TIMESTAMP NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE datasets (
   UNIQUE (namespace_uuid, source_uuid, name, physical_name)
 );
 
-CREATE TABLE jobs (
+CREATE TABLE IF NOT EXISTS jobs (
   uuid                 UUID PRIMARY KEY,
   type                 VARCHAR(64) NOT NULL,
   created_at           TIMESTAMP NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE jobs (
   UNIQUE (namespace_uuid, name)
 );
 
-CREATE TABLE job_versions (
+CREATE TABLE IF NOT EXISTS job_versions (
   uuid            UUID PRIMARY KEY,
   created_at      TIMESTAMP NOT NULL,
   updated_at      TIMESTAMP NOT NULL,
@@ -72,21 +72,21 @@ CREATE TABLE job_versions (
   UNIQUE (job_uuid, version)
 );
 
-CREATE TABLE job_versions_io_mapping (
+CREATE TABLE IF NOT EXISTS job_versions_io_mapping (
   job_version_uuid UUID REFERENCES job_versions(uuid),
   dataset_uuid     UUID REFERENCES datasets(uuid),
   io_type          VARCHAR(64) NOT NULL,
   PRIMARY KEY (job_version_uuid, dataset_uuid, io_type)
 );
 
-CREATE TABLE run_args (
+CREATE TABLE IF NOT EXISTS run_args (
   uuid       UUID PRIMARY KEY,
   created_at TIMESTAMP NOT NULL,
   args       VARCHAR(255) NOT NULL,
   checksum   VARCHAR(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE runs (
+CREATE TABLE IF NOT EXISTS runs (
   uuid               UUID PRIMARY KEY,
   created_at         TIMESTAMP NOT NULL,
   updated_at         TIMESTAMP NOT NULL,
@@ -97,14 +97,14 @@ CREATE TABLE runs (
   current_run_state  VARCHAR(64)
 );
 
-CREATE TABLE run_states (
+CREATE TABLE IF NOT EXISTS run_states (
   uuid            UUID PRIMARY KEY,
   transitioned_at TIMESTAMP NOT NULL,
   run_uuid        UUID REFERENCES runs(uuid),
   state           VARCHAR(64) NOT NULL
 );
 
-CREATE TABLE dataset_versions (
+CREATE TABLE IF NOT EXISTS dataset_versions (
   uuid         UUID PRIMARY KEY,
   created_at   TIMESTAMP NOT NULL,
   dataset_uuid UUID REFERENCES datasets(uuid),
@@ -113,12 +113,12 @@ CREATE TABLE dataset_versions (
   UNIQUE (dataset_uuid, version)
 );
 
-CREATE TABLE stream_versions (
+CREATE TABLE IF NOT EXISTS stream_versions (
   dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
   schema_location      VARCHAR(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE runs_input_mapping (
+CREATE TABLE IF NOT EXISTS runs_input_mapping (
   run_uuid             UUID REFERENCES runs(uuid),
   dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
   PRIMARY KEY (run_uuid, dataset_version_uuid)

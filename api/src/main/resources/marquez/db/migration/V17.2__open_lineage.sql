@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-CREATE TABLE lineage_events (
+CREATE TABLE IF NOT EXISTS lineage_events (
   event_time timestamp with time zone,
   event jsonb,
   event_type text,

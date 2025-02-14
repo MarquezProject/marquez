@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-CREATE TABLE dataset_symlinks (
+CREATE TABLE IF NOT EXISTS dataset_symlinks (
   dataset_uuid      UUID,
   name              VARCHAR NOT NULL,
   namespace_uuid    UUID REFERENCES namespaces(uuid),

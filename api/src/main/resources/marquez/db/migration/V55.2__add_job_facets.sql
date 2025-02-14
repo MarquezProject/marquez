@@ -1,4 +1,4 @@
-CREATE TABLE job_facets (
+CREATE TABLE IF NOT EXISTS job_facets (
   created_at         TIMESTAMPTZ NOT NULL,
   job_uuid           UUID REFERENCES jobs(uuid),
   run_uuid           UUID REFERENCES runs(uuid),
