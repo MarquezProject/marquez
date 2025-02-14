@@ -20,7 +20,7 @@ CREATE UNIQUE INDEX unique_jobs_namespace_uuid_name_parent ON jobs (name, namesp
 ALTER TABLE jobs
     ADD CONSTRAINT unique_jobs_namespace_uuid_name_parent UNIQUE USING INDEX unique_jobs_namespace_uuid_name_parent;
 
-CREATE TABlE jobs_fqn
+CREATE TABLE IF NOT EXISTS jobs_fqn
 (
     uuid            uuid    NOT NULL PRIMARY KEY,
     namespace_uuid  uuid    NOT NULL,

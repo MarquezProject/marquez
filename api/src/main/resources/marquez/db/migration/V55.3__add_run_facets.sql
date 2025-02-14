@@ -1,4 +1,4 @@
-CREATE TABLE run_facets (
+CREATE TABLE IF NOT EXISTS run_facets (
   created_at         TIMESTAMPTZ NOT NULL,
   run_uuid           UUID REFERENCES runs(uuid),
   lineage_event_time TIMESTAMPTZ NOT NULL,

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-CREATE TABLE job_contexts (
+CREATE TABLE IF NOT EXISTS job_contexts (
   uuid       UUID PRIMARY KEY,
   created_at TIMESTAMP NOT NULL,
   context    TEXT NOT NULL,
