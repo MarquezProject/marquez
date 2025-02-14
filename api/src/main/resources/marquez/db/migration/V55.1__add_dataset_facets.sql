@@ -1,4 +1,4 @@
-CREATE TABLE dataset_facets (
+CREATE TABLE IF NOT EXISTS dataset_facets (
   created_at            TIMESTAMPTZ NOT NULL,
   dataset_uuid          UUID REFERENCES datasets(uuid),
   dataset_version_uuid  UUID REFERENCES dataset_versions(uuid),

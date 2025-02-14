@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-CREATE TABLE dataset_fields (
+CREATE TABLE IF NOT EXISTS dataset_fields (
   uuid         UUID PRIMARY KEY,
   type         VARCHAR(64) NOT NULL,
   created_at   TIMESTAMP NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE dataset_fields (
   UNIQUE (dataset_uuid, name)
 );
 
-CREATE TABLE dataset_versions_field_mapping (
+CREATE TABLE IF NOT EXISTS dataset_versions_field_mapping (
   dataset_version_uuid UUID REFERENCES dataset_versions(uuid),
   dataset_field_uuid   UUID REFERENCES dataset_fields(uuid),
   PRIMARY KEY (dataset_version_uuid, dataset_field_uuid)
