@@ -1,0 +1,54 @@
+<!--
+Copyright 2018-2023 contributors to the Marquez project
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    {% seo %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9S43L0BB9X"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-9S43L0BB9X');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <script>
+      var githubRepo = 'MarquezProject/marquez';
+      var githubUrl = 'https://api.github.com/repos/' + githubRepo + '/releases/latest';
+
+      $.get(githubUrl).done(function (data) {
+        $('#result').html(data.tag_name);
+        document.getElementById("tag_url").href = "{{ site.github.repository_url }}/releases/tag/" + data.tag_name;
+      });
+    </script>
+
+    <header class="page-header" role="banner">
+      <div class='marquez-logo'>
+        <img src="./assets/images/marquez-logo.png" width="500px" />
+        <a href="https://lfaidata.foundation/projects">
+          <img src="./assets/images/lfaidata-project-badge-incubation-black.png" width="125px" />
+        </a>
+      </div>
+      <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
+      <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
+      <a href="quickstart.html" class="btn">Quickstart</a>
+
+      <a href="" id="tag_url" class="btn">Download <span id="result"></span></a>
+    </header>
+    <main id="content" class="main-content" role="main">
+      {{ content }}
+      <footer class="site-footer">
+      </footer>
+    </main>
+  </body>
+</html>

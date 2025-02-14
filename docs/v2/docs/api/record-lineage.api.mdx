@@ -1,0 +1,34 @@
+---
+id: record-lineage
+title: "Record a single lineage event"
+description: "Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard."
+sidebar_label: "Record a single lineage event"
+hide_title: true
+hide_table_of_contents: true
+api: {"operationId":"recordLineage","description":"Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.","tags":["Lineage"],"requestBody":{"content":{"application/json":{"schema":{"example":{"eventType":"COMPLETE","eventTime":"2019-05-09T19:49:24.201361Z","run":{"runId":"d46e465b-d358-4d32-83d4-df660ff614dd"},"job":{"namespace":"my-namespace","name":"my-job"},"outputs":[{"namespace":"my-namespace","name":"my-output","facets":{"schema":{"_producer":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client","_schemaURL":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet","fields":[{"name":"a","type":"INTEGER"},{"name":"b","type":"TIMESTAMP"},{"name":"c","type":"INTEGER"},{"name":"d","type":"INTEGER"}]}}}],"producer":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"},"title":"LineageEvent"}}}},"responses":{"200":{"description":"OK"}},"method":"post","path":"/lineage","servers":[{"url":"http://localhost:5000/api/v1","description":"Local API server"}],"jsonRequestBodyExample":{"eventType":"COMPLETE","eventTime":"2019-05-09T19:49:24.201361Z","run":{"runId":"d46e465b-d358-4d32-83d4-df660ff614dd"},"job":{"namespace":"my-namespace","name":"my-job"},"outputs":[{"namespace":"my-namespace","name":"my-output","facets":{"schema":{"_producer":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client","_schemaURL":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet","fields":[{"name":"a","type":"INTEGER"},{"name":"b","type":"TIMESTAMP"},{"name":"c","type":"INTEGER"},{"name":"d","type":"INTEGER"}]}}}],"producer":"https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"},"info":{"title":"Marquez","version":"0.41.0-SNAPSHOT","description":"Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.","license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"}},"postman":{"name":"Record a single lineage event","description":{"content":"Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.","type":"text/plain"},"url":{"path":["lineage"],"host":["{{baseUrl}}"],"query":[],"variable":[]},"header":[{"key":"Content-Type","value":"application/json"}],"method":"POST","body":{"mode":"raw","raw":"\"\"","options":{"raw":{"language":"json"}}}}}
+sidebar_class_name: "post api-method"
+info_path: docs/api/marquez
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import TabItem from "@theme/TabItem";
+
+## Record a single lineage event
+
+
+
+Receive, process, and store lineage metadata using the [OpenLineage](https://github.com/OpenLineage/OpenLineage/blob/main/spec/OpenLineage.json) standard.
+
+<MimeTabs><TabItem label={"application/json"} value={"application/json-schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Request Body</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}>any</ul></details></TabItem></MimeTabs><div><ApiTabs><TabItem label={"200"} value={"200"}><div>
+
+OK
+
+</div><div></div></TabItem></ApiTabs></div>
+      

@@ -1,0 +1,34 @@
+---
+id: get-namespace
+title: "Retrieve a namespace"
+description: "Returns a namespace."
+sidebar_label: "Retrieve a namespace"
+hide_title: true
+hide_table_of_contents: true
+api: {"operationId":"getNamespace","description":"Returns a namespace.","tags":["Namespaces"],"responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"type":"object","properties":{"name":{"description":"The name of the namespace.","type":"string"},"createdAt":{"description":"An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.","type":"string","format":"date-time"},"updatedAt":{"description":"An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was updated.","type":"string","format":"date-time"},"ownerName":{"description":"The owner of the namespace.","type":"string"},"description":{"description":"The description of the namespace.","type":"string"}},"example":{"name":"my-namespace","createdAt":"2019-05-09T19:49:24.201361Z","updatedAt":"2019-05-09T19:49:24.201361Z","ownerName":"me","description":"My first namespace!"},"title":"Namespace"}}}}},"parameters":[{"name":"namespace","in":"path","description":"The name of the namespace.","required":true,"schema":{"type":"string","maxLength":1024,"example":"my-namespace"}}],"method":"get","path":"/namespaces/{namespace}","servers":[{"url":"http://localhost:5000/api/v1","description":"Local API server"}],"info":{"title":"Marquez","version":"0.41.0-SNAPSHOT","description":"Marquez is an open source **metadata service** for the **collection**, **aggregation**, and **visualization** of a data ecosystem's metadata.","license":{"name":"Apache 2.0","url":"http://www.apache.org/licenses/LICENSE-2.0.html"}},"postman":{"name":"Retrieve a namespace","description":{"content":"Returns a namespace.","type":"text/plain"},"url":{"path":["namespaces",":namespace"],"host":["{{baseUrl}}"],"query":[],"variable":[{"disabled":false,"description":{"content":"(Required) The name of the namespace.","type":"text/plain"},"type":"any","value":"","key":"namespace"}]},"header":[{"key":"Accept","value":"application/json"}],"method":"GET"}}
+sidebar_class_name: "get api-method"
+info_path: docs/api/marquez
+custom_edit_url: null
+---
+
+import ApiTabs from "@theme/ApiTabs";
+import MimeTabs from "@theme/MimeTabs";
+import ParamsItem from "@theme/ParamsItem";
+import ResponseSamples from "@theme/ResponseSamples";
+import SchemaItem from "@theme/SchemaItem";
+import SchemaTabs from "@theme/SchemaTabs";
+import DiscriminatorTabs from "@theme/DiscriminatorTabs";
+import TabItem from "@theme/TabItem";
+
+## Retrieve a namespace
+
+
+
+Returns a namespace.
+
+<details style={{"marginBottom":"1rem"}} data-collapsed={false} open={true}><summary style={{}}><strong>Path Parameters</strong></summary><div><ul><ParamsItem className={"paramsItem"} param={{"name":"namespace","in":"path","description":"The name of the namespace.","required":true,"schema":{"type":"string","maxLength":1024,"example":"my-namespace"}}}></ParamsItem></ul></div></details><div><ApiTabs><TabItem label={"200"} value={"200"}><div>
+
+OK
+
+</div><div><MimeTabs schemaType={"response"}><TabItem label={"application/json"} value={"application/json"}><SchemaTabs><TabItem label={"Schema"} value={"Schema"}><details style={{}} data-collapsed={false} open={true}><summary style={{"textAlign":"left"}}><strong>Schema</strong></summary><div style={{"textAlign":"left","marginLeft":"1rem"}}></div><ul style={{"marginLeft":"1rem"}}><SchemaItem collapsible={false} name={"name"} required={false} schemaName={"string"} qualifierMessage={undefined} schema={{"description":"The name of the namespace.","type":"string"}}></SchemaItem><SchemaItem collapsible={false} name={"createdAt"} required={false} schemaName={"date-time"} qualifierMessage={undefined} schema={{"description":"An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was created.","type":"string","format":"date-time"}}></SchemaItem><SchemaItem collapsible={false} name={"updatedAt"} required={false} schemaName={"date-time"} qualifierMessage={undefined} schema={{"description":"An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the namespace was updated.","type":"string","format":"date-time"}}></SchemaItem><SchemaItem collapsible={false} name={"ownerName"} required={false} schemaName={"string"} qualifierMessage={undefined} schema={{"description":"The owner of the namespace.","type":"string"}}></SchemaItem><SchemaItem collapsible={false} name={"description"} required={false} schemaName={"string"} qualifierMessage={undefined} schema={{"description":"The description of the namespace.","type":"string"}}></SchemaItem></ul></details></TabItem><TabItem label={"Example (from schema)"} value={"Example (from schema)"}><ResponseSamples responseExample={"{\n  \"name\": \"my-namespace\",\n  \"createdAt\": \"2019-05-09T19:49:24.201361Z\",\n  \"updatedAt\": \"2019-05-09T19:49:24.201361Z\",\n  \"ownerName\": \"me\",\n  \"description\": \"My first namespace!\"\n}"} language={"json"}></ResponseSamples></TabItem></SchemaTabs></TabItem></MimeTabs></div></TabItem></ApiTabs></div>
+      

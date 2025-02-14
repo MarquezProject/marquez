@@ -1,0 +1,10 @@
+.container {
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.constrain {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}

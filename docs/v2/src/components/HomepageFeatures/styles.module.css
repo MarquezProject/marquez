@@ -1,0 +1,38 @@
+@media screen and (max-width: 996px) {
+    .flexContainer {
+        flex-direction: column;
+    }
+
+    .flexContainer.rightImage {
+        flex-direction: column;
+    }
+}
+
+.constrain {
+    max-width: 600px;
+    padding: 0 32px;
+}
+
+.flexContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.rightImage {
+    flex-direction: row-reverse;
+}
+
+.imageContainer {
+    flex: 1 1 0;
+    height: 100%;
+    width: 100%;
+}
+
+.image {
+    height: auto;
+    width: 100%;
+}
+

@@ -1,0 +1,42 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #236741;
+  --ifm-color-primary-dark: #205d3b;
+  --ifm-color-primary-darker: #1e5837;
+  --ifm-color-primary-darkest: #19482e;
+  --ifm-color-primary-light: #277148;
+  --ifm-color-primary-lighter: #28764b;
+  --ifm-color-primary-lightest: #2e8655;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-font-family-base: 'Karla', sans-serif;
+  --ifm-font-family-mono: "Source Code Pro", monospace;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #71ddbf;
+  --ifm-color-primary-dark: #56d7b3;
+  --ifm-color-primary-darker: #49d3ad;
+  --ifm-color-primary-darkest: #2dbd95;
+  --ifm-color-primary-light: #8ce3cb;
+  --ifm-color-primary-lighter: #99e7d1;
+  --ifm-color-primary-lightest: #c2f0e3;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-font-family-base: 'Karla', sans-serif;
+  --ifm-font-family-mono: "Source Code Pro", monospace;
+}
+
+.navbar, .dashed {
+  border-bottom: 2px dashed var(--ifm-color-primary-lighter);
+}
+
+.footer .col {
+  text-align: center;
+}

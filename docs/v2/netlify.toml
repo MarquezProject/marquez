@@ -1,0 +1,6 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Content-Security-Policy = "frame-ancestors none; link https://fonts.googleapis.com"
+    X-Content-Type-Options = "nosniff"
