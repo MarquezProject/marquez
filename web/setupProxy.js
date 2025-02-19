@@ -2,7 +2,7 @@
 const express = require('express')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const path = require('path')
-const appMetrics = require('./services/appMetrics');
+const appMetrics = require('./services/appMetrics')
 
 const app = express();
 const router = express.Router();
@@ -14,7 +14,7 @@ const metrics = new appMetrics();
 // Middleware to expose /metrics endpoint
 app.get('/metrics', async (req, res) => {
   try {
-    res.set('Content-Type', metrics.register.contentType);
+    res.set('Content-Type', metrics.register.contentType)
     res.end(await metrics.getMetrics());
   } catch (ex) {
     res.status(500).end(ex);
@@ -68,21 +68,21 @@ app.listen(port, () => {
   console.log(`App listening on port ${port}!`)
 })
 
-app.use(express.json());
+app.use(express.json())
 
 // Helper function to format datetime as "YYYY-MM-DD HH:mm:SS.sss"
 function getFormattedDateTime() {
   const d = new Date();
-  const pad = (n, size = 2) => n.toString().padStart(size, '0');
-  const year = d.getFullYear();
-  const month = pad(d.getMonth() + 1);
-  const day = pad(d.getDate());
-  const hour = pad(d.getHours());
-  const minute = pad(d.getMinutes());
-  const second = pad(d.getSeconds());
+  const pad = (n, size = 2) => n.toString().padStart(size, '0')
+  const year = d.getFullYear()
+  const month = pad(d.getMonth() + 1)
+  const day = pad(d.getDate())
+  const hour = pad(d.getHours())
+  const minute = pad(d.getMinutes())
+  const second = pad(d.getSeconds())
   // JavaScript Date only provides milliseconds (0-999), so we pad to 3 digits
-  const ms = pad(d.getMilliseconds(), 3);
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}.${ms}`;
+  const ms = pad(d.getMilliseconds(), 3)
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}.${ms}`
 }
 
 // Endpoint to log user info and increment counters
@@ -90,16 +90,16 @@ app.post('/api/loguserinfo', (req, res) => {
   const { email = '' } = req.body;
 
   if (typeof email !== 'string') {
-    return res.status(400).json({ error: 'Invalid email format' });
+    return res.status(400).json({ error: 'Invalid email format' })
   }
 
-  const encodedEmail = Buffer.from(email).toString('base64');
+  const encodedEmail = Buffer.from(email).toString('base64')
 
   // Increment total logins counter
-  metrics.incrementTotalLogins(); 
+  metrics.incrementTotalLogins(email)
 
   // Check if the user is logging in for the first time in the last 8 hours
-  metrics.incrementUniqueLogins(email);
+  metrics.incrementUniqueLogins(email)
 
   const logData = {
     accessLog: {
