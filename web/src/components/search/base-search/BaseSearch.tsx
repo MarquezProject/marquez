@@ -19,7 +19,6 @@ import SearchListItem from '../SearchListItem'
 
 interface BaseSearchProps {
   search: string
-  onSuggestionSelect?: (name: string) => void
 }
 
 interface StateProps {
@@ -79,7 +78,6 @@ const BaseSearch: React.FC<BaseSearchProps & StateProps & DispatchProps> = ({
   isSearching,
   fetchSearch,
   setSelectedNode,
-  onSuggestionSelect,
 }) => {
   const [filter, setFilter] = useState('All')
   const [sort, setSort] = useState('UPDATE_AT')
@@ -193,7 +191,6 @@ const BaseSearch: React.FC<BaseSearchProps & StateProps & DispatchProps> = ({
                           search={search}
                           onClick={() => {
                             setSelectedNode(listItem.nodeId)
-                            onSuggestionSelect?.(listItem.name)
                           }}
                         />
                       </React.Fragment>
