@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Box, Chip, IconButton, CircularProgress } from '@mui/material'
+import { Box, Chip, CircularProgress, IconButton } from '@mui/material'
 import { Close, SearchOutlined } from '@mui/icons-material'
 import { DRAWER_WIDTH, HEADER_HEIGHT, theme } from '../../helpers/theme'
-import { connect } from 'react-redux'
-import { useLocation } from 'react-router'
-import BaseSearch from './base-search/BaseSearch'
-import OpenSearch from './open-search/OpenSearch'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import SearchPlaceholder from './SearchPlaceholder'
 import { IState } from '../../store/reducers'
 import { MqInputBase } from '../core/input-base/MqInputBase'
+import { connect } from 'react-redux'
 import { trackEvent } from '../ga4'
+import { useLocation } from 'react-router'
+import BaseSearch from './base-search/BaseSearch'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
+import OpenSearch from './open-search/OpenSearch'
+import React, { useEffect, useRef, useState } from 'react'
+import SearchPlaceholder from './SearchPlaceholder'
 
 interface StateProps {
   isLoading: boolean
@@ -88,7 +88,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
   }
 
   const handleFocus = () => {
-    setOpen(true);
+    setOpen(true)
     trackEvent('Search', 'Focus Search Bar')
   }
 
@@ -140,12 +140,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
             <>
               {isLoading && <CircularProgress size={16} />}
               {open && (
-                <IconButton
-                  color={'secondary'}
-                  sx={{ mr: 1 }}
-                  size={'small'}
-                  onClick={handleClose}
-                >
+                <IconButton color={'secondary'} sx={{ mr: 1 }} size={'small'} onClick={handleClose}>
                   <Close />
                 </IconButton>
               )}

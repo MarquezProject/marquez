@@ -10,12 +10,12 @@ import { faCog, faDatabase, faSort } from '@fortawesome/free-solid-svg-icons'
 import { fetchSearch, setSelectedNode } from '../../../store/actionCreators'
 import { parseSearchGroup } from '../../../helpers/nodes'
 import { theme } from '../../../helpers/theme'
+import { trackEvent } from '../../ga4'
 import Box from '@mui/system/Box'
 import MqChipGroup from '../../core/chip/MqChipGroup'
 import MqText from '../../core/text/MqText'
 import React, { useEffect, useState } from 'react'
 import SearchListItem from '../SearchListItem'
-import { trackEvent } from '../../ga4'
 
 interface BaseSearchProps {
   search: string
@@ -93,7 +93,7 @@ const BaseSearch: React.FC<BaseSearchProps & StateProps & DispatchProps> = ({
   const onSelectSortFilter = (label: string) => {
     setSort(label)
     fetchSearch(search, filter.toUpperCase(), label.toUpperCase())
-    trackEvent('BaseSearch', 'Select Sort Option', label);
+    trackEvent('BaseSearch', 'Select Sort Option', label)
   }
 
   const searchApi = (q: string, filter = 'ALL', sort = 'NAME') => {
