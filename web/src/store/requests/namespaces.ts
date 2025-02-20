@@ -5,6 +5,6 @@ import { API_URL } from '../../globals'
 import { genericFetchWrapper } from './index'
 
 export const getNamespaces = async () => {
-  const url = `${API_URL}/namespaces`
+  const url = `${API_URL}/namespaces?limit=500`
   return genericFetchWrapper(url, { method: 'GET' }, 'fetchNamespaces')
 }
