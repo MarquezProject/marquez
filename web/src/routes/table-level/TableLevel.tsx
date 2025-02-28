@@ -1,6 +1,6 @@
 import * as Redux from 'redux'
 import { ActionBar } from './ActionBar'
-import { Box } from '@mui/system'
+import { Box, CircularProgress } from '@mui/material'
 import { DEFAULT_MAX_SCALE, Graph, ZoomPanControls } from '../../../libs/graph'
 import { Drawer } from '@mui/material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
@@ -13,35 +13,36 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { createElkNodes } from './layout'
 import { fetchLineage } from '../../store/actionCreators'
+import { trackEvent } from '../../components/ga4'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React, { useEffect, useRef, useState } from 'react'
 import TableLevelDrawer from './TableLevelDrawer'
-import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   lineage: LineageGraph
+  isLoading: boolean
 }
 
 interface DispatchProps {
   fetchLineage: typeof fetchLineage
 }
 
-type ColumnLevelProps = StateProps & DispatchProps
+type TableLevelProps = StateProps & DispatchProps
 
 const zoomInFactor = 1.5
 const zoomOutFactor = 1 / zoomInFactor
 
-const ColumnLevel: React.FC<ColumnLevelProps> = ({
+const TableLevel: React.FC<TableLevelProps> = ({
   fetchLineage: fetchLineage,
   lineage: lineage,
-}: ColumnLevelProps) => {
+  isLoading: isLoading,
+}: TableLevelProps) => {
   const { nodeType, namespace, name } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
-
   const [isCompact, setIsCompact] = useState(searchParams.get('isCompact') === 'true')
   const [isFull, setIsFull] = useState(searchParams.get('isFull') === 'true')
 
@@ -51,17 +52,13 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   useEffect(() => {
     if (name && namespace && nodeType) {
-      fetchLineage(nodeType as JobOrDataset, namespace, name, depth, true) // true by default
+      fetchLineage(nodeType as JobOrDataset, namespace, name, depth, true)
     }
   }, [name, namespace, depth])
 
   useEffect(() => {
-    trackEvent('TableLevel', 'View Table-Level Lineage');
-  }, []);
-
-  if (!lineage) {
-    return <div />
-  }
+    trackEvent('TableLevel', 'View Table-Level Lineage')
+  }, [])
 
   const handleScaleZoom = (inOrOut: 'in' | 'out') => {
     graphControls.current?.scaleZoom(inOrOut === 'in' ? zoomInFactor : zoomOutFactor)
@@ -99,6 +96,37 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     }, 300)
   }, [nodes.length, isCompact])
 
+  if (isLoading) {
+    return (
+      <>
+        <ActionBar
+          nodeType={nodeType?.toUpperCase() as JobOrDataset}
+          fetchLineage={fetchLineage}
+          depth={depth}
+          setDepth={setDepth}
+          isCompact={isCompact}
+          setIsCompact={setIsCompact}
+          isFull={isFull}
+          setIsFull={setIsFull}
+          isLoading={isLoading}
+        />
+        <Box
+          display='flex'
+          justifyContent='center'
+          alignItems='center'
+          height={`calc(100vh - ${HEADER_HEIGHT}px - 64px)`}
+          sx={{ bgcolor: 'secondy.main' }}
+        >
+          <CircularProgress />
+        </Box>
+      </>
+    )
+  }
+
+  if (!lineage) {
+    return <div />
+  }
+
   return (
     <>
       <ActionBar
@@ -110,6 +138,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
         setIsCompact={setIsCompact}
         isFull={isFull}
         setIsFull={setIsFull}
+        isLoading={isLoading}
       />
       <Box height={`calc(100vh - ${HEADER_HEIGHT}px - ${HEADER_HEIGHT}px - 1px)`}>
         <Drawer
@@ -156,6 +185,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   lineage: state.lineage.lineage,
+  isLoading: state.lineage.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
@@ -166,4 +196,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch) =>
     dispatch
   )
 
-export default connect(mapStateToProps, mapDispatchToProps)(ColumnLevel)
+export default connect(mapStateToProps, mapDispatchToProps)(TableLevel)

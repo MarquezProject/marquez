@@ -1,8 +1,8 @@
 import * as Redux from 'redux'
 import { ActionBar } from './ActionBar'
+import { CircularProgress, Drawer } from '@mui/material'
 import { ColumnLevelNodeData, ColumnLevelNodeKinds, columnLevelNodeRenderer } from './nodes'
 import { ColumnLineageGraph } from '../../types/api'
-import { Drawer } from '@mui/material'
 import { Graph, ZoomPanControls } from '../../../libs/graph'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { IState } from '../../store/reducers'
@@ -11,16 +11,17 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { createElkNodes } from './layout'
 import { fetchColumnLineage } from '../../store/actionCreators'
+import { trackEvent } from '../../components/ga4'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import ColumnLevelDrawer from './ColumnLevelDrawer'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import React, { useEffect, useRef, useState } from 'react'
-import { trackEvent } from '../../components/ga4'
 
 interface StateProps {
   columnLineage: ColumnLineageGraph
+  isLoading: boolean
 }
 
 interface DispatchProps {
@@ -35,6 +36,7 @@ const zoomOutFactor = 1 / zoomInFactor
 const ColumnLevel: React.FC<ColumnLevelProps> = ({
   fetchColumnLineage: fetchColumnLineage,
   columnLineage: columnLineage,
+  isLoading: isLoading,
 }: ColumnLevelProps) => {
   const { namespace, name } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -80,6 +82,30 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
     }, 300)
   }, [nodes.length])
 
+  if (isLoading) {
+    return (
+      <>
+        <ActionBar
+          fetchColumnLineage={fetchColumnLineage}
+          depth={depth}
+          setDepth={setDepth}
+          withDownstream={withDownstream}
+          setWithDownstream={setWithDownstream}
+          isLoading={isLoading}
+        />
+        <Box
+          display='flex'
+          justifyContent='center'
+          alignItems='center'
+          height={`calc(100vh - ${HEADER_HEIGHT}px - 64px)`}
+          sx={{ bgcolor: 'secondy.main' }}
+        >
+          <CircularProgress />
+        </Box>
+      </>
+    )
+  }
+
   return (
     <>
       <ActionBar
@@ -88,6 +114,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
         setDepth={setDepth}
         withDownstream={withDownstream}
         setWithDownstream={setWithDownstream}
+        isLoading={isLoading}
       />
       <Box height={`calc(100vh - ${HEADER_HEIGHT}px - 64px)`}>
         <Drawer
@@ -133,6 +160,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
 const mapStateToProps = (state: IState) => ({
   columnLineage: state.columnLineage.columnLineage,
+  isLoading: state.columnLineage.isLoading,
 })
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch) =>

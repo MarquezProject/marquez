@@ -29,6 +29,7 @@ interface ActionBarProps {
   setIsCompact: (isCompact: boolean) => void
   isFull: boolean
   setIsFull: (isFull: boolean) => void
+  isLoading: boolean
 }
 
 export const ActionBar = ({
@@ -40,6 +41,7 @@ export const ActionBar = ({
   setIsCompact,
   isFull,
   setIsFull,
+  isLoading,
 }: ActionBarProps) => {
   const { namespace, name } = useParams()
   const navigate = useNavigate()
@@ -216,7 +218,7 @@ export const ActionBar = ({
           </IconButton>
         </MQTooltip>
         <MQTooltip title={'Select the number of levels to display in the lineage'}>
-          {loading ? (
+          {loading || isLoading === true ? (
             <CircularProgress size={40} sx={{ width: '80px', mr: 2 }} />
           ) : (
             <TextField

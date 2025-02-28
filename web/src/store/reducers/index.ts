@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { History } from 'history'
-import { IColumnLineageState } from '../requests/columnlineage'
+import { IColumnLineageState } from '../reducers/columnLineage'
 import { Reducer, combineReducers } from 'redux'
 import { createRouterReducer } from '@lagunovsky/redux-react-router'
 import columnLineage from './columnLineage'
