@@ -33,6 +33,13 @@ data:
       url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
+    # Enables retention policy configuration for database (default: disabled)
+    {{- if .Values.marquez.dbRetention }}
+    dbRetention:
+      frequencyMins: {{ .Values.marquez.dbRetention.frequencyMins }}
+      numberOfRowsPerBatch: {{ .Values.marquez.dbRetention.numberOfRowsPerBatch }}
+      retentionDays: {{ .Values.marquez.dbRetention.retentionDays }}
+    {{- end }}
 
     # Enables database migration on startup (default: true)
     migrateOnStartup: ${MIGRATE_ON_STARTUP}
