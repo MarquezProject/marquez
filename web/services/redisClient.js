@@ -1,3 +1,14 @@
+/**
+ * Redis Client Module
+ *
+ * This module configures and manages Redis clients for both read and write operations.
+ * It ensures that the clients are connected and handles connection setup and error logging.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To standardize and manage the process of connecting to Redis for read and write operations.
+ */
+
 const redis = require('redis');
 
 // Function to create a Redis client

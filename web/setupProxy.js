@@ -3,23 +3,37 @@ const express = require('express')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const path = require('path')
 const appMetrics = require('./services/appMetrics')
+const { sendLogToKafka } = require('./services/kafkaProducer')
+const { getFormattedDateTime } = require('./services/helpers/dateTimeHelper')
+const { excludedEmails } = require('./services/helpers/excludedEmails')
+const { connectProducer } = require('./services/kafkaProducer')
+const { buildLogData } = require('./services/helpers/logFormatter')
 
 const app = express();
 const router = express.Router();
 const distPath = path.join(__dirname, 'dist')
 
 // Initialize Metrics
-const metrics = new appMetrics();
+const metrics = new appMetrics()
 
 // Middleware to expose /metrics endpoint
 app.get('/metrics', async (req, res) => {
   try {
     res.set('Content-Type', metrics.register.contentType)
-    res.end(await metrics.getMetrics());
+    res.end(await metrics.getMetrics())
   } catch (ex) {
-    res.status(500).end(ex);
+    res.status(500).end(ex)
   }
 });
+
+(async () => {
+  try {
+    await connectProducer()
+  } catch (error) {
+    console.error('Error connecting Kafka producer:', error)
+    process.exit(1)
+  }
+})();
 
 const environmentVariable = (variableName) => {
   const value = process.env[variableName]
@@ -70,47 +84,62 @@ app.listen(port, () => {
 
 app.use(express.json())
 
-// Helper function to format datetime as "YYYY-MM-DD HH:mm:SS.sss"
-function getFormattedDateTime() {
-  const d = new Date();
-  const pad = (n, size = 2) => n.toString().padStart(size, '0')
-  const year = d.getFullYear()
-  const month = pad(d.getMonth() + 1)
-  const day = pad(d.getDate())
-  const hour = pad(d.getHours())
-  const minute = pad(d.getMinutes())
-  const second = pad(d.getSeconds())
-  // JavaScript Date only provides milliseconds (0-999), so we pad to 3 digits
-  const ms = pad(d.getMilliseconds(), 3)
-  return `${year}-${month}-${day} ${hour}:${minute}:${second}.${ms}`
-}
-
 // Endpoint to log user info and increment counters
 app.post('/api/loguserinfo', (req, res) => {
-  const { email = '' } = req.body;
+  const {
+    email = '',
+    name,
+    locale,
+    zoneinfo
+  } = req.body
 
+  // Guard against invalid email values
   if (typeof email !== 'string') {
     return res.status(400).json({ error: 'Invalid email format' })
   }
 
-  const encodedEmail = Buffer.from(email).toString('base64')
+    // Calculate the encoded email once
+    const encodedEmail = Buffer.from(email).toString('base64')
 
-  // Increment total logins counter
+    // Skip processing if the email is excluded
+    if (excludedEmails.has(encodedEmail)) {
+      return res.sendStatus(200);
+    }
+
+    // Create userInfo from request data (without circular references)
+    const userInfo = {
+      email,
+      name,
+      locale,
+      zoneinfo,
+      email_verified: true
+    }
+
+  // Build enriched log data using the helper
+  const kafkaData = buildLogData(userInfo)
+
+  // Update metrics
   metrics.incrementTotalLogins(email)
-
-  // Check if the user is logging in for the first time in the last 8 hours
   metrics.incrementUniqueLogins(email)
 
+  if (excludedEmails.has(encodedEmail)) {
+    return; // skip everything for excluded emails
+  }
+  // Console log for local debugging
   const logData = {
     accessLog: {
       email: encodedEmail,
-      dateTime: getFormattedDateTime(),
-    },
+      dateTime: getFormattedDateTime()
+    }
   };
-  console.log(JSON.stringify(logData));
-  res.sendStatus(200);
+  console.log(JSON.stringify(logData))
+
+  // Send meta info to Kafka
+  sendLogToKafka(kafkaData)
+
+  // Response
+  res.sendStatus(200)
 });
 
-// Export the app for testing or further integration
-module.exports = app;
+module.exports = app
 

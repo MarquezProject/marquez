@@ -1,3 +1,14 @@
+/**
+ * GA4 Module
+ *
+ * This module provides functions to initialize Google Analytics 4 (GA4) and track page views and events.
+ * It dynamically sets the GA4 tracking ID based on the environment (staging or production).
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To integrate Google Analytics 4 for tracking user interactions and page views in the application.
+ */
+
 import ReactGA from 'react-ga4';
 
 function decodeBase64(str: string) {

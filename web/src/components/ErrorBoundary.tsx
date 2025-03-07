@@ -1,3 +1,14 @@
+/**
+ * ErrorBoundary Component
+ *
+ * This component provides an error boundary for React components. It catches JavaScript errors
+ * anywhere in the child component tree, logs those errors, and displays a fallback UI.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To handle errors gracefully in the application and provide a fallback UI.
+ */
+
 import React, { ReactNode } from 'react'
 
 interface ErrorBoundaryProps {
