@@ -1,12 +1,12 @@
 import React, { useRef } from 'react'
 import useSize from '@react-hook/size'
 
+import { CircularProgress } from '@mui/material'
 import { DEFAULT_MAX_SCALE, ZoomPanControls, ZoomPanSvg } from './ZoomPanSvg'
 import { Edge as EdgeComponent } from './Edge'
 import { Node as NodeComponent } from './Node'
 import { useLayout } from '../layout/useLayout'
 import Box from '@mui/system/Box'
-import LinearProgress from '@mui/material/LinearProgress'
 import type { Direction, Edge, Node, NodeRenderer } from '../types'
 import type { MiniMapPlacement } from './ZoomPanSvg/MiniMap'
 
@@ -140,8 +140,18 @@ export const Graph = <K, D>({
         </ZoomPanSvg>
       )}
       {isRendering && (
-        <Box position='absolute' bottom='0' left='0' right='0'>
-          <LinearProgress />
+        <Box
+          position='absolute'
+          top='0'
+          left='0'
+          width='100%'
+          height='100%'
+          bgcolor='rgba(0, 0, 0, 0.5)'
+          display='flex'
+          justifyContent='center'
+          alignItems='center'
+        >
+          <CircularProgress />
         </Box>
       )}
     </Box>
