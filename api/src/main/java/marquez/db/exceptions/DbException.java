@@ -21,10 +21,7 @@ public class DbException extends Exception {
     super(cause);
   }
 
-  /**
-   * Constructs a {@code DbException} with the provided {@code message} and the
-   * {@code cause}.
-   */
+  /** Constructs a {@code DbException} with the provided {@code message} and the {@code cause}. */
   public DbException(@Nullable final String message, @Nullable final Throwable cause) {
     super(message, cause);
   }

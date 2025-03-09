@@ -137,11 +137,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
-    final MarquezContext marquezContext = MarquezContext.builder()
-        .jdbi(jdbi)
-        .searchConfig(config.getSearchConfig())
-        .tags(config.getTags())
-        .build();
+    final MarquezContext marquezContext =
+        MarquezContext.builder()
+            .jdbi(jdbi)
+            .searchConfig(config.getSearchConfig())
+            .tags(config.getTags())
+            .build();
 
     registerResources(config, env, marquezContext);
     registerServlets(env);
@@ -170,12 +171,14 @@ public final class MarquezApp extends Application<MarquezConfig> {
   private Jdbi newJdbi(
       @NonNull MarquezConfig config, @NonNull Environment env, @NonNull ManagedDataSource source) {
     final JdbiFactory factory = new JdbiFactory();
-    final Jdbi jdbi = factory
-        .build(env, config.getDataSourceFactory(), source, DB_POSTGRES)
-        .installPlugin(new SqlObjectPlugin())
-        .installPlugin(new PostgresPlugin())
-        .installPlugin(new Jackson2Plugin());
-    SqlLogger sqlLogger = new DelegatingSqlLogger(new LabelledSqlLogger(), new InstrumentedSqlLogger(env.metrics()));
+    final Jdbi jdbi =
+        factory
+            .build(env, config.getDataSourceFactory(), source, DB_POSTGRES)
+            .installPlugin(new SqlObjectPlugin())
+            .installPlugin(new PostgresPlugin())
+            .installPlugin(new Jackson2Plugin());
+    SqlLogger sqlLogger =
+        new DelegatingSqlLogger(new LabelledSqlLogger(), new InstrumentedSqlLogger(env.metrics()));
     if (isSentryEnabled(config)) {
       sqlLogger = new TracingSQLLogger(sqlLogger);
     }
