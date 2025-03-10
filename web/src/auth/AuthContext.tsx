@@ -1,3 +1,15 @@
+/**
+ * AuthContext Module
+ *
+ * This module provides a React context for managing authentication state using Okta.
+ * It handles user login, logout, and authentication state management, and logs user
+ * information to the backend upon successful login.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To manage user authentication state and integrate with Okta for secure login.
+ */
+
 import { AuthState, OktaAuth } from '@okta/okta-auth-js'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { trackEvent } from '../components/ga4'

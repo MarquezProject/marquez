@@ -1,3 +1,14 @@
+/**
+ * Login Component
+ *
+ * This component provides the login page for the application. It integrates with Okta for authentication
+ * and tracks user interactions using Google Analytics 4 (GA4).
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To provide a secure login page and track user interactions for analytics.
+ */
+
 import { Box, Button, Container } from '@mui/material'
 import { Helmet } from 'react-helmet-async'
 import { Navigate } from 'react-router-dom'

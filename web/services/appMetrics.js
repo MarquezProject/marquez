@@ -1,23 +1,33 @@
-const client = require('prom-client');
-const crypto = require('crypto');
+/**
+ * appMetrics Module
+ *
+ * This module is responsible for collecting and exposing various Prometheus 
+ * metrics related to the application's performance and user activity. It 
+ * tracks total and unique user logins, application uptime, and user activity 
+ * over a specified duration. Additionally, it integrates with Redis for 
+ * storing login timestamps and Kafka for logging unique user events, all while 
+ * ensuring that emails on the excluded list are not processed.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To monitor application performance and user activity while protecting 
+ * sensitive internal data.
+ */
 
-// Import Redis write client from your redisClient.js file
-const { redisWriteClient, redisReadClient } = require('./redisClient');
+const client = require('prom-client')
+const crypto = require('crypto')
+const { buildLogData } = require('./helpers/logFormatter')
 
 // Centralize the excluded emails list
-const excludedEmails = new Set([
-  'bWF0ZXVzLmNhcmRvc29AbnViYW5rLmNvbS5icg==',
-  'bHVpcy55YW1hZGFAbnViYW5rLmNvbS5icg==',
-  'cmFmYWVsLmJyYWdlcm9sbGlAbnViYW5rLmNvbS5icg==',
-  'a2Fpby5iZW5pY2lvQG51YmFuay5jb20uYnI=',
-  'bWljaGFlbC5zYW50YUBudWJhbmsuY29tLmJy',
-  'cGVkcm8uYXJhdWpvMUBudWJhbmsuY29tLmJy',
-  'amhvbmF0YXMucm9zZW5kb0BudWJhbmsuY29tLmJy',
-  'dml2aWFuLm1pcmFuZGFAbnViYW5rLmNvbS5icg==',
-  'YnJ1bmEucGVyaW5AbnViYW5rLmNvbS5icg=='
-]);
+const { excludedEmails } = require('./helpers/excludedEmails')
 
-class appMetrics {
+// Import Kafka producer functions from your kafkaProducer.js file
+const { sendLogToKafka } = require('./kafkaProducer')
+
+// Import Redis write client from your redisClient.js file
+const { redisWriteClient, redisReadClient } = require('./redisClient')
+
+class AppMetrics {
   constructor() {
     // Create a Registry to hold all metrics
     this.register = new client.Registry();
@@ -41,7 +51,7 @@ class appMetrics {
 
     // Define Prometheus Gauge for user activity in the last 72 hours
     this.userActivityGauge = new client.Gauge({
-      name: 'user_activity_last_72_hours',
+      name: 'user_access_activity_gauge',
       help: 'Indicates whether there have been users in the last 72 hours (1) or not (0)',
     });
 
@@ -76,11 +86,24 @@ class appMetrics {
    * @param {string} email - The user's email
    */
   incrementTotalLogins(email) {
+    if (typeof email !== 'string') {
+      console.error('Invalid email provided to incrementTotalLogins:', email);
+      return; // Early exit if email is not a string.
+    }
     const encodedEmail = this.encodeEmail(email);
     if (excludedEmails.has(encodedEmail)) {
       return; // Do not increment if user is in the excluded list
     }
     this.totalUserLoginCounter.inc();
+  }
+  
+  encodeEmail(email) {
+    // Optionally check here:
+    if (!email) {
+      console.error('No email provided to encodeEmail.');
+      return '';
+    }
+    return Buffer.from(email).toString('base64');
   }
 
   /**
@@ -92,27 +115,26 @@ class appMetrics {
     const encodedEmail = this.encodeEmail(email);
     const key = `unique_user:${encodedEmail}`;
     const currentTime = Date.now();
-    const eightHours = 8 * 60 * 60 * 1000;
+    const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    
+    if (excludedEmails.has(encodedEmail)) {
+      return; // skip everything for excluded emails
+    }
 
     try {
       const storedTime = await redisReadClient.get(key);
-      if (!storedTime || (currentTime - parseInt(storedTime)) > eightHours) {
+      if (!storedTime || (currentTime - parseInt(storedTime)) > sevenDays) {
         // Set the key with expiration (7 days)
         await redisWriteClient.set(key, currentTime, { EX: 7 * 24 * 60 * 60 });
         this.uniqueUserLoginCounter.inc();
+
+        const userInfo = { email}; 
+        const logData = buildLogData(userInfo);
+        sendLogToKafka(logData);
       }
     } catch (err) {
       console.error('Error in incrementUniqueLogins:', err);
     }
-  }
-
-  /**
-   * Encodes the email using Base64 encoding
-   * @param {string} email
-   * @returns {string}
-   */
-  encodeEmail(email) {
-    return Buffer.from(email).toString('base64');
   }
 
   /**
@@ -136,16 +158,14 @@ class appMetrics {
 
   /**
    * Updates the user activity gauge every minute.
-   * Examines Redis keys starting with "unique_user:" and counts keys where the stored timestamp is within 72 hours.
+   * Checks if there is any user logged in at the moment.
    * Excludes specific base64-encoded emails from the count.
    */
   async updateUserActivity() {
     setInterval(async () => {
       try {
         const keys = await redisReadClient.keys('unique_user:*');
-        let activeUsers = 0;
-        const currentTime = Date.now();
-        const seventyTwoHours = 72 * 60 * 60 * 1000;
+        let userActivityDetected = false;
 
         if (keys && keys.length) {
           // Get values for all keys
@@ -153,23 +173,22 @@ class appMetrics {
           keys.forEach((key) => {
             pipeline.get(key);
           });
-          const results = await pipeline.exec();
+          await pipeline.exec();
 
-          keys.forEach((key, index) => {
-            const storedTime = results[index] ? parseInt(results[index]) : 0;
+          for (const key of keys) {
             const encodedEmail = key.replace('unique_user:', '');
-            // Only count if within 72h and not in excluded list
-            if ((currentTime - storedTime) <= seventyTwoHours && !excludedEmails.has(encodedEmail)) {
-              activeUsers++;
+            // Check if the email is not in the excluded list
+            if (!excludedEmails.has(encodedEmail)) {
+              userActivityDetected = true;
+              break; // No need to check further if activity is detected
             }
-          });
+          }
         }
-        this.userActivityGauge.set(activeUsers > 0 ? 1 : 0);
+        this.userActivityGauge.set(userActivityDetected ? 1 : 0);
       } catch (err) {
         console.error('Error updating user activity gauge:', err);
       }
     }, 60 * 1000); // Update every minute
   }
 }
-
-module.exports = appMetrics;
+module.exports = AppMetrics;

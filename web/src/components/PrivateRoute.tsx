@@ -1,3 +1,15 @@
+/**
+ * PrivateRoute Component
+ *
+ * This component provides a wrapper for routes that require authentication.
+ * It checks if the user is authenticated and either renders the child components
+ * or redirects the user to the login page.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To protect routes that require authentication and ensure only authenticated users can access them.
+ */
+
 import { useAuth } from '../auth/AuthContext'
 import CircularProgress from '@mui/material/CircularProgress'
 import React from 'react'

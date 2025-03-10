@@ -1,3 +1,15 @@
+/**
+ * LoginCallback Component
+ *
+ * This component handles the callback from Okta after a user has authenticated.
+ * It processes the authentication response, sets the user information, logs the user info,
+ * and redirects the user to the appropriate page.
+ *
+ * Author: Jonathan Moraes
+ * Created: 2025-02-19
+ * Reason: To handle the Okta authentication callback and manage user session state.
+ */
+
 import React, { useEffect } from 'react'
 import { Box, CircularProgress } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
