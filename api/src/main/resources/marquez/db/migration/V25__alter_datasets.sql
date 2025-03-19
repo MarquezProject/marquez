@@ -12,3 +12,6 @@ UPDATE datasets SET
     source_name = s.name
 FROM sources s
 WHERE s.uuid = datasets.source_uuid;
+
+-- Implementation required for streaming CDC support
+ALTER TABLE datasets REPLICA IDENTITY FULL;

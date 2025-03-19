@@ -10,3 +10,5 @@ ALTER TABLE job_versions_io_mapping ALTER COLUMN job_version_uuid DROP NOT NULL;
 CREATE INDEX job_versions_io_mapping_job_uuid_job_symlink_target_uuid ON job_versions_io_mapping (job_uuid, job_symlink_target_uuid);
 
 ALTER TABLE job_versions_io_mapping ADD CONSTRAINT job_versions_io_mapping_mapping_pkey UNIQUE (job_version_uuid, dataset_uuid, io_type, job_uuid);
+-- Implementation required for streaming CDC support
+ALTER TABLE job_versions_io_mapping REPLICA IDENTITY FULL;

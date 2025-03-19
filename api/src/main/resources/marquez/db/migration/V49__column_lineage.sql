@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS column_lineage (
   updated_at                    TIMESTAMP NOT NULL,
   UNIQUE (output_dataset_version_uuid, output_dataset_field_uuid, input_dataset_version_uuid, input_dataset_field_uuid)
 );
+
+-- Implementation required for streaming CDC support
+ALTER TABLE column_lineage REPLICA IDENTITY FULL;

@@ -3,6 +3,9 @@
 ALTER TABLE lineage_events
     ADD run_uuid uuid;
 
+-- Implementation required for streaming CDC support
+ALTER TABLE lineage_events REPLICA IDENTITY FULL;
+
 CREATE INDEX lineage_events_run_id_index
     on lineage_events(run_uuid);
 

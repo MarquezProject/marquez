@@ -4,6 +4,8 @@ ALTER TABLE jobs ADD current_job_context_uuid UUID;
 ALTER TABLE jobs ADD current_location varchar;
 ALTER TABLE jobs ADD current_inputs JSONB;
 ALTER TABLE jobs ADD current_outputs JSONB;
+-- Implementation required for streaming CDC support
+ALTER TABLE jobs REPLICA IDENTITY FULL;
 
 UPDATE jobs SET
   current_job_context_uuid = jv.job_context_uuid,
