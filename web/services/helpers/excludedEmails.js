@@ -11,15 +11,16 @@
  */
 
 const excludedEmails = new Set([
-    'bWF0ZXVzLmNhcmRvc29AbnViYW5rLmNvbS5icg==',
-    'bHVpcy55YW1hZGFAbnViYW5rLmNvbS5icg==',
-    'cmFmYWVsLmJyYWdlcm9sbGlAbnViYW5rLmNvbS5icg==',
-    'a2Fpby5iZW5pY2lvQG51YmFuay5jb20uYnI=',
-    'bWljaGFlbC5zYW50YUBudWJhbmsuY29tLmJy',
-    'cGVkcm8uYXJhdWpvMUBudWJhbmsuY29tLmJy',
-    'amhvbmF0YXMucm9zZW5kb0BudWJhbmsuY29tLmJy',
-    'dml2aWFuLm1pcmFuZGFAbnViYW5rLmNvbS5icg==',
-    'YnJ1bmEucGVyaW5AbnViYW5rLmNvbS5icg=='
+  'bWF0ZXVzLmNhcmRvc29AbnViYW5rLmNvbS5icg==',
+  'bHVpcy55YW1hZGFAbnViYW5rLmNvbS5icg==',
+  'cmFmYWVsLmJyYWdlcm9sbGlAbnViYW5rLmNvbS5icg==',
+  'a2Fpby5iZW5pY2lvQG51YmFuay5jb20uYnI=',
+  'bWljaGFlbC5zYW50YUBudWJhbmsuY29tLmJy',
+  'cGVkcm8uYXJhdWpvMUBudWJhbmsuY29tLmJy',
+  'amhvbmF0YXMucm9zZW5kb0BudWJhbmsuY29tLmJy',
+  'dml2aWFuLm1pcmFuZGFAbnViYW5rLmNvbS5icg==',
+  'YnJ1bmEucGVyaW5AbnViYW5rLmNvbS5icg==',
+  'am9uYXRoYW4ubW9yYWVzLmdmdEBudWJhbmsuY29tLmJy'
   ]);
   
   module.exports = { excludedEmails }
