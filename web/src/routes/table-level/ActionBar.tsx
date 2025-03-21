@@ -46,7 +46,6 @@ const filterVisibleNodes = (lineageGraph: LineageGraph, nodeType: string, namesp
   })
 }
 
-
 export const ActionBar = ({
   nodeType,
   fetchLineage,
@@ -139,7 +138,7 @@ export const ActionBar = ({
       setDepth(currentMaxDepth)
       searchParams.set('depth', currentMaxDepth.toString())
       setSearchParams(searchParams)
-      setSnackbarMessage("You’ve reached the maximum depth. Enable All dependencies to display indirect dependencies in higher depths.")
+      setSnackbarMessage("You've reached the maximum depth")
       setOpenSnackbar(true)
       setTimeout(() => setLoading(false), 2000)
       return
@@ -156,7 +155,7 @@ export const ActionBar = ({
         if (Array.isArray(response.graph)) {
           const totalObjects = response.graph.length
 
-          const visibleNodes = filterVisibleNodes(response.graph, nodeType, namespace, name, isFull)
+          const visibleNodes = filterVisibleNodes(response, nodeType, namespace, name, isFull)
           const visibleObjectsCount = visibleNodes.length
 
           if (isFull) {
@@ -169,10 +168,10 @@ export const ActionBar = ({
 
               setMaxDepthFull(newMaxDepth)
               localStorage.setItem('maxDepthFull', newMaxDepth.toString())
-              setSnackbarMessage("You’ve reached the maximum depth. Enable All dependencies to display indirect dependencies in higher depths.")
+              setSnackbarMessage("You've reached the maximum depth")
               setOpenSnackbar(true)
             } else if (visibleObjectsCount === prevObjectsCount) {
-              setSnackbarMessage("You’ve reached the maximum depth. Enable All dependencies to display indirect dependencies in higher depths.")
+              setSnackbarMessage("You've reached the maximum depth")
               setOpenSnackbar(true)
               setTimeout(() => setLoading(false), 2000)
               return
@@ -187,10 +186,10 @@ export const ActionBar = ({
 
               setMaxDepthNonFull(newMaxDepth)
               localStorage.setItem('maxDepthNonFull', newMaxDepth.toString())
-              setSnackbarMessage("You’ve reached the maximum depth. Enable All dependencies to display indirect dependencies in higher depths.")
+              setSnackbarMessage("You've reached the maximum depth")
               setOpenSnackbar(true)
             } else if (visibleObjectsCount === prevObjectsCount) {
-              setSnackbarMessage("You’ve reached the maximum depth. Enable All dependencies to display indirect dependencies in higher depths.")
+              setSnackbarMessage("You've reached the maximum depth")
               setOpenSnackbar(true)
               setTimeout(() => setLoading(false), 2000)
               return
@@ -210,6 +209,7 @@ export const ActionBar = ({
         console.error('Error fetching lineage data:', error)
       }
     }
+
     setLoading(false)
     trackEvent('ActionBar', 'Change Depth', newDepth.toString())
   }
