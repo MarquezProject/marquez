@@ -34,6 +34,15 @@ marquez:
     name: marquez
     user: buendia
     password: macondo
+  dbRetention:
+    enabled: false
+    # Apply retention policy at a frequency of every 'X' minutes (default: 15)
+    frequencyMins: 15
+#    Maximum number of rows deleted per batch (default: 1000)
+    numberOfRowsPerBatch:  1000
+#    Maximum retention days (default: 7)
+    retentionDays: 7
+
   ## Indicates if Flyway database migration will execute upon deployment
   ##
   migrateOnStartup: true
