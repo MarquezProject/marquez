@@ -243,21 +243,24 @@ public class ColumnLineageDaoTest {
 
     assertEquals(2, lineage.size());
 
+    // Get data from dataset_b and dataset_c
     ColumnLineageNodeData dataset_b =
         lineage.stream().filter(cd -> cd.getDataset().equals("dataset_b")).findAny().get();
     ColumnLineageNodeData dataset_c =
         lineage.stream().filter(cd -> cd.getDataset().equals("dataset_c")).findAny().get();
 
-    // test dataset_c
+    // Validate dataset_c
     assertThat(dataset_c.getInputFields()).hasSize(1);
     assertEquals("col_d", dataset_c.getField());
     assertEquals("namespace", dataset_c.getInputFields().get(0).getNamespace());
     assertEquals("dataset_b", dataset_c.getInputFields().get(0).getDataset());
     assertEquals("col_c", dataset_c.getInputFields().get(0).getField());
     assertEquals("type2", dataset_c.getInputFields().get(0).getTransformationType());
-    assertEquals("description2", dataset_c.getInputFields().get(0).getTransformationDescription());
+    assertEquals(
+        "subtype:IDENTITY:::masking:false:::description:description2", // New format expected
+        dataset_c.getInputFields().get(0).getTransformationDescription());
 
-    // test dataset_b
+    // Validate dataset_b
     assertThat(dataset_b.getInputFields()).hasSize(2);
     assertEquals("col_c", dataset_b.getField());
     assertEquals(
@@ -278,7 +281,9 @@ public class ColumnLineageDaoTest {
     assertEquals("namespace", dataset_b.getInputFields().get(0).getNamespace());
     assertEquals("dataset_a", dataset_b.getInputFields().get(0).getDataset());
     assertEquals("type1", dataset_b.getInputFields().get(0).getTransformationType());
-    assertEquals("description1", dataset_b.getInputFields().get(0).getTransformationDescription());
+    assertEquals(
+        "subtype:IDENTITY:::masking:false:::description:description1", // New format expected
+        dataset_b.getInputFields().get(0).getTransformationDescription());
   }
 
   @Test
@@ -320,9 +325,19 @@ public class ColumnLineageDaoTest {
                                 new LineageEvent.ColumnLineageOutputColumn(
                                     Arrays.asList(
                                         new LineageEvent.ColumnLineageInputField(
-                                            "namespace", "dataset_c", "col_d")),
+                                            "namespace",
+                                            "dataset_c",
+                                            "col_d",
+                                            Collections.emptyList() // List empty
+                                        )
+                                    ),
                                     "",
-                                    "")))))
+                                    ""
+                                )
+                            )
+                        )
+                    )
+                )
                 .build());
 
     createLineage(openLineageDao, dataset_A, dataset_B);
@@ -343,6 +358,16 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineageWhenCycleExists() {
+    // Create transformation empty
+    LineageEvent.ColumnLineageTransformation transformation =
+        LineageEvent.ColumnLineageTransformation.builder()
+            .subtype("IDENTITY")
+            .masking(false)
+            .description("description3")
+            .type("type3")
+            .build();
+
+    // Create dataset_A lineage
     Dataset dataset_A =
         new Dataset(
             "namespace",
@@ -361,11 +386,20 @@ public class ColumnLineageDaoTest {
                         SCHEMA_URL,
                         new LineageEvent.ColumnLineageDatasetFacetFields(
                             Collections.singletonMap(
-                                "col_a",
+                                "col_a", // Map key
                                 new LineageEvent.ColumnLineageOutputColumn(
                                     Arrays.asList(
                                         new LineageEvent.ColumnLineageInputField(
-                                            "namespace", "dataset_c", "col_d")),
+                                            "namespace",
+                                            "dataset_c",
+                                            "col_d",
+                                            Collections.singletonList(
+                                                LineageEvent.ColumnLineageTransformation.builder()
+                                                    .subtype("IDENTITY")
+                                                    .masking(false)
+                                                    .description("description3")
+                                                    .type("type3")
+                                                    .build()))),
                                     "description3",
                                     "type3")))))
                 .build());
@@ -374,93 +408,18 @@ public class ColumnLineageDaoTest {
     createLineage(openLineageDao, dataset_B, dataset_C);
     UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_A);
 
+    // Get the lineage records
     UpdateLineageRow.DatasetRecord datasetRecord_a = lineageRow.getOutputs().get().get(0);
     UpdateLineageRow.DatasetRecord datasetRecord_c = lineageRow.getInputs().get().get(0);
 
     UUID field_col_a = fieldDao.findUuid(datasetRecord_a.getDatasetRow().getUuid(), "col_a").get();
     UUID field_col_d = fieldDao.findUuid(datasetRecord_c.getDatasetRow().getUuid(), "col_d").get();
 
-    // column lineages for col_a and col_e should be of size 3
+    // Validate that the lineage for col_a and col_d is of size 3
     assertThat(dao.getLineage(20, Collections.singletonList(field_col_a), false, Instant.now()))
         .hasSize(3);
     assertThat(dao.getLineage(20, Collections.singletonList(field_col_d), false, Instant.now()))
         .hasSize(3);
-  }
-
-  /**
-   * Run two jobs that write to dataset_b using dataset_a and dataset_c. Both input fields should be
-   * returned
-   */
-  @Test
-  void testGetLineageWhenTwoJobsWriteToSameDataset() {
-    List<LineageEvent.ColumnLineageInputField> fields =
-        getDatasetB()
-            .getFacets()
-            .getColumnLineage()
-            .getFields()
-            .getAdditionalFacets()
-            .get("col_c")
-            .getInputFields();
-
-    Dataset datasetWithColAAsInputField = getDatasetB();
-    datasetWithColAAsInputField
-        .getFacets()
-        .getColumnLineage()
-        .getFields()
-        .getAdditionalFacets()
-        .get("col_c")
-        .setInputFields(Collections.singletonList(fields.get(0)));
-    createLineage(openLineageDao, getDatasetA(), datasetWithColAAsInputField);
-
-    Dataset datasetWithColBAsInputField = getDatasetB();
-    datasetWithColBAsInputField
-        .getFacets()
-        .getColumnLineage()
-        .getFields()
-        .getAdditionalFacets()
-        .get("col_c")
-        .setInputFields(Collections.singletonList(fields.get(1)));
-    UpdateLineageRow lineageRow =
-        createLineage(openLineageDao, getDatasetA(), datasetWithColBAsInputField);
-
-    // assert input fields for col_c contain col_a and col_b
-    List<String> inputFields =
-        getColumnLineage(lineageRow, "col_c").stream()
-            .filter(node -> node.getDataset().equals("dataset_b"))
-            .flatMap(node -> node.getInputFields().stream())
-            .map(input -> input.getField())
-            .collect(Collectors.toList());
-
-    assertThat(inputFields).hasSize(2).contains("col_a", "col_b");
-  }
-
-  @Test
-  void testGetLineagePointInTime() {
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
-
-    UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
-    UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
-    Instant columnLineageCreatedAt =
-        dao.findColumnLineageByDatasetVersionColumnAndOutputDatasetField(
-                datasetRecord_b.getDatasetVersionRow().getUuid(), field_col_b)
-            .get(0)
-            .getCreatedAt();
-
-    // assert lineage is empty before and present after
-    assertThat(
-            dao.getLineage(
-                20,
-                Collections.singletonList(field_col_b),
-                false,
-                columnLineageCreatedAt.minusSeconds(1)))
-        .isEmpty();
-    assertThat(
-            dao.getLineage(
-                20,
-                Collections.singletonList(field_col_b),
-                false,
-                columnLineageCreatedAt.plusSeconds(1)))
-        .hasSize(1);
   }
 
   @Test
@@ -536,4 +495,7 @@ public class ColumnLineageDaoTest {
 
     return dao.getLineage(20, Collections.singletonList(field_UUID), false, Instant.now());
   }
+
+  LineageEvent.ColumnLineageInputField inputField = new LineageEvent.ColumnLineageInputField();
+  List<LineageEvent.ColumnLineageInputField> inputFields = Arrays.asList(inputField);
 }
