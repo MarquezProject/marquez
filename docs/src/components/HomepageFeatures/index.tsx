@@ -52,7 +52,7 @@ const featureList: FeatureItem[] = [
                 quality systems.
             </p>
         </>
-    }
+    },
 ]
 
 type FeatureItem = {
@@ -88,6 +88,22 @@ export default function HomepageFeatures(): JSX.Element {
                     {featureList.map((props, idx) => (
                         <Feature key={idx} {...props} />
                     ))}
+                </div>
+            </div>
+            <div className="container">
+                <div className={styles.constrain}>
+                    <h3>Interactive Demo</h3>
+                </div>
+                <div style={{ position: 'relative', paddingBottom: 'calc(51.71875% + 41px)', marginBottom: 40, height: 0, width: '100%' }}>
+                    <iframe
+                        src="https://demo.arcade.software/jvl9klSzforNlap3HWxS?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+                        title="Marquez"
+                        frameBorder="0"
+                        loading="lazy"
+                        allowFullScreen
+                        allow="clipboard-write"
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', colorScheme: 'light' }}
+                    />
                 </div>
             </div>
         </section>
