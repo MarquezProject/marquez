@@ -3,7 +3,7 @@
 openapi: 3.0.2
 info:
   title: Marquez
-  version: 0.52.0-SNAPSHOT
+  version: 0.50.0
   description: Marquez is an open source **metadata service** for the **collection**, **aggregation**,
     and **visualization** of a data ecosystem's metadata.
   license:
@@ -258,6 +258,9 @@ paths:
     get:
       operationId: getDatasets
       parameters:
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/sortDirection'
+        - $ref: '#/components/parameters/pattern'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
       summary: List all datasets
@@ -370,6 +373,9 @@ paths:
     get:
       operationId: getJobs
       parameters:
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/sortDirection'
+        - $ref: '#/components/parameters/pattern'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
       summary: List all jobs
@@ -602,23 +608,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LineageGraph'
-
-  /runlineage/upstream:
-    get:
-      operationId: getRunLineageUpstream
-      paramteters:
-        - $ref: '#/components/parameters/runId'
-        - $ref: '#/components/parameters/depth'
-      tags:
-        - Lineage
-      summary: Get the upstream lineage for a given run
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpstreamRunLineage'
 
   /column-lineage:
     get:
@@ -899,6 +888,26 @@ components:
         type: string
         example: name
         description: Sorts the results of your query by indicated direction `asc` or `desc`.
+      required: false
+
+    pattern:
+      name: pattern
+      in: query
+      schema:
+        default: '%'
+        type: string
+        example: etl
+        description: Filters the results of your query by indicated pattern. Matches any substring
+      required: false
+
+    orderBy:
+      name: orderBy
+      in: query
+      schema:
+        type: string
+        default: name
+        example: name
+        description: Orders the results of your query by indicated `sortDirection` by any column on the row.
       required: false
 
     before:
@@ -1551,15 +1560,6 @@ components:
         name:
           description: The name of the job.
           type: string
-        simpleName:
-          description: The shortened name of the job.
-          type: string
-        parentJobName:
-          description: The name of the parent job.
-          type: string
-        parentJobUuid:
-          description: The UUID of the parent job.
-          type: string
         createdAt:
           description: An [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) timestamp representing the date/time the job was created.
           type: string
@@ -1596,10 +1596,6 @@ components:
           type: string
         latestRun:
           $ref: '#/components/schemas/Run'
-        latestRuns:
-          type: array
-          items:
-            $ref: '#/components/schemas/Run'
         facets:
           $ref: '#/components/schemas/JobFacets'
         currentVersion:
@@ -1621,7 +1617,6 @@ components:
         context: {'SQL': "SELECT * FROM mytable;"}
         description: My first job!
         latestRun: null
-        latestRuns: []
         facets: {}
         currentVersion: "b1d626a2-6d3a-475e-9ecf-943176d4a8c6"
 
@@ -1944,88 +1939,28 @@ components:
       example:
         description: My first tag!
 
-    UpstreamRunLineage:
-      type: object
-      properties:
-        runs:
-          description: the list of upstream runs including the selected run in topological order upstream
-          type: array
-          items:
-            type: object
-            propoerties:
-              job:
-                type: object
-                description: identifier of the job version for this run
-                propoerties:
-                  namespace:
-                    type: string
-                  name:
-                    type: string
-                  version:
-                    type: string
-                    format: uuid
-              run:
-                description: run information
-                type: object
-                properties:
-                  id:
-                    description: the run identifier
-                    type: string
-                    format: uuid
-                  start:
-                    description: start time of the run
-                    type: string
-                    format: date-time
-                  end:
-                    description: end time of the run
-                    type: string
-                    format: date-time
-                  status:
-                    description: whether the run completed succesfully or not
-                    type: string
-              inputs:
-                description: ustream input dataset versions
-                type: array
-                items:
-                  description: identifier of the upstream dataset version consumed by this run
-                  type: object
-                  properties:
-                    namespace:
-                      type: string
-                    name:
-                      type: string
-                    version:
-                      type: string
-                      format: uuid
-                    producedByRunId:
-                      description: the run that produced this dataset version
-                      type: string
-                      format: uuid
-
     LineageEvent:
       example:
         eventType: COMPLETE
         eventTime: 2019-05-09T19:49:24.201361Z
         run: {runId: d46e465b-d358-4d32-83d4-df660ff614dd}
         job: {namespace: my-namespace,name: my-job}
-        outputs: [
-          {
-            namespace: my-namespace,
-            name: my-output,
-            facets: {
-              schema: {
-                _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
-                _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
-                fields: [
-                  { name: a, type: INTEGER },
-                  { name: b, type: TIMESTAMP },
-                  { name: c, type: INTEGER },
-                  { name: d, type: INTEGER }
-                ]
-              }
+        outputs: [{
+          namespace: my-namespace,
+          name: my-output,
+          facets: {
+            schema: {
+              _producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client",
+              _schemaURL: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/spec/OpenLineage.json#/definitions/SchemaDatasetFacet",
+              fields: [
+                {name: a, type: INTEGER},
+                {name: b, type: TIMESTAMP},
+                {name: c, type: INTEGER},
+                {name: d, type: INTEGER}
+              ]
             }
           }
-        ]
+        }]
         producer: "https://github.com/OpenLineage/OpenLineage/blob/v1-0-0/client"
 
     SearchResultList:

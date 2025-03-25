@@ -2,6 +2,7 @@ version: "3.7"
 services:
   web:
     image: "marquezproject/marquez-web:${TAG}"
+    # platform: linux/amd64
     container_name: marquez-web
     build:
       context: .
