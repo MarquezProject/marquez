@@ -92,6 +92,8 @@ import {
   deleteDatasetTagSuccess,
   deleteJobSuccess,
   deleteJobTagSuccess,
+  fetchColumnLineageEnd,
+  fetchColumnLineageStart,
   fetchColumnLineageSuccess,
   fetchDatasetMetricsSuccess,
   fetchDatasetSuccess,
@@ -104,7 +106,9 @@ import {
   fetchJobSuccess,
   fetchJobsSuccess,
   fetchLatestRunsSuccess,
+  fetchLineageEnd,
   fetchLineageMetricsSuccess,
+  fetchLineageStart,
   fetchLineageSuccess,
   fetchNamespacesSuccess,
   fetchOpenSearchDatasetsSuccess,
@@ -142,6 +146,7 @@ export function* fetchLineage() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_LINEAGE)
+      yield put(fetchLineageStart())
       const result: LineageGraph = yield call(
         getLineage,
         payload.nodeType,
@@ -152,6 +157,8 @@ export function* fetchLineage() {
       yield put(fetchLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
+    } finally {
+      yield put(fetchLineageEnd())
     }
   }
 }
@@ -160,6 +167,7 @@ export function* fetchColumnLineage() {
   while (true) {
     try {
       const { payload } = yield take(FETCH_COLUMN_LINEAGE)
+      yield put(fetchColumnLineageStart())
       const result: ColumnLineageGraph = yield call(
         getColumnLineage,
         payload.nodeType,
@@ -171,6 +179,8 @@ export function* fetchColumnLineage() {
       yield put(fetchColumnLineageSuccess(result))
     } catch (e) {
       yield put(applicationError('Something went wrong while fetching lineage'))
+    } finally {
+      yield put(fetchColumnLineageEnd())
     }
   }
 }

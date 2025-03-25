@@ -468,6 +468,14 @@ export const fetchLineage = (
   },
 })
 
+export const fetchLineageStart = () => ({
+  type: actionTypes.FETCH_LINEAGE_START,
+})
+
+export const fetchLineageEnd = () => ({
+  type: actionTypes.FETCH_LINEAGE_END,
+})
+
 export const fetchColumnLineage = (
   nodeType: JobOrDataset,
   namespace: string,
@@ -483,6 +491,14 @@ export const fetchColumnLineage = (
     depth,
     withDownstream,
   },
+})
+
+export const fetchColumnLineageStart = () => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE_START,
+})
+
+export const fetchColumnLineageEnd = () => ({
+  type: actionTypes.FETCH_COLUMN_LINEAGE_END,
 })
 
 export const fetchLineageSuccess = (lineage: LineageGraph) => ({

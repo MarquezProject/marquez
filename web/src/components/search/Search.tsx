@@ -79,6 +79,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
   useEffect(() => {
     // close search on a route change
     setOpen(false)
+    setSearch('')
   }, [location])
 
   const handleSearch = () => {
@@ -93,6 +94,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
 
   const handleClose = () => {
     setOpen(false)
+    setSearch('')
     trackEvent('Search', 'Close Search Bar')
   }
 
@@ -161,7 +163,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
             }
           }}
           value={search}
-          autoComplete={'on'}
+          autoComplete={'off'}
           id={'searchBar'}
         />
         <ClickAwayListener
@@ -198,12 +200,7 @@ const Search: React.FC<SearchProps> = ({ isLoading, onSearch }) => {
                   {process.env.REACT_APP_ADVANCED_SEARCH === 'true' ? (
                     <OpenSearch search={search} />
                   ) : (
-                    <BaseSearch
-                      search={search}
-                      onSuggestionSelect={(selectedName: string) => {
-                        setSearch(selectedName)
-                      }}
-                    />
+                    <BaseSearch search={search} />
                   )}
                 </Box>
               </Box>

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  FETCH_LINEAGE_END,
+  FETCH_LINEAGE_START,
   FETCH_LINEAGE_SUCCESS,
   RESET_LINEAGE,
   SET_BOTTOM_BAR_HEIGHT,
@@ -20,6 +22,7 @@ export interface ILineageState {
   selectedNode: Nullable<string>
   bottomBarHeight: number
   depth: number
+  isLoading: boolean
   tabIndex: number
   showFullGraph: boolean
 }
@@ -29,6 +32,7 @@ const initialState: ILineageState = {
   selectedNode: null,
   bottomBarHeight: (window.innerHeight - HEADER_HEIGHT) / 3,
   depth: 5,
+  isLoading: false,
   tabIndex: 0,
   showFullGraph: true,
 }
@@ -41,6 +45,10 @@ const DRAG_BAR_HEIGHT = 8
 
 export default (state = initialState, action: ILineageActions) => {
   switch (action.type) {
+    case FETCH_LINEAGE_START:
+      return { ...state, isLoading: true }
+    case FETCH_LINEAGE_END:
+      return { ...state, isLoading: false }
     case FETCH_LINEAGE_SUCCESS:
       return { ...state, lineage: action.payload }
     case SET_SELECTED_NODE:

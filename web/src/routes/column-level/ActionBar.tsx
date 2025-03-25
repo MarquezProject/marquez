@@ -13,12 +13,11 @@ import {
 } from '@mui/material'
 import { HEADER_HEIGHT, theme } from '../../helpers/theme'
 import { fetchColumnLineage } from '../../store/actionCreators'
-import { getColumnLineage } from '../../store/requests/columnlineage'
+import { trackEvent } from '../../components/ga4'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqText from '../../components/core/text/MqText'
-import { trackEvent } from '../../components/ga4'
-import React, { useState } from 'react'
+import React from 'react'
 
 interface ActionBarProps {
   fetchColumnLineage: typeof fetchColumnLineage
@@ -26,23 +25,22 @@ interface ActionBarProps {
   setDepth: (depth: number) => void
   withDownstream: boolean
   setWithDownstream: (withDownstream: boolean) => void
+  isLoading: boolean
 }
 
 export const ActionBar = ({
+  fetchColumnLineage,
   depth,
   setDepth,
   withDownstream,
   setWithDownstream,
+  isLoading,
 }: ActionBarProps) => {
   const { namespace, name } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [loading, setLoading] = useState(false)
-
   const handleDepthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true)
-
     const newDepth = isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
     setDepth(newDepth)
     searchParams.set('depth', e.target.value)
@@ -51,14 +49,11 @@ export const ActionBar = ({
     trackEvent('ActionBar', 'Change Depth', newDepth.toString())
 
     if (namespace && name) {
-      await getColumnLineage('DATASET', namespace, name, newDepth, withDownstream)
+      fetchColumnLineage('DATASET', namespace, name, newDepth, withDownstream)
     }
-    setLoading(false)
   }
 
   const handleDirectionChange = async (e: SelectChangeEvent<'Both' | 'Upstream'>) => {
-    setLoading(true)
-
     const newValue = e.target.value === 'Both'
     setWithDownstream(newValue)
     searchParams.set('withDownstream', newValue.toString())
@@ -67,15 +62,14 @@ export const ActionBar = ({
     trackEvent('ActionBar', 'Change Direction', newValue ? 'Both' : 'Upstream')
 
     if (namespace && name) {
-      await getColumnLineage('DATASET', namespace, name, depth, newValue)
+      fetchColumnLineage('DATASET', namespace, name, depth, newValue)
     }
-    setLoading(false)
   }
 
   const handleBackClick = () => {
-    navigate('/');
+    navigate('/')
     trackEvent('ActionBar', 'Navigate Back to Datasets')
-  };
+  }
 
   return (
     <Box
@@ -117,7 +111,7 @@ export const ActionBar = ({
         </Box>
       </Box>
       <Box display={'flex'} alignItems={'center'}>
-        {loading ? (
+        {isLoading ? (
           <CircularProgress size={40} sx={{ width: '150px', mr: 2 }} />
         ) : (
           <>
