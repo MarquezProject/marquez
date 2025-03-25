@@ -2,6 +2,7 @@ version: "3.7"
 services:
   seed_marquez:
     image: "marquezproject/marquez:${TAG}"
+    # platform: linux/amd64
     container_name: seed-marquez-with-metadata
     environment:
       - MARQUEZ_URL=http://api:${API_PORT}
