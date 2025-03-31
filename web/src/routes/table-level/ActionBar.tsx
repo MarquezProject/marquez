@@ -129,90 +129,83 @@ export const ActionBar = ({
   }, [namespace, name, nodeType, depth, fetchLineage])
 
   const handleDepthChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true)
+    setLoading(true);
 
-    const newDepth = isNaN(parseInt(e.target.value)) ? 0 : parseInt(e.target.value)
-    const currentMaxDepth = isFull ? maxDepthFull : maxDepthNonFull
+    const requestedDepth = parseInt(e.target.value, 10) || 0;
+    const currentMaxDepth = isFull ? maxDepthFull : maxDepthNonFull;
 
-    if (currentMaxDepth !== null && newDepth > currentMaxDepth) {
-      setDepth(currentMaxDepth)
-      searchParams.set('depth', currentMaxDepth.toString())
-      setSearchParams(searchParams)
-      setSnackbarMessage("You've reached the maximum depth")
-      setOpenSnackbar(true)
-      setTimeout(() => setLoading(false), 2000)
-      return
+    // Verifica se o usuário está tentando ultrapassar o limite conhecido
+    if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
+      setDepth(currentMaxDepth);
+      searchParams.set('depth', currentMaxDepth.toString());
+      setSearchParams(searchParams);
+      setSnackbarMessage("You've reached the maximum depth");
+      setOpenSnackbar(true);
+      setLoading(false);
+      return;
     }
 
-    setDepth(newDepth)
-    searchParams.set('depth', e.target.value)
-    setSearchParams(searchParams)
+    if (!namespace || !name) {
+      setSnackbarMessage("Namespace or name is missing");
+      setOpenSnackbar(true);
+      setLoading(false);
+      return;
+    }
 
-    if (namespace && name) {
-      try {
-        const response = await getLineage(nodeType, namespace, name, newDepth)
+    try {
+      const response = await getLineage(nodeType, namespace, name, requestedDepth);
 
-        if (Array.isArray(response.graph)) {
-          const totalObjects = response.graph.length
+      if (Array.isArray(response.graph)) {
+        const totalObjects = response.graph.length;
+        const visibleNodes = filterVisibleNodes(response, nodeType, namespace, name, isFull);
+        const visibleObjectsCount = visibleNodes.length;
 
-          const visibleNodes = filterVisibleNodes(response, nodeType, namespace, name, isFull)
-          const visibleObjectsCount = visibleNodes.length
+        const objectsCount = isFull ? totalObjects : visibleObjectsCount;
 
-          if (isFull) {
-            if (prevObjectsCount !== null && prevObjectsCount === totalObjects) {
-              const newMaxDepth = prevDepth || newDepth
+        if (currentMaxDepth === null && requestedDepth > depth) { // Calcula o maxDepth apenas uma vez
+          if (prevObjectsCount !== null && objectsCount <= prevObjectsCount) {
+            const newMaxDepth = requestedDepth - 1;
 
-              setDepth(newMaxDepth)
-              searchParams.set('depth', newMaxDepth.toString())
-              setSearchParams(searchParams)
-
-              setMaxDepthFull(newMaxDepth)
-              localStorage.setItem('maxDepthFull', newMaxDepth.toString())
-              setSnackbarMessage("You've reached the maximum depth")
-              setOpenSnackbar(true)
-            } else if (visibleObjectsCount === prevObjectsCount) {
-              setSnackbarMessage("You've reached the maximum depth")
-              setOpenSnackbar(true)
-              setTimeout(() => setLoading(false), 2000)
-              return
+            if (isFull) {
+              setMaxDepthFull(newMaxDepth);
+              localStorage.setItem('maxDepthFull', newMaxDepth.toString());
+            } else {
+              setMaxDepthNonFull(newMaxDepth);
+              localStorage.setItem('maxDepthNonFull', newMaxDepth.toString());
             }
+
+            setDepth(newMaxDepth);
+            searchParams.set('depth', newMaxDepth.toString());
+            setSearchParams(searchParams);
+            setSnackbarMessage("You've reached the maximum depth");
+            setOpenSnackbar(true);
           } else {
-            if (prevObjectsCount !== null && prevObjectsCount === visibleObjectsCount) {
-              const newMaxDepth = prevDepth || newDepth
-
-              setDepth(newMaxDepth)
-              searchParams.set('depth', newMaxDepth.toString())
-              setSearchParams(searchParams)
-
-              setMaxDepthNonFull(newMaxDepth)
-              localStorage.setItem('maxDepthNonFull', newMaxDepth.toString())
-              setSnackbarMessage("You've reached the maximum depth")
-              setOpenSnackbar(true)
-            } else if (visibleObjectsCount === prevObjectsCount) {
-              setSnackbarMessage("You've reached the maximum depth")
-              setOpenSnackbar(true)
-              setTimeout(() => setLoading(false), 2000)
-              return
-            }
+            setDepth(requestedDepth);
+            searchParams.set('depth', requestedDepth.toString());
+            setSearchParams(searchParams);
+            setPrevObjectsCount(objectsCount);
           }
-
-          setPrevObjectsCount(isFull ? totalObjects : visibleObjectsCount)
-          setPrevDepth(newDepth)
         } else {
-          setSnackbarMessage("Failed to fetch lineage data")
-          setOpenSnackbar(true)
-          console.error('Failed to fetch lineage data')
+          // Permite alterar o depth livremente dentro do limite
+          setDepth(requestedDepth);
+          searchParams.set('depth', requestedDepth.toString());
+          setSearchParams(searchParams);
+          setPrevObjectsCount(objectsCount);
         }
-      } catch (error) {
-        setSnackbarMessage("Error fetching lineage data")
-        setOpenSnackbar(true)
-        console.error('Error fetching lineage data:', error)
+      } else {
+        setSnackbarMessage("Failed to fetch lineage data");
+        setOpenSnackbar(true);
+        console.error('Failed to fetch lineage data');
       }
+    } catch (error) {
+      setSnackbarMessage("Error fetching lineage data");
+      setOpenSnackbar(true);
+      console.error('Error fetching lineage data:', error);
     }
 
-    setLoading(false)
-    trackEvent('ActionBar', 'Change Depth', newDepth.toString())
-  }
+    setLoading(false);
+    trackEvent('ActionBar', 'Change Depth', requestedDepth.toString());
+  };
 
   const handleCloseSnackbar = useCallback(() => {
     setOpenSnackbar(false)
