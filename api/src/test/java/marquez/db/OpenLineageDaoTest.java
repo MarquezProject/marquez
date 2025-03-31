@@ -291,7 +291,7 @@ class OpenLineageDaoTest {
                                 new LineageEvent.ColumnLineageOutputColumn(
                                     Collections.singletonList(
                                         new LineageEvent.ColumnLineageInputField(
-                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME, null)),
                                     TRANSFORMATION_DESCRIPTION,
                                     TRANSFORMATION_TYPE)))))
                 .build());
@@ -347,7 +347,7 @@ class OpenLineageDaoTest {
                                 new LineageEvent.ColumnLineageOutputColumn(
                                     Collections.singletonList(
                                         new LineageEvent.ColumnLineageInputField(
-                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                            INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME, null)),
                                     UPDATED_TRANSFORMATION_DESCRIPTION,
                                     UPDATED_TRANSFORMATION_TYPE)))))
                 .build());
@@ -714,7 +714,7 @@ class OpenLineageDaoTest {
                             new LineageEvent.ColumnLineageOutputColumn(
                                 Collections.singletonList(
                                     new LineageEvent.ColumnLineageInputField(
-                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME)),
+                                        INPUT_NAMESPACE, INPUT_DATASET, INPUT_FIELD_NAME, null)),
                                 TRANSFORMATION_DESCRIPTION,
                                 TRANSFORMATION_TYPE)))))
             .build());

@@ -46,6 +46,14 @@ public class ColumnLineageTestUtils {
 
   // dataset_B (col_c) depends on (col_a, col_b)
   public static LineageEvent.Dataset getDatasetB() {
+    LineageEvent.ColumnLineageTransformation transformation =
+        LineageEvent.ColumnLineageTransformation.builder()
+            .subtype("IDENTITY")
+            .masking(false)
+            .description("description1")
+            .type("type1")
+            .build();
+
     return new LineageEvent.Dataset(
         "namespace",
         "dataset_b",
@@ -68,9 +76,15 @@ public class ColumnLineageTestUtils {
                             new LineageEvent.ColumnLineageOutputColumn(
                                 Arrays.asList(
                                     new LineageEvent.ColumnLineageInputField(
-                                        "namespace", "dataset_a", "col_a"),
+                                        "namespace",
+                                        "dataset_a",
+                                        "col_a",
+                                        Collections.singletonList(transformation)),
                                     new LineageEvent.ColumnLineageInputField(
-                                        "namespace", "dataset_a", "col_b")),
+                                        "namespace",
+                                        "dataset_a",
+                                        "col_b",
+                                        Collections.singletonList(transformation))),
                                 "description1",
                                 "type1")))))
             .build());
@@ -78,6 +92,14 @@ public class ColumnLineageTestUtils {
 
   // dataset_C (col_d) depends on col_c
   public static LineageEvent.Dataset getDatasetC() {
+    LineageEvent.ColumnLineageTransformation transformation =
+        LineageEvent.ColumnLineageTransformation.builder()
+            .subtype("IDENTITY")
+            .masking(false)
+            .description("description2")
+            .type("type2")
+            .build();
+
     return new LineageEvent.Dataset(
         "namespace",
         "dataset_c",
@@ -100,7 +122,10 @@ public class ColumnLineageTestUtils {
                             new LineageEvent.ColumnLineageOutputColumn(
                                 Arrays.asList(
                                     new LineageEvent.ColumnLineageInputField(
-                                        "namespace", "dataset_b", "col_c")),
+                                        "namespace",
+                                        "dataset_b",
+                                        "col_c",
+                                        Collections.singletonList(transformation))),
                                 "description2",
                                 "type2")))))
             .dataSource(

@@ -642,6 +642,11 @@ public class LineageEvent extends BaseEvent {
     @NotNull private String namespace;
     @NotNull private String name;
     @NotNull private String field;
+    private List<ColumnLineageTransformation> transformations;
+
+  public List<ColumnLineageTransformation> getTransformations() {
+    return transformations;
+  }
   }
 
   @Builder
@@ -686,5 +691,19 @@ public class LineageEvent extends BaseEvent {
     public Map<String, Object> getAdditionalFacets() {
       return additional;
     }
+  }
+
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Setter
+  @Getter
+  @Valid
+  @ToString
+  public static class ColumnLineageTransformation {
+    private String description;
+    private boolean masking;
+    private String subtype;
+    private String type;
   }
 }
