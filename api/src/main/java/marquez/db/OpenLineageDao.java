@@ -1075,20 +1075,17 @@ public interface OpenLineageDao extends BaseDao {
                   datasetVersionRow.getUuid(),
                   inputFields);
 
-              // Extract the values ​​of transformationType and transformationDescription
-              String transformationType = columnLineage.getInputFields().stream()
+              Optional<LineageEvent.ColumnLineageTransformation> transformation = columnLineage.getInputFields().stream()
                   .flatMap(inputField -> inputField.getTransformations().stream())
-                  .map(LineageEvent.ColumnLineageTransformation::getType)
-                  .findFirst()
+                  .findAny();
+
+              String transformationType = transformation.map(LineageEvent.ColumnLineageTransformation::getType)
                   .orElse(null);
 
-              String transformationDescription = columnLineage.getInputFields().stream()
-                  .flatMap(inputField -> inputField.getTransformations().stream())
-                  .map(transformation -> String.format("subtype:%s:::masking:%s:::description:%s",
-                      transformation.getSubtype(),
-                      transformation.isMasking(),
-                      transformation.getDescription()))
-                  .findFirst()
+              String transformationDescription = transformation.map(transform -> String.format("subtype:%s:::masking:%s:::description:%s",
+                  transform.getSubtype(),
+                  transform.isMasking(),
+                  transform.getDescription()))
                   .orElse(null);
 
               return daos
