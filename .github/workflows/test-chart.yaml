@@ -24,7 +24,7 @@ jobs:
           python-version: 3.7
 
       - name: Setup chart-testing
-        uses: helm/chart-testing-action@v2.6.1
+        uses: helm/chart-testing-action@v2.7.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
