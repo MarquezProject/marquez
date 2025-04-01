@@ -90,7 +90,7 @@ To explore metadata via graphql, browse to [http://localhost:5000/graphql-playgr
 
 We invite everyone to help us improve and keep documentation up to date. Documentation is maintained in this repository and can be found under [`docs/`](https://github.com/MarquezProject/marquez/tree/main/docs).
 
-> **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/quickstart.html) guide. Below you will find the steps to get up and running from source.
+> **Note:** To begin collecting metadata with Marquez, follow our [quickstart](https://marquezproject.github.io/marquez/docs/quickstart.html) guide. Below you will find the steps to get up and running from source.
 
 ## Versions and OpenLineage Compatibility
 
