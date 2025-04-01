@@ -134,25 +134,22 @@ export const ActionBar = ({
     const requestedDepth = parseInt(e.target.value, 10) || 0;
     const currentMaxDepth = isFull ? maxDepthFull : maxDepthNonFull;
 
-    // Verifica se o usuário está tentando ultrapassar o limite conhecido
-    if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
-      setDepth(currentMaxDepth);
-      searchParams.set('depth', currentMaxDepth.toString());
-      setSearchParams(searchParams);
-      setSnackbarMessage("You've reached the maximum depth");
-      setOpenSnackbar(true);
-      setLoading(false);
-      return;
-    }
-
     if (!namespace || !name) {
       setSnackbarMessage("Namespace or name is missing");
-      setOpenSnackbar(true);
+
+      if (!openSnackbar) {
+        setOpenSnackbar(true);
+        setTimeout(() => {
+          setOpenSnackbar(false);
+        }, 2000);
+      }
+
       setLoading(false);
       return;
     }
 
     try {
+      // Sempre faz a requisição para buscar os dados
       const response = await getLineage(nodeType, namespace, name, requestedDepth);
 
       if (Array.isArray(response.graph)) {
@@ -162,31 +159,21 @@ export const ActionBar = ({
 
         const objectsCount = isFull ? totalObjects : visibleObjectsCount;
 
-        if (currentMaxDepth === null && requestedDepth > depth) { // Calcula o maxDepth apenas uma vez
-          if (prevObjectsCount !== null && objectsCount <= prevObjectsCount) {
-            const newMaxDepth = requestedDepth - 1;
+        // Compara o requestedDepth com o limite atual
+        if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
+          setDepth(currentMaxDepth);
+          searchParams.set('depth', currentMaxDepth.toString());
+          setSearchParams(searchParams);
+          setSnackbarMessage("You've reached the maximum depth");
 
-            if (isFull) {
-              setMaxDepthFull(newMaxDepth);
-              localStorage.setItem('maxDepthFull', newMaxDepth.toString());
-            } else {
-              setMaxDepthNonFull(newMaxDepth);
-              localStorage.setItem('maxDepthNonFull', newMaxDepth.toString());
-            }
-
-            setDepth(newMaxDepth);
-            searchParams.set('depth', newMaxDepth.toString());
-            setSearchParams(searchParams);
-            setSnackbarMessage("You've reached the maximum depth");
+          if (!openSnackbar) {
             setOpenSnackbar(true);
-          } else {
-            setDepth(requestedDepth);
-            searchParams.set('depth', requestedDepth.toString());
-            setSearchParams(searchParams);
-            setPrevObjectsCount(objectsCount);
+            setTimeout(() => {
+              setOpenSnackbar(false);
+            }, 2000);
           }
         } else {
-          // Permite alterar o depth livremente dentro do limite
+          // Atualiza o depth normalmente se estiver dentro do limite
           setDepth(requestedDepth);
           searchParams.set('depth', requestedDepth.toString());
           setSearchParams(searchParams);
@@ -194,12 +181,26 @@ export const ActionBar = ({
         }
       } else {
         setSnackbarMessage("Failed to fetch lineage data");
-        setOpenSnackbar(true);
+
+        if (!openSnackbar) {
+          setOpenSnackbar(true);
+          setTimeout(() => {
+            setOpenSnackbar(false);
+          }, 2000);
+        }
+
         console.error('Failed to fetch lineage data');
       }
     } catch (error) {
       setSnackbarMessage("Error fetching lineage data");
-      setOpenSnackbar(true);
+
+      if (!openSnackbar) {
+        setOpenSnackbar(true);
+        setTimeout(() => {
+          setOpenSnackbar(false);
+        }, 2000);
+      }
+
       console.error('Error fetching lineage data:', error);
     }
 
@@ -208,8 +209,8 @@ export const ActionBar = ({
   };
 
   const handleCloseSnackbar = useCallback(() => {
-    setOpenSnackbar(false)
-  }, [])
+    setOpenSnackbar(false);
+  }, []);
 
   const handleAllDependenciesToggle = useCallback((checked: boolean) => {
     setIsFull(checked)
@@ -320,7 +321,7 @@ export const ActionBar = ({
           </MQTooltip>
         </Box>
       </Box>
-      <Snackbar open={openSnackbar} autoHideDuration={1500} onClose={handleCloseSnackbar}>
+      <Snackbar open={openSnackbar}  onClose={handleCloseSnackbar}>
         <Alert
           onClose={handleCloseSnackbar}
           severity='info'
