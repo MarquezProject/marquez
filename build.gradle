@@ -68,7 +68,7 @@ subprojects {
         mockitoVersion = '5.4.0'
         openlineageVersion = '1.23.0'
         slf4jVersion = '1.7.36'
-        postgresqlVersion = '42.7.4'
+        postgresqlVersion = '42.7.5'
         jakartaVersion = '9.1.0'
         graphqlJavaVersion = '20.2'
         graphqlServletVersion = '15.0.0'

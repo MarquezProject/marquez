@@ -75,8 +75,8 @@ dependencies {
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "io.openlineage:openlineage-java:0.30.1"
 
-    implementation 'org.opensearch.client:opensearch-rest-client:2.19.1'
-    implementation 'org.opensearch.client:opensearch-java:2.22.0'
+    implementation 'org.opensearch.client:opensearch-rest-client:2.11.1'
+    implementation 'org.opensearch.client:opensearch-java:2.11.1'
 
     testImplementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"
     testImplementation "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
