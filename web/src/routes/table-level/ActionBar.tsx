@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import {
   Alert,
   Box,
@@ -68,6 +68,7 @@ export const ActionBar = ({
   const [maxDepthNonFull, setMaxDepthNonFull] = useState<number | null>(null)
   const [prevObjectsCount, setPrevObjectsCount] = useState<number | null>(null)
   const [prevDepth, setPrevDepth] = useState<number | null>(null)
+  const snackbarTimeoutRef = useRef<NodeJS.Timeout | null>(null) 
 
   useEffect(() => {
     const resetLimitState = () => {
@@ -137,14 +138,47 @@ export const ActionBar = ({
     if (!namespace || !name) {
       setSnackbarMessage("Namespace or name is missing");
 
-      if (!openSnackbar) {
-        setOpenSnackbar(true);
-        setTimeout(() => {
-          setOpenSnackbar(false);
-        }, 2000);
+      setOpenSnackbar(true);
+      if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+      snackbarTimeoutRef.current = setTimeout(() => {
+        setOpenSnackbar(false);
+        setLoading(false); 
+      }, 2000);
+
+      return;
+    }
+
+   
+    if (currentMaxDepth !== null && requestedDepth <= currentMaxDepth) {
+      setDepth(requestedDepth);
+      searchParams.set('depth', requestedDepth.toString());
+      setSearchParams(searchParams);
+      setLoading(false);
+      return;
+    }
+
+    if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
+      setSnackbarMessage("You've reached the maximum depth");
+
+      setOpenSnackbar(true);
+      if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+      snackbarTimeoutRef.current = setTimeout(() => {
+        setOpenSnackbar(false);
+        setLoading(false); 
+      }, 2000);
+
+      if (isFull && maxDepthFull === null) {
+        setMaxDepthFull(currentMaxDepth);
+        localStorage.setItem('maxDepthFull', currentMaxDepth.toString());
+      } else if (!isFull && maxDepthNonFull === null) {
+        setMaxDepthNonFull(currentMaxDepth);
+        localStorage.setItem('maxDepthNonFull', currentMaxDepth.toString());
       }
 
-      setLoading(false);
+      setDepth(currentMaxDepth);
+      searchParams.set('depth', currentMaxDepth.toString());
+      setSearchParams(searchParams);
+
       return;
     }
 
@@ -158,45 +192,59 @@ export const ActionBar = ({
 
         const objectsCount = isFull ? totalObjects : visibleObjectsCount;
 
-        if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
-          setDepth(currentMaxDepth);
-          searchParams.set('depth', currentMaxDepth.toString());
-          setSearchParams(searchParams);
-          setSnackbarMessage("You've reached the maximum depth");
+        setDepth(requestedDepth);
+        searchParams.set('depth', requestedDepth.toString());
+        setSearchParams(searchParams);
+        setPrevObjectsCount(objectsCount);
 
-          if (!openSnackbar) {
+        if (prevObjectsCount !== null && objectsCount <= prevObjectsCount) {
+          const newMaxDepth = requestedDepth - 1;
+
+          if (isFull && maxDepthFull === null) {
+            setMaxDepthFull(newMaxDepth);
+            setSnackbarMessage("You've reached the maximum depth");
             setOpenSnackbar(true);
-            setTimeout(() => {
+
+            if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+            snackbarTimeoutRef.current = setTimeout(() => {
               setOpenSnackbar(false);
             }, 2000);
+
+            localStorage.setItem('maxDepthFull', newMaxDepth.toString());
+          } else if (!isFull && maxDepthNonFull === null) {
+            setMaxDepthNonFull(newMaxDepth);
+            setSnackbarMessage("You've reached the maximum depth");
+            setOpenSnackbar(true);
+
+            if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+            snackbarTimeoutRef.current = setTimeout(() => {
+              setOpenSnackbar(false);
+            }, 2000);
+
+            localStorage.setItem('maxDepthNonFull', newMaxDepth.toString());
           }
-        } else {
-          setDepth(requestedDepth);
-          searchParams.set('depth', requestedDepth.toString());
-          setSearchParams(searchParams);
-          setPrevObjectsCount(objectsCount);
         }
       } else {
         setSnackbarMessage("Failed to fetch lineage data");
 
-        if (!openSnackbar) {
-          setOpenSnackbar(true);
-          setTimeout(() => {
-            setOpenSnackbar(false);
-          }, 2000);
-        }
+        setOpenSnackbar(true);
+        if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+        snackbarTimeoutRef.current = setTimeout(() => {
+          setOpenSnackbar(false);
+          setLoading(false); 
+        }, 2000);
 
         console.error('Failed to fetch lineage data');
       }
     } catch (error) {
       setSnackbarMessage("Error fetching lineage data");
 
-      if (!openSnackbar) {
-        setOpenSnackbar(true);
-        setTimeout(() => {
-          setOpenSnackbar(false);
-        }, 2000);
-      }
+      setOpenSnackbar(true);
+      if (snackbarTimeoutRef.current) clearTimeout(snackbarTimeoutRef.current);
+      snackbarTimeoutRef.current = setTimeout(() => {
+        setOpenSnackbar(false);
+        setLoading(false); 
+      }, 2000);
 
       console.error('Error fetching lineage data:', error);
     }
@@ -207,6 +255,10 @@ export const ActionBar = ({
 
   const handleCloseSnackbar = useCallback(() => {
     setOpenSnackbar(false);
+    if (snackbarTimeoutRef.current) {
+      clearTimeout(snackbarTimeoutRef.current)
+      snackbarTimeoutRef.current = null
+    }
   }, []);
 
   const handleAllDependenciesToggle = useCallback((checked: boolean) => {
