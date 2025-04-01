@@ -149,7 +149,6 @@ export const ActionBar = ({
     }
 
     try {
-      // Sempre faz a requisição para buscar os dados
       const response = await getLineage(nodeType, namespace, name, requestedDepth);
 
       if (Array.isArray(response.graph)) {
@@ -159,7 +158,6 @@ export const ActionBar = ({
 
         const objectsCount = isFull ? totalObjects : visibleObjectsCount;
 
-        // Compara o requestedDepth com o limite atual
         if (currentMaxDepth !== null && requestedDepth > currentMaxDepth) {
           setDepth(currentMaxDepth);
           searchParams.set('depth', currentMaxDepth.toString());
@@ -173,7 +171,6 @@ export const ActionBar = ({
             }, 2000);
           }
         } else {
-          // Atualiza o depth normalmente se estiver dentro do limite
           setDepth(requestedDepth);
           searchParams.set('depth', requestedDepth.toString());
           setSearchParams(searchParams);
