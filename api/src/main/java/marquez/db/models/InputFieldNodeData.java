@@ -5,8 +5,8 @@
 
 package marquez.db.models;
 
+import jakarta.annotation.Nullable;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,6 +20,13 @@ public class InputFieldNodeData {
   @NonNull String dataset;
   @Nullable UUID datasetVersion;
   @NonNull String field;
-  String transformationDescription;
-  String transformationType;
+  @Nullable String transformationDescription;
+  @Nullable String transformationType;
+
+  public InputFieldNodeData() {
+    // Default constructor for Jackson deserialization
+    this.namespace = "";
+    this.dataset = "";
+    this.field = "";
+  }
 }

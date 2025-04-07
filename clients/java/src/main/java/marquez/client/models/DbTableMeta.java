@@ -7,9 +7,9 @@ package marquez.client.models;
 
 import static marquez.client.models.DatasetType.DB_TABLE;
 
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

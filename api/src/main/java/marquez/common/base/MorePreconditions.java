@@ -7,7 +7,7 @@ package marquez.common.base;
 
 import static com.google.common.base.Strings.lenientFormat;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 
 public final class MorePreconditions {

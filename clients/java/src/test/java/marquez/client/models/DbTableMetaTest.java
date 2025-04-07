@@ -8,7 +8,9 @@ package marquez.client.models;
 import static marquez.client.models.ModelGenerator.newDbTableMeta;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 public class DbTableMetaTest {
@@ -16,8 +18,8 @@ public class DbTableMetaTest {
   private static final String JSON = JsonGenerator.newJsonFor(META);
 
   @Test
-  public void testToJson() {
+  public void testToJson() throws JSONException {
     final String actual = META.toJson();
-    assertThat(actual).isEqualTo(JSON);
+    JSONAssert.assertEquals(JSON, actual, true);
   }
 }

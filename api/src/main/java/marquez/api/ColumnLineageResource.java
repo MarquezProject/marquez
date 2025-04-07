@@ -5,19 +5,18 @@
 
 package marquez.api;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
@@ -37,7 +36,7 @@ public class ColumnLineageResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response getLineage(
       @QueryParam("nodeId") @NotNull NodeId nodeId,
       @QueryParam("depth") @DefaultValue(DEFAULT_DEPTH) int depth,
