@@ -27,6 +27,7 @@ import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
+import marquez.service.exceptions.NodeIdNotFoundException;
 import marquez.service.models.ColumnLineage;
 import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;

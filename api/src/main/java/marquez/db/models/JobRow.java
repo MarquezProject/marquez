@@ -5,11 +5,11 @@
 
 package marquez.db.models;
 
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.DatasetId;

@@ -7,8 +7,8 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import jakarta.ws.rs.core.Response;
 import java.util.List;
-import javax.ws.rs.core.Response;
 import marquez.api.NamespaceResource.Namespaces;
 import marquez.api.filter.exclusions.Exclusions;
 import marquez.api.filter.exclusions.ExclusionsConfig;

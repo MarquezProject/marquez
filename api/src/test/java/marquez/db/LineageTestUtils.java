@@ -5,6 +5,7 @@
 
 package marquez.db;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -19,7 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.validation.Valid;
 import lombok.Value;
 import marquez.common.Utils;
 import marquez.db.models.UpdateLineageRow;

@@ -5,23 +5,22 @@
 
 package marquez.api.v2beta;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.validation.constraints.NotBlank;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -45,7 +44,7 @@ public class SearchResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("jobs")
   public Response searchJobs(@QueryParam("q") @NotBlank String query) throws IOException {
     if (!searchService.isEnabled()) {
@@ -58,7 +57,7 @@ public class SearchResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("datasets")
   public Response searchDatasets(@QueryParam("q") @NotBlank String query) throws IOException {
     if (!searchService.isEnabled()) {

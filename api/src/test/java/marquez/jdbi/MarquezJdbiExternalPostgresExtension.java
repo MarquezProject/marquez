@@ -6,15 +6,15 @@
 package marquez.jdbi;
 
 import javax.sql.DataSource;
-import marquez.PostgresContainer;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.postgresql.ds.PGSimpleDataSource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresExtension {
 
-  private static final PostgresContainer POSTGRES = PostgresContainer.create("marquez");
+  private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:15.4");
 
   static {
     POSTGRES.start();
@@ -26,20 +26,25 @@ public class MarquezJdbiExternalPostgresExtension extends JdbiExternalPostgresEx
   private final String password;
   private final String database;
 
-  MarquezJdbiExternalPostgresExtension() {
+  public MarquezJdbiExternalPostgresExtension() {
     super();
     hostname = POSTGRES.getHost();
-    port = POSTGRES.getPort();
+    port = POSTGRES.getMappedPort(5432);
     username = POSTGRES.getUsername();
     password = POSTGRES.getPassword();
     database = POSTGRES.getDatabaseName();
-    plugins.add(new SqlObjectPlugin());
-    plugins.add(new PostgresPlugin());
-    plugins.add(new Jackson2Plugin());
-    migration =
+
+    // Add required plugins
+    super.plugins.add(new SqlObjectPlugin());
+    super.plugins.add(new PostgresPlugin());
+    super.plugins.add(new Jackson2Plugin());
+
+    // Configure migration
+    super.migration =
         Migration.before().withPaths("marquez/db/migration", "classpath:marquez/db/migrations");
   }
 
+  @Override
   protected DataSource createDataSource() {
     final PGSimpleDataSource datasource = new PGSimpleDataSource();
     datasource.setServerName(hostname);

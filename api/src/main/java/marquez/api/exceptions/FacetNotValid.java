@@ -8,9 +8,9 @@ package marquez.api.exceptions;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static marquez.common.base.MorePreconditions.checkNotBlank;
 
+import jakarta.ws.rs.BadRequestException;
 import java.io.Serial;
 import java.util.UUID;
-import javax.ws.rs.BadRequestException;
 
 public class FacetNotValid {
   public static class MissingRunIdForParent extends BadRequestException {

@@ -36,6 +36,7 @@ import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.exceptions.NodeIdNotFoundException;
 import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
 import marquez.service.models.Lineage;
@@ -59,9 +60,9 @@ public class ColumnLineageServiceTest {
   private static ColumnLineageService lineageService;
   private static LineageEvent.JobFacet jobFacet;
 
-  private LineageEvent.Dataset dataset_A = getDatasetA();
-  private LineageEvent.Dataset dataset_B = getDatasetB();
-  private LineageEvent.Dataset dataset_C = getDatasetC();
+  private final LineageEvent.Dataset dataset_A = getDatasetA();
+  private final LineageEvent.Dataset dataset_B = getDatasetB();
+  private final LineageEvent.Dataset dataset_C = getDatasetC();
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {

@@ -5,13 +5,13 @@
 
 package marquez.db;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;

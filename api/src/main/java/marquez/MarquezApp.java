@@ -1,28 +1,23 @@
-/*
- * Copyright 2018-2023 contributors to the Marquez project
- * SPDX-License-Identifier: Apache-2.0
- */
-
 package marquez;
 
 import com.codahale.metrics.jdbi3.InstrumentedSqlLogger;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.core.Application;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi3.JdbiFactory;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.dropwizard.DropwizardExports;
-import io.prometheus.client.exporter.MetricsServlet;
 import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.client.servlet.jakarta.exporter.MetricsServlet;
 import io.sentry.Sentry;
+import jakarta.servlet.DispatcherType;
 import java.util.EnumSet;
-import javax.servlet.DispatcherType;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.filter.JobRedirectFilter;
@@ -76,20 +71,18 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
   @Override
   public void initialize(@NonNull Bootstrap<MarquezConfig> bootstrap) {
-    // Enable metric collection for prometheus.
+    // Enable Prometheus metrics
     CollectorRegistry.defaultRegistry.register(
         new DropwizardExports(bootstrap.getMetricRegistry()));
     DatabaseMetrics.registry.register(new DropwizardExports(bootstrap.getMetricRegistry()));
-    DefaultExports.initialize(); // Add metrics for CPU, JVM memory, etc.
+    DefaultExports.initialize();
     DefaultExports.register(DatabaseMetrics.registry);
 
-    // Enable variable substitution with environment variables.
     bootstrap.setConfigurationSourceProvider(
         new SubstitutingSourceProvider(
             bootstrap.getConfigurationSourceProvider(),
             new EnvironmentVariableSubstitutor(ERROR_ON_UNDEFINED)));
 
-    // Add CLI commands
     bootstrap.addCommand(new DbMigrateCommand());
     bootstrap.addCommand(new DbRetentionCommand());
     bootstrap.addCommand(new MetadataCommand());
@@ -98,7 +91,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
     bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     Utils.addZonedDateTimeMixin(bootstrap.getObjectMapper());
 
-    // Add graphql playground
     bootstrap.addBundle(
         new AssetsBundle(
             "/assets",
@@ -118,8 +110,7 @@ public final class MarquezApp extends Application<MarquezConfig> {
       DbMigration.migrateDbOrError(config.getFlywayFactory(), source, config.isMigrateOnStartup());
     } catch (FlywayException errorOnDbMigrate) {
       log.info("Stopping app...");
-      // Propagate throwable up the stack.
-      onFatalError(errorOnDbMigrate); // Signal app termination.
+      onFatalError(errorOnDbMigrate);
     }
 
     if (isSentryEnabled(config)) {
@@ -149,16 +140,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
     registerServlets(env);
     registerFilters(env, marquezContext);
 
-    // Add scheduled jobs to lifecycle.
     if (config.hasDbRetentionPolicy()) {
-      // Add job to apply retention policy to database.
       env.lifecycle().manage(new DbRetentionJob(jdbi, config.getDbRetention()));
     }
 
-    // Add job to refresh materialized views.
     env.lifecycle().manage(new MaterializeViewRefresherJob(jdbi));
 
-    // set namespaceFilter
     ExclusionsConfig exclusions = config.getExclude();
     Exclusions.use(exclusions);
   }
@@ -168,7 +155,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
         && !config.getSentry().getDsn().equals(SentryConfig.DEFAULT_DSN);
   }
 
-  /** Returns a new {@link Jdbi} object. */
   private Jdbi newJdbi(
       @NonNull MarquezConfig config, @NonNull Environment env, @NonNull ManagedDataSource source) {
     final JdbiFactory factory = new JdbiFactory();
@@ -197,6 +183,9 @@ public final class MarquezApp extends Application<MarquezConfig> {
           .addMapping("/api/v1-beta/graphql", "/api/v1/schema.json");
     }
 
+    // Prometheus metrics endpoint
+    env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
+
     log.debug("Registering resources...");
     for (final Object resource : context.getResources()) {
       env.jersey().register(resource);
@@ -205,9 +194,6 @@ public final class MarquezApp extends Application<MarquezConfig> {
 
   private void registerServlets(@NonNull Environment env) {
     log.debug("Registering servlets...");
-
-    // Expose metrics for monitoring.
-    env.servlets().addServlet(PROMETHEUS, new MetricsServlet()).addMapping(PROMETHEUS_ENDPOINT);
     env.servlets()
         .addServlet(PROMETHEUS_V2, new MetricsServlet(DatabaseMetrics.registry))
         .addMapping(PROMETHEUS_ENDPOINT_V2);

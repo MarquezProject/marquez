@@ -7,13 +7,13 @@ package marquez.client.models;
 
 import static marquez.client.models.DatasetType.STREAM;
 
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

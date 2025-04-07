@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.dropwizard.util.Resources;
+import com.google.common.io.Resources;
 import io.openlineage.client.OpenLineage;
 import io.openlineage.client.OpenLineage.RunEvent;
 import io.openlineage.client.OpenLineage.RunEvent.EventType;

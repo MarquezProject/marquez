@@ -7,6 +7,8 @@ package marquez.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -14,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.search.SearchConfig;
 import marquez.service.models.LineageEvent;

@@ -8,7 +8,7 @@ package marquez.jobs;
 import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
