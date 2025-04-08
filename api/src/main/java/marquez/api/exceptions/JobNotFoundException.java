@@ -7,7 +7,7 @@ package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import jakarta.ws.rs.NotFoundException;
+import javax.ws.rs.NotFoundException;
 import marquez.common.models.JobName;
 
 public final class JobNotFoundException extends NotFoundException {

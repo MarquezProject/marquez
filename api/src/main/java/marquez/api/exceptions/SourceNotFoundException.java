@@ -7,7 +7,7 @@ package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import jakarta.ws.rs.NotFoundException;
+import javax.ws.rs.NotFoundException;
 import marquez.common.models.SourceName;
 
 public final class SourceNotFoundException extends NotFoundException {

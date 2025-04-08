@@ -47,10 +47,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
+@RegisterExtension
 public class DatasetIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
@@ -545,6 +545,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     List<Job> jobs = client.listJobs(namespaceName);
     assertThat(jobs).hasSize(0);
 
+    // Create a new dataset in the namespace to undelete it
     LineageEvent eventThatWillUndeleteNamespace =
         LineageEvent.builder()
             .eventType("COMPLETE")
@@ -554,7 +555,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .inputs(
                 List.of(
                     new LineageEvent.Dataset(
-                        namespaceName, name, LineageTestUtils.newDatasetFacet())))
+                        namespaceName, "new_table", LineageTestUtils.newDatasetFacet())))
             .outputs(Collections.emptyList())
             .producer("the_producer")
             .build();
@@ -570,8 +571,10 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
               assertThat(namespace.getName()).isEqualTo(namespaceName);
             });
 
+    // The old datasets should remain hidden
     datasets = client.listDatasets(namespaceName);
     assertThat(datasets).hasSize(1);
+    assertThat(datasets.get(0).getName()).isEqualTo("new_table");
 
     jobs = client.listJobs(namespaceName);
     assertThat(jobs).hasSize(1);

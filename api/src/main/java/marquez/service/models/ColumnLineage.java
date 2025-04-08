@@ -5,14 +5,14 @@
 
 package marquez.service.models;
 
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
@@ -20,8 +20,9 @@ import lombok.ToString;
 @Builder
 @Getter
 public class ColumnLineage {
-  @NotNull private String name;
-  @NotNull private List<ColumnLineageInputField> inputFields;
+  @NonNull private String name;
+  @NonNull private List<ColumnLineageInputField> inputFields;
+  @NonNull private List<ColumnLineageOutputField> outputFields;
 
   @Nullable private String transformationDescription;
   @Nullable private String transformationType;

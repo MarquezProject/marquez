@@ -7,7 +7,7 @@ package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import jakarta.ws.rs.BadRequestException;
+import javax.ws.rs.BadRequestException;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.RunId;
