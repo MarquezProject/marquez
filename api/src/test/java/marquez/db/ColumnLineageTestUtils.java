@@ -10,7 +10,6 @@ import static marquez.db.LineageTestUtils.SCHEMA_URL;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.UUID;
 import marquez.api.JdbiUtils;
 import marquez.db.models.UpdateLineageRow;
 import marquez.service.models.LineageEvent;
@@ -110,14 +109,13 @@ public class ColumnLineageTestUtils {
   }
 
   public static UpdateLineageRow createLineage(
-      OpenLineageDao openLineageDao, LineageEvent.Dataset input, LineageEvent.Dataset output) {
+      OpenLineageDao openLineageDao,
+      String jobName,
+      String status,
+      LineageEvent.Dataset input,
+      LineageEvent.Dataset output) {
     LineageEvent.JobFacet jobFacet = JobFacet.builder().build();
     return LineageTestUtils.createLineageRow(
-        openLineageDao,
-        "job_" + UUID.randomUUID(),
-        "COMPLETE",
-        jobFacet,
-        Arrays.asList(input),
-        Arrays.asList(output));
+        openLineageDao, jobName, status, jobFacet, Arrays.asList(input), Arrays.asList(output));
   }
 }

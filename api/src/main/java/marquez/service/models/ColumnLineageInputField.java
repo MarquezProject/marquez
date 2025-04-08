@@ -5,10 +5,10 @@
 
 package marquez.service.models;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 @EqualsAndHashCode
@@ -16,9 +16,9 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 public class ColumnLineageInputField {
-  @NotNull private String namespace;
-  @NotNull private String dataset;
-  @NotNull private String field;
+  @NonNull private String namespace;
+  @NonNull private String dataset;
+  @NonNull private String field;
   private String transformationDescription;
   private String transformationType;
 }

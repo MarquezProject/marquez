@@ -157,7 +157,12 @@ public class LineageTestUtils {
         Instant.now().atZone(LOCAL_ZONE).truncatedTo(ChronoUnit.HOURS));
     nominalTimeRunFacet.setNominalEndTime(
         nominalTimeRunFacet.getNominalStartTime().plus(1, ChronoUnit.HOURS));
-
+    System.out.println("Creating lineage row:");
+    System.out.println("Job name: " + jobName);
+    System.out.println("Run ID: " + runId);
+    System.out.println("Status: " + status);
+    System.out.println("Inputs: " + inputs);
+    System.out.println("Outputs: " + outputs);
     LineageEvent event =
         LineageEvent.builder()
             .eventType(status)
@@ -256,6 +261,7 @@ public class LineageTestUtils {
    */
   public static UpdateLineageRow createLineageRow(
       OpenLineageDao dao, Job job, List<Dataset> inputs, List<Dataset> outputs) {
+
     JobEvent event =
         JobEvent.builder()
             .eventTime(Instant.now().atZone(LOCAL_ZONE))

@@ -8,6 +8,7 @@ package marquez.service;
 import com.google.common.collect.ImmutableSortedSet;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -242,6 +243,7 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
                                               f.getTransformationDescription(),
                                               f.getTransformationType()))
                                   .collect(Collectors.toList()))
+                          .outputFields(Collections.emptyList())
                           .build());
             });
 
