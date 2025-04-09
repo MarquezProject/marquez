@@ -1,3 +1,6 @@
+# Copyright 2018-2023 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+
 FROM eclipse-temurin:17 AS base
 WORKDIR /usr/src/app
 COPY gradle gradle
@@ -22,9 +25,5 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/api/build/libs/marquez-*.jar /usr/src/app
 COPY marquez.dev.yml marquez.dev.yml
 COPY docker/entrypoint.sh entrypoint.sh
-
-# Make entrypoint executable
-RUN chmod +x entrypoint.sh
-
 EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
