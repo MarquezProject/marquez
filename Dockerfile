@@ -4,6 +4,8 @@ COPY gradle gradle
 COPY gradle.properties gradle.properties
 COPY gradlew gradlew
 COPY settings.gradle settings.gradle
+RUN chmod +x ./gradlew
+RUN sed -i 's/\r$//' ./gradlew
 RUN ./gradlew --version
 
 FROM base AS build
