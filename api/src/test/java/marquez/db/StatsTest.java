@@ -130,17 +130,35 @@ public class StatsTest {
     List<LineageMetric> lastDayLineageMetrics = DB.lastDayLineageMetrics();
     List<LineageMetric> lastWeekLineageMetrics = DB.lastWeekLineageMetrics("UTC");
 
+    // Verify day metrics
     assertThat(lastDayLineageMetrics).isNotEmpty();
-    assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 2).getComplete())
-        .isEqualTo(hourEvents);
+    // Events from the current hour should be in the last bucket
     assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 1).getComplete())
+        .as("Current hour events")
         .isEqualTo(secondEvents);
+    // Events from 1 hour ago should be in the second-to-last bucket
+    assertThat(lastDayLineageMetrics.get(lastDayLineageMetrics.size() - 2).getComplete())
+        .as("Previous hour events")
+        .isEqualTo(hourEvents);
 
+    // Verify week metrics
     assertThat(lastWeekLineageMetrics).isNotEmpty();
+    // Events from 2 days ago should be in their own bucket
     assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 3).getComplete())
+        .as("Events from 2 days ago")
         .isEqualTo(dayEvents);
+    // Events from today should be aggregated in the last bucket
     assertThat(lastWeekLineageMetrics.get(lastWeekLineageMetrics.size() - 1).getComplete())
+        .as("Today's total events")
         .isEqualTo(secondEvents + hourEvents);
+
+    // Verify no failed events
+    assertThat(lastDayLineageMetrics.stream().mapToInt(LineageMetric::getFail).sum())
+        .as("No failed events in last day")
+        .isEqualTo(0);
+    assertThat(lastWeekLineageMetrics.stream().mapToInt(LineageMetric::getFail).sum())
+        .as("No failed events in last week")
+        .isEqualTo(0);
   }
 
   @Test
