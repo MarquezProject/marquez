@@ -20,40 +20,97 @@ import marquez.client.models.Node;
 import marquez.client.models.NodeId;
 import marquez.db.ColumnLineageTestUtils;
 import marquez.db.OpenLineageDao;
-import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.db.models.UpdateLineageRow;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
-  public void setup(Jdbi jdbi) {
-    OpenLineageDao openLineageDao = jdbi.onDemand(OpenLineageDao.class);
+  public void setup() {
+    // Use the static Jdbi instance provided by MarquezApp
+    Jdbi staticAppJdbi = MarquezApp.getJdbiInstanceForTesting();
+    OpenLineageDao openLineageDao = staticAppJdbi.onDemand(OpenLineageDao.class);
+
+    // Create namespace first
+    createNamespace("namespace");
+    System.out.println("DEBUG: Created namespace 'namespace'");
 
     // Use datasets that include schema + column lineage facets
     LineageEvent.Dataset datasetA = getDatasetA();
     LineageEvent.Dataset datasetB = getDatasetB();
     LineageEvent.Dataset datasetC = getDatasetC();
+    System.out.println("DEBUG: Created test datasets:");
+    System.out.println(
+        "DEBUG: Dataset A: "
+            + datasetA.getName()
+            + " with fields: "
+            + datasetA.getFacets().getSchema().getFields());
+    System.out.println(
+        "DEBUG: Dataset B: "
+            + datasetB.getName()
+            + " with fields: "
+            + datasetB.getFacets().getSchema().getFields());
+    System.out.println(
+        "DEBUG: Dataset C: "
+            + datasetC.getName()
+            + " with fields: "
+            + datasetC.getFacets().getSchema().getFields());
 
     // Use helper that sets column lineage correctly
-    ColumnLineageTestUtils.createLineage(openLineageDao, "job1", "COMPLETE", datasetA, datasetB);
-    ColumnLineageTestUtils.createLineage(openLineageDao, "job2", "COMPLETE", datasetB, datasetC);
+    UpdateLineageRow lineage1 =
+        ColumnLineageTestUtils.createLineage(
+            openLineageDao, "job1", "COMPLETE", datasetA, datasetB);
+    System.out.println(
+        "DEBUG: Created lineage 1: job1 connecting "
+            + datasetA.getName()
+            + " -> "
+            + datasetB.getName());
+    System.out.println("DEBUG: Lineage 1 job: " + lineage1.getJob().getName());
+
+    UpdateLineageRow lineage2 =
+        ColumnLineageTestUtils.createLineage(
+            openLineageDao, "job2", "COMPLETE", datasetB, datasetC);
+    System.out.println(
+        "DEBUG: Created lineage 2: job2 connecting "
+            + datasetB.getName()
+            + " -> "
+            + datasetC.getName());
+    System.out.println("DEBUG: Lineage 2 job: " + lineage2.getJob().getName());
+
+    // Verify data in database
+    System.out.println("DEBUG: Verifying data in database...");
+    System.out.println("DEBUG: Checking datasets table...");
+    staticAppJdbi.useHandle(
+        handle -> {
+          handle
+              .createQuery("SELECT * FROM datasets_view WHERE namespace_name = 'namespace'")
+              .mapToMap()
+              .forEach(row -> System.out.println("DEBUG: Found dataset: " + row));
+        });
+
+    System.out.println("DEBUG: Checking column_lineage table...");
+    staticAppJdbi.useHandle(
+        handle -> {
+          handle
+              .createQuery("SELECT * FROM column_lineage")
+              .mapToMap()
+              .forEach(row -> System.out.println("DEBUG: Found column lineage: " + row));
+        });
   }
 
   @AfterEach
-  public void tearDown(Jdbi jdbi) {
-    JdbiUtils.cleanDatabase(jdbi);
+  public void tearDown() {
+    // Use the static Jdbi instance provided by MarquezApp for cleanup
+    Jdbi staticAppJdbi = MarquezApp.getJdbiInstanceForTesting();
+    JdbiUtils.cleanDatabase(staticAppJdbi);
   }
 
   @Test
-  @Disabled
   public void testColumnLineageEndpointByDataset() {
     MarquezClient.Lineage lineage =
         client.getColumnLineage(NodeId.of(new DatasetId("namespace", "dataset_b")));
@@ -65,7 +122,6 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  @Disabled
   public void testColumnLineageEndpointByDatasetField() {
     MarquezClient.Lineage lineage =
         client.getColumnLineage(NodeId.of(new DatasetFieldId("namespace", "dataset_b", "col_c")));
@@ -77,7 +133,6 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  @Disabled
   public void testColumnLineageEndpointWithDepthLimit() {
     MarquezClient.Lineage lineage =
         client.getColumnLineage(
@@ -89,7 +144,6 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  @Disabled
   public void testColumnLineageEndpointWithDownstream() {
     MarquezClient.Lineage lineage =
         client.getColumnLineage(NodeId.of(new JobId("namespace", "job1")), 10, true);
@@ -99,7 +153,6 @@ public class ColumnLineageIntegrationTest extends BaseIntegrationTest {
   }
 
   @Test
-  @Disabled
   public void testColumnLineageEndpointByJob() {
     MarquezClient.Lineage lineage =
         client.getColumnLineage(NodeId.of(new JobId("namespace", "job1")), 1, false);

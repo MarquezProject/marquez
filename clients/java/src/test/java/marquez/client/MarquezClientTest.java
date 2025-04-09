@@ -110,8 +110,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.json.JSONException;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @org.junit.jupiter.api.Tag("UnitTests")
 @ExtendWith(MockitoExtension.class)
@@ -633,13 +631,14 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateDbTable() throws Exception {
-    final DbTableMeta meta = DbTableMeta.builder()
-        .physicalName(DB_TABLE_PHYSICAL_NAME)
-        .sourceName(DB_TABLE_SOURCE_NAME)
-        .fields(FIELDS)
-        .tags(TAGS)
-        .description(DB_TABLE_DESCRIPTION)
-        .build();
+    final DbTableMeta meta =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(FIELDS)
+            .tags(TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .build();
 
     final String expectedJson = Utils.toJson(meta);
     when(http.put(marquezUrl.toDatasetUrl(NAMESPACE_NAME, DB_TABLE_NAME), expectedJson))
@@ -663,14 +662,15 @@ public class MarquezClientTest {
 
   @Test
   public void testModifiedDbTable() throws Exception {
-    final DbTableMeta meta = DbTableMeta.builder()
-        .physicalName(DB_TABLE_PHYSICAL_NAME)
-        .sourceName(DB_TABLE_SOURCE_NAME)
-        .fields(FIELDS)
-        .tags(TAGS)
-        .description(DB_TABLE_DESCRIPTION)
-        .runId(RUN_ID)
-        .build();
+    final DbTableMeta meta =
+        DbTableMeta.builder()
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(FIELDS)
+            .tags(TAGS)
+            .description(DB_TABLE_DESCRIPTION)
+            .runId(RUN_ID)
+            .build();
 
     final String expectedJson = Utils.toJson(meta);
     when(http.put(marquezUrl.toDatasetUrl(NAMESPACE_NAME, DB_TABLE_NAME), expectedJson))
@@ -801,9 +801,11 @@ public class MarquezClientTest {
   public void testListEvents() throws Exception {
     Events events = new Events(EVENTS);
     when(http.get(marquezUrl.toEventUrl(MarquezClient.SortDirection.DESC, 100)))
-        .thenReturn(Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
     final List<LineageEvent> listEvents = client.listLineageEvents();
-    assertThat(listEvents.get(0).getEventTime().toString()).isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
     assertThat(listEvents).hasSize(1);
   }
 
@@ -811,31 +813,41 @@ public class MarquezClientTest {
   public void testListEventsWithSortDirection() throws Exception {
     Events events = new Events(EVENTS);
     when(http.get(marquezUrl.toEventUrl(MarquezClient.SortDirection.DESC, 5)))
-        .thenReturn(Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<LineageEvent> listEvents = client.listLineageEvents(MarquezClient.SortDirection.DESC, 5);
-    assertThat(listEvents.get(0).getEventTime().toString()).isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+    final List<LineageEvent> listEvents =
+        client.listLineageEvents(MarquezClient.SortDirection.DESC, 5);
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
     assertThat(listEvents).hasSize(1);
   }
 
   @Test
   public void testListEventsWithSortDirectionBeforeAfter() throws Exception {
     Events events = new Events(EVENTS);
-    when(http.get(marquezUrl.toEventUrl(MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5)))
-        .thenReturn(Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
-    final List<LineageEvent> listEvents = client.listLineageEvents(MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5);
-    assertThat(listEvents.get(0).getEventTime().toString()).isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+    when(http.get(
+            marquezUrl.toEventUrl(
+                MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5)))
+        .thenReturn(
+            Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
+    final List<LineageEvent> listEvents =
+        client.listLineageEvents(
+            MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5);
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
     assertThat(listEvents).hasSize(1);
   }
 
   @Test
   public void testCreateJob() throws Exception {
-    final JobMeta meta = JobMeta.builder()
-        .type(JOB_TYPE)
-        .inputs(INPUTS)
-        .outputs(OUTPUTS)
-        .location(LOCATION)
-        .description(JOB_DESCRIPTION)
-        .build();
+    final JobMeta meta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(INPUTS)
+            .outputs(OUTPUTS)
+            .location(LOCATION)
+            .description(JOB_DESCRIPTION)
+            .build();
 
     final String expectedJson = Utils.toJson(meta);
     when(http.put(marquezUrl.toJobUrl(NAMESPACE_NAME, JOB_NAME), expectedJson))
@@ -847,14 +859,15 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateJobWithRunId() throws Exception {
-    final JobMeta meta = JobMeta.builder()
-        .type(JOB_TYPE)
-        .inputs(INPUTS)
-        .outputs(OUTPUTS)
-        .location(LOCATION)
-        .description(JOB_DESCRIPTION)
-        .runId(RUN_ID)
-        .build();
+    final JobMeta meta =
+        JobMeta.builder()
+            .type(JOB_TYPE)
+            .inputs(INPUTS)
+            .outputs(OUTPUTS)
+            .location(LOCATION)
+            .description(JOB_DESCRIPTION)
+            .runId(RUN_ID)
+            .build();
 
     final String expectedJson = Utils.toJson(meta);
     when(http.put(marquezUrl.toJobUrl(NAMESPACE_NAME, JOB_NAME), expectedJson))

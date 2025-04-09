@@ -6,7 +6,6 @@
 package marquez.client.models;
 
 import static marquez.client.models.ModelGenerator.newDbTableMeta;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
