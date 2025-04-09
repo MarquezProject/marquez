@@ -6,12 +6,13 @@
 package marquez.common.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.UUID;
 import marquez.BaseIntegrationTest;
+import marquez.MarquezApp;
 import marquez.api.JdbiUtils;
 import marquez.client.MarquezHttpException;
 import marquez.client.models.DbTableMeta;
@@ -24,16 +25,13 @@ import marquez.client.models.RunState;
 import marquez.client.models.Source;
 import marquez.client.models.SourceMeta;
 import marquez.common.models.CommonModelGenerator;
-import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class JobResourceIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
@@ -43,8 +41,9 @@ public class JobResourceIntegrationTest extends BaseIntegrationTest {
   }
 
   @AfterEach
-  public void tearDown(Jdbi jdbi) {
-    JdbiUtils.cleanDatabase(jdbi);
+  public void tearDown() {
+    Jdbi staticAppJdbi = MarquezApp.getJdbiInstanceForTesting();
+    JdbiUtils.cleanDatabase(staticAppJdbi);
   }
 
   @Test

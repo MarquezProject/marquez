@@ -78,6 +78,8 @@ dependencies {
     implementation 'org.opensearch.client:opensearch-rest-client:2.19.1'
     implementation 'org.opensearch.client:opensearch-java:2.22.0'
 
+    testImplementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+    testImplementation "io.dropwizard:dropwizard-jdbi3:${dropwizardVersion}"
     testImplementation "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
     testImplementation "org.jdbi:jdbi3-testing:${jdbi3Version}"
     testImplementation "org.jdbi:jdbi3-testcontainers:${jdbi3Version}"
@@ -122,6 +124,11 @@ task testDataAccess(type: Test) {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
 }
 
 publishing {

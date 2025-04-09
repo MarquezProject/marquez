@@ -60,6 +60,12 @@ public final class MarquezApp extends Application<MarquezConfig> {
   private static final String PROMETHEUS_ENDPOINT = "/metrics";
   private static final String PROMETHEUS_ENDPOINT_V2 = "/v2beta/metrics";
 
+  private static Jdbi jdbiInstance; // Static reference for testing
+
+  public static Jdbi getJdbiInstanceForTesting() { // Static getter for testing
+    return jdbiInstance;
+  }
+
   public static void main(final String[] args) throws Exception {
     new MarquezApp().run(args);
   }
@@ -129,6 +135,8 @@ public final class MarquezApp extends Application<MarquezConfig> {
     }
 
     final Jdbi jdbi = newJdbi(config, env, source);
+    jdbiInstance = jdbi; // Assign to static field
+
     final MarquezContext marquezContext =
         MarquezContext.builder()
             .jdbi(jdbi)

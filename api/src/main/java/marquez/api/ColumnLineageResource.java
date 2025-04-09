@@ -21,8 +21,8 @@ import java.util.Map;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.service.ServiceFactory;
-import marquez.service.models.NodeId;
 import marquez.service.exceptions.NodeIdNotFoundException;
+import marquez.service.models.NodeId;
 
 @Slf4j
 @Path("/api/v1/column-lineage")
