@@ -35,78 +35,82 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 @RegisterRowMapper(UpstreamRunRowMapper.class)
 public interface LineageDao {
 
-  public record JobSummary(NamespaceName namespace, JobName name, UUID version) {}
+  public record JobSummary(NamespaceName namespace, JobName name, UUID version) {
+  }
 
-  public record RunSummary(RunId id, Instant start, Instant end, String status) {}
+  public record RunSummary(RunId id, Instant start, Instant end, String status) {
+  }
 
   public record DatasetSummary(
-      NamespaceName namespace, DatasetName name, UUID version, RunId producedByRunId) {}
+      NamespaceName namespace, DatasetName name, UUID version, RunId producedByRunId) {
+  }
 
-  public record UpstreamRunRow(JobSummary job, RunSummary run, DatasetSummary input) {}
+  public record UpstreamRunRow(JobSummary job, RunSummary run, DatasetSummary input) {
+  }
 
   /**
-   * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
-   * input jobIds. This returns a single layer from the BFS using datasets as edges. Jobs that have
-   * no input or output datasets will have no results. Jobs that have no upstream producers or
+   * Fetch all of the jobs that consume or produce the datasets that are consumed
+   * or produced by the
+   * input jobIds. This returns a single layer from the BFS using datasets as
+   * edges. Jobs that have
+   * no input or output datasets will have no results. Jobs that have no upstream
+   * producers or
    * downstream consumers will have the original jobIds returned.
    *
    * @param jobIds
    * @return
    */
-  @SqlQuery(
-      """
-      WITH RECURSIVE
-                 job_io AS (
-                    SELECT
-                           io.job_uuid AS job_uuid,
-                           io.job_symlink_target_uuid AS job_symlink_target_uuid,
-                           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='INPUT') AS inputs,
-                           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='OUTPUT') AS outputs
-                    FROM job_versions_io_mapping io
-                    WHERE io.is_current_job_version = TRUE
-                    GROUP BY io.job_symlink_target_uuid, io.job_uuid
-                ),
-                lineage(job_uuid, job_symlink_target_uuid, inputs, outputs) AS (
-                    SELECT job_uuid,
-                           job_symlink_target_uuid,
-                           COALESCE(inputs, Array[]::uuid[]) AS inputs,
-                           COALESCE(outputs, Array[]::uuid[]) AS outputs,
-                           0 AS depth
-                    FROM job_io
-                    WHERE job_uuid IN (<jobIds>) OR job_symlink_target_uuid IN (<jobIds>)
-                    UNION
-                    SELECT io.job_uuid, io.job_symlink_target_uuid, io.inputs, io.outputs, l.depth + 1
-                    FROM job_io io, lineage l
-                    WHERE (io.job_uuid != l.job_uuid) AND
-                        array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
-                      AND depth < :depth),
-                lineage_outside_job_io(job_uuid) AS (
-                    SELECT
-                      param_jobs.param_job_uuid as job_uuid,
-                      j.symlink_target_uuid,
-                      Array[]::uuid[] AS inputs,
-                      Array[]::uuid[] AS outputs,
-                      0 AS depth
-                    FROM (SELECT unnest(ARRAY[<jobIds>]::UUID[]) AS param_job_uuid) param_jobs
-                    LEFT JOIN lineage l on param_jobs.param_job_uuid = l.job_uuid
-                    INNER JOIN jobs j ON j.uuid = param_jobs.param_job_uuid
-                    WHERE l.job_uuid IS NULL
-                )
-            SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
-            FROM (SELECT * FROM lineage UNION SELECT * FROM lineage_outside_job_io) l2
-            INNER JOIN jobs_view j ON (j.uuid=l2.job_uuid OR j.uuid=l2.job_symlink_target_uuid)
-  """)
+  @SqlQuery("""
+          WITH RECURSIVE
+                     job_io AS (
+                        SELECT
+                               io.job_uuid AS job_uuid,
+                               io.job_symlink_target_uuid AS job_symlink_target_uuid,
+                               ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='INPUT') AS inputs,
+                               ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='OUTPUT') AS outputs
+                        FROM job_versions_io_mapping io
+                        WHERE io.is_current_job_version = TRUE
+                        GROUP BY io.job_symlink_target_uuid, io.job_uuid
+                    ),
+                    lineage(job_uuid, job_symlink_target_uuid, inputs, outputs) AS (
+                        SELECT job_uuid,
+                               job_symlink_target_uuid,
+                               COALESCE(inputs, Array[]::uuid[]) AS inputs,
+                               COALESCE(outputs, Array[]::uuid[]) AS outputs,
+                               0 AS depth
+                        FROM job_io
+                        WHERE job_uuid IN (<jobIds>) OR job_symlink_target_uuid IN (<jobIds>)
+                        UNION
+                        SELECT io.job_uuid, io.job_symlink_target_uuid, io.inputs, io.outputs, l.depth + 1
+                        FROM job_io io, lineage l
+                        WHERE (io.job_uuid != l.job_uuid) AND
+                            array_cat(io.inputs, io.outputs) && array_cat(l.inputs, l.outputs)
+                          AND depth < :depth),
+                    lineage_outside_job_io(job_uuid) AS (
+                        SELECT
+                          param_jobs.param_job_uuid as job_uuid,
+                          j.symlink_target_uuid,
+                          Array[]::uuid[] AS inputs,
+                          Array[]::uuid[] AS outputs,
+                          0 AS depth
+                        FROM (SELECT unnest(ARRAY[<jobIds>]::UUID[]) AS param_job_uuid) param_jobs
+                        LEFT JOIN lineage l on param_jobs.param_job_uuid = l.job_uuid
+                        INNER JOIN jobs j ON j.uuid = param_jobs.param_job_uuid
+                        WHERE l.job_uuid IS NULL
+                    )
+                SELECT DISTINCT ON (j.uuid) j.*, inputs AS input_uuids, outputs AS output_uuids
+                FROM (SELECT * FROM lineage UNION SELECT * FROM lineage_outside_job_io) l2
+                INNER JOIN jobs_view j ON (j.uuid=l2.job_uuid OR j.uuid=l2.job_symlink_target_uuid)
+      """)
   Set<JobData> getLineage(@BindList Set<UUID> jobIds, int depth);
 
-  @SqlQuery(
-      """
-    SELECT j.*, NULL as input_uuids, NULL AS output_uuids FROM jobs_view j
-    WHERE j.parent_job_uuid= :jobId
-    LIMIT 1""")
+  @SqlQuery("""
+      SELECT j.*, NULL as input_uuids, NULL AS output_uuids FROM jobs_view j
+      WHERE j.parent_job_uuid= :jobId
+      LIMIT 1""")
   Optional<JobData> getParentJobData(UUID jobId);
 
-  @SqlQuery(
-      """
+  @SqlQuery("""
       SELECT ds.*, dv.fields, dv.lifecycle_state
       FROM datasets_view ds
       LEFT JOIN dataset_versions dv ON dv.uuid = ds.current_version_uuid
@@ -115,8 +119,7 @@ public interface LineageDao {
       AND ds.uuid IN (<dsUuids>)""")
   Set<DatasetData> getDatasetData(@BindList Set<UUID> dsUuids);
 
-  @SqlQuery(
-      """
+  @SqlQuery("""
       SELECT ds.*, dv.fields, dv.lifecycle_state
       FROM datasets_view ds
       LEFT JOIN dataset_versions dv on dv.uuid = ds.current_version_uuid
@@ -126,8 +129,7 @@ public interface LineageDao {
       AND CAST((:namespaceName, :datasetName) AS DATASET_NAME) = ANY(d.dataset_symlinks)""")
   DatasetData getDatasetData(String namespaceName, String datasetName);
 
-  @SqlQuery(
-      """
+  @SqlQuery("""
       SELECT j.uuid FROM jobs j
       INNER JOIN job_versions jv ON jv.job_uuid = j.uuid
       INNER JOIN job_versions_io_mapping io ON io.job_version_uuid = jv.uuid
@@ -137,49 +139,47 @@ public interface LineageDao {
       LIMIT 1""")
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
 
-  @SqlQuery(
-      """
-                  WITH latest_runs AS (
-                      SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version
-                      FROM runs_view r
-                      INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
-                      INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
-                      WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)
-                      ORDER BY r.job_name, r.namespace_name, created_at DESC
-                  )
-                  SELECT r.*, ra.args, f.facets,
-                    r.version AS job_version, ri.input_versions, ro.output_versions
-                    from latest_runs AS r
-                  LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
-                  LEFT JOIN LATERAL (
-                      SELECT im.run_uuid,
-                             JSON_AGG(json_build_object('namespace', dv.namespace_name,
-                                                        'name', dv.dataset_name,
-                                                        'version', dv.version)) AS input_versions
-                      FROM runs_input_mapping im
-                      INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
-                      WHERE im.run_uuid=r.uuid
-                      GROUP BY im.run_uuid
-                  ) ri ON ri.run_uuid=r.uuid
-                  LEFT JOIN LATERAL (
-                      SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
-                      FROM run_facets_view AS rf
-                      WHERE rf.run_uuid=r.uuid
-                      GROUP BY rf.run_uuid
-                  ) AS f ON r.uuid=f.run_uuid
-                  LEFT JOIN LATERAL (
-                      SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
-                                                                  'name', dataset_name,
-                                                                  'version', version)) AS output_versions
-                      FROM dataset_versions
-                      WHERE run_uuid=r.uuid
-                      GROUP BY run_uuid
-                  ) ro ON ro.run_uuid=r.uuid
-                  """)
+  @SqlQuery("""
+      WITH latest_runs AS (
+          SELECT DISTINCT on(r.job_name, r.namespace_name) r.*, jv.version
+          FROM runs_view r
+          INNER JOIN job_versions jv ON jv.uuid=r.job_version_uuid
+          INNER JOIN jobs_view j ON j.uuid=jv.job_uuid
+          WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>)
+          ORDER BY r.job_name, r.namespace_name, created_at DESC
+      )
+      SELECT r.*, ra.args, f.facets,
+        r.version AS job_version, ri.input_versions, ro.output_versions
+        from latest_runs AS r
+      LEFT JOIN run_args AS ra ON ra.uuid = r.run_args_uuid
+      LEFT JOIN LATERAL (
+          SELECT im.run_uuid,
+                 JSON_AGG(json_build_object('namespace', dv.namespace_name,
+                                            'name', dv.dataset_name,
+                                            'version', dv.version)) AS input_versions
+          FROM runs_input_mapping im
+          INNER JOIN dataset_versions dv on im.dataset_version_uuid = dv.uuid
+          WHERE im.run_uuid=r.uuid
+          GROUP BY im.run_uuid
+      ) ri ON ri.run_uuid=r.uuid
+      LEFT JOIN LATERAL (
+          SELECT rf.run_uuid, JSON_AGG(rf.facet ORDER BY rf.lineage_event_time ASC) AS facets
+          FROM run_facets_view AS rf
+          WHERE rf.run_uuid=r.uuid
+          GROUP BY rf.run_uuid
+      ) AS f ON r.uuid=f.run_uuid
+      LEFT JOIN LATERAL (
+          SELECT run_uuid, JSON_AGG(json_build_object('namespace', namespace_name,
+                                                      'name', dataset_name,
+                                                      'version', version)) AS output_versions
+          FROM dataset_versions
+          WHERE run_uuid=r.uuid
+          GROUP BY run_uuid
+      ) ro ON ro.run_uuid=r.uuid
+      """)
   List<Run> getCurrentRunsWithFacets(@BindList Collection<UUID> jobUuid);
 
-  @SqlQuery(
-      """
+  @SqlQuery("""
         WITH latest_runs AS (SELECT current_run_uuid, current_version_uuid AS job_version
                              FROM jobs j
                              WHERE j.uuid in (<jobUuid>) OR j.symlink_target_uuid IN (<jobUuid>))
@@ -190,8 +190,7 @@ public interface LineageDao {
       """)
   List<Run> getCurrentRuns(@BindList Collection<UUID> jobUuid);
 
-  @SqlQuery(
-      """
+  @SqlQuery("""
       WITH RECURSIVE
         upstream_runs(
                 r_uuid, -- run uuid
@@ -236,4 +235,51 @@ public interface LineageDao {
       ORDER BY depth ASC, job_name ASC;
       """)
   List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
+
+  /**
+   * Fetch all of the jobs that consume or produce the datasets that are consumed
+   * or produced by the
+   * input jobIds. This returns a single layer from the BFS using datasets as
+   * edges. Jobs that have
+   * no input or output datasets will have no results. Jobs that have no upstream
+   * producers or
+   * downstream consumers will have the original jobIds returned.
+   * @param jobIds
+   * @return 
+   */
+  @SqlQuery("""
+      SELECT DISTINCT j.*,
+             job_io.inputs AS input_uuids,
+             job_io.outputs AS output_uuids
+      FROM (
+         SELECT
+           io.job_uuid AS job_uuid,
+           io.job_symlink_target_uuid AS job_symlink_target_uuid,
+           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='INPUT') AS inputs,
+           ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io_type='OUTPUT') AS outputs
+         FROM job_versions_io_mapping io
+         WHERE io.is_current_job_version = TRUE
+         GROUP BY io.job_symlink_target_uuid, io.job_uuid
+      ) job_io
+      INNER JOIN jobs_view j
+        ON (j.uuid=job_io.job_uuid OR j.uuid=job_io.job_symlink_target_uuid)
+      WHERE j.uuid IN (<jobIds>) OR j.symlink_target_uuid IN (<jobIds>)
+      """)
+  Set<JobData> getDirectLineage(@BindList Set<UUID> jobIds);
+
+  /**
+   * Fetch all of the jobs that consume or produce the datasets that are consumed
+   * or produced by the
+   * input jobIds. This returns a single layer from the BFS using datasets as
+   * edges. Jobs that have
+   * no input or output datasets will have no results. Jobs that have no upstream
+   * producers or
+   * downstream consumers will have the original jobIds returned.
+   *
+   * @param jobIds
+   * @return
+   */
+  default Set<JobData> getDirectLineage(@BindList Set<UUID> jobIds, int depth) {
+    throw new UnsupportedOperationException("Use getDirectLineage and iterate in LineageService.");
+  }
 }
