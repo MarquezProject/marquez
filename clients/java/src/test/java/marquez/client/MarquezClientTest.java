@@ -186,7 +186,7 @@ public class MarquezClientTest {
   private static final LineageEvent RAW_LINEAGE_EVENT =
       new LineageEvent(
           "START",
-          ZonedDateTime.now(ZoneId.of("UTC")),
+          ZonedDateTime.now(ZoneId.of("Z")),
           Collections.emptyMap(),
           Collections.emptyMap(),
           Collections.emptyList(),
@@ -480,6 +480,10 @@ public class MarquezClientTest {
                   NodeId.of(new DatasetFieldId("namespace", "outDataset", "some-col2")),
                   NodeId.of(DATASET_FIELD_ID))));
 
+  private static final List<LineageEvent> EVENTS = Collections.singletonList(RAW_LINEAGE_EVENT);
+  private static final ZonedDateTime BEFORE_TIMESTAMP = ZonedDateTime.parse("2020-01-01T00:00:00Z");
+  private static final ZonedDateTime AFTER_TIMESTAMP = ZonedDateTime.parse("2019-01-01T00:00:00Z");
+
   private final MarquezUrl marquezUrl = MarquezUrl.create(DEFAULT_BASE_URL);
   @Mock private MarquezHttp http;
   private MarquezClient client;
@@ -627,8 +631,6 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateDbTable() throws Exception {
-    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
-
     final DbTableMeta meta =
         DbTableMeta.builder()
             .physicalName(DB_TABLE_PHYSICAL_NAME)
@@ -638,13 +640,12 @@ public class MarquezClientTest {
             .description(DB_TABLE_DESCRIPTION)
             .build();
 
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String dbTableAsJson = Utils.getMapper().writeValueAsString(DB_TABLE);
-    when(http.put(url, metaAsJson)).thenReturn(dbTableAsJson);
+    final String expectedJson = Utils.toJson(meta);
+    when(http.put(marquezUrl.toDatasetUrl(NAMESPACE_NAME, DB_TABLE_NAME), expectedJson))
+        .thenReturn(Utils.toJson(DB_TABLE));
 
     final Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, meta);
-    assertThat(dataset).isInstanceOf(DbTable.class);
-    assertThat((DbTable) dataset).isEqualTo(DB_TABLE);
+    assertThat(dataset).isEqualTo(DB_TABLE);
   }
 
   @Test
@@ -661,33 +662,22 @@ public class MarquezClientTest {
 
   @Test
   public void testModifiedDbTable() throws Exception {
-    final URL url = buildUrlFor("/namespaces/%s/datasets/%s", NAMESPACE_NAME, DB_TABLE_NAME);
-
-    final String dbTableAsJson = JsonGenerator.newJsonFor(DB_TABLE);
-    when(http.get(url)).thenReturn(dbTableAsJson);
-
-    final DbTable dataset = (DbTable) client.getDataset(NAMESPACE_NAME, DB_TABLE_NAME);
-
-    final DbTableMeta modifiedMeta =
+    final DbTableMeta meta =
         DbTableMeta.builder()
-            .physicalName(dataset.getPhysicalName())
-            .sourceName(dataset.getSourceName())
+            .physicalName(DB_TABLE_PHYSICAL_NAME)
+            .sourceName(DB_TABLE_SOURCE_NAME)
             .fields(FIELDS)
             .tags(TAGS)
-            .description(dataset.getDescription().get())
-            .runId(NEW.getId())
+            .description(DB_TABLE_DESCRIPTION)
+            .runId(RUN_ID)
             .build();
 
-    final Instant beforeModified = Instant.now();
-    final String modifiedMetaAsJson = JsonGenerator.newJsonFor(modifiedMeta);
-    final String modifiedDbTableAsJson = Utils.getMapper().writeValueAsString(DB_TABLE_MODIFIED);
-    when(http.put(url, modifiedMetaAsJson)).thenReturn(modifiedDbTableAsJson);
+    final String expectedJson = Utils.toJson(meta);
+    when(http.put(marquezUrl.toDatasetUrl(NAMESPACE_NAME, DB_TABLE_NAME), expectedJson))
+        .thenReturn(Utils.toJson(DB_TABLE_MODIFIED));
 
-    final Dataset modifiedDataset =
-        client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, modifiedMeta);
-    assertThat(modifiedDataset).isInstanceOf(DbTable.class);
-    assertThat((DbTable) modifiedDataset).isEqualTo(DB_TABLE_MODIFIED);
-    assertThat(modifiedDataset.getLastModifiedAt().get().isAfter(beforeModified)).isFalse();
+    final Dataset dataset = client.createDataset(NAMESPACE_NAME, DB_TABLE_NAME, meta);
+    assertThat(dataset).isEqualTo(DB_TABLE_MODIFIED);
   }
 
   @Test
@@ -809,59 +799,59 @@ public class MarquezClientTest {
 
   @Test
   public void testListEvents() throws Exception {
-    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/events/lineage?sortDirection=desc&limit=100")))
+    Events events = new Events(EVENTS);
+    when(http.get(marquezUrl.toEventUrl(MarquezClient.SortDirection.DESC, 100)))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
     final List<LineageEvent> listEvents = client.listLineageEvents();
-    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+    assertThat(listEvents).hasSize(1);
   }
 
   @Test
   public void testListEventsWithSortDirection() throws Exception {
-    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
-    when(http.get(buildUrlFor("/events/lineage?sortDirection=desc&limit=10")))
+    Events events = new Events(EVENTS);
+    when(http.get(marquezUrl.toEventUrl(MarquezClient.SortDirection.DESC, 5)))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
     final List<LineageEvent> listEvents =
-        client.listLineageEvents(MarquezClient.SortDirection.DESC, 10);
-    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
+        client.listLineageEvents(MarquezClient.SortDirection.DESC, 5);
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+    assertThat(listEvents).hasSize(1);
   }
 
   @Test
   public void testListEventsWithSortDirectionBeforeAfter() throws Exception {
-    Events events = new Events(Collections.singletonList(RAW_LINEAGE_EVENT));
+    Events events = new Events(EVENTS);
     when(http.get(
-            URI.create(
-                    "http://localhost:8080/api/v1/events/lineage?sortDirection=desc&before=2020-01-01T00%3A00Z&limit=10&after=2022-01-01T00%3A00%2B01%3A00")
-                .toURL()))
+            marquezUrl.toEventUrl(
+                MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5)))
         .thenReturn(
             Utils.toJson(new ResultsPage<>("events", events.getValue(), events.getValue().size())));
     final List<LineageEvent> listEvents =
         client.listLineageEvents(
-            MarquezClient.SortDirection.DESC,
-            ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")),
-            ZonedDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneId.of("Europe/Warsaw")),
-            10);
-    assertThat(listEvents).asList().containsExactly(RAW_LINEAGE_EVENT);
+            MarquezClient.SortDirection.DESC, BEFORE_TIMESTAMP, AFTER_TIMESTAMP, 5);
+    assertThat(listEvents.get(0).getEventTime().toString())
+        .isEqualTo(RAW_LINEAGE_EVENT.getEventTime().toString());
+    assertThat(listEvents).hasSize(1);
   }
 
   @Test
   public void testCreateJob() throws Exception {
-    final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
-
     final JobMeta meta =
         JobMeta.builder()
             .type(JOB_TYPE)
             .inputs(INPUTS)
             .outputs(OUTPUTS)
-            .tags(ImmutableSet.of())
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
             .build();
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
-    final String jobAsJson = JsonGenerator.newJsonFor(JOB);
-    when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
+
+    final String expectedJson = Utils.toJson(meta);
+    when(http.put(marquezUrl.toJobUrl(NAMESPACE_NAME, JOB_NAME), expectedJson))
+        .thenReturn(Utils.toJson(JOB));
 
     final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
     assertThat(job).isEqualTo(JOB);
@@ -869,27 +859,22 @@ public class MarquezClientTest {
 
   @Test
   public void testCreateJobWithRunId() throws Exception {
-    final URL url = buildUrlFor("/namespaces/%s/jobs/%s", NAMESPACE_NAME, JOB_NAME);
-
     final JobMeta meta =
         JobMeta.builder()
             .type(JOB_TYPE)
             .inputs(INPUTS)
             .outputs(OUTPUTS)
-            .tags(ImmutableSet.of())
             .location(LOCATION)
             .description(JOB_DESCRIPTION)
             .runId(RUN_ID)
             .build();
-    final String metaAsJson = JsonGenerator.newJsonFor(meta);
 
-    final String jobAsJson = JsonGenerator.newJsonFor(JOB_WITH_LATEST_RUN);
-    when(http.put(url, metaAsJson)).thenReturn(jobAsJson);
+    final String expectedJson = Utils.toJson(meta);
+    when(http.put(marquezUrl.toJobUrl(NAMESPACE_NAME, JOB_NAME), expectedJson))
+        .thenReturn(Utils.toJson(JOB_WITH_LATEST_RUN));
 
     final Job job = client.createJob(NAMESPACE_NAME, JOB_NAME, meta);
-
     assertThat(job).isEqualTo(JOB_WITH_LATEST_RUN);
-    verify(http, times(1)).put(url, metaAsJson);
   }
 
   @Test

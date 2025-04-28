@@ -1,3 +1,8 @@
+/*
+ * Copyright 2018-2023 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package marquez.api;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -7,8 +12,8 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import jakarta.ws.rs.core.Response;
 import java.util.List;
-import javax.ws.rs.core.Response;
 import marquez.api.NamespaceResource.Namespaces;
 import marquez.api.filter.exclusions.Exclusions;
 import marquez.api.filter.exclusions.ExclusionsConfig;

@@ -5,9 +5,9 @@
 
 package marquez.service;
 
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.DatasetVersionId;

@@ -5,9 +5,9 @@
 
 package marquez.service.models;
 
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.NamespaceName;

@@ -5,10 +5,10 @@
 
 package marquez.cli;
 
-import io.dropwizard.cli.ConfiguredCommand;
+import io.dropwizard.core.cli.ConfiguredCommand;
+import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.setup.Bootstrap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezConfig;

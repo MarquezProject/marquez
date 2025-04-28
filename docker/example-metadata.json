@@ -1,0 +1,50 @@
+[
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2025-04-07T22:00:00.000Z",
+    "producer": "https://marquez.io",
+    "run": {
+      "runId": "00000000-0000-0000-0000-000000000001"
+    },
+    "job": {
+      "namespace": "namespace",
+      "name": "job1"
+    },
+    "inputs": [
+      {
+        "namespace": "namespace",
+        "name": "dataset_a"
+      }
+    ],
+    "outputs": [
+      {
+        "namespace": "namespace",
+        "name": "dataset_b"
+      }
+    ]
+  },
+  {
+    "eventType": "COMPLETE",
+    "eventTime": "2025-04-07T22:01:00.000Z",
+    "producer": "https://marquez.io",
+    "run": {
+      "runId": "00000000-0000-0000-0000-000000000002"
+    },
+    "job": {
+      "namespace": "namespace",
+      "name": "job2"
+    },
+    "inputs": [
+      {
+        "namespace": "namespace",
+        "name": "dataset_b"
+      }
+    ],
+    "outputs": [
+      {
+        "namespace": "namespace",
+        "name": "dataset_c"
+      }
+    ]
+  }
+]

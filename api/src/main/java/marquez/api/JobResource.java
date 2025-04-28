@@ -5,33 +5,32 @@
 
 package marquez.api;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -85,8 +84,8 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @PUT
   @Path("/namespaces/{namespace}/jobs/{job}")
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response createOrUpdate(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -108,7 +107,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response getJob(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName) {
     throwIfNotExists(namespaceName);
@@ -125,7 +124,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/versions/{version}")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response getJobVersion(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -145,7 +144,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/versions")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response listJobVersions(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -165,7 +164,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/jobs")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response list(
       @QueryParam("lastRunStates") List<RunState> lastRunStates,
       @QueryParam("limit") @DefaultValue("100") @Min(value = 0) int limit,
@@ -178,7 +177,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/namespaces/{namespace}/jobs")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response list(
       @PathParam("namespace") NamespaceName namespaceName,
       @QueryParam("lastRunStates") List<RunState> lastRunStates,
@@ -203,7 +202,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @DELETE
   @Path("/namespaces/{namespace}/jobs/{job}")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response delete(
       @PathParam("namespace") NamespaceName namespaceName, @PathParam("job") JobName jobName) {
     throwIfNotExists(namespaceName);
@@ -222,8 +221,8 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @POST
   @Path("namespaces/{namespace}/jobs/{job}/runs")
-  @Consumes(APPLICATION_JSON)
-  @Produces(APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response createRun(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -252,7 +251,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @GET
   @Path("/namespaces/{namespace}/jobs/{job}/runs")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response listRuns(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -277,7 +276,7 @@ public class JobResource extends BaseResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/jobs/runs/{id}/facets")
   public Response getRunFacets(
       @PathParam("id") RunId runId, @QueryParam("type") @NotNull FacetType type) {
@@ -305,7 +304,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @POST
   @Path("/namespaces/{namespace}/jobs/{job}/tags/{tag}")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response updatetag(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,
@@ -325,7 +324,7 @@ public class JobResource extends BaseResource {
   @ExceptionMetered
   @DELETE
   @Path("/namespaces/{namespace}/jobs/{job}/tags/{tag}")
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response deletetag(
       @PathParam("namespace") NamespaceName namespaceName,
       @PathParam("job") JobName jobName,

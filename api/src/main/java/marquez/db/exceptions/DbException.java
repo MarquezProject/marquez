@@ -5,7 +5,7 @@
 
 package marquez.db.exceptions;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /** An exception thrown to indicate a database error. */
 public class DbException extends Exception {

@@ -110,6 +110,7 @@ public abstract class BaseIntegrationTest {
   protected static JobMeta JOB_META;
 
   public static DropwizardAppExtension<MarquezConfig> APP;
+
   protected final HttpClient http2 = HttpClient.newBuilder().version(Version.HTTP_2).build();
 
   protected URL baseUrl;
