@@ -163,7 +163,7 @@ By default, Marquez uses the following ports:
 
 > **Note:** All of the configuration settings in `marquez.yml` can be specified either in the configuration file or in an environment variable.
 
-## Running the [HTTP API](https://github.com/MarquezProject/marquez/blob/main/src/main/java/marquez/MarquezApp.java) Server
+## Running the [HTTP API](https://github.com/MarquezProject/marquez/blob/main/api/src/main/java/marquez/MarquezApp.java) Server
 
 ```bash
 $ ./gradlew :api:runShadow
