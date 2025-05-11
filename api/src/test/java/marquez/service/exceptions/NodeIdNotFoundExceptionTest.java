@@ -16,7 +16,7 @@ class NodeIdNotFoundExceptionTest {
   void testConstructorWithMessage() {
     String message = "Node not found";
     NodeIdNotFoundException exception = new NodeIdNotFoundException(message);
-    
+
     assertNotNull(exception);
     assertEquals(message, exception.getMessage());
   }
@@ -26,9 +26,9 @@ class NodeIdNotFoundExceptionTest {
     String message = "Node not found";
     Throwable cause = new RuntimeException("Original error");
     NodeIdNotFoundException exception = new NodeIdNotFoundException(message, cause);
-    
+
     assertNotNull(exception);
     assertEquals(message, exception.getMessage());
     assertEquals(cause, exception.getCause());
   }
-} 
+}
