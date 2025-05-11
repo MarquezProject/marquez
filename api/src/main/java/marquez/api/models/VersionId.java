@@ -5,8 +5,8 @@
 
 package marquez.api.models;
 
+import jakarta.annotation.Nullable;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetVersionId;

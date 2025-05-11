@@ -7,11 +7,11 @@ package marquez.client;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.UrlEscapers;
+import jakarta.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.RunState;
 import org.apache.commons.lang3.StringUtils;

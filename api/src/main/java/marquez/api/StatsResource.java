@@ -5,16 +5,15 @@
 
 package marquez.api;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.ResponseMetered;
 import com.codahale.metrics.annotation.Timed;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.api.models.Period;
@@ -35,7 +34,7 @@ public class StatsResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/lineage-events")
   public Response getStats(
       @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
@@ -58,7 +57,7 @@ public class StatsResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/jobs")
   public Response getJobs(
       @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
@@ -74,7 +73,7 @@ public class StatsResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/datasets")
   public Response getDatasets(
       @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {
@@ -90,7 +89,7 @@ public class StatsResource {
   @ResponseMetered
   @ExceptionMetered
   @GET
-  @Produces(APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   @Path("/sources")
   public Response getSources(
       @QueryParam("period") Period period, @QueryParam("timezone") String timezone) {

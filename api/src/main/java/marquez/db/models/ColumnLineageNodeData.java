@@ -6,11 +6,11 @@
 package marquez.db.models;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import marquez.service.models.ColumnLineageInputField;
@@ -26,6 +26,18 @@ public class ColumnLineageNodeData implements NodeData {
   @Nullable String transformationDescription;
   @Nullable String transformationType;
   @NonNull List<InputFieldNodeData> inputFields;
+
+  public ColumnLineageNodeData() {
+    // Default constructor for Jackson deserialization
+    this.namespace = "";
+    this.dataset = "";
+    this.datasetVersion = null;
+    this.field = "";
+    this.fieldType = null;
+    this.transformationDescription = null;
+    this.transformationType = null;
+    this.inputFields = ImmutableList.of();
+  }
 
   public ColumnLineageNodeData(
       String namespace,

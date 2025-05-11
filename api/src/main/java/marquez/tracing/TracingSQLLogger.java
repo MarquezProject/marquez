@@ -9,9 +9,11 @@ import com.codahale.metrics.jdbi3.strategies.SmartNameStrategy;
 import io.sentry.ISpan;
 import io.sentry.Sentry;
 import java.sql.SQLException;
+import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.core.statement.StatementContext;
 
+@Slf4j
 public class TracingSQLLogger implements SqlLogger {
   private final SqlLogger delegate;
   private static final SmartNameStrategy naming = new SmartNameStrategy();

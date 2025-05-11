@@ -1,10 +1,16 @@
+# Copyright 2018-2023 contributors to the Marquez project
+# SPDX-License-Identifier: Apache-2.0
+
 FROM eclipse-temurin:17 AS base
 WORKDIR /usr/src/app
 COPY gradle gradle
 COPY gradle.properties gradle.properties
 COPY gradlew gradlew
 COPY settings.gradle settings.gradle
-RUN ./gradlew --version
+
+# Make wrapper executable and fix line endings
+RUN chmod +x ./gradlew
+RUN sed -i 's/\r$//' ./gradlew
 
 FROM base AS build
 WORKDIR /usr/src/app
@@ -19,5 +25,6 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/api/build/libs/marquez-*.jar /usr/src/app
 COPY marquez.dev.yml marquez.dev.yml
 COPY docker/entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
 EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

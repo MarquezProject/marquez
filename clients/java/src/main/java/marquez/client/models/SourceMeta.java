@@ -5,9 +5,9 @@
 
 package marquez.client.models;
 
+import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

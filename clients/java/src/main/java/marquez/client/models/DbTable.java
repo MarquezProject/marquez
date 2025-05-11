@@ -7,12 +7,12 @@ package marquez.client.models;
 
 import static marquez.client.models.DatasetType.DB_TABLE;
 
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

@@ -5,10 +5,10 @@
 
 package marquez.db.models;
 
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

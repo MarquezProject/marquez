@@ -5,8 +5,8 @@
 
 package marquez.service.models;
 
+import jakarta.annotation.Nullable;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.OwnerName;

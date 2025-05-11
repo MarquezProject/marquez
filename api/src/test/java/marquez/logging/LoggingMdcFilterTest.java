@@ -7,11 +7,11 @@ package marquez.logging;
 
 import static org.junit.Assert.assertEquals;
 
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
-import javax.ws.rs.container.ContainerRequestContext;
 import org.glassfish.jersey.server.ExtendedUriInfo;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.junit.Before;

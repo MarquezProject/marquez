@@ -6,13 +6,13 @@
 package marquez.db;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.Utils;
 import marquez.service.models.LineageEvent;

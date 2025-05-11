@@ -9,12 +9,12 @@ import static marquez.common.models.CommonModelGenerator.newFields;
 
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.client.OpenLineage;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.common.models.DatasetType;
 import marquez.common.models.JobType;

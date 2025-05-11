@@ -9,10 +9,10 @@ import static marquez.db.DbRetention.DEFAULT_DRY_RUN;
 import static marquez.db.DbRetention.DEFAULT_NUMBER_OF_ROWS_PER_BATCH;
 import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 
-import io.dropwizard.cli.ConfiguredCommand;
+import io.dropwizard.core.cli.ConfiguredCommand;
+import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.setup.Bootstrap;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import marquez.MarquezConfig;

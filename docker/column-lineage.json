@@ -1,0 +1,121 @@
+[
+    {
+      "eventType": "COMPLETE",
+      "eventTime": "2025-04-07T22:00:00.000Z",
+      "producer": "https://marquez.io",
+      "run": {
+        "runId": "00000000-0000-0000-0000-000000000001"
+      },
+      "job": {
+        "namespace": "namespace",
+        "name": "job1"
+      },
+      "inputs": [
+        {
+          "namespace": "namespace",
+          "name": "dataset_a",
+          "facets": {
+            "schema": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+              "fields": [
+                { "name": "col_a", "type": "string" }
+              ]
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "namespace": "namespace",
+          "name": "dataset_b",
+          "facets": {
+            "schema": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+              "fields": [
+                { "name": "col_b", "type": "string" }
+              ]
+            },
+            "columnLineage": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/ColumnLineageDatasetFacet.json",
+              "fields": {
+                "col_b": {
+                  "inputFields": [
+                    {
+                      "namespace": "namespace",
+                      "name": "dataset_a",
+                      "field": "col_a"
+                    }
+                  ],
+                  "transformationDescription": "col_b = col_a",
+                  "transformationType": "COPY"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "eventType": "COMPLETE",
+      "eventTime": "2025-04-07T22:01:00.000Z",
+      "producer": "https://marquez.io",
+      "run": {
+        "runId": "00000000-0000-0000-0000-000000000002"
+      },
+      "job": {
+        "namespace": "namespace",
+        "name": "job2"
+      },
+      "inputs": [
+        {
+          "namespace": "namespace",
+          "name": "dataset_b",
+          "facets": {
+            "schema": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+              "fields": [
+                { "name": "col_b", "type": "string" }
+              ]
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "namespace": "namespace",
+          "name": "dataset_c",
+          "facets": {
+            "schema": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/SchemaDatasetFacet.json",
+              "fields": [
+                { "name": "col_c", "type": "string" }
+              ]
+            },
+            "columnLineage": {
+              "_producer": "https://marquez.io",
+              "_schemaURL": "https://openlineage.io/spec/facets/1-0-0/ColumnLineageDatasetFacet.json",
+              "fields": {
+                "col_c": {
+                  "inputFields": [
+                    {
+                      "namespace": "namespace",
+                      "name": "dataset_b",
+                      "field": "col_b"
+                    }
+                  ],
+                  "transformationDescription": "col_c = col_b",
+                  "transformationType": "COPY"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+  
