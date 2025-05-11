@@ -99,11 +99,8 @@ public class ColumnLineageResourceTest {
 
   @Test
   public void testGetColumnLineageWithMissingNodeId() {
-    Response response = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .request()
-        .get();
-    
+    Response response = UNDER_TEST.target("/api/v1/column-lineage").request().get();
+
     assertThat(response.getStatus()).isEqualTo(400);
     Map<String, String> error = response.readEntity(Map.class);
     assertThat(error.get("error")).isEqualTo("Missing required query param: nodeId");
@@ -111,12 +108,9 @@ public class ColumnLineageResourceTest {
 
   @Test
   public void testGetColumnLineageWithBlankNodeId() {
-    Response response = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "   ")
-        .request()
-        .get();
-    
+    Response response =
+        UNDER_TEST.target("/api/v1/column-lineage").queryParam("nodeId", "   ").request().get();
+
     assertThat(response.getStatus()).isEqualTo(400);
     Map<String, String> error = response.readEntity(Map.class);
     assertThat(error.get("error")).isEqualTo("Missing required query param: nodeId");
@@ -124,12 +118,13 @@ public class ColumnLineageResourceTest {
 
   @Test
   public void testGetColumnLineageWithInvalidNodeId() {
-    Response response = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "invalid:format")
-        .request()
-        .get();
-    
+    Response response =
+        UNDER_TEST
+            .target("/api/v1/column-lineage")
+            .queryParam("nodeId", "invalid:format")
+            .request()
+            .get();
+
     assertThat(response.getStatus()).isEqualTo(400);
     Map<String, String> error = response.readEntity(Map.class);
     assertThat(error.get("error")).isEqualTo("Invalid nodeId format");
@@ -141,11 +136,12 @@ public class ColumnLineageResourceTest {
     when(lineageService.lineage(any(NodeId.class), eq(20), eq(false)))
         .thenThrow(new NodeIdNotFoundException("Node not found"));
 
-    Response response = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "dataset:namespace:nonExistentDataset")
-        .request()
-        .get();
+    Response response =
+        UNDER_TEST
+            .target("/api/v1/column-lineage")
+            .queryParam("nodeId", "dataset:namespace:nonExistentDataset")
+            .request()
+            .get();
 
     assertThat(response.getStatus()).isEqualTo(404);
     Map<String, String> error = response.readEntity(Map.class);
@@ -157,13 +153,14 @@ public class ColumnLineageResourceTest {
     // Mock the service to return lineage with custom depth
     when(lineageService.lineage(any(NodeId.class), eq(5), eq(false))).thenReturn(LINEAGE);
 
-    final Lineage lineage = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "dataset:namespace:commonDataset")
-        .queryParam("depth", "5")
-        .request()
-        .get()
-        .readEntity(Lineage.class);
+    final Lineage lineage =
+        UNDER_TEST
+            .target("/api/v1/column-lineage")
+            .queryParam("nodeId", "dataset:namespace:commonDataset")
+            .queryParam("depth", "5")
+            .request()
+            .get()
+            .readEntity(Lineage.class);
 
     assertEquals(lineage, LINEAGE);
   }
@@ -173,13 +170,14 @@ public class ColumnLineageResourceTest {
     // Mock the service to return lineage with downstream
     when(lineageService.lineage(any(NodeId.class), eq(20), eq(true))).thenReturn(LINEAGE);
 
-    final Lineage lineage = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "dataset:namespace:commonDataset")
-        .queryParam("withDownstream", "true")
-        .request()
-        .get()
-        .readEntity(Lineage.class);
+    final Lineage lineage =
+        UNDER_TEST
+            .target("/api/v1/column-lineage")
+            .queryParam("nodeId", "dataset:namespace:commonDataset")
+            .queryParam("withDownstream", "true")
+            .request()
+            .get()
+            .readEntity(Lineage.class);
 
     assertEquals(lineage, LINEAGE);
   }
@@ -190,11 +188,12 @@ public class ColumnLineageResourceTest {
     when(lineageService.lineage(any(NodeId.class), eq(20), eq(false)))
         .thenThrow(new RuntimeException("Internal error"));
 
-    Response response = UNDER_TEST
-        .target("/api/v1/column-lineage")
-        .queryParam("nodeId", "dataset:namespace:commonDataset")
-        .request()
-        .get();
+    Response response =
+        UNDER_TEST
+            .target("/api/v1/column-lineage")
+            .queryParam("nodeId", "dataset:namespace:commonDataset")
+            .request()
+            .get();
 
     assertThat(response.getStatus()).isEqualTo(500);
     Map<String, String> error = response.readEntity(Map.class);
