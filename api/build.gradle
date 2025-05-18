@@ -28,7 +28,11 @@ ext {
     testcontainersVersion = '1.18.3'
     sentryVersion = '6.34.0'
 }
-
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.guava:guava:32.1.3-jre'
+    }
+}
 dependencies {
     implementation project(':clients:java')
     implementation "io.dropwizard:dropwizard-core:${dropwizardVersion}"
@@ -54,9 +58,15 @@ dependencies {
     implementation 'org.glassfish:jakarta.el:4.0.2'
     
     // GraphQL dependencies with Jakarta EE 9 support
-    implementation "com.graphql-java:graphql-java:${graphqlJavaVersion}"
-    implementation "com.graphql-java-kickstart:graphql-java-servlet:${graphqlServletVersion}"
-    implementation "com.graphql-java-kickstart:graphql-java-kickstart:${graphqlServletVersion}"
+    implementation ("com.graphql-java:graphql-java:${graphqlJavaVersion}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation ("com.graphql-java-kickstart:graphql-java-servlet:${graphqlServletVersion}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation ("com.graphql-java-kickstart:graphql-java-kickstart:${graphqlServletVersion}") {
+        exclude group: 'com.google.guava', module: 'guava'
+    }
     
     implementation "io.prometheus:simpleclient_servlet_jakarta:0.16.0"
     implementation "io.prometheus:simpleclient_common:0.16.0"
@@ -74,6 +84,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:8.5.13'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "io.openlineage:openlineage-java:0.30.1"
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
 
     implementation 'org.opensearch.client:opensearch-rest-client:2.19.1'
     implementation 'org.opensearch.client:opensearch-java:2.22.0'
@@ -86,7 +97,6 @@ dependencies {
     testImplementation "org.junit.vintage:junit-vintage-engine:${junit5Version}"
     testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
-    testImplementation 'org.apache.httpcomponents:httpclient:4.5.14'
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junit5Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:${junit5Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${junit5Version}"
@@ -205,12 +215,22 @@ shadowJar {
         include 'LICENSE'
     }
     mergeServiceFiles()
+    // Include all dependencies by default
+    exclude 'io/dropwizard/logback/shaded/guava/**'
+    exclude 'META-INF/maven/com.google.guava/**' // Optional: only if you want zero guava metadata
+
     dependencies {
-        include(dependency('jakarta.platform:jakarta.jakartaee-api'))
-        include(dependency('jakarta.platform:jakarta.jakartaee-bom'))
-        include(dependency('jakarta.annotation:jakarta.annotation-api'))
-        include(dependency('jakarta.validation:jakarta.validation-api'))
-        include(dependency('io.dropwizard:dropwizard-jdbi3'))
+          exclude { dep ->
+            dep.moduleGroup == 'com.google.guava' &&
+            (dep.moduleName == 'guava' && dep.moduleVersion == '31.0.1-jre')
+        }
+        //exclude(dependency('com.google.guava:guava')) 
+        // Exclude test dependencies
+        exclude(dependency('org.junit:.*'))
+        exclude(dependency('org.testcontainers:.*'))
+        exclude(dependency('org.junit.jupiter:.*'))
+        exclude(dependency('org.junit.vintage:.*'))
+        exclude(dependency('com.google.guava:guava:31.0.1-jre'))
     }
     manifest {
         attributes(
