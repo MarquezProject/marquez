@@ -8,6 +8,7 @@ package marquez.service;
 import com.google.common.collect.ImmutableSortedSet;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,7 @@ import marquez.db.ColumnLineageDao;
 import marquez.db.DatasetFieldDao;
 import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
+import marquez.service.exceptions.NodeIdNotFoundException;
 import marquez.service.models.ColumnLineage;
 import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
@@ -241,6 +243,7 @@ public class ColumnLineageService extends DelegatingDaos.DelegatingColumnLineage
                                               f.getTransformationDescription(),
                                               f.getTransformationType()))
                                   .collect(Collectors.toList()))
+                          .outputFields(Collections.emptyList())
                           .build());
             });
 

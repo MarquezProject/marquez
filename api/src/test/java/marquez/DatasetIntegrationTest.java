@@ -5,6 +5,7 @@
 
 package marquez;
 
+import static marquez.common.api.TestUtils.assertSuccessStatusCode;
 import static marquez.db.ColumnLineageTestUtils.getDatasetA;
 import static marquez.db.ColumnLineageTestUtils.getDatasetB;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
@@ -40,17 +41,14 @@ import marquez.client.models.RunMeta;
 import marquez.client.models.StreamVersion;
 import marquez.common.Utils;
 import marquez.db.LineageTestUtils;
-import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
 import marquez.service.models.LineageEvent;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 @org.junit.jupiter.api.Tag("IntegrationTests")
-@ExtendWith(MarquezJdbiExternalPostgresExtension.class)
 public class DatasetIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
@@ -61,8 +59,9 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
   }
 
   @AfterEach
-  public void tearDown(Jdbi jdbi) {
-    JdbiUtils.cleanDatabase(jdbi);
+  public void tearDown() {
+    Jdbi staticAppJdbi = MarquezApp.getJdbiInstanceForTesting();
+    JdbiUtils.cleanDatabase(staticAppJdbi);
   }
 
   @Test
@@ -144,7 +143,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     datasetFacets.setAdditional(inputFacets);
     final LineageEvent readEvent =
@@ -380,9 +379,15 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(event);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     client.deleteDataset(namespace, name);
+
+    try { // Add a small delay to allow the database update to propagate
+      Thread.sleep(500); // Wait 500 milliseconds
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
 
     List<Dataset> datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(0);
@@ -406,14 +411,14 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     CompletableFuture<Integer> resp = sendEvent(event);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     client.deleteDataset(namespace, name);
 
     List<Dataset> datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(0);
     resp = sendEvent(event);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     datasets = client.listDatasets(namespace);
     assertThat(datasets).hasSize(1);
@@ -479,7 +484,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(event);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     client.deleteNamespace(namespace);
 
@@ -521,10 +526,10 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     resp = sendEvent(secondEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     List<Dataset> datasets = client.listDatasets(namespaceName);
     assertThat(datasets).hasSize(2);
@@ -545,6 +550,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
     List<Job> jobs = client.listJobs(namespaceName);
     assertThat(jobs).hasSize(0);
 
+    // Create a new dataset in the namespace to undelete it
     LineageEvent eventThatWillUndeleteNamespace =
         LineageEvent.builder()
             .eventType("COMPLETE")
@@ -554,13 +560,13 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .inputs(
                 List.of(
                     new LineageEvent.Dataset(
-                        namespaceName, name, LineageTestUtils.newDatasetFacet())))
+                        namespaceName, "new_table", LineageTestUtils.newDatasetFacet())))
             .outputs(Collections.emptyList())
             .producer("the_producer")
             .build();
 
     resp = sendEvent(eventThatWillUndeleteNamespace);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     namespaces = client.listNamespaces();
     assertThat(namespaces)
@@ -570,8 +576,10 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
               assertThat(namespace.getName()).isEqualTo(namespaceName);
             });
 
+    // The old datasets should remain hidden
     datasets = client.listDatasets(namespaceName);
     assertThat(datasets).hasSize(1);
+    assertThat(datasets.get(0).getName()).isEqualTo("new_table");
 
     jobs = client.listJobs(namespaceName);
     assertThat(jobs).hasSize(1);
@@ -621,7 +629,7 @@ public class DatasetIntegrationTest extends BaseIntegrationTest {
             .outputs(Collections.emptyList())
             .build();
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
     List<DatasetVersion> versions = client.listDatasetVersions(NAMESPACE_NAME, DB_TABLE_NAME);
 
     versions.forEach(

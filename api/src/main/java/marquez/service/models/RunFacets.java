@@ -6,8 +6,8 @@
 package marquez.service.models;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

@@ -5,6 +5,7 @@
 
 package marquez;
 
+import static marquez.common.api.TestUtils.assertSuccessStatusCode;
 import static marquez.db.LineageTestUtils.PRODUCER_URL;
 import static marquez.db.LineageTestUtils.SCHEMA_URL;
 import static org.assertj.core.api.Assertions.as;
@@ -20,7 +21,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.dropwizard.util.Resources;
+import com.google.common.io.Resources;
 import io.openlineage.client.OpenLineage;
 import io.openlineage.client.OpenLineage.RunEvent;
 import io.openlineage.client.OpenLineage.RunEvent.EventType;
@@ -961,7 +962,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .build();
 
     final CompletableFuture<Integer> resp = sendEvent(lineageEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     List<LineageEvent> events = client.listLineageEvents();
 
@@ -1005,7 +1006,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     marquez.service.models.LineageEvent secondEvent =
         builder
@@ -1015,7 +1016,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .build();
 
     resp = sendEvent(secondEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     List<LineageEvent> rawEvents = client.listLineageEvents();
 
@@ -1060,7 +1061,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         builder.eventTime(time).eventType("START").schemaURL(new URI(RUN_EVENT_SCHEMA_URL)).build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     marquez.service.models.LineageEvent secondEvent =
         builder
@@ -1070,7 +1071,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .build();
 
     resp = sendEvent(secondEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     List<LineageEvent> rawEvents = client.listLineageEvents(MarquezClient.SortDirection.ASC, 10);
 
@@ -1117,7 +1118,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
         builder.eventTime(after.minus(1, ChronoUnit.YEARS)).eventType("START").build();
 
     CompletableFuture<Integer> resp = sendEvent(firstEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     marquez.service.models.LineageEvent secondEvent =
         builder
@@ -1127,7 +1128,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .build();
 
     resp = sendEvent(secondEvent);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     marquez.service.models.LineageEvent thirdEvent =
         builder
@@ -1184,7 +1185,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
             .build();
 
     CompletableFuture<Integer> resp = sendEvent(event);
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     List<Job> jobs = client.listJobs(NAMESPACE_NAME);
 
@@ -1331,7 +1332,7 @@ public class OpenLineageIntegrationTest extends BaseIntegrationTest {
                 });
 
     // Ensure the event was received.
-    assertThat(resp.join()).isEqualTo(201);
+    assertSuccessStatusCode(resp.join());
 
     // (3) Convert the OpenLineage event to Json.
     final JsonNode openLineageEventAsJson =

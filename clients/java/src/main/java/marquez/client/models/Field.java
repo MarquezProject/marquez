@@ -7,9 +7,9 @@ package marquez.client.models;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

@@ -5,12 +5,10 @@
 
 package marquez.api.exceptions;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-
 import io.dropwizard.jersey.errors.ErrorMessage;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jdbi.v3.core.JdbiException;
 
@@ -20,9 +18,9 @@ public class JdbiExceptionExceptionMapper implements ExceptionMapper<JdbiExcepti
   @Override
   public Response toResponse(JdbiException e) {
     log.error("Failed to execute statement", e);
-    return Response.serverError()
-        .type(APPLICATION_JSON_TYPE)
-        .entity(new ErrorMessage(INTERNAL_SERVER_ERROR.getStatusCode(), e.getMessage()))
+    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .entity(new ErrorMessage(e.getMessage()))
         .build();
   }
 }

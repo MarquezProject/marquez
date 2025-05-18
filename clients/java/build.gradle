@@ -22,10 +22,27 @@ plugins {
 dependencies {
     implementation "io.dropwizard:dropwizard-jackson:${dropwizardVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.16.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.1'
     implementation 'org.apache.commons:commons-lang3:3.17.0'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation platform("jakarta.platform:jakarta.jakartaee-bom:${jakartaVersion}")
+    implementation "jakarta.platform:jakarta.jakartaee-api:${jakartaVersion}"
+    implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationVersion}"
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+    testImplementation 'org.skyscreamer:jsonassert:1.5.1'
+    testImplementation 'org.json:json:20231013'
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testImplementation "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 }
 
 task testUnit(type: Test) {

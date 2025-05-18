@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
+import lombok.NonNull;
 import marquez.common.models.DatasetName;
 import marquez.common.models.JobName;
 import marquez.common.models.NamespaceName;
@@ -235,5 +235,5 @@ public interface LineageDao {
         ) sub
       ORDER BY depth ASC, job_name ASC;
       """)
-  List<UpstreamRunRow> getUpstreamRuns(@NotNull UUID runId, int depth);
+  List<UpstreamRunRow> getUpstreamRuns(@NonNull UUID runId, int depth);
 }

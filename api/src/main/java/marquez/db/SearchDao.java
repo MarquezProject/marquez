@@ -5,9 +5,9 @@
 
 package marquez.db;
 
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
-import javax.annotation.Nullable;
 import marquez.api.models.SearchFilter;
 import marquez.api.models.SearchResult;
 import marquez.api.models.SearchSort;

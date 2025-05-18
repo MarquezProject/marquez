@@ -10,10 +10,10 @@ import static marquez.db.DbRetention.DEFAULT_RETENTION_DAYS;
 import static marquez.jobs.DbRetentionConfig.DEFAULT_FREQUENCY_MINS;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import org.junit.jupiter.api.Test;
 
 /** The test suite for {@link DbRetentionConfig}. */

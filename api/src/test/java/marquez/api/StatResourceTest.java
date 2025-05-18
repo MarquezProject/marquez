@@ -9,10 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import jakarta.ws.rs.core.Response;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Response;
 import marquez.api.models.Period;
 import marquez.db.models.IntervalMetric;
 import marquez.db.models.LineageMetric;
