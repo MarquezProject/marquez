@@ -53,7 +53,7 @@ subprojects {
     ext {
         assertjVersion = '3.26.3'
         dropwizardVersion = '2.1.12'
-        jacocoVersion = '0.8.12'
+        jacocoVersion = '0.8.13'
         junit5Version = '5.10.2'
         lombokVersion = '1.18.34'
         mockitoVersion = '5.4.0'
