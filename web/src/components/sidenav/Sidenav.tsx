@@ -15,21 +15,18 @@ import MqIconButton from '../core/icon-button/MqIconButton'
 
 // for i18n
 import '../../i18n/config'
-import { FormControl, MenuItem, Select } from '@mui/material'
+import { FormControl } from '@mui/material'
 // import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
-import iconSearchArrow from '../../img/iconSearchArrow.svg'
 import fabrion_logo from './fabrion_logo_red.png'
+import iconSearchArrow from '../../img/iconSearchArrow.svg'
 
 interface SidenavProps {}
 
 const Sidenav: React.FC<SidenavProps> = () => {
   const i18next = require('i18next')
-  const changeLanguage = (lng: string) => {
-    i18next.changeLanguage(lng)
-  }
   const theme = createTheme(useTheme())
 
   const location = useLocation()
@@ -72,7 +69,10 @@ const Sidenav: React.FC<SidenavProps> = () => {
             justifyContent={'center'}
             height={HEADER_HEIGHT}
           >
-            <Link to='/' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Link
+              to='/'
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
               <img src={fabrion_logo} height={40} alt='Fabrion Logo' />
             </Link>
           </Box>

@@ -597,8 +597,7 @@ i18next
           },
           lineage: {
             empty_title: '未选择节点',
-            empty_body:
-              '尝试通过搜索或工作或数据集页面选择一个节点。',
+            empty_body: '尝试通过搜索或工作或数据集页面选择一个节点。',
             graph_depth_title: '深度',
             full_graph_label: '完整',
             empty: '空',
@@ -612,7 +611,7 @@ i18next
             events: '事件',
           },
           namespace_select: {
-            prompt: 'ns',   // namespace的缩写
+            prompt: 'ns', // namespace的缩写
           },
           dataset_tags: {
             tooltip: '添加标签',
@@ -639,8 +638,7 @@ i18next
           },
           datasets_route: {
             empty_title: '没有数据集',
-            empty_body:
-              '尝试更改命名空间或查看我们的文档以添加数据集。',
+            empty_body: '尝试更改命名空间或查看我们的文档以添加数据集。',
             heading: '数据集',
             name_col: '名称',
             namespace_col: '命名空间',
@@ -654,8 +652,7 @@ i18next
           },
           jobs_route: {
             empty_title: '没有工作',
-            empty_body:
-              '尝试更改命名空间或查看我们的文档以添加工作。',
+            empty_body: '尝试更改命名空间或查看我们的文档以添加工作。',
             heading: '工作',
             name_col: '名称',
             namespace_col: '命名空间',
@@ -694,7 +691,7 @@ i18next
             empty_body: '尝试更改日期或查看我们的文档以添加事件。',
           },
         },
-      }, 
+      },
     },
     defaultNS,
     detection: DETECTION_OPTIONS,
