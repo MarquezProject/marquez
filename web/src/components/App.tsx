@@ -43,7 +43,7 @@ const store = createStore(
 
 sagaMiddleware.run(rootSaga)
 
-const TITLE = 'Marquez'
+const TITLE = 'Fabrion'
 
 const App = (): ReactElement => {
   return (

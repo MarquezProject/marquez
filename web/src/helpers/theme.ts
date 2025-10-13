@@ -43,16 +43,16 @@ export const theme = createTheme({
       main: '#FFB74D',
     },
     success: {
-      main: '#4CAF50',
+      main: '#4F4D4E',
     },
     info: {
       main: '#9c98ec',
     },
     background: {
-      default: '#191f26',
+      default: '#000000',
     },
     secondary: {
-      main: '#454f5b',
+      main: '#4F4D4E',
     },
   },
   zIndex: {

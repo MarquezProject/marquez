@@ -16,12 +16,12 @@ import MqIconButton from '../core/icon-button/MqIconButton'
 // for i18n
 import '../../i18n/config'
 import { FormControl, MenuItem, Select } from '@mui/material'
-import { MqInputNoIcon } from '../core/input-base/MqInputBase'
+// import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
 import iconSearchArrow from '../../img/iconSearchArrow.svg'
-import marquez_logo from './marquez-icon-white-solid.svg'
+import fabrion_logo from './fabrion_logo_red.png'
 
 interface SidenavProps {}
 
@@ -72,8 +72,8 @@ const Sidenav: React.FC<SidenavProps> = () => {
             justifyContent={'center'}
             height={HEADER_HEIGHT}
           >
-            <Link to='/'>
-              <img src={marquez_logo} height={40} alt='Marquez Logo' />
+            <Link to='/' style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <img src={fabrion_logo} height={40} alt='Fabrion Logo' />
             </Link>
           </Box>
           <Divider sx={{ my: 1 }} />
@@ -116,7 +116,8 @@ const Sidenav: React.FC<SidenavProps> = () => {
             maxWidth: '100px',
           }}
         >
-          <Box px={1}>
+          {/* disabled due to issue with icons alignmens on languages change */}
+          {/* <Box px={1}>
             <Select
               fullWidth
               value={i18next.resolvedLanguage}
@@ -142,7 +143,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
                 {'zh'}
               </MenuItem>
             </Select>
-          </Box>
+          </Box> */}
         </FormControl>
       </Box>
     </Drawer>
