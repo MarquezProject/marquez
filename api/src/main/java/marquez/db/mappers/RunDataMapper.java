@@ -1,3 +1,7 @@
+/*
+ * Copyright 2018-2023 contributors to the Marquez project
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package marquez.db.mappers;
 
 import static java.util.stream.Collectors.toList;
