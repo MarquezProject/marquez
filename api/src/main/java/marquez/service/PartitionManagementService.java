@@ -48,9 +48,16 @@ public class PartitionManagementService {
   public void createPartitionsForPeriod(LocalDate startDate, int days) {
     log.info("Creating partitions for {} days starting from {}", days, startDate);
 
-    for (int i = 0; i < days; i++) {
-      LocalDate currentDate = startDate.plusDays(i);
-      ensurePartitionExists(currentDate);
+    // Calculate the end date
+    LocalDate endDate = startDate.plusDays(days - 1);
+
+    // Create partitions for each unique month in the period
+    LocalDate currentMonth = startDate.withDayOfMonth(1);
+    LocalDate endMonth = endDate.withDayOfMonth(1);
+
+    while (!currentMonth.isAfter(endMonth)) {
+      ensurePartitionExists(currentMonth);
+      currentMonth = currentMonth.plusMonths(1);
     }
   }
 
