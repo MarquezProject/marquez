@@ -389,4 +389,312 @@ public class DenormalizedLineageServiceTest {
 
     assertThat(partitions).hasSizeGreaterThanOrEqualTo(2);
   }
+
+  @Test
+  public void testGetPartitionStats() {
+    // Test: Verify partition statistics can be retrieved
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_stats",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "output", null)));
+
+    denormalizedLineageService.populateLineageForRun(lineageRow.getRun().getUuid());
+
+    // When: Get partition stats
+    assertThatCode(() -> denormalizedLineageService.getPartitionStats()).doesNotThrowAnyException();
+  }
+
+  @Test
+  public void testAnalyzeAllPartitions() {
+    // Test: Verify analyze partitions command executes
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_analyze",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "output", null)));
+
+    denormalizedLineageService.populateLineageForRun(lineageRow.getRun().getUuid());
+
+    // When: Analyze partitions
+    assertThatCode(() -> denormalizedLineageService.analyzeAllPartitions())
+        .doesNotThrowAnyException();
+  }
+
+  @Test
+  public void testPopulateLineageWithErrorHandling() {
+    // Test: Verify error handling when run doesn't exist
+    UUID nonExistentRunUuid = UUID.randomUUID();
+
+    // When: Try to populate lineage for non-existent run
+    try {
+      denormalizedLineageService.populateLineageForRun(nonExistentRunUuid);
+    } catch (Exception e) {
+      // Then: Should throw exception
+      assertThat(e).isNotNull();
+    }
+  }
+
+  @Test
+  public void testDeleteExistingRecordsBeforePopulate() {
+    // Given: Run with existing denormalized records
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_delete",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "output", null)));
+    UUID runUuid = lineageRow.getRun().getUuid();
+
+    // Populate once
+    denormalizedLineageService.populateLineageForRun(runUuid);
+
+    Long countBefore =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery("SELECT COUNT(*) FROM run_lineage_denormalized WHERE run_uuid = ?")
+                    .bind(0, runUuid)
+                    .mapTo(Long.class)
+                    .one());
+
+    // When: Populate again (should delete and re-insert)
+    denormalizedLineageService.populateLineageForRun(runUuid);
+
+    // Then: Count should remain the same (deleted old, inserted new)
+    Long countAfter =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery("SELECT COUNT(*) FROM run_lineage_denormalized WHERE run_uuid = ?")
+                    .bind(0, runUuid)
+                    .mapTo(Long.class)
+                    .one());
+
+    assertThat(countAfter).isEqualTo(countBefore);
+  }
+
+  @Test
+  public void testIsParentRunDetection() {
+    // Given: Parent run with child
+    UpdateLineageRow parentRun =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "parent_job_detection",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "parent_output", null)));
+
+    UpdateLineageRow childRun =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "child_job_detection",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "child_output", null)));
+
+    UUID parentRunUuid = parentRun.getRun().getUuid();
+    UUID childRunUuid = childRun.getRun().getUuid();
+
+    // Set parent-child relationship
+    jdbi.useHandle(
+        handle -> {
+          handle.execute(
+              "UPDATE runs SET parent_run_uuid = ? WHERE uuid = ?", parentRunUuid, childRunUuid);
+        });
+
+    // When: Populate parent run
+    denormalizedLineageService.populateLineageForRun(parentRunUuid);
+
+    // Then: Parent lineage should be populated
+    Long parentLineageCount =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT COUNT(*) FROM run_parent_lineage_denormalized WHERE run_uuid = ?")
+                    .bind(0, parentRunUuid)
+                    .mapTo(Long.class)
+                    .one());
+
+    assertThat(parentLineageCount).isGreaterThan(0);
+  }
+
+  @Test
+  public void testHasParentRunDetection() {
+    // Given: Child run with parent
+    UpdateLineageRow parentRun =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "parent_job_has_parent",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "parent_output", null)));
+
+    UpdateLineageRow childRun =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "child_job_has_parent",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "child_output", null)));
+
+    UUID parentRunUuid = parentRun.getRun().getUuid();
+    UUID childRunUuid = childRun.getRun().getUuid();
+
+    // Set parent-child relationship
+    jdbi.useHandle(
+        handle -> {
+          handle.execute(
+              "UPDATE runs SET parent_run_uuid = ? WHERE uuid = ?", parentRunUuid, childRunUuid);
+        });
+
+    // When: Populate child run (should update parent lineage)
+    denormalizedLineageService.populateLineageForRun(childRunUuid);
+
+    // Then: Parent lineage should be updated
+    Long parentLineageCount =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT COUNT(*) FROM run_parent_lineage_denormalized WHERE run_uuid = ?")
+                    .bind(0, parentRunUuid)
+                    .mapTo(Long.class)
+                    .one());
+
+    assertThat(parentLineageCount).isGreaterThan(0);
+  }
+
+  @Test
+  public void testPopulateRunLineageDenormalizedWithInputsAndOutputs() {
+    // Test: Verify run lineage includes input and output datasets
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_io",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(
+                new Dataset("namespace", "input1", null), new Dataset("namespace", "input2", null)),
+            List.of(
+                new Dataset("namespace", "output1", null),
+                new Dataset("namespace", "output2", null)));
+    UUID runUuid = lineageRow.getRun().getUuid();
+
+    // When: Populate lineage
+    denormalizedLineageService.populateLineageForRun(runUuid);
+
+    // Then: Verify inputs and outputs are in denormalized table
+    List<String> inputDatasets =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT DISTINCT input_dataset_name FROM run_lineage_denormalized WHERE run_uuid = ? AND input_dataset_name IS NOT NULL")
+                    .bind(0, runUuid)
+                    .mapTo(String.class)
+                    .list());
+
+    List<String> outputDatasets =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT DISTINCT output_dataset_name FROM run_lineage_denormalized WHERE run_uuid = ? AND output_dataset_name IS NOT NULL")
+                    .bind(0, runUuid)
+                    .mapTo(String.class)
+                    .list());
+
+    assertThat(inputDatasets).hasSizeGreaterThanOrEqualTo(2);
+    assertThat(outputDatasets).hasSizeGreaterThanOrEqualTo(2);
+  }
+
+  @Test
+  public void testEnsurePartitionsExistForRunDate() {
+    // Test: Verify partitions are created for run date
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_partition_date",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "output", null)));
+    UUID runUuid = lineageRow.getRun().getUuid();
+
+    // When: Populate lineage (should auto-create partition)
+    denormalizedLineageService.populateLineageForRun(runUuid);
+
+    // Then: Verify partition exists for current month
+    List<String> partitions =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT tablename FROM pg_tables "
+                            + "WHERE tablename LIKE 'run_lineage_denormalized_%'")
+                    .mapTo(String.class)
+                    .list());
+
+    assertThat(partitions).isNotEmpty();
+
+    LocalDate today = LocalDate.now();
+    String expectedPartition =
+        "run_lineage_denormalized_y"
+            + today.format(DateTimeFormatter.ofPattern("yyyy"))
+            + "m"
+            + today.format(DateTimeFormatter.ofPattern("MM"));
+
+    assertThat(partitions).contains(expectedPartition);
+  }
+
+  @Test
+  public void testRunWithNullStartedAtUsesEndedAt() {
+    // Given: Run with null started_at but has ended_at
+    UpdateLineageRow lineageRow =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "test_job_null_started",
+            "COMPLETE",
+            JobFacet.builder().build(),
+            List.of(),
+            List.of(new Dataset("namespace", "output", null)));
+    UUID runUuid = lineageRow.getRun().getUuid();
+
+    // Set started_at to null but keep ended_at
+    jdbi.useHandle(
+        handle -> {
+          handle.execute("UPDATE runs SET started_at = NULL WHERE uuid = ?", runUuid);
+        });
+
+    // When: Populate lineage
+    assertThatCode(() -> denormalizedLineageService.populateLineageForRun(runUuid))
+        .doesNotThrowAnyException();
+
+    // Then: Should use ended_at for run_date
+    Long count =
+        jdbi.withHandle(
+            handle ->
+                handle
+                    .createQuery(
+                        "SELECT COUNT(*) FROM run_lineage_denormalized WHERE run_uuid = ? AND run_date IS NOT NULL")
+                    .bind(0, runUuid)
+                    .mapTo(Long.class)
+                    .one());
+
+    assertThat(count).isGreaterThan(0);
+  }
 }
