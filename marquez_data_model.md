@@ -264,4 +264,4 @@ The Marquez data model is organized into several logical sections:
 - Foreign key relationships for data integrity
 - JSONB fields for flexible metadata storage
 - Comprehensive versioning support
-- Detailed lineage tracking at both dataset and column levels 
+- Detailed lineage tracking at both dataset and column levels

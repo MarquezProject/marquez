@@ -37,4 +37,4 @@ tags:
   - name: PII
     description: Personally identifiable information
   - name: SENSITIVE
-    description: Contains sensitive information     
+    description: Contains sensitive information

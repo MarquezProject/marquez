@@ -40,11 +40,11 @@ dependencies {
     implementation "io.dropwizard:dropwizard-json-logging:${dropwizardVersion}"
     implementation "io.dropwizard:dropwizard-http2:${dropwizardVersion}"
     implementation "io.dropwizard:dropwizard-assets:${dropwizardVersion}"
-    
+
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    
+
     // Jakarta EE dependencies
     implementation platform("jakarta.platform:jakarta.jakartaee-bom:${jakartaVersion}")
     implementation "jakarta.platform:jakarta.jakartaee-api:${jakartaVersion}"
@@ -56,7 +56,7 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
     implementation 'org.glassfish:jakarta.el:4.0.2'
-    
+
     // GraphQL dependencies with Jakarta EE 9 support
     implementation ("com.graphql-java:graphql-java:${graphqlJavaVersion}") {
         exclude group: 'com.google.guava', module: 'guava'
@@ -67,12 +67,12 @@ dependencies {
     implementation ("com.graphql-java-kickstart:graphql-java-kickstart:${graphqlServletVersion}") {
         exclude group: 'com.google.guava', module: 'guava'
     }
-    
+
     implementation "io.prometheus:simpleclient_servlet_jakarta:0.16.0"
     implementation "io.prometheus:simpleclient_common:0.16.0"
     implementation "io.prometheus:simpleclient_dropwizard:0.16.0"
     implementation "io.prometheus:simpleclient_hotspot:0.16.0"
-    
+
     implementation "org.jdbi:jdbi3-core:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-jackson2:${jdbi3Version}"
     implementation "org.jdbi:jdbi3-postgres:${jdbi3Version}"
@@ -101,7 +101,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:${junit5Version}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${junit5Version}"
     testImplementation "org.testcontainers:testcontainers:${testcontainersVersion}"
-    
+
     // Add Jakarta EE dependencies for tests
     testImplementation platform("jakarta.platform:jakarta.jakartaee-bom:${jakartaVersion}")
     testImplementation "jakarta.platform:jakarta.jakartaee-api:${jakartaVersion}"
@@ -224,7 +224,7 @@ shadowJar {
             dep.moduleGroup == 'com.google.guava' &&
             (dep.moduleName == 'guava' && dep.moduleVersion == '31.0.1-jre')
         }
-        //exclude(dependency('com.google.guava:guava')) 
+        //exclude(dependency('com.google.guava:guava'))
         // Exclude test dependencies
         exclude(dependency('org.junit:.*'))
         exclude(dependency('org.testcontainers:.*'))
