@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { chakra, keyframes, usePrefersReducedMotion } from '@chakra-ui/react'
+import { chakra, usePrefersReducedMotion } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 
 import { EdgeLabel } from './EdgeLabel'
 import { grey } from '@mui/material/colors'
