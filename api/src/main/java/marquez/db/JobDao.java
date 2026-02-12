@@ -282,8 +282,8 @@ public interface JobDao extends BaseDao {
         .peek(
             j -> {
               List<Run> runs =
-                  runDao.findByLatestJob(
-                      j.getNamespace().getValue(), j.getName().getValue(), 10, 0);
+                  runDao.findCurrentRunByJob(
+                      j.getNamespace().getValue(), j.getName().getValue(), 1, 0);
               this.setJobData(runs, j);
             })
         .toList();

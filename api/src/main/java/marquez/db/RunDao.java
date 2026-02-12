@@ -511,9 +511,27 @@ public interface RunDao extends BaseDao {
       BASE_FIND_RUN_SQL
           + """
       WHERE r.uuid IN (
-        SELECT r.uuid FROM runs_view r
-        INNER JOIN jobs_view j ON j.namespace_name=r.namespace_name AND j.name=r.job_name
+        SELECT j.current_run_uuid FROM jobs_view j
         WHERE j.namespace_name=:namespace AND (j.name=:jobName OR j.name=ANY(j.aliases))
+      )
+      ORDER BY transitioned_at DESC, started_at DESC
+      LIMIT :limit OFFSET :offset
+      """)
+  List<Run> findCurrentRunByJob(String namespace, String jobName, int limit, int offset);
+
+  @SqlQuery(
+      BASE_FIND_RUN_SQL
+          + """
+      WHERE r.job_uuid IN (
+        SELECT j.uuid FROM jobs j
+        WHERE j.uuid IN (
+          SELECT jv.uuid FROM jobs_view jv
+          WHERE jv.namespace_name=:namespace AND (jv.name=:jobName OR jv.name=ANY(jv.aliases))
+        )
+        OR j.symlink_target_uuid IN (
+          SELECT jv.uuid FROM jobs_view jv
+          WHERE jv.namespace_name=:namespace AND (jv.name=:jobName OR jv.name=ANY(jv.aliases))
+        )
       )
       ORDER BY transitioned_at DESC, started_at DESC
       LIMIT :limit OFFSET :offset
