@@ -119,7 +119,7 @@
     "webpack-dev-server": "^4.15.0",
     "webpack-merge": "^5.9.0"
   },
-  "resolutions": {
+  "overrides": {
     "@types/react": "18.3.28",
     "d3-dispatch": "3.0.1",
     "@types/d3-dispatch": "3.0.6"
