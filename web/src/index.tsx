@@ -12,6 +12,7 @@ import './i18n/config'
 
 const container = document.getElementById('root');
 
-const root = ReactDOMClient.createRoot(container);
-
-root.render(<App />);
+if (container) {
+  const root = ReactDOMClient.createRoot(container);
+  root.render(<App />);
+}
