@@ -49,6 +49,7 @@
     "i18next-browser-languagedetector": "^7.0.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "package.json": "^2.0.1",
     "postcss-loader": "^7.3.0",
     "postcss-modules-values": "^4.0.0",
     "react": "18.3.1",
@@ -67,8 +68,9 @@
   },
   "devDependencies": {
     "@redux-devtools/extension": "^3.2.5",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.4.3",
     "@types/babel__core": "^7.20.0",
     "@types/babel__template": "^7.4.1",
@@ -118,6 +120,6 @@
     "webpack-merge": "^5.9.0"
   },
   "resolutions": {
-    "@types/react": "18.0.28"
+    "@types/react": "18.3.28"
   }
 }
