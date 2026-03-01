@@ -76,7 +76,6 @@
     "@types/babel__template": "^7.4.1",
     "@types/d3": "^7.4.0",
     "@types/d3-axis": "^3.0.2",
-    "@types/d3-dispatch": "^3.0.6",
     "@types/d3-format": "^3.0.1",
     "@types/d3-scale": "^4.0.3",
     "@types/d3-selection": "^3.0.5",
@@ -122,6 +121,7 @@
   },
   "resolutions": {
     "@types/react": "18.3.28",
+    "d3-dispatch": "3.0.1",
     "@types/d3-dispatch": "3.0.6"
   }
 }
