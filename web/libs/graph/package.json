@@ -31,7 +31,7 @@
     "@types/react-dom": "^18.0.6",
     "d3-interpolate": "^2.0.1",
     "d3-selection": "^2.0.0",
-    "d3-transition": "^2.0.0",
+    "d3-transition": "^3.0.1",
     "d3-zoom": "^2.0.0",
     "elkjs": "^0.8.2",
     "jest": "^27.5.1",
