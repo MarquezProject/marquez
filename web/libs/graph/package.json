@@ -12,7 +12,10 @@
     "tsc:validate": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@react-hook/size": "^2.1.2",
+    "framer-motion": "^12.35.1",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
