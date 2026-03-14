@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import SVG from 'react-inlinesvg'
 
 import { Link, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
