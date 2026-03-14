@@ -15,7 +15,7 @@ import { createElkNodes } from './layout'
 import { fetchLineage } from '../../store/actionCreators'
 import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
-import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import { ParentSize } from '@visx/responsive'
 import React, { useEffect, useRef, useState } from 'react'
 import TableLevelDrawer from './TableLevelDrawer'
 

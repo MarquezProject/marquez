@@ -15,7 +15,7 @@ import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import ColumnLevelDrawer from './ColumnLevelDrawer'
-import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import { ParentSize } from '@visx/responsive'
 import React, { useEffect, useRef, useState } from 'react'
 
 interface StateProps {

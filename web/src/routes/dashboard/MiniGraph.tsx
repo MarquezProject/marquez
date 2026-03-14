@@ -6,7 +6,7 @@ import { LineChart } from '@mui/x-charts'
 import { Skeleton } from '@mui/material'
 import { formatTime } from './StackedLineageEvents'
 import { theme } from '../../helpers/theme'
-import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import { ParentSize } from '@visx/responsive'
 import React from 'react'
 
 interface Props {
