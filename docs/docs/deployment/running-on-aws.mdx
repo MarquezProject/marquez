@@ -70,7 +70,7 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
    ```bash
    kubectl run pgsql-postgresql-client --rm --tty -i --restart='Never' \
      --namespace marquez \
-     --image docker.io/bitnami/postgresql:12-debian-10 \
+     --image docker.io/bitnamilegacy/postgresql:17.6.0-debian-12-r4 \
      --env="PGPASSWORD=<AWS-RDS-PASSWORD>" \
      --command -- psql marquez --host <AWS-RDS-HOST> -U <AWS-RDS-USERNAME> -d marquez -p 5432
    ```
@@ -82,7 +82,7 @@ Next, create an AWS RDS instance as outlined in the AWS RDS [documentation](http
 1. Get Marquez:
 
    ```bash
-   $ git clone git@github.com:MarquezProject/marquez.git && cd chart
+   $ git clone git@github.com:MarquezProject/marquez.git && cd marquez/chart/
    ```
 
 2. Install Marquez:
