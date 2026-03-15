@@ -3,9 +3,6 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
-      {
-        isolatedModules: 'true'
-      }
     ]
   },
   testRegex: '__tests__/(.+).(test|spec).tsx?',

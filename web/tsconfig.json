@@ -13,7 +13,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "resolveJsonModule": false
+    "resolveJsonModule": false,
+    "isolatedModules": true,
   },
   "include": [
     "./src/**/*",
