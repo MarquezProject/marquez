@@ -84,7 +84,7 @@ const ColumnLineageColumnNode = ({ node }: ColumnLineageColumnNodeProps & StateP
         }}
         x={8}
         y={16}
-        textAnchor='top'
+        textAnchor='start'
         fontSize={12}
         cursor={'pointer'}
         stroke={grey[400]}
