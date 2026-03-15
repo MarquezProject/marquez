@@ -12,11 +12,14 @@
     "tsc:validate": "tsc --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@react-hook/size": "^2.1.2",
+    "framer-motion": "^12.35.1",
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
-    "@chakra-ui/react": "^2",
+    "@chakra-ui/react": "^2.10.9",
     "elkjs": "^0.8.2",
     "react": "^18",
     "react-dom": "^18",
@@ -24,16 +27,15 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.4.3",
     "@types/jest": "^27.5.2",
-    "@types/react": "^18.0.15",
+    "@types/react": "^18.3.28",
     "@types/react-dom": "^18.0.6",
     "d3-interpolate": "^2.0.1",
     "d3-selection": "^2.0.0",
-    "d3-transition": "^2.0.0",
-    "d3-zoom": "^2.0.0",
+    "d3-transition": "^3.0.1",
+    "d3-zoom": "^3.0.0",
     "elkjs": "^0.8.2",
     "jest": "^27.5.1",
     "prettier": "^2.8.8",

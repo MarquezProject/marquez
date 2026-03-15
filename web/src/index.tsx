@@ -1,8 +1,9 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2026 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import * as React from 'react'
-import { createRoot } from 'react-dom/client'
+import * as ReactDOMClient from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import App from './components/App'
 
 // fonts
@@ -10,8 +11,13 @@ import './index.css'
 
 import './i18n/config'
 
-const container = document.getElementById('root')
+const container = document.getElementById('root');
+
 if (container) {
-  const root = createRoot(container)
-  root.render(<App />)
+  const root = ReactDOMClient.createRoot(container);
+  root.render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
 }
