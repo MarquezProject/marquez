@@ -3,8 +3,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Box, BoxProps } from '@chakra-ui/react'
 import { ZoomTransform, zoom as d3Zoom, zoomIdentity } from 'd3-zoom'
 import { useTheme } from '@emotion/react'
-import { Selection } from 'd3-selection'
-import { Transition } from 'd3-transition'
 
 import { Background } from './Background'
 import {
