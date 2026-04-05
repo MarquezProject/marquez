@@ -40,7 +40,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
-  const graphControls = useRef<ZoomPanControls>()
+  const graphControls = useRef<ZoomPanControls | null>(null)
 
   useEffect(() => {
     if (name && namespace) {

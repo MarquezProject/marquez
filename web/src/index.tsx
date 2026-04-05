@@ -4,7 +4,8 @@
 import * as React from 'react'
 import * as ReactDOMClient from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import App from './components/App'
+import App from './components/App';
+import { ChakraProvider } from '@chakra-ui/react';
 
 // fonts
 import './index.css'
@@ -17,7 +18,9 @@ if (container) {
   const root = ReactDOMClient.createRoot(container);
   root.render(
     <BrowserRouter>
-      <App />
+      <ChakraProvider>
+        <App />
+      </ChakraProvider>
     </BrowserRouter>
   );
 }

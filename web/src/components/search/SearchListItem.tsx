@@ -20,7 +20,7 @@ interface OwnProps {
   onClick: (nodeName: string) => void
 }
 
-const searchResultIcon: { [key in JobOrDataset]: JSX.Element } = {
+const searchResultIcon: { [key in JobOrDataset]: React.JSX.Element } = {
   JOB: <FontAwesomeIcon icon={faCog} color={theme.palette.primary.main} />,
   DATASET: <FontAwesomeIcon icon={faDatabase} color={theme.palette.info.main} />,
 }

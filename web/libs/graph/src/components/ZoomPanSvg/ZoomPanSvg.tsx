@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Box, BoxProps } from '@chakra-ui/react'
 import { ZoomTransform, zoom as d3Zoom, zoomIdentity } from 'd3-zoom'
 import { useTheme } from '@emotion/react'
+import { Selection } from 'd3-selection'
+import { Transition } from 'd3-transition'
 
 import { Background } from './Background'
 import {
@@ -183,7 +185,7 @@ export const ZoomPanSvg = ({
   /* ---- REFS ---- */
 
   const svgRef = useRef<SVGSVGElement>(null)
-  const zoomRef = useRef<SVGGElement>(null)
+  const zoomRef = useRef<SVGSVGElement>(null)
   const svgD3Selection = useD3Selection(svgRef)
   const zoomD3Selection = useD3Selection(zoomRef)
 
@@ -224,7 +226,7 @@ export const ZoomPanSvg = ({
     svgD3Selection
       ?.transition()
       .duration(animationDuration)
-      .call(d3Zoom<SVGSVGElement, unknown>().transform, transformConstrained)
+      .call(d3Zoom<any, any>().transform, transformConstrained)
   }
 
   // Reset to x:0, y:0, k:1
@@ -293,7 +295,7 @@ export const ZoomPanSvg = ({
 
       // Update the minimap without animation
       setCurrentZoomState(defaultZoom)
-      svgD3Selection?.call(d3Zoom<SVGSVGElement, unknown>().transform, defaultZoom)
+      svgD3Selection?.call(d3Zoom<any, any>().transform, defaultZoom)
     }
   }
 
@@ -416,7 +418,7 @@ export const ZoomPanSvg = ({
               backgroundColor={backgroundColor}
               dotGridColor={dotGridColor}
             />
-            {children}
+              {{children} as any}
           </>
         </g>
       </svg>

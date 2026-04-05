@@ -44,7 +44,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
   const [isCompact, setIsCompact] = useState(searchParams.get('isCompact') === 'true')
   const [isFull, setIsFull] = useState(searchParams.get('isFull') === 'true')
 
-  const graphControls = useRef<ZoomPanControls>()
+  const graphControls = useRef<ZoomPanControls | null>(null)
 
   const collapsedNodes = searchParams.get('collapsedNodes')
 
