@@ -124,6 +124,7 @@
   },
   "overrides": {
     "d3-dispatch": "3.0.1",
-    "@types/d3-dispatch": "3.0.6"
+    "@types/d3-dispatch": "3.0.6",
+    "typescript": "^5.9.3",
   }
 }
