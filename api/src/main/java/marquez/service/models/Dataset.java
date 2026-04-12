@@ -93,6 +93,11 @@ public abstract class Dataset {
     this.isDeleted = isDeleted;
   }
 
+  /** Returns the {@link NodeId} for this dataset, allowing direct queries to the Lineage API. */
+  public NodeId getNodeId() {
+    return NodeId.of(id);
+  }
+
   public Optional<Instant> getLastModifiedAt() {
     return Optional.ofNullable(lastModifiedAt);
   }
