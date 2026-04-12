@@ -7,7 +7,7 @@ import { Selection, select } from 'd3-selection'
  * A hook to create a d3 selection from a React ref.
  * @param ref  - a React.RefObject
  */
-export const useD3Selection = <T extends SVGElement | HTMLElement = SVGElement>(
+export const useD3Selection = <T extends SVGSVGElement | SVGElement | HTMLElement | null = SVGElement>(
   ref: React.RefObject<T>
 ) => {
   const [selection, setSelection] = useState<Selection<T, unknown, null, unknown>>()

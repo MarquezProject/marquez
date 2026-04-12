@@ -15,7 +15,7 @@ import { useCallbackRef } from '../../helpers/hooks'
 import { useParams, useSearchParams } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import ColumnLevelDrawer from './ColumnLevelDrawer'
-import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import { ParentSize } from '@visx/responsive'
 import React, { useEffect, useRef, useState } from 'react'
 
 interface StateProps {
@@ -40,7 +40,7 @@ const ColumnLevel: React.FC<ColumnLevelProps> = ({
 
   const [depth, setDepth] = useState(Number(searchParams.get('depth')) || 2)
 
-  const graphControls = useRef<ZoomPanControls>()
+  const graphControls = useRef<ZoomPanControls | null>(null)
 
   useEffect(() => {
     if (name && namespace) {

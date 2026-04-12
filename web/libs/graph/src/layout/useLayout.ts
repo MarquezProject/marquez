@@ -73,10 +73,10 @@ export const useLayout = <K, D>({
 }: Props<K, D>): Output<K, D> => {
   /* STATE */
   // Layout is stored in a ref to support `keepPreviousGraph`.
-  const layoutRef = useRef<Output<K, D>['layout']>()
+  const layoutRef = useRef<Output<K, D>['layout']>(undefined)
 
   // The graph we want rendered in the layout.
-  const elkInputRef = useRef<ElkNode>()
+  const elkInputRef = useRef<ElkNode>(undefined)
 
   // After the elk async layout completes, it stores the root node.
   const [elkOutput, setElkOutput] = useState<ElkNode>()

@@ -1,8 +1,7 @@
-// Copyright 2018-2023 contributors to the Marquez project
+// Copyright 2018-2026 contributors to the Marquez project
 // SPDX-License-Identifier: Apache-2.0
 
 import React from 'react'
-import SVG from 'react-inlinesvg'
 
 import { Link, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
@@ -20,8 +19,8 @@ import { MqInputNoIcon } from '../core/input-base/MqInputBase'
 import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
-import iconSearchArrow from '../../img/iconSearchArrow.svg'
-import marquez_logo from './marquez-icon-white-solid.svg'
+import { ReactComponent as IconSearchArrow } from '../../img/iconSearchArrow.svg'
+import { ReactComponent as marquez_logo } from './marquez-icon-white-solid.svg'
 
 interface SidenavProps {}
 
@@ -107,7 +106,7 @@ const Sidenav: React.FC<SidenavProps> = () => {
             title={i18next.t('sidenav.events')}
             active={location.pathname === '/events'}
           >
-            <SVG src={iconSearchArrow} width={'20px'} />
+            <IconSearchArrow style={{ width: '20px'}} />
           </MqIconButton>
         </Box>
         <FormControl

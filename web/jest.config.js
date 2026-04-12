@@ -3,9 +3,6 @@ module.exports = {
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
-      {
-        isolatedModules: 'true'
-      }
     ]
   },
   testRegex: '__tests__/(.+).(test|spec).tsx?',
@@ -28,5 +25,6 @@ module.exports = {
     '\\.(css|less)$': 'identity-obj-proxy',
     "d3": "<rootDir>/node_modules/d3/dist/d3.min.js",
     "^d3-(.*)$": "<rootDir>/node_modules/d3-$1/dist/d3-$1.min.js"
-  }
+  },
+  transformIgnorePatterns: ['node_modules/(?!(d3-dispatch)/)']
 }

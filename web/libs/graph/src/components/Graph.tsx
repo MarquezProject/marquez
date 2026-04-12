@@ -55,8 +55,8 @@ export const Graph = <K, D>({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setZoomPanControls = () => {},
 }: Props<K, D>) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [containerWidth, containerHeight] = useSize(containerRef)
+  const containerRef = useRef<HTMLElement>(null)
+  const [containerWidth, containerHeight] = useSize(containerRef.current!)
 
   const { layout, error, isRendering } = useLayout<K, D>({
     id,

@@ -1,6 +1,10 @@
+// Copyright 2018-2026 contributors to the Marquez project
+// SPDX-License-Identifier: Apache-2.0
+
 import React from 'react'
 
-import { chakra, keyframes, usePrefersReducedMotion } from '@chakra-ui/react'
+import { chakra, usePrefersReducedMotion } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
 
 import { EdgeLabel } from './EdgeLabel'
 import { grey } from '@mui/material/colors'

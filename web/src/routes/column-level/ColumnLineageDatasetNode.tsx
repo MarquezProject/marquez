@@ -46,7 +46,7 @@ export const ColumnLineageDatasetNode = ({ node }: ColumnLineageDatasetNodeProps
       <text
         x={16}
         y={24}
-        textAnchor='top'
+        textAnchor='start'
         fontSize={14}
         stroke={'white'}
         cursor={'pointer'}

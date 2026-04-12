@@ -9,7 +9,7 @@ import { sum } from 'lodash'
 import { theme } from '../../helpers/theme'
 import Box from '@mui/system/Box'
 import MqText from '../../components/core/text/MqText'
-import ParentSize from '@visx/responsive/lib/components/ParentSize'
+import { ParentSize } from '@visx/responsive'
 import React from 'react'
 
 interface Props {
