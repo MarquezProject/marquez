@@ -23,6 +23,7 @@ import lombok.ToString;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
 import marquez.common.models.DatasetType;
+import marquez.common.models.DatasetVersionId;
 import marquez.common.models.Field;
 import marquez.common.models.NamespaceName;
 import marquez.common.models.SourceName;
@@ -87,6 +88,16 @@ public abstract class DatasetVersion {
     this.currentSchemaVersion = currentSchemaVersion;
     this.createdByRun = createdByRun;
     this.facets = (facets == null) ? ImmutableMap.of() : facets;
+  }
+
+  /**
+   * Returns the {@link NodeId} for this dataset version, allowing direct queries to the Lineage
+   * API. The returned nodeId includes the version UUID (e.g., {@code
+   * dataset:namespace:name#version}).
+   */
+  public NodeId getNodeId() {
+    return NodeId.of(
+        new DatasetVersionId(id.getNamespace(), id.getName(), version.getValue()));
   }
 
   public Optional<String> getDescription() {
