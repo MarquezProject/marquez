@@ -96,7 +96,7 @@ services:
       - marquez
 
   postgres:
-    image: bitnami/postgresql:12.1.0
+    image: bitnami/postgresql:14.0.0
     ports:
       - "5432:5432"
     environment:
