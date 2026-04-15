@@ -90,6 +90,11 @@ public final class Job {
     this.tags = (tags == null) ? ImmutableSet.of() : tags;
   }
 
+  /** Returns the {@link NodeId} for this job, allowing direct queries to the Lineage API. */
+  public NodeId getNodeId() {
+    return NodeId.of(id);
+  }
+
   public Optional<URL> getLocation() {
     return Optional.ofNullable(location);
   }
