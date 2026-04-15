@@ -343,6 +343,32 @@ class MarquezClient:
         Utils.is_valid_uuid(run_id, 'run_id')
         return self._get(self._url('/jobs/runs/{0}', run_id))
 
+    def get_lineage(self, node_id, depth=None):
+        """Fetch the lineage graph for a given node.
+
+        Returns the lineage graph (upstream and downstream datasets and jobs)
+        for the specified node ID. The node ID format is:
+            - For datasets: "dataset:<namespace>:<name>"
+            - For jobs: "job:<namespace>:<name>"
+
+        Args:
+            node_id: The node identifier to fetch lineage for.
+            depth: The maximum depth of the lineage graph (default: 20).
+
+        Returns:
+            A dict representing the lineage graph with nodes and edges.
+        """
+        if not node_id:
+            raise ValueError('node_id must not be None')
+
+        return self._get(
+            self._url('/lineage'),
+            params={
+                'nodeId': node_id,
+                'depth': depth or DEFAULT_DEPTH
+            }
+        )
+
     def get_column_lineage_by_dataset(
             self,
             namespace,
