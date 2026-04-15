@@ -10,12 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.net.URL;
 import java.time.Instant;
 import java.util.UUID;
 import marquez.common.models.DatasetId;
 import marquez.common.models.DatasetName;
-import marquez.common.models.DatasetType;
 import marquez.common.models.JobId;
 import marquez.common.models.JobName;
 import marquez.common.models.JobType;
@@ -45,7 +43,6 @@ class NodeIdOnModelsTest {
             SourceName.of("test-source"),
             ImmutableList.of(),
             ImmutableSet.of(),
-            null,
             null,
             null,
             null,
