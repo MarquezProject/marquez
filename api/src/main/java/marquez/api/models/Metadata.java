@@ -11,6 +11,7 @@ import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.collect.ImmutableSet;
 import io.openlineage.server.OpenLineage;
+import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.net.URL;
 import java.time.Instant;
@@ -19,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

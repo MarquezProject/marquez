@@ -36,6 +36,7 @@ import marquez.db.models.ColumnLineageNodeData;
 import marquez.db.models.InputFieldNodeData;
 import marquez.db.models.UpdateLineageRow;
 import marquez.jdbi.MarquezJdbiExternalPostgresExtension;
+import marquez.service.exceptions.NodeIdNotFoundException;
 import marquez.service.models.ColumnLineageInputField;
 import marquez.service.models.Dataset;
 import marquez.service.models.Lineage;
@@ -59,9 +60,9 @@ public class ColumnLineageServiceTest {
   private static ColumnLineageService lineageService;
   private static LineageEvent.JobFacet jobFacet;
 
-  private LineageEvent.Dataset dataset_A = getDatasetA();
-  private LineageEvent.Dataset dataset_B = getDatasetB();
-  private LineageEvent.Dataset dataset_C = getDatasetC();
+  private final LineageEvent.Dataset dataset_A = getDatasetA();
+  private final LineageEvent.Dataset dataset_B = getDatasetB();
+  private final LineageEvent.Dataset dataset_C = getDatasetC();
 
   @BeforeAll
   public static void setUpOnce(Jdbi jdbi) {
@@ -80,8 +81,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testLineageByDatasetFieldId() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     Lineage lineage =
         lineageService.lineage(
@@ -137,8 +138,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testLineageByDatasetId() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     Lineage lineageByField =
         lineageService.lineage(
@@ -161,8 +162,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testLineageWhenLineageEmpty() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     assertThrows(
         NodeIdNotFoundException.class,
@@ -188,8 +189,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testEnrichDatasets() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
     Dataset dataset_c = datasetDao.findDatasetByName("namespace", "dataset_c").get();
@@ -222,8 +223,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testGetLineageWithDownstream() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     Lineage lineage =
         lineageService.lineage(
@@ -253,8 +254,8 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testEnrichDatasetsHasNoDuplicates() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     Dataset dataset_b = datasetDao.findDatasetByName("namespace", "dataset_b").get();
     lineageService.enrichWithColumnLineage(Arrays.asList(dataset_b));
@@ -293,10 +294,15 @@ public class ColumnLineageServiceTest {
 
   @Test
   public void testGetLineagePointInTime() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
     UpdateLineageRow lineageRow =
-        createLineage(openLineageDao, dataset_A, dataset_B); // we will obtain this version
-    createLineage(openLineageDao, dataset_A, dataset_B);
+        createLineage(
+            openLineageDao,
+            "job1",
+            "COMPLETE",
+            dataset_A,
+            dataset_B); // we will obtain this version
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_A, dataset_B);
 
     Lineage lineage =
         lineageService.lineage(

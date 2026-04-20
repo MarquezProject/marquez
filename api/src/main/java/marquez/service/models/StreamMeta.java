@@ -9,8 +9,8 @@ import static marquez.common.models.DatasetType.STREAM;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import jakarta.annotation.Nullable;
 import java.net.URL;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

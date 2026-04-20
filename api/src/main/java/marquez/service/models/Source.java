@@ -9,10 +9,10 @@ import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import jakarta.annotation.Nullable;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.Value;
 import marquez.common.models.SourceName;

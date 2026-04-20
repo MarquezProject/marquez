@@ -6,10 +6,10 @@
 package marquez.api;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.annotation.Nullable;
+import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.Optional;
-import javax.annotation.Nullable;
-import javax.ws.rs.core.UriInfo;
 import lombok.NonNull;
 import marquez.api.exceptions.DatasetNotFoundException;
 import marquez.api.exceptions.FieldNotFoundException;

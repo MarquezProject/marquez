@@ -34,6 +34,7 @@ import static marquez.client.MarquezPathV1.sourcePath;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +43,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 import lombok.NonNull;
 import marquez.client.models.NodeId;
 import marquez.client.models.RunState;

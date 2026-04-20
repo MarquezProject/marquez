@@ -7,7 +7,7 @@ package marquez.api.exceptions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
 import marquez.common.models.Version;
 
 public final class JobVersionNotFoundException extends NotFoundException {

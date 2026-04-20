@@ -55,6 +55,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
   private final RunService runService;
   private final DatasetVersionDao datasetVersionDao;
   private final ObjectMapper mapper = Utils.newObjectMapper();
+  private final DenormalizedLineageService denormalizedLineageService;
 
   private final Executor executor;
 
@@ -66,6 +67,7 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
     super(baseDao.createOpenLineageDao());
     this.runService = runService;
     this.datasetVersionDao = baseDao.createDatasetVersionDao();
+    this.denormalizedLineageService = new DenormalizedLineageService(baseDao.getHandle().getJdbi());
     this.executor = executor;
   }
 
@@ -151,6 +153,24 @@ public class OpenLineageService extends DelegatingDaos.DelegatingOpenLineageDao 
                     }
                     buildJobInputUpdate(update).ifPresent(runService::notify);
                     buildRunTransition(update).ifPresent(runService::notify);
+
+                    // Trigger denormalized lineage population as the last step for completed runs
+                    if (event.getEventType().equalsIgnoreCase("COMPLETE")) {
+                      CompletableFuture.runAsync(
+                          withSentry(
+                              withMdc(
+                                  () -> {
+                                    try {
+                                      denormalizedLineageService.populateLineageForRun(runUuid);
+                                    } catch (Exception e) {
+                                      log.error(
+                                          "Failed to populate denormalized lineage for run: {}",
+                                          runUuid,
+                                          e);
+                                    }
+                                  })),
+                          executor);
+                    }
                   }
                 });
 
