@@ -4,7 +4,7 @@ Python client for [Marquez](https://github.com/MarquezProject/marquez).
 
 ## Documentation
 
-See the [API docs](https://marquezproject.github.io/marquez/openapi.html).
+See the [API docs](https://marquezproject.ai/openapi.html).
 
 ## Requirements
 
