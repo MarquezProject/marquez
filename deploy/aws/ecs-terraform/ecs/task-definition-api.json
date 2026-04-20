@@ -1,0 +1,97 @@
+{
+  "family": "marquez-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "marquez-api",
+      "image": "${ECR_REPOSITORY_URI}:${IMAGE_TAG}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        },
+        {
+          "containerPort": 5001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "MARQUEZ_PORT",
+          "value": "5000"
+        },
+        {
+          "name": "MARQUEZ_ADMIN_PORT",
+          "value": "5001"
+        },
+        {
+          "name": "POSTGRES_HOST",
+          "value": "${RDS_ENDPOINT}"
+        },
+        {
+          "name": "POSTGRES_PORT",
+          "value": "5432"
+        },
+        {
+          "name": "POSTGRES_DB",
+          "value": "marquez"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "value": "marquez"
+        },
+        {
+          "name": "MIGRATE_ON_STARTUP",
+          "value": "true"
+        },
+        {
+          "name": "SEARCH_ENABLED",
+          "value": "${SEARCH_ENABLED}"
+        },
+        {
+          "name": "SEARCH_HOST",
+          "value": "${OPENSEARCH_ENDPOINT}"
+        },
+        {
+          "name": "SEARCH_PORT",
+          "value": "443"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "POSTGRES_PASSWORD",
+          "valueFrom": "${DB_PASSWORD_SECRET_ARN}"
+        },
+        {
+          "name": "SEARCH_USERNAME",
+          "valueFrom": "${OPENSEARCH_USERNAME_SECRET_ARN}"
+        },
+        {
+          "name": "SEARCH_PASSWORD",
+          "valueFrom": "${OPENSEARCH_PASSWORD_SECRET_ARN}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/marquez-api",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:5001/healthcheck || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

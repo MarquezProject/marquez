@@ -1,0 +1,36 @@
+{
+  "serviceName": "marquez-api",
+  "taskDefinition": "marquez-api",
+  "desiredCount": 2,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["${PRIVATE_SUBNET_1}", "${PRIVATE_SUBNET_2}"],
+      "securityGroups": ["${API_SECURITY_GROUP}"],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "${API_TARGET_GROUP_ARN}",
+      "containerName": "marquez-api",
+      "containerPort": 5000
+    },
+    {
+      "targetGroupArn": "${API_ADMIN_TARGET_GROUP_ARN}",
+      "containerName": "marquez-api",
+      "containerPort": 5001
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 60,
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 100,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  },
+  "enableECSManagedTags": true,
+  "propagateTags": "SERVICE"
+}

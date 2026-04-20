@@ -19,5 +19,6 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/api/build/libs/marquez-*.jar /usr/src/app
 COPY marquez.dev.yml marquez.dev.yml
 COPY docker/entrypoint.sh entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
 EXPOSE 5000 5001
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]

@@ -1,0 +1,31 @@
+{
+  "serviceName": "marquez-web",
+  "taskDefinition": "marquez-web",
+  "desiredCount": 2,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["${PRIVATE_SUBNET_1}", "${PRIVATE_SUBNET_2}"],
+      "securityGroups": ["${WEB_SECURITY_GROUP}"],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "${WEB_TARGET_GROUP_ARN}",
+      "containerName": "marquez-web",
+      "containerPort": 3000
+    }
+  ],
+  "healthCheckGracePeriodSeconds": 60,
+  "deploymentConfiguration": {
+    "maximumPercent": 200,
+    "minimumHealthyPercent": 100,
+    "deploymentCircuitBreaker": {
+      "enable": true,
+      "rollback": true
+    }
+  },
+  "enableECSManagedTags": true,
+  "propagateTags": "SERVICE"
+}

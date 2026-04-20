@@ -9,9 +9,9 @@ server:
 
 db:
   driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/marquez
-  user: marquez
-  password: marquez
+  url: jdbc:postgresql://${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-marquez}
+  user: ${POSTGRES_USER:-marquez}
+  password: ${POSTGRES_PASSWORD:-marquez}
 
 migrateOnStartup: true
 

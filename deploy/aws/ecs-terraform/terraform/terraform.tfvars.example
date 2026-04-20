@@ -1,0 +1,42 @@
+# Terraform Variables Configuration Example
+# Copy this file to terraform.tfvars and update with your values
+
+# Environment Configuration
+environment = "sandbox"  # Options: sandbox, dev, staging, production
+project_name = "marquez"
+region = "us-east-1"
+
+# Network Configuration
+vpc_cidr = "10.1.0.0/16"  # Use different CIDR for each environment
+availability_zones_count = 2  # Number of AZs to use (2 for dev, 3+ for production)
+
+# NAT Gateway Configuration
+enable_nat_gateway = true
+nat_gateway_count = 1  # 1 for sandbox/dev (cost optimization), 2 for production (HA)
+
+# Database Configuration
+database_instance_class = "db.t3.micro"  # db.t3.micro for sandbox, db.t3.small+ for production
+database_allocated_storage = 20  # 20GB for sandbox, 100GB+ for production
+database_multi_az = false  # false for sandbox/dev, true for production
+backup_retention_period = 1  # 1 day for sandbox, 7-30 days for production
+
+# ECS Configuration
+ecs_task_cpu = "512"  # 512 for sandbox, 1024+ for production
+ecs_task_memory = "1024"  # 1024 for sandbox, 2048+ for production
+ecs_service_desired_count = 1  # 1 for sandbox, 2+ for production
+
+# Security Configuration
+enable_deletion_protection = false  # false for sandbox/dev, true for production
+
+# Database Password (sensitive - use environment variable or AWS Secrets Manager)
+# db_password = "your-secure-password-here"
+
+# OpenSearch Integration
+opensearch_enabled = false  # Enable if using OpenSearch for search functionality
+
+# Tags
+tags = {
+  Owner = "your-team"
+  CostCenter = "engineering"
+  Terraform = "true"
+}
