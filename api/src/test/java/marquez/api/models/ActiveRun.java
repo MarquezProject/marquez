@@ -10,12 +10,12 @@ import static io.openlineage.client.OpenLineage.RunEvent.EventType.START;
 
 import io.openlineage.client.OpenLineage;
 import io.openlineage.client.OpenLineageClient;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 

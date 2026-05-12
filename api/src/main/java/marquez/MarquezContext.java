@@ -8,7 +8,6 @@ package marquez;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import graphql.kickstart.servlet.GraphQLHttpServlet;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -110,7 +109,7 @@ public final class MarquezContext {
   @Getter private final ImmutableList<Object> resources;
   @Getter private final JdbiExceptionExceptionMapper jdbiException;
   @Getter private final JsonProcessingExceptionMapper jsonException;
-  @Getter private final GraphQLHttpServlet graphqlServlet;
+  @Getter private final jakarta.servlet.Servlet graphqlServlet;
   @Getter private final SearchConfig searchConfig;
 
   private MarquezContext(

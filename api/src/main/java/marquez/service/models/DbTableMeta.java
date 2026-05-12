@@ -9,7 +9,7 @@ import static marquez.common.models.DatasetType.DB_TABLE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import marquez.common.models.DatasetName;

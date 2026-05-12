@@ -7,10 +7,10 @@ package marquez.db;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

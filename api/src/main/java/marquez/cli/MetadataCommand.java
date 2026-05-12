@@ -14,8 +14,8 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 import com.google.common.collect.ImmutableList;
-import io.dropwizard.cli.Command;
-import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.core.cli.Command;
+import io.dropwizard.core.setup.Bootstrap;
 import io.openlineage.client.OpenLineage;
 import java.io.FileWriter;
 import java.io.IOException;

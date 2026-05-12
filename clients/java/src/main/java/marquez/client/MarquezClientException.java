@@ -5,7 +5,7 @@
 
 package marquez.client;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import lombok.NoArgsConstructor;
 
 /** An exception thrown to indicate a client error. */

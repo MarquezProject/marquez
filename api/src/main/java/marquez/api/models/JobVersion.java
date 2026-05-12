@@ -5,11 +5,11 @@
 
 package marquez.api.models;
 
+import jakarta.annotation.Nullable;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;

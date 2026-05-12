@@ -237,8 +237,9 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineage() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_B, dataset_C);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
     Set<ColumnLineageNodeData> lineage = getColumnLineage(lineageRow, "col_d");
 
     assertEquals(2, lineage.size());
@@ -283,8 +284,9 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineageWhenNoLineageForColumn() {
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
 
     UpdateLineageRow.DatasetRecord datasetRecord_a = lineageRow.getInputs().get().get(0);
     UUID field_col_a = fieldDao.findUuid(datasetRecord_a.getDatasetRow().getUuid(), "col_a").get();
@@ -325,9 +327,10 @@ public class ColumnLineageDaoTest {
                                     "")))))
                 .build());
 
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_D);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job3", "COMPLETE", dataset_C, dataset_D);
 
     UpdateLineageRow.DatasetRecord datasetRecord_d = lineageRow.getOutputs().get().get(0);
     UUID field_col_e = fieldDao.findUuid(datasetRecord_d.getDatasetRow().getUuid(), "col_e").get();
@@ -370,9 +373,10 @@ public class ColumnLineageDaoTest {
                                     "type3")))))
                 .build());
 
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_B, dataset_C);
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_C, dataset_A);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_B, dataset_C);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job3", "COMPLETE", dataset_C, dataset_A);
 
     UpdateLineageRow.DatasetRecord datasetRecord_a = lineageRow.getOutputs().get().get(0);
     UpdateLineageRow.DatasetRecord datasetRecord_c = lineageRow.getInputs().get().get(0);
@@ -410,7 +414,7 @@ public class ColumnLineageDaoTest {
         .getAdditionalFacets()
         .get("col_c")
         .setInputFields(Collections.singletonList(fields.get(0)));
-    createLineage(openLineageDao, getDatasetA(), datasetWithColAAsInputField);
+    createLineage(openLineageDao, "job1", "COMPLETE", getDatasetA(), datasetWithColAAsInputField);
 
     Dataset datasetWithColBAsInputField = getDatasetB();
     datasetWithColBAsInputField
@@ -421,7 +425,8 @@ public class ColumnLineageDaoTest {
         .get("col_c")
         .setInputFields(Collections.singletonList(fields.get(1)));
     UpdateLineageRow lineageRow =
-        createLineage(openLineageDao, getDatasetA(), datasetWithColBAsInputField);
+        createLineage(
+            openLineageDao, "job1", "COMPLETE", getDatasetA(), datasetWithColBAsInputField);
 
     // assert input fields for col_c contain col_a and col_b
     List<String> inputFields =
@@ -436,7 +441,8 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineagePointInTime() {
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
 
     UpdateLineageRow.DatasetRecord datasetRecord_b = lineageRow.getOutputs().get().get(0);
     UUID field_col_b = fieldDao.findUuid(datasetRecord_b.getDatasetRow().getUuid(), "col_c").get();
@@ -465,9 +471,10 @@ public class ColumnLineageDaoTest {
 
   @Test
   void testGetLineageWhenJobRunMultipleTimes() {
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    createLineage(openLineageDao, dataset_A, dataset_B);
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, dataset_B);
+    createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
+    createLineage(openLineageDao, "job2", "COMPLETE", dataset_A, dataset_B);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, dataset_B);
 
     Set<ColumnLineageNodeData> columnLineage = getColumnLineage(lineageRow, "col_c");
     assertThat(columnLineage).hasSize(1);
@@ -485,7 +492,8 @@ public class ColumnLineageDaoTest {
     Dataset datasetWithNullDataType = getDatasetB();
     datasetWithNullDataType.getFacets().getSchema().getFields().get(0).setType(null);
 
-    UpdateLineageRow lineageRow = createLineage(openLineageDao, dataset_A, datasetWithNullDataType);
+    UpdateLineageRow lineageRow =
+        createLineage(openLineageDao, "job1", "COMPLETE", dataset_A, datasetWithNullDataType);
     getColumnLineage(lineageRow, "col_c");
   }
 
@@ -508,7 +516,7 @@ public class ColumnLineageDaoTest {
         .getAdditionalFacets()
         .get("col_c")
         .setInputFields(Collections.singletonList(fields.get(0)));
-    createLineage(openLineageDao, getDatasetA(), datasetWithColAAsInputField);
+    createLineage(openLineageDao, "job1", "COMPLETE", getDatasetA(), datasetWithColAAsInputField);
 
     Dataset datasetWithColBAsInputField = getDatasetB();
     datasetWithColBAsInputField
@@ -518,7 +526,7 @@ public class ColumnLineageDaoTest {
         .getAdditionalFacets()
         .get("col_c")
         .setInputFields(Collections.singletonList(fields.get(1)));
-    createLineage(openLineageDao, getDatasetA(), datasetWithColBAsInputField);
+    createLineage(openLineageDao, "job1", "COMPLETE", getDatasetA(), datasetWithColBAsInputField);
 
     List<InputFieldNodeData> inputFields =
         dao
