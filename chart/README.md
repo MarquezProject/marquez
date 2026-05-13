@@ -122,10 +122,22 @@ helm delete marquez
 |-----------------------|------------------------------------|---------|
 | `ingress.enabled`     | Enables ingress settings           | `false` |
 | `ingress.annotations` | Annotations applied to ingress     | `nil`   |
-| `ingress.hosts`       | Hostname applied to ingress routes | `nil`   |
-| `ingress.tls`         | TLS settings for hostname          | `nil`   |
+| `ingress.hosts`       | Hostname applied to ingress routes | `nil`       |
+| `ingress.tls`         | TLS settings for hostname          | `nil`       |
+
+### [External Secrets Operator](https://external-secrets.io/) **parameters**
+
+| Parameter                                     | Description                                                             | Default             |
+|-----------------------------------------------|-------------------------------------------------------------------------|---------------------|
+| `externalSecrets.enabled`                     | Enable ExternalSecret resource creation                                 | `false`             |
+| `externalSecrets.secretStoreName`             | Name of the SecretStore or ClusterSecretStore                           | `my-secret-store`   |
+| `externalSecrets.secretStoreKind`             | Kind of the SecretStore (SecretStore or ClusterSecretStore)             | `SecretStore`       |
+| `externalSecrets.refreshInterval`             | How often the secret should be refreshed                                | `1h`                |
+| `externalSecrets.auth.password.remoteKey`     | Remote key in the external secret store for the database password       | `marquez/db/password` |
+| `externalSecrets.auth.password.remoteProperty`| Property in the external secret store (if the key is a JSON object)     | `""`                |
 
 ## Local Installation Guide
+
 
 ### Helm Managed Postgres
 

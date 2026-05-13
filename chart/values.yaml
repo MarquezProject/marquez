@@ -212,3 +212,23 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+
+## External Secrets Operator integration
+## ref: https://external-secrets.io/
+externalSecrets:
+  ## @param externalSecrets.enabled Enable ExternalSecret resource creation
+  enabled: false
+  ## @param externalSecrets.secretStoreName Name of the SecretStore or ClusterSecretStore
+  secretStoreName: "my-secret-store"
+  ## @param externalSecrets.secretStoreKind Kind of the SecretStore (SecretStore or ClusterSecretStore)
+  secretStoreKind: "SecretStore"
+  ## @param externalSecrets.refreshInterval How often the secret should be refreshed
+  refreshInterval: "1h"
+  ## Authentication parameters to be fetched from external secret store
+  auth:
+    ## @param externalSecrets.auth.password.remoteKey Remote key in the external secret store for the database password
+    password:
+      remoteKey: "marquez/db/password"
+      ## @param externalSecrets.auth.password.remoteProperty Property in the external secret store (if the key is a JSON object)
+      remoteProperty: ""
