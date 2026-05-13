@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.50.0...HEAD)
 
+### Added
+
+* Chart: Add External Secrets Operator (ESO) integration to manage PostgreSQL passwords
+
 ## [0.50.0](https://github.com/MarquezProject/marquez/compare/0.49.0...0.50.0) - 2024-10-23
 
 ### Added
