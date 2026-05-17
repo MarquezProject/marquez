@@ -222,7 +222,7 @@ public final class NodeId implements Comparable<NodeId> {
       return parts;
     } else {
       // try to avoid matching colons in URIs- e.g., scheme://authority and host:port patterns
-      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+))");
+      Pattern p = Pattern.compile("(?:" + ID_DELIM + "(?!//|\\d+(?:/|$)))");
       Matcher matcher = p.matcher(value);
       String[] returnParts = new String[expectedParts];
 

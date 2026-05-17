@@ -21,6 +21,7 @@ public class NodeIdTest {
       value = {
         "my-namespace$my-dataset",
         "gs://bucket$/path/to/data",
+        "s3://mybucket$3d801.temp/table",
         "postgresql://hostname:5432/database$my_table",
         "my-namespace$my_struct<a:bigint,b:bigint,c:string>"
       },
@@ -38,7 +39,9 @@ public class NodeIdTest {
       value = {
         "my-namespace$my-dataset$colA",
         "gs://bucket$/path/to/data$colA",
-        "gs://bucket$/path/to/data$col_A"
+        "gs://bucket$/path/to/data$col_A",
+        "s3://mybucket$3d801.temp/table$colA",
+        "s3://mybucket$3d801.temp/table$col_A"
       },
       delimiter = '$')
   public void testDatasetField(String namespace, String dataset, String field) {
@@ -90,6 +93,8 @@ public class NodeIdTest {
       value = {
         "my-namespace$my-dataset#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "gs://bucket$/path/to/data#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$3d801.temp/table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$/3d801.temp/table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "postgresql://hostname:5432/database$my_table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "my-namespace$my_struct<a:bigint,b:bigint,c:string>#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
       },
@@ -113,7 +118,9 @@ public class NodeIdTest {
       value = {
         "my-namespace$my-dataset$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "gs://bucket$/path/to/data$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-        "gs://bucket$/path/to/data$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+        "gs://bucket$/path/to/data$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$3d801.temp/table$colA#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$/3d801.temp/table$col_A#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
       },
       delimiter = '$')
   public void testDatasetFieldWithVersion(
