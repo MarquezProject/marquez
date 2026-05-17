@@ -71,6 +71,7 @@ class NodeIdTest {
       value = {
         "my-namespace$my-dataset",
         "gs://bucket$/path/to/data",
+        "s3://mybucket$3d801.temp/table",
         "postgresql://hostname:5432/database$my_table",
         "my-namespace$my_struct<a:bigint,b:bigint,c:string>"
       },
@@ -95,6 +96,8 @@ class NodeIdTest {
       value = {
         "my-namespace$my-dataset#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "gs://bucket$/path/to/data#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$3d801.temp/table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "s3://mybucket$/3d801.temp/table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "postgresql://hostname:5432/database$my_table#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
         "my-namespace$my_struct<a:bigint,b:bigint,c:string>#aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
       },
