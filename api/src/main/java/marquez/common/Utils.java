@@ -339,6 +339,12 @@ public final class Utils {
   }
 
   private static Version newDatasetVersionFor(DatasetVersionData data) {
+    // Note: runId is intentionally excluded from the hash. A DatasetVersion identifies the
+    // *content* of a dataset (its namespace, source, physical name, schema, and lifecycle
+    // state) - not the run that produced it. Including runId here would mean a brand new
+    // DatasetVersion is minted on every single run even when the dataset itself hasn't
+    // changed, causing unbounded growth of dataset_versions/dataset_versions_field_mapping
+    // rows for datasets written by high-frequency jobs (see #3082).
     final byte[] bytes =
         VERSION_JOINER
             .join(
@@ -348,8 +354,7 @@ public final class Utils {
                 data.getPhysicalName(),
                 data.getSchemaLocation(),
                 data.getFields().stream().map(Utils::joinField).collect(joining(VERSION_DELIM)),
-                data.getLifecycleState(),
-                data.getRunId())
+                data.getLifecycleState())
             .getBytes(UTF_8);
     return Version.of(UUID.nameUUIDFromBytes(bytes));
   }

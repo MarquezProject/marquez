@@ -287,6 +287,42 @@ public class UtilsTest {
   }
 
   @Test
+  public void testDatasetVersionEqualAcrossDifferentRunsWithSameDatasetContent() {
+    // A DatasetVersion identifies the *content* (schema, physical name, lifecycle state, etc.) of
+    // a dataset. Two runs writing the exact same dataset content should therefore produce the
+    // *same* DatasetVersion, even though the runs themselves have different runIds. Including
+    // runId in the hash causes a new DatasetVersion to be created on every run, even when nothing
+    // about the dataset changed (see: https://github.com/MarquezProject/marquez/issues/3082).
+    final NamespaceName namespaceName = newNamespaceName();
+    DatasetName datasetName = newDatasetName();
+    DatasetName physicalName = newDatasetName();
+    SourceName sourceName = newSourceName();
+    String lifecycleState = newLifecycleState();
+    List<LineageEvent.SchemaField> schemaFields = newSchemaFields(2);
+
+    Version first =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            lifecycleState,
+            schemaFields,
+            newRunId().getValue());
+    Version second =
+        Utils.newDatasetVersionFor(
+            namespaceName.getValue(),
+            sourceName.getValue(),
+            physicalName.getValue(),
+            datasetName.getValue(),
+            lifecycleState,
+            schemaFields,
+            newRunId().getValue());
+
+    assertThat(first).isEqualTo(second);
+  }
+
+  @Test
   public void testDatasetVersionForDBTableMetaDataIsNotEqualOnDifferentData() {
     DbTableMeta dbTableMeta = newDbTableMeta();
 
