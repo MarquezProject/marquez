@@ -259,6 +259,80 @@ class OpenLineageDaoTest {
   }
 
   @Test
+  /**
+   * Regression test for https://github.com/MarquezProject/marquez/issues/3100: transformation
+   * details reported via the (non-deprecated) {@code InputField.transformations[]} array must be
+   * persisted, not just the deprecated whole-output-column {@code
+   * transformationDescription}/{@code transformationType} fields.
+   */
+  void testUpdateMarquezModelDatasetWithColumnLineageFacet_usesNewTransformationsFormat() {
+    final String NEW_FORMAT_DESCRIPTION = "concat(a, b)";
+    final String NEW_FORMAT_TYPE = "DIRECT";
+
+    LineageEvent.ColumnLineageInputField.Transformation transformation =
+        LineageEvent.ColumnLineageInputField.Transformation.builder()
+            .type(NEW_FORMAT_TYPE)
+            .subtype("TRANSFORMATION")
+            .description(NEW_FORMAT_DESCRIPTION)
+            .build();
+
+    LineageEvent.ColumnLineageInputField inputFieldWithTransformation =
+        LineageEvent.ColumnLineageInputField.builder()
+            .namespace(INPUT_NAMESPACE)
+            .name(INPUT_DATASET)
+            .field(INPUT_FIELD_NAME)
+            .transformations(Collections.singletonList(transformation))
+            .build();
+
+    // deprecated inputFields/transformationDescription/transformationType constructor args are
+    // deliberately left unset, matching producers that only emit the new format.
+    LineageEvent.ColumnLineageOutputColumn outputColumn =
+        LineageEvent.ColumnLineageOutputColumn.builder()
+            .inputFields(Collections.singletonList(inputFieldWithTransformation))
+            .build();
+
+    LineageEvent.ColumnLineageDatasetFacet columnLineageFacet =
+        new LineageEvent.ColumnLineageDatasetFacet(
+            PRODUCER_URL,
+            SCHEMA_URL,
+            new LineageEvent.ColumnLineageDatasetFacetFields(
+                Collections.singletonMap(OUTPUT_COLUMN, outputColumn)));
+
+    Dataset outputDataset =
+        new Dataset(
+            NAMESPACE,
+            DATASET_NAME,
+            LineageEvent.DatasetFacets.builder()
+                .schema(
+                    new SchemaDatasetFacet(
+                        PRODUCER_URL,
+                        SCHEMA_URL,
+                        Arrays.asList(new SchemaField(OUTPUT_COLUMN, "STRING", "my name"))))
+                .columnLineage(columnLineageFacet)
+                .build());
+
+    JobFacet jobFacet = JobFacet.builder().build();
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            dao,
+            WRITE_JOB_NAME,
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(getInputDataset()),
+            Arrays.asList(outputDataset));
+
+    assertThat(
+            writeJob.getOutputs().get().stream()
+                .findAny()
+                .orElseThrow()
+                .getColumnLineageRows())
+        .extracting(
+            (ds) -> ds.getTransformationDescription().get(),
+            (ds) -> ds.getTransformationType().get())
+        .containsExactly(Tuple.tuple(NEW_FORMAT_DESCRIPTION, NEW_FORMAT_TYPE));
+  }
+
+  @Test
   void testUpdateMarquezModelDatasetWithColumnLineageFacetWhenInputFieldDoesNotExist() {
     JobFacet jobFacet = JobFacet.builder().build();
     UpdateLineageRow writeJob =

@@ -630,8 +630,6 @@ public class LineageEvent extends BaseEvent {
     private String transformationType;
   }
 
-  @Builder
-  @AllArgsConstructor
   @NoArgsConstructor
   @Setter
   @Getter
@@ -642,6 +640,44 @@ public class LineageEvent extends BaseEvent {
     @NotNull private String namespace;
     @NotNull private String name;
     @NotNull private String field;
+
+    /**
+     * The transformations applied to this specific input field in order to compute the output
+     * field it is associated with. This is the current (non-deprecated) way for a producer to
+     * report per-input-field transformation details, as opposed to the deprecated {@link
+     * ColumnLineageOutputColumn#getTransformationDescription()} / {@link
+     * ColumnLineageOutputColumn#getTransformationType()}, which apply (at most) a single,
+     * whole-column value shared by every input field. See
+     * https://github.com/OpenLineage/OpenLineage/blob/main/spec/facets/ColumnLineageDatasetFacet.json
+     */
+    private List<Transformation> transformations;
+
+    public ColumnLineageInputField(String namespace, String name, String field) {
+      this(namespace, name, field, null);
+    }
+
+    @Builder
+    public ColumnLineageInputField(
+        String namespace, String name, String field, List<Transformation> transformations) {
+      this.namespace = namespace;
+      this.name = name;
+      this.field = field;
+      this.transformations = transformations;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Valid
+    @ToString
+    public static class Transformation {
+      private String type;
+      private String subtype;
+      private String description;
+      private Boolean masking;
+    }
   }
 
   @Builder
