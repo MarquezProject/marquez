@@ -191,6 +191,11 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
     // (3) Create db table with invalid field type
     final Field field0 = Field.builder().name("field0").type(newFieldType()).build();
     final Field field1 = Field.builder().name("field1").type(null).build();
+    // A null/unknown field type is normalized to "UNKNOWN" on write so that repeated upserts of
+    // the same field reliably collide on the (dataset_uuid, name, type) unique constraint instead
+    // of creating a new dataset_fields row (and therefore a new column_lineage edge) every time
+    // (see #3083).
+    final Field expectedField1 = Field.builder().name("field1").type("UNKNOWN").build();
     final DatasetName datasetName = newDatasetName();
     final DbTableMeta dbTableMeta =
         DbTableMeta.builder()
@@ -200,7 +205,45 @@ public class MarquezAppIntegrationTest extends BaseIntegrationTest {
             .build();
     final Dataset dataset =
         client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
-    assertThat(dataset.getFields()).containsExactly(field0, field1);
+    assertThat(dataset.getFields()).containsExactly(field0, expectedField1);
+  }
+
+  @Test
+  public void testDatasetWithUnknownFieldType_repeatedUpsertsDoNotDuplicateField() {
+    // Regression test for https://github.com/MarquezProject/marquez/issues/3083: upserting the
+    // same dataset with a field that has a null/unknown type multiple times must not create
+    // multiple dataset_fields rows for that field.
+    final NamespaceMeta namespaceMeta =
+        NamespaceMeta.builder().ownerName(OWNER_NAME).description(NAMESPACE_DESCRIPTION).build();
+    client.createNamespace(NAMESPACE_NAME, namespaceMeta);
+
+    final SourceMeta sourceMeta =
+        SourceMeta.builder()
+            .type(STREAM_SOURCE_TYPE)
+            .connectionUrl(STREAM_CONNECTION_URL)
+            .description(STREAM_SOURCE_DESCRIPTION)
+            .build();
+    client.createSource(DB_TABLE_SOURCE_NAME, sourceMeta);
+
+    final Field unknownTypeField = Field.builder().name("modified_at").type(null).build();
+    final DatasetName datasetName = newDatasetName();
+    final DbTableMeta dbTableMeta =
+        DbTableMeta.builder()
+            .physicalName(datasetName.getValue())
+            .sourceName(DB_TABLE_SOURCE_NAME)
+            .fields(ImmutableList.of(unknownTypeField))
+            .build();
+
+    // Emit the same dataset (and therefore the same null-type field) multiple times, as described
+    // in the issue's reproduction steps.
+    Dataset dataset = null;
+    for (int i = 0; i < 5; i++) {
+      dataset = client.createDataset(NAMESPACE_NAME, datasetName.getValue(), dbTableMeta);
+    }
+
+    // Only a single field should exist for 'modified_at', not five duplicates.
+    assertThat(dataset.getFields()).hasSize(1);
+    assertThat(dataset.getFields().get(0).getName()).isEqualTo("modified_at");
   }
 
   @Test

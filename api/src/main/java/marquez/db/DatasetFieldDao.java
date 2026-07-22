@@ -251,6 +251,24 @@ public interface DatasetFieldDao extends BaseDao {
           """)
   List<InputFieldData> findInputFieldsDataAssociatedWithRun(UUID runUuid);
 
+  /**
+   * Upserts a {@code dataset_fields} row.
+   *
+   * <p>The {@code type} column participates in the {@code (dataset_uuid, name, type)} unique
+   * constraint used as the {@code ON CONFLICT} target below. In standard SQL, {@code NULL} is
+   * never considered equal to another {@code NULL} for uniqueness purposes, so a field with an
+   * unknown/omitted {@code type} (a legitimate, common case for OpenLineage events that don't
+   * report column types) would never match an existing row and a brand new {@code dataset_fields}
+   * row - with a new {@code uuid} - would be inserted on every single upsert. Since each distinct
+   * {@code dataset_fields} row independently accumulates its own {@code column_lineage} edges,
+   * this caused an unbounded, combinatorial explosion of duplicate rows in both {@code
+   * dataset_fields} and {@code column_lineage} for any field with a null type (see #3083).
+   *
+   * <p>To fix this without weakening the constraint, a null {@code type} is normalized to the
+   * literal sentinel value {@code 'UNKNOWN'} before insertion, so that repeated upserts of a
+   * field with no known type reliably collide with the previously-inserted row (which also stored
+   * {@code 'UNKNOWN'}) and are treated as an update instead of a fresh insert.
+   */
   @SqlQuery(
       "INSERT INTO dataset_fields ("
           + "uuid, "
@@ -262,7 +280,7 @@ public interface DatasetFieldDao extends BaseDao {
           + "description"
           + ") VALUES ("
           + ":uuid, "
-          + ":type, "
+          + "COALESCE(:type, 'UNKNOWN'), "
           + ":now, "
           + ":now, "
           + ":datasetUuid, "
