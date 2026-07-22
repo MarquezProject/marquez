@@ -1094,6 +1094,23 @@ public interface OpenLineageDao extends BaseDao {
                   datasetVersionRow.getUuid(),
                   inputFieldsByTransformation);
 
+              // NOTE: when this output field has 2+ distinct transformation groups (its input
+              // fields resolve to more than one distinct (description, type) pair via
+              // transformationOf(...) above), upsertColumnLineageRow(...) below is invoked once
+              // per group. That method's implementation always returns ALL column_lineage rows
+              // currently persisted for this (outputDatasetVersionUuid, outputDatasetFieldUuid)
+              // pair - not just the rows written by the current call - via
+              // ColumnLineageDao#findColumnLineageByDatasetVersionColumnAndOutputDatasetField.
+              // So across multiple groups, the same underlying row can appear more than once in
+              // the aggregate List<ColumnLineageRow> this method returns for a given output
+              // field.
+              //
+              // As of this writing this has no production impact: the only consumer of this
+              // return value, DatasetRecord#getColumnLineageRows(), is not read anywhere in
+              // production code today (only in tests, and only the single-transformation-group
+              // case is currently exercised). If a real consumer is added later, either dedupe
+              // the combined list here or change upsertColumnLineageRow(...)/ColumnLineageDao to
+              // return only the rows written by that specific call.
               return inputFieldsByTransformation.entrySet().stream()
                   .flatMap(
                       entry ->
