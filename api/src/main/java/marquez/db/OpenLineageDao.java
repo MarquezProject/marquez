@@ -1049,10 +1049,23 @@ public interface OpenLineageDao extends BaseDao {
                 return Stream.empty();
               }
 
-              // get field uuids of input columns related to this run
-              List<Pair<UUID, UUID>> inputFields =
+              // Match each field associated with this run to the OpenLineage input field it
+              // corresponds to (if any), along with the transformation description/type that
+              // applies to that specific input -> output edge. Prefer the (non-deprecated)
+              // per-input-field InputField#transformations entry reported by the producer;
+              // fall back to the deprecated, whole-output-column
+              // transformationDescription/transformationType for producers that only report the
+              // old format. Without this fallback/lookup, transformation details reported via the
+              // modern `transformations` array were silently dropped and always appeared as null
+              // (see #3100).
+              //
+              // Input fields are then grouped by the transformation (description, type) that
+              // applies to each of them, so that each distinct transformation is persisted with
+              // its own value while still reusing the existing batch upsertColumnLineageRow(...)
+              // API (which applies a single description/type to every input field passed to it).
+              Map<Pair<String, String>, List<Pair<UUID, UUID>>> inputFieldsByTransformation =
                   runFields.stream()
-                      .filter(
+                      .flatMap(
                           fieldData ->
                               columnLineage.getInputFields().stream()
                                   .filter(
@@ -1061,31 +1074,70 @@ public interface OpenLineageDao extends BaseDao {
                                               && of.getName().equals(fieldData.getDatasetName())
                                               && of.getField().equals(fieldData.getField()))
                                   .findAny()
-                                  .isPresent())
-                      .map(
-                          fieldData ->
-                              Pair.of(
-                                  fieldData.getDatasetVersionUuid(),
-                                  fieldData.getDatasetFieldUuid()))
-                      .collect(Collectors.toList());
+                                  .map(matchedInputField -> Pair.of(fieldData, matchedInputField))
+                                  .stream())
+                      .collect(
+                          Collectors.groupingBy(
+                              fieldDataAndInputField ->
+                                  transformationOf(
+                                      fieldDataAndInputField.getRight(), columnLineage),
+                              Collectors.mapping(
+                                  fieldDataAndInputField ->
+                                      Pair.of(
+                                          fieldDataAndInputField.getLeft().getDatasetVersionUuid(),
+                                          fieldDataAndInputField.getLeft().getDatasetFieldUuid()),
+                                  Collectors.toList())));
 
               log.debug(
-                  "Adding column lineage on output field '{}' for dataset version '{}' with input fields: {}",
+                  "Adding column lineage on output field '{}' for dataset version '{}' with input fields by transformation: {}",
                   outputField.get().getName(),
                   datasetVersionRow.getUuid(),
-                  inputFields);
-              return daos
-                  .getColumnLineageDao()
-                  .upsertColumnLineageRow(
-                      datasetVersionRow.getUuid(),
-                      outputField.get().getUuid(),
-                      inputFields,
-                      columnLineage.getTransformationDescription(),
-                      columnLineage.getTransformationType(),
-                      now)
-                  .stream();
+                  inputFieldsByTransformation);
+
+              return inputFieldsByTransformation.entrySet().stream()
+                  .flatMap(
+                      entry ->
+                          daos.getColumnLineageDao()
+                              .upsertColumnLineageRow(
+                                  datasetVersionRow.getUuid(),
+                                  outputField.get().getUuid(),
+                                  entry.getValue(),
+                                  entry.getKey().getLeft(),
+                                  entry.getKey().getRight(),
+                                  now)
+                              .stream());
             })
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Resolves the (transformationDescription, transformationType) pair that applies to a single
+   * OpenLineage column-lineage input field. Prefers the first entry of the (non-deprecated) {@link
+   * LineageEvent.ColumnLineageInputField#getTransformations()} list reported for that specific
+   * input field; falls back to the deprecated, whole-output-column {@code
+   * transformationDescription}/{@code transformationType} on {@link
+   * LineageEvent.ColumnLineageOutputColumn} for producers that only report the old format.
+   *
+   * <p>If a producer reports more than one transformation for a single input field, only the
+   * first is used, matching the granularity at which Marquez persists a transformation
+   * description/type (one value per input/output field edge).
+   */
+  static Pair<String, String> transformationOf(
+      LineageEvent.ColumnLineageInputField inputField,
+      LineageEvent.ColumnLineageOutputColumn outputColumn) {
+    Optional<LineageEvent.ColumnLineageInputField.Transformation> transformation =
+        Optional.ofNullable(inputField.getTransformations()).stream()
+            .flatMap(List::stream)
+            .findFirst();
+    String transformationDescription =
+        transformation
+            .map(LineageEvent.ColumnLineageInputField.Transformation::getDescription)
+            .orElseGet(outputColumn::getTransformationDescription);
+    String transformationType =
+        transformation
+            .map(LineageEvent.ColumnLineageInputField.Transformation::getType)
+            .orElseGet(outputColumn::getTransformationType);
+    return Pair.of(transformationDescription, transformationType);
   }
 
   default String formatDatasetName(String name) {
