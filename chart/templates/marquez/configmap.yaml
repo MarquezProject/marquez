@@ -34,11 +34,13 @@ data:
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
     # Enables retention policy configuration for database (default: disabled)
-    {{- if .Values.marquez.dbRetention }}
+    {{- with .Values.marquez.dbRetention }}
+    {{- if .enabled }}
     dbRetention:
-      frequencyMins: {{ .Values.marquez.dbRetention.frequencyMins }}
-      numberOfRowsPerBatch: {{ .Values.marquez.dbRetention.numberOfRowsPerBatch }}
-      retentionDays: {{ .Values.marquez.dbRetention.retentionDays }}
+      frequencyMins: {{ .frequencyMins }}
+      numberOfRowsPerBatch: {{ .numberOfRowsPerBatch }}
+      retentionDays: {{ .retentionDays }}
+    {{- end }}
     {{- end }}
 
     # Enables database migration on startup (default: true)

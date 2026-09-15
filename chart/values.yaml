@@ -39,7 +39,7 @@ marquez:
     # Apply retention policy at a frequency of every 'X' minutes (default: 15)
     frequencyMins: 15
 #    Maximum number of rows deleted per batch (default: 1000)
-    numberOfRowsPerBatch:  1000
+    numberOfRowsPerBatch: 1000
 #    Maximum retention days (default: 7)
     retentionDays: 7
 
