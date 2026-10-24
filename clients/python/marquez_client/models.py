@@ -33,3 +33,13 @@ class RunState(Enum):
     COMPLETED = 'COMPLETED'
     FAILED = 'FAILED'
     ABORTED = 'ABORTED'
+
+
+class SearchFilter(Enum):
+    DATASET = 'DATASET'
+    JOB = 'JOB'
+
+
+class SearchSort(Enum):
+    NAME = 'NAME'
+    UPDATE_AT = 'UPDATE_AT'

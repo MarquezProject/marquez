@@ -24,7 +24,9 @@ from marquez_client.constants import (
 from marquez_client.models import (
     DatasetId,
     DatasetType,
-    JobType
+    JobType,
+    SearchFilter,
+    SearchSort
 )
 from marquez_client.utils import Utils
 
@@ -433,6 +435,27 @@ class MarquezClient:
         return self._put(
             self._url('/tags/{0}', name),
             payload=payload
+        )
+
+    def search(self, query, filter=None, sort=None, limit=None,
+               namespace=None, before=None, after=None):
+        Utils.is_none(query, 'query')
+        if filter is not None:
+            Utils.is_instance_of(filter, SearchFilter)
+        if sort is not None:
+            Utils.is_instance_of(sort, SearchSort)
+
+        return self._get(
+            self._url('/search'),
+            params={
+                'q': query,
+                'filter': filter.value if filter is not None else None,
+                'sort': sort.value if sort is not None else None,
+                'limit': limit or DEFAULT_LIMIT,
+                'namespace': namespace,
+                'before': before,
+                'after': after
+            }
         )
 
     @deprecated(deprecated_in='0.20.0', removed_in='0.25.0',

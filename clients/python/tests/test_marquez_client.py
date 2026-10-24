@@ -20,7 +20,9 @@ from marquez_client.models import (
     DatasetId,
     JobType,
     JobId,
-    RunState
+    RunState,
+    SearchFilter,
+    SearchSort
 )
 from marquez_client.utils import Utils
 
@@ -269,6 +271,19 @@ COLUMN_LINEAGE = [
         ]
     }
 ]
+
+SEARCH_RESULTS = {
+    'totalCount': 1,
+    'results': [
+        {
+            'type': 'JOB',
+            'name': JOB_NAME,
+            'updatedAt': NOW_AS_ISO,
+            'namespace': NAMESPACE_NAME,
+            'nodeId': f'job:{NAMESPACE_NAME}:{JOB_NAME}'
+        }
+    ]
+}
 
 
 @pytest.fixture
@@ -1038,3 +1053,70 @@ def test_get_column_lineage_by_job(mock_get, client):
         },
         timeout=mock.ANY
     )
+
+
+@mock.patch('requests.get')
+def test_search(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = SEARCH_RESULTS
+
+    search_results = client.search('my-job')
+
+    assert search_results == SEARCH_RESULTS
+    mock_get.assert_called_once_with(
+        url=client._url('/search'),
+        params={
+            'q': 'my-job',
+            'filter': None,
+            'sort': None,
+            'limit': DEFAULT_LIMIT,
+            'namespace': None,
+            'before': None,
+            'after': None
+        },
+        headers=mock.ANY,
+        timeout=mock.ANY
+    )
+
+
+@mock.patch('requests.get')
+def test_search_with_options(mock_get, client):
+    mock_get.return_value.status_code.return_value = HTTPStatus.OK
+    mock_get.return_value.json.return_value = SEARCH_RESULTS
+
+    search_results = client.search(
+        'my-job', filter=SearchFilter.JOB, sort=SearchSort.UPDATE_AT,
+        limit=5, namespace=NAMESPACE_NAME, before='2024-12-31',
+        after='2024-01-01'
+    )
+
+    assert search_results == SEARCH_RESULTS
+    mock_get.assert_called_once_with(
+        url=client._url('/search'),
+        params={
+            'q': 'my-job',
+            'filter': 'JOB',
+            'sort': 'UPDATE_AT',
+            'limit': 5,
+            'namespace': NAMESPACE_NAME,
+            'before': '2024-12-31',
+            'after': '2024-01-01'
+        },
+        headers=mock.ANY,
+        timeout=mock.ANY
+    )
+
+
+def test_search_without_query(client):
+    with pytest.raises(ValueError):
+        client.search(None)
+
+
+def test_search_with_invalid_filter(client):
+    with pytest.raises(ValueError):
+        client.search('my-job', filter='JOB')
+
+
+def test_search_with_invalid_sort(client):
+    with pytest.raises(ValueError):
+        client.search('my-job', sort='NAME')

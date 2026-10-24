@@ -32,6 +32,9 @@ client = MarquezClient(url='http://localhost:5000')
 
 # list namespaces
 client.list_namespaces()
+
+# search datasets and jobs by name
+client.search('orders')
 ```
 
 To enable logging, set the environment variable `MARQUEZ_LOG_LEVEL` to `DEBUG`, `INFO`, or `ERROR`:
