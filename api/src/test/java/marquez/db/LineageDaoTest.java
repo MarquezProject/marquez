@@ -390,6 +390,60 @@ public class LineageDaoTest {
     assertThat(finalConsumer).hasSize(1).flatMap(JobData::getUuid).hasSize(1).containsAll(jobIds);
   }
 
+  /** A deleted job doesn't connect the datasets it consumes and produces */
+  @Test
+  public void testGetLineageWithDeletedJob() {
+    Dataset intermediateDataset =
+        new Dataset(
+            NAMESPACE,
+            "intermediateDataset",
+            newDatasetFacet(new SchemaField("firstname", "string", "the first name")));
+    Dataset disconnectedDataset =
+        new Dataset(
+            NAMESPACE,
+            "disconnectedDataset",
+            newDatasetFacet(new SchemaField("firstname", "string", "the first name")));
+    UpdateLineageRow writeJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "writeJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(),
+            Arrays.asList(dataset));
+    UpdateLineageRow deletedJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "deletedJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(dataset),
+            Arrays.asList(intermediateDataset));
+    UpdateLineageRow disconnectedJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "disconnectedJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(intermediateDataset),
+            Arrays.asList(disconnectedDataset));
+
+    Set<UUID> jobIds = Collections.singleton(writeJob.getJob().getUuid());
+    assertThat(lineageDao.getLineage(jobIds, 2))
+        .extracting(JobData::getUuid)
+        .containsExactlyInAnyOrder(
+            writeJob.getJob().getUuid(),
+            deletedJob.getJob().getUuid(),
+            disconnectedJob.getJob().getUuid());
+
+    jdbi.onDemand(JobDao.class).delete(NAMESPACE, "deletedJob");
+
+    // the disconnected job was only reachable through the deleted job
+    assertThat(lineageDao.getLineage(jobIds, 2))
+        .extracting(JobData::getUuid)
+        .containsExactly(writeJob.getJob().getUuid());
+  }
+
   /** A failed consumer job doesn't show up in the datasets out edges */
   @Test
   public void testGetLineageWithFailedConsumer() {
@@ -588,6 +642,27 @@ public class LineageDaoTest {
     Optional<UUID> jobNode =
         lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
     assertThat(jobNode).isPresent().get().isEqualTo(writeJob.getJob().getUuid());
+  }
+
+  @Test
+  public void testGetJobFromInputOrOutputIgnoresDeletedJob() {
+    JobFacet jobFacet = JobFacet.builder().build();
+
+    LineageTestUtils.createLineageRow(
+        openLineageDao, "writeJob", "COMPLETE", jobFacet, Arrays.asList(), Arrays.asList(dataset));
+    UpdateLineageRow consumerJob =
+        LineageTestUtils.createLineageRow(
+            openLineageDao,
+            "consumerJob",
+            "COMPLETE",
+            jobFacet,
+            Arrays.asList(dataset),
+            Arrays.asList());
+    jdbi.onDemand(JobDao.class).delete(NAMESPACE, "writeJob");
+
+    Optional<UUID> jobNode =
+        lineageDao.getJobFromInputOrOutput(dataset.getName(), dataset.getNamespace());
+    assertThat(jobNode).isPresent().get().isEqualTo(consumerJob.getJob().getUuid());
   }
 
   @Test

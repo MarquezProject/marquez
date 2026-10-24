@@ -48,7 +48,8 @@ public interface LineageDao {
    * Fetch all of the jobs that consume or produce the datasets that are consumed or produced by the
    * input jobIds. This returns a single layer from the BFS using datasets as edges. Jobs that have
    * no input or output datasets will have no results. Jobs that have no upstream producers or
-   * downstream consumers will have the original jobIds returned.
+   * downstream consumers will have the original jobIds returned. Deleted jobs are not traversed, so
+   * datasets are not connected through jobs that are hidden from lineage.
    *
    * @param jobIds
    * @return
@@ -63,6 +64,7 @@ public interface LineageDao {
                            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='INPUT') AS inputs,
                            ARRAY_AGG(DISTINCT io.dataset_uuid) FILTER (WHERE io.io_type='OUTPUT') AS outputs
                     FROM job_versions_io_mapping io
+                    INNER JOIN jobs_view j ON j.uuid = COALESCE(io.job_symlink_target_uuid, io.job_uuid)
                     WHERE io.is_current_job_version = TRUE
                     GROUP BY io.job_symlink_target_uuid, io.job_uuid
                 ),
@@ -133,6 +135,7 @@ public interface LineageDao {
       INNER JOIN job_versions_io_mapping io ON io.job_version_uuid = jv.uuid
       INNER JOIN datasets_view ds ON ds.uuid = io.dataset_uuid
       WHERE ds.name = :datasetName AND ds.namespace_name = :namespaceName
+      AND j.is_hidden IS FALSE
       ORDER BY io_type DESC, jv.created_at DESC
       LIMIT 1""")
   Optional<UUID> getJobFromInputOrOutput(String datasetName, String namespaceName);
