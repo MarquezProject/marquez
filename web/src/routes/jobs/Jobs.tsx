@@ -27,6 +27,7 @@ import { stopWatchDuration } from '../../helpers/time'
 import { truncateText } from '../../helpers/text'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
+import GettingStartedLink from '../../components/core/empty/GettingStartedLink'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
@@ -139,6 +140,7 @@ const Jobs: React.FC<JobsProps> = ({
               <MqEmpty title={i18next.t('jobs_route.empty_title')}>
                 <>
                   <MqText subdued>{i18next.t('jobs_route.empty_body')}</MqText>
+                  <GettingStartedLink />
                   <Button
                     color={'primary'}
                     size={'small'}

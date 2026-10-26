@@ -150,6 +150,11 @@ i18next
             empty_title: 'No events found',
             empty_body: 'Try changing dates or consulting our documentation to add events.',
           },
+          empty_state: {
+            getting_started:
+              'New to Marquez? Lineage appears here once your pipelines send OpenLineage events.',
+            integrations_link: 'Set up an OpenLineage integration (Airflow, Spark, dbt and more)',
+          },
           events_columns: {
             id: 'RUN_ID',
             state: 'STATE',

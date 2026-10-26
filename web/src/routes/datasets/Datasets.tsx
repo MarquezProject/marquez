@@ -33,6 +33,7 @@ import { useTheme } from '@emotion/react'
 import Assertions from '../../components/datasets/Assertions'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
+import GettingStartedLink from '../../components/core/empty/GettingStartedLink'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqEmpty from '../../components/core/empty/MqEmpty'
@@ -147,6 +148,7 @@ const Datasets: React.FC<DatasetsProps> = ({
               <MqEmpty title={i18next.t('datasets_route.empty_title')}>
                 <>
                   <MqText subdued>{i18next.t('datasets_route.empty_body')}</MqText>
+                  <GettingStartedLink />
                   <Button
                     color={'primary'}
                     size={'small'}

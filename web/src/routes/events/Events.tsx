@@ -30,6 +30,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useTheme } from '@emotion/react'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
+import GettingStartedLink from '../../components/core/empty/GettingStartedLink'
 import IconButton from '@mui/material/IconButton'
 import MQTooltip from '../../components/core/tooltip/MQTooltip'
 import MqCopy from '../../components/core/copy/MqCopy'
@@ -237,6 +238,7 @@ const Events: React.FC<EventsProps> = ({
               <MqEmpty title={i18next.t('events_route.empty_title')}>
                 <>
                   <MqText subdued>{i18next.t('events_route.empty_body')}</MqText>
+                  <GettingStartedLink />
                   <Button
                     color={'primary'}
                     size={'small'}
