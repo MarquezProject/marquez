@@ -20,7 +20,7 @@ import { useTheme } from '@emotion/react'
 
 import { Dashboard } from '@mui/icons-material'
 import { ReactComponent as IconSearchArrow } from '../../img/iconSearchArrow.svg'
-import { ReactComponent as marquez_logo } from './marquez-icon-white-solid.svg'
+import marquez_logo from './marquez-icon-white-solid.svg'
 
 interface SidenavProps {}
 
@@ -72,7 +72,11 @@ const Sidenav: React.FC<SidenavProps> = () => {
             height={HEADER_HEIGHT}
           >
             <Link to='/'>
-              <img src={marquez_logo} height={40} alt='Marquez Logo' />
+              <img
+                src={marquez_logo}
+                style={{ height: 40, maxWidth: 'none' }}
+                alt='Marquez Logo'
+              />
             </Link>
           </Box>
           <Divider sx={{ my: 1 }} />

@@ -416,7 +416,7 @@ export const ZoomPanSvg = ({
               backgroundColor={backgroundColor}
               dotGridColor={dotGridColor}
             />
-              {{children} as any}
+            {children as React.ReactNode}
           </>
         </g>
       </svg>
