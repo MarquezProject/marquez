@@ -24,7 +24,10 @@ module.exports = {
       '<rootDir>/__tests__/__mocks__/fileMock.js',
     '\\.(css|less)$': 'identity-obj-proxy',
     "d3": "<rootDir>/node_modules/d3/dist/d3.min.js",
-    "^d3-(.*)$": "<rootDir>/node_modules/d3-$1/dist/d3-$1.min.js"
+    "^d3-(.*)$": "<rootDir>/node_modules/d3-$1/dist/d3-$1.min.js",
+    // v16 pulls an ESM-only refractor graph that Jest does not compile.
+    '^react-syntax-highlighter$': '<rootDir>/src/__tests__/__mocks__/reactSyntaxHighlighter.js',
+    '^react-syntax-highlighter/.+$': '<rootDir>/src/__tests__/__mocks__/reactSyntaxHighlighterStyle.js'
   },
   transformIgnorePatterns: ['node_modules/(?!(d3-dispatch)/)']
 }

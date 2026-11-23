@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import ELK, { ElkNode } from 'elkjs'
+// elkjs' main entry is the Node build, which breaks in the browser once `web-worker` is installed
+import ELK, { ElkNode } from 'elkjs/lib/elk-api'
 import isEqual from 'lodash/isEqual'
 
 import { useCallbackRef } from '../utils/hooks'

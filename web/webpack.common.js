@@ -21,7 +21,7 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(png|jpe?g|gif)(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'file-loader'
       },
       {
@@ -45,7 +45,9 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: ['@svgr/webpack'], // Use the @svgr/webpack loader
+        // file-loader runs first so the default export is the asset URL and
+        // svgr adds the inline component as the named `ReactComponent` export
+        use: ['@svgr/webpack', 'file-loader'],
         issuer: {
           and: [/\.(js|ts|jsx|tsx)$/], // Only apply this rule to JS/TS files
         },

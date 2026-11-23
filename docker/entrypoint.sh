@@ -12,8 +12,9 @@ if [[ -z "${MARQUEZ_CONFIG}" ]]; then
   echo "WARNING 'MARQUEZ_CONFIG' not set, using development configuration."
 fi
 
-# Adjust java options for the http server
-JAVA_OPTS="${JAVA_OPTS} -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true"
+# Adjust java options for the http server.
+# -XX:-UseBASE64Intrinsics disables the HotSpot path affected by CVE-2026-114938.
+JAVA_OPTS="${JAVA_OPTS} -Duser.timezone=UTC -Dlog4j2.formatMsgNoLookups=true -XX:-UseBASE64Intrinsics"
 
 # Start http server with java options and configuration
 java ${JAVA_OPTS} -jar marquez-*.jar server ${MARQUEZ_CONFIG}

@@ -56,7 +56,7 @@ export const Graph = <K, D>({
   setZoomPanControls = () => {},
 }: Props<K, D>) => {
   const containerRef = useRef<HTMLElement>(null)
-  const [containerWidth, containerHeight] = useSize(containerRef.current!)
+  const [containerWidth, containerHeight] = useSize(containerRef as React.RefObject<HTMLElement>)
 
   const { layout, error, isRendering } = useLayout<K, D>({
     id,

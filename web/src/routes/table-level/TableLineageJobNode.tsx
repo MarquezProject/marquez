@@ -43,7 +43,7 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
   const addToToolTip = (job: LineageJob) => {
     return (
       <foreignObject>
-        <Box>
+        <Box sx={{ maxWidth: 560 }}>
           <Box display={'flex'} justifyContent={'space-between'}>
             <MqText block bold sx={{ mr: 6 }}>
               Namespace:
@@ -61,11 +61,22 @@ const TableLineageJobNode = ({ node }: TableLineageJobNodeProps & StateProps) =>
             </MqText>
           </Box>
           {job.description && (
-            <Box display={'flex'} justifyContent={'space-between'}>
-              <MqText block bold sx={{ mr: 6 }}>
+            <Box display={'flex'} justifyContent={'space-between'} alignItems={'flex-start'}>
+              <MqText block bold sx={{ mr: 6, flexShrink: 0 }}>
                 Description:
               </MqText>
-              <MqText block font={'mono'}>
+              <MqText
+                block
+                font={'mono'}
+                sx={{
+                  flex: 1,
+                  minWidth: 0,
+                  overflowWrap: 'anywhere',
+                  textAlign: 'right',
+                  maxHeight: 160,
+                  overflowY: 'auto',
+                }}
+              >
                 {job.description}
               </MqText>
             </Box>

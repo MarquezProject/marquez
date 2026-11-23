@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/MarquezProject/marquez/compare/0.50.0...HEAD)
 
+### Changed
+
+* API: Run on Eclipse Temurin 17.0.21.1+2 and disable `UseBASE64Intrinsics` to avoid CVE-2026-114938
+* Web: Move the UI toolchain to Node 22, React Router 7, and webpack-dev-server 6
+
+### Fixed
+
+* Web: Wrap long dataset and job descriptions in lineage tooltips
+* Web: Load the sidenav logo and lineage graph (`elkjs`) in the browser build
+
 ## [0.50.0](https://github.com/MarquezProject/marquez/compare/0.49.0...0.50.0) - 2024-10-23
 
 ### Added

@@ -3,7 +3,6 @@
 
 import * as React from 'react'
 import * as ReactDOMClient from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import App from './components/App';
 import { ChakraProvider } from '@chakra-ui/react';
 
@@ -17,10 +16,8 @@ const container = document.getElementById('root');
 if (container) {
   const root = ReactDOMClient.createRoot(container);
   root.render(
-    <BrowserRouter>
-      <ChakraProvider>
-        <App />
-      </ChakraProvider>
-    </BrowserRouter>
+    <ChakraProvider>
+      <App />
+    </ChakraProvider>
   );
 }

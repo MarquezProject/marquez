@@ -12,9 +12,7 @@ const webpackDev = {
   devServer: {
     static: {
       directory: __dirname + '/src',
-      staticOptions: {},
       publicPath: "/",
-      serveIndex: true,
       watch: true,
     },
     port: 1337,
@@ -25,16 +23,16 @@ const webpackDev = {
       index: './index.html',
       disableDotRule: true
     },
-    proxy: {
-      '/api': {
+    proxy: [
+      {
+        context: ['/api'],
         target: `http://${process.env.MARQUEZ_HOST || 'localhost'}:${process.env.MARQUEZ_PORT || 5000}/`,
         secure: false,
-        logLevel: 'debug',
         headers: {
           'X-Bifrost-Authentication': 'developer'
         }
       }
-    }
+    ]
   },
   // Enable sourcemaps for debugging webpack"s output.
   devtool: 'eval-cheap-module-source-map',

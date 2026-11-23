@@ -10,7 +10,7 @@ title() {
 }
 
 ls() {
-  docker run -it --rm -v "${1}:/tmp" busybox ls /tmp
+  docker run --rm -v "${1}:/tmp" busybox ls /tmp
 }
 
 usage() {
