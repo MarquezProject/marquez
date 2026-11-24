@@ -5,6 +5,7 @@ on:
     paths:
       - 'chart/**'
       - '!chart/**.md'
+      - '.github/workflows/test-chart.yaml'
 
 jobs:
   lint-test-chart:
@@ -17,6 +18,65 @@ jobs:
 
       - name: Setup Helm
         uses: azure/setup-helm@v3.5
+
+      - name: Test database retention rendering
+        run: |
+          set -euo pipefail
+
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency build chart
+
+          render_retention() {
+            local release_name="$1"
+            shift
+            helm template "$release_name" chart \
+              --show-only templates/marquez/configmap.yaml \
+              "$@"
+          }
+
+          assert_retention_absent() {
+            local release_name="$1"
+            shift
+            local rendered
+            rendered="$(render_retention "$release_name" "$@")"
+            if grep -q '^    dbRetention:$' <<<"$rendered"; then
+              echo "dbRetention was rendered for $release_name"
+              printf '%s\n' "$rendered"
+              return 1
+            fi
+          }
+
+          assert_retention_absent retention-default
+          assert_retention_absent retention-disabled \
+            --set marquez.dbRetention.enabled=false
+          assert_retention_absent retention-missing-enabled \
+            --set marquez.dbRetention.enabled=null
+          assert_retention_absent retention-null-settings \
+            --set marquez.dbRetention=null
+
+          enabled_render="$(render_retention retention-enabled \
+            --set marquez.dbRetention.enabled=true \
+            --set marquez.dbRetention.frequencyMins=17 \
+            --set marquez.dbRetention.numberOfRowsPerBatch=137 \
+            --set marquez.dbRetention.retentionDays=29)"
+          actual_retention="$(printf '%s\n' "$enabled_render" | \
+            sed -n '/^    dbRetention:$/,+3p')"
+          expected_retention='    dbRetention:
+                frequencyMins: 17
+                numberOfRowsPerBatch: 137
+                retentionDays: 29'
+
+          if [[ "$actual_retention" != "$expected_retention" ]]; then
+            echo "dbRetention did not render the enabled values"
+            diff <(printf '%s\n' "$expected_retention") \
+              <(printf '%s\n' "$actual_retention") || true
+            exit 1
+          fi
+
+          if [[ "$(grep -c '^    dbRetention:$' <<<"$enabled_render")" -ne 1 ]]; then
+            echo "dbRetention was not rendered exactly once"
+            exit 1
+          fi
 
       - name: Setup Python
         uses: actions/setup-python@v4
